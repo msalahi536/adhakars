@@ -31,7 +31,7 @@ export function DhikrCard({ dhikr, count, onIncrement, index, total, isSpecial, 
 
   const handleTap = () => {
     if (complete) return;
-    if (typeof navigator !== "undefined" && navigator.vibrate) navigator.vibrate(15);
+    vibrateIfEnabled(15);
     setTapped(true);
     setTimeout(() => setTapped(false), 260);
     const willComplete = count + 1 >= dhikr.target;
