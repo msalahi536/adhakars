@@ -230,7 +230,8 @@ function Tasbih() {
           {/* Section A — LCD */}
           <div
             style={{
-              width: 180,
+              width: "100%",
+              maxWidth: 180,
               height: 64,
               borderRadius: 10,
               background: flash ? "#D8E6BC" : "#C5D4AA",
