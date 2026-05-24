@@ -14,6 +14,7 @@ import appCss from "../styles.css?url";
 import { BottomNav } from "@/components/BottomNav";
 import { applyTheme, getMode, resolveTheme } from "@/lib/theme";
 import { reconcileStreak } from "@/lib/storage";
+import { initOneSignal } from "@/lib/onesignal";
 
 function NotFoundComponent() {
   return (
@@ -71,6 +72,9 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { rel: "stylesheet", href: appCss },
       { rel: "manifest", href: "/manifest.json" },
     ],
+    scripts: [
+      { src: "https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js", defer: true },
+    ],
   }),
   shellComponent: RootShell,
   component: RootComponent,
@@ -102,6 +106,7 @@ function RootComponent() {
 
   useEffect(() => {
     reconcileStreak();
+    initOneSignal();
   }, []);
 
   return (
