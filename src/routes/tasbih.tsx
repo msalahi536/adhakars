@@ -191,7 +191,7 @@ function Tasbih() {
             flexDirection: "column",
             alignItems: "center",
             justifyContent: "space-between",
-            padding: "48px 24px 28px",
+            padding: "64px 24px 28px",
           }}
         >
           {/* LCD */}
