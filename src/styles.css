@@ -182,13 +182,18 @@
 }
 
 .glass-nav {
-  background: color-mix(in oklab, var(--surface) 92%, transparent);
-  backdrop-filter: blur(24px) saturate(180%);
-  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  background: var(--nav-bg, color-mix(in oklab, var(--surface) 92%, transparent));
+  backdrop-filter: blur(10px) saturate(180%);
+  -webkit-backdrop-filter: blur(10px) saturate(180%);
 }
 
 .card-grad {
   background: radial-gradient(120% 80% at 20% 0%, var(--card-2) 0%, var(--card) 70%);
+}
+
+.fade-mask-2 {
+  -webkit-mask-image: linear-gradient(to bottom, #000 60%, transparent 100%);
+          mask-image: linear-gradient(to bottom, #000 60%, transparent 100%);
 }
 
 @keyframes pulse-tap {
