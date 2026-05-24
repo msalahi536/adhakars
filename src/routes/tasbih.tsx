@@ -208,10 +208,24 @@ function Tasbih() {
           />
         </svg>
 
-        {/* Inner flex column — strict layout, no overflow */}
+        {/* Inner content — constrained column, never overflows shell */}
         <div
-          className="relative flex h-full w-full flex-col items-center"
-          style={{ padding: "32px 28px", gap: 20 }}
+          style={{
+            position: "absolute",
+            top: 0,
+            left: "50%",
+            transform: "translateX(-50%)",
+            width: "70%",
+            maxWidth: 200,
+            height: "100%",
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            justifyContent: "space-evenly",
+            padding: "40px 0",
+            background: "transparent",
+            border: "none",
+          }}
         >
           {/* Section A — LCD */}
           <div
