@@ -83,7 +83,7 @@ export function SwipeStack({ items, counts, onIncrement }: Props) {
         {/* Outgoing card */}
         {previous && (
           <div
-            className="card-slide absolute inset-0 px-3"
+            className="card-slide absolute inset-0"
             style={{
               transform: `translateX(${anim!.dir === 1 ? -width : width}px)`,
               opacity: 0,
@@ -193,7 +193,7 @@ function IncomingCard({
 
   return (
     <div
-      className="card-slide absolute inset-0 px-3"
+      className="card-slide absolute inset-0"
       style={{ transform }}
     >
       {children}
