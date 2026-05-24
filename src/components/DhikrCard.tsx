@@ -52,8 +52,8 @@ export function DhikrCard({ dhikr, count, onIncrement, index, total, isSpecial, 
 
   return (
     <div
-      className="card-grad relative flex h-full w-full flex-col overflow-hidden rounded-[24px] shadow-2xl shadow-black/20"
-      style={{ color: "var(--card-foreground)", border: "1px solid var(--border)" }}
+      className="relative flex h-full w-full flex-col overflow-hidden rounded-[24px]"
+      style={{ background: "var(--card)", color: "var(--card-foreground)", border: "1px solid var(--border)", boxShadow: "var(--card-shadow, 0 4px 16px rgba(0,0,0,0.08))" }}
     >
       {/* Header strip: badge + title + index */}
       <div className="flex items-center gap-3 px-5 pt-5">
