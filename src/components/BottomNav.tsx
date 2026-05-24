@@ -42,16 +42,18 @@ export function BottomNav() {
 
   return (
     <nav
-      className="fixed bottom-0 left-0 right-0 z-50"
+      className="fixed left-0 right-0 z-50"
       style={{
+        bottom: 0,
         paddingBottom: "env(safe-area-inset-bottom)",
+        paddingTop: 8,
         background: themeNavBg,
         backdropFilter: "blur(12px) saturate(180%)",
         WebkitBackdropFilter: "blur(12px) saturate(180%)",
         borderTop: `1px solid ${borderColor}`,
       }}
     >
-      <div className="mx-auto flex max-w-md items-stretch justify-around px-2" style={{ height: 60 }}>
+      <div className="mx-auto flex max-w-md items-stretch justify-around px-2" style={{ height: 56 }}>
         {tabs.map((t) => (
           <Link
             key={t.to}

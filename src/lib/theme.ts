@@ -32,9 +32,9 @@ export const resolveTheme = (mode: ThemeMode, route: string): ThemeId => {
 };
 
 // Display prefs
-export type DisplayPrefs = { showTransliteration: boolean; arabicLarge: boolean; vibrate: boolean };
+export type DisplayPrefs = { showTransliteration: boolean; arabicLarge: boolean };
 const DISPLAY_KEY = "adhkar:display";
-const defaults: DisplayPrefs = { showTransliteration: true, arabicLarge: false, vibrate: true };
+const defaults: DisplayPrefs = { showTransliteration: true, arabicLarge: false };
 export const getDisplay = (): DisplayPrefs => {
   if (typeof window === "undefined") return defaults;
   try {
@@ -46,6 +46,5 @@ export const getDisplay = (): DisplayPrefs => {
 export const setDisplay = (d: DisplayPrefs) => localStorage.setItem(DISPLAY_KEY, JSON.stringify(d));
 export const vibrateIfEnabled = (pattern: number | number[]) => {
   if (typeof navigator === "undefined" || !navigator.vibrate) return;
-  if (!getDisplay().vibrate) return;
   navigator.vibrate(pattern);
 };

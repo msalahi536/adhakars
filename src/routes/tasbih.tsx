@@ -132,13 +132,14 @@ function Tasbih() {
       {/* Device shell — organic worry-stone shape */}
       <div
         className="relative mt-6"
-        style={{ width: 280, height: 400 }}
+        style={{ width: 240, height: 340 }}
       >
         {/* SVG shell */}
         <svg
           viewBox="0 0 280 400"
-          width={280}
-          height={400}
+          width={240}
+          height={340}
+          preserveAspectRatio="none"
           style={{
             position: "absolute",
             inset: 0,
@@ -162,106 +163,69 @@ function Tasbih() {
             </linearGradient>
           </defs>
           <path
-            d="
-              M 156 10
-              C 216 18, 266 64, 270 138
-              C 272 186, 250 228, 240 276
-              C 230 318, 222 362, 184 388
-              C 156 406, 116 400, 90 382
-              C 58 360, 38 322, 28 280
-              C 18 228, 8 180, 20 132
-              C 34 70, 86 2, 156 10
-              Z
-            "
+            d="M 156 10 C 216 18, 266 64, 270 138 C 272 186, 250 228, 240 276 C 230 318, 222 362, 184 388 C 156 406, 116 400, 90 382 C 58 360, 38 322, 28 280 C 18 228, 8 180, 20 132 C 34 70, 86 2, 156 10 Z"
             fill="url(#shellGrad)"
             stroke="url(#shellStroke)"
             strokeWidth={6}
             strokeLinejoin="round"
           />
           <path
-            d="
-              M 156 18
-              C 212 26, 260 70, 262 140
-              C 264 186, 244 226, 234 272
-              C 226 314, 216 354, 180 378
-              C 154 394, 118 388, 94 372
-              C 64 352, 46 318, 36 278
-              C 28 228, 18 184, 30 138
-              C 44 78, 92 12, 156 18
-              Z
-            "
+            d="M 156 18 C 212 26, 260 70, 262 140 C 264 186, 244 226, 234 272 C 226 314, 216 354, 180 378 C 154 394, 118 388, 94 372 C 64 352, 46 318, 36 278 C 28 228, 18 184, 30 138 C 44 78, 92 12, 156 18 Z"
             fill="none"
             stroke="rgba(0,0,0,0.35)"
             strokeWidth={2}
             strokeLinejoin="round"
           />
           <path
-            d="
-              M 156 10
-              C 216 18, 266 64, 270 138
-              C 232 84, 122 64, 58 116
-              C 40 130, 28 138, 20 132
-              C 34 70, 86 2, 156 10
-              Z
-            "
+            d="M 156 10 C 216 18, 266 64, 270 138 C 232 84, 122 64, 58 116 C 40 130, 28 138, 20 132 C 34 70, 86 2, 156 10 Z"
             fill="url(#shellHighlight)"
           />
         </svg>
 
-        {/* Inner content — constrained column, never overflows shell */}
+        {/* Inner content — flex column */}
         <div
           style={{
             position: "absolute",
-            top: 0,
-            left: "50%",
-            transform: "translateX(-50%)",
-            width: "70%",
-            maxWidth: 200,
-            height: "100%",
+            inset: 0,
             display: "flex",
             flexDirection: "column",
             alignItems: "center",
-            justifyContent: "space-evenly",
-            padding: "40px 0",
-            background: "transparent",
-            border: "none",
+            justifyContent: "space-between",
+            padding: "28px 24px",
           }}
         >
-          {/* Section A — LCD */}
+          {/* LCD */}
           <div
             style={{
-              width: "100%",
-              maxWidth: 180,
-              height: 64,
+              width: 140,
+              height: 56,
+              margin: "0 auto",
               borderRadius: 10,
               background: flash ? "#D8E6BC" : "#C5D4AA",
               boxShadow: "inset 0 2px 6px rgba(0,0,0,0.25)",
-              position: "relative",
               transition: "background 0.18s ease",
               display: "flex",
               flexDirection: "column",
               justifyContent: "center",
-              paddingRight: 12,
-              paddingLeft: 12,
               alignItems: "flex-end",
+              padding: "0 10px",
             }}
           >
             <span
               style={{
                 fontFamily: "'Share Tech Mono', ui-monospace, monospace",
                 fontVariantNumeric: "tabular-nums",
-                fontSize: 36,
+                fontSize: 30,
                 lineHeight: 1,
                 letterSpacing: "0.04em",
                 color: "#1A1F1C",
-                fontWeight: 400,
               }}
             >
               {total}
             </span>
             <span
               style={{
-                fontSize: 10,
+                fontSize: 9,
                 color: "rgba(26,31,28,0.6)",
                 marginTop: 2,
                 letterSpacing: "0.08em",
@@ -272,14 +236,14 @@ function Tasbih() {
             </span>
           </div>
 
-          {/* Section B — Undo / Reset row */}
-          <div className="flex w-full items-center justify-between">
+          {/* Undo / Reset row */}
+          <div className="flex w-full items-center justify-between" style={{ paddingLeft: 8, paddingRight: 8 }}>
             <button
               onClick={undo}
               className="transition-transform active:scale-90"
               style={{
-                width: 48,
-                height: 48,
+                width: 42,
+                height: 42,
                 borderRadius: "50%",
                 background: "#5C6D74",
                 border: "1px solid rgba(0,0,0,0.25)",
@@ -292,7 +256,7 @@ function Tasbih() {
               }}
               aria-label="undo"
             >
-              <Undo2 size={20} />
+              <Undo2 size={18} />
             </button>
             <button
               onMouseDown={onResetStart}
@@ -301,8 +265,8 @@ function Tasbih() {
               onTouchStart={onResetStart}
               onTouchEnd={onResetEnd}
               style={{
-                width: 48,
-                height: 48,
+                width: 42,
+                height: 42,
                 borderRadius: "50%",
                 background: "#5C6D74",
                 border: "1px solid rgba(0,0,0,0.25)",
@@ -315,11 +279,11 @@ function Tasbih() {
               }}
               aria-label="hold to reset"
             >
-              <RotateCcw size={20} />
+              <RotateCcw size={18} />
             </button>
           </div>
 
-          {/* Section C — Tap button */}
+          {/* Tap button */}
           <div className="flex items-center justify-center">
             <button
               onPointerDown={(e) => {
@@ -331,8 +295,8 @@ function Tasbih() {
               onPointerLeave={() => setPressed(false)}
               onPointerCancel={() => setPressed(false)}
               style={{
-                width: 130,
-                height: 130,
+                width: 110,
+                height: 110,
                 transform: pressed ? "scale(0.95)" : "scale(1)",
                 borderRadius: "50%",
                 background:
