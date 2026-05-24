@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import type { Dhikr } from "@/data/adhkar";
 import { DhikrCard } from "./DhikrCard";
 import { ChevronLeft, ChevronRight } from "lucide-react";
@@ -13,69 +13,50 @@ type Props = {
 
 export function SwipeStack({ items, counts, onIncrement }: Props) {
   const [idx, setIdx] = useState(0);
-  const [dx, setDx] = useState(0);
-  const startX = useRef<number | null>(null);
-  const containerRef = useRef<HTMLDivElement>(null);
-  const [w, setW] = useState(0);
-
-  useEffect(() => {
-    const update = () => setW(containerRef.current?.offsetWidth ?? window.innerWidth);
-    update();
-    window.addEventListener("resize", update);
-    return () => window.removeEventListener("resize", update);
-  }, []);
+  const [fading, setFading] = useState(false);
 
   const clamp = (i: number) => Math.max(0, Math.min(items.length - 1, i));
-  const go = (n: number) => setIdx((i) => clamp(i + n));
+  const goTo = (i: number) => {
+    const n = clamp(i);
+    if (n === idx) return;
+    setFading(true);
+    setTimeout(() => {
+      setIdx(n);
+      setFading(false);
+    }, 150);
+  };
+  const go = (n: number) => goTo(idx + n);
 
-  const onTouchStart = (e: React.TouchEvent) => {
-    startX.current = e.touches[0].clientX;
-  };
-  const onTouchMove = (e: React.TouchEvent) => {
-    if (startX.current == null) return;
-    setDx(e.touches[0].clientX - startX.current);
-  };
-  const onTouchEnd = () => {
-    if (Math.abs(dx) > 70) {
-      go(dx < 0 ? 1 : -1);
-    }
-    setDx(0);
-    startX.current = null;
-  };
+  const current = items[idx];
 
-  // mouse drag for desktop preview
-  const mouseDown = useRef<number | null>(null);
-  const onMouseDown = (e: React.MouseEvent) => {
-    mouseDown.current = e.clientX;
-  };
-  const onMouseMove = (e: React.MouseEvent) => {
-    if (mouseDown.current == null) return;
-    setDx(e.clientX - mouseDown.current);
-  };
-  const onMouseUp = () => {
-    if (mouseDown.current == null) return;
-    if (Math.abs(dx) > 70) go(dx < 0 ? 1 : -1);
-    setDx(0);
-    mouseDown.current = null;
-  };
-
-  const handleIncrement = (item: Item) => {
-    const prev = counts[item.dhikr.id] ?? 0;
-    const willComplete = prev + 1 >= item.dhikr.target;
-    onIncrement(item.dhikr.id, item.dhikr.target);
+  const handleIncrement = () => {
+    if (!current) return;
+    const prev = counts[current.dhikr.id] ?? 0;
+    const willComplete = prev + 1 >= current.dhikr.target;
+    onIncrement(current.dhikr.id, current.dhikr.target);
     if (willComplete && idx < items.length - 1) {
-      setTimeout(() => setIdx((i) => clamp(i + 1)), 1000);
+      setTimeout(() => goTo(idx + 1), 900);
     }
   };
 
-  // peek of next card by ~20px
-  const peek = 20;
-  const cardW = Math.max(0, w - peek);
+  // Touch swipe (no transform — just detect direction on release)
+  const [startX, setStartX] = useState<number | null>(null);
+  const onTouchStart = (e: React.TouchEvent) => setStartX(e.touches[0].clientX);
+  const onTouchEnd = (e: React.TouchEvent) => {
+    if (startX == null) return;
+    const dx = e.changedTouches[0].clientX - startX;
+    if (Math.abs(dx) > 60) go(dx < 0 ? 1 : -1);
+    setStartX(null);
+  };
+
+  useEffect(() => {
+    // Reset to first when item list identity changes
+    setIdx(0);
+  }, [items.length]);
 
   return (
-    <div className="flex flex-1 flex-col">
-      {/* dots */}
-      <div className="mb-3 flex items-center justify-center gap-3 px-4">
+    <div className="flex flex-1 flex-col overflow-hidden">
+      <div className="mb-2 flex items-center justify-center px-4">
         <span
           className="rounded-full px-3 py-1 text-xs font-semibold"
           style={{ background: "var(--surface)" }}
@@ -85,41 +66,31 @@ export function SwipeStack({ items, counts, onIncrement }: Props) {
       </div>
 
       <div
-        ref={containerRef}
-        className="relative flex-1 overflow-hidden"
+        className="relative min-h-0 flex-1 px-3"
         onTouchStart={onTouchStart}
-        onTouchMove={onTouchMove}
         onTouchEnd={onTouchEnd}
-        onMouseDown={onMouseDown}
-        onMouseMove={onMouseMove}
-        onMouseUp={onMouseUp}
-        onMouseLeave={onMouseUp}
         style={{ touchAction: "pan-y" }}
       >
         <div
-          className="absolute inset-y-0 left-0 flex"
-          style={{
-            transform: `translateX(${-idx * cardW + dx}px)`,
-            transition: dx === 0 ? "transform 420ms cubic-bezier(0.34, 1.56, 0.64, 1)" : "none",
-          }}
+          className="h-full w-full transition-opacity duration-150"
+          style={{ opacity: fading ? 0 : 1 }}
         >
-          {items.map((item, i) => (
-            <div
-              key={item.dhikr.id + i}
-              className="px-3 py-1"
-              style={{ width: cardW, flex: `0 0 ${cardW}px` }}
-            >
-              <DhikrCard
-                dhikr={item.dhikr}
-                count={counts[item.dhikr.id] ?? 0}
-                onIncrement={() => handleIncrement(item)}
-                index={i + 1}
-                total={items.length}
-                isSpecial={item.isSpecial}
-                specialLabel={item.specialLabel}
-              />
+          {current ? (
+            <DhikrCard
+              key={current.dhikr.id}
+              dhikr={current.dhikr}
+              count={counts[current.dhikr.id] ?? 0}
+              onIncrement={handleIncrement}
+              index={idx + 1}
+              total={items.length}
+              isSpecial={current.isSpecial}
+              specialLabel={current.specialLabel}
+            />
+          ) : (
+            <div className="p-6 text-center text-sm opacity-70">
+              Error: no dhikr at index {idx}
             </div>
-          ))}
+          )}
         </div>
       </div>
 
@@ -137,7 +108,7 @@ export function SwipeStack({ items, counts, onIncrement }: Props) {
           {items.map((_, i) => (
             <button
               key={i}
-              onClick={() => setIdx(i)}
+              onClick={() => goTo(i)}
               className="h-1.5 rounded-full transition-all"
               style={{
                 width: i === idx ? 20 : 6,

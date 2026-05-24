@@ -1,7 +1,13 @@
 import { useEffect, useState } from "react";
 import { SwipeStack } from "./SwipeStack";
-import type { Dhikr } from "@/data/adhkar";
+import { morningAdhkar, eveningAdhkar, type Dhikr } from "@/data/adhkar";
 import { getCounts, setCount } from "@/lib/storage";
+
+if (typeof window !== "undefined") {
+  console.log("Morning adhkar loaded:", morningAdhkar.length);
+  console.log("Evening adhkar loaded:", eveningAdhkar.length);
+}
+
 
 type Item = { dhikr: Dhikr; isSpecial?: boolean; specialLabel?: string };
 
