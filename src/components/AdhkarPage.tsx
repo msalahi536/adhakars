@@ -9,17 +9,14 @@ type Props = {
   kind: "morning" | "evening";
   title: string;
   subtitle: string;
-  emoji: string;
   list: Dhikr[];
-  extras?: Item[]; // appended (e.g., Baqarah)
+  extras?: Item[];
 };
 
-export function AdhkarPage({ kind, title, subtitle, emoji, list, extras = [] }: Props) {
+export function AdhkarPage({ kind, title, subtitle, list, extras = [] }: Props) {
   const [counts, setCounts] = useState<Record<string, number>>({});
 
-  useEffect(() => {
-    setCounts(getCounts(kind));
-  }, [kind]);
+  useEffect(() => { setCounts(getCounts(kind)); }, [kind]);
 
   const items: Item[] = [...list.map((d) => ({ dhikr: d })), ...extras];
   const completed = items.filter((i) => (counts[i.dhikr.id] ?? 0) >= i.dhikr.target).length;
@@ -32,42 +29,42 @@ export function AdhkarPage({ kind, title, subtitle, emoji, list, extras = [] }: 
   };
 
   return (
-    <div className="mx-auto flex h-[100dvh] max-w-md flex-col pb-[calc(86px+env(safe-area-inset-bottom))]">
-      {/* gradient header */}
+    <div
+      className="mx-auto flex max-w-md flex-col overflow-hidden"
+      style={{ height: "100dvh", paddingBottom: "calc(64px + env(safe-area-inset-bottom))" }}
+    >
+      {/* Header */}
       <div
-        className="px-5 pt-5 pb-4"
+        className="shrink-0 px-5 pt-5 pb-4"
         style={{
           background: "var(--grad-header)",
-          color: "var(--accent-foreground)",
+          color: "var(--header-fg, var(--accent-foreground))",
           borderBottomLeftRadius: 24,
           borderBottomRightRadius: 24,
         }}
       >
-        <div className="label-caps">{subtitle}</div>
-        <div className="mt-1 flex items-baseline gap-2">
-          <span className="text-2xl">{emoji}</span>
-          <h1 className="text-2xl font-bold tracking-tight">{title} Adhkar</h1>
+        <div className="label-caps" style={{ color: "var(--header-fg, var(--accent-foreground))", opacity: 0.85 }}>
+          {subtitle}
         </div>
+        <h1 className="mt-1 text-2xl font-bold tracking-tight">{title} Adhkar</h1>
         <div className="mt-3 flex items-center gap-3">
           <div
             className="h-1.5 flex-1 overflow-hidden rounded-full"
-            style={{ background: "color-mix(in oklab, var(--accent-foreground) 18%, transparent)" }}
+            style={{ background: "color-mix(in oklab, var(--header-fg, var(--accent-foreground)) 22%, transparent)" }}
           >
             <div
               className="h-full rounded-full transition-all duration-500"
               style={{
                 width: `${(completed / items.length) * 100}%`,
-                background: "var(--accent-foreground)",
+                background: "var(--accent)",
               }}
             />
           </div>
-          <div className="text-xs font-bold">
-            {completed} / {items.length}
-          </div>
+          <div className="text-xs font-bold">{completed} / {items.length}</div>
         </div>
       </div>
 
-      <div className="mt-4 flex flex-1 flex-col">
+      <div className="mt-3 flex min-h-0 flex-1 flex-col overflow-hidden">
         <SwipeStack items={items} counts={counts} onIncrement={inc} />
       </div>
     </div>
