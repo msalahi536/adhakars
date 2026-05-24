@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { RotateCcw, Undo2 } from "lucide-react";
+import { vibrateIfEnabled } from "@/lib/theme";
 
 export const Route = createFileRoute("/tasbih")({
   head: () => ({
