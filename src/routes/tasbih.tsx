@@ -320,7 +320,7 @@ function Tasbih() {
           </div>
 
           {/* Section C — Tap button */}
-          <div className="flex flex-1 items-center justify-center">
+          <div className="flex items-center justify-center">
             <button
               onPointerDown={(e) => {
                 e.preventDefault();
