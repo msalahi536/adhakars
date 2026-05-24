@@ -191,16 +191,16 @@ function Tasbih() {
             flexDirection: "column",
             alignItems: "center",
             justifyContent: "space-between",
-            padding: "28px 24px",
+            padding: "48px 24px 28px",
           }}
         >
           {/* LCD */}
           <div
             style={{
-              width: 140,
-              height: 56,
+              width: 122,
+              height: 50,
               margin: "0 auto",
-              borderRadius: 10,
+              borderRadius: 9,
               background: flash ? "#D8E6BC" : "#C5D4AA",
               boxShadow: "inset 0 2px 6px rgba(0,0,0,0.25)",
               transition: "background 0.18s ease",
@@ -215,7 +215,7 @@ function Tasbih() {
               style={{
                 fontFamily: "'Share Tech Mono', ui-monospace, monospace",
                 fontVariantNumeric: "tabular-nums",
-                fontSize: 30,
+                fontSize: 27,
                 lineHeight: 1,
                 letterSpacing: "0.04em",
                 color: "#1A1F1C",
