@@ -3,7 +3,17 @@ import { createFileRoute } from "@tanstack/react-router";
 import { RotateCcw, Undo2 } from "lucide-react";
 
 export const Route = createFileRoute("/tasbih")({
-  head: () => ({ meta: [{ title: "Tasbih — My Adhkar" }] }),
+  head: () => ({
+    meta: [
+      { title: "Tasbih — My Adhkar" },
+    ],
+    links: [
+      {
+        rel: "stylesheet",
+        href: "https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap",
+      },
+    ],
+  }),
   component: Tasbih,
 });
 
@@ -69,24 +79,30 @@ function Tasbih() {
     if (resetTimer.current) clearTimeout(resetTimer.current);
   };
 
+  // Pad number to 4 digits, right aligned
+  const display = String(total).padStart(4, " ");
+
   return (
     <div
       className="mx-auto flex max-w-md flex-col items-center"
       style={{
         minHeight: "100dvh",
-        background: "#1a1a2e",
-        color: "#ffffff",
+        background: "#4F5F66",
+        color: "#E8EDF0",
         paddingTop: "calc(env(safe-area-inset-top) + 20px)",
         paddingBottom: "calc(80px + env(safe-area-inset-bottom))",
         paddingLeft: 20,
         paddingRight: 20,
       }}
     >
-      <h1 className="text-center font-bold tracking-tight" style={{ fontSize: 20, color: "#fff" }}>
+      <h1
+        className="text-center font-bold tracking-tight"
+        style={{ fontSize: 20, color: "#E8EDF0" }}
+      >
         Tasbih
       </h1>
 
-      {/* Milestone pills */}
+      {/* Cycle pills */}
       <div className="mt-5 flex items-center justify-center gap-2">
         {MILESTONES.map((t) => {
           const active = milestone === t;
@@ -101,8 +117,8 @@ function Tasbih() {
                 height: 36,
                 borderRadius: 18,
                 fontSize: 14,
-                background: active ? "#c9a84c" : "rgba(255,255,255,0.12)",
-                color: active ? "#ffffff" : "rgba(255,255,255,0.5)",
+                background: active ? "#D4A547" : "#3A4A52",
+                color: active ? "#2A1F00" : "#8A9CA3",
                 border: "none",
               }}
             >
@@ -112,135 +128,216 @@ function Tasbih() {
         })}
       </div>
 
-      {/* Counter device */}
+      {/* Cycle indicator above device */}
       <div
-        className="mt-8 flex flex-col items-center"
-        style={{
-          width: 280,
-          minHeight: 340,
-          borderRadius: 40,
-          background: "#0d0d1a",
-          border: "2px solid rgba(255,255,255,0.08)",
-          boxShadow: "0 20px 60px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.05)",
-          padding: 20,
-        }}
+        className="mt-6 text-center"
+        style={{ fontSize: 12, color: "#8A9CA3", letterSpacing: "0.1em" }}
       >
-        {/* LCD display */}
+        {hasMilestone ? `cycle ${cycleNum} · ${cycleCount}/${milestone}` : "∞ continuous"}
+      </div>
+
+      {/* Device shell — organic worry-stone shape */}
+      <div className="relative mt-4 flex flex-col items-center" style={{ width: 300, height: 420 }}>
+        {/* SVG shell */}
+        <svg
+          viewBox="0 0 300 420"
+          width={300}
+          height={420}
+          style={{ position: "absolute", inset: 0, filter: "drop-shadow(0 18px 32px rgba(0,0,0,0.35))" }}
+          aria-hidden
+        >
+          <defs>
+            <linearGradient id="shellGrad" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stopColor="#465861" />
+              <stop offset="100%" stopColor="#33424A" />
+            </linearGradient>
+            <linearGradient id="shellHighlight" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stopColor="rgba(255,255,255,0.18)" />
+              <stop offset="40%" stopColor="rgba(255,255,255,0)" />
+            </linearGradient>
+          </defs>
+          {/*
+            Organic worry-stone silhouette: wider top, narrower bottom, asymmetric curves.
+            Hand-tuned Bezier path.
+          */}
+          <path
+            d="
+              M 150 8
+              C 220 8, 282 50, 288 130
+              C 294 200, 280 260, 260 320
+              C 244 370, 200 412, 150 412
+              C 100 412, 58 372, 42 322
+              C 22 262, 8 198, 14 128
+              C 22 50, 80 8, 150 8
+              Z
+            "
+            fill="url(#shellGrad)"
+            stroke="#8A9CA3"
+            strokeWidth={3}
+          />
+          {/* Subtle top highlight */}
+          <path
+            d="
+              M 150 8
+              C 220 8, 282 50, 288 130
+              C 240 70, 80 70, 14 128
+              C 22 50, 80 8, 150 8
+              Z
+            "
+            fill="url(#shellHighlight)"
+          />
+        </svg>
+
+        {/* Inner content positioned over SVG */}
         <div
-          className="flex w-full flex-col items-center justify-center"
-          style={{
-            background: "#1a2a1a",
-            borderRadius: 12,
-            boxShadow: "inset 0 2px 8px rgba(0,0,0,0.6)",
-            padding: "16px 12px",
-            minHeight: 110,
-          }}
+          className="relative z-10 flex w-full flex-col items-center"
+          style={{ padding: "40px 36px 30px" }}
         >
-          <div
-            className="num-pulse-key"
-            key={total}
-            style={{
-              fontFamily: "ui-monospace, SFMono-Regular, Menlo, monospace",
-              fontSize: 64,
-              fontWeight: 700,
-              color: flash ? "#ffffff" : "#00ff88",
-              lineHeight: 1,
-              letterSpacing: "-0.02em",
-              transition: "color 0.18s ease",
-              textShadow: "0 0 12px rgba(0,255,136,0.35)",
-            }}
-          >
-            {total}
-          </div>
-          <div
-            style={{
-              fontFamily: "ui-monospace, SFMono-Regular, Menlo, monospace",
-              fontSize: 12,
-              color: "#00cc66",
-              marginTop: 6,
-              opacity: 0.85,
-            }}
-          >
-            {hasMilestone ? `cycle ${cycleNum} · ${cycleCount}/${milestone}` : "∞ continuous"}
-          </div>
-        </div>
+          {/* LCD row: undo + screen + reset */}
+          <div className="flex w-full items-center justify-between gap-3">
+            <button
+              onClick={undo}
+              className="flex shrink-0 items-center justify-center transition-transform active:scale-90"
+              style={{
+                width: 48,
+                height: 48,
+                borderRadius: "50%",
+                background: "#5C6D74",
+                border: "1px solid rgba(0,0,0,0.2)",
+                color: "#B8C5CB",
+                boxShadow:
+                  "inset 0 1px 0 rgba(255,255,255,0.15), inset 0 -2px 4px rgba(0,0,0,0.25), 0 2px 4px rgba(0,0,0,0.2)",
+              }}
+              aria-label="undo"
+            >
+              <Undo2 size={18} />
+            </button>
 
-        {/* Big tap button */}
-        <button
-          onPointerDown={(e) => {
-            e.preventDefault();
-            setPressed(true);
-            tap();
-          }}
-          onPointerUp={() => setPressed(false)}
-          onPointerLeave={() => setPressed(false)}
-          onPointerCancel={() => setPressed(false)}
-          className="mt-5 flex items-center justify-center"
-          style={{
-            width: 130,
-            height: 130,
-            borderRadius: "50%",
-            background: "radial-gradient(circle at 30% 30%, #3a3a5c, #1a1a2e)",
-            border: "3px solid rgba(255,255,255,0.15)",
-            boxShadow: pressed
-              ? "0 2px 6px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.05)"
-              : "0 8px 24px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.1)",
-            transform: pressed ? "scale(0.92)" : "scale(1)",
-            transition: "transform 80ms ease, box-shadow 80ms ease",
-            touchAction: "manipulation",
-            cursor: "pointer",
-          }}
-          aria-label="tap to count"
-        >
-          <span style={{ fontSize: 11, color: "rgba(255,255,255,0.4)", letterSpacing: "0.15em", fontWeight: 600 }}>
-            TAP
-          </span>
-        </button>
+            {/* LCD pill */}
+            <div
+              className="flex flex-1 items-center justify-end"
+              style={{
+                height: 70,
+                borderRadius: 18,
+                background: "linear-gradient(180deg, #B8C89C 0%, #C8D7AE 100%)",
+                boxShadow:
+                  "inset 0 3px 8px rgba(0,0,0,0.28), inset 0 -1px 2px rgba(255,255,255,0.4), 0 1px 0 rgba(255,255,255,0.05)",
+                padding: "0 14px",
+                position: "relative",
+                overflow: "hidden",
+                transition: "background 0.18s ease",
+                ...(flash
+                  ? { background: "linear-gradient(180deg, #E6F0CC 0%, #D8E6BC 100%)" }
+                  : {}),
+              }}
+            >
+              {/* Ghost segments */}
+              <span
+                aria-hidden
+                style={{
+                  position: "absolute",
+                  right: 14,
+                  top: "50%",
+                  transform: "translateY(-50%)",
+                  fontFamily: "'Share Tech Mono', ui-monospace, monospace",
+                  fontSize: 44,
+                  lineHeight: 1,
+                  letterSpacing: "0.08em",
+                  color: "#2C3530",
+                  opacity: 0.12,
+                  fontWeight: 400,
+                  pointerEvents: "none",
+                }}
+              >
+                8888
+              </span>
+              {/* Live number */}
+              <span
+                style={{
+                  fontFamily: "'Share Tech Mono', ui-monospace, monospace",
+                  fontSize: 44,
+                  lineHeight: 1,
+                  letterSpacing: "0.08em",
+                  color: "#1A1F1C",
+                  fontWeight: 400,
+                  position: "relative",
+                  zIndex: 1,
+                  whiteSpace: "pre",
+                }}
+              >
+                {display}
+              </span>
+            </div>
 
-        {/* Undo + reset */}
-        <div className="mt-5 flex items-center gap-4">
-          <button
-            onClick={undo}
-            className="flex items-center justify-center transition-transform active:scale-90"
-            style={{
-              width: 40,
-              height: 40,
-              borderRadius: "50%",
-              background: "rgba(255,255,255,0.06)",
-              border: "1px solid rgba(255,255,255,0.1)",
-              color: "rgba(255,255,255,0.6)",
-            }}
-            aria-label="undo"
-          >
-            <Undo2 size={16} />
-          </button>
-          <button
-            onMouseDown={onResetStart}
-            onMouseUp={onResetEnd}
-            onMouseLeave={onResetEnd}
-            onTouchStart={onResetStart}
-            onTouchEnd={onResetEnd}
-            className="flex items-center justify-center"
-            style={{
-              width: 40,
-              height: 40,
-              borderRadius: "50%",
-              background: "rgba(255,255,255,0.06)",
-              border: "1px solid rgba(255,255,255,0.1)",
-              color: "rgba(255,255,255,0.6)",
-            }}
-            aria-label="hold to reset"
-          >
-            <RotateCcw size={16} />
-          </button>
+            <button
+              onMouseDown={onResetStart}
+              onMouseUp={onResetEnd}
+              onMouseLeave={onResetEnd}
+              onTouchStart={onResetStart}
+              onTouchEnd={onResetEnd}
+              className="flex shrink-0 items-center justify-center"
+              style={{
+                width: 48,
+                height: 48,
+                borderRadius: "50%",
+                background: "#5C6D74",
+                border: "1px solid rgba(0,0,0,0.2)",
+                color: "#B8C5CB",
+                boxShadow:
+                  "inset 0 1px 0 rgba(255,255,255,0.15), inset 0 -2px 4px rgba(0,0,0,0.25), 0 2px 4px rgba(0,0,0,0.2)",
+              }}
+              aria-label="hold to reset"
+            >
+              <RotateCcw size={18} />
+            </button>
+          </div>
+
+          {/* Main tap button */}
+          <div className="mt-12 flex flex-1 items-center justify-center">
+            <button
+              onPointerDown={(e) => {
+                e.preventDefault();
+                setPressed(true);
+                tap();
+              }}
+              onPointerUp={() => setPressed(false)}
+              onPointerLeave={() => setPressed(false)}
+              onPointerCancel={() => setPressed(false)}
+              style={{
+                width: 150,
+                height: 150,
+                borderRadius: "50%",
+                background:
+                  "radial-gradient(circle at 32% 28%, #C8D2D7 0%, #B5C0C5 45%, #9FAEB4 100%)",
+                border: "6px solid #6B7880",
+                boxShadow: pressed
+                  ? "0 2px 6px rgba(0,0,0,0.35), inset 0 2px 6px rgba(0,0,0,0.25)"
+                  : "0 10px 22px rgba(0,0,0,0.35), inset 0 2px 0 rgba(255,255,255,0.4), inset 0 -3px 6px rgba(0,0,0,0.15)",
+                transform: pressed ? "scale(0.96)" : "scale(1)",
+                transition: "transform 90ms ease, box-shadow 90ms ease",
+                touchAction: "manipulation",
+                cursor: "pointer",
+                outline: "none",
+              }}
+              aria-label="tap to count"
+            />
+          </div>
         </div>
       </div>
 
+      {/* Helper text */}
       <div className="mt-6 text-center">
-        <div style={{ fontSize: 11, color: "rgba(255,255,255,0.3)", letterSpacing: "0.1em" }}>
+        <div
+          style={{
+            fontSize: 11,
+            color: "#8A9CA3",
+            letterSpacing: "0.15em",
+            fontWeight: 600,
+          }}
+        >
           TAP BUTTON TO COUNT
         </div>
-        <div style={{ fontSize: 10, color: "rgba(255,255,255,0.2)", marginTop: 4 }}>
+        <div style={{ fontSize: 10, color: "#8A9CA3", opacity: 0.7, marginTop: 4 }}>
           Hold reset 1.5s to clear
         </div>
       </div>
@@ -248,7 +345,7 @@ function Tasbih() {
       {toast && (
         <div
           className="pop-in fixed left-1/2 top-24 z-50 -translate-x-1/2 rounded-[12px] px-4 py-2 text-sm font-semibold shadow-lg"
-          style={{ background: "#c9a84c", color: "#ffffff" }}
+          style={{ background: "#D4A547", color: "#2A1F00" }}
         >
           {toast}
         </div>
