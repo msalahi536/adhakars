@@ -46,20 +46,30 @@ function Settings() {
       </header>
 
       <section
-        className="mb-6 overflow-hidden rounded-[28px] p-6 shadow-xl shadow-black/10"
-        style={{ background: "var(--grad-header)", color: "var(--accent-foreground)" }}
+        className="mb-6 overflow-hidden rounded-[24px] p-6 shadow-xl shadow-black/10"
+        style={{
+          background:
+            mode === "dusk" || mode === "deep-navy" || mode === "dark-emerald"
+              ? "linear-gradient(135deg, #2d3561, #3d4a8a)"
+              : "linear-gradient(135deg, #1d3d2a, #2d5a3d)",
+          color: "#ffffff",
+        }}
       >
-        <div className="flex items-center gap-5">
-          <div className="text-6xl leading-none">🔥</div>
-          <div className="flex-1">
-            <div className="label-caps">Current streak</div>
-            <div className="text-5xl font-extrabold leading-none">{streak.current}</div>
-            <div className="mt-1 text-xs font-semibold opacity-80">days in a row</div>
-          </div>
+        <div className="label-caps" style={{ color: "rgba(255,255,255,0.8)", opacity: 1 }}>
+          Current streak
         </div>
-        <div className="mt-4 flex items-center justify-between border-t pt-3 text-xs font-semibold" style={{ borderColor: "color-mix(in oklab, var(--accent-foreground) 25%, transparent)" }}>
+        <div className="mt-1 flex items-baseline gap-2">
+          <span style={{ fontSize: 48, fontWeight: 800, color: "#c9a84c", lineHeight: 1 }}>
+            {streak.current}
+          </span>
+          <span className="text-sm font-semibold opacity-80">days</span>
+        </div>
+        <div
+          className="mt-4 flex items-center justify-between border-t pt-3 text-xs font-semibold"
+          style={{ borderColor: "rgba(255,255,255,0.18)" }}
+        >
           <span>Longest: {streak.longest} days</span>
-          <span className="opacity-80">{streak.lastCompleted ? `Last: ${streak.lastCompleted}` : "Start today!"}</span>
+          <span className="opacity-80">{streak.lastCompleted ? `Last: ${streak.lastCompleted}` : "Start today"}</span>
         </div>
       </section>
 
