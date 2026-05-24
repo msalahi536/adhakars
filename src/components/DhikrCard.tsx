@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import type { Dhikr } from "@/data/adhkar";
 import { ProgressRing } from "./ProgressRing";
-import { getDisplay } from "@/lib/theme";
+import { getDisplay, vibrateIfEnabled } from "@/lib/theme";
 
 type Props = {
   dhikr: Dhikr;
