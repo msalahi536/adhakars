@@ -80,7 +80,7 @@ function Tasbih() {
   };
 
   // Pad number to 4 digits, right aligned
-  const display = String(total).padStart(4, " ");
+  
 
   return (
     <div
