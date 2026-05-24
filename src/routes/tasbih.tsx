@@ -36,15 +36,15 @@ function Tasbih() {
   const cycleNum = hasMilestone ? Math.floor(total / milestone) + 1 : 1;
 
   const tap = () => {
-    if (navigator.vibrate) navigator.vibrate(10);
+    if (navigator.vibrate) navigator.vibrate(15);
     setPulse(true);
-    setTimeout(() => setPulse(false), 220);
+    setTimeout(() => setPulse(false), 160);
     setTotal((n) => {
       const next = n + 1;
       if (hasMilestone && next % milestone === 0) {
         if (navigator.vibrate) navigator.vibrate([50, 30, 50]);
         setFlash(true);
-        setTimeout(() => setFlash(false), 600);
+        setTimeout(() => setFlash(false), 700);
       }
       return next;
     });
@@ -61,7 +61,7 @@ function Tasbih() {
       longPressFired.current = true;
       if (navigator.vibrate) navigator.vibrate(40);
       setTotal(0);
-      showToast("Counter reset");
+      showToast("Reset");
     }, 2000);
   };
   const onPressEnd = () => {
@@ -70,15 +70,16 @@ function Tasbih() {
   };
   const onPressCancel = () => {
     if (longPressTimer.current) clearTimeout(longPressTimer.current);
-    longPressFired.current = true; // suppress tap
+    longPressFired.current = true;
   };
 
-  // Arc progress
-  const arcSize = 200;
-  const stroke = 6;
-  const r = (arcSize - stroke) / 2;
+  // Big SVG progress ring
+  const ringSize = 260;
+  const stroke = 8;
+  const r = (ringSize - stroke) / 2;
   const c = 2 * Math.PI * r;
-  const pct = hasMilestone ? Math.min(1, cycleCount / milestone) : 0;
+  const pct = hasMilestone ? Math.min(1, cycleCount / milestone) : 1;
+  const offset = hasMilestone ? c * (1 - pct) : 0;
 
   return (
     <div
@@ -88,7 +89,7 @@ function Tasbih() {
       {/* Header */}
       <header className="shrink-0">
         <div className="label-caps">Counter</div>
-        <h1 className="mt-1 text-3xl font-bold tracking-tight">Tasbih</h1>
+        <h1 className="mt-1 text-[28px] font-bold tracking-tight">Tasbih</h1>
       </header>
 
       {/* Milestone selector */}
@@ -100,14 +101,14 @@ function Tasbih() {
             <button
               key={t}
               onClick={() => setMilestone(t)}
-              className="rounded-full px-4 py-2 text-sm font-semibold transition"
+              className="rounded-full px-4 py-2 text-sm font-semibold transition-transform active:scale-95"
               style={
                 active
                   ? { background: "var(--accent)", color: "var(--accent-foreground)" }
                   : {
                       background: "var(--btn-surface, var(--surface))",
                       color: "var(--btn-fg, var(--foreground))",
-                      border: "1px solid var(--border)",
+                      border: "1px solid var(--nav-border, var(--border))",
                     }
               }
             >
@@ -117,41 +118,53 @@ function Tasbih() {
         })}
       </div>
 
-      <div className="my-5 h-px shrink-0" style={{ background: "var(--border)" }} />
-
-      {/* Giant number + arc */}
-      <div className="flex shrink-0 flex-col items-center">
-        <div className="relative" style={{ width: arcSize, height: arcSize }}>
-          {hasMilestone && (
-            <svg width={arcSize} height={arcSize} className="absolute inset-0">
+      {/* Big circular counter + tap zone (no box) */}
+      <button
+        onMouseDown={onPressStart}
+        onMouseUp={onPressEnd}
+        onMouseLeave={onPressCancel}
+        onTouchStart={(e) => { e.preventDefault(); onPressStart(); }}
+        onTouchEnd={(e) => { e.preventDefault(); onPressEnd(); }}
+        onTouchCancel={onPressCancel}
+        className="mt-4 flex flex-1 flex-col items-center justify-center transition-transform active:scale-[0.99]"
+        style={{ touchAction: "manipulation", color: "var(--foreground)", background: "transparent", border: "none" }}
+        aria-label="tap to count"
+      >
+        <div className="relative" style={{ width: ringSize, height: ringSize }}>
+          <svg width={ringSize} height={ringSize} className="absolute inset-0">
+            <circle
+              cx={ringSize / 2}
+              cy={ringSize / 2}
+              r={r}
+              stroke="var(--ring-track, color-mix(in oklab, var(--foreground) 10%, transparent))"
+              strokeWidth={stroke}
+              fill="none"
+            />
+            {hasMilestone && (
               <circle
-                cx={arcSize / 2}
-                cy={arcSize / 2}
-                r={r}
-                stroke="var(--ring-track, rgba(255,255,255,0.18))"
-                strokeWidth={stroke}
-                fill="none"
-              />
-              <circle
-                cx={arcSize / 2}
-                cy={arcSize / 2}
+                cx={ringSize / 2}
+                cy={ringSize / 2}
                 r={r}
                 stroke="var(--accent)"
                 strokeWidth={stroke}
                 strokeLinecap="round"
                 fill="none"
                 strokeDasharray={c}
-                strokeDashoffset={c * (1 - pct)}
-                transform={`rotate(-90 ${arcSize / 2} ${arcSize / 2})`}
-                style={{ transition: "stroke-dashoffset 350ms cubic-bezier(0.34,1.56,0.64,1)" }}
+                strokeDashoffset={offset}
+                transform={`rotate(-90 ${ringSize / 2} ${ringSize / 2})`}
+                style={{
+                  transition: "stroke-dashoffset 350ms cubic-bezier(0.34,1.56,0.64,1)",
+                  filter: flash ? "drop-shadow(0 0 12px var(--accent))" : "none",
+                }}
               />
-            </svg>
-          )}
+            )}
+          </svg>
           <div className="absolute inset-0 flex flex-col items-center justify-center">
             <span
-              className={`tabular-nums leading-none ${pulse ? "tap-pulse" : ""} ${flash ? "pop-in" : ""}`}
+              key={pulse ? "p" : "s"}
+              className={`tabular-nums leading-none ${pulse ? "num-pulse" : ""}`}
               style={{
-                fontSize: 96,
+                fontSize: 72,
                 fontWeight: 800,
                 letterSpacing: "-0.02em",
                 color: flash ? "var(--accent)" : "var(--foreground)",
@@ -160,44 +173,24 @@ function Tasbih() {
             >
               {total}
             </span>
+            <div className="mt-2 text-[13px] opacity-60">
+              {hasMilestone ? <>cycle {cycleNum} · {cycleCount}/{milestone}</> : <>continuous</>}
+            </div>
           </div>
         </div>
-        <div className="mt-3 text-sm opacity-70">
-          {hasMilestone ? <>cycle {cycleNum} · {cycleCount}/{milestone}</> : <>continuous</>}
-        </div>
-      </div>
 
-      <div className="my-5 h-px shrink-0" style={{ background: "var(--border)" }} />
-
-      {/* Giant tap area */}
-      <button
-        onMouseDown={onPressStart}
-        onMouseUp={onPressEnd}
-        onMouseLeave={onPressCancel}
-        onTouchStart={(e) => { e.preventDefault(); onPressStart(); }}
-        onTouchEnd={(e) => { e.preventDefault(); onPressEnd(); }}
-        onTouchCancel={onPressCancel}
-        className="flex flex-1 flex-col items-center justify-center rounded-3xl active:scale-[0.99]"
-        style={{
-          background: "color-mix(in oklab, var(--foreground) 4%, transparent)",
-          border: "1px dashed color-mix(in oklab, var(--foreground) 15%, transparent)",
-          touchAction: "manipulation",
-          color: "var(--foreground)",
-        }}
-        aria-label="tap to count"
-      >
-        <span className="label-caps">Tap to count</span>
-        <span className="mt-1 text-[11px] opacity-50">Hold 2s to reset</span>
+        <div className="mt-8 label-caps">Tap to count</div>
+        <div className="mt-1 text-[11px] opacity-50">Hold 2s to reset</div>
       </button>
 
-      <div className="flex shrink-0 justify-center pt-3">
+      <div className="flex shrink-0 justify-center pb-2">
         <button
-          onClick={() => { setTotal(0); showToast("Counter reset"); }}
-          className="rounded-full px-5 py-1.5 text-xs font-semibold"
+          onClick={() => { setTotal(0); showToast("Reset"); }}
+          className="rounded-full px-5 py-1.5 text-xs font-semibold transition-transform active:scale-95"
           style={{
-            background: "var(--btn-surface, var(--surface))",
+            background: "transparent",
             color: "var(--btn-fg, var(--foreground))",
-            border: "1px solid var(--border)",
+            border: "1px solid var(--nav-border, var(--border))",
           }}
         >
           Reset
