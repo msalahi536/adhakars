@@ -190,10 +190,6 @@ function Tasbih() {
             "
             fill="url(#shellHighlight)"
           />
-
-            "
-            fill="url(#shellHighlight)"
-          />
         </svg>
 
         {/* Inner content positioned over SVG */}
