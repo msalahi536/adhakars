@@ -10,64 +10,77 @@ const tabs = [
   { to: "/settings" as const, label: "Settings", Icon: SettingsIcon },
 ];
 
+const DARK_THEMES = new Set(["dark-emerald", "deep-navy"]);
+
 export function BottomNav() {
   const [streak, setStreak] = useState(0);
+  const [theme, setTheme] = useState<string>("dawn");
+
   useEffect(() => {
     setStreak(getStreak().current);
-    const f = () => setStreak(getStreak().current);
-    window.addEventListener("adhkar:streak-update", f);
-    return () => window.removeEventListener("adhkar:streak-update", f);
+    const update = () =>
+      setTheme(document.documentElement.getAttribute("data-theme") || "dawn");
+    update();
+    const onStreak = () => setStreak(getStreak().current);
+    window.addEventListener("adhkar:streak-update", onStreak);
+    const obs = new MutationObserver(update);
+    obs.observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
+    return () => {
+      window.removeEventListener("adhkar:streak-update", onStreak);
+      obs.disconnect();
+    };
   }, []);
+
+  const isDark = DARK_THEMES.has(theme);
+  const navBg = isDark ? "rgba(15,20,30,0.97)" : "rgba(255,255,255,0.97)";
+  // dusk uses its own light bg and brand-purple active
+  const themeNavBg = theme === "dusk" ? "rgba(238, 242, 247, 0.97)" : navBg;
+  const iconColor = isDark ? "#ffffff" : "#4a5568";
+  const activeColor =
+    theme === "dusk" ? "#667eea" : "#c9a84c";
+  const borderColor = isDark ? "rgba(255,255,255,0.08)" : "rgba(0,0,0,0.08)";
 
   return (
     <nav
-      className="glass-nav fixed bottom-0 left-0 right-0 z-50 border-t"
+      className="fixed bottom-0 left-0 right-0 z-50"
       style={{
         paddingBottom: "env(safe-area-inset-bottom)",
-        borderColor: "var(--nav-border, color-mix(in oklab, var(--foreground) 10%, transparent))",
+        background: themeNavBg,
+        backdropFilter: "blur(12px) saturate(180%)",
+        WebkitBackdropFilter: "blur(12px) saturate(180%)",
+        borderTop: `1px solid ${borderColor}`,
       }}
     >
-      <div className="mx-auto flex max-w-md items-stretch justify-around px-2" style={{ height: 64 }}>
+      <div className="mx-auto flex max-w-md items-stretch justify-around px-2" style={{ height: 60 }}>
         {tabs.map((t) => (
           <Link
             key={t.to}
             to={t.to}
             activeOptions={{ exact: true }}
             className="relative flex flex-1 flex-col items-center justify-center gap-0.5 text-[10px] font-semibold"
+            style={{ transition: "color 0.25s ease" }}
           >
-            {({ isActive }) => (
-              <>
-                <div
-                  className="flex items-center justify-center rounded-full px-3.5 py-1 transition-all"
-                  style={
-                    isActive
-                      ? { background: "color-mix(in oklab, var(--accent) 22%, transparent)", color: "var(--accent)" }
-                      : { color: "color-mix(in oklab, var(--foreground) 55%, transparent)" }
-                  }
-                >
-                  <t.Icon size={22} strokeWidth={isActive ? 2.4 : 2} />
-                </div>
-                <span
-                  style={{
-                    color: isActive ? "var(--accent)" : "color-mix(in oklab, var(--foreground) 55%, transparent)",
-                  }}
-                >
-                  {t.label}
-                </span>
-                {t.to === "/settings" && streak > 0 && (
-                  <span
-                    className="absolute right-1.5 top-0.5 rounded-full px-1.5 py-0.5 text-[9px] font-bold"
-                    style={{ background: "var(--accent)", color: "var(--accent-foreground)" }}
-                  >
-                    🔥{streak}
-                  </span>
-                )}
-              </>
-            )}
+            {({ isActive }) => {
+              const color = isActive ? activeColor : iconColor;
+              const opacity = isActive ? 1 : 0.6;
+              return (
+                <>
+                  <t.Icon size={24} strokeWidth={isActive ? 2.4 : 2} style={{ color, opacity }} />
+                  <span style={{ color, opacity }}>{t.label}</span>
+                  {t.to === "/settings" && streak > 0 && (
+                    <span
+                      className="absolute right-1.5 top-0.5 rounded-[12px] px-1.5 py-0.5 text-[9px] font-bold"
+                      style={{ background: activeColor, color: isDark ? "#0a0a0a" : "#ffffff" }}
+                    >
+                      {streak}
+                    </span>
+                  )}
+                </>
+              );
+            }}
           </Link>
         ))}
       </div>
     </nav>
   );
 }
-
