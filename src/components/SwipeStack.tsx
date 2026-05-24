@@ -11,21 +11,55 @@ type Props = {
   onIncrement: (id: string, target: number) => void;
 };
 
+type Phase = "idle" | "out-left" | "out-right" | "in-left" | "in-right";
+
+const OUT_MS = 280;
+const IN_MS = 320;
+
 export function SwipeStack({ items, counts, onIncrement }: Props) {
   const [idx, setIdx] = useState(0);
+  const [phase, setPhase] = useState<Phase>("idle");
+  const [enter, setEnter] = useState(false);
   const [dragOffset, setDragOffset] = useState(0);
+  const animating = useRef(false);
   const isDragging = useRef(false);
   const startX = useRef(0);
   const startY = useRef(0);
   const axisLocked = useRef<null | "x" | "y">(null);
   const wrapperRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => { setIdx(0); }, [items.length]);
+  useEffect(() => { setIdx(0); setPhase("idle"); }, [items.length]);
 
-  const clamp = (i: number) => Math.max(0, Math.min(items.length - 1, i));
-  const goTo = (i: number) => setIdx(clamp(i));
-  const goNext = () => goTo(idx + 1);
-  const goPrev = () => goTo(idx - 1);
+  const animateTo = (dir: "next" | "prev") => {
+    if (animating.current) return;
+    if (dir === "next" && idx >= items.length - 1) return;
+    if (dir === "prev" && idx <= 0) return;
+    animating.current = true;
+    setPhase(dir === "next" ? "out-left" : "out-right");
+    setDragOffset(0);
+
+    setTimeout(() => {
+      setIdx((i) => i + (dir === "next" ? 1 : -1));
+      setPhase(dir === "next" ? "in-right" : "in-left");
+      setEnter(false);
+      // next frame: trigger transition in
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => setEnter(true));
+      });
+      setTimeout(() => {
+        setPhase("idle");
+        setEnter(false);
+        animating.current = false;
+      }, IN_MS + 20);
+    }, OUT_MS);
+  };
+
+  const goNext = () => animateTo("next");
+  const goPrev = () => animateTo("prev");
+  const goTo = (i: number) => {
+    if (animating.current || i === idx) return;
+    animateTo(i > idx ? "next" : "prev");
+  };
 
   const current = items[idx];
 
@@ -39,12 +73,13 @@ export function SwipeStack({ items, counts, onIncrement }: Props) {
     }
   };
 
-  // Non-passive touchmove via native listener so preventDefault works
+  // Touch handling
   useEffect(() => {
     const el = wrapperRef.current;
     if (!el) return;
 
     const onTouchStart = (e: TouchEvent) => {
+      if (animating.current) return;
       startX.current = e.touches[0].clientX;
       startY.current = e.touches[0].clientY;
       isDragging.current = true;
@@ -65,12 +100,15 @@ export function SwipeStack({ items, counts, onIncrement }: Props) {
     const onTouchEnd = () => {
       if (!isDragging.current) return;
       isDragging.current = false;
-      setDragOffset((dx) => {
-        if (dx < -50) goNext();
-        else if (dx > 50) goPrev();
-        return 0;
-      });
+      const dx = dragOffsetRef.current;
       axisLocked.current = null;
+      if (dx < -50) {
+        goNext();
+      } else if (dx > 50) {
+        goPrev();
+      } else {
+        setDragOffset(0);
+      }
     };
 
     el.addEventListener("touchstart", onTouchStart, { passive: true });
@@ -84,6 +122,48 @@ export function SwipeStack({ items, counts, onIncrement }: Props) {
       el.removeEventListener("touchcancel", onTouchEnd);
     };
   }, [idx, items.length]);
+
+  // Keep ref in sync for touchend closure
+  const dragOffsetRef = useRef(0);
+  useEffect(() => { dragOffsetRef.current = dragOffset; }, [dragOffset]);
+
+  // Compute card transform/opacity/transition
+  let transform = `translateX(${dragOffset}px)`;
+  let opacity = 1;
+  let transition = "none";
+
+  if (phase === "out-left") {
+    transform = "translateX(-110%)";
+    opacity = 0;
+    transition = `transform ${OUT_MS}ms cubic-bezier(0.4,0,0.2,1), opacity ${OUT_MS}ms ease`;
+  } else if (phase === "out-right") {
+    transform = "translateX(110%)";
+    opacity = 0;
+    transition = `transform ${OUT_MS}ms cubic-bezier(0.4,0,0.2,1), opacity ${OUT_MS}ms ease`;
+  } else if (phase === "in-right") {
+    if (!enter) {
+      transform = "translateX(110%)";
+      opacity = 0;
+      transition = "none";
+    } else {
+      transform = "translateX(0)";
+      opacity = 1;
+      transition = `transform ${IN_MS}ms cubic-bezier(0.4,0,0.2,1), opacity ${IN_MS}ms ease`;
+    }
+  } else if (phase === "in-left") {
+    if (!enter) {
+      transform = "translateX(-110%)";
+      opacity = 0;
+      transition = "none";
+    } else {
+      transform = "translateX(0)";
+      opacity = 1;
+      transition = `transform ${IN_MS}ms cubic-bezier(0.4,0,0.2,1), opacity ${IN_MS}ms ease`;
+    }
+  } else {
+    // idle — follow finger with no transition during drag, snap back if released without threshold
+    transition = isDragging.current ? "none" : `transform 0.25s ease`;
+  }
 
   return (
     <div className="flex flex-1 flex-col overflow-hidden">
@@ -104,10 +184,7 @@ export function SwipeStack({ items, counts, onIncrement }: Props) {
         {current && (
           <div
             className="h-full w-full"
-            style={{
-              transform: `translateX(${dragOffset}px)`,
-              transition: dragOffset === 0 ? "transform 0.3s ease" : "none",
-            }}
+            style={{ transform, opacity, transition, willChange: "transform, opacity" }}
           >
             <DhikrCard
               key={current.dhikr.id}
