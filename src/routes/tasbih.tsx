@@ -191,7 +191,7 @@ function Tasbih() {
             flexDirection: "column",
             alignItems: "center",
             justifyContent: "space-between",
-            padding: "48px 24px 28px",
+            padding: "64px 24px 28px",
           }}
         >
           {/* LCD */}
@@ -237,7 +237,7 @@ function Tasbih() {
           </div>
 
           {/* Undo / Reset row */}
-          <div className="flex w-full items-center justify-between" style={{ paddingLeft: 8, paddingRight: 8 }}>
+          <div className="flex w-full items-center justify-between" style={{ paddingLeft: 8, paddingRight: 8, marginTop: 12 }}>
             <button
               onClick={undo}
               className="transition-transform active:scale-90"
