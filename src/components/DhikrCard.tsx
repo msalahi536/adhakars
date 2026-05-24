@@ -52,8 +52,8 @@ export function DhikrCard({ dhikr, count, onIncrement, index, total, isSpecial, 
 
   return (
     <div
-      className="card-grad relative flex h-full w-full flex-col overflow-hidden rounded-[24px] shadow-2xl shadow-black/20"
-      style={{ color: "var(--card-foreground)", border: "1px solid var(--border)" }}
+      className="relative flex h-full w-full flex-col overflow-hidden rounded-[24px]"
+      style={{ background: "var(--card)", color: "var(--card-foreground)", border: "1px solid var(--border)", boxShadow: "var(--card-shadow, 0 4px 16px rgba(0,0,0,0.08))" }}
     >
       {/* Header strip: badge + title + index */}
       <div className="flex items-center gap-3 px-5 pt-5">
@@ -195,8 +195,8 @@ export function DhikrCard({ dhikr, count, onIncrement, index, total, isSpecial, 
           <span
             className="self-start rounded-full px-2.5 py-1 text-[11px] font-semibold"
             style={{
-              background: "color-mix(in oklab, var(--card-foreground) 12%, transparent)",
-              color: "color-mix(in oklab, var(--card-foreground) 85%, transparent)",
+              background: "var(--source-bg, color-mix(in oklab, var(--card-foreground) 12%, transparent))",
+              color: "var(--source-fg, var(--card-foreground))",
             }}
           >
             {dhikr.source}
@@ -219,7 +219,7 @@ export function DhikrCard({ dhikr, count, onIncrement, index, total, isSpecial, 
               <span className="text-3xl" style={{ color: "var(--accent)" }}>✓</span>
             ) : (
               <>
-                <span className="text-3xl font-bold leading-none" style={{ color: "#ffffff" }}>{count}</span>
+                <span className="text-3xl font-bold leading-none" style={{ color: "var(--count-fg, var(--card-foreground))" }}>{count}</span>
                 <span className="mt-1 text-[10px] opacity-70">/ {dhikr.target}</span>
               </>
             )}

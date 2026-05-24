@@ -1,20 +1,18 @@
-export type ThemeId = "dawn" | "dusk" | "warm-green" | "deep-navy" | "soft-sage" | "dark-emerald";
-export type ThemeMode = "auto" | ThemeId;
+export type ThemeId = "dawn" | "dusk";
+export type ThemeMode = "auto" | "classic";
 
-export const themes: { id: ThemeId; name: string; swatch: [string, string, string] }[] = [
-  { id: "dawn", name: "Dawn", swatch: ["#fbf5e2", "#1f3d2b", "#e0b552"] },
-  { id: "dusk", name: "Dusk", swatch: ["#0e1230", "#2a4c5e", "#cfd4dc"] },
-  { id: "warm-green", name: "Warm Greens & Golds", swatch: ["#faf3e3", "#1f3d2b", "#c9a24c"] },
-  { id: "deep-navy", name: "Deep Navy & Silver", swatch: ["#0c1226", "#1a2547", "#c5cbd6"] },
-  { id: "soft-sage", name: "Soft Cream & Sage", swatch: ["#f7f3eb", "#7e9a78", "#b08a44"] },
-  { id: "dark-emerald", name: "Dark Emerald & Gold", swatch: ["#04130d", "#0d3320", "#e8b84a"] },
+export const themes: { id: ThemeMode; name: string; description: string }[] = [
+  { id: "auto", name: "Auto (Dawn / Dusk)", description: "Warm by day, cool by evening" },
+  { id: "classic", name: "Classic", description: "Cream & gold, all day" },
 ];
 
 const MODE_KEY = "adhkar:theme-mode";
 
 export const getMode = (): ThemeMode => {
   if (typeof window === "undefined") return "auto";
-  return (localStorage.getItem(MODE_KEY) as ThemeMode) || "auto";
+  const raw = localStorage.getItem(MODE_KEY);
+  if (raw === "auto" || raw === "classic") return raw;
+  return "auto";
 };
 
 export const setMode = (m: ThemeMode) => {
@@ -28,7 +26,7 @@ export const applyTheme = (id: ThemeId) => {
 };
 
 export const resolveTheme = (mode: ThemeMode, route: string): ThemeId => {
-  if (mode !== "auto") return mode;
+  if (mode === "classic") return "dawn";
   if (route.startsWith("/evening")) return "dusk";
   return "dawn";
 };
