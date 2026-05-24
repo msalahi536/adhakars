@@ -1,40 +1,39 @@
 import { useEffect, useRef, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
-import { ProgressRing } from "@/components/ProgressRing";
 
 export const Route = createFileRoute("/tasbih")({
   head: () => ({ meta: [{ title: "Tasbih — My Adhkar" }] }),
   component: Tasbih,
 });
 
-const TARGETS = [33, 99, 100];
+type Milestone = 33 | 99 | 100 | 0; // 0 = infinity
+const MILESTONES: Milestone[] = [33, 99, 100, 0];
 const STORAGE = "adhkar:tasbih";
 
 function Tasbih() {
   const [total, setTotal] = useState(0);
-  const [milestone, setMilestone] = useState(33);
-  const [label, setLabel] = useState("SubhanAllah");
-  const [flash, setFlash] = useState(false);
+  const [milestone, setMilestone] = useState<Milestone>(33);
   const [pulse, setPulse] = useState(false);
+  const [flash, setFlash] = useState(false);
   const [toast, setToast] = useState<string | null>(null);
   const longPressTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const pressActive = useRef(false);
+  const longPressFired = useRef(false);
 
   useEffect(() => {
     try {
       const s = JSON.parse(localStorage.getItem(STORAGE) || "{}");
       if (typeof s.total === "number") setTotal(s.total);
-      if (typeof s.milestone === "number") setMilestone(s.milestone);
-      if (typeof s.label === "string") setLabel(s.label);
+      if (typeof s.milestone === "number") setMilestone(s.milestone as Milestone);
     } catch {}
   }, []);
 
   useEffect(() => {
-    localStorage.setItem(STORAGE, JSON.stringify({ total, milestone, label }));
-  }, [total, milestone, label]);
+    localStorage.setItem(STORAGE, JSON.stringify({ total, milestone }));
+  }, [total, milestone]);
 
-  const cycleCount = total % milestone;
-  const cycleNum = Math.floor(total / milestone) + 1;
+  const hasMilestone = milestone > 0;
+  const cycleCount = hasMilestone ? total % milestone : 0;
+  const cycleNum = hasMilestone ? Math.floor(total / milestone) + 1 : 1;
 
   const tap = () => {
     if (navigator.vibrate) navigator.vibrate(10);
@@ -42,10 +41,10 @@ function Tasbih() {
     setTimeout(() => setPulse(false), 220);
     setTotal((n) => {
       const next = n + 1;
-      if (next % milestone === 0) {
+      if (hasMilestone && next % milestone === 0) {
         if (navigator.vibrate) navigator.vibrate([50, 30, 50]);
         setFlash(true);
-        setTimeout(() => setFlash(false), 500);
+        setTimeout(() => setFlash(false), 600);
       }
       return next;
     });
@@ -57,96 +56,153 @@ function Tasbih() {
   };
 
   const onPressStart = () => {
-    pressActive.current = true;
+    longPressFired.current = false;
     longPressTimer.current = setTimeout(() => {
-      if (pressActive.current) {
-        if (navigator.vibrate) navigator.vibrate(40);
-        setTotal(0);
-        showToast("Counter reset");
-        pressActive.current = false;
-      }
-    }, 700);
+      longPressFired.current = true;
+      if (navigator.vibrate) navigator.vibrate(40);
+      setTotal(0);
+      showToast("Counter reset");
+    }, 2000);
   };
-  const onPressEnd = (didTap: boolean) => {
+  const onPressEnd = () => {
     if (longPressTimer.current) clearTimeout(longPressTimer.current);
-    if (pressActive.current && didTap) tap();
-    pressActive.current = false;
+    if (!longPressFired.current) tap();
   };
+  const onPressCancel = () => {
+    if (longPressTimer.current) clearTimeout(longPressTimer.current);
+    longPressFired.current = true; // suppress tap
+  };
+
+  // Arc progress
+  const arcSize = 200;
+  const stroke = 6;
+  const r = (arcSize - stroke) / 2;
+  const c = 2 * Math.PI * r;
+  const pct = hasMilestone ? Math.min(1, cycleCount / milestone) : 0;
 
   return (
-    <div className="mx-auto flex h-[100dvh] max-w-md flex-col px-4 pt-5 pb-[calc(86px+env(safe-area-inset-bottom))]">
-      <header className="mb-3">
+    <div
+      className="mx-auto flex h-[100dvh] max-w-md flex-col px-5 pt-6"
+      style={{ paddingBottom: "calc(64px + env(safe-area-inset-bottom))" }}
+    >
+      {/* Header */}
+      <header className="shrink-0">
         <div className="label-caps">Counter</div>
-        <h1 className="mt-1 text-3xl font-bold">Tasbih</h1>
+        <h1 className="mt-1 text-3xl font-bold tracking-tight">Tasbih</h1>
       </header>
 
-      <input
-        value={label}
-        onChange={(e) => setLabel(e.target.value)}
-        placeholder="What are you counting?"
-        className="mb-3 w-full rounded-full px-5 py-3 text-sm outline-none"
-        style={{ background: "var(--surface)", border: "1px solid var(--border)" }}
-      />
-
-      <div className="mb-3 flex flex-wrap items-center gap-2">
-        {TARGETS.map((t) => (
-          <button
-            key={t}
-            onClick={() => setMilestone(t)}
-            className="rounded-full px-4 py-1.5 text-sm font-semibold transition"
-            style={
-              milestone === t
-                ? { background: "var(--accent)", color: "var(--accent-foreground)" }
-                : { background: "var(--surface)", border: "1px solid var(--border)" }
-            }
-          >
-            {t}
-          </button>
-        ))}
-        <input
-          type="number"
-          min={1}
-          placeholder="custom"
-          className="w-24 rounded-full px-4 py-1.5 text-sm outline-none"
-          style={{ background: "var(--surface)", border: "1px solid var(--border)" }}
-          onChange={(e) => {
-            const v = parseInt(e.target.value);
-            if (!isNaN(v) && v > 0) setMilestone(v);
-          }}
-        />
+      {/* Milestone selector */}
+      <div className="mt-5 flex shrink-0 items-center gap-2">
+        {MILESTONES.map((t) => {
+          const active = milestone === t;
+          const label = t === 0 ? "∞" : String(t);
+          return (
+            <button
+              key={t}
+              onClick={() => setMilestone(t)}
+              className="rounded-full px-4 py-2 text-sm font-semibold transition"
+              style={
+                active
+                  ? { background: "var(--accent)", color: "var(--accent-foreground)" }
+                  : {
+                      background: "var(--btn-surface, var(--surface))",
+                      color: "var(--btn-fg, var(--foreground))",
+                      border: "1px solid var(--border)",
+                    }
+              }
+            >
+              {label}
+            </button>
+          );
+        })}
       </div>
 
-      <button
-        onMouseDown={onPressStart}
-        onMouseUp={() => onPressEnd(true)}
-        onMouseLeave={() => onPressEnd(false)}
-        onTouchStart={(e) => { e.preventDefault(); onPressStart(); }}
-        onTouchEnd={(e) => { e.preventDefault(); onPressEnd(true); }}
-        className="card-grad relative flex flex-1 flex-col items-center justify-center rounded-[32px] py-10 shadow-2xl shadow-black/10 active:scale-[0.99] transition"
-        style={{
-          color: "var(--card-foreground)",
-          touchAction: "manipulation",
-          minHeight: 360,
-        }}
-      >
-        <div className={`relative ${pulse ? "tap-pulse" : ""} ${flash ? "pop-in" : ""}`}>
-          <ProgressRing value={cycleCount} max={milestone} size={260} stroke={14} complete={false} />
+      <div className="my-5 h-px shrink-0" style={{ background: "var(--border)" }} />
+
+      {/* Giant number + arc */}
+      <div className="flex shrink-0 flex-col items-center">
+        <div className="relative" style={{ width: arcSize, height: arcSize }}>
+          {hasMilestone && (
+            <svg width={arcSize} height={arcSize} className="absolute inset-0">
+              <circle
+                cx={arcSize / 2}
+                cy={arcSize / 2}
+                r={r}
+                stroke="var(--ring-track, rgba(255,255,255,0.18))"
+                strokeWidth={stroke}
+                fill="none"
+              />
+              <circle
+                cx={arcSize / 2}
+                cy={arcSize / 2}
+                r={r}
+                stroke="var(--accent)"
+                strokeWidth={stroke}
+                strokeLinecap="round"
+                fill="none"
+                strokeDasharray={c}
+                strokeDashoffset={c * (1 - pct)}
+                transform={`rotate(-90 ${arcSize / 2} ${arcSize / 2})`}
+                style={{ transition: "stroke-dashoffset 350ms cubic-bezier(0.34,1.56,0.64,1)" }}
+              />
+            </svg>
+          )}
           <div className="absolute inset-0 flex flex-col items-center justify-center">
-            <span className="text-[64px] font-bold leading-none tracking-tight tabular-nums">{total}</span>
-            <span className="mt-2 text-xs opacity-70">
-              cycle {cycleNum} · {cycleCount}/{milestone}
+            <span
+              className={`tabular-nums leading-none ${pulse ? "tap-pulse" : ""} ${flash ? "pop-in" : ""}`}
+              style={{
+                fontSize: 96,
+                fontWeight: 800,
+                letterSpacing: "-0.02em",
+                color: flash ? "var(--accent)" : "var(--foreground)",
+                transition: "color 200ms",
+              }}
+            >
+              {total}
             </span>
           </div>
-          {flash && (
-            <span
-              className="radial-pulse pointer-events-none absolute inset-0 rounded-full"
-              style={{ background: "color-mix(in oklab, var(--accent) 60%, transparent)" }}
-            />
-          )}
         </div>
-        <div className="mt-7 text-sm opacity-80">{label || "Tap to count"}</div>
-        <div className="mt-1 text-[11px] opacity-50">Hold to reset</div>
+        <div className="mt-3 text-sm opacity-70">
+          {hasMilestone ? <>cycle {cycleNum} · {cycleCount}/{milestone}</> : <>continuous</>}
+        </div>
+      </div>
+
+      <div className="my-5 h-px shrink-0" style={{ background: "var(--border)" }} />
+
+      {/* Giant tap area */}
+      <button
+        onMouseDown={onPressStart}
+        onMouseUp={onPressEnd}
+        onMouseLeave={onPressCancel}
+        onTouchStart={(e) => { e.preventDefault(); onPressStart(); }}
+        onTouchEnd={(e) => { e.preventDefault(); onPressEnd(); }}
+        onTouchCancel={onPressCancel}
+        className="flex flex-1 flex-col items-center justify-center rounded-3xl active:scale-[0.99]"
+        style={{
+          background: "color-mix(in oklab, var(--foreground) 4%, transparent)",
+          border: "1px dashed color-mix(in oklab, var(--foreground) 15%, transparent)",
+          touchAction: "manipulation",
+          color: "var(--foreground)",
+        }}
+        aria-label="tap to count"
+      >
+        <span className="label-caps">Tap to count</span>
+        <span className="mt-1 text-[11px] opacity-50">Hold 2s to reset</span>
       </button>
+
+      <div className="flex shrink-0 justify-center pt-3">
+        <button
+          onClick={() => { setTotal(0); showToast("Counter reset"); }}
+          className="rounded-full px-5 py-1.5 text-xs font-semibold"
+          style={{
+            background: "var(--btn-surface, var(--surface))",
+            color: "var(--btn-fg, var(--foreground))",
+            border: "1px solid var(--border)",
+          }}
+        >
+          Reset
+        </button>
+      </div>
 
       {toast && (
         <div
