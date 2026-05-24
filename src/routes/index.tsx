@@ -18,8 +18,8 @@ function Morning() {
       kind="morning"
       title="Morning"
       subtitle="Between Fajr & Sunrise"
-      emoji="🌅"
       list={morningAdhkar}
     />
+
   );
 }
