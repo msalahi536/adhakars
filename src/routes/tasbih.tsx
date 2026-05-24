@@ -167,20 +167,14 @@ function Tasbih() {
 
         {/* Big tap button */}
         <button
-          onMouseDown={() => setPressed(true)}
-          onMouseUp={() => setPressed(false)}
-          onMouseLeave={() => setPressed(false)}
-          onTouchStart={(e) => { e.preventDefault(); setPressed(true); tap(); }}
-          onTouchEnd={(e) => { e.preventDefault(); setPressed(false); }}
-          onClick={(e) => {
-            // For non-touch (desktop) clicks
-            if ((e as React.MouseEvent).detail === 0) return;
-            // touchstart already incremented on mobile; this fires on mouse only
-            // Detect: if last event was touch, skip
+          onPointerDown={(e) => {
+            e.preventDefault();
+            setPressed(true);
+            tap();
           }}
-          onPointerUp={(e) => {
-            if (e.pointerType === "mouse") tap();
-          }}
+          onPointerUp={() => setPressed(false)}
+          onPointerLeave={() => setPressed(false)}
+          onPointerCancel={() => setPressed(false)}
           className="mt-5 flex items-center justify-center"
           style={{
             width: 130,
