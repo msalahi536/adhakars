@@ -104,35 +104,22 @@ export function SwipeStack({ items, counts, onIncrement }: Props) {
 
         {/* Incoming / current card */}
         {current && (
-          <div
-            className="card-slide absolute inset-0 px-3"
-            style={
-              anim
-                ? {
-                    // start position depends on direction; we set initial via key+inline starting transform using animation frame
-                    transform: "translateX(0)",
-                    opacity: 1,
-                  }
-                : { transform: "translateX(0)", opacity: 1 }
-            }
+          <IncomingCard
+            animKey={`${idx}-${anim?.from ?? "static"}`}
+            dir={anim?.dir ?? null}
+            width={width}
           >
-            <IncomingCard
-              animKey={`${idx}-${anim?.from ?? "static"}`}
-              dir={anim?.dir ?? null}
-              width={width}
-            >
-              <DhikrCard
-                key={current.dhikr.id}
-                dhikr={current.dhikr}
-                count={counts[current.dhikr.id] ?? 0}
-                onIncrement={handleIncrement}
-                index={idx + 1}
-                total={items.length}
-                isSpecial={current.isSpecial}
-                specialLabel={current.specialLabel}
-              />
-            </IncomingCard>
-          </div>
+            <DhikrCard
+              key={current.dhikr.id}
+              dhikr={current.dhikr}
+              count={counts[current.dhikr.id] ?? 0}
+              onIncrement={handleIncrement}
+              index={idx + 1}
+              total={items.length}
+              isSpecial={current.isSpecial}
+              specialLabel={current.specialLabel}
+            />
+          </IncomingCard>
         )}
       </div>
 
