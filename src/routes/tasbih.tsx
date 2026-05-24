@@ -157,31 +157,35 @@ function Tasbih() {
             </linearGradient>
           </defs>
           {/*
-            Organic worry-stone silhouette: wider top, narrower bottom, asymmetric curves.
-            Hand-tuned Bezier path.
+            Asymmetric worry-stone silhouette: right shoulder bulges higher and wider,
+            left side dips with a softer hip, bottom is offset slightly right.
+            Each Bezier handle is hand-placed — no mirror, no symmetry.
           */}
           <path
             d="
-              M 150 8
-              C 220 8, 282 50, 288 130
-              C 294 200, 280 260, 260 320
-              C 244 370, 200 412, 150 412
-              C 100 412, 58 372, 42 322
-              C 22 262, 8 198, 14 128
-              C 22 50, 80 8, 150 8
+              M 168 6
+              C 232 14, 286 62, 290 138
+              C 292 188, 268 232, 256 282
+              C 246 326, 238 372, 198 402
+              C 168 422, 124 416, 96 396
+              C 62 372, 40 332, 30 286
+              C 18 232, 6 184, 18 132
+              C 32 70, 92 -2, 168 6
               Z
             "
             fill="url(#shellGrad)"
             stroke="#8A9CA3"
             strokeWidth={3}
+            strokeLinejoin="round"
           />
-          {/* Subtle top highlight */}
+          {/* Asymmetric top-left highlight following the bulge */}
           <path
             d="
-              M 150 8
-              C 220 8, 282 50, 288 130
-              C 240 70, 80 70, 14 128
-              C 22 50, 80 8, 150 8
+              M 168 6
+              C 232 14, 286 62, 290 138
+              C 250 78, 130 60, 60 112
+              C 40 124, 26 134, 18 132
+              C 32 70, 92 -2, 168 6
               Z
             "
             fill="url(#shellHighlight)"
