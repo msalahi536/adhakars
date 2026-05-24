@@ -193,7 +193,7 @@ function IncomingCard({
 
   return (
     <div
-      className="card-slide h-full w-full"
+      className="card-slide absolute inset-0 px-3"
       style={{ transform }}
     >
       {children}
