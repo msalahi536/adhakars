@@ -138,6 +138,11 @@ function Settings() {
           value={display.arabicLarge}
           onChange={(v) => updateDisplay({ arabicLarge: v })}
         />
+        <Toggle
+          label="Vibrate on tap"
+          value={display.vibrate}
+          onChange={(v) => updateDisplay({ vibrate: v })}
+        />
       </section>
 
       <section className="mb-6">
