@@ -41,12 +41,13 @@ export function AdhkarPage({ kind, title, subtitle, list, extras = [] }: Props) 
     >
       {/* Header */}
       <div
-        className="shrink-0 px-5 pt-5 pb-4"
+        className="shrink-0 px-5 pb-4"
         style={{
           background: "var(--grad-header)",
           color: "var(--header-fg, var(--accent-foreground))",
           borderBottomLeftRadius: 24,
           borderBottomRightRadius: 24,
+          paddingTop: "calc(env(safe-area-inset-top) + 20px)",
         }}
       >
         <div className="label-caps" style={{ color: "var(--header-sub, var(--header-fg, var(--accent-foreground)))", opacity: 1 }}>
