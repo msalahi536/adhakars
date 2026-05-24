@@ -130,14 +130,14 @@ function Tasbih() {
 
       {/* Device shell — organic worry-stone shape */}
       <div
-        className="relative mt-6 flex flex-col items-center"
-        style={{ width: 320, height: 440 }}
+        className="relative mt-6"
+        style={{ width: 280, height: 400 }}
       >
         {/* SVG shell */}
         <svg
-          viewBox="0 0 320 440"
-          width={320}
-          height={440}
+          viewBox="0 0 280 400"
+          width={280}
+          height={400}
           style={{
             position: "absolute",
             inset: 0,
@@ -160,38 +160,33 @@ function Tasbih() {
               <stop offset="45%" stopColor="rgba(255,255,255,0)" />
             </linearGradient>
           </defs>
-          {/*
-            Asymmetric worry-stone silhouette (re-scaled to 320x440).
-            Right shoulder bulges higher, left hip dips lower, base offset right.
-          */}
           <path
             d="
-              M 178 10
-              C 246 18, 304 70, 308 150
-              C 310 202, 286 250, 274 302
-              C 264 348, 254 396, 212 426
-              C 180 446, 132 440, 102 420
-              C 66 396, 42 354, 32 306
-              C 20 250, 8 198, 22 144
-              C 38 78, 100 2, 178 10
+              M 156 10
+              C 216 18, 266 64, 270 138
+              C 272 186, 250 228, 240 276
+              C 230 318, 222 362, 184 388
+              C 156 406, 116 400, 90 382
+              C 58 360, 38 322, 28 280
+              C 18 228, 8 180, 20 132
+              C 34 70, 86 2, 156 10
               Z
             "
             fill="url(#shellGrad)"
             stroke="url(#shellStroke)"
-            strokeWidth={7}
+            strokeWidth={6}
             strokeLinejoin="round"
           />
-          {/* Inner soft bezel — narrower stroke just inside the outer stroke */}
           <path
             d="
-              M 178 18
-              C 240 26, 296 74, 300 152
-              C 302 202, 280 248, 268 298
-              C 258 342, 248 388, 208 416
-              C 178 434, 134 428, 106 410
-              C 72 388, 50 348, 40 302
-              C 30 250, 18 200, 30 148
-              C 46 84, 104 12, 178 18
+              M 156 18
+              C 212 26, 260 70, 262 140
+              C 264 186, 244 226, 234 272
+              C 226 314, 216 354, 180 378
+              C 154 394, 118 388, 94 372
+              C 64 352, 46 318, 36 278
+              C 28 228, 18 184, 30 138
+              C 44 78, 92 12, 156 18
               Z
             "
             fill="none"
@@ -199,184 +194,146 @@ function Tasbih() {
             strokeWidth={2}
             strokeLinejoin="round"
           />
-          {/* Asymmetric top-left highlight following the bulge */}
           <path
             d="
-              M 178 10
-              C 246 18, 304 70, 308 150
-              C 264 88, 138 66, 64 124
-              C 44 138, 30 146, 22 144
-              C 38 78, 100 2, 178 10
+              M 156 10
+              C 216 18, 266 64, 270 138
+              C 232 84, 122 64, 58 116
+              C 40 130, 28 138, 20 132
+              C 34 70, 86 2, 156 10
               Z
             "
             fill="url(#shellHighlight)"
           />
         </svg>
 
-        {/* LCD — upper area, ~60% of shell width */}
+        {/* Inner flex column — strict layout, no overflow */}
         <div
-          style={{
-            position: "absolute",
-            top: 52,
-            left: "50%",
-            transform: "translateX(-50%)",
-            width: 200,
-            height: 84,
-            borderRadius: 22,
-            background: flash
-              ? "linear-gradient(180deg, #E6F0CC 0%, #D8E6BC 100%)"
-              : "linear-gradient(180deg, #B8C89C 0%, #C8D7AE 100%)",
-            boxShadow:
-              "inset 0 4px 10px rgba(0,0,0,0.32), inset 0 -1px 2px rgba(255,255,255,0.4), 0 1px 0 rgba(255,255,255,0.06)",
-            transition: "background 0.18s ease",
-            overflow: "hidden",
-          }}
+          className="relative flex h-full w-full flex-col items-center"
+          style={{ padding: "32px 28px", gap: 20 }}
         >
-          {/* Ghost segments — full width inside, right aligned */}
-          <span
-            aria-hidden
+          {/* Section A — LCD */}
+          <div
             style={{
-              position: "absolute",
-              inset: 0,
+              width: 180,
+              height: 64,
+              borderRadius: 10,
+              background: flash ? "#D8E6BC" : "#C5D4AA",
+              boxShadow: "inset 0 2px 6px rgba(0,0,0,0.25)",
+              position: "relative",
+              transition: "background 0.18s ease",
               display: "flex",
-              alignItems: "center",
-              justifyContent: "flex-end",
-              paddingRight: 18,
-              fontFamily: "'Share Tech Mono', ui-monospace, monospace",
-              fontVariantNumeric: "tabular-nums",
-              fontSize: 52,
-              lineHeight: 1,
-              letterSpacing: "0.06em",
-              color: "#1A1F1C",
-              opacity: 0.09,
-              fontWeight: 400,
-              pointerEvents: "none",
+              flexDirection: "column",
+              justifyContent: "center",
+              paddingRight: 12,
+              paddingLeft: 12,
+              alignItems: "flex-end",
             }}
           >
-            8888
-          </span>
-          {/* Live number — same font/size/position, right aligned */}
-          <span
-            style={{
-              position: "absolute",
-              inset: 0,
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "flex-end",
-              paddingRight: 18,
-              fontFamily: "'Share Tech Mono', ui-monospace, monospace",
-              fontVariantNumeric: "tabular-nums",
-              fontSize: 52,
-              lineHeight: 1,
-              letterSpacing: "0.06em",
-              color: "#1A1F1C",
-              fontWeight: 400,
-              zIndex: 1,
-            }}
-          >
-            {total}
-          </span>
+            <span
+              style={{
+                fontFamily: "'Share Tech Mono', ui-monospace, monospace",
+                fontVariantNumeric: "tabular-nums",
+                fontSize: 36,
+                lineHeight: 1,
+                letterSpacing: "0.04em",
+                color: "#1A1F1C",
+                fontWeight: 400,
+              }}
+            >
+              {total}
+            </span>
+            <span
+              style={{
+                fontSize: 10,
+                color: "rgba(26,31,28,0.6)",
+                marginTop: 2,
+                letterSpacing: "0.08em",
+                fontWeight: 600,
+              }}
+            >
+              {hasMilestone ? `cycle ${cycleNum} · ${cycleCount}/${milestone}` : "∞ continuous"}
+            </span>
+          </div>
+
+          {/* Section B — Undo / Reset row */}
+          <div className="flex w-full items-center justify-between">
+            <button
+              onClick={undo}
+              className="transition-transform active:scale-90"
+              style={{
+                width: 48,
+                height: 48,
+                borderRadius: "50%",
+                background: "#5C6D74",
+                border: "1px solid rgba(0,0,0,0.25)",
+                color: "#B8C5CB",
+                boxShadow:
+                  "inset 0 1px 0 rgba(255,255,255,0.18), inset 0 -2px 5px rgba(0,0,0,0.3), 0 3px 6px rgba(0,0,0,0.28)",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+              aria-label="undo"
+            >
+              <Undo2 size={20} />
+            </button>
+            <button
+              onMouseDown={onResetStart}
+              onMouseUp={onResetEnd}
+              onMouseLeave={onResetEnd}
+              onTouchStart={onResetStart}
+              onTouchEnd={onResetEnd}
+              style={{
+                width: 48,
+                height: 48,
+                borderRadius: "50%",
+                background: "#5C6D74",
+                border: "1px solid rgba(0,0,0,0.25)",
+                color: "#B8C5CB",
+                boxShadow:
+                  "inset 0 1px 0 rgba(255,255,255,0.18), inset 0 -2px 5px rgba(0,0,0,0.3), 0 3px 6px rgba(0,0,0,0.28)",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+              aria-label="hold to reset"
+            >
+              <RotateCcw size={20} />
+            </button>
+          </div>
+
+          {/* Section C — Tap button */}
+          <div className="flex flex-1 items-center justify-center">
+            <button
+              onPointerDown={(e) => {
+                e.preventDefault();
+                setPressed(true);
+                tap();
+              }}
+              onPointerUp={() => setPressed(false)}
+              onPointerLeave={() => setPressed(false)}
+              onPointerCancel={() => setPressed(false)}
+              style={{
+                width: 130,
+                height: 130,
+                transform: pressed ? "scale(0.95)" : "scale(1)",
+                borderRadius: "50%",
+                background:
+                  "radial-gradient(circle at 32% 28%, #C5D0D5 0%, #9FAEB4 100%)",
+                border: "4px solid #6B7880",
+                boxShadow: pressed
+                  ? "0 2px 6px rgba(0,0,0,0.25), inset 0 3px 8px rgba(0,0,0,0.28)"
+                  : "0 6px 16px rgba(0,0,0,0.25), inset 0 3px 0 rgba(255,255,255,0.4), inset 0 -3px 6px rgba(0,0,0,0.15)",
+                transition: "transform 90ms ease, box-shadow 90ms ease",
+                touchAction: "manipulation",
+                cursor: "pointer",
+                outline: "none",
+              }}
+              aria-label="tap to count"
+            />
+          </div>
         </div>
-
-        {/* Cycle text — just below LCD, inside shell */}
-        <div
-          style={{
-            position: "absolute",
-            top: 146,
-            left: 0,
-            right: 0,
-            textAlign: "center",
-            fontSize: 11,
-            color: "#9BAEB5",
-            letterSpacing: "0.12em",
-            fontWeight: 600,
-          }}
-        >
-          {hasMilestone ? `cycle ${cycleNum} · ${cycleCount}/${milestone}` : "∞ continuous"}
-        </div>
-
-        {/* Undo / Reset row — middle band, inset from shell edges */}
-        <button
-          onClick={undo}
-          className="transition-transform active:scale-90"
-          style={{
-            position: "absolute",
-            top: 178,
-            left: 76,
-            width: 52,
-            height: 52,
-            borderRadius: "50%",
-            background: "#5C6D74",
-            border: "1px solid rgba(0,0,0,0.25)",
-            color: "#B8C5CB",
-            boxShadow:
-              "inset 0 1px 0 rgba(255,255,255,0.18), inset 0 -2px 5px rgba(0,0,0,0.3), 0 3px 6px rgba(0,0,0,0.28)",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-          }}
-          aria-label="undo"
-        >
-          <Undo2 size={20} />
-        </button>
-        <button
-          onMouseDown={onResetStart}
-          onMouseUp={onResetEnd}
-          onMouseLeave={onResetEnd}
-          onTouchStart={onResetStart}
-          onTouchEnd={onResetEnd}
-          style={{
-            position: "absolute",
-            top: 178,
-            right: 76,
-            width: 52,
-            height: 52,
-            borderRadius: "50%",
-            background: "#5C6D74",
-            border: "1px solid rgba(0,0,0,0.25)",
-            color: "#B8C5CB",
-            boxShadow:
-              "inset 0 1px 0 rgba(255,255,255,0.18), inset 0 -2px 5px rgba(0,0,0,0.3), 0 3px 6px rgba(0,0,0,0.28)",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-          }}
-          aria-label="hold to reset"
-        >
-          <RotateCcw size={20} />
-        </button>
-
-        {/* Main tap button — lower 50%, centered */}
-        <button
-          onPointerDown={(e) => {
-            e.preventDefault();
-            setPressed(true);
-            tap();
-          }}
-          onPointerUp={() => setPressed(false)}
-          onPointerLeave={() => setPressed(false)}
-          onPointerCancel={() => setPressed(false)}
-          style={{
-            position: "absolute",
-            bottom: 48,
-            left: "50%",
-            width: 180,
-            height: 180,
-            transform: pressed ? "translateX(-50%) scale(0.96)" : "translateX(-50%) scale(1)",
-            borderRadius: "50%",
-            background:
-              "radial-gradient(circle at 32% 28%, #D4DEE3 0%, #B5C0C5 48%, #9FAEB4 100%)",
-            border: "7px solid #6B7880",
-            boxShadow: pressed
-              ? "0 3px 8px rgba(0,0,0,0.4), inset 0 3px 8px rgba(0,0,0,0.28)"
-              : "0 14px 28px rgba(0,0,0,0.4), inset 0 3px 0 rgba(255,255,255,0.45), inset 0 -4px 8px rgba(0,0,0,0.18)",
-            transition: "transform 90ms ease, box-shadow 90ms ease",
-            touchAction: "manipulation",
-            cursor: "pointer",
-            outline: "none",
-          }}
-          aria-label="tap to count"
-        />
       </div>
 
 
@@ -385,14 +342,14 @@ function Tasbih() {
         <div
           style={{
             fontSize: 11,
-            color: "#8A9CA3",
+            color: "rgba(255,255,255,0.45)",
             letterSpacing: "0.15em",
             fontWeight: 600,
           }}
         >
           TAP BUTTON TO COUNT
         </div>
-        <div style={{ fontSize: 10, color: "#8A9CA3", opacity: 0.7, marginTop: 4 }}>
+        <div style={{ fontSize: 10, color: "rgba(255,255,255,0.3)", marginTop: 4 }}>
           Hold reset 1.5s to clear
         </div>
       </div>
