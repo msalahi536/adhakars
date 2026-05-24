@@ -56,7 +56,13 @@ function Settings() {
   };
 
   return (
-    <div className="mx-auto max-w-md px-4 pt-6 pb-[calc(110px+env(safe-area-inset-bottom))]">
+    <div
+      className="mx-auto max-w-md px-4"
+      style={{
+        paddingTop: "calc(env(safe-area-inset-top) + 16px)",
+        paddingBottom: "calc(env(safe-area-inset-bottom) + 80px)",
+      }}
+    >
       <header className="mb-5">
         <div className="label-caps">Preferences</div>
         <h1 className="mt-1 text-3xl font-bold">Settings</h1>
