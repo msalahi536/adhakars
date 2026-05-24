@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
-import { themes, getMode, setMode, applyTheme, resolveTheme, getDisplay, setDisplay, type ThemeMode, type ThemeId } from "@/lib/theme";
+import { themes, getMode, setMode, applyTheme, resolveTheme, getDisplay, setDisplay, type ThemeMode } from "@/lib/theme";
 import { getStreak, resetToday } from "@/lib/storage";
 
 export const Route = createFileRoute("/settings")({
@@ -177,6 +177,3 @@ function Toggle({ label, value, onChange }: { label: string; value: boolean; onC
     </button>
   );
 }
-
-// helper to expose ThemeId import compat
-export type _ = ThemeId;
