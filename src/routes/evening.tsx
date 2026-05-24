@@ -18,9 +18,9 @@ function Evening() {
       kind="evening"
       title="Evening"
       subtitle="Between 'Asr & Maghrib"
-      emoji="🌙"
       list={eveningAdhkar}
-      extras={[{ dhikr: baqarahLastTwo, isSpecial: true, specialLabel: "🌇 After Sunset — Recite after the sun has set" }]}
+      extras={[{ dhikr: baqarahLastTwo, isSpecial: true, specialLabel: "After Sunset — recite after the sun has set" }]}
     />
+
   );
 }
