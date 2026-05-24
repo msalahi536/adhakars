@@ -50,7 +50,14 @@
   --header-fg: #2d1f00;
   --nav-bg: rgba(245, 240, 232, 0.97);
   --nav-border: rgba(45, 31, 0, 0.08);
+  --header-sub: #2d1f00;
+  --index-badge-bg: #c9a84c;
+  --index-badge-fg: #2d1f00;
+  --ring-track: rgba(255, 255, 255, 0.18);
+  --btn-surface: rgba(45, 31, 0, 0.08);
+  --btn-fg: #2d1f00;
 }
+
 
 /* ===== Dusk (evening auto) — deep navy + crisp white ===== */
 [data-theme="dusk"] {
