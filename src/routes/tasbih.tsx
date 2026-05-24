@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { RotateCcw, Undo2 } from "lucide-react";
+import { vibrateIfEnabled } from "@/lib/theme";
 
 export const Route = createFileRoute("/tasbih")({
   head: () => ({
@@ -51,11 +52,11 @@ function Tasbih() {
   };
 
   const tap = () => {
-    if (navigator.vibrate) navigator.vibrate(12);
+    vibrateIfEnabled(12);
     setTotal((n) => {
       const next = n + 1;
       if (hasMilestone && next % milestone === 0) {
-        if (navigator.vibrate) navigator.vibrate([40, 20, 40]);
+        vibrateIfEnabled([40, 20, 40]);
         setFlash(true);
         setTimeout(() => setFlash(false), 220);
       }
@@ -64,13 +65,13 @@ function Tasbih() {
   };
 
   const undo = () => {
-    if (navigator.vibrate) navigator.vibrate(8);
+    vibrateIfEnabled(8);
     setTotal((n) => Math.max(0, n - 1));
   };
 
   const onResetStart = () => {
     resetTimer.current = setTimeout(() => {
-      if (navigator.vibrate) navigator.vibrate(40);
+      vibrateIfEnabled(40);
       setTotal(0);
       showToast("Count reset ✓");
     }, 1500);
@@ -207,15 +208,30 @@ function Tasbih() {
           />
         </svg>
 
-        {/* Inner flex column — strict layout, no overflow */}
+        {/* Inner content — constrained column, never overflows shell */}
         <div
-          className="relative flex h-full w-full flex-col items-center"
-          style={{ padding: "32px 28px", gap: 20 }}
+          style={{
+            position: "absolute",
+            top: 0,
+            left: "50%",
+            transform: "translateX(-50%)",
+            width: "70%",
+            maxWidth: 200,
+            height: "100%",
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            justifyContent: "space-evenly",
+            padding: "40px 0",
+            background: "transparent",
+            border: "none",
+          }}
         >
           {/* Section A — LCD */}
           <div
             style={{
-              width: 180,
+              width: "100%",
+              maxWidth: 180,
               height: 64,
               borderRadius: 10,
               background: flash ? "#D8E6BC" : "#C5D4AA",
@@ -304,7 +320,7 @@ function Tasbih() {
           </div>
 
           {/* Section C — Tap button */}
-          <div className="flex flex-1 items-center justify-center">
+          <div className="flex items-center justify-center">
             <button
               onPointerDown={(e) => {
                 e.preventDefault();
