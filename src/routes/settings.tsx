@@ -33,10 +33,27 @@ function Settings() {
     window.dispatchEvent(new Event("adhkar:display-update"));
   };
 
-  const themeOptions: { id: ThemeMode; name: string; swatch?: [string, string, string] }[] = [
-    { id: "auto", name: "Auto (Dawn / Dusk)" },
-    ...themes.map((t) => ({ id: t.id as ThemeMode, name: t.name, swatch: t.swatch })),
-  ];
+  const themePreview = (variant: "morning" | "evening") => {
+    const isMorning = variant === "morning";
+    const bg = isMorning ? "#faf6ec" : "#eef2f8";
+    const card = isMorning ? "#fffcf4" : "#f5f8fc";
+    const border = isMorning ? "rgba(184,146,58,0.25)" : "rgba(74,107,154,0.25)";
+    const text = isMorning ? "#2d1f00" : "#1f3a5c";
+    const accent = isMorning ? "#c9a84c" : "#4a6b9a";
+    const translit = isMorning ? "#b8923a" : "#4a6b9a";
+    return (
+      <div className="flex h-24 items-center justify-center rounded-2xl p-3" style={{ background: bg }}>
+        <div
+          className="flex w-full max-w-[180px] flex-col items-center gap-1 rounded-xl px-3 py-2"
+          style={{ background: card, border: `1px solid ${border}`, color: text }}
+        >
+          <div className="text-[14px] font-bold" style={{ fontFamily: "Scheherazade New, serif" }}>ٱ</div>
+          <div className="text-[9px] italic" style={{ color: translit }}>bismillah</div>
+          <div className="h-1 w-6 rounded-full" style={{ background: accent }} />
+        </div>
+      </div>
+    );
+  };
 
   return (
     <div className="mx-auto max-w-md px-4 pt-6 pb-[calc(110px+env(safe-area-inset-bottom))]">
@@ -48,61 +65,55 @@ function Settings() {
       <section
         className="mb-6 overflow-hidden rounded-[24px] p-6 shadow-xl shadow-black/10"
         style={{
-          background:
-            mode === "dusk" || mode === "deep-navy" || mode === "dark-emerald"
-              ? "linear-gradient(135deg, #2d3561, #3d4a8a)"
-              : "linear-gradient(135deg, #1d3d2a, #2d5a3d)",
+          background: "linear-gradient(135deg, #c9a84c, #b8923a)",
           color: "#ffffff",
         }}
       >
-        <div className="label-caps" style={{ color: "rgba(255,255,255,0.8)", opacity: 1 }}>
+        <div className="label-caps" style={{ color: "rgba(255,255,255,0.85)", opacity: 1 }}>
           Current streak
         </div>
         <div className="mt-1 flex items-baseline gap-2">
-          <span style={{ fontSize: 48, fontWeight: 800, color: "#c9a84c", lineHeight: 1 }}>
+          <span style={{ fontSize: 48, fontWeight: 800, color: "#ffffff", lineHeight: 1 }}>
             {streak.current}
           </span>
-          <span className="text-sm font-semibold opacity-80">days</span>
+          <span className="text-sm font-semibold opacity-90">days</span>
         </div>
         <div
           className="mt-4 flex items-center justify-between border-t pt-3 text-xs font-semibold"
-          style={{ borderColor: "rgba(255,255,255,0.18)" }}
+          style={{ borderColor: "rgba(255,255,255,0.25)" }}
         >
           <span>Longest: {streak.longest} days</span>
-          <span className="opacity-80">{streak.lastCompleted ? `Last: ${streak.lastCompleted}` : "Start today"}</span>
+          <span className="opacity-90">{streak.lastCompleted ? `Last: ${streak.lastCompleted}` : "Start today"}</span>
         </div>
       </section>
 
       <section className="mb-6">
         <h2 className="label-caps mb-3">Theme</h2>
-        <div className="grid grid-cols-2 gap-3">
-          {themeOptions.map((t) => {
+        <div className="space-y-3">
+          {themes.map((t) => {
             const active = mode === t.id;
-            const swatch = t.swatch || ["#fbf5e2", "#0e1230", "#e0b552"];
             return (
               <button
                 key={t.id}
                 onClick={() => choose(t.id)}
-                className="overflow-hidden rounded-2xl p-3 text-left transition"
+                className="w-full overflow-hidden rounded-[24px] p-3 text-left transition"
                 style={{
                   background: "var(--surface)",
-                  border: active ? "2px solid var(--accent)" : "1px solid var(--border)",
+                  border: active ? "2px solid #c9a84c" : "1px solid var(--border)",
                 }}
               >
-                <div
-                  className="mb-2 flex h-14 items-center justify-center rounded-xl"
-                  style={{
-                    background: `linear-gradient(135deg, ${swatch[0]}, ${swatch[1]})`,
-                  }}
-                >
-                  <div
-                    className="rounded-lg px-2.5 py-1 text-[10px] font-bold"
-                    style={{ background: swatch[2], color: swatch[1] }}
-                  >
-                    Aa ٱ
+                {t.id === "auto" ? (
+                  <div className="mb-2 grid grid-cols-2 gap-2">
+                    {themePreview("morning")}
+                    {themePreview("evening")}
                   </div>
+                ) : (
+                  <div className="mb-2">{themePreview("morning")}</div>
+                )}
+                <div className="px-1">
+                  <div className="text-sm font-semibold">{t.name}</div>
+                  <div className="text-xs opacity-70">{t.description}</div>
                 </div>
-                <div className="text-xs font-semibold">{t.name}</div>
               </button>
             );
           })}
