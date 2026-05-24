@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { themes, getMode, setMode, applyTheme, resolveTheme, getDisplay, setDisplay, type ThemeMode } from "@/lib/theme";
 import { getStreak, resetToday } from "@/lib/storage";
+import { requestNotificationPermission, getNotificationPermission } from "@/lib/onesignal";
 
 export const Route = createFileRoute("/settings")({
   head: () => ({ meta: [{ title: "Settings — My Adhkar" }] }),
@@ -13,12 +14,22 @@ function Settings() {
   const [streak, setStreak] = useState({ current: 0, longest: 0, lastCompleted: null as string | null });
   const [display, setDisplayState] = useState(getDisplay());
   const [confirmReset, setConfirmReset] = useState(false);
+  const [notifEnabled, setNotifEnabled] = useState(false);
 
   useEffect(() => {
     setModeState(getMode());
     setStreak(getStreak());
     setDisplayState(getDisplay());
+    const check = () => setNotifEnabled(getNotificationPermission());
+    check();
+    const id = setInterval(check, 1000);
+    return () => clearInterval(id);
   }, []);
+
+  const handleEnableNotifications = async () => {
+    const granted = await requestNotificationPermission();
+    setNotifEnabled(granted);
+  };
 
   const choose = (m: ThemeMode) => {
     setModeState(m);
@@ -123,6 +134,30 @@ function Settings() {
               </button>
             );
           })}
+        </div>
+      </section>
+
+      <section className="mb-6">
+        <h2 className="label-caps mb-3">Notifications</h2>
+        <div
+          className="rounded-[24px] p-4"
+          style={{ background: "var(--surface)", border: "1px solid var(--border)" }}
+        >
+          <div className="text-sm" style={{ fontWeight: 600 }}>Daily Adhkar Reminders</div>
+          <div className="mt-1 text-xs opacity-70">Morning at 5:00 AM, Evening at 4:30 PM</div>
+          {notifEnabled ? (
+            <div className="mt-3 flex items-center justify-between text-xs">
+              <span className="opacity-70">Reminders enabled ✓</span>
+            </div>
+          ) : (
+            <button
+              onClick={handleEnableNotifications}
+              className="mt-3 w-full rounded-full py-2 text-sm font-semibold"
+              style={{ background: "#c9a84c", color: "#ffffff" }}
+            >
+              Enable Reminders
+            </button>
+          )}
         </div>
       </section>
 
