@@ -59,33 +59,33 @@
 }
 
 
-/* ===== Dusk (evening auto) — deep navy + crisp white ===== */
+/* ===== Dusk (evening auto) — soft cool white page + deep navy cards ===== */
 [data-theme="dusk"] {
   --radius: 1.5rem;
-  --background: #0a1628;
-  --foreground: #ffffff;
-  --surface: #162544;
-  --card: #162544;
-  --card-2: #1e3458;
+  --background: #f0f4f8;
+  --foreground: #0f2744;
+  --surface: #e2ecf5;
+  --card: #1a3a5c;
+  --card-2: #224878;
   --card-foreground: #ffffff;
-  --muted: #0f1e38;
-  --muted-foreground: #7aafd4;
-  --primary: #162544;
+  --muted: #e2ecf5;
+  --muted-foreground: #3a6a9a;
+  --primary: #1a3a5c;
   --primary-foreground: #ffffff;
   --accent: #c9a84c;
-  --accent-foreground: #0a1628;
-  --border: rgba(255, 255, 255, 0.12);
-  --translit: #a8c8e8;
-  --grad-header: linear-gradient(135deg, #162544 0%, #0a1628 100%);
-  --header-fg: #ffffff;
-  --header-sub: #7aafd4;
-  --nav-bg: rgba(10, 22, 40, 0.97);
-  --nav-border: rgba(255, 255, 255, 0.08);
-  --index-badge-bg: #1e4a7a;
-  --index-badge-fg: #ffffff;
+  --accent-foreground: #0f2744;
+  --border: transparent;
+  --translit: #a8cce0;
+  --grad-header: linear-gradient(135deg, #c8dff0 0%, #a8c8e0 100%);
+  --header-fg: #0f2744;
+  --header-sub: #3a6a9a;
+  --nav-bg: rgba(240, 244, 248, 0.97);
+  --nav-border: rgba(15, 39, 68, 0.08);
+  --index-badge-bg: #0f2744;
+  --index-badge-fg: #7ab0d4;
   --ring-track: rgba(255, 255, 255, 0.2);
-  --btn-surface: rgba(255, 255, 255, 0.15);
-  --btn-fg: #ffffff;
+  --btn-surface: rgba(15, 39, 68, 0.08);
+  --btn-fg: #0f2744;
 }
 
 
