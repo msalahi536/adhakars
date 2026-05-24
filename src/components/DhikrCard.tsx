@@ -55,15 +55,21 @@ export function DhikrCard({ dhikr, count, onIncrement, index, total, isSpecial, 
       className="card-grad relative flex h-full w-full flex-col overflow-hidden rounded-[28px] shadow-2xl shadow-black/20"
       style={{ color: "var(--card-foreground)", border: "1px solid var(--border)" }}
     >
-      {/* Header strip: title only (small, muted) */}
-      <div className="flex items-center justify-between px-5 pt-5">
+      {/* Header strip: badge + title + index */}
+      <div className="flex items-center gap-3 px-5 pt-5">
+        <span
+          className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-xs font-bold"
+          style={{ background: "var(--index-badge-bg, var(--accent))", color: "var(--index-badge-fg, var(--accent-foreground))" }}
+        >
+          {index}
+        </span>
         <h3
-          className="text-[13px] font-semibold uppercase opacity-70"
-          style={{ letterSpacing: "0.12em" }}
+          className="flex-1 text-[12px] font-semibold uppercase"
+          style={{ letterSpacing: "0.12em", color: "var(--card-foreground)", opacity: 0.85 }}
         >
           {dhikr.title}
         </h3>
-        <span className="text-[11px] opacity-60">{index} / {total}</span>
+        <span className="text-[11px] opacity-60">{index}/{total}</span>
       </div>
 
       {isSpecial && specialLabel && (
@@ -75,60 +81,62 @@ export function DhikrCard({ dhikr, count, onIncrement, index, total, isSpecial, 
         </div>
       )}
 
-      {/* Main content area — fixed, with overlay expansion */}
-      <div className="relative flex-1 overflow-hidden px-5 pt-3">
-        {/* Default (non-expanded) view */}
+      {/* Main content area — scrolls internally if needed */}
+      <div className="relative flex min-h-0 flex-1 flex-col px-5 pt-3">
         {!expanded && (
-          <div className="flex h-full flex-col">
-            <div className="flex-1 overflow-hidden" style={{ scrollbarWidth: "none" }}>
+          <div className="flex min-h-0 flex-1 flex-col">
+            <div className="min-h-0 flex-1 overflow-y-auto pr-1" style={{ scrollbarWidth: "none" }}>
               {dhikr.arabicMulti ? (
-                <div className="space-y-4">
+                <div className="space-y-5">
                   {dhikr.arabicMulti.map((part) => (
                     <div key={part.label}>
                       <div className="label-caps mb-1.5 text-center">{part.label}</div>
                       <p
                         className="arabic font-bold"
-                        style={{ fontSize: arabicSize, lineHeight: 1.7 }}
+                        style={{ fontSize: arabicSize, lineHeight: 1.75, color: "var(--card-foreground)" }}
                       >
                         {part.arabic}
                       </p>
+                      {display.showTransliteration && (
+                        <p
+                          className="mt-2 text-center italic"
+                          style={{ fontSize: 13, color: "var(--translit)", lineHeight: 1.55 }}
+                        >
+                          {part.transliteration}
+                        </p>
+                      )}
                     </div>
                   ))}
                 </div>
               ) : (
-                <p
-                  className="arabic font-bold"
-                  style={{ fontSize: arabicSize, lineHeight: 1.75 }}
-                >
-                  {dhikr.arabic}
-                </p>
-              )}
-
-              {display.showTransliteration && !dhikr.arabicMulti && dhikr.transliteration && (
-                <div
-                  className="relative mt-4"
-                  style={{
-                    maxHeight: "2.8em",
-                    overflow: "hidden",
-                    WebkitMaskImage: "linear-gradient(to bottom, #000 55%, transparent 100%)",
-                    maskImage: "linear-gradient(to bottom, #000 55%, transparent 100%)",
-                  }}
-                >
+                <>
                   <p
-                    className="text-center italic"
-                    style={{ fontSize: 13, color: "var(--translit)", lineHeight: 1.45 }}
+                    className="arabic font-bold"
+                    style={{ fontSize: arabicSize, lineHeight: 1.8, color: "var(--card-foreground)" }}
                   >
-                    {dhikr.transliteration}
+                    {dhikr.arabic}
                   </p>
-                </div>
+                  {display.showTransliteration && dhikr.transliteration && (
+                    <p
+                      className="mt-4 text-center italic"
+                      style={{ fontSize: 13, color: "var(--translit)", lineHeight: 1.55 }}
+                    >
+                      {dhikr.transliteration}
+                    </p>
+                  )}
+                </>
               )}
             </div>
 
             {(dhikr.translation || dhikr.commentary || dhikr.arabicMulti) && (
               <button
                 onClick={() => setExpanded(true)}
-                className="mx-auto mt-2 mb-1 block rounded-full px-4 py-1.5 text-xs font-semibold"
-                style={{ background: "color-mix(in oklab, var(--accent) 22%, transparent)" }}
+                className="mx-auto mt-3 mb-1 block rounded-full px-4 py-1.5 text-xs font-semibold"
+                style={{
+                  border: "1px solid color-mix(in oklab, var(--card-foreground) 40%, transparent)",
+                  color: "var(--card-foreground)",
+                  background: "transparent",
+                }}
               >
                 Read more
               </button>
@@ -136,10 +144,9 @@ export function DhikrCard({ dhikr, count, onIncrement, index, total, isSpecial, 
           </div>
         )}
 
-        {/* Expanded overlay — scrolls inside the card */}
         {expanded && (
           <div
-            className="fade-in absolute inset-0 flex flex-col rounded-b-[24px] px-5 pt-3"
+            className="fade-in absolute inset-0 flex flex-col px-5 pt-3"
             style={{ background: "var(--card)" }}
           >
             <div className="flex items-center justify-between pb-2">
@@ -147,7 +154,10 @@ export function DhikrCard({ dhikr, count, onIncrement, index, total, isSpecial, 
               <button
                 onClick={() => setExpanded(false)}
                 className="rounded-full px-3 py-1 text-[11px] font-semibold"
-                style={{ background: "color-mix(in oklab, var(--accent) 22%, transparent)" }}
+                style={{
+                  border: "1px solid color-mix(in oklab, var(--card-foreground) 40%, transparent)",
+                  color: "var(--card-foreground)",
+                }}
               >
                 Close
               </button>
@@ -157,25 +167,15 @@ export function DhikrCard({ dhikr, count, onIncrement, index, total, isSpecial, 
                 <div className="space-y-4 text-sm">
                   {dhikr.arabicMulti.map((p) => (
                     <div key={p.label}>
-                      <div className="label-caps mb-1">{p.label}</div>
-                      <p className="arabic font-bold" style={{ fontSize: arabicSize, lineHeight: 1.7 }}>{p.arabic}</p>
-                      <p className="mt-2 italic" style={{ color: "var(--translit)", fontSize: 12.5, lineHeight: 1.5 }}>{p.transliteration}</p>
-                      <p className="mt-2 opacity-90" style={{ fontSize: 13 }}>{p.translation}</p>
+                      <div className="label-caps mb-1">{p.label} — Translation</div>
+                      <p className="opacity-90" style={{ lineHeight: 1.55 }}>{p.translation}</p>
                     </div>
                   ))}
                 </div>
               ) : (
-                <div className="space-y-3 text-sm">
-                  {dhikr.transliteration && (
-                    <div>
-                      <div className="label-caps mb-1">Transliteration</div>
-                      <p className="italic" style={{ color: "var(--translit)", fontSize: 13, lineHeight: 1.55 }}>{dhikr.transliteration}</p>
-                    </div>
-                  )}
-                  <div>
-                    <div className="label-caps mb-1">Translation</div>
-                    <p className="opacity-90" style={{ lineHeight: 1.55 }}>{dhikr.translation}</p>
-                  </div>
+                <div className="text-sm">
+                  <div className="label-caps mb-1">Translation</div>
+                  <p className="opacity-90" style={{ lineHeight: 1.55 }}>{dhikr.translation}</p>
                 </div>
               )}
               {dhikr.commentary && (
@@ -233,17 +233,7 @@ export function DhikrCard({ dhikr, count, onIncrement, index, total, isSpecial, 
           ))}
         </button>
       </div>
-
-      {complete && (
-        <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
-          <span
-            className="pop-in text-[180px] font-black"
-            style={{ color: "color-mix(in oklab, var(--accent) 18%, transparent)" }}
-          >
-            ✓
-          </span>
-        </div>
-      )}
     </div>
   );
 }
+

@@ -17,7 +17,7 @@ export function ProgressRing({ value, max, size = 88, stroke = 7, complete }: Pr
         cx={size / 2}
         cy={size / 2}
         r={r}
-        stroke="color-mix(in oklab, var(--foreground) 12%, transparent)"
+        stroke="var(--ring-track, color-mix(in oklab, var(--foreground) 12%, transparent))"
         strokeWidth={stroke}
         fill="none"
       />
