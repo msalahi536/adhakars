@@ -76,7 +76,7 @@
   --accent-foreground: #2d3561;
   --border: transparent;
   --translit: #9bb5d4;
-  --grad-header: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  --grad-header: linear-gradient(135deg, #2d3561 0%, #3d4a8a 100%);
   --header-fg: #ffffff;
   --header-sub: rgba(255,255,255,0.85);
   --nav-bg: rgba(238, 242, 247, 0.97);
