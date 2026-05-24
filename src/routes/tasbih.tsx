@@ -52,11 +52,11 @@ function Tasbih() {
   };
 
   const tap = () => {
-    if (navigator.vibrate) navigator.vibrate(12);
+    vibrateIfEnabled(12);
     setTotal((n) => {
       const next = n + 1;
       if (hasMilestone && next % milestone === 0) {
-        if (navigator.vibrate) navigator.vibrate([40, 20, 40]);
+        vibrateIfEnabled([40, 20, 40]);
         setFlash(true);
         setTimeout(() => setFlash(false), 220);
       }
@@ -65,13 +65,13 @@ function Tasbih() {
   };
 
   const undo = () => {
-    if (navigator.vibrate) navigator.vibrate(8);
+    vibrateIfEnabled(8);
     setTotal((n) => Math.max(0, n - 1));
   };
 
   const onResetStart = () => {
     resetTimer.current = setTimeout(() => {
-      if (navigator.vibrate) navigator.vibrate(40);
+      vibrateIfEnabled(40);
       setTotal(0);
       showToast("Count reset ✓");
     }, 1500);
