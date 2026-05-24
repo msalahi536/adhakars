@@ -3,7 +3,6 @@ import { createFileRoute } from "@tanstack/react-router";
 import { themes, getMode, setMode, applyTheme, resolveTheme, getDisplay, setDisplay, type ThemeMode } from "@/lib/theme";
 import { getStreak, resetToday } from "@/lib/storage";
 import { requestNotificationPermission, getNotificationPermission } from "@/lib/onesignal";
-import { getStreak, resetToday } from "@/lib/storage";
 
 export const Route = createFileRoute("/settings")({
   head: () => ({ meta: [{ title: "Settings — My Adhkar" }] }),
