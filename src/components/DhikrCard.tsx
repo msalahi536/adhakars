@@ -219,7 +219,7 @@ export function DhikrCard({ dhikr, count, onIncrement, index, total, isSpecial, 
               <span className="text-3xl" style={{ color: "var(--accent)" }}>✓</span>
             ) : (
               <>
-                <span className="text-3xl font-bold leading-none" style={{ color: "#ffffff" }}>{count}</span>
+                <span className="text-3xl font-bold leading-none" style={{ color: "var(--count-fg, var(--card-foreground))" }}>{count}</span>
                 <span className="mt-1 text-[10px] opacity-70">/ {dhikr.target}</span>
               </>
             )}
