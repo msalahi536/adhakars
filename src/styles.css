@@ -241,3 +241,15 @@
   100% { transform: translate(var(--tx), var(--ty)) scale(1); opacity: 0; }
 }
 .confetti-piece { animation: confetti 900ms ease-out forwards; }
+
+.card-slide {
+  transition: transform 0.32s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.32s cubic-bezier(0.4, 0, 0.2, 1);
+  will-change: transform, opacity;
+}
+
+@keyframes num-pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.08); }
+  100% { transform: scale(1); }
+}
+.num-pulse { animation: num-pulse 150ms ease-out; }
