@@ -195,8 +195,8 @@ export function DhikrCard({ dhikr, count, onIncrement, index, total, isSpecial, 
           <span
             className="self-start rounded-full px-2.5 py-1 text-[11px] font-semibold"
             style={{
-              background: "color-mix(in oklab, var(--card-foreground) 12%, transparent)",
-              color: "color-mix(in oklab, var(--card-foreground) 85%, transparent)",
+              background: "var(--source-bg, color-mix(in oklab, var(--card-foreground) 12%, transparent))",
+              color: "var(--source-fg, var(--card-foreground))",
             }}
           >
             {dhikr.source}
