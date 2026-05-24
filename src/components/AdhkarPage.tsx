@@ -49,9 +49,10 @@ export function AdhkarPage({ kind, title, subtitle, list, extras = [] }: Props) 
           borderBottomRightRadius: 24,
         }}
       >
-        <div className="label-caps" style={{ color: "var(--header-fg, var(--accent-foreground))", opacity: 0.85 }}>
+        <div className="label-caps" style={{ color: "var(--header-sub, var(--header-fg, var(--accent-foreground)))", opacity: 1 }}>
           {subtitle}
         </div>
+
         <h1 className="mt-1 text-2xl font-bold tracking-tight">{title} Adhkar</h1>
         <div className="mt-3 flex items-center gap-3">
           <div
