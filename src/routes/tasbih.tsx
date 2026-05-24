@@ -150,7 +150,7 @@ function Tasbih() {
           </text>
           <text
             x={120}
-            y={168}
+            y={150}
             textAnchor="middle"
             fontSize={14}
             fill="var(--muted-foreground)"
