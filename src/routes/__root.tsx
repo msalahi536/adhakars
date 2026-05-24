@@ -5,13 +5,14 @@ import {
   Link,
   createRootRouteWithContext,
   useRouter,
+  useRouterState,
   HeadContent,
   Scripts,
 } from "@tanstack/react-router";
 
 import appCss from "../styles.css?url";
 import { BottomNav } from "@/components/BottomNav";
-import { getTheme, applyTheme } from "@/lib/theme";
+import { applyTheme, getMode, resolveTheme } from "@/lib/theme";
 import { reconcileStreak } from "@/lib/storage";
 
 function NotFoundComponent() {
@@ -85,13 +86,23 @@ function RootShell({ children }: { children: React.ReactNode }) {
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
+  const pathname = useRouterState({ select: (s) => s.location.pathname });
+
   useEffect(() => {
-    applyTheme(getTheme());
+    applyTheme(resolveTheme(getMode(), pathname));
+  }, [pathname]);
+
+  useEffect(() => {
     reconcileStreak();
   }, []);
+
   return (
     <QueryClientProvider client={queryClient}>
-      <div style={{ minHeight: "100dvh", background: "var(--background)" }}>
+      <div
+        key={pathname.startsWith("/evening") ? "ev" : pathname.startsWith("/tasbih") ? "ta" : pathname.startsWith("/settings") ? "se" : "mo"}
+        className="fade-in"
+        style={{ minHeight: "100dvh", background: "var(--background)" }}
+      >
         <Outlet />
         <BottomNav />
       </div>
