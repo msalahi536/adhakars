@@ -91,7 +91,7 @@ const threeSurahs: Dhikr = {
   source: "Sunan Abu Dawud / Musnad Imam Ahmad",
   commentary:
     "The Prophet mentioned that whoever recites Surahs Al-Ikhlas, Al-Falaq and An-Naas three times in both the morning and evening, then this will suffice him (as a protection) against everything.",
-  target: 3,
+  target: 9,
   arabicMulti: [
     {
       label: "Surah Al-Ikhlas",

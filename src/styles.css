@@ -28,45 +28,51 @@
   --font-sans: "Plus Jakarta Sans", system-ui, sans-serif;
 }
 
-/* ===== Dawn (morning auto) ===== */
+/* ===== Dawn (morning auto) — warm parchment + deep forest cards ===== */
 :root,
 [data-theme="dawn"] {
   --radius: 1.5rem;
-  --background: oklch(0.97 0.025 80);
-  --foreground: oklch(0.22 0.035 145);
-  --surface: oklch(0.95 0.03 80);
-  --card: oklch(0.3 0.06 150);
-  --card-2: oklch(0.36 0.07 145);
-  --card-foreground: oklch(0.97 0.025 80);
-  --muted: oklch(0.93 0.025 80);
-  --muted-foreground: oklch(0.45 0.04 145);
-  --primary: oklch(0.3 0.06 150);
-  --primary-foreground: oklch(0.97 0.025 80);
-  --accent: oklch(0.78 0.14 78);
-  --accent-foreground: oklch(0.22 0.04 145);
-  --border: oklch(0.88 0.025 80);
-  --translit: oklch(0.78 0.08 75);
-  --grad-header: linear-gradient(135deg, oklch(0.85 0.13 78) 0%, oklch(0.92 0.08 70) 100%);
+  --background: #f5f0e8;
+  --foreground: #2d1f00;
+  --surface: #ebe3d3;
+  --card: #1d3d2a;
+  --card-2: #244a34;
+  --card-foreground: #f0ead0;
+  --muted: #ebe3d3;
+  --muted-foreground: #6b5a3a;
+  --primary: #1d3d2a;
+  --primary-foreground: #f0ead0;
+  --accent: #c9a84c;
+  --accent-foreground: #2d1f00;
+  --border: #e0d6c0;
+  --translit: #a8c5a0;
+  --grad-header: linear-gradient(135deg, #e8c97a 0%, #d4a843 100%);
+  --header-fg: #2d1f00;
+  --nav-bg: rgba(245, 240, 232, 0.97);
+  --nav-border: rgba(45, 31, 0, 0.08);
 }
 
-/* ===== Dusk (evening auto) ===== */
+/* ===== Dusk (evening auto) — deep navy + rich blue cards ===== */
 [data-theme="dusk"] {
   --radius: 1.5rem;
-  --background: oklch(0.16 0.05 270);
-  --foreground: oklch(0.97 0.01 250);
-  --surface: oklch(0.22 0.06 270);
-  --card: oklch(0.28 0.07 220);
-  --card-2: oklch(0.34 0.08 215);
-  --card-foreground: oklch(0.97 0.01 250);
-  --muted: oklch(0.24 0.06 270);
-  --muted-foreground: oklch(0.74 0.025 250);
-  --primary: oklch(0.4 0.08 265);
-  --primary-foreground: oklch(0.97 0.01 250);
-  --accent: oklch(0.85 0.02 250);
-  --accent-foreground: oklch(0.16 0.05 270);
-  --border: oklch(0.32 0.06 270);
-  --translit: oklch(0.74 0.04 220);
-  --grad-header: linear-gradient(135deg, oklch(0.24 0.09 280) 0%, oklch(0.32 0.1 250) 100%);
+  --background: #0f1b2d;
+  --foreground: #e8f4ff;
+  --surface: #1a2744;
+  --card: #1e3a5f;
+  --card-2: #244672;
+  --card-foreground: #e8f4ff;
+  --muted: #1a2f4a;
+  --muted-foreground: #8bb8d4;
+  --primary: #1e3a5f;
+  --primary-foreground: #e8f4ff;
+  --accent: #c9a84c;
+  --accent-foreground: #0f1b2d;
+  --border: rgba(100, 160, 220, 0.2);
+  --translit: #8bb8d4;
+  --grad-header: linear-gradient(135deg, #1a2744 0%, #0f1b2d 100%);
+  --header-fg: #c9a84c;
+  --nav-bg: rgba(10, 20, 40, 0.97);
+  --nav-border: rgba(100, 160, 220, 0.15);
 }
 
 /* ===== Manual themes (kept) ===== */
@@ -176,13 +182,18 @@
 }
 
 .glass-nav {
-  background: color-mix(in oklab, var(--surface) 92%, transparent);
-  backdrop-filter: blur(24px) saturate(180%);
-  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  background: var(--nav-bg, color-mix(in oklab, var(--surface) 92%, transparent));
+  backdrop-filter: blur(10px) saturate(180%);
+  -webkit-backdrop-filter: blur(10px) saturate(180%);
 }
 
 .card-grad {
   background: radial-gradient(120% 80% at 20% 0%, var(--card-2) 0%, var(--card) 70%);
+}
+
+.fade-mask-2 {
+  -webkit-mask-image: linear-gradient(to bottom, #000 60%, transparent 100%);
+          mask-image: linear-gradient(to bottom, #000 60%, transparent 100%);
 }
 
 @keyframes pulse-tap {
