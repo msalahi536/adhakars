@@ -44,9 +44,6 @@ export function BottomNav() {
     <nav
       className="bottom-nav"
       style={{
-        bottom: 0,
-        left: 0,
-        right: 0,
         background: themeNavBg,
         backdropFilter: "blur(12px) saturate(180%)",
         WebkitBackdropFilter: "blur(12px) saturate(180%)",
