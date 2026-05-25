@@ -110,6 +110,12 @@
 
 @layer base {
   * { border-color: var(--color-border); }
+  html, body, #root {
+    height: 100%;
+    min-height: 100dvh;
+    margin: 0;
+    padding: 0;
+  }
   html, body {
     background-color: var(--color-background);
     color: var(--color-foreground);

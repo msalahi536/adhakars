@@ -42,11 +42,13 @@ export function BottomNav() {
 
   return (
     <nav
-      className="fixed left-0 right-0 z-50"
+      className="fixed z-50"
       style={{
         bottom: 0,
-        paddingBottom: "env(safe-area-inset-bottom)",
-        paddingTop: 8,
+        left: 0,
+        right: 0,
+        paddingBottom: "max(env(safe-area-inset-bottom), 0px)",
+        paddingTop: 10,
         background: themeNavBg,
         backdropFilter: "blur(12px) saturate(180%)",
         WebkitBackdropFilter: "blur(12px) saturate(180%)",
