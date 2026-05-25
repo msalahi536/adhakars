@@ -142,15 +142,15 @@
     inset: 0;
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
-    padding-bottom: calc(env(safe-area-inset-bottom) + 70px);
+    padding-bottom: calc(env(safe-area-inset-bottom) + 60px);
   }
   .bottom-nav {
     position: fixed;
     bottom: 0;
     left: 0;
     right: 0;
-    padding-bottom: max(env(safe-area-inset-bottom), 0px);
-    padding-top: 10px;
+    padding-bottom: env(safe-area-inset-bottom);
+    padding-top: 4px;
     z-index: 50;
   }
   html, body, * { transition-property: background-color, border-color, color; transition-duration: 300ms; }
