@@ -18,7 +18,7 @@ import { initOneSignal } from "@/lib/onesignal";
 
 function NotFoundComponent() {
   return (
-    <div className="flex min-h-screen items-center justify-center px-4">
+    <div className="flex items-center justify-center px-4" style={{ minHeight: "calc(var(--vh, 1vh) * 100)" }}>
       <div className="max-w-md text-center">
         <h1 className="text-6xl font-bold">404</h1>
         <p className="mt-3 text-sm opacity-70">This page doesn't exist.</p>
@@ -34,7 +34,7 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
   console.error(error);
   const router = useRouter();
   return (
-    <div className="flex min-h-screen items-center justify-center px-4 text-center">
+    <div className="flex items-center justify-center px-4 text-center" style={{ minHeight: "calc(var(--vh, 1vh) * 100)" }}>
       <div>
         <h1 className="text-xl font-semibold">Something went wrong</h1>
         <button
