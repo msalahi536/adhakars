@@ -15,6 +15,7 @@ import { BottomNav } from "@/components/BottomNav";
 import { applyTheme, getMode, resolveTheme } from "@/lib/theme";
 import { reconcileStreak } from "@/lib/storage";
 import { initOneSignal } from "@/lib/onesignal";
+import { initViewportSizing } from "@/lib/viewport";
 
 function NotFoundComponent() {
   return (
@@ -107,6 +108,7 @@ function RootComponent() {
   useEffect(() => {
     reconcileStreak();
     initOneSignal();
+    return initViewportSizing();
   }, []);
 
   return (
