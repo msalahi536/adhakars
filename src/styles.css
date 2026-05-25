@@ -110,52 +110,61 @@
 
 @layer base {
   :root {
-    --bottom-nav-row: 50px;
+    --bottom-nav-row: 56px;
     --bottom-nav-height: 56px;
   }
   * { border-color: var(--color-border); }
   html, body {
     margin: 0;
     padding: 0;
-    height: 100%;
-    width: 100%;
-    overflow: hidden;
   }
-  #root {
-    height: 100vh;
-    height: 100dvh;
-    overflow: hidden;
-  }
-  html, body {
-    background-color: var(--color-background);
-    color: var(--color-foreground);
+  body {
+    min-height: 100vh;
+    min-height: 100dvh;
+    background: var(--background);
+    color: var(--foreground);
     font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
     -webkit-tap-highlight-color: transparent;
     -webkit-user-select: none;
     user-select: none;
     -webkit-touch-callout: none;
     transition: background-color 350ms ease, color 350ms ease;
   }
-  body { overscroll-behavior: contain; }
-  .app-shell {
-    display: grid;
-    grid-template-rows: minmax(0, 1fr) var(--bottom-nav-height);
-    height: 100%;
-    overflow: hidden;
-  }
-  .app-content {
-    min-height: 0;
-    overflow-y: auto;
-    -webkit-overflow-scrolling: touch;
+  #root {
+    min-height: 100vh;
+    min-height: 100dvh;
   }
   .bottom-nav {
-    position: relative;
-    box-sizing: border-box;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    box-sizing: content-box;
     height: var(--bottom-nav-height);
-    padding-top: 4px;
+    padding-bottom: env(safe-area-inset-bottom);
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    background: var(--nav-bg);
     z-index: 50;
   }
-  .bottom-nav-inner { height: var(--bottom-nav-row); }
+  .bottom-nav-inner {
+    width: 100%;
+    height: var(--bottom-nav-row);
+  }
+  .page-content {
+    min-height: 100vh;
+    min-height: 100dvh;
+    padding-top: env(safe-area-inset-top);
+    padding-bottom: calc(var(--bottom-nav-height) + env(safe-area-inset-bottom) + 16px);
+  }
+  .adhkar-page {
+    height: calc(100vh - env(safe-area-inset-top) - var(--bottom-nav-height) - env(safe-area-inset-bottom) - 16px);
+    height: calc(100dvh - env(safe-area-inset-top) - var(--bottom-nav-height) - env(safe-area-inset-bottom) - 16px);
+  }
+  .tasbih-shell-wrapper { overflow: visible; }
   html, body, * { transition-property: background-color, border-color, color; transition-duration: 300ms; }
 }
 
