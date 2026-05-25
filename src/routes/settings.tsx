@@ -67,16 +67,16 @@ function Settings() {
   };
 
   return (
-    <div
-      className="mx-auto max-w-md px-4"
-      style={{
-        paddingTop: 16,
-      }}
-    >
-      <header className="mb-5">
-        <div className="label-caps">Preferences</div>
-        <h1 className="mt-1 text-3xl font-bold">Settings</h1>
+    <>
+      <header className="page-header" style={{ background: "var(--background)" }}>
+        <div className="mx-auto max-w-md px-4 pb-5 pt-4">
+          <div className="label-caps">Preferences</div>
+          <h1 className="mt-1 text-3xl font-bold">Settings</h1>
+        </div>
       </header>
+
+      <main className="scroll-area">
+        <div className="mx-auto max-w-md px-4 py-4">
 
       <section
         className="mb-6 overflow-hidden rounded-[24px] p-6 shadow-xl shadow-black/10"
@@ -211,10 +211,12 @@ function Settings() {
         )}
       </section>
 
-      <section className="rounded-2xl p-4 text-xs opacity-70" style={{ background: "var(--surface)", border: "1px solid var(--border)" }}>
-        Based on the authentic adhkar compiled by Shaykh Abdul Aziz At-Tarefe, compiled by Yasser Peerun.
-      </section>
-    </div>
+          <section className="rounded-2xl p-4 text-xs opacity-70" style={{ background: "var(--surface)", border: "1px solid var(--border)" }}>
+            Based on the authentic adhkar compiled by Shaykh Abdul Aziz At-Tarefe, compiled by Yasser Peerun.
+          </section>
+        </div>
+      </main>
+    </>
   );
 }
 
