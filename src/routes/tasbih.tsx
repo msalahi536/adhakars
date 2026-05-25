@@ -84,23 +84,20 @@ function Tasbih() {
   
 
   return (
-    <div
-      className="mx-auto flex min-h-full max-w-md flex-col items-center"
-      style={{
-        background: "#4F5F66",
-        color: "#E8EDF0",
-        minHeight: "calc(100dvh - env(safe-area-inset-top) - 56px - env(safe-area-inset-bottom) - 16px)",
-        paddingTop: 20,
-        paddingLeft: 20,
-        paddingRight: 20,
-      }}
-    >
-      <h1
-        className="text-center font-bold tracking-tight"
-        style={{ fontSize: 20, color: "#E8EDF0" }}
-      >
-        Tasbih
-      </h1>
+    <>
+      <header className="page-header" style={{ background: "#4F5F66", color: "#E8EDF0" }}>
+        <div className="mx-auto max-w-md px-5 pb-3 pt-5">
+          <h1
+            className="text-center font-bold tracking-tight"
+            style={{ fontSize: 20, color: "#E8EDF0" }}
+          >
+            Tasbih
+          </h1>
+        </div>
+      </header>
+
+      <main className="scroll-area" style={{ background: "#4F5F66", color: "#E8EDF0" }}>
+        <div className="mx-auto flex max-w-md flex-col items-center px-5 pb-6">
 
       {/* Cycle pills */}
       <div className="mt-5 flex items-center justify-center gap-2">
@@ -334,14 +331,16 @@ function Tasbih() {
         </div>
       </div>
 
-      {toast && (
-        <div
-          className="pop-in fixed left-1/2 top-24 z-50 -translate-x-1/2 rounded-[12px] px-4 py-2 text-sm font-semibold shadow-lg"
-          style={{ background: "#D4A547", color: "#2A1F00" }}
-        >
-          {toast}
+        {toast && (
+          <div
+            className="pop-in fixed left-1/2 top-24 z-50 -translate-x-1/2 rounded-[12px] px-4 py-2 text-sm font-semibold shadow-lg"
+            style={{ background: "#D4A547", color: "#2A1F00" }}
+          >
+            {toast}
+          </div>
+        )}
         </div>
-      )}
-    </div>
+      </main>
+    </>
   );
 }
