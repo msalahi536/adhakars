@@ -50,7 +50,7 @@ export function BottomNav() {
         borderTop: `1px solid ${borderColor}`,
       }}
     >
-      <div className="bottom-nav-inner mx-auto flex max-w-md items-stretch justify-around px-2">
+      <div className="bottom-nav-row mx-auto max-w-md px-2">
         {tabs.map((t) => (
           <Link
             key={t.to}
