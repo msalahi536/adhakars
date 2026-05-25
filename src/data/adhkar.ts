@@ -279,19 +279,6 @@ export const eveningAdhkar: Dhikr[] = [
     source: "Sunan Ibn Maajah 3868",
     target: 1,
   },
-  subhanExpanded,
-  {
-    id: "fitratil-islam-evening",
-    title: "Amsaynaa 'ala fitratil islami",
-    arabic:
-      "أَمْسَيْنَا عَلَى فِطْرَةِ الْإِسْلَامِ وَعَلَى كَلِمَةِ الْإِخْلَاصِ وَعَلَى دِينِ نَبِيِّنَا مُحَمَّدٍ ﷺ وَعَلَى مِلَّةِ أَبِينَا إِبْرَاهِيمَ حَنِيفًا مُسْلِمًا وَمَا كَانَ مِنَ الْمُشْرِكِينَ",
-    transliteration:
-      "Amsaynaa 'ala fitratil islami wa-'ala kalimatil ikhlaas, wa-'ala deeni nabeeyyinaa Muhammadin sallal-laahu 'alayhi wa sallam, wa-'ala millati abeenaa ibraaheema haneefan musliman wa-maa kaana minal mushrikeen",
-    translation:
-      "We have entered the evening upon the natural religion of Islam, the word of sincere devotion, the religion of our Prophet Muhammad (Peace and Blessings of Allah be upon him) and the faith of our father Ibrahim. He was an upright (in worshipping Allah) Muslim and he was not of those who worship others besides Allah.",
-    source: "Musnad Imam Ahmad 15360",
-    target: 1,
-  },
   hasbi,
   {
     id: "kalimaat-evening",
