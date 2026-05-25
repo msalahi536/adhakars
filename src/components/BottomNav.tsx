@@ -47,15 +47,13 @@ export function BottomNav() {
         bottom: 0,
         left: 0,
         right: 0,
-        paddingBottom: "env(safe-area-inset-bottom)",
-        paddingTop: 4,
         background: themeNavBg,
         backdropFilter: "blur(12px) saturate(180%)",
         WebkitBackdropFilter: "blur(12px) saturate(180%)",
         borderTop: `1px solid ${borderColor}`,
       }}
     >
-      <div className="mx-auto flex max-w-md items-stretch justify-around px-2" style={{ height: 50 }}>
+      <div className="bottom-nav-inner mx-auto flex max-w-md items-stretch justify-around px-2">
         {tabs.map((t) => (
           <Link
             key={t.to}
