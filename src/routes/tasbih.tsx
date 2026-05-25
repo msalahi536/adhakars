@@ -89,6 +89,7 @@ function Tasbih() {
       style={{
         background: "#4F5F66",
         color: "#E8EDF0",
+        minHeight: "calc(100dvh - env(safe-area-inset-top) - 56px - env(safe-area-inset-bottom) - 16px)",
         paddingTop: 20,
         paddingLeft: 20,
         paddingRight: 20,
