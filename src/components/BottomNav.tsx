@@ -18,8 +18,7 @@ export function BottomNav() {
 
   useEffect(() => {
     setStreak(getStreak().current);
-    const update = () =>
-      setTheme(document.documentElement.getAttribute("data-theme") || "dawn");
+    const update = () => setTheme(document.documentElement.getAttribute("data-theme") || "dawn");
     update();
     const onStreak = () => setStreak(getStreak().current);
     window.addEventListener("adhkar:streak-update", onStreak);
@@ -36,8 +35,7 @@ export function BottomNav() {
   // dusk uses its own light bg and brand-purple active
   const themeNavBg = theme === "dusk" ? "rgba(238, 242, 247, 0.97)" : navBg;
   const iconColor = isDark ? "#ffffff" : "#4a5568";
-  const activeColor =
-    theme === "dusk" ? "#667eea" : "#c9a84c";
+  const activeColor = theme === "dusk" ? "#667eea" : "#c9a84c";
   const borderColor = isDark ? "rgba(255,255,255,0.08)" : "rgba(0,0,0,0.08)";
 
   return (
