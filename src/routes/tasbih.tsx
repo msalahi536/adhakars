@@ -33,7 +33,9 @@ function Tasbih() {
       const s = JSON.parse(localStorage.getItem(STORAGE) || "{}");
       if (typeof s.total === "number") setTotal(s.total);
       if (typeof s.milestone === "number") setMilestone(s.milestone as Milestone);
-    } catch {}
+    } catch {
+      // Ignore malformed saved tasbih state.
+    }
   }, []);
 
   useEffect(() => {
