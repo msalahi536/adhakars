@@ -89,7 +89,7 @@ function Tasbih() {
       style={{
         background: "#4F5F66",
         color: "#E8EDF0",
-        paddingTop: "calc(env(safe-area-inset-top) + 20px)",
+        paddingTop: 20,
         paddingLeft: 20,
         paddingRight: 20,
       }}
@@ -129,7 +129,7 @@ function Tasbih() {
 
       {/* Device shell — organic worry-stone shape */}
       <div
-        className="relative mt-6"
+        className="tasbih-shell-wrapper relative mt-6"
         style={{ width: 240, height: 340 }}
       >
         {/* SVG shell */}
@@ -137,6 +137,7 @@ function Tasbih() {
           viewBox="0 0 280 400"
           width={240}
           height={340}
+          overflow="visible"
           preserveAspectRatio="none"
           style={{
             position: "absolute",
