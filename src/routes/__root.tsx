@@ -113,8 +113,8 @@ function RootComponent() {
     <QueryClientProvider client={queryClient}>
       <div
         key={pathname.startsWith("/evening") ? "ev" : pathname.startsWith("/tasbih") ? "ta" : pathname.startsWith("/settings") ? "se" : "mo"}
-        className="fade-in"
-        style={{ minHeight: "100dvh", background: "var(--background)" }}
+        className="app-root fade-in"
+        style={{ background: "var(--background)" }}
       >
         <Outlet />
         <BottomNav />
