@@ -42,7 +42,7 @@ export function BottomNav() {
 
   return (
     <nav
-      className="fixed z-50"
+      className="bottom-nav"
       style={{
         bottom: 0,
         left: 0,
@@ -55,18 +55,6 @@ export function BottomNav() {
         borderTop: `1px solid ${borderColor}`,
       }}
     >
-      <div
-        aria-hidden="true"
-        style={{
-          position: "absolute",
-          left: 0,
-          right: 0,
-          bottom: -48,
-          height: 48,
-          background: themeNavBg,
-          pointerEvents: "none",
-        }}
-      />
       <div className="mx-auto flex max-w-md items-stretch justify-around px-2" style={{ height: 56 }}>
         {tabs.map((t) => (
           <Link

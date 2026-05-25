@@ -71,7 +71,6 @@ function Settings() {
       className="mx-auto max-w-md px-4"
       style={{
         paddingTop: "calc(env(safe-area-inset-top) + 16px)",
-        paddingBottom: "calc(env(safe-area-inset-bottom) + 80px)",
       }}
     >
       <header className="mb-5">

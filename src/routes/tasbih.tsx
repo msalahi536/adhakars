@@ -85,13 +85,11 @@ function Tasbih() {
 
   return (
     <div
-      className="mx-auto flex max-w-md flex-col items-center"
+      className="mx-auto flex min-h-full max-w-md flex-col items-center"
       style={{
-        minHeight: "calc(var(--vh, 1vh) * 100)",
         background: "#4F5F66",
         color: "#E8EDF0",
         paddingTop: "calc(env(safe-area-inset-top) + 20px)",
-        paddingBottom: "calc(80px + env(safe-area-inset-bottom))",
         paddingLeft: 20,
         paddingRight: 20,
       }}
