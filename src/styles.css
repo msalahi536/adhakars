@@ -141,6 +141,15 @@
     -webkit-overflow-scrolling: touch;
     padding-bottom: calc(env(safe-area-inset-bottom) + 70px);
   }
+  .bottom-nav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding-bottom: max(env(safe-area-inset-bottom), 0px);
+    padding-top: 10px;
+    z-index: 50;
+  }
   html, body, * { transition-property: background-color, border-color, color; transition-duration: 300ms; }
 }
 
