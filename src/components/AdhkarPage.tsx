@@ -36,8 +36,7 @@ export function AdhkarPage({ kind, title, subtitle, list, extras = [] }: Props) 
 
   return (
     <div
-      className="mx-auto flex max-w-md flex-col overflow-hidden"
-      style={{ height: "calc(var(--vh, 1vh) * 100)", paddingBottom: "calc(80px + env(safe-area-inset-bottom))" }}
+      className="mx-auto flex h-full max-w-md flex-col overflow-hidden"
     >
       {/* Header */}
       <div
