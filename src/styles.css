@@ -131,6 +131,9 @@
     color: var(--color-foreground);
     font-family: var(--font-sans);
     -webkit-tap-highlight-color: transparent;
+    -webkit-user-select: none;
+    user-select: none;
+    -webkit-touch-callout: none;
     transition: background-color 350ms ease, color 350ms ease;
   }
   body { overscroll-behavior: contain; }
