@@ -22,7 +22,11 @@ function NotFoundComponent() {
       <div className="max-w-md text-center">
         <h1 className="text-6xl font-bold">404</h1>
         <p className="mt-3 text-sm opacity-70">This page doesn't exist.</p>
-        <Link to="/" className="mt-5 inline-block rounded-full px-5 py-2 text-sm font-semibold" style={{ background: "var(--accent)", color: "var(--accent-foreground)" }}>
+        <Link
+          to="/"
+          className="mt-5 inline-block rounded-full px-5 py-2 text-sm font-semibold"
+          style={{ background: "var(--accent)", color: "var(--accent-foreground)" }}
+        >
           Go home
         </Link>
       </div>
@@ -38,7 +42,10 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
       <div>
         <h1 className="text-xl font-semibold">Something went wrong</h1>
         <button
-          onClick={() => { router.invalidate(); reset(); }}
+          onClick={() => {
+            router.invalidate();
+            reset();
+          }}
           className="mt-4 rounded-full px-5 py-2 text-sm font-semibold"
           style={{ background: "var(--accent)", color: "var(--accent-foreground)" }}
         >
@@ -63,8 +70,16 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "twitter:title", content: "My Adhkar" },
       { property: "og:description", content: "Personal daily Islamic adhkar and tasbih." },
       { name: "twitter:description", content: "Personal daily Islamic adhkar and tasbih." },
-      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/ca909766-1cfc-4956-ae39-1a1b7af04e7a/id-preview-656ea870--52d629f3-34a0-4e01-bea4-f2b3af1922d0.lovable.app-1779660312907.png" },
-      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/ca909766-1cfc-4956-ae39-1a1b7af04e7a/id-preview-656ea870--52d629f3-34a0-4e01-bea4-f2b3af1922d0.lovable.app-1779660312907.png" },
+      {
+        property: "og:image",
+        content:
+          "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/ca909766-1cfc-4956-ae39-1a1b7af04e7a/id-preview-656ea870--52d629f3-34a0-4e01-bea4-f2b3af1922d0.lovable.app-1779660312907.png",
+      },
+      {
+        name: "twitter:image",
+        content:
+          "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/ca909766-1cfc-4956-ae39-1a1b7af04e7a/id-preview-656ea870--52d629f3-34a0-4e01-bea4-f2b3af1922d0.lovable.app-1779660312907.png",
+      },
       { name: "twitter:card", content: "summary_large_image" },
       { property: "og:type", content: "website" },
     ],
@@ -72,9 +87,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { rel: "stylesheet", href: appCss },
       { rel: "manifest", href: "/manifest.json" },
     ],
-    scripts: [
-      { src: "https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js", defer: true },
-    ],
+    scripts: [{ src: "https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js", defer: true }],
   }),
   shellComponent: RootShell,
   component: RootComponent,
@@ -111,15 +124,8 @@ function RootComponent() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <div style={{ background: "var(--background)" }}>
-        <main
-          key={pathname.startsWith("/evening") ? "ev" : pathname.startsWith("/tasbih") ? "ta" : pathname.startsWith("/settings") ? "se" : "mo"}
-          className="page-content fade-in"
-        >
-          <Outlet />
-        </main>
-        <BottomNav />
-      </div>
+      <Outlet />
+      <BottomNav />
     </QueryClientProvider>
   );
 }
