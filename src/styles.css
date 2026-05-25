@@ -112,7 +112,7 @@
   * { border-color: var(--color-border); }
   html, body, #root {
     height: 100%;
-    min-height: 100dvh;
+    min-height: calc(var(--vh, 1vh) * 100);
     margin: 0;
     padding: 0;
   }
@@ -124,6 +124,15 @@
     transition: background-color 350ms ease, color 350ms ease;
   }
   body { overscroll-behavior: contain; }
+  .app-root {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
   html, body, * { transition-property: background-color, border-color, color; transition-duration: 300ms; }
 }
 
