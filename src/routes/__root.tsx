@@ -111,13 +111,13 @@ function RootComponent() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <div className="app-shell" style={{ background: "var(--background)" }}>
-        <div
+      <div style={{ background: "var(--background)" }}>
+        <main
           key={pathname.startsWith("/evening") ? "ev" : pathname.startsWith("/tasbih") ? "ta" : pathname.startsWith("/settings") ? "se" : "mo"}
-          className="app-content fade-in"
+          className="page-content fade-in"
         >
           <Outlet />
-        </div>
+        </main>
         <BottomNav />
       </div>
     </QueryClientProvider>

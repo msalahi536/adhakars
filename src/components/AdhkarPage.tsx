@@ -36,7 +36,7 @@ export function AdhkarPage({ kind, title, subtitle, list, extras = [] }: Props) 
 
   return (
     <div
-      className="mx-auto flex h-full max-w-md flex-col overflow-hidden"
+      className="adhkar-page mx-auto flex max-w-md flex-col overflow-hidden"
     >
       {/* Header */}
       <div
@@ -46,7 +46,7 @@ export function AdhkarPage({ kind, title, subtitle, list, extras = [] }: Props) 
           color: "var(--header-fg, var(--accent-foreground))",
           borderBottomLeftRadius: 24,
           borderBottomRightRadius: 24,
-          paddingTop: "calc(env(safe-area-inset-top) + 20px)",
+          paddingTop: 20,
         }}
       >
         <div className="label-caps" style={{ color: "var(--header-sub, var(--header-fg, var(--accent-foreground)))", opacity: 1 }}>
