@@ -1,11 +1,12 @@
 import { useEffect, useState } from "react";
 import { Link } from "@tanstack/react-router";
-import { Sunrise, Moon, CircleDot, Settings as SettingsIcon } from "lucide-react";
+import { Sunrise, Moon, CircleDot, Settings as SettingsIcon, Hand } from "lucide-react";
 import { getStreak } from "@/lib/storage";
 
 const tabs = [
   { to: "/" as const, label: "Morning", Icon: Sunrise },
   { to: "/evening" as const, label: "Evening", Icon: Moon },
+  { to: "/salah" as const, label: "Salah", Icon: Hand },
   { to: "/tasbih" as const, label: "Tasbih", Icon: CircleDot },
   { to: "/settings" as const, label: "Settings", Icon: SettingsIcon },
 ];
@@ -32,7 +33,6 @@ export function BottomNav() {
 
   const isDark = DARK_THEMES.has(theme);
   const navBg = isDark ? "rgba(15,20,30,0.97)" : "rgba(255,255,255,0.97)";
-  // dusk uses its own light bg and brand-purple active
   const themeNavBg = theme === "dusk" ? "rgba(238, 242, 247, 0.97)" : navBg;
   const iconColor = isDark ? "#ffffff" : "#4a5568";
   const activeColor = theme === "dusk" ? "#667eea" : "#c9a84c";
@@ -48,25 +48,35 @@ export function BottomNav() {
         borderTop: `1px solid ${borderColor}`,
       }}
     >
-      <div className="bottom-nav-row mx-auto max-w-md px-2">
+      <div className="bottom-nav-row mx-auto max-w-md px-1">
         {tabs.map((t) => (
           <Link
             key={t.to}
             to={t.to}
             activeOptions={{ exact: true }}
-            className="relative flex flex-1 flex-col items-center justify-center gap-0.5 text-[10px] font-semibold"
-            style={{ transition: "color 0.25s ease" }}
+            className="relative flex flex-1 flex-col items-center justify-center gap-0.5 px-0.5 text-[10px] font-semibold"
+            style={{ transition: "color 0.25s ease", minWidth: 0 }}
           >
             {({ isActive }) => {
               const color = isActive ? activeColor : iconColor;
               const opacity = isActive ? 1 : 0.6;
               return (
                 <>
-                  <t.Icon size={24} strokeWidth={isActive ? 2.4 : 2} style={{ color, opacity }} />
-                  <span style={{ color, opacity }}>{t.label}</span>
+                  <t.Icon size={22} strokeWidth={isActive ? 2.4 : 2} style={{ color, opacity }} />
+                  <span
+                    style={{
+                      color,
+                      opacity,
+                      fontSize: 10,
+                      whiteSpace: "nowrap",
+                      lineHeight: 1,
+                    }}
+                  >
+                    {t.label}
+                  </span>
                   {t.to === "/settings" && streak > 0 && (
                     <span
-                      className="absolute right-1.5 top-0.5 rounded-[12px] px-1.5 py-0.5 text-[9px] font-bold"
+                      className="absolute right-0.5 top-0 rounded-[10px] px-1 py-0.5 text-[9px] font-bold"
                       style={{ background: activeColor, color: isDark ? "#0a0a0a" : "#ffffff" }}
                     >
                       {streak}
