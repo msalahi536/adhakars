@@ -1,4 +1,5 @@
 import { morningAdhkar, eveningAdhkar } from "@/data/adhkar";
+import { getSalahItems, isItemComplete, SALAH_PRAYERS } from "@/data/salah";
 
 export const todayKey = () => {
   const d = new Date();
@@ -10,9 +11,10 @@ export const todayKey = () => {
 
 type CountMap = Record<string, number>;
 
-const countsKey = (date: string, kind: "morning" | "evening") => `adhkar:${kind}:${date}`;
+// kind can be: "morning", "evening", "salah_fajr", "salah_dhuhr", etc.
+const countsKey = (date: string, kind: string) => `adhkar:${kind}:${date}`;
 
-export const getCounts = (kind: "morning" | "evening", date = todayKey()): CountMap => {
+export const getCounts = (kind: string, date = todayKey()): CountMap => {
   if (typeof window === "undefined") return {};
   try {
     return JSON.parse(localStorage.getItem(countsKey(date, kind)) || "{}");
@@ -21,7 +23,7 @@ export const getCounts = (kind: "morning" | "evening", date = todayKey()): Count
   }
 };
 
-export const setCount = (kind: "morning" | "evening", id: string, value: number) => {
+export const setCount = (kind: string, id: string, value: number) => {
   const c = getCounts(kind);
   c[id] = value;
   localStorage.setItem(countsKey(todayKey(), kind), JSON.stringify(c));
@@ -31,6 +33,9 @@ export const setCount = (kind: "morning" | "evening", id: string, value: number)
 export const resetToday = () => {
   localStorage.removeItem(countsKey(todayKey(), "morning"));
   localStorage.removeItem(countsKey(todayKey(), "evening"));
+  for (const p of SALAH_PRAYERS) {
+    localStorage.removeItem(countsKey(todayKey(), `salah_${p.id}`));
+  }
 };
 
 export const isSetComplete = (kind: "morning" | "evening", date = todayKey()): boolean => {
@@ -39,11 +44,20 @@ export const isSetComplete = (kind: "morning" | "evening", date = todayKey()): b
   return list.every((d) => (c[d.id] ?? 0) >= d.target);
 };
 
+export const isAnySalahComplete = (date = todayKey()): boolean => {
+  for (const p of SALAH_PRAYERS) {
+    const counts = getCounts(`salah_${p.id}`, date);
+    const items = getSalahItems(p.id);
+    if (items.every((it) => isItemComplete(it, counts))) return true;
+  }
+  return false;
+};
+
 // Streak
 type StreakData = {
   current: number;
   longest: number;
-  lastCompleted: string | null; // YYYY-MM-DD
+  lastCompleted: string | null;
 };
 const STREAK_KEY = "adhkar:streak";
 
@@ -73,6 +87,7 @@ const yesterday = () => {
 export const maybeUpdateStreak = () => {
   const today = todayKey();
   if (!isSetComplete("morning", today) || !isSetComplete("evening", today)) return;
+  if (!isAnySalahComplete(today)) return;
   const s = getStreak();
   if (s.lastCompleted === today) return;
   if (s.lastCompleted === yesterday()) {
@@ -86,11 +101,47 @@ export const maybeUpdateStreak = () => {
   window.dispatchEvent(new Event("adhkar:streak-update"));
 };
 
-// On app load, decay streak if missed days
 export const reconcileStreak = () => {
   const s = getStreak();
   if (!s.lastCompleted) return;
   if (s.lastCompleted === todayKey() || s.lastCompleted === yesterday()) return;
   s.current = 0;
   saveStreak(s);
+};
+
+// ============ Lifetime dhikr counter ============
+export type LifetimeCategory = "morning" | "evening" | "salah" | "tasbih";
+export type LifetimeCounts = {
+  total: number;
+  morning: number;
+  evening: number;
+  salah: number;
+  tasbih: number;
+};
+
+const LIFETIME_KEY = "lifetimeDhikr";
+const defaultLifetime: LifetimeCounts = {
+  total: 0,
+  morning: 0,
+  evening: 0,
+  salah: 0,
+  tasbih: 0,
+};
+
+export const getLifetime = (): LifetimeCounts => {
+  if (typeof window === "undefined") return defaultLifetime;
+  try {
+    return { ...defaultLifetime, ...JSON.parse(localStorage.getItem(LIFETIME_KEY) || "{}") };
+  } catch {
+    return defaultLifetime;
+  }
+};
+
+export const bumpLifetime = (category: LifetimeCategory, n = 1) => {
+  if (typeof window === "undefined" || n <= 0) return;
+  const cur = getLifetime();
+  cur[category] += n;
+  cur.total += n;
+  localStorage.setItem(LIFETIME_KEY, JSON.stringify(cur));
+  window.dispatchEvent(new Event("adhkar:lifetime-update"));
 };
