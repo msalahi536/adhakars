@@ -20,6 +20,8 @@ export type ComboDhikr = {
 export type SalahItem = {
   dhikr?: Dhikr;
   combo?: ComboDhikr;
+  isSpecial?: boolean;
+  specialLabel?: string;
 };
 
 export type SalahPrayer = "fajr" | "dhuhr" | "asr" | "maghrib" | "isha" | "witr";
