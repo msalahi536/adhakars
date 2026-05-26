@@ -137,6 +137,47 @@ function Settings() {
             </div>
           </section>
 
+          <section
+            className="mb-6 overflow-hidden rounded-[24px] p-5"
+            style={{
+              background: "linear-gradient(135deg, #1f3d2b 0%, #2d5a3d 100%)",
+              color: "#ffffff",
+            }}
+          >
+            <div className="label-caps" style={{ color: "rgba(255,255,255,0.85)", opacity: 1 }}>
+              My Dhikr
+            </div>
+            <div
+              className="mt-1 text-[11px] font-semibold uppercase tracking-wider"
+              style={{ color: "rgba(255,255,255,0.7)" }}
+            >
+              Total Remembrances
+            </div>
+            <div style={{ fontSize: 48, fontWeight: 800, color: "#c9a84c", lineHeight: 1.1 }}>
+              {lifetime.total.toLocaleString()}
+            </div>
+            <div
+              className="mt-4 grid grid-cols-4 gap-2 border-t pt-3"
+              style={{ borderColor: "rgba(255,255,255,0.18)" }}
+            >
+              {(["morning", "evening", "salah", "tasbih"] as const).map((k) => (
+                <div key={k} className="flex flex-col items-center">
+                  <span
+                    className="text-[10px] font-semibold uppercase tracking-wider"
+                    style={{ color: "rgba(255,255,255,0.6)" }}
+                  >
+                    {k}
+                  </span>
+                  <span style={{ fontSize: 16, fontWeight: 700, color: "#ffffff" }}>
+                    {lifetime[k].toLocaleString()}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </section>
+
+
+
           <section className="mb-6">
             <h2 className="label-caps mb-3">Theme</h2>
             <div className="space-y-3">
