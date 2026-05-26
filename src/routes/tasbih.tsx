@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { RotateCcw, Undo2 } from "lucide-react";
 import { vibrateIfEnabled } from "@/lib/theme";
+import { bumpLifetime } from "@/lib/storage";
 
 export const Route = createFileRoute("/tasbih")({
   head: () => ({
@@ -53,6 +54,7 @@ function Tasbih() {
 
   const tap = () => {
     vibrateIfEnabled(12);
+    bumpLifetime("tasbih", 1);
     setTotal((n) => {
       const next = n + 1;
       if (hasMilestone && next % milestone === 0) {
