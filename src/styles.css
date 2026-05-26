@@ -107,6 +107,46 @@
   --card-shadow: 0 4px 16px rgba(31, 58, 92, 0.07);
 }
 
+/* ===== Salah (after-prayer) — warm terracotta + amber, deep cards ===== */
+[data-theme="salah"] {
+  --radius: 1.5rem;
+  --background: #faf6f0;
+  --foreground: #2d1f0e;
+  --surface: #f3eadb;
+  --card: #2d1f0e;
+  --card-2: #2d1f0e;
+  --combo-card: #3a2a12;
+  --card-foreground: #f5e6c8;
+  --muted: #ede0ca;
+  --muted-foreground: #8b6f47;
+  --primary: #c9a84c;
+  --primary-foreground: #2d1f0e;
+  --accent: #c9a84c;
+  --accent-foreground: #2d1f0e;
+  --border: rgba(45, 31, 14, 0.15);
+  --translit: #c4a882;
+  --grad-header: linear-gradient(135deg, #d4956a 0%, #b8743a 100%);
+  --header-fg: #fff5e8;
+  --header-sub: rgba(255, 245, 232, 0.85);
+  --nav-bg: rgba(250, 246, 240, 0.97);
+  --nav-border: rgba(45, 31, 14, 0.08);
+  --nav-active: #c9a84c;
+  --nav-inactive: #8b6f47;
+  --index-badge-bg: #c9a84c;
+  --index-badge-fg: #2d1f0e;
+  --ring-track: rgba(245, 230, 200, 0.18);
+  --btn-surface: rgba(184, 116, 58, 0.12);
+  --btn-fg: #8b6f47;
+  --dot-active: #c9a84c;
+  --dot-inactive: rgba(45, 31, 14, 0.18);
+  --arrow-bg: rgba(184, 116, 58, 0.12);
+  --arrow-fg: #8b6f47;
+  --source-bg: rgba(245, 230, 200, 0.12);
+  --source-fg: #c4a882;
+  --count-fg: #f5e6c8;
+  --card-shadow: 0 6px 20px rgba(45, 31, 14, 0.18);
+}
+
 @layer base {
   :root {
     --bottom-nav-row: 56px;
@@ -210,6 +250,14 @@
 .fade-mask-2 {
   -webkit-mask-image: linear-gradient(to bottom, #000 60%, transparent 100%);
   mask-image: linear-gradient(to bottom, #000 60%, transparent 100%);
+}
+
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.hide-scrollbar {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
 }
 
 @keyframes pulse-tap {
