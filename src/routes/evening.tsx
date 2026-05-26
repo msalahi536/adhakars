@@ -15,12 +15,14 @@ export const Route = createFileRoute("/evening")({
 function Evening() {
   return (
     <AdhkarPage
-      kind="evening"
-      title="Evening"
+      storageKey="evening"
+      lifetimeCategory="evening"
+      title="Evening Adhkar"
       subtitle="Between 'Asr & Maghrib"
       list={eveningAdhkar}
-      extras={[{ dhikr: baqarahLastTwo, isSpecial: true, specialLabel: "After Sunset — recite after the sun has set" }]}
+      extras={[
+        { dhikr: baqarahLastTwo, isSpecial: true, specialLabel: "After Sunset — recite after the sun has set" },
+      ]}
     />
-
   );
 }

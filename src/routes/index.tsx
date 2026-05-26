@@ -15,11 +15,11 @@ export const Route = createFileRoute("/")({
 function Morning() {
   return (
     <AdhkarPage
-      kind="morning"
-      title="Morning"
+      storageKey="morning"
+      lifetimeCategory="morning"
+      title="Morning Adhkar"
       subtitle="Between Fajr & Sunrise"
       list={morningAdhkar}
     />
-
   );
 }
