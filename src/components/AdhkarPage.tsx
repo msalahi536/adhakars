@@ -1,49 +1,59 @@
 import { useEffect, useState } from "react";
 import { SwipeStack } from "./SwipeStack";
-import { morningAdhkar, eveningAdhkar, type Dhikr } from "@/data/adhkar";
-import { getCounts, setCount } from "@/lib/storage";
-
-if (typeof window !== "undefined") {
-  console.log("Morning adhkar loaded:", morningAdhkar.length);
-  console.log("Evening adhkar loaded:", eveningAdhkar.length);
-}
-
-type Item = { dhikr: Dhikr; isSpecial?: boolean; specialLabel?: string };
+import type { Dhikr } from "@/data/adhkar";
+import type { SalahItem } from "@/data/salah";
+import { isItemComplete } from "@/data/salah";
+import { getCounts, setCount, bumpLifetime, type LifetimeCategory } from "@/lib/storage";
 
 type Props = {
-  kind: "morning" | "evening";
+  storageKey: string; // e.g. "morning", "evening", "salah_fajr"
+  lifetimeCategory: LifetimeCategory;
   title: string;
   subtitle: string;
-  list: Dhikr[];
-  extras?: Item[];
+  list?: Dhikr[];
+  items?: SalahItem[];
+  extras?: SalahItem[];
+  headerStyle?: React.CSSProperties;
 };
 
-export function AdhkarPage({ kind, title, subtitle, list, extras = [] }: Props) {
+export function AdhkarPage({
+  storageKey,
+  lifetimeCategory,
+  title,
+  subtitle,
+  list,
+  items: itemsProp,
+  extras = [],
+  headerStyle,
+}: Props) {
   const [counts, setCounts] = useState<Record<string, number>>({});
 
   useEffect(() => {
-    setCounts(getCounts(kind));
-  }, [kind]);
+    setCounts(getCounts(storageKey));
+  }, [storageKey]);
 
-  const items: Item[] = [...list.map((d) => ({ dhikr: d })), ...extras];
-  const completed = items.filter((i) => (counts[i.dhikr.id] ?? 0) >= i.dhikr.target).length;
+  const baseItems: SalahItem[] = itemsProp ?? (list ?? []).map((d) => ({ dhikr: d }));
+  const items: SalahItem[] = [...baseItems, ...extras];
+  const completed = items.filter((i) => isItemComplete(i, counts)).length;
 
   const inc = (id: string, target: number) => {
-    const next = Math.min(target, (counts[id] ?? 0) + 1);
+    const prev = counts[id] ?? 0;
+    const next = Math.min(target, prev + 1);
+    if (next === prev) return;
     const updated = { ...counts, [id]: next };
     setCounts(updated);
-    setCount(kind, id, next);
+    setCount(storageKey, id, next);
+    bumpLifetime(lifetimeCategory, next - prev);
+  };
+
+  const defaultHeader: React.CSSProperties = {
+    background: "var(--grad-header)",
+    color: "var(--header-fg, var(--accent-foreground))",
   };
 
   return (
     <>
-      <header
-        className="page-header"
-        style={{
-          background: "var(--grad-header)",
-          color: "var(--header-fg, var(--accent-foreground))",
-        }}
-      >
+      <header className="page-header" style={{ ...defaultHeader, ...headerStyle }}>
         <div className="mx-auto max-w-md px-5 pb-4 pt-5">
           <div
             className="label-caps"
@@ -55,7 +65,7 @@ export function AdhkarPage({ kind, title, subtitle, list, extras = [] }: Props) 
             {subtitle}
           </div>
 
-          <h1 className="mt-1 text-2xl font-bold tracking-tight">{title} Adhkar</h1>
+          <h1 className="mt-1 text-2xl font-bold tracking-tight">{title}</h1>
           <div className="mt-3 flex items-center gap-3">
             <div
               className="h-1.5 flex-1 overflow-hidden rounded-full"
@@ -67,7 +77,7 @@ export function AdhkarPage({ kind, title, subtitle, list, extras = [] }: Props) 
               <div
                 className="h-full rounded-full transition-all duration-500"
                 style={{
-                  width: `${(completed / items.length) * 100}%`,
+                  width: `${items.length ? (completed / items.length) * 100 : 0}%`,
                   background: "var(--accent)",
                 }}
               />

@@ -1,12 +1,12 @@
 import { useEffect, useRef, useState } from "react";
-import type { Dhikr } from "@/data/adhkar";
 import { DhikrCard } from "./DhikrCard";
+import { TasbeehComboCard } from "./TasbeehComboCard";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-
-type Item = { dhikr: Dhikr; isSpecial?: boolean; specialLabel?: string };
+import type { SalahItem } from "@/data/salah";
+import { isItemComplete, itemId } from "@/data/salah";
 
 type Props = {
-  items: Item[];
+  items: SalahItem[];
   counts: Record<string, number>;
   onIncrement: (id: string, target: number) => void;
 };
@@ -27,8 +27,9 @@ export function SwipeStack({ items, counts, onIncrement }: Props) {
   const startY = useRef(0);
   const axisLocked = useRef<null | "x" | "y">(null);
   const wrapperRef = useRef<HTMLDivElement>(null);
+  const prevCompleteRef = useRef(false);
 
-  useEffect(() => { setIdx(0); setPhase("idle"); }, [items.length]);
+  useEffect(() => { setIdx(0); setPhase("idle"); prevCompleteRef.current = false; }, [items]);
 
   const animateTo = (dir: "next" | "prev") => {
     if (animating.current) return;
@@ -42,7 +43,6 @@ export function SwipeStack({ items, counts, onIncrement }: Props) {
       setIdx((i) => i + (dir === "next" ? 1 : -1));
       setPhase(dir === "next" ? "in-right" : "in-left");
       setEnter(false);
-      // next frame: trigger transition in
       requestAnimationFrame(() => {
         requestAnimationFrame(() => setEnter(true));
       });
@@ -50,6 +50,7 @@ export function SwipeStack({ items, counts, onIncrement }: Props) {
         setPhase("idle");
         setEnter(false);
         animating.current = false;
+        prevCompleteRef.current = false;
       }, IN_MS + 20);
     }, OUT_MS);
   };
@@ -63,15 +64,17 @@ export function SwipeStack({ items, counts, onIncrement }: Props) {
 
   const current = items[idx];
 
-  const handleIncrement = () => {
+  // Auto-advance when current item becomes complete
+  useEffect(() => {
     if (!current) return;
-    const prev = counts[current.dhikr.id] ?? 0;
-    const willComplete = prev + 1 >= current.dhikr.target;
-    onIncrement(current.dhikr.id, current.dhikr.target);
-    if (willComplete && idx < items.length - 1) {
-      setTimeout(() => goNext(), 900);
+    const nowComplete = isItemComplete(current, counts);
+    if (nowComplete && !prevCompleteRef.current && idx < items.length - 1) {
+      const t = setTimeout(() => goNext(), 900);
+      prevCompleteRef.current = true;
+      return () => clearTimeout(t);
     }
-  };
+    prevCompleteRef.current = nowComplete;
+  }, [counts, current, idx, items.length]);
 
   // Touch handling
   useEffect(() => {
@@ -80,6 +83,9 @@ export function SwipeStack({ items, counts, onIncrement }: Props) {
 
     const onTouchStart = (e: TouchEvent) => {
       if (animating.current) return;
+      // ignore swipes that start inside a scrollable card body
+      const target = e.target as HTMLElement | null;
+      if (target && target.closest("[data-no-swipe]")) return;
       startX.current = e.touches[0].clientX;
       startY.current = e.touches[0].clientY;
       isDragging.current = true;
@@ -123,11 +129,9 @@ export function SwipeStack({ items, counts, onIncrement }: Props) {
     };
   }, [idx, items.length]);
 
-  // Keep ref in sync for touchend closure
   const dragOffsetRef = useRef(0);
   useEffect(() => { dragOffsetRef.current = dragOffset; }, [dragOffset]);
 
-  // Compute card transform/opacity/transition
   let transform = `translateX(${dragOffset}px)`;
   let opacity = 1;
   let transition = "none";
@@ -142,26 +146,19 @@ export function SwipeStack({ items, counts, onIncrement }: Props) {
     transition = `transform ${OUT_MS}ms cubic-bezier(0.4,0,0.2,1), opacity ${OUT_MS}ms ease`;
   } else if (phase === "in-right") {
     if (!enter) {
-      transform = "translateX(110%)";
-      opacity = 0;
-      transition = "none";
+      transform = "translateX(110%)"; opacity = 0; transition = "none";
     } else {
-      transform = "translateX(0)";
-      opacity = 1;
+      transform = "translateX(0)"; opacity = 1;
       transition = `transform ${IN_MS}ms cubic-bezier(0.4,0,0.2,1), opacity ${IN_MS}ms ease`;
     }
   } else if (phase === "in-left") {
     if (!enter) {
-      transform = "translateX(-110%)";
-      opacity = 0;
-      transition = "none";
+      transform = "translateX(-110%)"; opacity = 0; transition = "none";
     } else {
-      transform = "translateX(0)";
-      opacity = 1;
+      transform = "translateX(0)"; opacity = 1;
       transition = `transform ${IN_MS}ms cubic-bezier(0.4,0,0.2,1), opacity ${IN_MS}ms ease`;
     }
   } else {
-    // idle — follow finger with no transition during drag, snap back if released without threshold
     transition = isDragging.current ? "none" : `transform 0.25s ease`;
   }
 
@@ -186,16 +183,25 @@ export function SwipeStack({ items, counts, onIncrement }: Props) {
             className="h-full w-full"
             style={{ transform, opacity, transition, willChange: "transform, opacity" }}
           >
-            <DhikrCard
-              key={current.dhikr.id}
-              dhikr={current.dhikr}
-              count={counts[current.dhikr.id] ?? 0}
-              onIncrement={handleIncrement}
-              index={idx + 1}
-              total={items.length}
-              isSpecial={current.isSpecial}
-              specialLabel={current.specialLabel}
-            />
+            {current.dhikr ? (
+              <DhikrCard
+                key={current.dhikr.id}
+                dhikr={current.dhikr}
+                count={counts[current.dhikr.id] ?? 0}
+                onIncrement={() => onIncrement(current.dhikr!.id, current.dhikr!.target)}
+                index={idx + 1}
+                total={items.length}
+              />
+            ) : (
+              <TasbeehComboCard
+                key={current.combo!.id}
+                combo={current.combo!}
+                counts={counts}
+                onIncrement={onIncrement}
+                index={idx + 1}
+                total={items.length}
+              />
+            )}
           </div>
         )}
       </div>
@@ -215,9 +221,9 @@ export function SwipeStack({ items, counts, onIncrement }: Props) {
           <ChevronLeft size={20} />
         </button>
         <div className="flex flex-wrap items-center justify-center gap-1.5">
-          {items.map((_, i) => (
+          {items.map((it, i) => (
             <button
-              key={i}
+              key={itemId(it) + i}
               onClick={() => goTo(i)}
               className="h-1.5 rounded-full transition-all"
               style={{

@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as TasbihRouteImport } from './routes/tasbih'
 import { Route as SettingsRouteImport } from './routes/settings'
+import { Route as SalahRouteImport } from './routes/salah'
 import { Route as EveningRouteImport } from './routes/evening'
 import { Route as IndexRouteImport } from './routes/index'
 
@@ -22,6 +23,11 @@ const TasbihRoute = TasbihRouteImport.update({
 const SettingsRoute = SettingsRouteImport.update({
   id: '/settings',
   path: '/settings',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SalahRoute = SalahRouteImport.update({
+  id: '/salah',
+  path: '/salah',
   getParentRoute: () => rootRouteImport,
 } as any)
 const EveningRoute = EveningRouteImport.update({
@@ -38,12 +44,14 @@ const IndexRoute = IndexRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/evening': typeof EveningRoute
+  '/salah': typeof SalahRoute
   '/settings': typeof SettingsRoute
   '/tasbih': typeof TasbihRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/evening': typeof EveningRoute
+  '/salah': typeof SalahRoute
   '/settings': typeof SettingsRoute
   '/tasbih': typeof TasbihRoute
 }
@@ -51,20 +59,22 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/evening': typeof EveningRoute
+  '/salah': typeof SalahRoute
   '/settings': typeof SettingsRoute
   '/tasbih': typeof TasbihRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/evening' | '/settings' | '/tasbih'
+  fullPaths: '/' | '/evening' | '/salah' | '/settings' | '/tasbih'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/evening' | '/settings' | '/tasbih'
-  id: '__root__' | '/' | '/evening' | '/settings' | '/tasbih'
+  to: '/' | '/evening' | '/salah' | '/settings' | '/tasbih'
+  id: '__root__' | '/' | '/evening' | '/salah' | '/settings' | '/tasbih'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   EveningRoute: typeof EveningRoute
+  SalahRoute: typeof SalahRoute
   SettingsRoute: typeof SettingsRoute
   TasbihRoute: typeof TasbihRoute
 }
@@ -83,6 +93,13 @@ declare module '@tanstack/react-router' {
       path: '/settings'
       fullPath: '/settings'
       preLoaderRoute: typeof SettingsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/salah': {
+      id: '/salah'
+      path: '/salah'
+      fullPath: '/salah'
+      preLoaderRoute: typeof SalahRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/evening': {
@@ -105,6 +122,7 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   EveningRoute: EveningRoute,
+  SalahRoute: SalahRoute,
   SettingsRoute: SettingsRoute,
   TasbihRoute: TasbihRoute,
 }
