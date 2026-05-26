@@ -10,7 +10,7 @@ import {
   setDisplay,
   type ThemeMode,
 } from "@/lib/theme";
-import { getStreak, resetToday } from "@/lib/storage";
+import { getStreak, resetToday, getLifetime, type LifetimeCounts } from "@/lib/storage";
 import { requestNotificationPermission, getNotificationPermission } from "@/lib/onesignal";
 
 export const Route = createFileRoute("/settings")({
@@ -28,15 +28,28 @@ function Settings() {
   const [display, setDisplayState] = useState(getDisplay());
   const [confirmReset, setConfirmReset] = useState(false);
   const [notifEnabled, setNotifEnabled] = useState(false);
+  const [lifetime, setLifetime] = useState<LifetimeCounts>({
+    total: 0,
+    morning: 0,
+    evening: 0,
+    salah: 0,
+    tasbih: 0,
+  });
 
   useEffect(() => {
     setModeState(getMode());
     setStreak(getStreak());
     setDisplayState(getDisplay());
+    setLifetime(getLifetime());
     const check = () => setNotifEnabled(getNotificationPermission());
     check();
     const id = setInterval(check, 1000);
-    return () => clearInterval(id);
+    const onLife = () => setLifetime(getLifetime());
+    window.addEventListener("adhkar:lifetime-update", onLife);
+    return () => {
+      clearInterval(id);
+      window.removeEventListener("adhkar:lifetime-update", onLife);
+    };
   }, []);
 
   const handleEnableNotifications = async () => {
