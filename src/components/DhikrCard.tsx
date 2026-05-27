@@ -11,9 +11,10 @@ type Props = {
   total: number;
   isSpecial?: boolean;
   specialLabel?: string;
+  isPersonalDua?: boolean;
 };
 
-export function DhikrCard({ dhikr, count, onIncrement, index, total, isSpecial, specialLabel }: Props) {
+export function DhikrCard({ dhikr, count, onIncrement, index, total, isSpecial, specialLabel, isPersonalDua }: Props) {
   const [tapped, setTapped] = useState(false);
   const [bursts, setBursts] = useState<number[]>([]);
   const [display, setDisplay] = useState(getDisplay());
@@ -198,32 +199,48 @@ export function DhikrCard({ dhikr, count, onIncrement, index, total, isSpecial, 
           </div>
         </div>
 
-        <button
-          onClick={handleTap}
-          disabled={complete}
-          className={`relative flex h-[104px] w-[104px] shrink-0 items-center justify-center rounded-full ${tapped ? "tap-pulse" : ""}`}
-          style={{ touchAction: "manipulation" }}
-          aria-label="increment counter"
-        >
-          <ProgressRing value={count} max={dhikr.target} size={104} stroke={9} complete={complete} />
-          <div className="absolute inset-0 flex flex-col items-center justify-center">
-            {complete ? (
-              <span className="text-3xl" style={{ color: "var(--accent)" }}>✓</span>
-            ) : (
-              <>
-                <span className="text-3xl font-bold leading-none" style={{ color: "var(--count-fg, var(--card-foreground))" }}>{count}</span>
-                <span className="mt-1 text-[10px] opacity-70">/ {dhikr.target}</span>
-              </>
-            )}
-          </div>
-          {bursts.map((b) => (
-            <span
-              key={b}
-              className="radial-pulse pointer-events-none absolute inset-0 rounded-full"
-              style={{ background: "color-mix(in oklab, var(--accent) 50%, transparent)" }}
-            />
-          ))}
-        </button>
+        {isPersonalDua ? (
+          <button
+            onClick={handleTap}
+            disabled={complete}
+            className="shrink-0 rounded-full px-6 py-3 text-sm font-bold transition-transform active:scale-95 disabled:opacity-60"
+            style={{
+              background: "var(--accent)",
+              color: "var(--accent-foreground)",
+              minWidth: 104,
+            }}
+            aria-label="mark done"
+          >
+            {complete ? "✓ Done" : "Done"}
+          </button>
+        ) : (
+          <button
+            onClick={handleTap}
+            disabled={complete}
+            className={`relative flex h-[104px] w-[104px] shrink-0 items-center justify-center rounded-full ${tapped ? "tap-pulse" : ""}`}
+            style={{ touchAction: "manipulation" }}
+            aria-label="increment counter"
+          >
+            <ProgressRing value={count} max={dhikr.target} size={104} stroke={9} complete={complete} />
+            <div className="absolute inset-0 flex flex-col items-center justify-center">
+              {complete ? (
+                <span className="text-3xl" style={{ color: "var(--accent)" }}>✓</span>
+              ) : (
+                <>
+                  <span className="text-3xl font-bold leading-none" style={{ color: "var(--count-fg, var(--card-foreground))" }}>{count}</span>
+                  <span className="mt-1 text-[10px] opacity-70">/ {dhikr.target}</span>
+                </>
+              )}
+            </div>
+            {bursts.map((b) => (
+              <span
+                key={b}
+                className="radial-pulse pointer-events-none absolute inset-0 rounded-full"
+                style={{ background: "color-mix(in oklab, var(--accent) 50%, transparent)" }}
+              />
+            ))}
+          </button>
+        )}
       </div>
     </div>
   );
