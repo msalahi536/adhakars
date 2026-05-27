@@ -9,6 +9,7 @@ type Props = {
   items: SalahItem[];
   counts: Record<string, number>;
   onIncrement: (id: string, target: number) => void;
+  persistKey?: string;
 };
 
 type Phase = "idle" | "out-left" | "out-right" | "in-left" | "in-right";
@@ -16,8 +17,26 @@ type Phase = "idle" | "out-left" | "out-right" | "in-left" | "in-right";
 const OUT_MS = 280;
 const IN_MS = 320;
 
-export function SwipeStack({ items, counts, onIncrement }: Props) {
-  const [idx, setIdx] = useState(0);
+const readPersistedIdx = (key?: string): number => {
+  if (!key || typeof window === "undefined") return 0;
+  const raw = window.localStorage.getItem(`cardIdx_${key}`);
+  const n = raw ? parseInt(raw, 10) : 0;
+  return Number.isFinite(n) && n >= 0 ? n : 0;
+};
+
+export function SwipeStack({ items, counts, onIncrement, persistKey }: Props) {
+  const [idx, setIdxState] = useState(() =>
+    Math.min(readPersistedIdx(persistKey), Math.max(0, items.length - 1)),
+  );
+  const setIdx = (updater: number | ((i: number) => number)) => {
+    setIdxState((prev) => {
+      const next = typeof updater === "function" ? (updater as (i: number) => number)(prev) : updater;
+      if (persistKey && typeof window !== "undefined") {
+        window.localStorage.setItem(`cardIdx_${persistKey}`, String(next));
+      }
+      return next;
+    });
+  };
   const [phase, setPhase] = useState<Phase>("idle");
   const [enter, setEnter] = useState(false);
   const [dragOffset, setDragOffset] = useState(0);
@@ -29,7 +48,20 @@ export function SwipeStack({ items, counts, onIncrement }: Props) {
   const wrapperRef = useRef<HTMLDivElement>(null);
   const prevCompleteRef = useRef(false);
 
-  useEffect(() => { setIdx(0); setPhase("idle"); prevCompleteRef.current = false; }, [items]);
+  // Reset ONLY when persistKey changes (e.g. switching prayer). Do NOT reset on items identity changes.
+  useEffect(() => {
+    const restored = Math.min(readPersistedIdx(persistKey), Math.max(0, items.length - 1));
+    setIdxState(restored);
+    setPhase("idle");
+    prevCompleteRef.current = false;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [persistKey]);
+
+  // Clamp if items list shrinks
+  useEffect(() => {
+    if (idx > items.length - 1) setIdxState(Math.max(0, items.length - 1));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [items.length]);
 
   const animateTo = (dir: "next" | "prev") => {
     if (animating.current) return;
