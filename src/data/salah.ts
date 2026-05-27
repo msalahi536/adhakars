@@ -22,6 +22,7 @@ export type SalahItem = {
   combo?: ComboDhikr;
   isSpecial?: boolean;
   specialLabel?: string;
+  isPersonalDua?: boolean;
 };
 
 export type SalahPrayer = "fajr" | "dhuhr" | "asr" | "maghrib" | "isha" | "witr";
@@ -35,99 +36,96 @@ export const SALAH_PRAYERS: { id: SalahPrayer; label: string }[] = [
   { id: "witr", label: "Witr" },
 ];
 
-// -------- Shared cards --------
+// ---------- Shared card factories (id prefixed per prayer) ----------
 
-const istighfar: Dhikr = {
-  id: "salah-istighfar",
+const cardA = (p: string): Dhikr => ({
+  id: `${p}_A`,
   title: "Istighfar",
   arabic: "أَسْتَغْفِرُ اللَّهَ",
-  transliteration: "Astaghfirullah (×3)",
+  transliteration: "Astaghfirullah",
   translation: "I seek forgiveness from Allah.",
   source: "Sahih Muslim 591",
   commentary:
-    "When the Messenger of Allah ﷺ finished his prayer, he would seek forgiveness three times then say: 'Allahumma antas-salaam, wa minkas-salaam, tabaarakta dhaal-jalaali wal-ikraam.'",
+    "When the Messenger of Allah ﷺ finished his prayer, he would seek forgiveness three times.",
   target: 3,
-  arabicMulti: [
-    {
-      label: "Astaghfirullah (×3)",
-      arabic: "أَسْتَغْفِرُ اللَّهَ",
-      transliteration: "Astaghfirullah",
-      translation: "I seek forgiveness from Allah.",
-    },
-    {
-      label: "Then say (×1)",
-      arabic:
-        "اللَّهُمَّ أَنْتَ السَّلاَمُ وَمِنْكَ السَّلاَمُ تَبَارَكْتَ ذَا الْجَلاَلِ وَالإِكْرَامِ",
-      transliteration:
-        "Allahumma antas-salaam, wa minkas-salaam, tabaarakta dhaal-jalaali wal-ikraam",
-      translation:
-        "O Allah, You are Peace and from You comes peace. Blessed are You, O Possessor of Glory and Honour.",
-    },
-  ],
-};
+});
 
-const laaIlaahaMaani: Dhikr = {
-  id: "salah-laailaaha-maani",
-  title: "Laa ilaaha illallah + Allahumma laa maani'",
-  arabic: "",
-  transliteration: "",
-  translation: "",
-  source: "Sahih Muslim 593a · Sahih al-Bukhari 844",
-  commentary: "The Prophet ﷺ used to say this after every obligatory prayer.",
+const cardB = (p: string): Dhikr => ({
+  id: `${p}_B`,
+  title: "Tasleem Dua",
+  arabic:
+    "اللَّهُمَّ أَنْتَ السَّلاَمُ وَمِنْكَ السَّلاَمُ تَبَارَكْتَ ذَا الْجَلاَلِ وَالإِكْرَامِ",
+  transliteration:
+    "Allahumma antas-salaam, wa minkas-salaam, tabaarakta dhaal-jalaali wal-ikraam",
+  translation:
+    "O Allah, You are Peace and from You comes peace. Blessed are You, O Possessor of Glory and Honour.",
+  source: "Sahih Muslim 591",
+  commentary:
+    "This is said immediately after Astaghfirullah ×3 — both come from the same hadith of Thawban. The Prophet ﷺ said this after every obligatory prayer.",
   target: 1,
-  arabicMulti: [
-    {
-      label: "Laa ilaaha illallah",
-      arabic:
-        "لَا إِلَهَ إِلَّا اللَّهُ وَحْدَهُ لَا شَرِيكَ لَهُ، لَهُ الْمُلْكُ وَلَهُ الْحَمْدُ وَهُوَ عَلَى كُلِّ شَيْءٍ قَدِيرٌ",
-      transliteration:
-        "Laa ilaaha illallahu wahdahu laa shareeka lah, lahul mulku wa lahul hamdu wa huwa 'alaa kulli shay'in qadeer",
-      translation:
-        "There is no god but Allah, alone, with no partner. To Him belongs the dominion and to Him belongs praise, and He has power over all things.",
-    },
-    {
-      label: "Allahumma laa maani'",
-      arabic:
-        "اللَّهُمَّ لَا مَانِعَ لِمَا أَعْطَيْتَ، وَلَا مُعْطِيَ لِمَا مَنَعْتَ، وَلَا يَنْفَعُ ذَا الْجَدِّ مِنْكَ الْجَدُّ",
-      transliteration:
-        "Allahumma laa maani'a limaa a'tayta, wa laa mu'tiya limaa mana'ta, wa laa yanfa'u dhal-jaddi minkal-jadd",
-      translation:
-        "O Allah, none can withhold what You give, and none can give what You withhold, and no wealth or majesty can benefit anyone against You.",
-    },
-  ],
-};
+});
 
-const tasbeehCombo: ComboDhikr = {
+const cardC = (p: string): Dhikr => ({
+  id: `${p}_C`,
+  title: "Laa Ilaaha Illallah",
+  arabic:
+    "لَا إِلَهَ إِلَّا اللَّهُ وَحْدَهُ لَا شَرِيكَ لَهُ، لَهُ الْمُلْكُ وَلَهُ الْحَمْدُ وَهُوَ عَلَى كُلِّ شَيْءٍ قَدِيرٌ",
+  transliteration:
+    "Laa ilaaha illallahu wahdahu laa shareeka lah, lahul mulku wa lahul hamdu wa huwa 'alaa kulli shay'in qadeer",
+  translation:
+    "There is no god but Allah, alone, with no partner. To Him belongs sovereignty and all praise, and He has power over all things.",
+  source: "Sahih Muslim 594",
+  commentary:
+    "Narrated from Ibn az-Zubayr that the Prophet ﷺ would say this after every obligatory prayer.",
+  target: 1,
+});
+
+const cardC2 = (p: string): Dhikr => ({
+  id: `${p}_C2`,
+  title: "Allahumma Laa Maani'a",
+  arabic:
+    "اللَّهُمَّ لَا مَانِعَ لِمَا أَعْطَيْتَ، وَلَا مُعْطِيَ لِمَا مَنَعْتَ، وَلَا يَنْفَعُ ذَا الْجَدِّ مِنْكَ الْجَدُّ",
+  transliteration:
+    "Allahumma laa maani'a limaa a'tayta, wa laa mu'tiya limaa mana'ta, wa laa yanfa'u dhal-jaddi minkal-jadd",
+  translation:
+    "O Allah, none can withhold what You give, and none can give what You withhold, and no wealth or majesty can benefit anyone against You.",
+  source: "Sahih al-Bukhari 844 | Sahih Muslim 593a",
+  commentary:
+    "Narrated from al-Mughira ibn Shu'ba that the Prophet ﷺ said this after every obligatory prayer. This is a separate narration from the previous card — both are said in sequence. Scholars such as Ibn Baz present them together as part of the same post-prayer adhkar sequence.",
+  target: 1,
+});
+
+const cardD = (p: string): ComboDhikr => ({
   kind: "combo",
-  id: "salah-tasbeeh-combo",
-  title: "Tasbeeh after Salah",
+  id: `${p}_D`,
+  title: "Tasbeeh",
   source: "Sahih Muslim 597a",
   commentary:
-    "Whoever extols Allah 33 times, praises Allah 33 times, and declares His Greatness 33 times after every prayer — 99 in all — and completes 100 with this statement, his sins will be forgiven even if they are as abundant as the foam of the sea.",
+    "Whoever extols Allah 33 times, praises Him 33 times, and declares His Greatness 33 times after every prayer — 99 in all — and completes 100 with this statement, his sins will be forgiven even if they are as abundant as the foam of the sea.",
   parts: [
     {
-      id: "salah-combo-subhanallah",
+      id: `${p}_D_subhan`,
       arabic: "سُبْحَانَ اللَّهِ",
       transliteration: "SubhanAllah",
       translation: "Glory be to Allah",
       target: 33,
     },
     {
-      id: "salah-combo-alhamdulillah",
+      id: `${p}_D_hamd`,
       arabic: "اَلْحَمْدُ لِلَّهِ",
       transliteration: "Alhamdulillah",
       translation: "All praise is for Allah",
       target: 33,
     },
     {
-      id: "salah-combo-allahuakbar",
+      id: `${p}_D_akbar`,
       arabic: "اللَّهُ أَكْبَرُ",
       transliteration: "Allahu Akbar",
       translation: "Allah is the Greatest",
       target: 33,
     },
     {
-      id: "salah-combo-final",
+      id: `${p}_D_final`,
       arabic:
         "لَا إِلَهَ إِلَّا اللَّهُ وَحْدَهُ لَا شَرِيكَ لَهُ، لَهُ الْمُلْكُ وَلَهُ الْحَمْدُ وَهُوَ عَلَى كُلِّ شَيْءٍ قَدِيرٌ",
       transliteration:
@@ -137,10 +135,10 @@ const tasbeehCombo: ComboDhikr = {
       target: 1,
     },
   ],
-};
+});
 
-const ayatulKursi: Dhikr = {
-  id: "salah-ayatul-kursi",
+const cardE = (p: string): Dhikr => ({
+  id: `${p}_E`,
   title: "Ayatul Kursi",
   arabic:
     "ٱللَّهُ لَآ إِلَـٰهَ إِلَّا هُوَ ٱلْحَىُّ ٱلْقَيُّومُ ۚ لَا تَأْخُذُهُۥ سِنَةٌۭ وَلَا نَوْمٌۭ ۚ لَّهُۥ مَا فِى ٱلسَّمَـٰوَٰتِ وَمَا فِى ٱلْأَرْضِ ۗ مَن ذَا ٱلَّذِى يَشْفَعُ عِندَهُۥٓ إِلَّا بِإِذْنِهِۦ ۚ يَعْلَمُ مَا بَيْنَ أَيْدِيهِمْ وَمَا خَلْفَهُمْ ۖ وَلَا يُحِيطُونَ بِشَىْءٍۢ مِّنْ عِلْمِهِۦٓ إِلَّا بِمَا شَآءَ ۚ وَسَعَ كُرْسِيُّهُ ٱلسَّمَـٰوَٰتِ وَٱلْأَرْضَ ۖ وَلَا يَـُٔودُهُۥ حِفْظُهُمَا ۚ وَهُوَ ٱلْعَلِىُّ ٱلْعَظِيمُ",
@@ -152,10 +150,10 @@ const ayatulKursi: Dhikr = {
   commentary:
     "The Messenger of Allah ﷺ said: 'Whoever recites Ayat al-Kursi at the end of every obligatory prayer, nothing but death will prevent him from entering Paradise.'",
   target: 1,
-};
+});
 
-const muadhDua: Dhikr = {
-  id: "salah-muadh",
+const cardF = (p: string): Dhikr => ({
+  id: `${p}_F`,
   title: "Du'a of Mu'adh ibn Jabal",
   arabic: "اللَّهُمَّ أَعِنِّي عَلَى ذِكْرِكَ وَشُكْرِكَ وَحُسْنِ عِبَادَتِكَ",
   transliteration: "Allahumma a'inni 'alaa dhikrika wa shukrika wa husni 'ibaadatik",
@@ -165,34 +163,27 @@ const muadhDua: Dhikr = {
   commentary:
     "The Messenger of Allah ﷺ took the hand of Mu'adh ibn Jabal and said: 'By Allah, I love you, Mu'adh. I instruct you: never leave reciting this supplication after every prescribed prayer.'",
   target: 1,
-};
+});
 
-const closingSeal: Dhikr = {
-  id: "salah-closing",
+const cardG = (p: string): Dhikr => ({
+  id: `${p}_G`,
   title: "Closing Seal",
   arabic: "سُبْحَانَكَ اللَّهُمَّ وَبِحَمْدِكَ أَسْتَغْفِرُكَ وَأَتُوبُ إِلَيْكَ",
   transliteration: "Subhaanaka Allahumma wa bihamdika, astaghfiruka wa atoobu ilayk",
-  translation: "Glory and praise be to You, O Allah. I seek Your forgiveness and I repent to You.",
+  translation:
+    "Glory and praise be to You, O Allah. I seek Your forgiveness and I repent to You.",
   source: "Sunan an-Nasa'i 1344 — Hasan",
   commentary:
     "'Aishah reported that whenever the Messenger of Allah ﷺ finished a prayer or sat in a gathering, he would say these words. He said: if good words were spoken, this seals them until the Day of Resurrection; if anything else was said, this is an expiation for it.",
   target: 1,
-};
+});
 
-// Mu'awwidhat — same surahs, varying target
-const surahsThrice: Dhikr = {
-  id: "salah-mu-awwidhat-3",
-  title: "Al-Ikhlas, Al-Falaq, An-Naas — Recite each 3×",
-  arabic: "",
-  transliteration: "",
-  translation: "",
-  source:
-    "Jami at-Tirmidhi 2903 — Hasan · Sunan Abi Dawud 1523 — Sahih · Imam Ibn Baz: 'After Maghrib and Fajr, they should be recited three times each.'",
-  commentary: "Recite each surah 3 times after Fajr and Maghrib.",
-  target: 9,
-  arabicMulti: [
+// Mu'awwidhat — full surahs
+const muawwidhatMulti = (times: 1 | 3) => {
+  const suffix = times === 3 ? "(×3)" : "(×1)";
+  return [
     {
-      label: "Surah Al-Ikhlas (×3)",
+      label: `Surah Al-Ikhlas ${suffix}`,
       arabic:
         "بِسْمِ اللَّهِ الرَّحْمَنِ الرَّحِيمِ قُلْ هُوَ اللَّهُ أَحَدٌ، اللَّهُ الصَّمَدُ، لَمْ يَلِدْ وَلَمْ يُولَدْ، وَلَمْ يَكُنْ لَهُ كُفُوًا أَحَدٌ",
       transliteration:
@@ -201,7 +192,7 @@ const surahsThrice: Dhikr = {
         "Say, He is Allah, One and Indivisible. Allah, the Sustainer needed by all. He has never had offspring, nor was He born. And there is none comparable to Him.",
     },
     {
-      label: "Surah Al-Falaq (×3)",
+      label: `Surah Al-Falaq ${suffix}`,
       arabic:
         "بِسْمِ اللَّهِ الرَّحْمَنِ الرَّحِيمِ قُلْ أَعُوذُ بِرَبِّ الْفَلَقِ، مِنْ شَرِّ مَا خَلَقَ، وَمِنْ شَرِّ غَاسِقٍ إِذَا وَقَبَ، وَمِنْ شَرِّ النَّفَّاثَاتِ فِي الْعُقَدِ، وَمِنْ شَرِّ حَاسِدٍ إِذَا حَسَدَ",
       transliteration:
@@ -210,7 +201,7 @@ const surahsThrice: Dhikr = {
         "Say, I seek refuge in the Lord of the daybreak. From the evil of whatever He has created. And from the evil of the night when it grows dark. And from the evil of those witches casting spells by blowing onto knots. And from the evil of an envier when they envy.",
     },
     {
-      label: "Surah An-Naas (×3)",
+      label: `Surah An-Naas ${suffix}`,
       arabic:
         "بِسْمِ اللَّهِ الرَّحْمَنِ الرَّحِيمِ قُلْ أَعُوذُ بِرَبِّ النَّاسِ، مَلِكِ النَّاسِ، إِلَهِ النَّاسِ، مِنْ شَرِّ الْوَسْوَاسِ الْخَنَّاسِ، الَّذِي يُوَسْوِسُ فِي صُدُورِ النَّاسِ، مِنَ الْجِنَّةِ وَالنَّاسِ",
       transliteration:
@@ -218,88 +209,141 @@ const surahsThrice: Dhikr = {
       translation:
         "Say, I seek refuge in the Lord of humankind. The Master of humankind. The God of humankind. From the evil of the lurking whisper. Who whispers into the hearts of humankind. From among jinn and humankind.",
     },
-  ],
+  ];
 };
 
-const surahsOnce: Dhikr = {
-  ...surahsThrice,
-  id: "salah-mu-awwidhat-1",
-  title: "Al-Ikhlas, Al-Falaq, An-Naas — Recite each 1×",
-  target: 3,
+const muawwidhatThrice = (p: string): Dhikr => ({
+  id: `${p}_H_muawwidhat`,
+  title: "Al-Mu'awwidhat — ×3",
+  arabic: "",
+  transliteration: "",
+  translation: "Recite each surah 3 times — specific to Fajr and Maghrib",
+  source: "Jami at-Tirmidhi 2903 — Hasan | Sunan Abi Dawud 1523 — Sahih",
+  commentary:
+    "Imam Ibn Baz stated: 'After Maghrib and Fajr, they should be recited three times each — and that is better.'",
+  target: 9,
+  arabicMulti: muawwidhatMulti(3),
+});
+
+const muawwidhatOnce = (p: string): Dhikr => ({
+  id: `${p}_H_muawwidhat`,
+  title: "Al-Mu'awwidhat — ×1",
+  arabic: "",
+  transliteration: "",
+  translation: "Recite each surah once — Dhuhr, Asr, and Isha",
+  source: "Jami at-Tirmidhi 2903 — Hasan | Sunan Abi Dawud 1523 — Sahih",
   commentary:
     "Imam Ibn Baz stated: 'It is legislated to recite Suratul-Ikhlas, Suratul-Falaq and Suratun-Naas once each after Dhuhr, Asr and Isha.'",
-  arabicMulti: surahsThrice.arabicMulti?.map((p) => ({
-    ...p,
-    label: p.label.replace("(×3)", "(×1)"),
-  })),
+  target: 3,
+  arabicMulti: muawwidhatMulti(1),
+});
+
+// Fajr-only cards
+const fajrG2: Dhikr = {
+  id: "fajr_G2",
+  title: "Forgotten Sunnah — Before Speaking",
+  arabic:
+    "لَا إِلَهَ إِلَّا اللَّهُ وَحْدَهُ لَا شَرِيكَ لَهُ، لَهُ الْمُلْكُ وَلَهُ الْحَمْدُ، يُحْيِي وَيُمِيتُ، وَهُوَ عَلَى كُلِّ شَيْءٍ قَدِيرٌ",
+  transliteration:
+    "Laa ilaaha illallahu wahdahu laa shareeka lah, lahul mulku wa lahul hamdu, yuhyee wa yumeetu, wa huwa 'alaa kulli shay'in qadeer",
+  translation:
+    "There is no god but Allah, alone, with no partner. To Him belongs sovereignty and all praise. He gives life and causes death, and He has power over all things.",
+  source: "Jami at-Tirmidhi 3474 — Hasan Sahih (Darussalam)",
+  commentary:
+    "⚠️ Say this FIRST — before speaking to anyone, while your feet are still folded after Fajr salam. The Prophet ﷺ said: \"Whoever says this ten times at the end of Fajr prayer, while his feet are still folded, before speaking — ten good deeds will be written for him, ten sins erased, he will be raised ten degrees, he will be protected all that day from every disliked thing, guarded from Shaytan, and no sin will reach him that day except shirk.\" This dhikr is specific to Fajr only and is a largely forgotten sunnah — do not neglect it.",
+  target: 10,
 };
 
-const morningDuaFajr: Dhikr = {
-  id: "salah-fajr-morning-dua",
-  title: "Morning Du'a (Fajr only)",
+const fajrKnowledge: Dhikr = {
+  id: "fajr_H_knowledge",
+  title: "Morning Knowledge Dua",
   arabic: "اللَّهُمَّ إِنِّي أَسْأَلُكَ عِلْمًا نَافِعًا، وَرِزْقًا طَيِّبًا، وَعَمَلاً مُتَقَبَّلاً",
-  transliteration: "Allahumma inni as'aluka 'ilman naafi'aa, wa rizqan tayyibaa, wa 'amalan mutaqabbalaa",
-  translation: "O Allah, I ask You for beneficial knowledge, goodly provision, and acceptable deeds.",
-  source: "Sunan Ibn Majah 925 — Sahih",
+  transliteration:
+    "Allahumma inni as'aluka 'ilman naafi'aa, wa rizqan tayyibaa, wa 'amalan mutaqabbalaa",
+  translation:
+    "O Allah, I ask You for beneficial knowledge, goodly provision, and acceptable deeds.",
+  source: "Sunan Ibn Majah 925 — Sahih (Darussalam)",
   commentary:
-    "It was narrated from Umm Salamah that when the Prophet ﷺ performed the Fajr prayer and said the Salam, he would say this.",
+    "Narrated from Umm Salamah that when the Prophet ﷺ performed Fajr and said the Salam, he would say this. Placed here after the main adhkar and before the Mu'awwidhat — both positions have scholarly basis.",
   target: 1,
 };
 
-const subhanalMalikQuddoos: Dhikr = {
-  id: "salah-witr-subhanal-malik",
-  title: "Subhanal Malikil Quddoos",
+// Witr cards
+const witr1: Dhikr = {
+  id: "witr_1",
+  title: "Subhanal Malikil Quddus",
   arabic: "سُبْحَانَ الْمَلِكِ الْقُدُّوسِ",
-  transliteration: "Subhaanal-Malikil-Quddoos (×3)",
+  transliteration: "Subhaanal-Malikil-Quddoos",
   translation: "Glory be to the Sovereign, the Most Holy.",
-  source: "Sunan an-Nasa'i 1699 — Sahih · Sunan Abi Dawud 1430 — Sahih",
+  source: "Sunan an-Nasa'i 1699 — Sahih | Sunan Abi Dawud 1430 — Sahih",
   commentary:
-    "When the Messenger of Allah ﷺ finished the Witr prayer, he would say 'Subhanal-Malikil-Quddoos' three times, elongating and raising his voice on the last one.",
+    "When the Messenger of Allah ﷺ finished the Witr prayer, he would say 'Subhanal-Malikil-Quddoos' three times, elongating and raising his voice on the last one. This is the only specific dhikr authentically established for after Witr.",
   target: 3,
 };
 
-const witrFinalDua: Dhikr = {
-  id: "salah-witr-khayrat",
-  title: "Du'a after Witr",
+const witr2: Dhikr = {
+  id: "witr_2",
+  title: "Dua of 'Ali ibn Abi Talib",
   arabic:
-    "اللَّهُمَّ إِنِّي أَسْأَلُكَ فِعْلَ الْخَيْرَاتِ وَتَرْكَ الْمُنْكَرَاتِ وَحُبَّ الْمَسَاكِينِ وَإِذَا أَرَدْتَ بِعِبَادِكَ فِتْنَةً فَاقْبِضْنِي إِلَيْكَ غَيْرَ مَفْتُونٍ",
+    "اللَّهُمَّ إِنِّي أَعُوذُ بِرِضَاكَ مِنْ سَخَطِكَ، وَبِمُعَافَاتِكَ مِنْ عُقُوبَتِكَ، وَأَعُوذُ بِكَ مِنْكَ، لَا أُحْصِي ثَنَاءً عَلَيْكَ أَنْتَ كَمَا أَثْنَيْتَ عَلَى نَفْسِكَ",
   transliteration:
-    "Allahumma inni as'aluka fi'lal-khayraat, wa tarkal-munkaraat, wa hubbal-masaakeen, wa idhaa aradta bi'ibaadika fitnatan faqbidni ilayka ghayra maftoon",
+    "Allahumma inni a'udhu biridhaaka min sakhatika, wa bimu'aafaatika min 'uqoobatika, wa a'udhu bika minka, laa uhsee thanaa'an 'alayka, anta kamaa athnayta 'alaa nafsik",
   translation:
-    "O Allah, I ask You for the doing of good deeds, the avoiding of evil deeds, and the love of the poor. And when You have willed Fitnah (tribulation) for Your servants, then take me to You without being afflicted by it.",
-  source: "Jami at-Tirmidhi 3233 — Hasan",
+    "O Allah, I seek refuge in Your pleasure from Your anger, and in Your pardon from Your punishment, and I seek refuge in You from You. I cannot enumerate Your praise — You are as You have praised Yourself.",
+  source: "Sunan Abi Dawud 1427 — Sahih",
   commentary:
-    "The Prophet ﷺ was told by his Lord in a dream: 'O Muhammad! When you have performed Salah then say this.'",
+    "The Prophet ﷺ taught this to 'Ali ibn Abi Talib to say after Witr prayer. This is authentically established as specific to Witr.",
   target: 1,
 };
 
-const sharedAll: SalahItem[] = [
-  { dhikr: istighfar },
-  { dhikr: laaIlaahaMaani },
-  { combo: tasbeehCombo },
-  { dhikr: ayatulKursi },
-  { dhikr: muadhDua },
-  { dhikr: closingSeal },
+const witr3: Dhikr = {
+  id: "witr_3",
+  title: "Personal Du'a",
+  arabic: "",
+  transliteration: "",
+  translation:
+    "This is a blessed time for personal supplication. Ask Allah for whatever you need — for yourself, your family, and the Muslims.",
+  source: "General scholarly guidance",
+  commentary:
+    "After Witr is one of the most recommended times for personal dua. The Prophet ﷺ encouraged making dua after Witr and this time is especially blessed.",
+  target: 1,
+};
+
+const sharedSequence = (p: string): SalahItem[] => [
+  { dhikr: cardA(p) },
+  { dhikr: cardB(p) },
+  { dhikr: cardC(p) },
+  { dhikr: cardC2(p) },
+  { combo: cardD(p) },
+  { dhikr: cardE(p) },
+  { dhikr: cardF(p) },
+  { dhikr: cardG(p) },
 ];
 
 export function getSalahItems(prayer: SalahPrayer): SalahItem[] {
   if (prayer === "fajr") {
-    return [...sharedAll, { dhikr: surahsThrice }, { dhikr: morningDuaFajr }];
+    return [
+      {
+        dhikr: fajrG2,
+        isSpecial: true,
+        specialLabel: "⚠️ Say this before speaking — feet still folded",
+      },
+      ...sharedSequence("fajr"),
+      { dhikr: fajrKnowledge },
+      { dhikr: muawwidhatThrice("fajr") },
+    ];
   }
   if (prayer === "maghrib") {
-    return [...sharedAll, { dhikr: surahsThrice }];
+    return [...sharedSequence("maghrib"), { dhikr: muawwidhatThrice("maghrib") }];
   }
   if (prayer === "dhuhr" || prayer === "asr" || prayer === "isha") {
-    return [...sharedAll, { dhikr: surahsOnce }];
+    return [...sharedSequence(prayer), { dhikr: muawwidhatOnce(prayer) }];
   }
-  // witr: subhanalMalik first, then shared cards 1, 3, 5, 6, then khayrat
+  // witr
   return [
-    { dhikr: subhanalMalikQuddoos },
-    { dhikr: istighfar },
-    { combo: tasbeehCombo },
-    { dhikr: muadhDua },
-    { dhikr: closingSeal },
-    { dhikr: witrFinalDua },
+    { dhikr: witr1 },
+    { dhikr: witr2 },
+    { dhikr: witr3, isPersonalDua: true },
   ];
 }
 
