@@ -387,6 +387,10 @@
   padding-bottom: calc(72px + env(safe-area-inset-bottom)) !important;
 }
 
+:root {
+  --safe-bottom: env(safe-area-inset-bottom, 20px);
+}
+
 .bottom-nav,
 nav.bottom-nav,
 nav[class*="bottom"],
@@ -397,10 +401,10 @@ nav[class*="bottom"],
   left: 0 !important;
   right: 0 !important;
   width: 100% !important;
-  height: 80px !important;
-  min-height: 80px !important;
-  max-height: 80px !important;
-  padding: 0 0 20px 0 !important;
+  height: calc(60px + env(safe-area-inset-bottom, 20px)) !important;
+  min-height: calc(60px + env(safe-area-inset-bottom, 20px)) !important;
+  max-height: calc(60px + env(safe-area-inset-bottom, 20px)) !important;
+  padding: 0 0 env(safe-area-inset-bottom, 20px) 0 !important;
   margin: 0 !important;
   z-index: 9999 !important;
   box-sizing: border-box !important;
@@ -412,7 +416,7 @@ nav[class*="bottom"],
 .bottom-nav > *,
 nav.bottom-nav > *,
 [class*="BottomNav"] > * {
-  height: 100% !important;
+  height: 60px !important;
   flex: 1 !important;
   padding: 0 !important;
   margin: 0 !important;
@@ -420,3 +424,9 @@ nav.bottom-nav > *,
   align-items: center !important;
   justify-content: center !important;
 }
+
+.scroll-area,
+.page-content {
+  padding-bottom: calc(72px + env(safe-area-inset-bottom, 20px)) !important;
+}
+
