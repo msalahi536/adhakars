@@ -9,8 +9,22 @@ export const Route = createFileRoute("/salah")({
   component: Salah,
 });
 
+const PRAYER_KEY = "selectedPrayer";
+const validPrayer = (v: string | null): SalahPrayer => {
+  const ids = SALAH_PRAYERS.map((p) => p.id) as string[];
+  return (v && ids.includes(v) ? v : "fajr") as SalahPrayer;
+};
+
 function Salah() {
-  const [prayer, setPrayer] = useState<SalahPrayer>("fajr");
+  const [prayer, setPrayerState] = useState<SalahPrayer>(() => {
+    if (typeof window === "undefined") return "fajr";
+    return validPrayer(window.localStorage.getItem(PRAYER_KEY));
+  });
+  const setPrayer = (p: SalahPrayer) => {
+    if (typeof window !== "undefined") window.localStorage.setItem(PRAYER_KEY, p);
+    setPrayerState(p);
+  };
+
   const [counts, setCounts] = useState<Record<string, number>>({});
   const storageKey = `salah_${prayer}`;
   const items = getSalahItems(prayer);
@@ -37,19 +51,19 @@ function Salah() {
       <header
         className="page-header"
         style={{
-          background: "linear-gradient(135deg, #d4956a 0%, #b8743a 100%)",
-          color: "#fff5e8",
+          background: "linear-gradient(135deg, #2e7d5e 0%, #1a5c42 100%)",
+          color: "#ffffff",
         }}
       >
         <div className="mx-auto max-w-md px-5 pb-4 pt-5">
-          <div className="label-caps" style={{ color: "rgba(255,245,232,0.85)", opacity: 1 }}>
+          <div className="label-caps" style={{ color: "rgba(255,255,255,0.85)", opacity: 1 }}>
             After {selectedLabel}
           </div>
           <h1 className="mt-1 text-2xl font-bold tracking-tight">After Salah</h1>
           <div className="mt-3 flex items-center gap-3">
             <div
               className="h-1.5 flex-1 overflow-hidden rounded-full"
-              style={{ background: "rgba(255,245,232,0.25)" }}
+              style={{ background: "rgba(255,255,255,0.25)" }}
             >
               <div
                 className="h-full rounded-full transition-all duration-500"
@@ -63,14 +77,10 @@ function Salah() {
               {completed} / {items.length}
             </div>
           </div>
-        </div>
-      </header>
 
-      <main className="scroll-area flex flex-col">
-        <div className="mx-auto flex min-h-0 w-full max-w-md flex-1 flex-col">
-          {/* Prayer selector */}
+          {/* Prayer selector — inside the header */}
           <div
-            className="hide-scrollbar flex gap-2 overflow-x-auto px-4 pb-2 pt-3"
+            className="hide-scrollbar -mx-5 mt-4 flex gap-2 overflow-x-auto px-5 pb-1"
             style={{ scrollbarWidth: "none" }}
           >
             {SALAH_PRAYERS.map((p) => {
@@ -81,14 +91,14 @@ function Salah() {
                   onClick={() => setPrayer(p.id)}
                   className="flex shrink-0 items-center justify-center font-bold transition-all active:scale-95"
                   style={{
-                    minWidth: 72,
-                    height: 38,
-                    borderRadius: 20,
+                    minWidth: 70,
+                    height: 36,
+                    borderRadius: 18,
                     padding: "0 16px",
                     fontSize: 13,
-                    background: active ? "#c9a84c" : "var(--surface)",
-                    color: active ? "#ffffff" : "var(--muted-foreground)",
-                    border: active ? "none" : "1px solid var(--border)",
+                    background: active ? "#c9a84c" : "rgba(255,255,255,0.15)",
+                    color: active ? "#1a3d2b" : "#ffffff",
+                    border: "none",
                     transition: "background 0.25s ease, color 0.25s ease",
                   }}
                 >
@@ -97,12 +107,35 @@ function Salah() {
               );
             })}
           </div>
+        </div>
+      </header>
 
+      <main className="scroll-area flex flex-col" style={{ background: "#f0f7f4" }}>
+        <div
+          className="mx-auto flex min-h-0 w-full max-w-md flex-1 flex-col pt-3"
+          style={
+            {
+              // Salah card theme overrides (scoped to this page)
+              ["--card" as string]: "#1a4a35",
+              ["--card-foreground" as string]: "#f0f7f2",
+              ["--translit" as string]: "#8fc4a8",
+              ["--accent" as string]: "#c9a84c",
+              ["--accent-foreground" as string]: "#1a3d2b",
+              ["--border" as string]: "rgba(255,255,255,0.08)",
+              ["--source-bg" as string]: "rgba(0,0,0,0.3)",
+              ["--source-fg" as string]: "#8fc4a8",
+              ["--combo-card" as string]: "#0f2e1e",
+              ["--index-badge-bg" as string]: "#c9a84c",
+              ["--index-badge-fg" as string]: "#1a3d2b",
+              ["--count-fg" as string]: "#f0f7f2",
+            } as React.CSSProperties
+          }
+        >
           <SwipeStack
-            key={prayer}
             items={items}
             counts={counts}
             onIncrement={inc}
+            persistKey={storageKey}
           />
         </div>
       </main>
