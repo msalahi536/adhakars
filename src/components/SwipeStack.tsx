@@ -223,6 +223,9 @@ export function SwipeStack({ items, counts, onIncrement, persistKey }: Props) {
                 onIncrement={() => onIncrement(current.dhikr!.id, current.dhikr!.target)}
                 index={idx + 1}
                 total={items.length}
+                isSpecial={current.isSpecial}
+                specialLabel={current.specialLabel}
+                isPersonalDua={current.isPersonalDua}
               />
             ) : (
               <TasbeehComboCard
