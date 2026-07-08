@@ -10,6 +10,7 @@ type Props = {
   items: SalahItem[];
   counts: Record<string, number>;
   onIncrement: (id: string, target: number) => void;
+  onReset?: () => void;
   persistKey?: string;
   finishCta?: { label: string; to: string };
   onFinishNav?: () => void;
