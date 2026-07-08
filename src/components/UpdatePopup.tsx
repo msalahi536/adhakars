@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 
-const UPDATE_VERSION = "v2-sleep-qibla";
+const UPDATE_VERSION = "v2-sleep-qibla-repush";
 const UPDATE_KEY = "updateSeen";
 
 export function UpdatePopup() {
