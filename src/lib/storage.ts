@@ -30,6 +30,11 @@ export const setCount = (kind: string, id: string, value: number) => {
   maybeUpdateStreak();
 };
 
+export const clearCounts = (kind: string, date = todayKey()) => {
+  if (typeof window === "undefined") return;
+  localStorage.removeItem(countsKey(date, kind));
+};
+
 export const resetToday = () => {
   localStorage.removeItem(countsKey(todayKey(), "morning"));
   localStorage.removeItem(countsKey(todayKey(), "evening"));
