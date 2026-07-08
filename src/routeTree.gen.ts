@@ -10,14 +10,21 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as TasbihRouteImport } from './routes/tasbih'
+import { Route as SleepRouteImport } from './routes/sleep'
 import { Route as SettingsRouteImport } from './routes/settings'
 import { Route as SalahRouteImport } from './routes/salah'
+import { Route as QiblaRouteImport } from './routes/qibla'
 import { Route as EveningRouteImport } from './routes/evening'
 import { Route as IndexRouteImport } from './routes/index'
 
 const TasbihRoute = TasbihRouteImport.update({
   id: '/tasbih',
   path: '/tasbih',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SleepRoute = SleepRouteImport.update({
+  id: '/sleep',
+  path: '/sleep',
   getParentRoute: () => rootRouteImport,
 } as any)
 const SettingsRoute = SettingsRouteImport.update({
@@ -28,6 +35,11 @@ const SettingsRoute = SettingsRouteImport.update({
 const SalahRoute = SalahRouteImport.update({
   id: '/salah',
   path: '/salah',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const QiblaRoute = QiblaRouteImport.update({
+  id: '/qibla',
+  path: '/qibla',
   getParentRoute: () => rootRouteImport,
 } as any)
 const EveningRoute = EveningRouteImport.update({
@@ -44,38 +56,68 @@ const IndexRoute = IndexRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/evening': typeof EveningRoute
+  '/qibla': typeof QiblaRoute
   '/salah': typeof SalahRoute
   '/settings': typeof SettingsRoute
+  '/sleep': typeof SleepRoute
   '/tasbih': typeof TasbihRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/evening': typeof EveningRoute
+  '/qibla': typeof QiblaRoute
   '/salah': typeof SalahRoute
   '/settings': typeof SettingsRoute
+  '/sleep': typeof SleepRoute
   '/tasbih': typeof TasbihRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/evening': typeof EveningRoute
+  '/qibla': typeof QiblaRoute
   '/salah': typeof SalahRoute
   '/settings': typeof SettingsRoute
+  '/sleep': typeof SleepRoute
   '/tasbih': typeof TasbihRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/evening' | '/salah' | '/settings' | '/tasbih'
+  fullPaths:
+    | '/'
+    | '/evening'
+    | '/qibla'
+    | '/salah'
+    | '/settings'
+    | '/sleep'
+    | '/tasbih'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/evening' | '/salah' | '/settings' | '/tasbih'
-  id: '__root__' | '/' | '/evening' | '/salah' | '/settings' | '/tasbih'
+  to:
+    | '/'
+    | '/evening'
+    | '/qibla'
+    | '/salah'
+    | '/settings'
+    | '/sleep'
+    | '/tasbih'
+  id:
+    | '__root__'
+    | '/'
+    | '/evening'
+    | '/qibla'
+    | '/salah'
+    | '/settings'
+    | '/sleep'
+    | '/tasbih'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   EveningRoute: typeof EveningRoute
+  QiblaRoute: typeof QiblaRoute
   SalahRoute: typeof SalahRoute
   SettingsRoute: typeof SettingsRoute
+  SleepRoute: typeof SleepRoute
   TasbihRoute: typeof TasbihRoute
 }
 
@@ -86,6 +128,13 @@ declare module '@tanstack/react-router' {
       path: '/tasbih'
       fullPath: '/tasbih'
       preLoaderRoute: typeof TasbihRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/sleep': {
+      id: '/sleep'
+      path: '/sleep'
+      fullPath: '/sleep'
+      preLoaderRoute: typeof SleepRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/settings': {
@@ -100,6 +149,13 @@ declare module '@tanstack/react-router' {
       path: '/salah'
       fullPath: '/salah'
       preLoaderRoute: typeof SalahRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/qibla': {
+      id: '/qibla'
+      path: '/qibla'
+      fullPath: '/qibla'
+      preLoaderRoute: typeof QiblaRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/evening': {
@@ -122,8 +178,10 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   EveningRoute: EveningRoute,
+  QiblaRoute: QiblaRoute,
   SalahRoute: SalahRoute,
   SettingsRoute: SettingsRoute,
+  SleepRoute: SleepRoute,
   TasbihRoute: TasbihRoute,
 }
 export const routeTree = rootRouteImport
