@@ -10,6 +10,7 @@ type Props = {
   items: SalahItem[];
   counts: Record<string, number>;
   onIncrement: (id: string, target: number) => void;
+  onReset?: () => void;
   persistKey?: string;
   finishCta?: { label: string; to: string };
   onFinishNav?: () => void;
@@ -27,17 +28,11 @@ const readPersistedIdx = (key?: string): number => {
   return Number.isFinite(n) && n >= 0 ? n : 0;
 };
 
-export function SwipeStack({ items, counts, onIncrement, persistKey, finishCta, onFinishNav }: Props) {
+export function SwipeStack({ items, counts, onIncrement, onReset, persistKey, finishCta, onFinishNav }: Props) {
   const navigate = useNavigate();
-  const [idx, setIdxState] = useState(() => {
-    const restored = Math.min(readPersistedIdx(persistKey), Math.max(0, items.length - 1));
-    // If the user left on the last card AND all items are complete, restart at 0.
-    if (typeof window !== "undefined" && restored === items.length - 1 && items.length > 0) {
-      const allDone = items.every((it) => isItemComplete(it, {}));
-      if (allDone) return 0;
-    }
-    return restored;
-  });
+  const [idx, setIdxState] = useState(() =>
+    Math.min(readPersistedIdx(persistKey), Math.max(0, items.length - 1)),
+  );
   const setIdx = (updater: number | ((i: number) => number)) => {
     setIdxState((prev) => {
       const next = typeof updater === "function" ? (updater as (i: number) => number)(prev) : updater;
@@ -58,16 +53,9 @@ export function SwipeStack({ items, counts, onIncrement, persistKey, finishCta, 
   const wrapperRef = useRef<HTMLDivElement>(null);
   const prevCompleteRef = useRef(false);
 
-  // Reset ONLY when persistKey changes (e.g. switching prayer). Do NOT reset on items identity changes.
+  // Reset ONLY when persistKey changes (e.g. switching prayer). Do NOT auto-advance or auto-restart.
   useEffect(() => {
-    let restored = Math.min(readPersistedIdx(persistKey), Math.max(0, items.length - 1));
-    // Auto-reset to start if user left on the final card after completing everything.
-    if (restored === items.length - 1 && items.length > 0 && items.every((it) => isItemComplete(it, {}))) {
-      restored = 0;
-      if (persistKey && typeof window !== "undefined") {
-        window.localStorage.setItem(`cardIdx_${persistKey}`, "0");
-      }
-    }
+    const restored = Math.min(readPersistedIdx(persistKey), Math.max(0, items.length - 1));
     setIdxState(restored);
     setPhase("idle");
     prevCompleteRef.current = false;
@@ -113,17 +101,7 @@ export function SwipeStack({ items, counts, onIncrement, persistKey, finishCta, 
 
   const current = items[idx];
 
-  // Auto-advance when current item becomes complete
-  useEffect(() => {
-    if (!current) return;
-    const nowComplete = isItemComplete(current, counts);
-    if (nowComplete && !prevCompleteRef.current && idx < items.length - 1) {
-      const t = setTimeout(() => goNext(), 900);
-      prevCompleteRef.current = true;
-      return () => clearTimeout(t);
-    }
-    prevCompleteRef.current = nowComplete;
-  }, [counts, current, idx, items.length]);
+  // Auto-advance intentionally disabled — user controls navigation via arrows / swipe.
 
   // Touch handling
   useEffect(() => {
@@ -217,10 +195,9 @@ export function SwipeStack({ items, counts, onIncrement, persistKey, finishCta, 
     setIdx(0);
     setPhase("idle");
     prevCompleteRef.current = false;
+    if (onReset) onReset();
   };
   const handleFinishNav = () => {
-    // Reset progress index so user starts fresh next time they open this set.
-    setIdx(0);
     if (onFinishNav) onFinishNav();
     if (finishCta) navigate({ to: finishCta.to });
   };

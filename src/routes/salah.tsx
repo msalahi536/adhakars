@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { SwipeStack } from "@/components/SwipeStack";
 import { SALAH_PRAYERS, getSalahItems, isItemComplete, type SalahPrayer } from "@/data/salah";
-import { getCounts, setCount, bumpLifetime } from "@/lib/storage";
+import { getCounts, setCount, clearCounts, bumpLifetime } from "@/lib/storage";
 
 export const Route = createFileRoute("/salah")({
   head: () => ({ meta: [{ title: "Salah Adhkar — My Adhkar" }] }),
@@ -135,6 +135,10 @@ function Salah() {
             items={items}
             counts={counts}
             onIncrement={inc}
+            onReset={() => {
+              clearCounts(storageKey);
+              setCounts({});
+            }}
             persistKey={storageKey}
           />
         </div>
