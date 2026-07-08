@@ -162,7 +162,7 @@ function Qibla() {
                 leaves your device.
               </p>
               <button
-                onClick={start}
+                onClick={() => start()}
                 className="rounded-full px-6 py-3 text-sm font-bold"
                 style={{ background: "#c9a84c", color: "#1f3d2b" }}
               >
