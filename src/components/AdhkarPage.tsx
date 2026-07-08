@@ -91,7 +91,16 @@ export function AdhkarPage({
 
       <main className="scroll-area flex flex-col">
         <div className="mx-auto flex min-h-0 w-full max-w-md flex-1 flex-col pt-3">
-          <SwipeStack items={items} counts={counts} onIncrement={inc} persistKey={storageKey} />
+          <SwipeStack
+            items={items}
+            counts={counts}
+            onIncrement={inc}
+            onReset={() => {
+              clearCounts(storageKey);
+              setCounts({});
+            }}
+            persistKey={storageKey}
+          />
         </div>
       </main>
     </>
