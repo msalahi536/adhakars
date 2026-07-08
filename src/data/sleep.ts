@@ -301,12 +301,19 @@ const wakeDisclaimer: Dhikr = {
   title: "Physical Sunnan of Waking Up",
   arabic: "",
   transliteration: "",
-  translation:
-    "1. Say the waking dua the INSTANT your eyes open — before your phone. 2. Wipe sleep from your face with your hand. 3. Use the miswak. 4. Wash both hands 3× before dipping into any vessel. 5. Blow water out of nose 3× in wudu. 6. Dhikr → Wudu → Salah undoes Shaytan's three knots.",
+  translation: "",
   source: "Sahih al-Bukhari 245 · 162 · 3295 · 6312 · 1142 · Sahih Muslim 763b · 2711",
   commentary:
     "The Prophet ﷺ said: \"Satan puts three knots at the back of the head of any of you if he is asleep... When one wakes up and remembers Allah, one knot is undone; and when one performs ablution, the second knot is undone, and when one prays the third knot is undone — one gets up energetic with a good heart in the morning; otherwise lazy and with a mischievous heart.\"",
   target: 1,
+  steps: [
+    "Say the waking dua the INSTANT your eyes open — before your phone.",
+    "Wipe sleep from your face with your hand.",
+    "Use the miswak.",
+    "Wash both hands 3× before dipping into any vessel.",
+    "Blow water out of nose 3× in wudu.",
+    "Dhikr → Wudu → Salah undoes Shaytan's three knots.",
+  ],
 };
 
 const wakeMain: Dhikr = {
