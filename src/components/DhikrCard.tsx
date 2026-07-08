@@ -151,6 +151,17 @@ export function DhikrCard({ dhikr, count, onIncrement, index, total, isSpecial, 
             </>
           )}
 
+          {dhikr.steps && dhikr.steps.length > 0 && (
+            <div className="mt-4">
+              <div className="label-caps mb-2">Physical Sunnan</div>
+              <ul className="list-disc space-y-2 pl-5 text-[13px] opacity-90" style={{ lineHeight: 1.55 }}>
+                {dhikr.steps.map((step, i) => (
+                  <li key={i}>{step}</li>
+                ))}
+              </ul>
+            </div>
+          )}
+
           {hasTranslation && dhikr.translation && !dhikr.arabicMulti && (
             <div className="mt-4">
               <div className="label-caps mb-1">Translation</div>
