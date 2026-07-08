@@ -101,7 +101,39 @@ export function SwipeStack({ items, counts, onIncrement, onReset, persistKey, fi
 
   const current = items[idx];
 
-  // Auto-advance intentionally disabled — user controls navigation via arrows / swipe.
+  // Auto-advance ONLY when the current card transitions from incomplete → complete
+  // due to a user tap in this session. Ignore already-complete cards on mount and
+  // manual back navigation.
+  const wasCompleteRef = useRef<boolean>(false);
+  const advanceTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  useEffect(() => {
+    // Reset baseline whenever we land on a new card.
+    if (advanceTimerRef.current) {
+      clearTimeout(advanceTimerRef.current);
+      advanceTimerRef.current = null;
+    }
+    wasCompleteRef.current = current ? isItemComplete(current, counts) : false;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [idx, persistKey]);
+
+  useEffect(() => {
+    if (!current) return;
+    const nowComplete = isItemComplete(current, counts);
+    if (nowComplete && !wasCompleteRef.current && idx < items.length - 1) {
+      wasCompleteRef.current = true;
+      advanceTimerRef.current = setTimeout(() => {
+        advanceTimerRef.current = null;
+        goNext();
+      }, 700);
+    }
+    // If it became incomplete again (e.g. reset), update baseline
+    if (!nowComplete) wasCompleteRef.current = false;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [counts, current, idx, items.length]);
+
+  useEffect(() => () => {
+    if (advanceTimerRef.current) clearTimeout(advanceTimerRef.current);
+  }, []);
 
   // Touch handling
   useEffect(() => {
