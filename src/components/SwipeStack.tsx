@@ -195,10 +195,9 @@ export function SwipeStack({ items, counts, onIncrement, onReset, persistKey, fi
     setIdx(0);
     setPhase("idle");
     prevCompleteRef.current = false;
+    if (onReset) onReset();
   };
   const handleFinishNav = () => {
-    // Reset progress index so user starts fresh next time they open this set.
-    setIdx(0);
     if (onFinishNav) onFinishNav();
     if (finishCta) navigate({ to: finishCta.to });
   };
