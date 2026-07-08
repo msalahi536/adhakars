@@ -208,8 +208,10 @@
     height: calc(var(--bottom-nav-row) + env(safe-area-inset-bottom));
     min-height: calc(var(--bottom-nav-row) + env(safe-area-inset-bottom));
     margin: 0;
-    padding-block: 0 env(safe-area-inset-bottom);
-    padding-inline: 0;
+    padding-top: 0;
+    padding-right: 0;
+    padding-bottom: env(safe-area-inset-bottom);
+    padding-left: 0;
     background: var(--nav-bg);
     z-index: 100;
     box-sizing: border-box;
