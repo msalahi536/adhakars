@@ -8,6 +8,7 @@ export type Dhikr = {
   commentary?: string;
   target: number;
   arabicMulti?: { label: string; arabic: string; transliteration: string; translation: string }[];
+  steps?: string[];
 };
 
 const sayyidul: Dhikr = {
