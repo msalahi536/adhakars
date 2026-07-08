@@ -7,12 +7,18 @@ const sleepDisclaimer: Dhikr = {
   title: "Physical Sunnan Before You Lie Down",
   arabic: "",
   transliteration: "",
-  translation:
-    "1. Make Wudu (as you would for Salah). 2. Dust the bed 3 times with the inside of your garment. 3. Lie on your RIGHT side. 4. Place your RIGHT hand under your right cheek. 5. Say Bismillah before lying down.",
+  translation: "",
   source: "Sahih al-Bukhari 247, 6320, 6312 · Sahih Muslim 2710a",
   commentary:
     "Do these physical adab BEFORE starting the adhkar. The Prophet ﷺ said: \"Whoever goes to sleep without remembering Allah, that will be a source of regret for him on the Day of Resurrection.\" Shaytan actively tries to make you fall asleep before finishing — begin as soon as you get into bed.",
   target: 1,
+  steps: [
+    "Make Wudu (as you would for Salah).",
+    "Dust the bed 3 times with the inside of your garment.",
+    "Lie on your RIGHT side.",
+    "Place your RIGHT hand under your right cheek.",
+    "Say Bismillah before lying down.",
+  ],
 };
 
 const sleepKafirun: Dhikr = {
