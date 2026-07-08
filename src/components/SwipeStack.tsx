@@ -1,7 +1,8 @@
 import { useEffect, useRef, useState } from "react";
+import { useNavigate } from "@tanstack/react-router";
 import { DhikrCard } from "./DhikrCard";
 import { TasbeehComboCard } from "./TasbeehComboCard";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight, RotateCcw, ArrowRight } from "lucide-react";
 import type { SalahItem } from "@/data/salah";
 import { isItemComplete, itemId } from "@/data/salah";
 
@@ -10,6 +11,8 @@ type Props = {
   counts: Record<string, number>;
   onIncrement: (id: string, target: number) => void;
   persistKey?: string;
+  finishCta?: { label: string; to: string };
+  onFinishNav?: () => void;
 };
 
 type Phase = "idle" | "out-left" | "out-right" | "in-left" | "in-right";
@@ -24,10 +27,17 @@ const readPersistedIdx = (key?: string): number => {
   return Number.isFinite(n) && n >= 0 ? n : 0;
 };
 
-export function SwipeStack({ items, counts, onIncrement, persistKey }: Props) {
-  const [idx, setIdxState] = useState(() =>
-    Math.min(readPersistedIdx(persistKey), Math.max(0, items.length - 1)),
-  );
+export function SwipeStack({ items, counts, onIncrement, persistKey, finishCta, onFinishNav }: Props) {
+  const navigate = useNavigate();
+  const [idx, setIdxState] = useState(() => {
+    const restored = Math.min(readPersistedIdx(persistKey), Math.max(0, items.length - 1));
+    // If the user left on the last card AND all items are complete, restart at 0.
+    if (typeof window !== "undefined" && restored === items.length - 1 && items.length > 0) {
+      const allDone = items.every((it) => isItemComplete(it, {}));
+      if (allDone) return 0;
+    }
+    return restored;
+  });
   const setIdx = (updater: number | ((i: number) => number)) => {
     setIdxState((prev) => {
       const next = typeof updater === "function" ? (updater as (i: number) => number)(prev) : updater;
@@ -50,7 +60,14 @@ export function SwipeStack({ items, counts, onIncrement, persistKey }: Props) {
 
   // Reset ONLY when persistKey changes (e.g. switching prayer). Do NOT reset on items identity changes.
   useEffect(() => {
-    const restored = Math.min(readPersistedIdx(persistKey), Math.max(0, items.length - 1));
+    let restored = Math.min(readPersistedIdx(persistKey), Math.max(0, items.length - 1));
+    // Auto-reset to start if user left on the final card after completing everything.
+    if (restored === items.length - 1 && items.length > 0 && items.every((it) => isItemComplete(it, {}))) {
+      restored = 0;
+      if (persistKey && typeof window !== "undefined") {
+        window.localStorage.setItem(`cardIdx_${persistKey}`, "0");
+      }
+    }
     setIdxState(restored);
     setPhase("idle");
     prevCompleteRef.current = false;
@@ -194,16 +211,41 @@ export function SwipeStack({ items, counts, onIncrement, persistKey }: Props) {
     transition = isDragging.current ? "none" : `transform 0.25s ease`;
   }
 
+  const isLast = idx === items.length - 1;
+  const restart = () => {
+    if (animating.current) return;
+    setIdx(0);
+    setPhase("idle");
+    prevCompleteRef.current = false;
+  };
+  const handleFinishNav = () => {
+    // Reset progress index so user starts fresh next time they open this set.
+    setIdx(0);
+    if (onFinishNav) onFinishNav();
+    if (finishCta) navigate({ to: finishCta.to });
+  };
+
   return (
     <div className="flex flex-1 flex-col overflow-hidden">
-      <div className="mb-2 flex items-center justify-center px-4">
+      <div className="mb-2 flex items-center justify-center gap-2 px-4">
         <span
           className="rounded-[12px] px-3 py-1 text-xs font-semibold"
           style={{ background: "var(--surface)" }}
         >
           {idx + 1} / {items.length}
         </span>
+        {idx > 0 && (
+          <button
+            onClick={restart}
+            className="flex items-center gap-1 rounded-[12px] px-2.5 py-1 text-[11px] font-semibold transition active:scale-95"
+            style={{ background: "var(--surface)", color: "var(--foreground)" }}
+            aria-label="restart"
+          >
+            <RotateCcw size={12} /> Restart
+          </button>
+        )}
       </div>
+
 
       <div
         ref={wrapperRef}
@@ -240,6 +282,29 @@ export function SwipeStack({ items, counts, onIncrement, persistKey }: Props) {
           </div>
         )}
       </div>
+
+      {isLast && (finishCta || true) && (
+        <div className="mt-2 flex flex-col gap-2 px-4">
+          {finishCta && (
+            <button
+              onClick={handleFinishNav}
+              className="flex items-center justify-center gap-2 rounded-full py-3 text-sm font-bold transition active:scale-[0.98]"
+              style={{ background: "var(--accent)", color: "var(--accent-foreground)" }}
+            >
+              {finishCta.label} <ArrowRight size={16} />
+            </button>
+          )}
+          <button
+            onClick={restart}
+            className="flex items-center justify-center gap-2 rounded-full py-2.5 text-xs font-semibold transition active:scale-[0.98]"
+            style={{ background: "var(--surface)", color: "var(--foreground)", border: "1px solid var(--border)" }}
+          >
+            <RotateCcw size={14} /> Start Over
+          </button>
+        </div>
+      )}
+
+
 
       <div className="mt-3 flex items-center justify-between px-6">
         <button
