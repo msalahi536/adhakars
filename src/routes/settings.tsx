@@ -292,11 +292,26 @@ function Settings() {
           </section>
 
           <section
-            className="rounded-2xl p-4 text-xs opacity-70"
+            className="mb-4 rounded-2xl p-4 text-xs opacity-70"
             style={{ background: "var(--surface)", border: "1px solid var(--border)" }}
           >
             Based on the authentic adhkar compiled by Shaykh Abdul Aziz At-Tarefe, compiled by
             Yasser Peerun.
+          </section>
+
+          <section
+            className="rounded-2xl p-4 text-xs"
+            style={{ background: "var(--surface)", border: "1px solid var(--border)" }}
+          >
+            <div className="label-caps mb-1">Contact</div>
+            <div className="font-semibold">Mohammad Salahi</div>
+            <a
+              href="tel:+18589889943"
+              className="mt-0.5 block font-semibold"
+              style={{ color: "var(--accent)" }}
+            >
+              858-988-9943
+            </a>
           </section>
         </div>
       </main>
