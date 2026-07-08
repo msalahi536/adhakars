@@ -44,24 +44,23 @@ function Sleep() {
     const updated = { ...counts, [id]: next };
     setCounts(updated);
     setCount(storageKey, id, next);
-    // Track under evening bucket for sleep, morning bucket for wake
     bumpLifetime(mode === "sleep" ? "evening" : "morning", next - prev);
   };
 
   const isSleep = mode === "sleep";
-  const gradient = isSleep
-    ? "linear-gradient(135deg, #1a1f3a 0%, #0d1425 100%)"
-    : "linear-gradient(135deg, #f5b26e 0%, #e58a3a 100%)";
-  const accent = "#c9a84c";
+  // Evening (dusk) palette — used for both sleep and wake for a calm, consistent feel
+  const gradient = "linear-gradient(135deg, #a9c0dc 0%, #7a9bc4 100%)";
+  const accent = "#4a6b9a";
+  const headerFg = "#1f3a5c";
 
   return (
     <>
       <header
         className="page-header"
-        style={{ background: gradient, color: "#ffffff" }}
+        style={{ background: gradient, color: headerFg }}
       >
         <div className="mx-auto max-w-md px-5 pb-4 pt-5">
-          <div className="label-caps" style={{ color: "rgba(255,255,255,0.85)", opacity: 1 }}>
+          <div className="label-caps" style={{ color: "rgba(31,58,92,0.75)", opacity: 1 }}>
             {isSleep ? "Before Sleep" : "Upon Waking"}
           </div>
           <h1 className="mt-1 text-2xl font-bold tracking-tight">
@@ -71,7 +70,7 @@ function Sleep() {
           <div className="mt-3 flex items-center gap-3">
             <div
               className="h-1.5 flex-1 overflow-hidden rounded-full"
-              style={{ background: "rgba(255,255,255,0.25)" }}
+              style={{ background: "rgba(31,58,92,0.15)" }}
             >
               <div
                 className="h-full rounded-full transition-all duration-500"
@@ -86,10 +85,9 @@ function Sleep() {
             </div>
           </div>
 
-          {/* Sleep / Wake toggle */}
           <div
             className="mt-4 flex rounded-full p-1"
-            style={{ background: "rgba(255,255,255,0.15)" }}
+            style={{ background: "rgba(31,58,92,0.12)" }}
           >
             {(["sleep", "wake"] as SleepMode[]).map((m) => {
               const active = m === mode;
@@ -100,7 +98,7 @@ function Sleep() {
                   className="flex-1 rounded-full py-2 text-sm font-bold transition-all"
                   style={{
                     background: active ? accent : "transparent",
-                    color: active ? "#1a1f3a" : "#ffffff",
+                    color: active ? "#ffffff" : headerFg,
                   }}
                 >
                   {m === "sleep" ? "🌙 Sleep" : "☀️ Wake"}
@@ -113,38 +111,24 @@ function Sleep() {
 
       <main
         className="scroll-area flex flex-col"
-        style={{ background: isSleep ? "#0d1425" : "#faf3e8" }}
+        style={{ background: "#eef2f8" }}
       >
         <div
           className="mx-auto flex min-h-0 w-full max-w-md flex-1 flex-col pt-3"
           style={
-            isSleep
-              ? ({
-                  ["--card" as string]: "#1e2445",
-                  ["--card-foreground" as string]: "#f0f2fa",
-                  ["--translit" as string]: "#9aa3d4",
-                  ["--accent" as string]: "#c9a84c",
-                  ["--accent-foreground" as string]: "#1a1f3a",
-                  ["--border" as string]: "rgba(255,255,255,0.08)",
-                  ["--source-bg" as string]: "rgba(0,0,0,0.3)",
-                  ["--source-fg" as string]: "#9aa3d4",
-                  ["--index-badge-bg" as string]: "#c9a84c",
-                  ["--index-badge-fg" as string]: "#1a1f3a",
-                  ["--count-fg" as string]: "#f0f2fa",
-                } as React.CSSProperties)
-              : ({
-                  ["--card" as string]: "#fffcf4",
-                  ["--card-foreground" as string]: "#3a2410",
-                  ["--translit" as string]: "#a5731a",
-                  ["--accent" as string]: "#e58a3a",
-                  ["--accent-foreground" as string]: "#ffffff",
-                  ["--border" as string]: "rgba(58, 36, 16, 0.12)",
-                  ["--source-bg" as string]: "rgba(229, 138, 58, 0.12)",
-                  ["--source-fg" as string]: "#a5731a",
-                  ["--index-badge-bg" as string]: "#e58a3a",
-                  ["--index-badge-fg" as string]: "#ffffff",
-                  ["--count-fg" as string]: "#3a2410",
-                } as React.CSSProperties)
+            {
+              ["--card" as string]: "#f5f8fc",
+              ["--card-foreground" as string]: "#1f3a5c",
+              ["--translit" as string]: "#4a6b9a",
+              ["--accent" as string]: "#4a6b9a",
+              ["--accent-foreground" as string]: "#ffffff",
+              ["--border" as string]: "rgba(74,107,154,0.15)",
+              ["--source-bg" as string]: "rgba(74,107,154,0.12)",
+              ["--source-fg" as string]: "#4a6b9a",
+              ["--index-badge-bg" as string]: "#4a6b9a",
+              ["--index-badge-fg" as string]: "#ffffff",
+              ["--count-fg" as string]: "#1f3a5c",
+            } as React.CSSProperties
           }
         >
           <SwipeStack
@@ -157,11 +141,7 @@ function Sleep() {
                 ? { label: "Go to Wake Adhkar", to: "/sleep" }
                 : { label: "Go to Morning Adhkar", to: "/" }
             }
-            onFinishNav={
-              isSleep
-                ? () => setMode("wake")
-                : undefined
-            }
+            onFinishNav={isSleep ? () => setMode("wake") : undefined}
           />
         </div>
       </main>
