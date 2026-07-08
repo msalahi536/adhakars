@@ -93,30 +93,31 @@ function Qibla() {
     );
 
     // 2) Motion / orientation permission (iOS 13+)
+    // On auto-start (previously granted), skip requestPermission — it requires a
+    // fresh user gesture and would throw. Just attach listeners directly.
     const DOE = DeviceOrientationEvent as DeviceOrientationEventStatic;
-    try {
-      if (typeof DOE?.requestPermission === "function") {
-        const resp = await DOE.requestPermission();
-        if (resp !== "granted") {
-          setError("Motion access denied. Enable in iOS Settings → Safari → Motion & Orientation.");
-          setPermState("denied");
-          return;
+    if (!auto) {
+      try {
+        if (typeof DOE?.requestPermission === "function") {
+          const resp = await DOE.requestPermission();
+          if (resp !== "granted") {
+            setError("Motion access denied. Enable in iOS Settings → Safari → Motion & Orientation.");
+            setPermState("denied");
+            return;
+          }
         }
+      } catch {
+        setError("Motion access blocked. Enable in iOS Settings → Safari → Motion & Orientation.");
+        setPermState("denied");
+        return;
       }
-    } catch {
-      setError("Motion access blocked. Enable in iOS Settings → Safari → Motion & Orientation.");
-      setPermState("denied");
-      return;
     }
 
     const handler = (e: DeviceOrientationEvent) => {
-      // iOS provides webkitCompassHeading (0 = N, clockwise) — most accurate.
       const anyE = e as DeviceOrientationEvent & { webkitCompassHeading?: number };
       if (typeof anyE.webkitCompassHeading === "number") {
         setHeading(anyE.webkitCompassHeading);
       } else if (typeof e.alpha === "number") {
-        // Android: alpha is 0 at east on some devices, but generally 0 = N when absolute.
-        // Convert alpha to compass heading (clockwise from N).
         const h = (360 - e.alpha) % 360;
         setHeading(h);
       }
@@ -125,6 +126,11 @@ function Qibla() {
     window.addEventListener("deviceorientationabsolute", handler as EventListener, true);
     window.addEventListener("deviceorientation", handler as EventListener, true);
 
+    try {
+      localStorage.setItem("qibla-perm-granted", "1");
+    } catch {
+      // ignore
+    }
     setPermState("granted");
   };
 
