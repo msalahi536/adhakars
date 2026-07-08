@@ -50,6 +50,7 @@
   --header-fg: #2d1f00;
   --header-sub: #6b5a2d;
   --nav-bg: rgba(250, 246, 236, 0.97);
+  --nav-safe-area-bg: #faf6ec;
   --nav-border: rgba(45, 31, 0, 0.08);
   --nav-active: #c9a84c;
   --nav-inactive: #8a7a4c;
@@ -89,6 +90,7 @@
   --header-fg: #1f3a5c;
   --header-sub: #4a6b9a;
   --nav-bg: rgba(238, 242, 248, 0.97);
+  --nav-safe-area-bg: #eef2f8;
   --nav-border: rgba(31, 58, 92, 0.08);
   --nav-active: #4a6b9a;
   --nav-inactive: #8896a8;
@@ -129,6 +131,7 @@
   --header-fg: #fff5e8;
   --header-sub: rgba(255, 245, 232, 0.85);
   --nav-bg: rgba(250, 246, 240, 0.97);
+  --nav-safe-area-bg: #faf6f0;
   --nav-border: rgba(45, 31, 14, 0.08);
   --nav-active: #c9a84c;
   --nav-inactive: #8b6f47;
@@ -166,9 +169,10 @@
     overflow: hidden;
     -webkit-user-select: none;
     user-select: none;
+    background-color: var(--nav-safe-area-bg);
   }
   body {
-    background: var(--background);
+    background: var(--nav-safe-area-bg);
     color: var(--foreground);
     font-family: var(--font-sans);
     -webkit-font-smoothing: antialiased;
@@ -187,6 +191,7 @@
     margin: 0;
     padding: 0;
     min-height: 100dvh;
+    background: var(--nav-safe-area-bg);
   }
   .page-header {
     flex-shrink: 0;

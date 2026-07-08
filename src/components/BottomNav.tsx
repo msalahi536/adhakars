@@ -34,8 +34,6 @@ export function BottomNav() {
   }, []);
 
   const isDark = DARK_THEMES.has(theme);
-  const navBg = isDark ? "rgba(15,20,30,0.97)" : "rgba(255,255,255,0.97)";
-  const themeNavBg = theme === "dusk" ? "rgba(238, 242, 247, 0.97)" : navBg;
   const iconColor = isDark ? "#ffffff" : "#4a5568";
   const activeColor = theme === "dusk" ? "#667eea" : "#c9a84c";
   const borderColor = isDark ? "rgba(255,255,255,0.08)" : "rgba(0,0,0,0.08)";
@@ -44,7 +42,7 @@ export function BottomNav() {
     <nav
       className="bottom-nav"
       style={{
-        background: themeNavBg,
+        background: "var(--nav-bg)",
         backdropFilter: "blur(12px) saturate(180%)",
         WebkitBackdropFilter: "blur(12px) saturate(180%)",
         borderTop: `1px solid ${borderColor}`,
