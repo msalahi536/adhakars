@@ -54,15 +54,20 @@ function Qibla() {
   const listenerRef = useRef<((e: DeviceOrientationEvent) => void) | null>(null);
 
   useEffect(() => {
+    // Auto-start if previously granted (skips the iOS gesture-required prompt).
+    if (typeof window !== "undefined" && localStorage.getItem("qibla-perm-granted") === "1") {
+      void start(true);
+    }
     return () => {
       if (listenerRef.current) {
         window.removeEventListener("deviceorientationabsolute", listenerRef.current as EventListener);
         window.removeEventListener("deviceorientation", listenerRef.current as EventListener);
       }
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const start = async () => {
+  const start = async (auto = false) => {
     setError(null);
     setPermState("requesting");
 
@@ -88,30 +93,31 @@ function Qibla() {
     );
 
     // 2) Motion / orientation permission (iOS 13+)
+    // On auto-start (previously granted), skip requestPermission — it requires a
+    // fresh user gesture and would throw. Just attach listeners directly.
     const DOE = DeviceOrientationEvent as DeviceOrientationEventStatic;
-    try {
-      if (typeof DOE?.requestPermission === "function") {
-        const resp = await DOE.requestPermission();
-        if (resp !== "granted") {
-          setError("Motion access denied. Enable in iOS Settings → Safari → Motion & Orientation.");
-          setPermState("denied");
-          return;
+    if (!auto) {
+      try {
+        if (typeof DOE?.requestPermission === "function") {
+          const resp = await DOE.requestPermission();
+          if (resp !== "granted") {
+            setError("Motion access denied. Enable in iOS Settings → Safari → Motion & Orientation.");
+            setPermState("denied");
+            return;
+          }
         }
+      } catch {
+        setError("Motion access blocked. Enable in iOS Settings → Safari → Motion & Orientation.");
+        setPermState("denied");
+        return;
       }
-    } catch {
-      setError("Motion access blocked. Enable in iOS Settings → Safari → Motion & Orientation.");
-      setPermState("denied");
-      return;
     }
 
     const handler = (e: DeviceOrientationEvent) => {
-      // iOS provides webkitCompassHeading (0 = N, clockwise) — most accurate.
       const anyE = e as DeviceOrientationEvent & { webkitCompassHeading?: number };
       if (typeof anyE.webkitCompassHeading === "number") {
         setHeading(anyE.webkitCompassHeading);
       } else if (typeof e.alpha === "number") {
-        // Android: alpha is 0 at east on some devices, but generally 0 = N when absolute.
-        // Convert alpha to compass heading (clockwise from N).
         const h = (360 - e.alpha) % 360;
         setHeading(h);
       }
@@ -120,6 +126,11 @@ function Qibla() {
     window.addEventListener("deviceorientationabsolute", handler as EventListener, true);
     window.addEventListener("deviceorientation", handler as EventListener, true);
 
+    try {
+      localStorage.setItem("qibla-perm-granted", "1");
+    } catch {
+      // ignore
+    }
     setPermState("granted");
   };
 
@@ -157,7 +168,7 @@ function Qibla() {
                 leaves your device.
               </p>
               <button
-                onClick={start}
+                onClick={() => start()}
                 className="rounded-full px-6 py-3 text-sm font-bold"
                 style={{ background: "#c9a84c", color: "#1f3d2b" }}
               >
