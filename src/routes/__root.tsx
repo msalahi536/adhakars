@@ -12,6 +12,7 @@ import {
 
 import appCss from "../styles.css?url";
 import { BottomNav } from "@/components/BottomNav";
+import { UpdatePopup } from "@/components/UpdatePopup";
 import { applyTheme, getMode, resolveTheme } from "@/lib/theme";
 import { reconcileStreak } from "@/lib/storage";
 import { initOneSignal } from "@/lib/onesignal";
