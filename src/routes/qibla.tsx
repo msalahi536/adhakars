@@ -54,8 +54,17 @@ function Qibla() {
   const listenerRef = useRef<((e: DeviceOrientationEvent) => void) | null>(null);
 
   useEffect(() => {
-    // Auto-start if previously granted (skips the iOS gesture-required prompt).
-    if (typeof window !== "undefined" && localStorage.getItem("qibla-perm-granted") === "1") {
+    // Auto-start only when the platform does NOT require a per-session user
+    // gesture for motion access. iOS 13+ (DeviceOrientationEvent.requestPermission)
+    // MUST be triggered from a fresh tap each session — otherwise the listener
+    // attaches but never fires, leaving an empty compass.
+    const DOE = DeviceOrientationEvent as DeviceOrientationEventStatic;
+    const needsGesture = typeof DOE?.requestPermission === "function";
+    if (
+      typeof window !== "undefined" &&
+      !needsGesture &&
+      localStorage.getItem("qibla-perm-granted") === "1"
+    ) {
       void start(true);
     }
     return () => {
