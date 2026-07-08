@@ -135,6 +135,10 @@ function Salah() {
             items={items}
             counts={counts}
             onIncrement={inc}
+            onReset={() => {
+              clearCounts(storageKey);
+              setCounts({});
+            }}
             persistKey={storageKey}
           />
         </div>
