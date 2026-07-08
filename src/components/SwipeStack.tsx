@@ -101,17 +101,7 @@ export function SwipeStack({ items, counts, onIncrement, onReset, persistKey, fi
 
   const current = items[idx];
 
-  // Auto-advance when current item becomes complete
-  useEffect(() => {
-    if (!current) return;
-    const nowComplete = isItemComplete(current, counts);
-    if (nowComplete && !prevCompleteRef.current && idx < items.length - 1) {
-      const t = setTimeout(() => goNext(), 900);
-      prevCompleteRef.current = true;
-      return () => clearTimeout(t);
-    }
-    prevCompleteRef.current = nowComplete;
-  }, [counts, current, idx, items.length]);
+  // Auto-advance intentionally disabled — user controls navigation via arrows / swipe.
 
   // Touch handling
   useEffect(() => {
