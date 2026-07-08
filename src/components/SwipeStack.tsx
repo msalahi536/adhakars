@@ -53,16 +53,9 @@ export function SwipeStack({ items, counts, onIncrement, onReset, persistKey, fi
   const wrapperRef = useRef<HTMLDivElement>(null);
   const prevCompleteRef = useRef(false);
 
-  // Reset ONLY when persistKey changes (e.g. switching prayer). Do NOT reset on items identity changes.
+  // Reset ONLY when persistKey changes (e.g. switching prayer). Do NOT auto-advance or auto-restart.
   useEffect(() => {
-    let restored = Math.min(readPersistedIdx(persistKey), Math.max(0, items.length - 1));
-    // Auto-reset to start if user left on the final card after completing everything.
-    if (restored === items.length - 1 && items.length > 0 && items.every((it) => isItemComplete(it, {}))) {
-      restored = 0;
-      if (persistKey && typeof window !== "undefined") {
-        window.localStorage.setItem(`cardIdx_${persistKey}`, "0");
-      }
-    }
+    const restored = Math.min(readPersistedIdx(persistKey), Math.max(0, items.length - 1));
     setIdxState(restored);
     setPhase("idle");
     prevCompleteRef.current = false;
