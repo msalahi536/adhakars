@@ -127,6 +127,7 @@ function RootComponent() {
     <QueryClientProvider client={queryClient}>
       <Outlet />
       <BottomNav />
+      <UpdatePopup />
     </QueryClientProvider>
   );
 }
