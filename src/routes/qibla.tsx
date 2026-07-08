@@ -54,15 +54,20 @@ function Qibla() {
   const listenerRef = useRef<((e: DeviceOrientationEvent) => void) | null>(null);
 
   useEffect(() => {
+    // Auto-start if previously granted (skips the iOS gesture-required prompt).
+    if (typeof window !== "undefined" && localStorage.getItem("qibla-perm-granted") === "1") {
+      void start(true);
+    }
     return () => {
       if (listenerRef.current) {
         window.removeEventListener("deviceorientationabsolute", listenerRef.current as EventListener);
         window.removeEventListener("deviceorientation", listenerRef.current as EventListener);
       }
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const start = async () => {
+  const start = async (auto = false) => {
     setError(null);
     setPermState("requesting");
 
