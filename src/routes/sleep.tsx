@@ -3,7 +3,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { SwipeStack } from "@/components/SwipeStack";
 import { sleepItems, wakeItems, type SleepMode } from "@/data/sleep";
 import { isItemComplete } from "@/data/salah";
-import { getCounts, setCount, bumpLifetime } from "@/lib/storage";
+import { getCounts, setCount, clearCounts, bumpLifetime } from "@/lib/storage";
 
 export const Route = createFileRoute("/sleep")({
   head: () => ({
