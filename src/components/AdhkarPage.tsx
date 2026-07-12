@@ -16,6 +16,10 @@ type Props = {
   extras?: SalahItem[];
   headerStyle?: React.CSSProperties;
   headerPattern?: React.ReactNode;
+  headerAction?: React.ReactNode;
+  emptyState?: React.ReactNode;
+  onEditItem?: (id: string) => void;
+  onDeleteItem?: (id: string) => void;
 };
 
 export function AdhkarPage({
@@ -28,6 +32,10 @@ export function AdhkarPage({
   extras = [],
   headerStyle,
   headerPattern,
+  headerAction,
+  emptyState,
+  onEditItem,
+  onDeleteItem,
 }: Props) {
   const [counts, setCounts] = useState<Record<string, number>>({});
 
@@ -59,7 +67,16 @@ export function AdhkarPage({
       <header className="page-header relative overflow-hidden" style={{ ...defaultHeader, ...headerStyle }}>
         {headerPattern}
         <HeaderSettingsButton />
+        {headerAction && (
+          <div
+            className="absolute z-10"
+            style={{ top: "calc(env(safe-area-inset-top) + 10px)", right: 56 }}
+          >
+            {headerAction}
+          </div>
+        )}
         <div className="relative mx-auto max-w-md px-5 pb-4 pt-5">
+
 
           <div
             className="label-caps"
@@ -97,16 +114,22 @@ export function AdhkarPage({
 
       <main className="scroll-area flex flex-col">
         <div className="mx-auto flex min-h-0 w-full max-w-md flex-1 flex-col pt-3">
-          <SwipeStack
-            items={items}
-            counts={counts}
-            onIncrement={inc}
-            onReset={() => {
-              clearCounts(storageKey);
-              setCounts({});
-            }}
-            persistKey={storageKey}
-          />
+          {items.length === 0 && emptyState ? (
+            emptyState
+          ) : (
+            <SwipeStack
+              items={items}
+              counts={counts}
+              onIncrement={inc}
+              onReset={() => {
+                clearCounts(storageKey);
+                setCounts({});
+              }}
+              persistKey={storageKey}
+              onEditItem={onEditItem}
+              onDeleteItem={onDeleteItem}
+            />
+          )}
         </div>
       </main>
     </>

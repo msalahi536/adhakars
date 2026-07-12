@@ -115,13 +115,14 @@ export const reconcileStreak = () => {
 };
 
 // ============ Lifetime dhikr counter ============
-export type LifetimeCategory = "morning" | "evening" | "salah" | "tasbih";
+export type LifetimeCategory = "morning" | "evening" | "salah" | "tasbih" | "custom";
 export type LifetimeCounts = {
   total: number;
   morning: number;
   evening: number;
   salah: number;
   tasbih: number;
+  custom: number;
 };
 
 const LIFETIME_KEY = "lifetimeDhikr";
@@ -131,6 +132,7 @@ const defaultLifetime: LifetimeCounts = {
   evening: 0,
   salah: 0,
   tasbih: 0,
+  custom: 0,
 };
 
 export const getLifetime = (): LifetimeCounts => {

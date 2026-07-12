@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "@tanstack/react-router";
 import { DhikrCard } from "./DhikrCard";
 import { TasbeehComboCard } from "./TasbeehComboCard";
-import { ChevronLeft, ChevronRight, RotateCcw, ArrowRight } from "lucide-react";
+import { ChevronLeft, ChevronRight, RotateCcw, ArrowRight, Pencil, Trash2 } from "lucide-react";
 import type { SalahItem } from "@/data/salah";
 import { isItemComplete, itemId } from "@/data/salah";
 
@@ -14,6 +14,8 @@ type Props = {
   persistKey?: string;
   finishCta?: { label: string; to: string };
   onFinishNav?: () => void;
+  onEditItem?: (id: string) => void;
+  onDeleteItem?: (id: string) => void;
 };
 
 type Phase = "idle" | "out-left" | "out-right" | "in-left" | "in-right";
@@ -28,7 +30,7 @@ const readPersistedIdx = (key?: string): number => {
   return Number.isFinite(n) && n >= 0 ? n : 0;
 };
 
-export function SwipeStack({ items, counts, onIncrement, onReset, persistKey, finishCta, onFinishNav }: Props) {
+export function SwipeStack({ items, counts, onIncrement, onReset, persistKey, finishCta, onFinishNav, onEditItem, onDeleteItem }: Props) {
   const navigate = useNavigate();
   const [idx, setIdxState] = useState(() =>
     Math.min(readPersistedIdx(persistKey), Math.max(0, items.length - 1)),
@@ -251,6 +253,26 @@ export function SwipeStack({ items, counts, onIncrement, onReset, persistKey, fi
             aria-label="restart"
           >
             <RotateCcw size={12} /> Restart
+          </button>
+        )}
+        {current?.dhikr && onEditItem && (
+          <button
+            onClick={() => onEditItem(current.dhikr!.id)}
+            className="flex items-center gap-1 rounded-[12px] px-2.5 py-1 text-[11px] font-semibold transition active:scale-95"
+            style={{ background: "var(--surface)", color: "var(--foreground)" }}
+            aria-label="edit"
+          >
+            <Pencil size={12} /> Edit
+          </button>
+        )}
+        {current?.dhikr && onDeleteItem && (
+          <button
+            onClick={() => onDeleteItem(current.dhikr!.id)}
+            className="flex items-center gap-1 rounded-[12px] px-2.5 py-1 text-[11px] font-semibold transition active:scale-95"
+            style={{ background: "var(--surface)", color: "#c0392b" }}
+            aria-label="delete"
+          >
+            <Trash2 size={12} /> Delete
           </button>
         )}
       </div>

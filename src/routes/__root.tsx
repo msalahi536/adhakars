@@ -16,6 +16,7 @@ import { BottomNav } from "@/components/BottomNav";
 import { applyTheme, getMode, resolveTheme } from "@/lib/theme";
 import { reconcileStreak } from "@/lib/storage";
 import { applyReminders, getNotificationPrefs, checkNotificationPermission } from "@/lib/notifications";
+import { supabase } from "@/integrations/supabase/client";
 
 function NotFoundComponent() {
   return (
@@ -117,6 +118,7 @@ function RootShell({ children }: { children: React.ReactNode }) {
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
+  const router = useRouter();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
 
   useEffect(() => {
@@ -125,8 +127,6 @@ function RootComponent() {
 
   useEffect(() => {
     reconcileStreak();
-    // Re-apply saved local reminder schedules on app open. Silently no-ops
-    // on web where the Capacitor plugin isn't available.
     (async () => {
       try {
         const granted = await checkNotificationPermission();
@@ -136,6 +136,14 @@ function RootComponent() {
       }
     })();
   }, []);
+
+  useEffect(() => {
+    const { data: sub } = supabase.auth.onAuthStateChange((event) => {
+      if (event !== "SIGNED_IN" && event !== "SIGNED_OUT" && event !== "USER_UPDATED") return;
+      router.invalidate();
+    });
+    return () => sub.subscription.unsubscribe();
+  }, [router]);
 
   return (
     <QueryClientProvider client={queryClient}>
