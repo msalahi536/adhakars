@@ -63,8 +63,9 @@ function Sleep() {
         style={{ background: gradient, color: headerFg }}
       >
         <DiagonalLatticePattern />
+        <HeaderBackButton />
         <HeaderSettingsButton />
-        <div className="relative mx-auto max-w-md px-5 pb-4 pt-5">
+        <div className="relative mx-auto max-w-md px-5 pb-4 pt-5" style={{ paddingLeft: 60, paddingRight: 60 }}>
           <div className="label-caps" style={{ color: "rgba(31,58,92,0.75)", opacity: 1 }}>
             {isSleep ? "Before Sleep" : "Upon Waking"}
           </div>
