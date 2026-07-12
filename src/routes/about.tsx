@@ -10,11 +10,11 @@ const DONATE_URL = "#";
 export const Route = createFileRoute("/about")({
   head: () => ({
     meta: [
-      { title: "About & Support, My Adhkar" },
+      { title: "About & Support, Adhkar as-Sahih" },
       {
         name: "description",
         content:
-          "About the My Adhkar project, how to support it, and how to get in touch.",
+          "About the Adhkar as-Sahih project, how to support it, and how to get in touch.",
       },
     ],
   }),
@@ -50,7 +50,7 @@ function About() {
           >
             <h2 className="label-caps mb-2">About the project</h2>
             <p className="text-sm leading-relaxed" style={{ color: "var(--foreground)" }}>
-              Adhkar as-sahih is a simple, offline friendly companion for the
+              Adhkar as-Sahih is a simple, offline friendly companion for the
               daily remembrance of Allah. Every dhikr and du'a in this app is
               taken from authentic narrations, with the source listed on each
               card so you can verify it yourself.

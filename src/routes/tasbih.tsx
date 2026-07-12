@@ -8,7 +8,7 @@ import { triggerHaptic } from "@/lib/theme";
 import { bumpLifetime } from "@/lib/storage";
 
 export const Route = createFileRoute("/tasbih")({
-  head: () => ({ meta: [{ title: "Tasbih, My Adhkar" }] }),
+  head: () => ({ meta: [{ title: "Tasbih, Adhkar as-Sahih" }] }),
   component: Tasbih,
 });
 
