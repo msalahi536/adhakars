@@ -30,7 +30,7 @@ const readPersistedIdx = (key?: string): number => {
   return Number.isFinite(n) && n >= 0 ? n : 0;
 };
 
-export function SwipeStack({ items, counts, onIncrement, onReset, persistKey, finishCta, onFinishNav }: Props) {
+export function SwipeStack({ items, counts, onIncrement, onReset, persistKey, finishCta, onFinishNav, onEditItem, onDeleteItem }: Props) {
   const navigate = useNavigate();
   const [idx, setIdxState] = useState(() =>
     Math.min(readPersistedIdx(persistKey), Math.max(0, items.length - 1)),
