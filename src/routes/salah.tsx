@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { SwipeStack } from "@/components/SwipeStack";
 import { HeaderSettingsButton } from "@/components/HeaderSettingsButton";
+import { ConcentricCirclesPattern } from "@/components/HeaderPatterns";
 import { SALAH_PRAYERS, getSalahItems, isItemComplete, type SalahPrayer } from "@/data/salah";
 import { getCounts, setCount, clearCounts, bumpLifetime } from "@/lib/storage";
 
