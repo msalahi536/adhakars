@@ -51,14 +51,15 @@ function Salah() {
   return (
     <>
       <header
-        className="page-header relative"
+        className="page-header relative overflow-hidden"
         style={{
           background: "linear-gradient(135deg, #2e7d5e 0%, #1a5c42 100%)",
           color: "#ffffff",
         }}
       >
+        <ConcentricCirclesPattern />
         <HeaderSettingsButton />
-        <div className="mx-auto max-w-md px-5 pb-4 pt-5">
+        <div className="relative mx-auto max-w-md px-5 pb-4 pt-5">
           <div className="label-caps" style={{ color: "rgba(255,255,255,0.85)", opacity: 1 }}>
             After {selectedLabel}
           </div>
