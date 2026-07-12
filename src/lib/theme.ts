@@ -33,9 +33,9 @@ export const resolveTheme = (mode: ThemeMode, route: string): ThemeId => {
 };
 
 // Display prefs
-export type DisplayPrefs = { showTransliteration: boolean; arabicLarge: boolean };
+export type DisplayPrefs = { showTransliteration: boolean; arabicLarge: boolean; haptics: boolean };
 const DISPLAY_KEY = "adhkar:display";
-const defaults: DisplayPrefs = { showTransliteration: true, arabicLarge: false };
+const defaults: DisplayPrefs = { showTransliteration: true, arabicLarge: false, haptics: true };
 export const getDisplay = (): DisplayPrefs => {
   if (typeof window === "undefined") return defaults;
   try {
@@ -46,6 +46,35 @@ export const getDisplay = (): DisplayPrefs => {
 };
 export const setDisplay = (d: DisplayPrefs) => localStorage.setItem(DISPLAY_KEY, JSON.stringify(d));
 export const vibrateIfEnabled = (pattern: number | number[]) => {
+  if (typeof window !== "undefined" && !getDisplay().haptics) return;
   if (typeof navigator === "undefined" || !navigator.vibrate) return;
   navigator.vibrate(pattern);
 };
+
+export type HapticStrength = "light" | "medium" | "heavy";
+export const triggerHaptic = async (strength: HapticStrength = "light") => {
+  if (typeof window === "undefined") return;
+  if (!getDisplay().haptics) return;
+  try {
+    const cap = (window as unknown as { Capacitor?: { isNativePlatform?: () => boolean } }).Capacitor;
+    if (cap?.isNativePlatform?.()) {
+      const mod = await import(/* @vite-ignore */ "@capacitor/haptics").catch(() => null);
+      if (mod?.Haptics && mod?.ImpactStyle) {
+        const style =
+          strength === "heavy"
+            ? mod.ImpactStyle.Heavy
+            : strength === "medium"
+              ? mod.ImpactStyle.Medium
+              : mod.ImpactStyle.Light;
+        await mod.Haptics.impact({ style });
+        return;
+      }
+    }
+  } catch {
+    // swallow — fall through to web vibrate
+  }
+  if (typeof navigator !== "undefined" && navigator.vibrate) {
+    navigator.vibrate(strength === "medium" ? 25 : strength === "heavy" ? 40 : 12);
+  }
+};
+
