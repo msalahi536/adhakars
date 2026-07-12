@@ -26,10 +26,10 @@ import {
   type ReminderId,
 } from "@/lib/notifications";
 
-const APP_VERSION = "1.0.0";
+const APP_VERSION = "1.0.3";
 
 export const Route = createFileRoute("/settings")({
-  head: () => ({ meta: [{ title: "Settings — My Adhkar" }] }),
+  head: () => ({ meta: [{ title: "Settings, My Adhkar" }] }),
   component: Settings,
 });
 
@@ -223,7 +223,7 @@ function Settings() {
                   </div>
                   <div className="mt-1 text-xs opacity-70">
                     Get a local notification on your device every morning and
-                    evening — no internet needed.
+                    evening. No internet needed.
                   </div>
                   <button
                     onClick={handleEnableNotifications}
