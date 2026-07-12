@@ -23,7 +23,7 @@ function Evening() {
       list={eveningAdhkar}
       headerPattern={<InterlockingArcsPattern />}
       extras={[
-        { dhikr: baqarahLastTwo, isSpecial: true, specialLabel: "After Sunset — recite after the sun has set" },
+        { dhikr: baqarahLastTwo, isSpecial: true, specialLabel: "After Sunset. Recite after the sun has set" },
       ]}
     />
   );

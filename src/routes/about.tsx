@@ -50,10 +50,10 @@ function About() {
           >
             <h2 className="label-caps mb-2">About the project</h2>
             <p className="text-sm leading-relaxed" style={{ color: "var(--foreground)" }}>
-              My Adhkar is a simple, offline-friendly companion for daily
-              remembrance of Allah. Every dhikr, du'a, and adhkar in this app
-              is sourced directly from authentic hadith or the Qur'an — no
-              weak or fabricated narrations.
+              Adhkar as-sahih is a simple, offline friendly companion for the
+              daily remembrance of Allah. Every dhikr and du'a in this app is
+              taken from authentic narrations, with the source listed on each
+              card so you can verify it yourself.
             </p>
             <p
               className="mt-3 text-xs leading-relaxed"
@@ -70,10 +70,14 @@ function About() {
           >
             <h2 className="label-caps mb-2">Support this project</h2>
             <p className="text-sm leading-relaxed" style={{ color: "var(--foreground)" }}>
-              This app is completely free with no ads and no tracking. If it
-              has benefited you, a small donation helps cover hosting, keeps
-              development going, and supports future features — all as
-              ṣadaqah jāriyah, in shā' Allāh.
+              This app is free. There are no ads and nothing is sold. If it
+              has benefited you, a donation helps cover hosting and keeps the
+              work going, as sadaqah jariyah, in sha' Allah.
+            </p>
+            <p className="mt-3 text-sm leading-relaxed" style={{ color: "var(--foreground)" }}>
+              And if you are not able to give, please make du'a for this
+              project and for everyone who uses it. That is a support worth
+              more than any amount.
             </p>
             <a
               href={DONATE_URL}
@@ -103,8 +107,9 @@ function About() {
           >
             <h2 className="label-caps mb-2">Contact &amp; feedback</h2>
             <p className="text-sm leading-relaxed" style={{ color: "var(--foreground)" }}>
-              Spotted an error in an adhkar? Have a feature idea? Want to
-              share how the app has helped you? I'd love to hear from you.
+              Found a mistake in an adhkar? Have an idea for a feature? Want
+              to share how the app has helped you? Please reach out, I would
+              love to hear from you.
             </p>
             <a
               href="mailto:msalahi536@gmail.com"
