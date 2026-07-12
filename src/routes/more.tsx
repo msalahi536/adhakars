@@ -57,13 +57,14 @@ function More() {
     <>
       <header
         className="page-header relative overflow-hidden"
-        style={{ background: "var(--background)", color: "var(--foreground)" }}
+        style={{ background: "var(--grad-header)", color: "var(--header-fg)" }}
       >
         <SparseStarsPattern />
         <HeaderSettingsButton />
-        <div className="relative mx-auto max-w-md px-4 pb-5 pt-4">
-          <div className="label-caps">More</div>
-          <h1 className="mt-1 text-3xl font-bold">Tools</h1>
+        <div className="relative mx-auto max-w-md px-4 pb-5 pt-4" style={{ paddingRight: 60 }}>
+          <div className="label-caps" style={{ color: "var(--header-sub)", opacity: 1 }}>More</div>
+          <h1 className="mt-1 text-3xl font-bold tracking-tight">Tools</h1>
+          <p className="mt-2 text-xs opacity-90">Sleep, wake, qibla and your own adhkar.</p>
           {streak > 0 && (
             <div
               className="mt-3 inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-bold"
