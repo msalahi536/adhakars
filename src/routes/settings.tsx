@@ -39,6 +39,8 @@ function Settings() {
   const [display, setDisplayState] = useState(getDisplay());
   const [confirmReset, setConfirmReset] = useState(false);
   const [notifEnabled, setNotifEnabled] = useState(false);
+  const [notifPrefs, setNotifPrefsState] = useState<NotificationPrefs>(() => getNotificationPrefs());
+  const nativeAvailable = isNativePlatform();
   const [lifetime, setLifetime] = useState<LifetimeCounts>({
     total: 0,
     morning: 0,
@@ -52,13 +54,15 @@ function Settings() {
     setStreak(getStreak());
     setDisplayState(getDisplay());
     setLifetime(getLifetime());
-    const check = () => setNotifEnabled(getNotificationPermission());
-    check();
-    const id = setInterval(check, 1000);
+    setNotifPrefsState(getNotificationPrefs());
+    let cancelled = false;
+    checkNotificationPermission().then((v) => {
+      if (!cancelled) setNotifEnabled(v);
+    });
     const onLife = () => setLifetime(getLifetime());
     window.addEventListener("adhkar:lifetime-update", onLife);
     return () => {
-      clearInterval(id);
+      cancelled = true;
       window.removeEventListener("adhkar:lifetime-update", onLife);
     };
   }, []);
@@ -66,7 +70,41 @@ function Settings() {
   const handleEnableNotifications = async () => {
     const granted = await requestNotificationPermission();
     setNotifEnabled(granted);
+    if (granted) {
+      // Re-apply saved schedule now that permission is available.
+      await applyReminders(notifPrefs);
+    }
   };
+
+  const updateReminder = async (
+    id: ReminderId,
+    patch: Partial<NotificationPrefs["morning"]>,
+  ) => {
+    const next: NotificationPrefs = {
+      ...notifPrefs,
+      [id]: { ...notifPrefs[id], ...patch },
+    };
+    setNotifPrefsState(next);
+    setNotificationPrefs(next);
+    const r = next[id];
+    if (r.enabled && notifEnabled) {
+      await scheduleReminder(id, r.hour, r.minute);
+    } else {
+      await cancelReminder(id);
+    }
+  };
+
+  const parseTime = (v: string): { hour: number; minute: number } => {
+    const [h, m] = v.split(":").map((n) => parseInt(n, 10));
+    return {
+      hour: Number.isFinite(h) ? Math.max(0, Math.min(23, h)) : 0,
+      minute: Number.isFinite(m) ? Math.max(0, Math.min(59, m)) : 0,
+    };
+  };
+
+  const formatTime = (hour: number, minute: number) =>
+    `${String(hour).padStart(2, "0")}:${String(minute).padStart(2, "0")}`;
+
 
   const choose = (m: ThemeMode) => {
     setModeState(m);
