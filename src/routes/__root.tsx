@@ -1,5 +1,5 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import {
   Outlet,
   Link,
@@ -12,6 +12,7 @@ import {
 
 import appCss from "../styles.css?url";
 import { BottomNav } from "@/components/BottomNav";
+import { Onboarding, hasOnboarded } from "@/components/Onboarding";
 
 import { applyTheme, getMode, resolveTheme } from "@/lib/theme";
 import { reconcileStreak } from "@/lib/storage";
@@ -145,11 +146,16 @@ function RootComponent() {
     return () => sub.subscription.unsubscribe();
   }, [router]);
 
+  const [showOnboarding, setShowOnboarding] = useState(false);
+  useEffect(() => {
+    if (!hasOnboarded()) setShowOnboarding(true);
+  }, []);
+
   return (
     <QueryClientProvider client={queryClient}>
       <Outlet />
       <BottomNav />
-      
+      {showOnboarding && <Onboarding onDone={() => setShowOnboarding(false)} />}
     </QueryClientProvider>
   );
 }
