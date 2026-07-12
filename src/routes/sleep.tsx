@@ -58,11 +58,12 @@ function Sleep() {
   return (
     <>
       <header
-        className="page-header relative"
+        className="page-header relative overflow-hidden"
         style={{ background: gradient, color: headerFg }}
       >
+        <DiagonalLatticePattern />
         <HeaderSettingsButton />
-        <div className="mx-auto max-w-md px-5 pb-4 pt-5">
+        <div className="relative mx-auto max-w-md px-5 pb-4 pt-5">
           <div className="label-caps" style={{ color: "rgba(31,58,92,0.75)", opacity: 1 }}>
             {isSleep ? "Before Sleep" : "Upon Waking"}
           </div>
