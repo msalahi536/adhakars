@@ -88,7 +88,7 @@ function More() {
         <div className="mx-auto max-w-md px-4 py-4 space-y-4">
           {/* Consistency card */}
           <section
-            className="overflow-hidden rounded-[24px] p-5"
+            className="overflow-hidden rounded-[24px] p-4"
             style={{
               background: "linear-gradient(135deg, #1f3d2b 0%, #2d5a3d 100%)",
               color: "#ffffff",
@@ -117,15 +117,15 @@ function More() {
               }
               return (
                 <>
-                  <div className="mt-3 text-[11px] font-semibold uppercase tracking-wider" style={{ color: "rgba(255,255,255,0.7)" }}>
+                  <div className="mt-2 text-[11px] font-semibold uppercase tracking-wider" style={{ color: "rgba(255,255,255,0.7)" }}>
                     {monthLabel}
                   </div>
-                  <div className="mt-2 grid gap-1" style={{ gridTemplateColumns: "repeat(7, minmax(0, 1fr))" }}>
+                  <div className="mt-1 grid gap-0.5" style={{ gridTemplateColumns: "repeat(7, minmax(0, 1fr))" }}>
                     {weekdays.map((w, i) => (
-                      <div key={`w${i}`} className="text-center text-[10px]" style={{ color: "rgba(255,255,255,0.55)" }}>{w}</div>
+                      <div key={`w${i}`} className="text-center text-[9px]" style={{ color: "rgba(255,255,255,0.55)" }}>{w}</div>
                     ))}
                     {cells.map((c) => {
-                      if (!c.date) return <div key={c.key} style={{ aspectRatio: "1 / 1" }} />;
+                      if (!c.date) return <div key={c.key} style={{ height: 26 }} />;
                       const status = statusByDate.get(c.date);
                       const isToday = c.date === todayDate;
                       const isFuture = c.date > todayDate;
@@ -143,14 +143,14 @@ function More() {
                         <div
                           key={c.key}
                           title={c.date}
-                          className="flex items-center justify-center text-[10px] font-semibold"
+                          className="flex items-center justify-center text-[9px] font-semibold"
                           style={{
-                            aspectRatio: "1 / 1",
-                            borderRadius: 6,
+                            height: 26,
+                            borderRadius: 5,
                             background: bg,
                             border,
                             color,
-                            boxShadow: isToday ? "0 0 0 2px rgba(255,255,255,0.9)" : undefined,
+                            boxShadow: isToday ? "0 0 0 1.5px rgba(255,255,255,0.9)" : undefined,
                           }}
                         >
                           {c.day}
@@ -162,12 +162,12 @@ function More() {
               );
             })()}
             {consistency.graceUsedRecently && (
-              <p className="mt-3 text-xs" style={{ color: "rgba(255,255,255,0.9)" }}>
+              <p className="mt-2 text-xs" style={{ color: "rgba(255,255,255,0.9)" }}>
                 You missed a day. Your streak is still going. Begin again today.
               </p>
             )}
             <div
-              className="mt-3 flex items-center justify-between border-t pt-2 text-[11px]"
+              className="mt-2 flex items-center justify-between border-t pt-2 text-[11px]"
               style={{ borderColor: "rgba(255,255,255,0.18)", color: "rgba(255,255,255,0.75)" }}
             >
               <span>Current streak: {consistency.current} days</span>
