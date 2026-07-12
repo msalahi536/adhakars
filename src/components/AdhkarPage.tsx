@@ -56,9 +56,11 @@ export function AdhkarPage({
 
   return (
     <>
-      <header className="page-header relative" style={{ ...defaultHeader, ...headerStyle }}>
+      <header className="page-header relative overflow-hidden" style={{ ...defaultHeader, ...headerStyle }}>
+        {headerPattern}
         <HeaderSettingsButton />
-        <div className="mx-auto max-w-md px-5 pb-4 pt-5">
+        <div className="relative mx-auto max-w-md px-5 pb-4 pt-5">
+
           <div
             className="label-caps"
             style={{
