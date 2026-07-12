@@ -146,11 +146,16 @@ function RootComponent() {
     return () => sub.subscription.unsubscribe();
   }, [router]);
 
+  const [showOnboarding, setShowOnboarding] = useState(false);
+  useEffect(() => {
+    if (!hasOnboarded()) setShowOnboarding(true);
+  }, []);
+
   return (
     <QueryClientProvider client={queryClient}>
       <Outlet />
       <BottomNav />
-      
+      {showOnboarding && <Onboarding onDone={() => setShowOnboarding(false)} />}
     </QueryClientProvider>
   );
 }
