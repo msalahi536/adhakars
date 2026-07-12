@@ -1,16 +1,14 @@
 import { useEffect, useState } from "react";
 import { Link } from "@tanstack/react-router";
-import { Sunrise, Moon, CircleDot, Settings as SettingsIcon, Hand, BedDouble, Compass } from "lucide-react";
+import { Sunrise, Moon, CircleDot, Hand, MoreHorizontal } from "lucide-react";
 import { getStreak } from "@/lib/storage";
 
 const tabs = [
   { to: "/" as const, label: "Morning", Icon: Sunrise },
   { to: "/evening" as const, label: "Evening", Icon: Moon },
   { to: "/salah" as const, label: "Salah", Icon: Hand },
-  { to: "/sleep" as const, label: "Sleep", Icon: BedDouble },
-  { to: "/qibla" as const, label: "Qibla", Icon: Compass },
   { to: "/tasbih" as const, label: "Tasbih", Icon: CircleDot },
-  { to: "/settings" as const, label: "Settings", Icon: SettingsIcon },
+  { to: "/more" as const, label: "More", Icon: MoreHorizontal },
 ];
 
 const DARK_THEMES = new Set(["dark-emerald", "deep-navy"]);
@@ -82,7 +80,7 @@ export function BottomNav() {
                   >
                     {t.label}
                   </span>
-                  {t.to === "/settings" && streak > 0 && (
+                  {t.to === "/more" && streak > 0 && (
                     <span
                       className="absolute right-0 top-0 rounded-[10px] px-1 py-0.5 text-[8px] font-bold"
                       style={{ background: activeColor, color: isDark ? "#0a0a0a" : "#ffffff" }}

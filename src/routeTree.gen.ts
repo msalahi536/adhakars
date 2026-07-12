@@ -14,6 +14,7 @@ import { Route as SleepRouteImport } from './routes/sleep'
 import { Route as SettingsRouteImport } from './routes/settings'
 import { Route as SalahRouteImport } from './routes/salah'
 import { Route as QiblaRouteImport } from './routes/qibla'
+import { Route as MoreRouteImport } from './routes/more'
 import { Route as EveningRouteImport } from './routes/evening'
 import { Route as IndexRouteImport } from './routes/index'
 
@@ -42,6 +43,11 @@ const QiblaRoute = QiblaRouteImport.update({
   path: '/qibla',
   getParentRoute: () => rootRouteImport,
 } as any)
+const MoreRoute = MoreRouteImport.update({
+  id: '/more',
+  path: '/more',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const EveningRoute = EveningRouteImport.update({
   id: '/evening',
   path: '/evening',
@@ -56,6 +62,7 @@ const IndexRoute = IndexRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/evening': typeof EveningRoute
+  '/more': typeof MoreRoute
   '/qibla': typeof QiblaRoute
   '/salah': typeof SalahRoute
   '/settings': typeof SettingsRoute
@@ -65,6 +72,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/evening': typeof EveningRoute
+  '/more': typeof MoreRoute
   '/qibla': typeof QiblaRoute
   '/salah': typeof SalahRoute
   '/settings': typeof SettingsRoute
@@ -75,6 +83,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/evening': typeof EveningRoute
+  '/more': typeof MoreRoute
   '/qibla': typeof QiblaRoute
   '/salah': typeof SalahRoute
   '/settings': typeof SettingsRoute
@@ -86,6 +95,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/evening'
+    | '/more'
     | '/qibla'
     | '/salah'
     | '/settings'
@@ -95,6 +105,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/evening'
+    | '/more'
     | '/qibla'
     | '/salah'
     | '/settings'
@@ -104,6 +115,7 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/evening'
+    | '/more'
     | '/qibla'
     | '/salah'
     | '/settings'
@@ -114,6 +126,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   EveningRoute: typeof EveningRoute
+  MoreRoute: typeof MoreRoute
   QiblaRoute: typeof QiblaRoute
   SalahRoute: typeof SalahRoute
   SettingsRoute: typeof SettingsRoute
@@ -158,6 +171,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof QiblaRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/more': {
+      id: '/more'
+      path: '/more'
+      fullPath: '/more'
+      preLoaderRoute: typeof MoreRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/evening': {
       id: '/evening'
       path: '/evening'
@@ -178,6 +198,7 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   EveningRoute: EveningRoute,
+  MoreRoute: MoreRoute,
   QiblaRoute: QiblaRoute,
   SalahRoute: SalahRoute,
   SettingsRoute: SettingsRoute,
