@@ -266,25 +266,90 @@ function Settings() {
               className="rounded-[24px] p-4"
               style={{ background: "var(--surface)", border: "1px solid var(--border)" }}
             >
-              <div className="text-sm" style={{ fontWeight: 600 }}>
-                Daily Adhkar Reminders
-              </div>
-              <div className="mt-1 text-xs opacity-70">Morning at 5:00 AM, Evening at 4:30 PM</div>
-              {notifEnabled ? (
-                <div className="mt-3 flex items-center justify-between text-xs">
-                  <span className="opacity-70">Reminders enabled ✓</span>
-                </div>
+              {!nativeAvailable ? (
+                <>
+                  <div className="text-sm" style={{ fontWeight: 600 }}>
+                    Daily Adhkar Reminders
+                  </div>
+                  <div className="mt-1 text-xs opacity-70">
+                    Reminders are unavailable on the web. Install the mobile app to
+                    get local device notifications at your chosen times.
+                  </div>
+                </>
+              ) : !notifEnabled ? (
+                <>
+                  <div className="text-sm" style={{ fontWeight: 600 }}>
+                    Daily Adhkar Reminders
+                  </div>
+                  <div className="mt-1 text-xs opacity-70">
+                    Get a local notification on your device every morning and
+                    evening — no internet needed.
+                  </div>
+                  <button
+                    onClick={handleEnableNotifications}
+                    className="mt-3 w-full rounded-full py-2 text-sm font-semibold"
+                    style={{ background: "#c9a84c", color: "#ffffff" }}
+                  >
+                    Enable Reminders
+                  </button>
+                </>
               ) : (
-                <button
-                  onClick={handleEnableNotifications}
-                  className="mt-3 w-full rounded-full py-2 text-sm font-semibold"
-                  style={{ background: "#c9a84c", color: "#ffffff" }}
-                >
-                  Enable Reminders
-                </button>
+                <div className="space-y-3">
+                  {(["morning", "evening"] as ReminderId[]).map((id) => {
+                    const r = notifPrefs[id];
+                    const label = id === "morning" ? "Morning reminder" : "Evening reminder";
+                    return (
+                      <div
+                        key={id}
+                        className="flex items-center justify-between gap-3 rounded-2xl px-3 py-2.5"
+                        style={{
+                          background: "var(--background)",
+                          border: "1px solid var(--border)",
+                        }}
+                      >
+                        <div className="flex min-w-0 flex-col">
+                          <span className="text-sm font-semibold">{label}</span>
+                          <input
+                            type="time"
+                            value={formatTime(r.hour, r.minute)}
+                            onChange={(e) => {
+                              const { hour, minute } = parseTime(e.target.value);
+                              void updateReminder(id, { hour, minute });
+                            }}
+                            disabled={!r.enabled}
+                            className="mt-1 rounded-md bg-transparent text-sm font-semibold outline-none"
+                            style={{
+                              color: "var(--foreground)",
+                              opacity: r.enabled ? 1 : 0.5,
+                            }}
+                          />
+                        </div>
+                        <button
+                          onClick={() => void updateReminder(id, { enabled: !r.enabled })}
+                          className="relative inline-block h-6 w-11 shrink-0 rounded-full transition"
+                          style={{
+                            background: r.enabled
+                              ? "var(--accent)"
+                              : "color-mix(in oklab, var(--foreground) 20%, transparent)",
+                          }}
+                          aria-label={`Toggle ${label}`}
+                        >
+                          <span
+                            className="absolute top-0.5 h-5 w-5 rounded-full bg-white transition-all"
+                            style={{ left: r.enabled ? 22 : 2 }}
+                          />
+                        </button>
+                      </div>
+                    );
+                  })}
+                  <div className="text-[11px] opacity-60">
+                    Reminders fire on your device using your local time.
+                  </div>
+                </div>
               )}
             </div>
           </section>
+
 
           <section className="mb-6 space-y-3">
             <h2 className="label-caps mb-1">Display</h2>
