@@ -1,7 +1,9 @@
 import { useEffect, useState } from "react";
-import { Link } from "@tanstack/react-router";
+import { Link, useRouterState } from "@tanstack/react-router";
 import { Sunrise, Moon, CircleDot, Hand, MoreHorizontal } from "lucide-react";
 import { getStreak } from "@/lib/storage";
+
+const MORE_NESTED = ["/sleep", "/wake", "/qibla"];
 
 const tabs = [
   { to: "/" as const, label: "Morning", Icon: Sunrise },
