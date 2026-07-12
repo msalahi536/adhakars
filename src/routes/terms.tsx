@@ -5,7 +5,7 @@ import { ConcentricCirclesPattern } from "@/components/HeaderPatterns";
 export const Route = createFileRoute("/terms")({
   head: () => ({
     meta: [
-      { title: "Terms of Service — My Adhkar" },
+      { title: "Terms of Service, My Adhkar" },
       { name: "description", content: "Terms of service for the My Adhkar app." },
     ],
   }),

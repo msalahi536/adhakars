@@ -10,7 +10,7 @@ const DONATE_URL = "#";
 export const Route = createFileRoute("/about")({
   head: () => ({
     meta: [
-      { title: "About & Support — My Adhkar" },
+      { title: "About & Support, My Adhkar" },
       {
         name: "description",
         content:
