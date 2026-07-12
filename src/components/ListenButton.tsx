@@ -1,95 +1,80 @@
 import { useEffect, useRef, useState } from "react";
-import { Loader2, Pause, Volume2 } from "lucide-react";
-
-/**
- * Audio recitations by dhikr id. Populate this map when audio files are added.
- * Example: { "morning-ayatul-kursi": "/audio/morning-ayatul-kursi.mp3" }
- */
-export const RECITATION_AUDIO: Record<string, string> = {};
+import { Volume2 } from "lucide-react";
 
 type Props = {
   dhikrId: string;
   size?: number;
 };
 
-type PlayState = "idle" | "loading" | "playing";
+export function ListenButton({ size = 32 }: Props) {
+  const [open, setOpen] = useState(false);
+  const wrapRef = useRef<HTMLDivElement | null>(null);
 
-export function ListenButton({ dhikrId, size = 32 }: Props) {
-  const src = RECITATION_AUDIO[dhikrId];
-  const available = Boolean(src);
-  const [state, setState] = useState<PlayState>("idle");
-  const audioRef = useRef<HTMLAudioElement | null>(null);
-
-  // Stop and reset when the card switches to a different dhikr.
   useEffect(() => {
-    return () => {
-      const a = audioRef.current;
-      if (a) {
-        a.pause();
-        a.src = "";
-      }
-      audioRef.current = null;
+    if (!open) return;
+    const onDoc = (e: MouseEvent) => {
+      if (!wrapRef.current?.contains(e.target as Node)) setOpen(false);
     };
-  }, [dhikrId]);
+    const t = window.setTimeout(() => document.addEventListener("click", onDoc), 0);
+    const auto = window.setTimeout(() => setOpen(false), 2400);
+    return () => {
+      window.clearTimeout(t);
+      window.clearTimeout(auto);
+      document.removeEventListener("click", onDoc);
+    };
+  }, [open]);
 
   const handleClick = (e: React.MouseEvent) => {
     e.stopPropagation();
-    if (!available) return;
-
-    let a = audioRef.current;
-    if (!a) {
-      a = new Audio(src);
-      audioRef.current = a;
-      a.addEventListener("waiting", () => setState("loading"));
-      a.addEventListener("playing", () => setState("playing"));
-      a.addEventListener("pause", () => setState("idle"));
-      a.addEventListener("ended", () => setState("idle"));
-      a.addEventListener("error", () => setState("idle"));
-    }
-
-    if (state === "playing" || state === "loading") {
-      a.pause();
-      setState("idle");
-      return;
-    }
-
-    setState("loading");
-    a.play().catch(() => setState("idle"));
+    setOpen((v) => !v);
   };
 
   const iconSize = Math.round(size * 0.5);
-  const Icon =
-    state === "loading" ? Loader2 : state === "playing" ? Pause : Volume2;
 
   return (
-    <button
-      type="button"
-      onClick={handleClick}
-      disabled={!available}
-      aria-label={
-        available
-          ? state === "playing"
-            ? "pause recitation"
-            : "play recitation"
-          : "recitation not available"
-      }
-      aria-disabled={!available}
-      data-no-swipe
-      className="flex shrink-0 items-center justify-center rounded-full transition-transform active:scale-95"
-      style={{
-        width: size,
-        height: size,
-        background: "var(--index-badge-bg, var(--accent))",
-        color: "var(--index-badge-fg, var(--accent-foreground))",
-        opacity: available ? 1 : 0.4,
-        cursor: available ? "pointer" : "not-allowed",
-      }}
-    >
-      <Icon
-        size={iconSize}
-        strokeWidth={2.4}
-        className={state === "loading" ? "animate-spin" : ""}
-      />
-    </button>
+    <div ref={wrapRef} className="relative shrink-0" data-no-swipe>
+      <button
+        type="button"
+        onClick={handleClick}
+        aria-label="play recitation"
+        className="flex items-center justify-center rounded-full transition-transform active:scale-95"
+        style={{
+          width: size,
+          height: size,
+          background: "var(--index-badge-bg, var(--accent))",
+          color: "var(--index-badge-fg, var(--accent-foreground))",
+        }}
+      >
+        <Volume2 size={iconSize} strokeWidth={2.4} />
+      </button>
+
+      {open && (
+        <div
+          role="status"
+          className="absolute left-[calc(100%+8px)] top-1/2 z-20 -translate-y-1/2 whitespace-nowrap rounded-full px-3 py-1.5 text-[11px] font-medium shadow-md"
+          style={{
+            background: "var(--popover, var(--card))",
+            color: "var(--popover-foreground, var(--card-foreground))",
+            border: "1px solid var(--border)",
+            animation: "listen-pop 160ms ease-out",
+          }}
+        >
+          <span
+            aria-hidden
+            className="absolute right-full top-1/2 -translate-y-1/2"
+            style={{
+              width: 0,
+              height: 0,
+              borderTop: "5px solid transparent",
+              borderBottom: "5px solid transparent",
+              borderRight: "6px solid var(--border)",
+            }}
+          />
+          Audio recitations coming soon
+        </div>
+      )}
+
+      <style>{`@keyframes listen-pop { from { opacity: 0; transform: translate(-4px, -50%);} to { opacity: 1; transform: translate(0, -50%);} }`}</style>
+    </div>
   );
 }
