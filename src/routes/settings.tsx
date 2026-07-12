@@ -11,7 +11,18 @@ import {
   type ThemeMode,
 } from "@/lib/theme";
 import { getStreak, resetToday, getLifetime, type LifetimeCounts } from "@/lib/storage";
-import { requestNotificationPermission, getNotificationPermission } from "@/lib/onesignal";
+import {
+  getNotificationPrefs,
+  setNotificationPrefs,
+  requestNotificationPermission,
+  checkNotificationPermission,
+  applyReminders,
+  scheduleReminder,
+  cancelReminder,
+  isNativePlatform,
+  type NotificationPrefs,
+  type ReminderId,
+} from "@/lib/notifications";
 
 export const Route = createFileRoute("/settings")({
   head: () => ({ meta: [{ title: "Settings — My Adhkar" }] }),
@@ -28,6 +39,8 @@ function Settings() {
   const [display, setDisplayState] = useState(getDisplay());
   const [confirmReset, setConfirmReset] = useState(false);
   const [notifEnabled, setNotifEnabled] = useState(false);
+  const [notifPrefs, setNotifPrefsState] = useState<NotificationPrefs>(() => getNotificationPrefs());
+  const nativeAvailable = isNativePlatform();
   const [lifetime, setLifetime] = useState<LifetimeCounts>({
     total: 0,
     morning: 0,
@@ -41,13 +54,15 @@ function Settings() {
     setStreak(getStreak());
     setDisplayState(getDisplay());
     setLifetime(getLifetime());
-    const check = () => setNotifEnabled(getNotificationPermission());
-    check();
-    const id = setInterval(check, 1000);
+    setNotifPrefsState(getNotificationPrefs());
+    let cancelled = false;
+    checkNotificationPermission().then((v) => {
+      if (!cancelled) setNotifEnabled(v);
+    });
     const onLife = () => setLifetime(getLifetime());
     window.addEventListener("adhkar:lifetime-update", onLife);
     return () => {
-      clearInterval(id);
+      cancelled = true;
       window.removeEventListener("adhkar:lifetime-update", onLife);
     };
   }, []);
@@ -55,7 +70,41 @@ function Settings() {
   const handleEnableNotifications = async () => {
     const granted = await requestNotificationPermission();
     setNotifEnabled(granted);
+    if (granted) {
+      // Re-apply saved schedule now that permission is available.
+      await applyReminders(notifPrefs);
+    }
   };
+
+  const updateReminder = async (
+    id: ReminderId,
+    patch: Partial<NotificationPrefs["morning"]>,
+  ) => {
+    const next: NotificationPrefs = {
+      ...notifPrefs,
+      [id]: { ...notifPrefs[id], ...patch },
+    };
+    setNotifPrefsState(next);
+    setNotificationPrefs(next);
+    const r = next[id];
+    if (r.enabled && notifEnabled) {
+      await scheduleReminder(id, r.hour, r.minute);
+    } else {
+      await cancelReminder(id);
+    }
+  };
+
+  const parseTime = (v: string): { hour: number; minute: number } => {
+    const [h, m] = v.split(":").map((n) => parseInt(n, 10));
+    return {
+      hour: Number.isFinite(h) ? Math.max(0, Math.min(23, h)) : 0,
+      minute: Number.isFinite(m) ? Math.max(0, Math.min(59, m)) : 0,
+    };
+  };
+
+  const formatTime = (hour: number, minute: number) =>
+    `${String(hour).padStart(2, "0")}:${String(minute).padStart(2, "0")}`;
+
 
   const choose = (m: ThemeMode) => {
     setModeState(m);
@@ -217,25 +266,90 @@ function Settings() {
               className="rounded-[24px] p-4"
               style={{ background: "var(--surface)", border: "1px solid var(--border)" }}
             >
-              <div className="text-sm" style={{ fontWeight: 600 }}>
-                Daily Adhkar Reminders
-              </div>
-              <div className="mt-1 text-xs opacity-70">Morning at 5:00 AM, Evening at 4:30 PM</div>
-              {notifEnabled ? (
-                <div className="mt-3 flex items-center justify-between text-xs">
-                  <span className="opacity-70">Reminders enabled ✓</span>
-                </div>
+              {!nativeAvailable ? (
+                <>
+                  <div className="text-sm" style={{ fontWeight: 600 }}>
+                    Daily Adhkar Reminders
+                  </div>
+                  <div className="mt-1 text-xs opacity-70">
+                    Reminders are unavailable on the web. Install the mobile app to
+                    get local device notifications at your chosen times.
+                  </div>
+                </>
+              ) : !notifEnabled ? (
+                <>
+                  <div className="text-sm" style={{ fontWeight: 600 }}>
+                    Daily Adhkar Reminders
+                  </div>
+                  <div className="mt-1 text-xs opacity-70">
+                    Get a local notification on your device every morning and
+                    evening — no internet needed.
+                  </div>
+                  <button
+                    onClick={handleEnableNotifications}
+                    className="mt-3 w-full rounded-full py-2 text-sm font-semibold"
+                    style={{ background: "#c9a84c", color: "#ffffff" }}
+                  >
+                    Enable Reminders
+                  </button>
+                </>
               ) : (
-                <button
-                  onClick={handleEnableNotifications}
-                  className="mt-3 w-full rounded-full py-2 text-sm font-semibold"
-                  style={{ background: "#c9a84c", color: "#ffffff" }}
-                >
-                  Enable Reminders
-                </button>
+                <div className="space-y-3">
+                  {(["morning", "evening"] as ReminderId[]).map((id) => {
+                    const r = notifPrefs[id];
+                    const label = id === "morning" ? "Morning reminder" : "Evening reminder";
+                    return (
+                      <div
+                        key={id}
+                        className="flex items-center justify-between gap-3 rounded-2xl px-3 py-2.5"
+                        style={{
+                          background: "var(--background)",
+                          border: "1px solid var(--border)",
+                        }}
+                      >
+                        <div className="flex min-w-0 flex-col">
+                          <span className="text-sm font-semibold">{label}</span>
+                          <input
+                            type="time"
+                            value={formatTime(r.hour, r.minute)}
+                            onChange={(e) => {
+                              const { hour, minute } = parseTime(e.target.value);
+                              void updateReminder(id, { hour, minute });
+                            }}
+                            disabled={!r.enabled}
+                            className="mt-1 rounded-md bg-transparent text-sm font-semibold outline-none"
+                            style={{
+                              color: "var(--foreground)",
+                              opacity: r.enabled ? 1 : 0.5,
+                            }}
+                          />
+                        </div>
+                        <button
+                          onClick={() => void updateReminder(id, { enabled: !r.enabled })}
+                          className="relative inline-block h-6 w-11 shrink-0 rounded-full transition"
+                          style={{
+                            background: r.enabled
+                              ? "var(--accent)"
+                              : "color-mix(in oklab, var(--foreground) 20%, transparent)",
+                          }}
+                          aria-label={`Toggle ${label}`}
+                        >
+                          <span
+                            className="absolute top-0.5 h-5 w-5 rounded-full bg-white transition-all"
+                            style={{ left: r.enabled ? 22 : 2 }}
+                          />
+                        </button>
+                      </div>
+                    );
+                  })}
+                  <div className="text-[11px] opacity-60">
+                    Reminders fire on your device using your local time.
+                  </div>
+                </div>
               )}
             </div>
           </section>
+
 
           <section className="mb-6 space-y-3">
             <h2 className="label-caps mb-1">Display</h2>
