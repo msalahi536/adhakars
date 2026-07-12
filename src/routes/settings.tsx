@@ -49,6 +49,7 @@ function Settings() {
     evening: 0,
     salah: 0,
     tasbih: 0,
+    custom: 0,
   });
 
   useEffect(() => {
