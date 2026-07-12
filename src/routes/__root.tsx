@@ -64,13 +64,13 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1, viewport-fit=cover" },
-      { title: "My Adhkar" },
+      { title: "Adhkar as-Sahih" },
       { name: "description", content: "Personal daily Islamic adhkar and tasbih." },
       { name: "theme-color", content: "#1f3d2b" },
       { name: "apple-mobile-web-app-capable", content: "yes" },
       { name: "apple-mobile-web-app-status-bar-style", content: "black-translucent" },
-      { property: "og:title", content: "My Adhkar" },
-      { name: "twitter:title", content: "My Adhkar" },
+      { property: "og:title", content: "Adhkar as-Sahih" },
+      { name: "twitter:title", content: "Adhkar as-Sahih" },
       { property: "og:description", content: "Personal daily Islamic adhkar and tasbih." },
       { name: "twitter:description", content: "Personal daily Islamic adhkar and tasbih." },
       {

@@ -5,8 +5,8 @@ import { ConcentricCirclesPattern } from "@/components/HeaderPatterns";
 export const Route = createFileRoute("/terms")({
   head: () => ({
     meta: [
-      { title: "Terms of Service, My Adhkar" },
-      { name: "description", content: "Terms of service for the My Adhkar app." },
+      { title: "Terms of Service, Adhkar as-Sahih" },
+      { name: "description", content: "Terms of service for the Adhkar as-Sahih app." },
     ],
   }),
   component: Terms,
@@ -15,11 +15,11 @@ export const Route = createFileRoute("/terms")({
 const SECTIONS: { heading: string; body: string }[] = [
   {
     heading: "The app",
-    body: "My Adhkar is provided free of charge, as is, without warranty of any kind. It is offered as a benefit to the community and is not a substitute for scholarly guidance.",
+    body: "Adhkar as-Sahih is provided free of charge, as is, and without warranty of any kind. It is offered as a benefit to the community and is not a substitute for scholarly guidance. For any ruling or religious question, please return to the people of knowledge.",
   },
   {
     heading: "Accuracy",
-    body: "Every effort has been made to include only authentic narrations with clear sources. If you find an error, please report it and it will be corrected.",
+    body: "Every adhkar in this app is presented with its source so that you can verify it. Every effort has been made to be accurate. If you find a mistake, please report it and it will be corrected.",
   },
   {
     heading: "Your content",
@@ -27,11 +27,11 @@ const SECTIONS: { heading: string; body: string }[] = [
   },
   {
     heading: "Donations",
-    body: "Donations are voluntary, are not payment for any feature or content, and are non refundable. Every feature of the app is free whether you donate or not.",
+    body: "Donations are voluntary. They are not payment for any feature or content, they unlock nothing, and they are non refundable. Every part of this app is free whether you donate or not.",
   },
   {
     heading: "Limitation of liability",
-    body: "This app is provided without warranty. We are not liable for any loss of data, including counts, streaks, or custom adhkar.",
+    body: "This app is provided without warranty. We are not responsible for any loss of data, including counts, streaks, or custom adhkar.",
   },
   {
     heading: "Changes",
@@ -67,7 +67,7 @@ function Terms() {
         <div className="mx-auto max-w-md px-4 py-4 space-y-4 text-sm leading-relaxed">
           <p style={{ color: "var(--muted-foreground)" }}>Last updated: July 2026</p>
           <p style={{ color: "var(--foreground)" }}>
-            By using My Adhkar you agree to these terms.
+            By using Adhkar as-Sahih you agree to these terms.
           </p>
           {SECTIONS.map((s) => (
             <section key={s.heading}>

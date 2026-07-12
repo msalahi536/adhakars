@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import type { Dhikr } from "@/data/adhkar";
 import { ProgressRing } from "./ProgressRing";
+import { ListenButton } from "./ListenButton";
 import { getDisplay, triggerHaptic } from "@/lib/theme";
 
 type Props = {
@@ -14,7 +15,7 @@ type Props = {
   isPersonalDua?: boolean;
 };
 
-export function DhikrCard({ dhikr, count, onIncrement, index, total, isSpecial, specialLabel, isPersonalDua }: Props) {
+export function DhikrCard({ dhikr, count, onIncrement, isSpecial, specialLabel, isPersonalDua }: Props) {
   const [tapped, setTapped] = useState(false);
   const [bursts, setBursts] = useState<number[]>([]);
   const [display, setDisplay] = useState(getDisplay());
@@ -70,19 +71,13 @@ export function DhikrCard({ dhikr, count, onIncrement, index, total, isSpecial, 
       style={{ background: "var(--card)", color: "var(--card-foreground)", border: "1px solid var(--border)", boxShadow: "var(--card-shadow, 0 4px 16px rgba(0,0,0,0.08))" }}
     >
       <div className="flex items-center gap-3 px-5 pt-5">
-        <span
-          className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-xs font-bold"
-          style={{ background: "var(--index-badge-bg, var(--accent))", color: "var(--index-badge-fg, var(--accent-foreground))" }}
-        >
-          {index}
-        </span>
+        <ListenButton dhikrId={dhikr.id} size={32} />
         <h3
           className="flex-1 text-[12px] font-semibold uppercase"
           style={{ letterSpacing: "0.12em", color: "var(--card-foreground)", opacity: 0.85 }}
         >
           {dhikr.title}
         </h3>
-        <span className="text-[11px] opacity-60">{index}/{total}</span>
       </div>
 
       {isSpecial && specialLabel && (

@@ -5,8 +5,8 @@ import { ConcentricCirclesPattern } from "@/components/HeaderPatterns";
 export const Route = createFileRoute("/privacy")({
   head: () => ({
     meta: [
-      { title: "Privacy Policy, My Adhkar" },
-      { name: "description", content: "Privacy policy for the My Adhkar app." },
+      { title: "Privacy Policy, Adhkar as-Sahih" },
+      { name: "description", content: "Privacy policy for the Adhkar as-Sahih app." },
     ],
   }),
   component: Privacy,
@@ -15,15 +15,19 @@ export const Route = createFileRoute("/privacy")({
 const SECTIONS: { heading: string; body: string }[] = [
   {
     heading: "What is stored",
-    body: "Your counts, streaks, lifetime totals, display preferences, and any custom adhkar you create are saved locally on your device only. This information never leaves your phone and is not sent to us or to anyone else.",
+    body: "Your counts, streaks, lifetime totals, display preferences, and any custom adhkar you create are saved locally on your device. This information never leaves your device and is never sent to us or to anyone else.",
+  },
+  {
+    heading: "Cookies and local storage",
+    body: "This app does not use advertising or tracking cookies. It uses your device's local storage only to remember your progress and preferences so the app works between sessions. This data stays on your device and is cleared when you reset your progress or uninstall the app.",
   },
   {
     heading: "Location",
-    body: "The Qibla Finder uses your device location and motion sensors to calculate the direction of the Ka'bah. This happens entirely on your device. Your location is never stored, logged, or transmitted.",
+    body: "The Qibla Finder uses your device location and motion sensors to calculate the direction of the Ka'bah. This calculation happens entirely on your device. Your location is never stored, logged, or transmitted.",
   },
   {
     heading: "Notifications",
-    body: "Daily reminders are scheduled locally on your device using your device clock. No reminder data is sent to any server.",
+    body: "Daily reminders are scheduled on your device using your device clock. No reminder data is sent to any server.",
   },
   {
     heading: "Deleting your data",
@@ -67,7 +71,9 @@ function Privacy() {
         <div className="mx-auto max-w-md px-4 py-4 space-y-4 text-sm leading-relaxed">
           <p style={{ color: "var(--muted-foreground)" }}>Last updated: July 2026</p>
           <p style={{ color: "var(--foreground)" }}>
-            My Adhkar does not collect, transmit, or store any personal data.
+            Adhkar as-Sahih does not collect, transmit, or store any personal
+            data. There are no analytics, no advertising, and no tracking of
+            any kind.
           </p>
           {SECTIONS.map((s) => (
             <section key={s.heading}>

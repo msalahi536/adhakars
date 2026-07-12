@@ -8,7 +8,7 @@ import { getStreak, getLifetime, type LifetimeCounts } from "@/lib/storage";
 export const Route = createFileRoute("/more")({
   head: () => ({
     meta: [
-      { title: "More, My Adhkar" },
+      { title: "More, Adhkar as-Sahih" },
       { name: "description", content: "Sleep & Wake adhkar, Qibla finder and more tools." },
     ],
   }),
