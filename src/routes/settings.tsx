@@ -11,7 +11,18 @@ import {
   type ThemeMode,
 } from "@/lib/theme";
 import { getStreak, resetToday, getLifetime, type LifetimeCounts } from "@/lib/storage";
-import { requestNotificationPermission, getNotificationPermission } from "@/lib/onesignal";
+import {
+  getNotificationPrefs,
+  setNotificationPrefs,
+  requestNotificationPermission,
+  checkNotificationPermission,
+  applyReminders,
+  scheduleReminder,
+  cancelReminder,
+  isNativePlatform,
+  type NotificationPrefs,
+  type ReminderId,
+} from "@/lib/notifications";
 
 export const Route = createFileRoute("/settings")({
   head: () => ({ meta: [{ title: "Settings — My Adhkar" }] }),
