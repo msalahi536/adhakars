@@ -12,7 +12,14 @@ import {
   setDisplay,
   type ThemeMode,
 } from "@/lib/theme";
-import { resetToday, resetAllProgress } from "@/lib/storage";
+import {
+  resetToday,
+  resetAllProgress,
+  getCommitment,
+  setCommitment,
+  getCustomAdhkarRows,
+  type CommitmentSection,
+} from "@/lib/storage";
 import {
   getNotificationPrefs,
   setNotificationPrefs,
