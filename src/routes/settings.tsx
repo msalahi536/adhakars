@@ -250,7 +250,8 @@ function Settings() {
               onChange={(v) => updateDisplay({ arabicLarge: v })}
             />
             <Toggle
-              label="Haptic feedback"
+              label="Vibration on tap"
+              description="Vibrate when tapping counters and the tasbih."
               value={display.haptics}
               onChange={(v) => updateDisplay({ haptics: v })}
             />
@@ -326,22 +327,29 @@ function Settings() {
 
 function Toggle({
   label,
+  description,
   value,
   onChange,
 }: {
   label: string;
+  description?: string;
   value: boolean;
   onChange: (v: boolean) => void;
 }) {
   return (
     <button
       onClick={() => onChange(!value)}
-      className="flex w-full items-center justify-between rounded-2xl px-4 py-3 text-sm font-semibold"
+      className="flex w-full items-center justify-between gap-3 rounded-2xl px-4 py-3 text-left text-sm font-semibold"
       style={{ background: "var(--surface)", border: "1px solid var(--border)" }}
     >
-      <span>{label}</span>
+      <span className="flex min-w-0 flex-col">
+        <span>{label}</span>
+        {description && (
+          <span className="mt-0.5 text-xs font-normal opacity-70">{description}</span>
+        )}
+      </span>
       <span
-        className="relative inline-block h-6 w-11 rounded-full transition"
+        className="relative inline-block h-6 w-11 shrink-0 rounded-full transition"
         style={{
           background: value
             ? "var(--accent)"

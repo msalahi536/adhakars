@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import type { Dhikr } from "@/data/adhkar";
 import { ProgressRing } from "./ProgressRing";
-import { getDisplay, vibrateIfEnabled } from "@/lib/theme";
+import { getDisplay, triggerHaptic } from "@/lib/theme";
 
 type Props = {
   dhikr: Dhikr;
@@ -43,10 +43,10 @@ export function DhikrCard({ dhikr, count, onIncrement, index, total, isSpecial, 
 
   const handleTap = () => {
     if (complete) return;
-    vibrateIfEnabled(15);
+    const willComplete = count + 1 >= dhikr.target;
+    triggerHaptic(willComplete ? "medium" : "light");
     setTapped(true);
     setTimeout(() => setTapped(false), 260);
-    const willComplete = count + 1 >= dhikr.target;
     if (willComplete) {
       const id = Date.now();
       setBursts((b) => [...b, id]);

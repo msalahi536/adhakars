@@ -87,20 +87,51 @@ function Tasbih() {
   return (
     <>
       <header
-        className="page-header"
+        className="page-header relative overflow-hidden"
         style={{ background: "var(--grad-header)", color: "var(--header-fg)" }}
       >
-        <div className="mx-auto max-w-md px-5 pb-4 pt-5">
-          <div className="label-caps" style={{ color: "var(--header-sub)", opacity: 1 }}>
+        {/* Decorative overlay */}
+        <div
+          aria-hidden
+          className="pointer-events-none absolute inset-0"
+          style={{
+            background:
+              "radial-gradient(120% 80% at 100% 0%, color-mix(in oklab, var(--header-fg) 18%, transparent) 0%, transparent 55%), radial-gradient(80% 60% at 0% 100%, color-mix(in oklab, var(--accent) 22%, transparent) 0%, transparent 60%)",
+            opacity: 0.55,
+          }}
+        />
+        <div
+          aria-hidden
+          className="pointer-events-none absolute -right-6 -top-6 h-32 w-32 rounded-full"
+          style={{
+            border: "1px solid color-mix(in oklab, var(--header-fg) 25%, transparent)",
+            opacity: 0.4,
+          }}
+        />
+        <div
+          aria-hidden
+          className="pointer-events-none absolute -right-2 -top-2 h-20 w-20 rounded-full"
+          style={{
+            border: "1px solid color-mix(in oklab, var(--header-fg) 30%, transparent)",
+            opacity: 0.35,
+          }}
+        />
+        <div className="relative mx-auto max-w-md px-5 pb-5 pt-6 text-center">
+          <div
+            className="label-caps"
+            style={{ color: "var(--header-sub)", opacity: 1, letterSpacing: "0.2em" }}
+          >
             Dhikr Counter
           </div>
-          <h1 className="mt-1 text-2xl font-bold tracking-tight">Tasbih</h1>
-
-          {/* Cycle target selector — matches Salah pills */}
-          <div
-            className="hide-scrollbar -mx-5 mt-4 flex gap-2 overflow-x-auto px-5 pb-1"
-            style={{ scrollbarWidth: "none" }}
+          <h1
+            className="mt-1.5 font-bold tracking-tight"
+            style={{ fontSize: 34, lineHeight: 1.1 }}
           >
+            Tasbih
+          </h1>
+
+          {/* Cycle target selector — centered, all four fit */}
+          <div className="mt-4 flex items-center justify-center gap-2">
             {MILESTONES.map((t) => {
               const active = milestone === t;
               const label = t === 0 ? "∞" : String(t);
@@ -110,12 +141,14 @@ function Tasbih() {
                   onClick={() => setMilestone(t)}
                   className="flex shrink-0 items-center justify-center font-bold transition-all active:scale-95"
                   style={{
-                    minWidth: 70,
+                    flex: "1 1 0",
+                    maxWidth: 78,
                     height: 36,
                     borderRadius: 18,
-                    padding: "0 16px",
                     fontSize: 13,
-                    background: active ? "var(--accent)" : "color-mix(in oklab, var(--header-fg) 15%, transparent)",
+                    background: active
+                      ? "var(--accent)"
+                      : "color-mix(in oklab, var(--header-fg) 15%, transparent)",
                     color: active ? "var(--accent-foreground)" : "var(--header-fg)",
                     border: "none",
                   }}
@@ -142,7 +175,7 @@ function Tasbih() {
             onPointerUp={() => setPressed(false)}
             onPointerLeave={() => setPressed(false)}
             onPointerCancel={() => setPressed(false)}
-            className="relative flex w-full flex-1 flex-col items-center justify-center overflow-hidden rounded-[24px] outline-none"
+            className="relative flex w-full flex-col items-center justify-center overflow-hidden rounded-[24px] outline-none"
             style={{
               background: "var(--card)",
               color: "var(--card-foreground)",
@@ -150,9 +183,8 @@ function Tasbih() {
               boxShadow: "var(--card-shadow, 0 4px 16px rgba(0,0,0,0.08))",
               transform: pressed ? "scale(0.985)" : "scale(1)",
               transition: "transform 120ms ease",
-              padding: "32px 20px",
+              padding: "28px 20px 32px",
               touchAction: "manipulation",
-              minHeight: 380,
               cursor: "pointer",
               userSelect: "none",
             }}
