@@ -14,12 +14,10 @@ import { Route as SleepRouteImport } from './routes/sleep'
 import { Route as SettingsRouteImport } from './routes/settings'
 import { Route as SalahRouteImport } from './routes/salah'
 import { Route as QiblaRouteImport } from './routes/qibla'
+import { Route as MyAdhkarRouteImport } from './routes/my-adhkar'
 import { Route as MoreRouteImport } from './routes/more'
 import { Route as EveningRouteImport } from './routes/evening'
-import { Route as AuthRouteImport } from './routes/auth'
-import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as AuthenticatedMyAdhkarRouteImport } from './routes/_authenticated/my-adhkar'
 
 const TasbihRoute = TasbihRouteImport.update({
   id: '/tasbih',
@@ -46,6 +44,11 @@ const QiblaRoute = QiblaRouteImport.update({
   path: '/qibla',
   getParentRoute: () => rootRouteImport,
 } as any)
+const MyAdhkarRoute = MyAdhkarRouteImport.update({
+  id: '/my-adhkar',
+  path: '/my-adhkar',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const MoreRoute = MoreRouteImport.update({
   id: '/more',
   path: '/more',
@@ -56,110 +59,87 @@ const EveningRoute = EveningRouteImport.update({
   path: '/evening',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AuthRoute = AuthRouteImport.update({
-  id: '/auth',
-  path: '/auth',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
-  id: '/_authenticated',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AuthenticatedMyAdhkarRoute = AuthenticatedMyAdhkarRouteImport.update({
-  id: '/my-adhkar',
-  path: '/my-adhkar',
-  getParentRoute: () => AuthenticatedRouteRoute,
-} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/auth': typeof AuthRoute
   '/evening': typeof EveningRoute
   '/more': typeof MoreRoute
+  '/my-adhkar': typeof MyAdhkarRoute
   '/qibla': typeof QiblaRoute
   '/salah': typeof SalahRoute
   '/settings': typeof SettingsRoute
   '/sleep': typeof SleepRoute
   '/tasbih': typeof TasbihRoute
-  '/my-adhkar': typeof AuthenticatedMyAdhkarRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/auth': typeof AuthRoute
   '/evening': typeof EveningRoute
   '/more': typeof MoreRoute
+  '/my-adhkar': typeof MyAdhkarRoute
   '/qibla': typeof QiblaRoute
   '/salah': typeof SalahRoute
   '/settings': typeof SettingsRoute
   '/sleep': typeof SleepRoute
   '/tasbih': typeof TasbihRoute
-  '/my-adhkar': typeof AuthenticatedMyAdhkarRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
-  '/auth': typeof AuthRoute
   '/evening': typeof EveningRoute
   '/more': typeof MoreRoute
+  '/my-adhkar': typeof MyAdhkarRoute
   '/qibla': typeof QiblaRoute
   '/salah': typeof SalahRoute
   '/settings': typeof SettingsRoute
   '/sleep': typeof SleepRoute
   '/tasbih': typeof TasbihRoute
-  '/_authenticated/my-adhkar': typeof AuthenticatedMyAdhkarRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
-    | '/auth'
     | '/evening'
     | '/more'
+    | '/my-adhkar'
     | '/qibla'
     | '/salah'
     | '/settings'
     | '/sleep'
     | '/tasbih'
-    | '/my-adhkar'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
-    | '/auth'
     | '/evening'
     | '/more'
+    | '/my-adhkar'
     | '/qibla'
     | '/salah'
     | '/settings'
     | '/sleep'
     | '/tasbih'
-    | '/my-adhkar'
   id:
     | '__root__'
     | '/'
-    | '/_authenticated'
-    | '/auth'
     | '/evening'
     | '/more'
+    | '/my-adhkar'
     | '/qibla'
     | '/salah'
     | '/settings'
     | '/sleep'
     | '/tasbih'
-    | '/_authenticated/my-adhkar'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
-  AuthRoute: typeof AuthRoute
   EveningRoute: typeof EveningRoute
   MoreRoute: typeof MoreRoute
+  MyAdhkarRoute: typeof MyAdhkarRoute
   QiblaRoute: typeof QiblaRoute
   SalahRoute: typeof SalahRoute
   SettingsRoute: typeof SettingsRoute
@@ -204,6 +184,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof QiblaRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/my-adhkar': {
+      id: '/my-adhkar'
+      path: '/my-adhkar'
+      fullPath: '/my-adhkar'
+      preLoaderRoute: typeof MyAdhkarRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/more': {
       id: '/more'
       path: '/more'
@@ -218,20 +205,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof EveningRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/auth': {
-      id: '/auth'
-      path: '/auth'
-      fullPath: '/auth'
-      preLoaderRoute: typeof AuthRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/_authenticated': {
-      id: '/_authenticated'
-      path: ''
-      fullPath: '/'
-      preLoaderRoute: typeof AuthenticatedRouteRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/': {
       id: '/'
       path: '/'
@@ -239,33 +212,14 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/_authenticated/my-adhkar': {
-      id: '/_authenticated/my-adhkar'
-      path: '/my-adhkar'
-      fullPath: '/my-adhkar'
-      preLoaderRoute: typeof AuthenticatedMyAdhkarRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
   }
 }
 
-interface AuthenticatedRouteRouteChildren {
-  AuthenticatedMyAdhkarRoute: typeof AuthenticatedMyAdhkarRoute
-}
-
-const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
-  AuthenticatedMyAdhkarRoute: AuthenticatedMyAdhkarRoute,
-}
-
-const AuthenticatedRouteRouteWithChildren =
-  AuthenticatedRouteRoute._addFileChildren(AuthenticatedRouteRouteChildren)
-
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
-  AuthRoute: AuthRoute,
   EveningRoute: EveningRoute,
   MoreRoute: MoreRoute,
+  MyAdhkarRoute: MyAdhkarRoute,
   QiblaRoute: QiblaRoute,
   SalahRoute: SalahRoute,
   SettingsRoute: SettingsRoute,
