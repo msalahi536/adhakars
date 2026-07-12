@@ -130,9 +130,12 @@ function Tasbih() {
 
       <main className="scroll-area flex flex-col">
         <div className="mx-auto flex min-h-0 w-full max-w-md flex-1 flex-col px-4 pt-4">
-          <button
+          <div
+            role="button"
+            tabIndex={0}
             onPointerDown={(e) => {
-              e.preventDefault();
+              const target = e.target as HTMLElement;
+              if (target.closest("[data-no-tap]")) return;
               setPressed(true);
               tap();
             }}
@@ -150,6 +153,8 @@ function Tasbih() {
               padding: "32px 20px",
               touchAction: "manipulation",
               minHeight: 380,
+              cursor: "pointer",
+              userSelect: "none",
             }}
             aria-label="tap to count"
           >
@@ -244,7 +249,7 @@ function Tasbih() {
                 Hold reset 1.5s to clear
               </div>
             </div>
-          </button>
+          </div>
         </div>
 
         {toast && (
