@@ -175,7 +175,7 @@ function Tasbih() {
             onPointerUp={() => setPressed(false)}
             onPointerLeave={() => setPressed(false)}
             onPointerCancel={() => setPressed(false)}
-            className="relative flex w-full flex-col items-center justify-center overflow-hidden rounded-[24px] outline-none"
+            className="relative flex w-full flex-1 flex-col items-center justify-center overflow-hidden rounded-[24px] outline-none"
             style={{
               background: "var(--card)",
               color: "var(--card-foreground)",
