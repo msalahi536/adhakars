@@ -13,7 +13,6 @@ import {
 import appCss from "../styles.css?url";
 import { BottomNav } from "@/components/BottomNav";
 import { Onboarding, hasOnboarded } from "@/components/Onboarding";
-import { useState } from "react";
 
 import { applyTheme, getMode, resolveTheme } from "@/lib/theme";
 import { reconcileStreak } from "@/lib/storage";
