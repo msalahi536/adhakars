@@ -14,6 +14,7 @@ import { Route as SleepRouteImport } from './routes/sleep'
 import { Route as SettingsRouteImport } from './routes/settings'
 import { Route as SalahRouteImport } from './routes/salah'
 import { Route as QiblaRouteImport } from './routes/qibla'
+import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as MyAdhkarRouteImport } from './routes/my-adhkar'
 import { Route as MoreRouteImport } from './routes/more'
 import { Route as EveningRouteImport } from './routes/evening'
@@ -43,6 +44,11 @@ const SalahRoute = SalahRouteImport.update({
 const QiblaRoute = QiblaRouteImport.update({
   id: '/qibla',
   path: '/qibla',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PrivacyRoute = PrivacyRouteImport.update({
+  id: '/privacy',
+  path: '/privacy',
   getParentRoute: () => rootRouteImport,
 } as any)
 const MyAdhkarRoute = MyAdhkarRouteImport.update({
@@ -77,6 +83,7 @@ export interface FileRoutesByFullPath {
   '/evening': typeof EveningRoute
   '/more': typeof MoreRoute
   '/my-adhkar': typeof MyAdhkarRoute
+  '/privacy': typeof PrivacyRoute
   '/qibla': typeof QiblaRoute
   '/salah': typeof SalahRoute
   '/settings': typeof SettingsRoute
@@ -89,6 +96,7 @@ export interface FileRoutesByTo {
   '/evening': typeof EveningRoute
   '/more': typeof MoreRoute
   '/my-adhkar': typeof MyAdhkarRoute
+  '/privacy': typeof PrivacyRoute
   '/qibla': typeof QiblaRoute
   '/salah': typeof SalahRoute
   '/settings': typeof SettingsRoute
@@ -102,6 +110,7 @@ export interface FileRoutesById {
   '/evening': typeof EveningRoute
   '/more': typeof MoreRoute
   '/my-adhkar': typeof MyAdhkarRoute
+  '/privacy': typeof PrivacyRoute
   '/qibla': typeof QiblaRoute
   '/salah': typeof SalahRoute
   '/settings': typeof SettingsRoute
@@ -116,6 +125,7 @@ export interface FileRouteTypes {
     | '/evening'
     | '/more'
     | '/my-adhkar'
+    | '/privacy'
     | '/qibla'
     | '/salah'
     | '/settings'
@@ -128,6 +138,7 @@ export interface FileRouteTypes {
     | '/evening'
     | '/more'
     | '/my-adhkar'
+    | '/privacy'
     | '/qibla'
     | '/salah'
     | '/settings'
@@ -140,6 +151,7 @@ export interface FileRouteTypes {
     | '/evening'
     | '/more'
     | '/my-adhkar'
+    | '/privacy'
     | '/qibla'
     | '/salah'
     | '/settings'
@@ -153,6 +165,7 @@ export interface RootRouteChildren {
   EveningRoute: typeof EveningRoute
   MoreRoute: typeof MoreRoute
   MyAdhkarRoute: typeof MyAdhkarRoute
+  PrivacyRoute: typeof PrivacyRoute
   QiblaRoute: typeof QiblaRoute
   SalahRoute: typeof SalahRoute
   SettingsRoute: typeof SettingsRoute
@@ -195,6 +208,13 @@ declare module '@tanstack/react-router' {
       path: '/qibla'
       fullPath: '/qibla'
       preLoaderRoute: typeof QiblaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/privacy': {
+      id: '/privacy'
+      path: '/privacy'
+      fullPath: '/privacy'
+      preLoaderRoute: typeof PrivacyRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/my-adhkar': {
@@ -241,6 +261,7 @@ const rootRouteChildren: RootRouteChildren = {
   EveningRoute: EveningRoute,
   MoreRoute: MoreRoute,
   MyAdhkarRoute: MyAdhkarRoute,
+  PrivacyRoute: PrivacyRoute,
   QiblaRoute: QiblaRoute,
   SalahRoute: SalahRoute,
   SettingsRoute: SettingsRoute,
