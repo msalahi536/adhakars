@@ -100,36 +100,67 @@ function More() {
             <p className="mt-2 text-sm font-semibold" style={{ color: "#ffffff" }}>
               You have remembered Allah on {consistency.completedCount} of the last 30 days.
             </p>
-            <div
-              className="mt-3 grid gap-1"
-              style={{ gridTemplateColumns: "repeat(15, minmax(0, 1fr))" }}
-            >
-              {consistency.days.map((d) => {
-                const isToday = d.date === todayDate;
-                let bg = "transparent";
-                let border = "1px solid rgba(255,255,255,0.25)";
-                if (d.status === "complete") {
-                  bg = "#c9a84c";
-                  border = "1px solid #c9a84c";
-                } else if (d.status === "grace") {
-                  bg = "#f5c542";
-                  border = "1px solid #f5c542";
-                }
-                return (
-                  <div
-                    key={d.date}
-                    title={d.date}
-                    style={{
-                      aspectRatio: "1 / 1",
-                      borderRadius: 6,
-                      background: bg,
-                      border,
-                      boxShadow: isToday ? "0 0 0 2px rgba(255,255,255,0.9)" : undefined,
-                    }}
-                  />
-                );
-              })}
-            </div>
+            {(() => {
+              const now = new Date();
+              const year = now.getFullYear();
+              const month = now.getMonth();
+              const firstDow = new Date(year, month, 1).getDay();
+              const daysInMonth = new Date(year, month + 1, 0).getDate();
+              const statusByDate = new Map(consistency.days.map((d) => [d.date, d.status]));
+              const pad = (n: number) => String(n).padStart(2, "0");
+              const monthLabel = now.toLocaleString(undefined, { month: "long", year: "numeric" });
+              const weekdays = ["S", "M", "T", "W", "T", "F", "S"];
+              const cells: Array<{ key: string; date?: string; day?: number }> = [];
+              for (let i = 0; i < firstDow; i++) cells.push({ key: `b${i}` });
+              for (let d = 1; d <= daysInMonth; d++) {
+                cells.push({ key: `d${d}`, date: `${year}-${pad(month + 1)}-${pad(d)}`, day: d });
+              }
+              return (
+                <>
+                  <div className="mt-3 text-[11px] font-semibold uppercase tracking-wider" style={{ color: "rgba(255,255,255,0.7)" }}>
+                    {monthLabel}
+                  </div>
+                  <div className="mt-2 grid gap-1" style={{ gridTemplateColumns: "repeat(7, minmax(0, 1fr))" }}>
+                    {weekdays.map((w, i) => (
+                      <div key={`w${i}`} className="text-center text-[10px]" style={{ color: "rgba(255,255,255,0.55)" }}>{w}</div>
+                    ))}
+                    {cells.map((c) => {
+                      if (!c.date) return <div key={c.key} style={{ aspectRatio: "1 / 1" }} />;
+                      const status = statusByDate.get(c.date);
+                      const isToday = c.date === todayDate;
+                      const isFuture = c.date > todayDate;
+                      let bg = "transparent";
+                      let border = "1px solid rgba(255,255,255,0.25)";
+                      let color = "rgba(255,255,255,0.7)";
+                      if (status === "complete") {
+                        bg = "#c9a84c"; border = "1px solid #c9a84c"; color = "#1f3d2b";
+                      } else if (status === "grace") {
+                        bg = "#f5c542"; border = "1px solid #f5c542"; color = "#1f3d2b";
+                      } else if (isFuture) {
+                        border = "1px dashed rgba(255,255,255,0.15)"; color = "rgba(255,255,255,0.35)";
+                      }
+                      return (
+                        <div
+                          key={c.key}
+                          title={c.date}
+                          className="flex items-center justify-center text-[10px] font-semibold"
+                          style={{
+                            aspectRatio: "1 / 1",
+                            borderRadius: 6,
+                            background: bg,
+                            border,
+                            color,
+                            boxShadow: isToday ? "0 0 0 2px rgba(255,255,255,0.9)" : undefined,
+                          }}
+                        >
+                          {c.day}
+                        </div>
+                      );
+                    })}
+                  </div>
+                </>
+              );
+            })()}
             {consistency.graceUsedRecently && (
               <p className="mt-3 text-xs" style={{ color: "rgba(255,255,255,0.9)" }}>
                 You missed a day. Your streak is still going. Begin again today.
