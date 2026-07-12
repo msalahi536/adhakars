@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { AdhkarPage } from "@/components/AdhkarPage";
+import { GirihStarPattern } from "@/components/HeaderPatterns";
 import { morningAdhkar } from "@/data/adhkar";
 
 export const Route = createFileRoute("/")({
@@ -20,6 +21,7 @@ function Morning() {
       title="Morning Adhkar"
       subtitle="Between Fajr & Sunrise"
       list={morningAdhkar}
+      headerPattern={<GirihStarPattern />}
     />
   );
 }

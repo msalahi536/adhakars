@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
+import { SparseStarsPattern } from "@/components/HeaderPatterns";
 import {
   themes,
   getMode,
@@ -150,8 +151,12 @@ function Settings() {
 
   return (
     <>
-      <header className="page-header" style={{ background: "var(--background)" }}>
-        <div className="mx-auto max-w-md px-4 pb-5 pt-4">
+      <header
+        className="page-header relative overflow-hidden"
+        style={{ background: "var(--background)", color: "var(--foreground)" }}
+      >
+        <SparseStarsPattern />
+        <div className="relative mx-auto max-w-md px-4 pb-5 pt-4">
           <div className="label-caps">Preferences</div>
           <h1 className="mt-1 text-3xl font-bold">Settings</h1>
         </div>

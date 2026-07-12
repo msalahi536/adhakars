@@ -3,6 +3,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { RotateCcw, Undo2 } from "lucide-react";
 import { ProgressRing } from "@/components/ProgressRing";
 import { HeaderSettingsButton } from "@/components/HeaderSettingsButton";
+import { MuqarnasPattern } from "@/components/HeaderPatterns";
 import { triggerHaptic } from "@/lib/theme";
 import { bumpLifetime } from "@/lib/storage";
 
@@ -91,32 +92,17 @@ function Tasbih() {
         className="page-header relative overflow-hidden"
         style={{ background: "var(--grad-header)", color: "var(--header-fg)" }}
       >
-        {/* Decorative overlay */}
+        {/* Soft radial glow (kept for depth) */}
         <div
           aria-hidden
           className="pointer-events-none absolute inset-0"
           style={{
             background:
-              "radial-gradient(120% 80% at 100% 0%, color-mix(in oklab, var(--header-fg) 18%, transparent) 0%, transparent 55%), radial-gradient(80% 60% at 0% 100%, color-mix(in oklab, var(--accent) 22%, transparent) 0%, transparent 60%)",
-            opacity: 0.55,
+              "radial-gradient(120% 80% at 100% 0%, color-mix(in oklab, var(--header-fg) 12%, transparent) 0%, transparent 55%)",
+            opacity: 0.5,
           }}
         />
-        <div
-          aria-hidden
-          className="pointer-events-none absolute -right-6 -top-6 h-32 w-32 rounded-full"
-          style={{
-            border: "1px solid color-mix(in oklab, var(--header-fg) 25%, transparent)",
-            opacity: 0.4,
-          }}
-        />
-        <div
-          aria-hidden
-          className="pointer-events-none absolute -right-2 -top-2 h-20 w-20 rounded-full"
-          style={{
-            border: "1px solid color-mix(in oklab, var(--header-fg) 30%, transparent)",
-            opacity: 0.35,
-          }}
-        />
+        <MuqarnasPattern />
         <HeaderSettingsButton />
         <div className="relative mx-auto max-w-md px-5 pb-5 pt-6 text-center">
           <div

@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { BedDouble, Compass, ChevronRight } from "lucide-react";
 import { HeaderSettingsButton } from "@/components/HeaderSettingsButton";
+import { SparseStarsPattern } from "@/components/HeaderPatterns";
 import { getStreak } from "@/lib/storage";
 
 export const Route = createFileRoute("/more")({
@@ -49,11 +50,12 @@ function More() {
   return (
     <>
       <header
-        className="page-header relative"
-        style={{ background: "var(--background)" }}
+        className="page-header relative overflow-hidden"
+        style={{ background: "var(--background)", color: "var(--foreground)" }}
       >
+        <SparseStarsPattern />
         <HeaderSettingsButton />
-        <div className="mx-auto max-w-md px-4 pb-5 pt-4">
+        <div className="relative mx-auto max-w-md px-4 pb-5 pt-4">
           <div className="label-caps">More</div>
           <h1 className="mt-1 text-3xl font-bold">Tools</h1>
           {streak > 0 && (
