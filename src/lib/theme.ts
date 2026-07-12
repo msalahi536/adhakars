@@ -58,7 +58,8 @@ export const triggerHaptic = async (strength: HapticStrength = "light") => {
   try {
     const cap = (window as unknown as { Capacitor?: { isNativePlatform?: () => boolean } }).Capacitor;
     if (cap?.isNativePlatform?.()) {
-      const mod = await import(/* @vite-ignore */ "@capacitor/haptics").catch(() => null);
+      const modName = "@capacitor/haptics";
+      const mod: any = await import(/* @vite-ignore */ modName).catch(() => null);
       if (mod?.Haptics && mod?.ImpactStyle) {
         const style =
           strength === "heavy"
