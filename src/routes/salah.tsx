@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { SwipeStack } from "@/components/SwipeStack";
+import { HeaderSettingsButton } from "@/components/HeaderSettingsButton";
 import { SALAH_PRAYERS, getSalahItems, isItemComplete, type SalahPrayer } from "@/data/salah";
 import { getCounts, setCount, clearCounts, bumpLifetime } from "@/lib/storage";
 
@@ -49,12 +50,13 @@ function Salah() {
   return (
     <>
       <header
-        className="page-header"
+        className="page-header relative"
         style={{
           background: "linear-gradient(135deg, #2e7d5e 0%, #1a5c42 100%)",
           color: "#ffffff",
         }}
       >
+        <HeaderSettingsButton />
         <div className="mx-auto max-w-md px-5 pb-4 pt-5">
           <div className="label-caps" style={{ color: "rgba(255,255,255,0.85)", opacity: 1 }}>
             After {selectedLabel}

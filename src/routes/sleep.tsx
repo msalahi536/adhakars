@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { SwipeStack } from "@/components/SwipeStack";
+import { HeaderSettingsButton } from "@/components/HeaderSettingsButton";
 import { sleepItems, wakeItems, type SleepMode } from "@/data/sleep";
 import { isItemComplete } from "@/data/salah";
 import { getCounts, setCount, clearCounts, bumpLifetime } from "@/lib/storage";
@@ -56,9 +57,10 @@ function Sleep() {
   return (
     <>
       <header
-        className="page-header"
+        className="page-header relative"
         style={{ background: gradient, color: headerFg }}
       >
+        <HeaderSettingsButton />
         <div className="mx-auto max-w-md px-5 pb-4 pt-5">
           <div className="label-caps" style={{ color: "rgba(31,58,92,0.75)", opacity: 1 }}>
             {isSleep ? "Before Sleep" : "Upon Waking"}

@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { RotateCcw, Undo2 } from "lucide-react";
 import { ProgressRing } from "@/components/ProgressRing";
+import { HeaderSettingsButton } from "@/components/HeaderSettingsButton";
 import { triggerHaptic } from "@/lib/theme";
 import { bumpLifetime } from "@/lib/storage";
 
@@ -116,6 +117,7 @@ function Tasbih() {
             opacity: 0.35,
           }}
         />
+        <HeaderSettingsButton />
         <div className="relative mx-auto max-w-md px-5 pb-5 pt-6 text-center">
           <div
             className="label-caps"
