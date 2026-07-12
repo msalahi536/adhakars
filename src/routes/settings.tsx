@@ -250,7 +250,8 @@ function Settings() {
               onChange={(v) => updateDisplay({ arabicLarge: v })}
             />
             <Toggle
-              label="Haptic feedback"
+              label="Vibration on tap"
+              description="Vibrate when tapping counters and the tasbih."
               value={display.haptics}
               onChange={(v) => updateDisplay({ haptics: v })}
             />
