@@ -312,11 +312,11 @@ function Settings() {
             <div className="label-caps mb-1">Contact</div>
             <div className="font-semibold">Mohammad Salahi</div>
             <a
-              href="tel:+18589889943"
+              href="mailto:msalahi536@gmail.com"
               className="mt-0.5 block font-semibold"
               style={{ color: "var(--accent)" }}
             >
-              858-988-9943
+              msalahi536@gmail.com
             </a>
           </section>
         </div>
