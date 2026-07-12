@@ -51,10 +51,14 @@ function Sleep() {
   };
 
   const isSleep = mode === "sleep";
-  // Evening (dusk) palette — used for both sleep and wake for a calm, consistent feel
-  const gradient = "linear-gradient(135deg, #a9c0dc 0%, #7a9bc4 100%)";
-  const accent = "#4a6b9a";
-  const headerFg = "#1f3a5c";
+  // Sleep = deep evening blue (night). Wake = warm gold (dawn).
+  const gradient = isSleep
+    ? "linear-gradient(135deg, #a9c0dc 0%, #7a9bc4 100%)"
+    : "linear-gradient(135deg, #e8c97a 0%, #d4a843 100%)";
+  const accent = isSleep ? "#4a6b9a" : "#c9a84c";
+  const headerFg = isSleep ? "#1f3a5c" : "#2d1f00";
+  const headerFgRgb = isSleep ? "31,58,92" : "45,31,0";
+
 
   return (
     <>
