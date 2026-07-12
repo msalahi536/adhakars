@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { RotateCcw, Undo2 } from "lucide-react";
 import { ProgressRing } from "@/components/ProgressRing";
-import { vibrateIfEnabled } from "@/lib/theme";
+import { triggerHaptic } from "@/lib/theme";
 import { bumpLifetime } from "@/lib/storage";
 
 export const Route = createFileRoute("/tasbih")({
