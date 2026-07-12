@@ -16,6 +16,10 @@ type Props = {
   extras?: SalahItem[];
   headerStyle?: React.CSSProperties;
   headerPattern?: React.ReactNode;
+  headerAction?: React.ReactNode;
+  emptyState?: React.ReactNode;
+  onEditItem?: (id: string) => void;
+  onDeleteItem?: (id: string) => void;
 };
 
 export function AdhkarPage({
@@ -28,6 +32,10 @@ export function AdhkarPage({
   extras = [],
   headerStyle,
   headerPattern,
+  headerAction,
+  emptyState,
+  onEditItem,
+  onDeleteItem,
 }: Props) {
   const [counts, setCounts] = useState<Record<string, number>>({});
 
