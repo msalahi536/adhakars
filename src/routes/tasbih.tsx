@@ -3,6 +3,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { RotateCcw, Undo2 } from "lucide-react";
 import { ProgressRing } from "@/components/ProgressRing";
 import { HeaderSettingsButton } from "@/components/HeaderSettingsButton";
+import { MuqarnasPattern } from "@/components/HeaderPatterns";
 import { triggerHaptic } from "@/lib/theme";
 import { bumpLifetime } from "@/lib/storage";
 
