@@ -18,6 +18,8 @@ const DARK_THEMES = new Set(["dark-emerald", "deep-navy"]);
 export function BottomNav() {
   const [streak, setStreak] = useState(0);
   const [theme, setTheme] = useState<string>("dawn");
+  const pathname = useRouterState({ select: (s) => s.location.pathname });
+  const moreNestedActive = MORE_NESTED.some((p) => pathname === p || pathname.startsWith(p + "/"));
 
   useEffect(() => {
     setStreak(getStreak().current);
