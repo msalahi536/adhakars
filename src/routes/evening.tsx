@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { AdhkarPage } from "@/components/AdhkarPage";
+import { InterlockingArcsPattern } from "@/components/HeaderPatterns";
 import { eveningAdhkar, baqarahLastTwo } from "@/data/adhkar";
 
 export const Route = createFileRoute("/evening")({
