@@ -16,7 +16,10 @@ import { Route as SalahRouteImport } from './routes/salah'
 import { Route as QiblaRouteImport } from './routes/qibla'
 import { Route as MoreRouteImport } from './routes/more'
 import { Route as EveningRouteImport } from './routes/evening'
+import { Route as AuthRouteImport } from './routes/auth'
+import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AuthenticatedMyAdhkarRouteImport } from './routes/_authenticated/my-adhkar'
 
 const TasbihRoute = TasbihRouteImport.update({
   id: '/tasbih',
@@ -53,14 +56,29 @@ const EveningRoute = EveningRouteImport.update({
   path: '/evening',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthRoute = AuthRouteImport.update({
+  id: '/auth',
+  path: '/auth',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
+  id: '/_authenticated',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedMyAdhkarRoute = AuthenticatedMyAdhkarRouteImport.update({
+  id: '/my-adhkar',
+  path: '/my-adhkar',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/auth': typeof AuthRoute
   '/evening': typeof EveningRoute
   '/more': typeof MoreRoute
   '/qibla': typeof QiblaRoute
@@ -68,9 +86,11 @@ export interface FileRoutesByFullPath {
   '/settings': typeof SettingsRoute
   '/sleep': typeof SleepRoute
   '/tasbih': typeof TasbihRoute
+  '/my-adhkar': typeof AuthenticatedMyAdhkarRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/auth': typeof AuthRoute
   '/evening': typeof EveningRoute
   '/more': typeof MoreRoute
   '/qibla': typeof QiblaRoute
@@ -78,10 +98,13 @@ export interface FileRoutesByTo {
   '/settings': typeof SettingsRoute
   '/sleep': typeof SleepRoute
   '/tasbih': typeof TasbihRoute
+  '/my-adhkar': typeof AuthenticatedMyAdhkarRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
+  '/auth': typeof AuthRoute
   '/evening': typeof EveningRoute
   '/more': typeof MoreRoute
   '/qibla': typeof QiblaRoute
@@ -89,11 +112,13 @@ export interface FileRoutesById {
   '/settings': typeof SettingsRoute
   '/sleep': typeof SleepRoute
   '/tasbih': typeof TasbihRoute
+  '/_authenticated/my-adhkar': typeof AuthenticatedMyAdhkarRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/auth'
     | '/evening'
     | '/more'
     | '/qibla'
@@ -101,9 +126,11 @@ export interface FileRouteTypes {
     | '/settings'
     | '/sleep'
     | '/tasbih'
+    | '/my-adhkar'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/auth'
     | '/evening'
     | '/more'
     | '/qibla'
@@ -111,9 +138,12 @@ export interface FileRouteTypes {
     | '/settings'
     | '/sleep'
     | '/tasbih'
+    | '/my-adhkar'
   id:
     | '__root__'
     | '/'
+    | '/_authenticated'
+    | '/auth'
     | '/evening'
     | '/more'
     | '/qibla'
@@ -121,10 +151,13 @@ export interface FileRouteTypes {
     | '/settings'
     | '/sleep'
     | '/tasbih'
+    | '/_authenticated/my-adhkar'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
+  AuthRoute: typeof AuthRoute
   EveningRoute: typeof EveningRoute
   MoreRoute: typeof MoreRoute
   QiblaRoute: typeof QiblaRoute
@@ -185,6 +218,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof EveningRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/auth': {
+      id: '/auth'
+      path: '/auth'
+      fullPath: '/auth'
+      preLoaderRoute: typeof AuthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated': {
+      id: '/_authenticated'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof AuthenticatedRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -192,11 +239,31 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/my-adhkar': {
+      id: '/_authenticated/my-adhkar'
+      path: '/my-adhkar'
+      fullPath: '/my-adhkar'
+      preLoaderRoute: typeof AuthenticatedMyAdhkarRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
   }
 }
 
+interface AuthenticatedRouteRouteChildren {
+  AuthenticatedMyAdhkarRoute: typeof AuthenticatedMyAdhkarRoute
+}
+
+const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedMyAdhkarRoute: AuthenticatedMyAdhkarRoute,
+}
+
+const AuthenticatedRouteRouteWithChildren =
+  AuthenticatedRouteRoute._addFileChildren(AuthenticatedRouteRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
+  AuthRoute: AuthRoute,
   EveningRoute: EveningRoute,
   MoreRoute: MoreRoute,
   QiblaRoute: QiblaRoute,
