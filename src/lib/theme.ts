@@ -28,7 +28,6 @@ export const applyTheme = (id: ThemeId) => {
 export const resolveTheme = (mode: ThemeMode, route: string): ThemeId => {
   if (mode === "classic") return "dawn";
   if (route.startsWith("/evening")) return "dusk";
-  if (route.startsWith("/salah")) return "salah";
   return "dawn";
 };
 
