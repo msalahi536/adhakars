@@ -1,5 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
+import { HeaderSettingsButton } from "@/components/HeaderSettingsButton";
+
 
 export const Route = createFileRoute("/qibla")({
   head: () => ({
@@ -151,12 +153,13 @@ function Qibla() {
   return (
     <>
       <header
-        className="page-header"
+        className="page-header relative"
         style={{
           background: "linear-gradient(135deg, #1f3d2b 0%, #2d5a3d 100%)",
           color: "#ffffff",
         }}
       >
+        <HeaderSettingsButton />
         <div className="mx-auto max-w-md px-5 pb-4 pt-5">
           <div className="label-caps" style={{ color: "rgba(255,255,255,0.85)", opacity: 1 }}>
             Direction of Prayer

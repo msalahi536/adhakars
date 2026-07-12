@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { SwipeStack } from "./SwipeStack";
+import { HeaderSettingsButton } from "./HeaderSettingsButton";
 import type { Dhikr } from "@/data/adhkar";
 import type { SalahItem } from "@/data/salah";
 import { isItemComplete } from "@/data/salah";
@@ -53,7 +54,8 @@ export function AdhkarPage({
 
   return (
     <>
-      <header className="page-header" style={{ ...defaultHeader, ...headerStyle }}>
+      <header className="page-header relative" style={{ ...defaultHeader, ...headerStyle }}>
+        <HeaderSettingsButton />
         <div className="mx-auto max-w-md px-5 pb-4 pt-5">
           <div
             className="label-caps"
