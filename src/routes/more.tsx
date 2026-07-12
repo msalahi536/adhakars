@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { BedDouble, Compass, ChevronRight } from "lucide-react";
 import { HeaderSettingsButton } from "@/components/HeaderSettingsButton";
+import { SparseStarsPattern } from "@/components/HeaderPatterns";
 import { getStreak } from "@/lib/storage";
 
 export const Route = createFileRoute("/more")({
