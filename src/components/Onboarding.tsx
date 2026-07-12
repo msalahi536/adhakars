@@ -111,6 +111,7 @@ export function Onboarding({ onDone }: { onDone: () => void }) {
       if (granted) {
         const prefs = getNotificationPrefs();
         const updated = {
+          ...prefs,
           morning: { ...prefs.morning, enabled: true },
           evening: { ...prefs.evening, enabled: true },
         };
