@@ -50,14 +50,14 @@ function Tasbih() {
   };
 
   const tap = () => {
-    vibrateIfEnabled(12);
+    triggerHaptic("light");
     bumpLifetime("tasbih", 1);
     setTapped(true);
     setTimeout(() => setTapped(false), 200);
     setTotal((n) => {
       const next = n + 1;
       if (hasMilestone && next % milestone === 0) {
-        vibrateIfEnabled([40, 20, 40]);
+        triggerHaptic("medium");
         setFlash(true);
         setTimeout(() => setFlash(false), 260);
       }
@@ -67,14 +67,14 @@ function Tasbih() {
 
   const undo = (e: React.MouseEvent) => {
     e.stopPropagation();
-    vibrateIfEnabled(8);
+    triggerHaptic("light");
     setTotal((n) => Math.max(0, n - 1));
   };
 
   const onResetStart = (e: React.PointerEvent | React.TouchEvent | React.MouseEvent) => {
     e.stopPropagation();
     resetTimer.current = setTimeout(() => {
-      vibrateIfEnabled(40);
+      triggerHaptic("heavy");
       setTotal(0);
       showToast("Count reset ✓");
     }, 1500);
