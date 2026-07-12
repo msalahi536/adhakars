@@ -249,6 +249,11 @@ function Settings() {
               value={display.arabicLarge}
               onChange={(v) => updateDisplay({ arabicLarge: v })}
             />
+            <Toggle
+              label="Haptic feedback"
+              value={display.haptics}
+              onChange={(v) => updateDisplay({ haptics: v })}
+            />
           </section>
 
           <section className="mb-6">
