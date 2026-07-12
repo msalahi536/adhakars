@@ -175,7 +175,7 @@ function Tasbih() {
             onPointerUp={() => setPressed(false)}
             onPointerLeave={() => setPressed(false)}
             onPointerCancel={() => setPressed(false)}
-            className="relative flex w-full flex-1 flex-col items-center justify-center overflow-hidden rounded-[24px] outline-none"
+            className="relative flex w-full flex-col items-center justify-center overflow-hidden rounded-[24px] outline-none"
             style={{
               background: "var(--card)",
               color: "var(--card-foreground)",
@@ -183,9 +183,8 @@ function Tasbih() {
               boxShadow: "var(--card-shadow, 0 4px 16px rgba(0,0,0,0.08))",
               transform: pressed ? "scale(0.985)" : "scale(1)",
               transition: "transform 120ms ease",
-              padding: "32px 20px",
+              padding: "28px 20px 32px",
               touchAction: "manipulation",
-              minHeight: 380,
               cursor: "pointer",
               userSelect: "none",
             }}
