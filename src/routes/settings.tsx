@@ -279,9 +279,14 @@ function Settings() {
                 </>
               ) : (
                 <div className="space-y-3">
-                  {(["morning", "evening"] as ReminderId[]).map((id) => {
+                  {(["morning", "evening", "nudge"] as ReminderId[]).map((id) => {
                     const r = notifPrefs[id];
-                    const label = id === "morning" ? "Morning reminder" : "Evening reminder";
+                    const label =
+                      id === "morning"
+                        ? "Morning reminder"
+                        : id === "evening"
+                        ? "Evening reminder"
+                        : "Gentle nudge if the day is incomplete";
                     return (
                       <div
                         key={id}
