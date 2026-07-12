@@ -15,7 +15,7 @@ import { BottomNav } from "@/components/BottomNav";
 import { UpdatePopup } from "@/components/UpdatePopup";
 import { applyTheme, getMode, resolveTheme } from "@/lib/theme";
 import { reconcileStreak } from "@/lib/storage";
-import { initOneSignal } from "@/lib/onesignal";
+import { applyReminders, getNotificationPrefs, checkNotificationPermission } from "@/lib/notifications";
 
 function NotFoundComponent() {
   return (
@@ -94,7 +94,6 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         href: "https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Scheherazade+New:wght@400;500;600;700&display=swap",
       },
     ],
-    scripts: [{ src: "https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js", defer: true }],
   }),
   shellComponent: RootShell,
   component: RootComponent,
@@ -126,7 +125,16 @@ function RootComponent() {
 
   useEffect(() => {
     reconcileStreak();
-    initOneSignal();
+    // Re-apply saved local reminder schedules on app open. Silently no-ops
+    // on web where the Capacitor plugin isn't available.
+    (async () => {
+      try {
+        const granted = await checkNotificationPermission();
+        if (granted) await applyReminders(getNotificationPrefs());
+      } catch {
+        // ignore
+      }
+    })();
   }, []);
 
   return (
