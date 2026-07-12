@@ -9,16 +9,24 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as TermsRouteImport } from './routes/terms'
 import { Route as TasbihRouteImport } from './routes/tasbih'
 import { Route as SleepRouteImport } from './routes/sleep'
 import { Route as SettingsRouteImport } from './routes/settings'
 import { Route as SalahRouteImport } from './routes/salah'
 import { Route as QiblaRouteImport } from './routes/qibla'
+import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as MyAdhkarRouteImport } from './routes/my-adhkar'
 import { Route as MoreRouteImport } from './routes/more'
 import { Route as EveningRouteImport } from './routes/evening'
+import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
 
+const TermsRoute = TermsRouteImport.update({
+  id: '/terms',
+  path: '/terms',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const TasbihRoute = TasbihRouteImport.update({
   id: '/tasbih',
   path: '/tasbih',
@@ -44,6 +52,11 @@ const QiblaRoute = QiblaRouteImport.update({
   path: '/qibla',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PrivacyRoute = PrivacyRouteImport.update({
+  id: '/privacy',
+  path: '/privacy',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const MyAdhkarRoute = MyAdhkarRouteImport.update({
   id: '/my-adhkar',
   path: '/my-adhkar',
@@ -59,6 +72,11 @@ const EveningRoute = EveningRouteImport.update({
   path: '/evening',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AboutRoute = AboutRouteImport.update({
+  id: '/about',
+  path: '/about',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
@@ -67,88 +85,116 @@ const IndexRoute = IndexRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/about': typeof AboutRoute
   '/evening': typeof EveningRoute
   '/more': typeof MoreRoute
   '/my-adhkar': typeof MyAdhkarRoute
+  '/privacy': typeof PrivacyRoute
   '/qibla': typeof QiblaRoute
   '/salah': typeof SalahRoute
   '/settings': typeof SettingsRoute
   '/sleep': typeof SleepRoute
   '/tasbih': typeof TasbihRoute
+  '/terms': typeof TermsRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/about': typeof AboutRoute
   '/evening': typeof EveningRoute
   '/more': typeof MoreRoute
   '/my-adhkar': typeof MyAdhkarRoute
+  '/privacy': typeof PrivacyRoute
   '/qibla': typeof QiblaRoute
   '/salah': typeof SalahRoute
   '/settings': typeof SettingsRoute
   '/sleep': typeof SleepRoute
   '/tasbih': typeof TasbihRoute
+  '/terms': typeof TermsRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/about': typeof AboutRoute
   '/evening': typeof EveningRoute
   '/more': typeof MoreRoute
   '/my-adhkar': typeof MyAdhkarRoute
+  '/privacy': typeof PrivacyRoute
   '/qibla': typeof QiblaRoute
   '/salah': typeof SalahRoute
   '/settings': typeof SettingsRoute
   '/sleep': typeof SleepRoute
   '/tasbih': typeof TasbihRoute
+  '/terms': typeof TermsRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/about'
     | '/evening'
     | '/more'
     | '/my-adhkar'
+    | '/privacy'
     | '/qibla'
     | '/salah'
     | '/settings'
     | '/sleep'
     | '/tasbih'
+    | '/terms'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/about'
     | '/evening'
     | '/more'
     | '/my-adhkar'
+    | '/privacy'
     | '/qibla'
     | '/salah'
     | '/settings'
     | '/sleep'
     | '/tasbih'
+    | '/terms'
   id:
     | '__root__'
     | '/'
+    | '/about'
     | '/evening'
     | '/more'
     | '/my-adhkar'
+    | '/privacy'
     | '/qibla'
     | '/salah'
     | '/settings'
     | '/sleep'
     | '/tasbih'
+    | '/terms'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AboutRoute: typeof AboutRoute
   EveningRoute: typeof EveningRoute
   MoreRoute: typeof MoreRoute
   MyAdhkarRoute: typeof MyAdhkarRoute
+  PrivacyRoute: typeof PrivacyRoute
   QiblaRoute: typeof QiblaRoute
   SalahRoute: typeof SalahRoute
   SettingsRoute: typeof SettingsRoute
   SleepRoute: typeof SleepRoute
   TasbihRoute: typeof TasbihRoute
+  TermsRoute: typeof TermsRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/terms': {
+      id: '/terms'
+      path: '/terms'
+      fullPath: '/terms'
+      preLoaderRoute: typeof TermsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/tasbih': {
       id: '/tasbih'
       path: '/tasbih'
@@ -184,6 +230,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof QiblaRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/privacy': {
+      id: '/privacy'
+      path: '/privacy'
+      fullPath: '/privacy'
+      preLoaderRoute: typeof PrivacyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/my-adhkar': {
       id: '/my-adhkar'
       path: '/my-adhkar'
@@ -205,6 +258,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof EveningRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/about': {
+      id: '/about'
+      path: '/about'
+      fullPath: '/about'
+      preLoaderRoute: typeof AboutRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -217,14 +277,17 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AboutRoute: AboutRoute,
   EveningRoute: EveningRoute,
   MoreRoute: MoreRoute,
   MyAdhkarRoute: MyAdhkarRoute,
+  PrivacyRoute: PrivacyRoute,
   QiblaRoute: QiblaRoute,
   SalahRoute: SalahRoute,
   SettingsRoute: SettingsRoute,
   SleepRoute: SleepRoute,
   TasbihRoute: TasbihRoute,
+  TermsRoute: TermsRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

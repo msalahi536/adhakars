@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
-import { createFileRoute } from "@tanstack/react-router";
-import { SparseStarsPattern } from "@/components/HeaderPatterns";
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { ConcentricCirclesPattern } from "@/components/HeaderPatterns";
 import { HeaderBackButton } from "@/components/HeaderBackButton";
 import {
   themes,
@@ -12,7 +12,7 @@ import {
   setDisplay,
   type ThemeMode,
 } from "@/lib/theme";
-import { getStreak, resetToday, getLifetime, type LifetimeCounts } from "@/lib/storage";
+import { resetToday, resetAllProgress } from "@/lib/storage";
 import {
   getNotificationPrefs,
   setNotificationPrefs,
@@ -26,6 +26,8 @@ import {
   type ReminderId,
 } from "@/lib/notifications";
 
+const APP_VERSION = "1.0.0";
+
 export const Route = createFileRoute("/settings")({
   head: () => ({ meta: [{ title: "Settings — My Adhkar" }] }),
   component: Settings,
@@ -33,40 +35,23 @@ export const Route = createFileRoute("/settings")({
 
 function Settings() {
   const [mode, setModeState] = useState<ThemeMode>("auto");
-  const [streak, setStreak] = useState({
-    current: 0,
-    longest: 0,
-    lastCompleted: null as string | null,
-  });
   const [display, setDisplayState] = useState(getDisplay());
   const [confirmReset, setConfirmReset] = useState(false);
+  const [confirmResetAll, setConfirmResetAll] = useState(false);
   const [notifEnabled, setNotifEnabled] = useState(false);
   const [notifPrefs, setNotifPrefsState] = useState<NotificationPrefs>(() => getNotificationPrefs());
   const nativeAvailable = isNativePlatform();
-  const [lifetime, setLifetime] = useState<LifetimeCounts>({
-    total: 0,
-    morning: 0,
-    evening: 0,
-    salah: 0,
-    tasbih: 0,
-    custom: 0,
-  });
 
   useEffect(() => {
     setModeState(getMode());
-    setStreak(getStreak());
     setDisplayState(getDisplay());
-    setLifetime(getLifetime());
     setNotifPrefsState(getNotificationPrefs());
     let cancelled = false;
     checkNotificationPermission().then((v) => {
       if (!cancelled) setNotifEnabled(v);
     });
-    const onLife = () => setLifetime(getLifetime());
-    window.addEventListener("adhkar:lifetime-update", onLife);
     return () => {
       cancelled = true;
-      window.removeEventListener("adhkar:lifetime-update", onLife);
     };
   }, []);
 
@@ -74,7 +59,6 @@ function Settings() {
     const granted = await requestNotificationPermission();
     setNotifEnabled(granted);
     if (granted) {
-      // Re-apply saved schedule now that permission is available.
       await applyReminders(notifPrefs);
     }
   };
@@ -107,7 +91,6 @@ function Settings() {
 
   const formatTime = (hour: number, minute: number) =>
     `${String(hour).padStart(2, "0")}:${String(minute).padStart(2, "0")}`;
-
 
   const choose = (m: ThemeMode) => {
     setModeState(m);
@@ -157,9 +140,12 @@ function Settings() {
         className="page-header relative overflow-hidden"
         style={{ background: "var(--background)", color: "var(--foreground)" }}
       >
-        <SparseStarsPattern />
+        <ConcentricCirclesPattern />
         <HeaderBackButton />
-        <div className="relative mx-auto max-w-md px-4 pb-5 pt-4" style={{ paddingLeft: 60, paddingRight: 60 }}>
+        <div
+          className="relative mx-auto max-w-md px-4 pb-5 pt-4"
+          style={{ paddingLeft: 60, paddingRight: 60 }}
+        >
           <div className="label-caps">Preferences</div>
           <h1 className="mt-1 text-3xl font-bold">Settings</h1>
         </div>
@@ -167,76 +153,9 @@ function Settings() {
 
       <main className="scroll-area">
         <div className="mx-auto max-w-md px-4 py-4">
-          <section
-            className="mb-6 overflow-hidden rounded-[24px] p-6 shadow-xl shadow-black/10"
-            style={{
-              background: "linear-gradient(135deg, #c9a84c, #b8923a)",
-              color: "#ffffff",
-            }}
-          >
-            <div className="label-caps" style={{ color: "rgba(255,255,255,0.85)", opacity: 1 }}>
-              Current streak
-            </div>
-            <div className="mt-1 flex items-baseline gap-2">
-              <span style={{ fontSize: 48, fontWeight: 800, color: "#ffffff", lineHeight: 1 }}>
-                {streak.current}
-              </span>
-              <span className="text-sm font-semibold opacity-90">days</span>
-            </div>
-            <div
-              className="mt-4 flex items-center justify-between border-t pt-3 text-xs font-semibold"
-              style={{ borderColor: "rgba(255,255,255,0.25)" }}
-            >
-              <span>Longest: {streak.longest} days</span>
-              <span className="opacity-90">
-                {streak.lastCompleted ? `Last: ${streak.lastCompleted}` : "Start today"}
-              </span>
-            </div>
-          </section>
-
-          <section
-            className="mb-6 overflow-hidden rounded-[24px] p-5"
-            style={{
-              background: "linear-gradient(135deg, #1f3d2b 0%, #2d5a3d 100%)",
-              color: "#ffffff",
-            }}
-          >
-            <div className="label-caps" style={{ color: "rgba(255,255,255,0.85)", opacity: 1 }}>
-              My Dhikr
-            </div>
-            <div
-              className="mt-1 text-[11px] font-semibold uppercase tracking-wider"
-              style={{ color: "rgba(255,255,255,0.7)" }}
-            >
-              Total Remembrances
-            </div>
-            <div style={{ fontSize: 48, fontWeight: 800, color: "#c9a84c", lineHeight: 1.1 }}>
-              {lifetime.total.toLocaleString()}
-            </div>
-            <div
-              className="mt-4 grid grid-cols-4 gap-2 border-t pt-3"
-              style={{ borderColor: "rgba(255,255,255,0.18)" }}
-            >
-              {(["morning", "evening", "salah", "tasbih"] as const).map((k) => (
-                <div key={k} className="flex flex-col items-center">
-                  <span
-                    className="text-[10px] font-semibold uppercase tracking-wider"
-                    style={{ color: "rgba(255,255,255,0.6)" }}
-                  >
-                    {k}
-                  </span>
-                  <span style={{ fontSize: 16, fontWeight: 700, color: "#ffffff" }}>
-                    {lifetime[k].toLocaleString()}
-                  </span>
-                </div>
-              ))}
-            </div>
-          </section>
-
-
-
+          {/* APPEARANCE */}
           <section className="mb-6">
-            <h2 className="label-caps mb-3">Theme</h2>
+            <h2 className="label-caps mb-3">Appearance</h2>
             <div className="space-y-3">
               {themes.map((t) => {
                 const active = mode === t.id;
@@ -266,10 +185,23 @@ function Settings() {
                 );
               })}
             </div>
+            <div className="mt-3 space-y-3">
+              <Toggle
+                label="Show transliteration"
+                value={display.showTransliteration}
+                onChange={(v) => updateDisplay({ showTransliteration: v })}
+              />
+              <Toggle
+                label="Large Arabic text"
+                value={display.arabicLarge}
+                onChange={(v) => updateDisplay({ arabicLarge: v })}
+              />
+            </div>
           </section>
 
+          {/* REMINDERS */}
           <section className="mb-6">
-            <h2 className="label-caps mb-3">Notifications</h2>
+            <h2 className="label-caps mb-3">Reminders</h2>
             <div
               className="rounded-[24px] p-4"
               style={{ background: "var(--surface)", border: "1px solid var(--border)" }}
@@ -358,19 +290,9 @@ function Settings() {
             </div>
           </section>
 
-
+          {/* FEEDBACK */}
           <section className="mb-6 space-y-3">
-            <h2 className="label-caps mb-1">Display</h2>
-            <Toggle
-              label="Show transliteration"
-              value={display.showTransliteration}
-              onChange={(v) => updateDisplay({ showTransliteration: v })}
-            />
-            <Toggle
-              label="Large Arabic text"
-              value={display.arabicLarge}
-              onChange={(v) => updateDisplay({ arabicLarge: v })}
-            />
+            <h2 className="label-caps mb-1">Feedback</h2>
             <Toggle
               label="Vibration on tap"
               description="Vibrate when tapping counters and the tasbih."
@@ -379,8 +301,9 @@ function Settings() {
             />
           </section>
 
-          <section className="mb-6">
-            <h2 className="label-caps mb-3">Today's progress</h2>
+          {/* DATA */}
+          <section className="mb-6 space-y-3">
+            <h2 className="label-caps mb-1">Data</h2>
             {confirmReset ? (
               <div
                 className="rounded-2xl p-4"
@@ -417,29 +340,80 @@ function Settings() {
                 Reset today's progress
               </button>
             )}
+
+            {confirmResetAll ? (
+              <div
+                className="rounded-2xl p-4"
+                style={{
+                  background: "rgba(220, 38, 38, 0.08)",
+                  border: "1px solid rgba(220, 38, 38, 0.3)",
+                }}
+              >
+                <p className="mb-1 text-sm font-semibold" style={{ color: "#b91c1c" }}>
+                  Reset ALL progress?
+                </p>
+                <p className="mb-3 text-xs" style={{ color: "#b91c1c" }}>
+                  This wipes every day's counts, your streak, and lifetime
+                  totals. This cannot be undone.
+                </p>
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => {
+                      resetAllProgress();
+                      setConfirmResetAll(false);
+                      window.location.reload();
+                    }}
+                    className="flex-1 rounded-full py-2 text-sm font-semibold text-white"
+                    style={{ background: "#dc2626" }}
+                  >
+                    Yes, reset everything
+                  </button>
+                  <button
+                    onClick={() => setConfirmResetAll(false)}
+                    className="flex-1 rounded-full py-2 text-sm font-semibold"
+                    style={{ background: "var(--muted)", color: "var(--foreground)" }}
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <button
+                onClick={() => setConfirmResetAll(true)}
+                className="w-full rounded-full py-3 text-sm font-semibold text-white"
+                style={{ background: "#dc2626" }}
+              >
+                Reset all progress
+              </button>
+            )}
           </section>
 
-          <section
-            className="mb-4 rounded-2xl p-4 text-xs opacity-70"
-            style={{ background: "var(--surface)", border: "1px solid var(--border)" }}
-          >
-            Based on the authentic adhkar compiled by Shaykh Abdul Aziz At-Tarefe, compiled by
-            Yasser Peerun.
-          </section>
-
-          <section
-            className="rounded-2xl p-4 text-xs"
-            style={{ background: "var(--surface)", border: "1px solid var(--border)" }}
-          >
-            <div className="label-caps mb-1">Contact</div>
-            <div className="font-semibold">Mohammad Salahi</div>
-            <a
-              href="mailto:msalahi536@gmail.com"
-              className="mt-0.5 block font-semibold"
-              style={{ color: "var(--accent)" }}
+          {/* ABOUT */}
+          <section className="mb-6 space-y-3">
+            <h2 className="label-caps mb-1">About</h2>
+            <div
+              className="flex items-center justify-between rounded-2xl px-4 py-3 text-sm"
+              style={{ background: "var(--surface)", border: "1px solid var(--border)" }}
             >
-              msalahi536@gmail.com
-            </a>
+              <span className="font-semibold">Version</span>
+              <span className="opacity-70">{APP_VERSION}</span>
+            </div>
+            <Link
+              to="/privacy"
+              className="flex w-full items-center justify-between rounded-2xl px-4 py-3 text-sm font-semibold"
+              style={{ background: "var(--surface)", border: "1px solid var(--border)" }}
+            >
+              <span>Privacy Policy</span>
+              <span className="opacity-40">›</span>
+            </Link>
+            <Link
+              to="/terms"
+              className="flex w-full items-center justify-between rounded-2xl px-4 py-3 text-sm font-semibold"
+              style={{ background: "var(--surface)", border: "1px solid var(--border)" }}
+            >
+              <span>Terms of Service</span>
+              <span className="opacity-40">›</span>
+            </Link>
           </section>
         </div>
       </main>

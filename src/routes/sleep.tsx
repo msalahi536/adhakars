@@ -51,10 +51,14 @@ function Sleep() {
   };
 
   const isSleep = mode === "sleep";
-  // Evening (dusk) palette — used for both sleep and wake for a calm, consistent feel
-  const gradient = "linear-gradient(135deg, #a9c0dc 0%, #7a9bc4 100%)";
-  const accent = "#4a6b9a";
-  const headerFg = "#1f3a5c";
+  // Sleep = deep evening blue (night). Wake = warm gold (dawn).
+  const gradient = isSleep
+    ? "linear-gradient(135deg, #a9c0dc 0%, #7a9bc4 100%)"
+    : "linear-gradient(135deg, #e8c97a 0%, #d4a843 100%)";
+  const accent = isSleep ? "#4a6b9a" : "#c9a84c";
+  const headerFg = isSleep ? "#1f3a5c" : "#2d1f00";
+  const headerFgRgb = isSleep ? "31,58,92" : "45,31,0";
+
 
   return (
     <>
@@ -66,7 +70,7 @@ function Sleep() {
         <HeaderBackButton />
         <HeaderSettingsButton />
         <div className="relative mx-auto max-w-md px-5 pb-4 pt-5" style={{ paddingLeft: 60, paddingRight: 60 }}>
-          <div className="label-caps" style={{ color: "rgba(31,58,92,0.75)", opacity: 1 }}>
+          <div className="label-caps" style={{ color: `rgba(${headerFgRgb},0.75)`, opacity: 1 }}>
             {isSleep ? "Before Sleep" : "Upon Waking"}
           </div>
           <h1 className="mt-1 text-2xl font-bold tracking-tight">
@@ -76,7 +80,7 @@ function Sleep() {
           <div className="mt-3 flex items-center gap-3">
             <div
               className="h-1.5 flex-1 overflow-hidden rounded-full"
-              style={{ background: "rgba(31,58,92,0.15)" }}
+              style={{ background: `rgba(${headerFgRgb},0.15)` }}
             >
               <div
                 className="h-full rounded-full transition-all duration-500"
@@ -93,7 +97,7 @@ function Sleep() {
 
           <div
             className="mt-4 flex rounded-full p-1"
-            style={{ background: "rgba(31,58,92,0.12)" }}
+            style={{ background: `rgba(${headerFgRgb},0.12)` }}
           >
             {(["sleep", "wake"] as SleepMode[]).map((m) => {
               const active = m === mode;
@@ -117,24 +121,38 @@ function Sleep() {
 
       <main
         className="scroll-area flex flex-col"
-        style={{ background: "#eef2f8" }}
+        style={{ background: isSleep ? "#eef2f8" : "#faf6ec" }}
       >
         <div
           className="mx-auto flex min-h-0 w-full max-w-md flex-1 flex-col pt-3"
           style={
-            {
-              ["--card" as string]: "#f5f8fc",
-              ["--card-foreground" as string]: "#1f3a5c",
-              ["--translit" as string]: "#4a6b9a",
-              ["--accent" as string]: "#4a6b9a",
-              ["--accent-foreground" as string]: "#ffffff",
-              ["--border" as string]: "rgba(74,107,154,0.15)",
-              ["--source-bg" as string]: "rgba(74,107,154,0.12)",
-              ["--source-fg" as string]: "#4a6b9a",
-              ["--index-badge-bg" as string]: "#4a6b9a",
-              ["--index-badge-fg" as string]: "#ffffff",
-              ["--count-fg" as string]: "#1f3a5c",
-            } as React.CSSProperties
+            isSleep
+              ? ({
+                  ["--card" as string]: "#f5f8fc",
+                  ["--card-foreground" as string]: "#1f3a5c",
+                  ["--translit" as string]: "#4a6b9a",
+                  ["--accent" as string]: "#4a6b9a",
+                  ["--accent-foreground" as string]: "#ffffff",
+                  ["--border" as string]: "rgba(74,107,154,0.15)",
+                  ["--source-bg" as string]: "rgba(74,107,154,0.12)",
+                  ["--source-fg" as string]: "#4a6b9a",
+                  ["--index-badge-bg" as string]: "#4a6b9a",
+                  ["--index-badge-fg" as string]: "#ffffff",
+                  ["--count-fg" as string]: "#1f3a5c",
+                } as React.CSSProperties)
+              : ({
+                  ["--card" as string]: "#fffcf4",
+                  ["--card-foreground" as string]: "#2d1f00",
+                  ["--translit" as string]: "#b8923a",
+                  ["--accent" as string]: "#c9a84c",
+                  ["--accent-foreground" as string]: "#ffffff",
+                  ["--border" as string]: "rgba(184,146,58,0.20)",
+                  ["--source-bg" as string]: "rgba(184,146,58,0.15)",
+                  ["--source-fg" as string]: "#b8923a",
+                  ["--index-badge-bg" as string]: "#c9a84c",
+                  ["--index-badge-fg" as string]: "#ffffff",
+                  ["--count-fg" as string]: "#2d1f00",
+                } as React.CSSProperties)
           }
         >
           <SwipeStack

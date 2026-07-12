@@ -43,6 +43,23 @@ export const resetToday = () => {
   }
 };
 
+/** Wipes ALL counts (every day), streaks, and lifetime totals. Destructive. */
+export const resetAllProgress = () => {
+  if (typeof window === "undefined") return;
+  const toRemove: string[] = [];
+  for (let i = 0; i < localStorage.length; i++) {
+    const key = localStorage.key(i);
+    if (!key) continue;
+    if (key.startsWith("adhkar:") || key === LIFETIME_KEY) {
+      toRemove.push(key);
+    }
+  }
+  for (const k of toRemove) localStorage.removeItem(k);
+  window.dispatchEvent(new Event("adhkar:streak-update"));
+  window.dispatchEvent(new Event("adhkar:lifetime-update"));
+};
+
+
 export const isSetComplete = (kind: "morning" | "evening", date = todayKey()): boolean => {
   const c = getCounts(kind, date);
   const list = kind === "morning" ? morningAdhkar : eveningAdhkar;

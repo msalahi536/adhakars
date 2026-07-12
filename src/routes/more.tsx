@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { BedDouble, Compass, BookPlus, ChevronRight } from "lucide-react";
+import { BedDouble, Compass, BookPlus, ChevronRight, HandHeart } from "lucide-react";
 import { HeaderSettingsButton } from "@/components/HeaderSettingsButton";
-import { SparseStarsPattern } from "@/components/HeaderPatterns";
-import { getStreak } from "@/lib/storage";
+import { ConcentricCirclesPattern } from "@/components/HeaderPatterns";
+import { getStreak, getLifetime, type LifetimeCounts } from "@/lib/storage";
 
 export const Route = createFileRoute("/more")({
   head: () => ({
@@ -16,7 +16,7 @@ export const Route = createFileRoute("/more")({
 });
 
 type Tile = {
-  to: "/sleep" | "/qibla" | "/my-adhkar";
+  to: "/sleep" | "/qibla" | "/my-adhkar" | "/about";
   title: string;
   subtitle: string;
   Icon: typeof BedDouble;
@@ -41,16 +41,40 @@ const tiles: Tile[] = [
     subtitle: "Find the direction of the Ka'bah",
     Icon: Compass,
   },
+  {
+    to: "/about",
+    title: "About & Support",
+    subtitle: "The project, donate, contact",
+    Icon: HandHeart,
+  },
 ];
 
 function More() {
-  const [streak, setStreak] = useState(0);
+  const [streak, setStreak] = useState({
+    current: 0,
+    longest: 0,
+    lastCompleted: null as string | null,
+  });
+  const [lifetime, setLifetime] = useState<LifetimeCounts>({
+    total: 0,
+    morning: 0,
+    evening: 0,
+    salah: 0,
+    tasbih: 0,
+    custom: 0,
+  });
 
   useEffect(() => {
-    setStreak(getStreak().current);
-    const onStreak = () => setStreak(getStreak().current);
+    setStreak(getStreak());
+    setLifetime(getLifetime());
+    const onStreak = () => setStreak(getStreak());
+    const onLife = () => setLifetime(getLifetime());
     window.addEventListener("adhkar:streak-update", onStreak);
-    return () => window.removeEventListener("adhkar:streak-update", onStreak);
+    window.addEventListener("adhkar:lifetime-update", onLife);
+    return () => {
+      window.removeEventListener("adhkar:streak-update", onStreak);
+      window.removeEventListener("adhkar:lifetime-update", onLife);
+    };
   }, []);
 
   return (
@@ -59,29 +83,83 @@ function More() {
         className="page-header relative overflow-hidden"
         style={{ background: "var(--grad-header)", color: "var(--header-fg)" }}
       >
-        <SparseStarsPattern />
+        <ConcentricCirclesPattern />
         <HeaderSettingsButton />
         <div className="relative mx-auto max-w-md px-4 pb-5 pt-4" style={{ paddingRight: 60 }}>
           <div className="label-caps" style={{ color: "var(--header-sub)", opacity: 1 }}>More</div>
           <h1 className="mt-1 text-3xl font-bold tracking-tight">Tools</h1>
           <p className="mt-2 text-xs opacity-90">Sleep, wake, qibla and your own adhkar.</p>
-          {streak > 0 && (
-            <div
-              className="mt-3 inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-bold"
-              style={{
-                background: "linear-gradient(135deg, #c9a84c, #b8923a)",
-                color: "#ffffff",
-              }}
-            >
-              <span>🔥</span>
-              <span>{streak}-day streak</span>
-            </div>
-          )}
         </div>
       </header>
 
       <main className="scroll-area">
-        <div className="mx-auto max-w-md px-4 py-2">
+        <div className="mx-auto max-w-md px-4 py-4 space-y-4">
+          <section
+            className="overflow-hidden rounded-[24px] p-6 shadow-xl shadow-black/10"
+            style={{
+              background: "linear-gradient(135deg, #c9a84c, #b8923a)",
+              color: "#ffffff",
+            }}
+          >
+            <div className="label-caps" style={{ color: "rgba(255,255,255,0.85)", opacity: 1 }}>
+              Current streak
+            </div>
+            <div className="mt-1 flex items-baseline gap-2">
+              <span style={{ fontSize: 48, fontWeight: 800, color: "#ffffff", lineHeight: 1 }}>
+                {streak.current}
+              </span>
+              <span className="text-sm font-semibold opacity-90">days</span>
+            </div>
+            <div
+              className="mt-4 flex items-center justify-between border-t pt-3 text-xs font-semibold"
+              style={{ borderColor: "rgba(255,255,255,0.25)" }}
+            >
+              <span>Longest: {streak.longest} days</span>
+              <span className="opacity-90">
+                {streak.lastCompleted ? `Last: ${streak.lastCompleted}` : "Start today"}
+              </span>
+            </div>
+          </section>
+
+          <section
+            className="overflow-hidden rounded-[24px] p-5"
+            style={{
+              background: "linear-gradient(135deg, #1f3d2b 0%, #2d5a3d 100%)",
+              color: "#ffffff",
+            }}
+          >
+            <div className="label-caps" style={{ color: "rgba(255,255,255,0.85)", opacity: 1 }}>
+              My Dhikr
+            </div>
+            <div
+              className="mt-1 text-[11px] font-semibold uppercase tracking-wider"
+              style={{ color: "rgba(255,255,255,0.7)" }}
+            >
+              Total Remembrances
+            </div>
+            <div style={{ fontSize: 48, fontWeight: 800, color: "#c9a84c", lineHeight: 1.1 }}>
+              {lifetime.total.toLocaleString()}
+            </div>
+            <div
+              className="mt-4 grid grid-cols-4 gap-2 border-t pt-3"
+              style={{ borderColor: "rgba(255,255,255,0.18)" }}
+            >
+              {(["morning", "evening", "salah", "tasbih"] as const).map((k) => (
+                <div key={k} className="flex flex-col items-center">
+                  <span
+                    className="text-[10px] font-semibold uppercase tracking-wider"
+                    style={{ color: "rgba(255,255,255,0.6)" }}
+                  >
+                    {k}
+                  </span>
+                  <span style={{ fontSize: 16, fontWeight: 700, color: "#ffffff" }}>
+                    {lifetime[k].toLocaleString()}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </section>
+
           <div className="grid grid-cols-2 gap-3">
             {tiles.map(({ to, title, subtitle, Icon }) => (
               <Link
