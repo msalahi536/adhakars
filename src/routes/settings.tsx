@@ -210,6 +210,39 @@ function Settings() {
             </div>
           </section>
 
+          {/* MY DAILY COMMITMENT */}
+          <section className="mb-6">
+            <h2 className="label-caps mb-1">My Daily Commitment</h2>
+            <p className="mb-3 text-xs opacity-70">
+              Choose what counts as a complete day. Only what you select is tracked.
+            </p>
+            <div className="space-y-2">
+              {(
+                [
+                  { id: "morning", label: "Morning Adhkar" },
+                  { id: "evening", label: "Evening Adhkar" },
+                  { id: "salah", label: "After Salah" },
+                  { id: "sleep", label: "Sleep Adhkar" },
+                  { id: "wake", label: "Wake Adhkar" },
+                  ...(hasCustom ? [{ id: "custom" as CommitmentSection, label: "My Adhkar" }] : []),
+                ] as { id: CommitmentSection; label: string }[]
+              ).map(({ id, label }) => (
+                <Toggle
+                  key={id}
+                  label={label}
+                  value={commitment[id]}
+                  onChange={(v) => {
+                    const next = { ...commitment, [id]: v };
+                    setCommitmentState(next);
+                    setCommitment(next);
+                  }}
+                />
+              ))}
+            </div>
+          </section>
+
+
+
           {/* REMINDERS */}
           <section className="mb-6">
             <h2 className="label-caps mb-3">Reminders</h2>
