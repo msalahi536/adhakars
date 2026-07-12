@@ -1,19 +1,12 @@
 import { useEffect, useRef, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { RotateCcw, Undo2 } from "lucide-react";
+import { ProgressRing } from "@/components/ProgressRing";
 import { vibrateIfEnabled } from "@/lib/theme";
 import { bumpLifetime } from "@/lib/storage";
 
 export const Route = createFileRoute("/tasbih")({
-  head: () => ({
-    meta: [{ title: "Tasbih — My Adhkar" }],
-    links: [
-      {
-        rel: "stylesheet",
-        href: "https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap",
-      },
-    ],
-  }),
+  head: () => ({ meta: [{ title: "Tasbih — My Adhkar" }] }),
   component: Tasbih,
 });
 
@@ -27,6 +20,7 @@ function Tasbih() {
   const [flash, setFlash] = useState(false);
   const [toast, setToast] = useState<string | null>(null);
   const [pressed, setPressed] = useState(false);
+  const [tapped, setTapped] = useState(false);
   const resetTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
@@ -46,6 +40,9 @@ function Tasbih() {
   const hasMilestone = milestone > 0;
   const cycleCount = hasMilestone ? total % milestone : 0;
   const cycleNum = hasMilestone ? Math.floor(total / milestone) + 1 : 1;
+  const ringMax = hasMilestone ? milestone : 100;
+  const ringValue = hasMilestone ? cycleCount : total % 100;
+  const complete = hasMilestone && cycleCount === 0 && total > 0;
 
   const showToast = (msg: string) => {
     setToast(msg);
@@ -55,52 +52,55 @@ function Tasbih() {
   const tap = () => {
     vibrateIfEnabled(12);
     bumpLifetime("tasbih", 1);
+    setTapped(true);
+    setTimeout(() => setTapped(false), 200);
     setTotal((n) => {
       const next = n + 1;
       if (hasMilestone && next % milestone === 0) {
         vibrateIfEnabled([40, 20, 40]);
         setFlash(true);
-        setTimeout(() => setFlash(false), 220);
+        setTimeout(() => setFlash(false), 260);
       }
       return next;
     });
   };
 
-  const undo = () => {
+  const undo = (e: React.MouseEvent) => {
+    e.stopPropagation();
     vibrateIfEnabled(8);
     setTotal((n) => Math.max(0, n - 1));
   };
 
-  const onResetStart = () => {
+  const onResetStart = (e: React.PointerEvent | React.TouchEvent | React.MouseEvent) => {
+    e.stopPropagation();
     resetTimer.current = setTimeout(() => {
       vibrateIfEnabled(40);
       setTotal(0);
       showToast("Count reset ✓");
     }, 1500);
   };
-  const onResetEnd = () => {
+  const onResetEnd = (e?: React.SyntheticEvent) => {
+    e?.stopPropagation();
     if (resetTimer.current) clearTimeout(resetTimer.current);
   };
 
-  // Pad number to 4 digits, right aligned
-
   return (
     <>
-      <header className="page-header" style={{ background: "#4F5F66", color: "#E8EDF0" }}>
-        <div className="mx-auto max-w-md px-5 pb-3 pt-5">
-          <h1
-            className="text-center font-bold tracking-tight"
-            style={{ fontSize: 20, color: "#E8EDF0" }}
-          >
-            Tasbih
-          </h1>
-        </div>
-      </header>
+      <header
+        className="page-header"
+        style={{ background: "var(--grad-header)", color: "var(--header-fg)" }}
+      >
+        <div className="mx-auto max-w-md px-5 pb-4 pt-5">
+          <div className="label-caps" style={{ color: "var(--header-sub)", opacity: 1 }}>
+            Dhikr Counter
+          </div>
+          <h1 className="mt-1 text-2xl font-bold tracking-tight">Tasbih</h1>
 
-      <main className="scroll-area" style={{ background: "#4F5F66", color: "#E8EDF0" }}>
-        <div className="mx-auto flex max-w-md flex-col items-center px-5 pb-6">
-          {/* Cycle pills */}
-          <div className="mt-5 flex items-center justify-center gap-2">
+          {/* Cycle target selector — matches Salah pills */}
+          <div
+            className="hide-scrollbar -mx-5 mt-4 flex gap-2 overflow-x-auto px-5 pb-1"
+            style={{ scrollbarWidth: "none" }}
+          >
             {MILESTONES.map((t) => {
               const active = milestone === t;
               const label = t === 0 ? "∞" : String(t);
@@ -108,14 +108,15 @@ function Tasbih() {
                 <button
                   key={t}
                   onClick={() => setMilestone(t)}
-                  className="flex items-center justify-center font-bold transition-all active:scale-95"
+                  className="flex shrink-0 items-center justify-center font-bold transition-all active:scale-95"
                   style={{
-                    width: 56,
+                    minWidth: 70,
                     height: 36,
                     borderRadius: 18,
-                    fontSize: 14,
-                    background: active ? "#D4A547" : "#3A4A52",
-                    color: active ? "#2A1F00" : "#8A9CA3",
+                    padding: "0 16px",
+                    fontSize: 13,
+                    background: active ? "var(--accent)" : "color-mix(in oklab, var(--header-fg) 15%, transparent)",
+                    color: active ? "var(--accent-foreground)" : "var(--header-fg)",
                     border: "none",
                   }}
                 >
@@ -124,221 +125,136 @@ function Tasbih() {
               );
             })}
           </div>
+        </div>
+      </header>
 
-          {/* Device shell — organic worry-stone shape */}
-          <div className="tasbih-shell-wrapper relative mt-6" style={{ width: 240, height: 340 }}>
-            {/* SVG shell */}
-            <svg
-              viewBox="0 0 280 400"
-              width={240}
-              height={340}
-              overflow="visible"
-              preserveAspectRatio="none"
-              style={{
-                position: "absolute",
-                inset: 0,
-                filter:
-                  "drop-shadow(0 24px 40px rgba(0,0,0,0.45)) drop-shadow(0 6px 12px rgba(0,0,0,0.25))",
-              }}
-              aria-hidden
-            >
-              <defs>
-                <linearGradient id="shellGrad" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor="#465861" />
-                  <stop offset="100%" stopColor="#33424A" />
-                </linearGradient>
-                <linearGradient id="shellStroke" x1="0" y1="0" x2="1" y2="1">
-                  <stop offset="0%" stopColor="#BDCED5" />
-                  <stop offset="55%" stopColor="#9BAEB5" />
-                  <stop offset="100%" stopColor="#5E6F77" />
-                </linearGradient>
-                <linearGradient id="shellHighlight" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor="rgba(255,255,255,0.22)" />
-                  <stop offset="45%" stopColor="rgba(255,255,255,0)" />
-                </linearGradient>
-              </defs>
-              <path
-                d="M 156 10 C 216 18, 266 64, 270 138 C 272 186, 250 228, 240 276 C 230 318, 222 362, 184 388 C 156 406, 116 400, 90 382 C 58 360, 38 322, 28 280 C 18 228, 8 180, 20 132 C 34 70, 86 2, 156 10 Z"
-                fill="url(#shellGrad)"
-                stroke="url(#shellStroke)"
-                strokeWidth={6}
-                strokeLinejoin="round"
-              />
-              <path
-                d="M 156 18 C 212 26, 260 70, 262 140 C 264 186, 244 226, 234 272 C 226 314, 216 354, 180 378 C 154 394, 118 388, 94 372 C 64 352, 46 318, 36 278 C 28 228, 18 184, 30 138 C 44 78, 92 12, 156 18 Z"
-                fill="none"
-                stroke="rgba(0,0,0,0.35)"
-                strokeWidth={2}
-                strokeLinejoin="round"
-              />
-              <path
-                d="M 156 10 C 216 18, 266 64, 270 138 C 232 84, 122 64, 58 116 C 40 130, 28 138, 20 132 C 34 70, 86 2, 156 10 Z"
-                fill="url(#shellHighlight)"
-              />
-            </svg>
-
-            {/* Inner content — flex column */}
+      <main className="scroll-area flex flex-col">
+        <div className="mx-auto flex min-h-0 w-full max-w-md flex-1 flex-col px-4 pt-4">
+          <button
+            onPointerDown={(e) => {
+              e.preventDefault();
+              setPressed(true);
+              tap();
+            }}
+            onPointerUp={() => setPressed(false)}
+            onPointerLeave={() => setPressed(false)}
+            onPointerCancel={() => setPressed(false)}
+            className="relative flex w-full flex-1 flex-col items-center justify-center overflow-hidden rounded-[24px] outline-none"
+            style={{
+              background: "var(--card)",
+              color: "var(--card-foreground)",
+              border: "1px solid var(--border)",
+              boxShadow: "var(--card-shadow, 0 4px 16px rgba(0,0,0,0.08))",
+              transform: pressed ? "scale(0.985)" : "scale(1)",
+              transition: "transform 120ms ease",
+              padding: "32px 20px",
+              touchAction: "manipulation",
+              minHeight: 380,
+            }}
+            aria-label="tap to count"
+          >
+            {/* Top corner controls */}
             <div
-              style={{
-                position: "absolute",
-                inset: 0,
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "center",
-                justifyContent: "space-between",
-                padding: "64px 24px 28px",
-              }}
+              className="absolute left-3 top-3 z-10"
+              onPointerDown={(e) => e.stopPropagation()}
             >
-              {/* LCD */}
-              <div
+              <button
+                onClick={undo}
+                className="flex h-9 w-9 items-center justify-center rounded-full transition-transform active:scale-90"
                 style={{
-                  width: 122,
-                  height: 50,
-                  margin: "0 auto",
-                  borderRadius: 9,
-                  background: flash ? "#D8E6BC" : "#C5D4AA",
-                  boxShadow: "inset 0 2px 6px rgba(0,0,0,0.25)",
-                  transition: "background 0.18s ease",
-                  display: "flex",
-                  flexDirection: "column",
-                  justifyContent: "center",
-                  alignItems: "flex-end",
-                  padding: "0 10px",
+                  background: "var(--btn-surface)",
+                  color: "var(--btn-fg)",
                 }}
+                aria-label="undo"
               >
+                <Undo2 size={16} />
+              </button>
+            </div>
+            <div
+              className="absolute right-3 top-3 z-10"
+              onPointerDown={(e) => e.stopPropagation()}
+            >
+              <button
+                onMouseDown={onResetStart}
+                onMouseUp={onResetEnd}
+                onMouseLeave={onResetEnd}
+                onTouchStart={onResetStart}
+                onTouchEnd={onResetEnd}
+                className="flex h-9 w-9 items-center justify-center rounded-full transition-transform active:scale-90"
+                style={{
+                  background: "var(--btn-surface)",
+                  color: "var(--btn-fg)",
+                }}
+                aria-label="hold to reset"
+              >
+                <RotateCcw size={16} />
+              </button>
+            </div>
+
+            {/* Big progress ring with count */}
+            <div className={`relative flex items-center justify-center ${tapped ? "tap-pulse" : ""}`}>
+              <ProgressRing
+                value={ringValue}
+                max={ringMax}
+                size={240}
+                stroke={14}
+                complete={complete}
+              />
+              <div className="absolute inset-0 flex flex-col items-center justify-center">
                 <span
+                  className="font-bold leading-none"
                   style={{
-                    fontFamily: "'Share Tech Mono', ui-monospace, monospace",
+                    fontSize: 64,
+                    color: "var(--count-fg, var(--card-foreground))",
                     fontVariantNumeric: "tabular-nums",
-                    fontSize: 27,
-                    lineHeight: 1,
-                    letterSpacing: "0.04em",
-                    color: "#1A1F1C",
+                    transition: "color 200ms",
                   }}
                 >
                   {total}
                 </span>
                 <span
-                  style={{
-                    fontSize: 9,
-                    color: "rgba(26,31,28,0.6)",
-                    marginTop: 2,
-                    letterSpacing: "0.08em",
-                    fontWeight: 600,
-                  }}
+                  className="mt-2 text-[12px]"
+                  style={{ color: "var(--muted-foreground)", letterSpacing: "0.05em" }}
                 >
-                  {hasMilestone ? `cycle ${cycleNum} · ${cycleCount}/${milestone}` : "∞ continuous"}
+                  {hasMilestone
+                    ? `cycle ${cycleNum} · ${cycleCount}/${milestone}`
+                    : "∞ continuous"}
                 </span>
               </div>
-
-              {/* Undo / Reset row */}
-              <div
-                className="flex w-full items-center justify-between"
-                style={{ paddingLeft: 8, paddingRight: 8, marginTop: 12 }}
-              >
-                <button
-                  onClick={undo}
-                  className="transition-transform active:scale-90"
-                  style={{
-                    width: 42,
-                    height: 42,
-                    borderRadius: "50%",
-                    background: "#5C6D74",
-                    border: "1px solid rgba(0,0,0,0.25)",
-                    color: "#B8C5CB",
-                    boxShadow:
-                      "inset 0 1px 0 rgba(255,255,255,0.18), inset 0 -2px 5px rgba(0,0,0,0.3), 0 3px 6px rgba(0,0,0,0.28)",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                  }}
-                  aria-label="undo"
-                >
-                  <Undo2 size={18} />
-                </button>
-                <button
-                  onMouseDown={onResetStart}
-                  onMouseUp={onResetEnd}
-                  onMouseLeave={onResetEnd}
-                  onTouchStart={onResetStart}
-                  onTouchEnd={onResetEnd}
-                  style={{
-                    width: 42,
-                    height: 42,
-                    borderRadius: "50%",
-                    background: "#5C6D74",
-                    border: "1px solid rgba(0,0,0,0.25)",
-                    color: "#B8C5CB",
-                    boxShadow:
-                      "inset 0 1px 0 rgba(255,255,255,0.18), inset 0 -2px 5px rgba(0,0,0,0.3), 0 3px 6px rgba(0,0,0,0.28)",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                  }}
-                  aria-label="hold to reset"
-                >
-                  <RotateCcw size={18} />
-                </button>
-              </div>
-
-              {/* Tap button */}
-              <div className="flex items-center justify-center">
-                <button
-                  onPointerDown={(e) => {
-                    e.preventDefault();
-                    setPressed(true);
-                    tap();
-                  }}
-                  onPointerUp={() => setPressed(false)}
-                  onPointerLeave={() => setPressed(false)}
-                  onPointerCancel={() => setPressed(false)}
-                  style={{
-                    width: 110,
-                    height: 110,
-                    transform: pressed ? "scale(0.95)" : "scale(1)",
-                    borderRadius: "50%",
-                    background: "radial-gradient(circle at 32% 28%, #C5D0D5 0%, #9FAEB4 100%)",
-                    border: "4px solid #6B7880",
-                    boxShadow: pressed
-                      ? "0 2px 6px rgba(0,0,0,0.25), inset 0 3px 8px rgba(0,0,0,0.28)"
-                      : "0 6px 16px rgba(0,0,0,0.25), inset 0 3px 0 rgba(255,255,255,0.4), inset 0 -3px 6px rgba(0,0,0,0.15)",
-                    transition: "transform 90ms ease, box-shadow 90ms ease",
-                    touchAction: "manipulation",
-                    cursor: "pointer",
-                    outline: "none",
-                  }}
-                  aria-label="tap to count"
+              {flash && (
+                <span
+                  className="radial-pulse pointer-events-none absolute inset-0 rounded-full"
+                  style={{ background: "color-mix(in oklab, var(--accent) 45%, transparent)" }}
                 />
+              )}
+            </div>
+
+            {/* Helper text */}
+            <div className="mt-8 text-center">
+              <div
+                className="label-caps"
+                style={{ color: "var(--muted-foreground)", opacity: 0.85 }}
+              >
+                Tap anywhere to count
+              </div>
+              <div
+                className="mt-1 text-[11px]"
+                style={{ color: "var(--muted-foreground)", opacity: 0.7 }}
+              >
+                Hold reset 1.5s to clear
               </div>
             </div>
-          </div>
-
-          {/* Helper text */}
-          <div className="mt-6 text-center">
-            <div
-              style={{
-                fontSize: 11,
-                color: "rgba(255,255,255,0.45)",
-                letterSpacing: "0.15em",
-                fontWeight: 600,
-              }}
-            >
-              TAP BUTTON TO COUNT
-            </div>
-            <div style={{ fontSize: 10, color: "rgba(255,255,255,0.3)", marginTop: 4 }}>
-              Hold reset 1.5s to clear
-            </div>
-          </div>
-
-          {toast && (
-            <div
-              className="pop-in fixed left-1/2 top-24 z-50 -translate-x-1/2 rounded-[12px] px-4 py-2 text-sm font-semibold shadow-lg"
-              style={{ background: "#D4A547", color: "#2A1F00" }}
-            >
-              {toast}
-            </div>
-          )}
+          </button>
         </div>
+
+        {toast && (
+          <div
+            className="pop-in fixed left-1/2 top-24 z-50 -translate-x-1/2 rounded-[12px] px-4 py-2 text-sm font-semibold shadow-lg"
+            style={{ background: "var(--accent)", color: "var(--accent-foreground)" }}
+          >
+            {toast}
+          </div>
+        )}
       </main>
     </>
   );
