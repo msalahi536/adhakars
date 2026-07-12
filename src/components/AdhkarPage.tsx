@@ -67,7 +67,16 @@ export function AdhkarPage({
       <header className="page-header relative overflow-hidden" style={{ ...defaultHeader, ...headerStyle }}>
         {headerPattern}
         <HeaderSettingsButton />
+        {headerAction && (
+          <div
+            className="absolute z-10"
+            style={{ top: "calc(env(safe-area-inset-top) + 10px)", right: 56 }}
+          >
+            {headerAction}
+          </div>
+        )}
         <div className="relative mx-auto max-w-md px-5 pb-4 pt-5">
+
 
           <div
             className="label-caps"
