@@ -249,7 +249,7 @@ function Tasbih() {
                 Hold reset 1.5s to clear
               </div>
             </div>
-          </button>
+          </div>
         </div>
 
         {toast && (
