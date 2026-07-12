@@ -27,6 +27,7 @@ export function AdhkarPage({
   items: itemsProp,
   extras = [],
   headerStyle,
+  headerPattern,
 }: Props) {
   const [counts, setCounts] = useState<Record<string, number>>({});
 
