@@ -255,6 +255,26 @@ export function SwipeStack({ items, counts, onIncrement, onReset, persistKey, fi
             <RotateCcw size={12} /> Restart
           </button>
         )}
+        {current?.dhikr && onEditItem && (
+          <button
+            onClick={() => onEditItem(current.dhikr!.id)}
+            className="flex items-center gap-1 rounded-[12px] px-2.5 py-1 text-[11px] font-semibold transition active:scale-95"
+            style={{ background: "var(--surface)", color: "var(--foreground)" }}
+            aria-label="edit"
+          >
+            <Pencil size={12} /> Edit
+          </button>
+        )}
+        {current?.dhikr && onDeleteItem && (
+          <button
+            onClick={() => onDeleteItem(current.dhikr!.id)}
+            className="flex items-center gap-1 rounded-[12px] px-2.5 py-1 text-[11px] font-semibold transition active:scale-95"
+            style={{ background: "var(--surface)", color: "#c0392b" }}
+            aria-label="delete"
+          >
+            <Trash2 size={12} /> Delete
+          </button>
+        )}
       </div>
 
 
