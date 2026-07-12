@@ -8,7 +8,7 @@ import { triggerHaptic } from "@/lib/theme";
 import { bumpLifetime } from "@/lib/storage";
 
 export const Route = createFileRoute("/tasbih")({
-  head: () => ({ meta: [{ title: "Tasbih — My Adhkar" }] }),
+  head: () => ({ meta: [{ title: "Tasbih, My Adhkar" }] }),
   component: Tasbih,
 });
 
@@ -79,7 +79,7 @@ function Tasbih() {
       triggerHaptic("heavy");
       setTotal(0);
       showToast("Count reset ✓");
-    }, 1500);
+    }, 2500);
   };
   const onResetEnd = (e?: React.SyntheticEvent) => {
     e?.stopPropagation();
@@ -118,7 +118,7 @@ function Tasbih() {
             Tasbih
           </h1>
 
-          {/* Cycle target selector — centered, all four fit */}
+          {/* Cycle target selector, centered, all four fit */}
           <div className="mt-4 flex items-center justify-center gap-2">
             {MILESTONES.map((t) => {
               const active = milestone === t;
@@ -266,7 +266,7 @@ function Tasbih() {
                 className="mt-1 text-[11px]"
                 style={{ color: "var(--muted-foreground)", opacity: 0.7 }}
               >
-                Hold reset 1.5s to clear
+                Hold reset 2.5s to clear
               </div>
             </div>
           </div>

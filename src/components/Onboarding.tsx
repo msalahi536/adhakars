@@ -39,7 +39,7 @@ const SLIDES: Slide[] = [
     Icon: BookOpen,
     label: "Welcome",
     title: "Authentic adhkar, every day",
-    body: "Every dhikr is sourced from Sahih hadith or the Qur'an — pure and trustworthy.",
+    body: "Every dhikr is sourced from Sahih hadith or the Qur'an. Pure and trustworthy.",
   },
   {
     Icon: Hand,
@@ -57,7 +57,7 @@ const SLIDES: Slide[] = [
     Icon: Bell,
     label: "Reminders",
     title: "Never miss a session",
-    body: "Enable daily reminders scheduled on your device — morning and evening, right on time.",
+    body: "Enable daily reminders scheduled on your device. Morning and evening, right on time.",
   },
 ];
 

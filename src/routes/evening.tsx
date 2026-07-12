@@ -6,7 +6,7 @@ import { eveningAdhkar, baqarahLastTwo } from "@/data/adhkar";
 export const Route = createFileRoute("/evening")({
   head: () => ({
     meta: [
-      { title: "Evening Adhkar — My Adhkar" },
+      { title: "Evening Adhkar, My Adhkar" },
       { name: "description", content: "Recite your evening adhkar with counters and streaks." },
     ],
   }),
@@ -23,7 +23,7 @@ function Evening() {
       list={eveningAdhkar}
       headerPattern={<InterlockingArcsPattern />}
       extras={[
-        { dhikr: baqarahLastTwo, isSpecial: true, specialLabel: "After Sunset — recite after the sun has set" },
+        { dhikr: baqarahLastTwo, isSpecial: true, specialLabel: "After Sunset. Recite after the sun has set" },
       ]}
     />
   );

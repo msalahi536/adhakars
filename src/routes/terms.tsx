@@ -5,12 +5,43 @@ import { ConcentricCirclesPattern } from "@/components/HeaderPatterns";
 export const Route = createFileRoute("/terms")({
   head: () => ({
     meta: [
-      { title: "Terms of Service — My Adhkar" },
+      { title: "Terms of Service, My Adhkar" },
       { name: "description", content: "Terms of service for the My Adhkar app." },
     ],
   }),
   component: Terms,
 });
+
+const SECTIONS: { heading: string; body: string }[] = [
+  {
+    heading: "The app",
+    body: "My Adhkar is provided free of charge, as is, without warranty of any kind. It is offered as a benefit to the community and is not a substitute for scholarly guidance.",
+  },
+  {
+    heading: "Accuracy",
+    body: "Every effort has been made to include only authentic narrations with clear sources. If you find an error, please report it and it will be corrected.",
+  },
+  {
+    heading: "Your content",
+    body: "Custom adhkar that you create are stored on your device only. You are responsible for what you add. We do not review, store, or have access to this content.",
+  },
+  {
+    heading: "Donations",
+    body: "Donations are voluntary, are not payment for any feature or content, and are non refundable. Every feature of the app is free whether you donate or not.",
+  },
+  {
+    heading: "Limitation of liability",
+    body: "This app is provided without warranty. We are not liable for any loss of data, including counts, streaks, or custom adhkar.",
+  },
+  {
+    heading: "Changes",
+    body: "These terms may be updated. Continued use of the app means you accept the current terms.",
+  },
+  {
+    heading: "Contact",
+    body: "msalahi536@gmail.com",
+  },
+];
 
 function Terms() {
   return (
@@ -33,15 +64,17 @@ function Terms() {
       </header>
 
       <main className="scroll-area">
-        <div className="mx-auto max-w-md px-4 py-4 space-y-3 text-sm leading-relaxed">
+        <div className="mx-auto max-w-md px-4 py-4 space-y-4 text-sm leading-relaxed">
+          <p style={{ color: "var(--muted-foreground)" }}>Last updated: July 2026</p>
           <p style={{ color: "var(--foreground)" }}>
-            My Adhkar is provided free of charge for personal, non-commercial
-            use. The app is offered "as is" without warranty of any kind.
+            By using My Adhkar you agree to these terms.
           </p>
-          <p style={{ color: "var(--muted-foreground)" }}>
-            {/* TODO: Replace with the full terms of service. */}
-            Full terms of service coming soon.
-          </p>
+          {SECTIONS.map((s) => (
+            <section key={s.heading}>
+              <h2 className="label-caps mb-1">{s.heading}</h2>
+              <p style={{ color: "var(--foreground)" }}>{s.body}</p>
+            </section>
+          ))}
         </div>
       </main>
     </>
