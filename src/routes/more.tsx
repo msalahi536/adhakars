@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { BedDouble, Compass, ChevronRight } from "lucide-react";
+import { BedDouble, Compass, BookPlus, ChevronRight } from "lucide-react";
 import { HeaderSettingsButton } from "@/components/HeaderSettingsButton";
 import { SparseStarsPattern } from "@/components/HeaderPatterns";
 import { getStreak } from "@/lib/storage";
@@ -16,13 +16,19 @@ export const Route = createFileRoute("/more")({
 });
 
 type Tile = {
-  to: "/sleep" | "/qibla";
+  to: "/sleep" | "/qibla" | "/my-adhkar";
   title: string;
   subtitle: string;
   Icon: typeof BedDouble;
 };
 
 const tiles: Tile[] = [
+  {
+    to: "/my-adhkar",
+    title: "My Adhkar",
+    subtitle: "Your own custom adhkar",
+    Icon: BookPlus,
+  },
   {
     to: "/sleep",
     title: "Sleep & Wake",
