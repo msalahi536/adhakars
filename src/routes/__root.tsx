@@ -127,8 +127,6 @@ function RootComponent() {
 
   useEffect(() => {
     reconcileStreak();
-    // Re-apply saved local reminder schedules on app open. Silently no-ops
-    // on web where the Capacitor plugin isn't available.
     (async () => {
       try {
         const granted = await checkNotificationPermission();
@@ -138,6 +136,14 @@ function RootComponent() {
       }
     })();
   }, []);
+
+  useEffect(() => {
+    const { data: sub } = supabase.auth.onAuthStateChange((event) => {
+      if (event !== "SIGNED_IN" && event !== "SIGNED_OUT" && event !== "USER_UPDATED") return;
+      router.invalidate();
+    });
+    return () => sub.subscription.unsubscribe();
+  }, [router]);
 
   return (
     <QueryClientProvider client={queryClient}>
