@@ -15,7 +15,7 @@ type Props = {
   isPersonalDua?: boolean;
 };
 
-export function DhikrCard({ dhikr, count, onIncrement, index, total, isSpecial, specialLabel, isPersonalDua }: Props) {
+export function DhikrCard({ dhikr, count, onIncrement, isSpecial, specialLabel, isPersonalDua }: Props) {
   const [tapped, setTapped] = useState(false);
   const [bursts, setBursts] = useState<number[]>([]);
   const [display, setDisplay] = useState(getDisplay());
