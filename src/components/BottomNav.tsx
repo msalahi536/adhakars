@@ -68,11 +68,12 @@ export function BottomNav() {
             style={{ transition: "color 0.25s ease", minWidth: 0 }}
           >
             {({ isActive }) => {
-              const color = isActive ? activeColor : iconColor;
-              const opacity = isActive ? 1 : 0.6;
+              const active = isActive || (t.to === "/more" && moreNestedActive);
+              const color = active ? activeColor : iconColor;
+              const opacity = active ? 1 : 0.6;
               return (
                 <>
-                  <t.Icon size={19} strokeWidth={isActive ? 2.4 : 2} style={{ color, opacity }} />
+                  <t.Icon size={19} strokeWidth={active ? 2.4 : 2} style={{ color, opacity }} />
                   <span
                     style={{
                       color,
