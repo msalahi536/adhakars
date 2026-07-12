@@ -55,6 +55,8 @@ function Settings() {
     setModeState(getMode());
     setDisplayState(getDisplay());
     setNotifPrefsState(getNotificationPrefs());
+    setCommitmentState(getCommitment());
+    setHasCustom(getCustomAdhkarRows().length > 0);
     let cancelled = false;
     checkNotificationPermission().then((v) => {
       if (!cancelled) setNotifEnabled(v);
