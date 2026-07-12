@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "@tanstack/react-router";
 import { DhikrCard } from "./DhikrCard";
 import { TasbeehComboCard } from "./TasbeehComboCard";
-import { ChevronLeft, ChevronRight, RotateCcw, ArrowRight } from "lucide-react";
+import { ChevronLeft, ChevronRight, RotateCcw, ArrowRight, Pencil, Trash2 } from "lucide-react";
 import type { SalahItem } from "@/data/salah";
 import { isItemComplete, itemId } from "@/data/salah";
 
@@ -14,6 +14,8 @@ type Props = {
   persistKey?: string;
   finishCta?: { label: string; to: string };
   onFinishNav?: () => void;
+  onEditItem?: (id: string) => void;
+  onDeleteItem?: (id: string) => void;
 };
 
 type Phase = "idle" | "out-left" | "out-right" | "in-left" | "in-right";
