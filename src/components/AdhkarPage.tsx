@@ -15,6 +15,7 @@ type Props = {
   items?: SalahItem[];
   extras?: SalahItem[];
   headerStyle?: React.CSSProperties;
+  headerPattern?: React.ReactNode;
 };
 
 export function AdhkarPage({
