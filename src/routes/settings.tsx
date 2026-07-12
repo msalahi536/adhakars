@@ -157,7 +157,8 @@ function Settings() {
         style={{ background: "var(--background)", color: "var(--foreground)" }}
       >
         <SparseStarsPattern />
-        <div className="relative mx-auto max-w-md px-4 pb-5 pt-4">
+        <HeaderBackButton />
+        <div className="relative mx-auto max-w-md px-4 pb-5 pt-4" style={{ paddingLeft: 60, paddingRight: 60 }}>
           <div className="label-caps">Preferences</div>
           <h1 className="mt-1 text-3xl font-bold">Settings</h1>
         </div>
