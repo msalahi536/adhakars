@@ -12,7 +12,14 @@ import {
   setDisplay,
   type ThemeMode,
 } from "@/lib/theme";
-import { resetToday, resetAllProgress } from "@/lib/storage";
+import {
+  resetToday,
+  resetAllProgress,
+  getCommitment,
+  setCommitment,
+  getCustomAdhkarRows,
+  type CommitmentSection,
+} from "@/lib/storage";
 import {
   getNotificationPrefs,
   setNotificationPrefs,
@@ -40,12 +47,16 @@ function Settings() {
   const [confirmResetAll, setConfirmResetAll] = useState(false);
   const [notifEnabled, setNotifEnabled] = useState(false);
   const [notifPrefs, setNotifPrefsState] = useState<NotificationPrefs>(() => getNotificationPrefs());
+  const [commitment, setCommitmentState] = useState<Record<CommitmentSection, boolean>>(() => getCommitment());
+  const [hasCustom, setHasCustom] = useState(false);
   const nativeAvailable = isNativePlatform();
 
   useEffect(() => {
     setModeState(getMode());
     setDisplayState(getDisplay());
     setNotifPrefsState(getNotificationPrefs());
+    setCommitmentState(getCommitment());
+    setHasCustom(getCustomAdhkarRows().length > 0);
     let cancelled = false;
     checkNotificationPermission().then((v) => {
       if (!cancelled) setNotifEnabled(v);
@@ -199,6 +210,39 @@ function Settings() {
             </div>
           </section>
 
+          {/* MY DAILY COMMITMENT */}
+          <section className="mb-6">
+            <h2 className="label-caps mb-1">My Daily Commitment</h2>
+            <p className="mb-3 text-xs opacity-70">
+              Choose what counts as a complete day. Only what you select is tracked.
+            </p>
+            <div className="space-y-2">
+              {(
+                [
+                  { id: "morning", label: "Morning Adhkar" },
+                  { id: "evening", label: "Evening Adhkar" },
+                  { id: "salah", label: "After Salah" },
+                  { id: "sleep", label: "Sleep Adhkar" },
+                  { id: "wake", label: "Wake Adhkar" },
+                  ...(hasCustom ? [{ id: "custom" as CommitmentSection, label: "My Adhkar" }] : []),
+                ] as { id: CommitmentSection; label: string }[]
+              ).map(({ id, label }) => (
+                <Toggle
+                  key={id}
+                  label={label}
+                  value={commitment[id]}
+                  onChange={(v) => {
+                    const next = { ...commitment, [id]: v };
+                    setCommitmentState(next);
+                    setCommitment(next);
+                  }}
+                />
+              ))}
+            </div>
+          </section>
+
+
+
           {/* REMINDERS */}
           <section className="mb-6">
             <h2 className="label-caps mb-3">Reminders</h2>
@@ -235,9 +279,14 @@ function Settings() {
                 </>
               ) : (
                 <div className="space-y-3">
-                  {(["morning", "evening"] as ReminderId[]).map((id) => {
+                  {(["morning", "evening", "nudge"] as ReminderId[]).map((id) => {
                     const r = notifPrefs[id];
-                    const label = id === "morning" ? "Morning reminder" : "Evening reminder";
+                    const label =
+                      id === "morning"
+                        ? "Morning reminder"
+                        : id === "evening"
+                        ? "Evening reminder"
+                        : "Gentle nudge if the day is incomplete";
                     return (
                       <div
                         key={id}

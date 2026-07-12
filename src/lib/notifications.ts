@@ -1,19 +1,19 @@
 // Local device notifications via @capacitor/local-notifications.
-// Uses a dynamic import so the app still builds on web where the plugin
-// is not installed / not available. All native calls are wrapped in
-// try/catch and gated behind a platform check.
 
-export type ReminderId = "morning" | "evening";
+import { isDayComplete } from "@/lib/storage";
+
+export type ReminderId = "morning" | "evening" | "nudge";
 
 export type Reminder = {
   enabled: boolean;
-  hour: number; // 0-23
-  minute: number; // 0-59
+  hour: number;
+  minute: number;
 };
 
 export type NotificationPrefs = {
   morning: Reminder;
   evening: Reminder;
+  nudge: Reminder;
 };
 
 const PREFS_KEY = "adhkar:notifications";
@@ -21,16 +21,19 @@ const PREFS_KEY = "adhkar:notifications";
 const NOTIF_IDS: Record<ReminderId, number> = {
   morning: 1,
   evening: 2,
+  nudge: 3,
 };
 
 const NOTIF_COPY: Record<ReminderId, { title: string; body: string }> = {
   morning: { title: "Morning Adhkar", body: "Time for your morning adhkar." },
   evening: { title: "Evening Adhkar", body: "Time for your evening adhkar." },
+  nudge: { title: "Adhkar as-Sahih", body: "Your adhkar are still waiting. There is still time today." },
 };
 
 const defaults: NotificationPrefs = {
   morning: { enabled: false, hour: 6, minute: 0 },
   evening: { enabled: false, hour: 16, minute: 30 },
+  nudge: { enabled: false, hour: 20, minute: 0 },
 };
 
 export const getNotificationPrefs = (): NotificationPrefs => {
@@ -42,6 +45,7 @@ export const getNotificationPrefs = (): NotificationPrefs => {
     return {
       morning: { ...defaults.morning, ...(parsed.morning ?? {}) },
       evening: { ...defaults.evening, ...(parsed.evening ?? {}) },
+      nudge: { ...defaults.nudge, ...(parsed.nudge ?? {}) },
     };
   } catch {
     return defaults;
@@ -53,8 +57,6 @@ export const setNotificationPrefs = (p: NotificationPrefs) => {
   localStorage.setItem(PREFS_KEY, JSON.stringify(p));
 };
 
-// Native detection --------------------------------------------------
-
 type CapWindow = {
   Capacitor?: { isNativePlatform?: () => boolean; getPlatform?: () => string };
 };
@@ -65,8 +67,6 @@ export const isNativePlatform = (): boolean => {
   return cap?.isNativePlatform?.() === true;
 };
 
-// Load the plugin at runtime only. Using a variable module name +
-// @vite-ignore prevents Vite from trying to bundle it on web.
 const loadPlugin = async (): Promise<any> => {
   if (!isNativePlatform()) return null;
   try {
@@ -77,8 +77,6 @@ const loadPlugin = async (): Promise<any> => {
     return null;
   }
 };
-
-// Permissions -------------------------------------------------------
 
 export const requestNotificationPermission = async (): Promise<boolean> => {
   const plugin = await loadPlugin();
@@ -102,8 +100,6 @@ export const checkNotificationPermission = async (): Promise<boolean> => {
   }
 };
 
-// Scheduling --------------------------------------------------------
-
 export const cancelReminder = async (id: ReminderId): Promise<void> => {
   const plugin = await loadPlugin();
   if (!plugin) return;
@@ -122,8 +118,6 @@ export const scheduleReminder = async (
   const plugin = await loadPlugin();
   if (!plugin) return false;
   try {
-    // Cancel any existing schedule with this ID before re-scheduling so
-    // there are never duplicates.
     await plugin.cancel({ notifications: [{ id: NOTIF_IDS[id] }] }).catch(() => {});
     const copy = NOTIF_COPY[id];
     await plugin.schedule({
@@ -148,12 +142,16 @@ export const scheduleReminder = async (
   }
 };
 
-// Apply the whole prefs object: schedule what's enabled, cancel what isn't.
 export const applyReminders = async (prefs: NotificationPrefs): Promise<void> => {
   if (!isNativePlatform()) return;
-  for (const key of ["morning", "evening"] as ReminderId[]) {
+  for (const key of ["morning", "evening", "nudge"] as ReminderId[]) {
     const r = prefs[key];
     if (r.enabled) {
+      // For nudge: only keep scheduled while day is incomplete.
+      if (key === "nudge" && isDayComplete()) {
+        await cancelReminder(key);
+        continue;
+      }
       await scheduleReminder(key, r.hour, r.minute);
     } else {
       await cancelReminder(key);
