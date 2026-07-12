@@ -128,14 +128,17 @@ function RootComponent() {
 
   useEffect(() => {
     reconcileStreak();
-    (async () => {
+    const reapply = async () => {
       try {
         const granted = await checkNotificationPermission();
         if (granted) await applyReminders(getNotificationPrefs());
       } catch {
         // ignore
       }
-    })();
+    };
+    void reapply();
+    window.addEventListener("adhkar:day-complete", reapply);
+    return () => window.removeEventListener("adhkar:day-complete", reapply);
   }, []);
 
   useEffect(() => {
