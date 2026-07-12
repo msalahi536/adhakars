@@ -59,8 +59,7 @@ function About() {
               className="mt-3 text-xs leading-relaxed"
               style={{ color: "var(--muted-foreground)" }}
             >
-              Based on the authentic adhkar compiled by Shaykh Abdul Aziz
-              At-Tarefe, compiled by Yasser Peerun.
+            Based on the authentic adhkar compiled by our team.
             </p>
           </section>
 
