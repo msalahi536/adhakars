@@ -1,7 +1,9 @@
 import { useEffect, useState } from "react";
-import { Link } from "@tanstack/react-router";
+import { Link, useRouterState } from "@tanstack/react-router";
 import { Sunrise, Moon, CircleDot, Hand, MoreHorizontal } from "lucide-react";
 import { getStreak } from "@/lib/storage";
+
+const MORE_NESTED = ["/sleep", "/wake", "/qibla"];
 
 const tabs = [
   { to: "/" as const, label: "Morning", Icon: Sunrise },
@@ -16,6 +18,8 @@ const DARK_THEMES = new Set(["dark-emerald", "deep-navy"]);
 export function BottomNav() {
   const [streak, setStreak] = useState(0);
   const [theme, setTheme] = useState<string>("dawn");
+  const pathname = useRouterState({ select: (s) => s.location.pathname });
+  const moreNestedActive = MORE_NESTED.some((p) => pathname === p || pathname.startsWith(p + "/"));
 
   useEffect(() => {
     setStreak(getStreak().current);
@@ -64,11 +68,12 @@ export function BottomNav() {
             style={{ transition: "color 0.25s ease", minWidth: 0 }}
           >
             {({ isActive }) => {
-              const color = isActive ? activeColor : iconColor;
-              const opacity = isActive ? 1 : 0.6;
+              const active = isActive || (t.to === "/more" && moreNestedActive);
+              const color = active ? activeColor : iconColor;
+              const opacity = active ? 1 : 0.6;
               return (
                 <>
-                  <t.Icon size={19} strokeWidth={isActive ? 2.4 : 2} style={{ color, opacity }} />
+                  <t.Icon size={19} strokeWidth={active ? 2.4 : 2} style={{ color, opacity }} />
                   <span
                     style={{
                       color,
