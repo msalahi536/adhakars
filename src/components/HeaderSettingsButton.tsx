@@ -12,8 +12,8 @@ export function HeaderSettingsButton() {
       aria-label="Settings"
       className="absolute z-10 flex items-center justify-center rounded-full transition-transform active:scale-90"
       style={{
-        top: "calc(env(safe-area-inset-top) + 22px)",
-        right: 12,
+        top: "calc(env(safe-area-inset-top) + 34px)",
+        right: 20,
         width: 36,
         height: 36,
         color: "currentColor",
