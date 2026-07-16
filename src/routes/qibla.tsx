@@ -208,7 +208,12 @@ function Qibla() {
 
       <main className="scroll-area" style={{ background: "#0f1a14" }}>
         <div className="mx-auto flex w-full max-w-md flex-col items-center px-5 py-6 text-white">
-          {permState !== "granted" && (
+          {showCalibration && (
+            <div className="mb-5 w-full">
+              <CompassCalibrationCard onDismiss={() => setShowCalibration(false)} />
+            </div>
+          )}
+          {permState !== "granted" && !showCalibration && (
             <div className="mt-6 flex w-full flex-col items-center gap-4">
               <p className="text-center text-sm opacity-80">
                 We need your location and motion sensors to compute the Qibla direction. Nothing
