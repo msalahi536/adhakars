@@ -152,8 +152,8 @@
 
 @layer base {
   :root {
-    --bottom-nav-row: 48px;
-    --bottom-nav-height: 48px;
+    --bottom-nav-row: 56px;
+    --bottom-nav-height: 56px;
   }
   * {
     border-color: var(--color-border);
@@ -207,10 +207,9 @@
   }
   .bottom-nav {
     position: fixed;
-    left: 12px;
-    right: 12px;
-    bottom: 12px;
-    width: auto;
+    inset-inline: 0;
+    bottom: 0;
+    width: 100%;
     height: calc(var(--bottom-nav-row) + env(safe-area-inset-bottom));
     min-height: calc(var(--bottom-nav-row) + env(safe-area-inset-bottom));
     margin: 0;
@@ -224,8 +223,6 @@
     display: flex;
     align-items: flex-start;
     justify-content: center;
-    border-radius: 28px;
-    box-shadow: var(--card-shadow);
   }
   .bottom-nav-row {
     width: 100%;
