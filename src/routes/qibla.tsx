@@ -2,12 +2,16 @@ import { useEffect, useRef, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { HeaderSettingsButton } from "@/components/HeaderSettingsButton";
 import { HeaderBackButton } from "@/components/HeaderBackButton";
+import { CompassCalibrationCard } from "@/components/CompassCalibrationCard";
+
+const CAL_OPEN_COUNT_KEY = "qibla-open-count";
+const CAL_AUTO_LIMIT = 3;
 
 
 export const Route = createFileRoute("/qibla")({
   head: () => ({
     meta: [
-      { title: "Qibla Finder, Sahih al-Adhkar" },
+      { title: "Qibla Finder, Sahih Al-Adhkar" },
       { name: "description", content: "Find the direction of the Qibla from your location." },
     ],
   }),
@@ -54,13 +58,28 @@ function Qibla() {
   const [coords, setCoords] = useState<{ lat: number; lng: number } | null>(null);
   const [heading, setHeading] = useState<number | null>(null); // device compass heading (0 = N)
   const [qiblaBearing, setQiblaBearing] = useState<number | null>(null);
+  const [showCalibration, setShowCalibration] = useState<boolean>(false);
+  const lowAccuracyShownRef = useRef(false);
   const listenerRef = useRef<((e: DeviceOrientationEvent) => void) | null>(null);
+
+  // Auto-show calibration card the first N opens.
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    try {
+      const raw = localStorage.getItem(CAL_OPEN_COUNT_KEY);
+      const n = raw ? parseInt(raw, 10) || 0 : 0;
+      if (n < CAL_AUTO_LIMIT) {
+        setShowCalibration(true);
+      }
+      localStorage.setItem(CAL_OPEN_COUNT_KEY, String(n + 1));
+    } catch {
+      // ignore
+    }
+  }, []);
 
   useEffect(() => {
     // Auto-start only when the platform does NOT require a per-session user
-    // gesture for motion access. iOS 13+ (DeviceOrientationEvent.requestPermission)
-    // MUST be triggered from a fresh tap each session — otherwise the listener
-    // attaches but never fires, leaving an empty compass.
+    // gesture for motion access.
     const DOE = DeviceOrientationEvent as DeviceOrientationEventStatic;
     const needsGesture = typeof DOE?.requestPermission === "function";
     if (
@@ -126,12 +145,26 @@ function Qibla() {
     }
 
     const handler = (e: DeviceOrientationEvent) => {
-      const anyE = e as DeviceOrientationEvent & { webkitCompassHeading?: number };
+      const anyE = e as DeviceOrientationEvent & {
+        webkitCompassHeading?: number;
+        webkitCompassAccuracy?: number;
+      };
       if (typeof anyE.webkitCompassHeading === "number") {
         setHeading(anyE.webkitCompassHeading);
       } else if (typeof e.alpha === "number") {
         const h = (360 - e.alpha) % 360;
         setHeading(h);
+      }
+      // Low compass accuracy: iOS reports -1 for invalid, or a degree value
+      // where larger = worse. Anything > 30° or -1 is treated as low accuracy.
+      const acc = anyE.webkitCompassAccuracy;
+      if (
+        typeof acc === "number" &&
+        (acc < 0 || acc > 30) &&
+        !lowAccuracyShownRef.current
+      ) {
+        lowAccuracyShownRef.current = true;
+        setShowCalibration(true);
       }
     };
     listenerRef.current = handler;
@@ -175,6 +208,11 @@ function Qibla() {
 
       <main className="scroll-area" style={{ background: "#0f1a14" }}>
         <div className="mx-auto flex w-full max-w-md flex-col items-center px-5 py-6 text-white">
+          {showCalibration && (
+            <div className="mb-5 w-full">
+              <CompassCalibrationCard onDismiss={() => setShowCalibration(false)} />
+            </div>
+          )}
           {permState !== "granted" && (
             <div className="mt-6 flex w-full flex-col items-center gap-4">
               <p className="text-center text-sm opacity-80">
@@ -267,6 +305,21 @@ function Qibla() {
                   style={{ width: 12, height: 12, background: "#c9a84c" }}
                 />
               </div>
+
+              {!showCalibration && (
+                <button
+                  onClick={() => setShowCalibration(true)}
+                  className="mt-4 rounded-full px-4 py-2 text-xs font-bold"
+                  style={{
+                    background: "rgba(255,255,255,0.08)",
+                    color: "#ffffff",
+                    border: "1px solid rgba(201,168,76,0.5)",
+                  }}
+                >
+                  Calibrate compass
+                </button>
+              )}
+
 
               <div className="mt-6 w-full space-y-2 text-center text-xs opacity-80">
                 {qiblaBearing !== null && (

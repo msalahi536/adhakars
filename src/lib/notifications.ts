@@ -27,7 +27,7 @@ const NOTIF_IDS: Record<ReminderId, number> = {
 const NOTIF_COPY: Record<ReminderId, { title: string; body: string }> = {
   morning: { title: "Morning Adhkar", body: "Time for your morning adhkar." },
   evening: { title: "Evening Adhkar", body: "Time for your evening adhkar." },
-  nudge: { title: "Sahih al-Adhkar", body: "Your adhkar are still waiting. There is still time today." },
+  nudge: { title: "Sahih Al-Adhkar", body: "Your adhkar are still waiting. There is still time today." },
 };
 
 const defaults: NotificationPrefs = {

@@ -14,7 +14,7 @@ import {
 export const Route = createFileRoute("/more")({
   head: () => ({
     meta: [
-      { title: "More, Sahih al-Adhkar" },
+      { title: "More, Sahih Al-Adhkar" },
       { name: "description", content: "Sleep & Wake adhkar, Qibla finder and more tools." },
     ],
   }),

@@ -11,7 +11,7 @@ import { getCounts, setCount, clearCounts, bumpLifetime } from "@/lib/storage";
 export const Route = createFileRoute("/sleep")({
   head: () => ({
     meta: [
-      { title: "Sleep & Wake Adhkar, Sahih al-Adhkar" },
+      { title: "Sleep & Wake Adhkar, Sahih Al-Adhkar" },
       { name: "description", content: "Authenticated adhkar before sleep and upon waking." },
     ],
   }),
