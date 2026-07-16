@@ -75,7 +75,7 @@ export function AdhkarPage({
             {headerAction}
           </div>
         )}
-        <div className="relative mx-auto max-w-md px-5 pb-12 pt-5">
+        <div className="relative mx-auto max-w-md px-5 pb-9 pt-8">
 
 
           <div
