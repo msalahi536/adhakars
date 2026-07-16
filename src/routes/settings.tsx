@@ -36,7 +36,7 @@ import {
 const APP_VERSION = "1.0.3";
 
 export const Route = createFileRoute("/settings")({
-  head: () => ({ meta: [{ title: "Settings, Adhkar as-Sahih" }] }),
+  head: () => ({ meta: [{ title: "Settings, Sahih al-Adhkar" }] }),
   component: Settings,
 });
 

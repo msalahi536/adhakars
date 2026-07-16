@@ -12,7 +12,7 @@ import type { Dhikr } from "@/data/adhkar";
 export const Route = createFileRoute("/my-adhkar")({
   head: () => ({
     meta: [
-      { title: "My Adhkar, Adhkar as-Sahih" },
+      { title: "My Adhkar, Sahih al-Adhkar" },
       { name: "description", content: "Your own custom adhkar cards, saved on this device." },
     ],
   }),

@@ -5,8 +5,8 @@ import { ConcentricCirclesPattern } from "@/components/HeaderPatterns";
 export const Route = createFileRoute("/privacy")({
   head: () => ({
     meta: [
-      { title: "Privacy Policy, Adhkar as-Sahih" },
-      { name: "description", content: "Privacy policy for the Adhkar as-Sahih app." },
+      { title: "Privacy Policy, Sahih al-Adhkar" },
+      { name: "description", content: "Privacy policy for the Sahih al-Adhkar app." },
     ],
   }),
   component: Privacy,
@@ -71,7 +71,7 @@ function Privacy() {
         <div className="mx-auto max-w-md px-4 py-4 space-y-4 text-sm leading-relaxed">
           <p style={{ color: "var(--muted-foreground)" }}>Last updated: July 2026</p>
           <p style={{ color: "var(--foreground)" }}>
-            Adhkar as-Sahih does not collect, transmit, or store any personal
+            Sahih al-Adhkar does not collect, transmit, or store any personal
             data. There are no analytics, no advertising, and no tracking of
             any kind.
           </p>
