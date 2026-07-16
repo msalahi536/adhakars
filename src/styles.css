@@ -152,8 +152,8 @@
 
 @layer base {
   :root {
-    --bottom-nav-row: 56px;
-    --bottom-nav-height: 56px;
+    --bottom-nav-row: 48px;
+    --bottom-nav-height: 48px;
   }
   * {
     border-color: var(--color-border);
