@@ -306,6 +306,21 @@ function Qibla() {
                 />
               </div>
 
+              {!showCalibration && (
+                <button
+                  onClick={() => setShowCalibration(true)}
+                  className="mt-4 rounded-full px-4 py-2 text-xs font-bold"
+                  style={{
+                    background: "rgba(255,255,255,0.08)",
+                    color: "#ffffff",
+                    border: "1px solid rgba(201,168,76,0.5)",
+                  }}
+                >
+                  Calibrate compass
+                </button>
+              )}
+
+
               <div className="mt-6 w-full space-y-2 text-center text-xs opacity-80">
                 {qiblaBearing !== null && (
                   <div>Qibla bearing: <span className="font-bold text-white">{qiblaBearing.toFixed(1)}°</span></div>
