@@ -225,7 +225,7 @@
     align-items: flex-start;
     justify-content: center;
     border-radius: 28px;
-    box-shadow: 0 4px 20px rgba(45, 31, 0, 0.08);
+    box-shadow: var(--card-shadow);
   }
   .bottom-nav-row {
     width: 100%;
