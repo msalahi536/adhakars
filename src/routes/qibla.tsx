@@ -213,7 +213,7 @@ function Qibla() {
               <CompassCalibrationCard onDismiss={() => setShowCalibration(false)} />
             </div>
           )}
-          {permState !== "granted" && !showCalibration && (
+          {permState !== "granted" && (
             <div className="mt-6 flex w-full flex-col items-center gap-4">
               <p className="text-center text-sm opacity-80">
                 We need your location and motion sensors to compute the Qibla direction. Nothing
