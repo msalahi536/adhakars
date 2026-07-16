@@ -145,12 +145,26 @@ function Qibla() {
     }
 
     const handler = (e: DeviceOrientationEvent) => {
-      const anyE = e as DeviceOrientationEvent & { webkitCompassHeading?: number };
+      const anyE = e as DeviceOrientationEvent & {
+        webkitCompassHeading?: number;
+        webkitCompassAccuracy?: number;
+      };
       if (typeof anyE.webkitCompassHeading === "number") {
         setHeading(anyE.webkitCompassHeading);
       } else if (typeof e.alpha === "number") {
         const h = (360 - e.alpha) % 360;
         setHeading(h);
+      }
+      // Low compass accuracy: iOS reports -1 for invalid, or a degree value
+      // where larger = worse. Anything > 30° or -1 is treated as low accuracy.
+      const acc = anyE.webkitCompassAccuracy;
+      if (
+        typeof acc === "number" &&
+        (acc < 0 || acc > 30) &&
+        !lowAccuracyShownRef.current
+      ) {
+        lowAccuracyShownRef.current = true;
+        setShowCalibration(true);
       }
     };
     listenerRef.current = handler;
