@@ -207,9 +207,10 @@
   }
   .bottom-nav {
     position: fixed;
-    inset-inline: 0;
-    bottom: 0;
-    width: 100%;
+    left: 12px;
+    right: 12px;
+    bottom: 12px;
+    width: auto;
     height: calc(var(--bottom-nav-row) + env(safe-area-inset-bottom));
     min-height: calc(var(--bottom-nav-row) + env(safe-area-inset-bottom));
     margin: 0;
@@ -223,6 +224,8 @@
     display: flex;
     align-items: flex-start;
     justify-content: center;
+    border-radius: 28px;
+    box-shadow: 0 4px 20px rgba(45, 31, 0, 0.08);
   }
   .bottom-nav-row {
     width: 100%;
