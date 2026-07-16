@@ -58,11 +58,25 @@ function Qibla() {
   const [coords, setCoords] = useState<{ lat: number; lng: number } | null>(null);
   const [heading, setHeading] = useState<number | null>(null); // device compass heading (0 = N)
   const [qiblaBearing, setQiblaBearing] = useState<number | null>(null);
+  const [showCalibration, setShowCalibration] = useState<boolean>(false);
+  const lowAccuracyShownRef = useRef(false);
   const listenerRef = useRef<((e: DeviceOrientationEvent) => void) | null>(null);
 
+  // Auto-show calibration card the first N opens.
   useEffect(() => {
-    // Auto-start only when the platform does NOT require a per-session user
-    // gesture for motion access. iOS 13+ (DeviceOrientationEvent.requestPermission)
+    if (typeof window === "undefined") return;
+    try {
+      const raw = localStorage.getItem(CAL_OPEN_COUNT_KEY);
+      const n = raw ? parseInt(raw, 10) || 0 : 0;
+      if (n < CAL_AUTO_LIMIT) {
+        setShowCalibration(true);
+      }
+      localStorage.setItem(CAL_OPEN_COUNT_KEY, String(n + 1));
+    } catch {
+      // ignore
+    }
+  }, []);
+
     // MUST be triggered from a fresh tap each session — otherwise the listener
     // attaches but never fires, leaving an empty compass.
     const DOE = DeviceOrientationEvent as DeviceOrientationEventStatic;
