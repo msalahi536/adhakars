@@ -187,27 +187,27 @@ function Qibla() {
   return (
     <>
       <header
-        className="page-header relative"
-        style={{
-          background: "linear-gradient(135deg, #1f3d2b 0%, #2d5a3d 100%)",
-          color: "#ffffff",
-        }}
+        className="page-header relative overflow-hidden"
+        style={{ background: "var(--grad-header)", color: "var(--header-fg)" }}
       >
         <HeaderBackButton />
         <HeaderSettingsButton />
         <div className="mx-auto max-w-md px-5 pb-4 pt-5" style={{ paddingLeft: 60, paddingRight: 60 }}>
-          <div className="label-caps" style={{ color: "rgba(255,255,255,0.85)", opacity: 1 }}>
+          <div className="label-caps" style={{ color: "var(--header-sub)", opacity: 1 }}>
             Direction of Prayer
           </div>
           <h1 className="mt-1 text-2xl font-bold tracking-tight">Qibla Finder</h1>
-          <p className="mt-2 text-xs opacity-90">
-            Point your phone flat. The gold arrow will point toward the Kaaba.
+          <p className="mt-2 text-xs" style={{ color: "var(--header-sub)" }}>
+            Point your phone flat. The arrow will point toward the Kaaba.
           </p>
         </div>
       </header>
 
-      <main className="scroll-area" style={{ background: "#0f1a14" }}>
-        <div className="mx-auto flex w-full max-w-md flex-col items-center px-5 py-6 text-white">
+      <main className="scroll-area">
+        <div
+          className="mx-auto flex w-full max-w-md flex-col items-center px-5 py-6"
+          style={{ color: "var(--foreground)" }}
+        >
           {showCalibration && (
             <div className="mb-5 w-full">
               <CompassCalibrationCard onDismiss={() => setShowCalibration(false)} />
@@ -215,19 +215,26 @@ function Qibla() {
           )}
           {permState !== "granted" && (
             <div className="mt-6 flex w-full flex-col items-center gap-4">
-              <p className="text-center text-sm opacity-80">
+              <p
+                className="text-center text-sm"
+                style={{ color: "var(--muted-foreground)" }}
+              >
                 We need your location and motion sensors to compute the Qibla direction. Nothing
                 leaves your device.
               </p>
               <button
                 onClick={() => start()}
                 className="rounded-full px-6 py-3 text-sm font-bold"
-                style={{ background: "#c9a84c", color: "#1f3d2b" }}
+                style={{
+                  background: "var(--accent)",
+                  color: "var(--accent-foreground)",
+                  boxShadow: "var(--card-shadow)",
+                }}
               >
                 {permState === "requesting" ? "Requesting…" : "Enable Compass"}
               </button>
               {error && (
-                <p className="text-center text-xs" style={{ color: "#ff9b9b" }}>
+                <p className="text-center text-xs" style={{ color: "#c0392b" }}>
                   {error}
                 </p>
               )}
@@ -244,12 +251,13 @@ function Qibla() {
                 <div
                   className="absolute inset-0 rounded-full"
                   style={{
-                    background: "radial-gradient(circle, #1a2e22 0%, #0f1a14 70%)",
-                    border: "2px solid rgba(201,168,76,0.35)",
-                    boxShadow: "0 8px 32px rgba(0,0,0,0.5)",
+                    background:
+                      "radial-gradient(circle, var(--card) 0%, var(--muted) 75%)",
+                    border: "2px solid color-mix(in oklab, var(--accent) 45%, transparent)",
+                    boxShadow: "var(--card-shadow)",
                   }}
                 />
-                {/* Cardinal marks — rotate with device so N always points to true North */}
+                {/* Cardinal marks rotate with device so N always points to true North */}
                 <div
                   className="absolute inset-0"
                   style={{
@@ -262,7 +270,10 @@ function Qibla() {
                       key={label}
                       className="absolute left-1/2 top-1/2 text-xs font-bold"
                       style={{
-                        color: label === "N" ? "#ff6b6b" : "rgba(255,255,255,0.7)",
+                        color:
+                          label === "N"
+                            ? "var(--accent)"
+                            : "color-mix(in oklab, var(--foreground) 55%, transparent)",
                         transform: `translate(-50%, -50%) rotate(${i * 90}deg) translateY(-118px) rotate(${-i * 90}deg)`,
                       }}
                     >
@@ -286,13 +297,15 @@ function Qibla() {
                           height: 0,
                           borderLeft: "18px solid transparent",
                           borderRight: "18px solid transparent",
-                          borderBottom: `40px solid ${aligned ? "#4ade80" : "#c9a84c"}`,
-                          filter: aligned ? "drop-shadow(0 0 12px #4ade80)" : "none",
+                          borderBottom: `40px solid ${aligned ? "#3d8f5c" : "var(--accent)"}`,
+                          filter: aligned
+                            ? "drop-shadow(0 0 12px color-mix(in oklab, #3d8f5c 60%, transparent))"
+                            : "none",
                         }}
                       />
                       <div
-                        className="mt-1 text-[10px] font-bold"
-                        style={{ color: aligned ? "#4ade80" : "#c9a84c" }}
+                        className="mt-1 text-[10px] font-bold tracking-wide"
+                        style={{ color: aligned ? "#3d8f5c" : "var(--accent)" }}
                       >
                         KAABA
                       </div>
@@ -302,7 +315,13 @@ function Qibla() {
                 {/* Center dot */}
                 <div
                   className="absolute rounded-full"
-                  style={{ width: 12, height: 12, background: "#c9a84c" }}
+                  style={{
+                    width: 12,
+                    height: 12,
+                    background: "var(--accent)",
+                    boxShadow:
+                      "0 0 0 4px color-mix(in oklab, var(--accent) 20%, transparent)",
+                  }}
                 />
               </div>
 
@@ -311,40 +330,56 @@ function Qibla() {
                   onClick={() => setShowCalibration(true)}
                   className="mt-4 rounded-full px-4 py-2 text-xs font-bold"
                   style={{
-                    background: "rgba(255,255,255,0.08)",
-                    color: "#ffffff",
-                    border: "1px solid rgba(201,168,76,0.5)",
+                    background: "var(--btn-surface)",
+                    color: "var(--btn-fg)",
+                    border:
+                      "1px solid color-mix(in oklab, var(--accent) 40%, transparent)",
                   }}
                 >
                   Calibrate compass
                 </button>
               )}
 
-
-              <div className="mt-6 w-full space-y-2 text-center text-xs opacity-80">
+              <div
+                className="mt-6 w-full space-y-1.5 text-center text-xs"
+                style={{ color: "var(--muted-foreground)" }}
+              >
                 {qiblaBearing !== null && (
-                  <div>Qibla bearing: <span className="font-bold text-white">{qiblaBearing.toFixed(1)}°</span></div>
+                  <div>
+                    Qibla bearing:{" "}
+                    <span className="font-bold" style={{ color: "var(--foreground)" }}>
+                      {qiblaBearing.toFixed(1)}°
+                    </span>
+                  </div>
                 )}
                 {heading !== null && (
-                  <div>Your heading: <span className="font-bold text-white">{heading.toFixed(1)}°</span></div>
+                  <div>
+                    Your heading:{" "}
+                    <span className="font-bold" style={{ color: "var(--foreground)" }}>
+                      {heading.toFixed(1)}°
+                    </span>
+                  </div>
                 )}
                 {coords && (
                   <div>
                     Distance to Kaaba:{" "}
-                    <span className="font-bold text-white">
+                    <span className="font-bold" style={{ color: "var(--foreground)" }}>
                       {distanceKm(coords.lat, coords.lng).toFixed(0)} km
                     </span>
                   </div>
                 )}
                 {aligned && (
-                  <div className="pt-2 text-sm font-bold" style={{ color: "#4ade80" }}>
+                  <div className="pt-2 text-sm font-bold" style={{ color: "#3d8f5c" }}>
                     ✓ You are facing the Qibla
                   </div>
                 )}
               </div>
 
-              <p className="mt-6 text-center text-[10px] opacity-60">
-                Tip: Keep phone flat and away from metal / magnets for best accuracy.
+              <p
+                className="mt-6 text-center text-[10px]"
+                style={{ color: "var(--muted-foreground)", opacity: 0.8 }}
+              >
+                Tip: Keep phone flat and away from metal or magnets for best accuracy.
               </p>
             </>
           )}

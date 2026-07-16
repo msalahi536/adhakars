@@ -106,15 +106,14 @@ export function CompassCalibrationCard({ onDismiss }: Props) {
     <div
       className="w-full rounded-2xl p-5"
       style={{
-        background: "linear-gradient(180deg, rgba(45,90,61,0.55) 0%, rgba(26,46,34,0.65) 100%)",
-        border: "1px solid rgba(201,168,76,0.35)",
-        boxShadow: "0 8px 24px rgba(0,0,0,0.35)",
+        background: "var(--card)",
+        border: "1px solid color-mix(in oklab, var(--accent) 35%, transparent)",
+        boxShadow: "var(--card-shadow)",
+        color: "var(--foreground)",
       }}
     >
-      <h2 className="text-base font-bold" style={{ color: "#ffffff" }}>
-        Calibrate your compass
-      </h2>
-      <p className="mt-2 text-sm" style={{ color: "rgba(255,255,255,0.9)" }}>
+      <h2 className="text-base font-bold">Calibrate your compass</h2>
+      <p className="mt-2 text-sm" style={{ color: "var(--muted-foreground)" }}>
         Move your phone in a figure 8 motion. Tilt and rotate it as you go.
       </p>
 
@@ -126,27 +125,31 @@ export function CompassCalibrationCard({ onDismiss }: Props) {
         <div className="mt-4">
           <div
             className="h-2 w-full overflow-hidden rounded-full"
-            style={{ background: "rgba(255,255,255,0.12)" }}
+            style={{
+              background: "color-mix(in oklab, var(--foreground) 10%, transparent)",
+            }}
           >
             <div
               style={{
                 width: `${Math.round(progress * 100)}%`,
                 height: "100%",
-                background: complete ? "#4ade80" : "#c9a84c",
+                background: complete ? "#3d8f5c" : "var(--accent)",
                 transition: "width 200ms linear, background 200ms linear",
               }}
             />
           </div>
           <div
-            className="mt-1 text-center text-[11px]"
-            style={{ color: complete ? "#4ade80" : "rgba(255,255,255,0.8)" }}
+            className="mt-1 text-center text-[11px] font-semibold"
+            style={{
+              color: complete ? "#3d8f5c" : "var(--muted-foreground)",
+            }}
           >
             {complete ? "Calibrated" : "Calibrating"}
           </div>
         </div>
       )}
 
-      <p className="mt-4 text-[11px]" style={{ color: "rgba(255,255,255,0.6)" }}>
+      <p className="mt-4 text-[11px]" style={{ color: "var(--muted-foreground)" }}>
         Keep away from magnets, metal, and magnetic phone cases, as these affect accuracy.
       </p>
 
@@ -155,7 +158,10 @@ export function CompassCalibrationCard({ onDismiss }: Props) {
           <button
             onClick={onDismiss}
             className="rounded-full px-5 py-2 text-sm font-bold"
-            style={{ background: "#c9a84c", color: "#1f3d2b" }}
+            style={{
+              background: "var(--accent)",
+              color: "var(--accent-foreground)",
+            }}
           >
             Got it
           </button>
@@ -165,9 +171,10 @@ export function CompassCalibrationCard({ onDismiss }: Props) {
               onClick={onDismiss}
               className="rounded-full px-5 py-2 text-sm font-bold"
               style={{
-                background: "rgba(255,255,255,0.08)",
-                color: "#ffffff",
-                border: "1px solid rgba(255,255,255,0.2)",
+                background: "var(--btn-surface)",
+                color: "var(--btn-fg)",
+                border:
+                  "1px solid color-mix(in oklab, var(--foreground) 12%, transparent)",
               }}
             >
               Skip
@@ -176,7 +183,10 @@ export function CompassCalibrationCard({ onDismiss }: Props) {
               <button
                 onClick={onDismiss}
                 className="rounded-full px-5 py-2 text-sm font-bold"
-                style={{ background: "#c9a84c", color: "#1f3d2b" }}
+                style={{
+                  background: "var(--accent)",
+                  color: "var(--accent-foreground)",
+                }}
               >
                 Done
               </button>
@@ -195,11 +205,11 @@ function Figure8Animation() {
       <path
         id="fig8-path"
         d="M20,35 C20,10 55,10 70,35 C85,60 120,60 120,35 C120,10 85,10 70,35 C55,60 20,60 20,35 Z"
-        stroke="rgba(201,168,76,0.45)"
+        stroke="color-mix(in oklab, var(--accent) 55%, transparent)"
         strokeWidth={2}
         fill="none"
       />
-      <circle r={5} fill="#c9a84c">
+      <circle r={5} fill="var(--accent)">
         <animateMotion dur="2.2s" repeatCount="indefinite">
           <mpath href="#fig8-path" />
         </animateMotion>
