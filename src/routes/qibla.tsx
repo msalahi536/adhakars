@@ -7,7 +7,7 @@ import { HeaderBackButton } from "@/components/HeaderBackButton";
 export const Route = createFileRoute("/qibla")({
   head: () => ({
     meta: [
-      { title: "Qibla Finder, Sahih al-Adhkar" },
+      { title: "Qibla Finder, Sahih Al-Adhkar" },
       { name: "description", content: "Find the direction of the Qibla from your location." },
     ],
   }),

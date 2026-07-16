@@ -5,8 +5,8 @@ import { ConcentricCirclesPattern } from "@/components/HeaderPatterns";
 export const Route = createFileRoute("/terms")({
   head: () => ({
     meta: [
-      { title: "Terms of Service, Sahih al-Adhkar" },
-      { name: "description", content: "Terms of service for the Sahih al-Adhkar app." },
+      { title: "Terms of Service, Sahih Al-Adhkar" },
+      { name: "description", content: "Terms of service for the Sahih Al-Adhkar app." },
     ],
   }),
   component: Terms,
@@ -15,7 +15,7 @@ export const Route = createFileRoute("/terms")({
 const SECTIONS: { heading: string; body: string }[] = [
   {
     heading: "The app",
-    body: "Sahih al-Adhkar is provided free of charge, as is, and without warranty of any kind. It is offered as a benefit to the community and is not a substitute for scholarly guidance. For any ruling or religious question, please return to the people of knowledge.",
+    body: "Sahih Al-Adhkar is provided free of charge, as is, and without warranty of any kind. It is offered as a benefit to the community and is not a substitute for scholarly guidance. For any ruling or religious question, please return to the people of knowledge.",
   },
   {
     heading: "Accuracy",
@@ -67,7 +67,7 @@ function Terms() {
         <div className="mx-auto max-w-md px-4 py-4 space-y-4 text-sm leading-relaxed">
           <p style={{ color: "var(--muted-foreground)" }}>Last updated: July 2026</p>
           <p style={{ color: "var(--foreground)" }}>
-            By using Sahih al-Adhkar you agree to these terms.
+            By using Sahih Al-Adhkar you agree to these terms.
           </p>
           {SECTIONS.map((s) => (
             <section key={s.heading}>
