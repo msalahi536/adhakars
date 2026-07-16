@@ -6,7 +6,7 @@ import { morningAdhkar } from "@/data/adhkar";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Morning Adhkar, Adhkar as-Sahih" },
+      { title: "Morning Adhkar, Sahih al-Adhkar" },
       { name: "description", content: "Recite your morning adhkar with counters and streaks." },
     ],
   }),

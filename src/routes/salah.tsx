@@ -7,7 +7,7 @@ import { SALAH_PRAYERS, getSalahItems, isItemComplete, type SalahPrayer } from "
 import { getCounts, setCount, clearCounts, bumpLifetime } from "@/lib/storage";
 
 export const Route = createFileRoute("/salah")({
-  head: () => ({ meta: [{ title: "Salah Adhkar, Adhkar as-Sahih" }] }),
+  head: () => ({ meta: [{ title: "Salah Adhkar, Sahih al-Adhkar" }] }),
   component: Salah,
 });
 
