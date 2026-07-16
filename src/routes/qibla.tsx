@@ -77,8 +77,9 @@ function Qibla() {
     }
   }, []);
 
-    // MUST be triggered from a fresh tap each session — otherwise the listener
-    // attaches but never fires, leaving an empty compass.
+  useEffect(() => {
+    // Auto-start only when the platform does NOT require a per-session user
+    // gesture for motion access.
     const DOE = DeviceOrientationEvent as DeviceOrientationEventStatic;
     const needsGesture = typeof DOE?.requestPermission === "function";
     if (
