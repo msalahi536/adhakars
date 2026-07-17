@@ -192,18 +192,6 @@
     flex-direction: column;
     -webkit-touch-callout: none;
   }
-  #root {
-    margin: 0;
-    padding: 0;
-    background: var(--nav-safe-area-bg);
-  }
-  body.app-mode #root {
-    min-height: 100dvh;
-    display: flex;
-    flex-direction: column;
-    flex: 1;
-    min-height: 0;
-  }
   .page-header {
     flex-shrink: 0;
     padding-top: env(safe-area-inset-top);
