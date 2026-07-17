@@ -22,7 +22,7 @@ export const Route = createFileRoute("/app/more")({
 });
 
 type Tile = {
-  to: "/app/sleep" | "/qibla" | "/my-adhkar" | "/about";
+  to: "/app/sleep" | "/app/qibla" | "/app/my-adhkar" | "/app/about";
   title: string;
   subtitle: string;
   Icon: typeof BedDouble;
