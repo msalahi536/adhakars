@@ -1,5 +1,5 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import {
   Outlet,
   Link,
@@ -11,8 +11,11 @@ import {
 } from "@tanstack/react-router";
 
 import appCss from "../styles.css?url";
-import { BottomNav } from "@/components/BottomNav";
-import { Onboarding, hasOnboarded } from "@/components/Onboarding";
+
+import { applyTheme, getMode, resolveTheme } from "@/lib/theme";
+import { reconcileStreak } from "@/lib/storage";
+import { applyReminders, getNotificationPrefs, checkNotificationPermission } from "@/lib/notifications";
+import { supabase } from "@/integrations/supabase/client";
 
 import { applyTheme, getMode, resolveTheme } from "@/lib/theme";
 import { reconcileStreak } from "@/lib/storage";
