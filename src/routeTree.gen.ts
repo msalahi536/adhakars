@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as DownloadRouteImport } from './routes/download'
+import { Route as DonateRouteImport } from './routes/donate'
 import { Route as AppRouteImport } from './routes/app'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
@@ -27,6 +28,11 @@ import { Route as AppAboutRouteImport } from './routes/app.about'
 const DownloadRoute = DownloadRouteImport.update({
   id: '/download',
   path: '/download',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DonateRoute = DonateRouteImport.update({
+  id: '/donate',
+  path: '/donate',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AppRoute = AppRouteImport.update({
@@ -99,6 +105,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/app': typeof AppRouteWithChildren
+  '/donate': typeof DonateRoute
   '/download': typeof DownloadRoute
   '/app/about': typeof AppAboutRoute
   '/app/evening': typeof AppEveningRoute
@@ -114,6 +121,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/donate': typeof DonateRoute
   '/download': typeof DownloadRoute
   '/app/about': typeof AppAboutRoute
   '/app/evening': typeof AppEveningRoute
@@ -131,6 +139,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/app': typeof AppRouteWithChildren
+  '/donate': typeof DonateRoute
   '/download': typeof DownloadRoute
   '/app/about': typeof AppAboutRoute
   '/app/evening': typeof AppEveningRoute
@@ -149,6 +158,7 @@ export interface FileRouteTypes {
     | '/'
     | '/about'
     | '/app'
+    | '/donate'
     | '/download'
     | '/app/about'
     | '/app/evening'
@@ -164,6 +174,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/about'
+    | '/donate'
     | '/download'
     | '/app/about'
     | '/app/evening'
@@ -180,6 +191,7 @@ export interface FileRouteTypes {
     | '/'
     | '/about'
     | '/app'
+    | '/donate'
     | '/download'
     | '/app/about'
     | '/app/evening'
@@ -197,6 +209,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AboutRoute: typeof AboutRoute
   AppRoute: typeof AppRouteWithChildren
+  DonateRoute: typeof DonateRoute
   DownloadRoute: typeof DownloadRoute
 }
 
@@ -207,6 +220,13 @@ declare module '@tanstack/react-router' {
       path: '/download'
       fullPath: '/download'
       preLoaderRoute: typeof DownloadRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/donate': {
+      id: '/donate'
+      path: '/donate'
+      fullPath: '/donate'
+      preLoaderRoute: typeof DonateRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/app': {
@@ -335,6 +355,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
   AppRoute: AppRouteWithChildren,
+  DonateRoute: DonateRoute,
   DownloadRoute: DownloadRoute,
 }
 export const routeTree = rootRouteImport
