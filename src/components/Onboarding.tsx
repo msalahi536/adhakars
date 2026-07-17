@@ -107,13 +107,12 @@ export function Onboarding({ onDone }: { onDone: () => void }) {
         setNotifDone(true);
         return;
       }
-      const granted = await requestNotificationPermission();
-      if (granted) {
+      const result = await requestNotificationPermission();
+      if (result.granted) {
         const prefs = getNotificationPrefs();
         const updated = {
           ...prefs,
-          morning: { ...prefs.morning, enabled: true },
-          evening: { ...prefs.evening, enabled: true },
+          reminders: prefs.reminders.map((r) => ({ ...r, enabled: true })),
         };
         setNotificationPrefs(updated);
         await applyReminders(updated);

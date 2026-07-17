@@ -30,7 +30,7 @@ import {
   cancelReminder,
   isNativePlatform,
   type NotificationPrefs,
-  type ReminderId,
+  type Reminder,
 } from "@/lib/notifications";
 
 const APP_VERSION = "1.0.3";
@@ -46,6 +46,7 @@ function Settings() {
   const [confirmReset, setConfirmReset] = useState(false);
   const [confirmResetAll, setConfirmResetAll] = useState(false);
   const [notifEnabled, setNotifEnabled] = useState(false);
+  const [notifChecking, setNotifChecking] = useState(true);
   const [notifRequesting, setNotifRequesting] = useState(false);
   const [notifError, setNotifError] = useState<string | null>(null);
   const [notifPrefs, setNotifPrefsState] = useState<NotificationPrefs>(() => getNotificationPrefs());
@@ -61,12 +62,16 @@ function Settings() {
     setHasCustom(getCustomAdhkarRows().length > 0);
     let cancelled = false;
     checkNotificationPermission().then((v) => {
-      if (!cancelled) setNotifEnabled(v);
+      if (!cancelled) {
+        setNotifEnabled(v);
+        setNotifChecking(false);
+      }
     });
     return () => {
       cancelled = true;
     };
   }, []);
+
 
   const handleEnableNotifications = async () => {
     setNotifRequesting(true);
@@ -96,22 +101,50 @@ function Settings() {
     }
   };
 
-  const updateReminder = async (
-    id: ReminderId,
-    patch: Partial<NotificationPrefs["morning"]>,
-  ) => {
-    const next: NotificationPrefs = {
-      ...notifPrefs,
-      [id]: { ...notifPrefs[id], ...patch },
-    };
+  const persistPrefs = (next: NotificationPrefs) => {
     setNotifPrefsState(next);
     setNotificationPrefs(next);
-    const r = next[id];
+  };
+
+  const updateReminder = async (id: number, patch: Partial<Reminder>) => {
+    const next: NotificationPrefs = {
+      ...notifPrefs,
+      reminders: notifPrefs.reminders.map((r) => (r.id === id ? { ...r, ...patch } : r)),
+    };
+    persistPrefs(next);
+    const r = next.reminders.find((x) => x.id === id);
+    if (!r) return;
     if (r.enabled && notifEnabled) {
-      await scheduleReminder(id, r.hour, r.minute);
+      await scheduleReminder(r);
     } else {
-      await cancelReminder(id);
+      await cancelReminder(r.id);
     }
+  };
+
+  const addReminder = () => {
+    const now = new Date();
+    const newReminder: Reminder = {
+      id: notifPrefs.nextId,
+      label: "New reminder",
+      hour: now.getHours(),
+      minute: 0,
+      enabled: true,
+    };
+    const next: NotificationPrefs = {
+      reminders: [...notifPrefs.reminders, newReminder],
+      nextId: notifPrefs.nextId + 1,
+    };
+    persistPrefs(next);
+    if (notifEnabled) void scheduleReminder(newReminder);
+  };
+
+  const removeReminder = async (id: number) => {
+    await cancelReminder(id);
+    const next: NotificationPrefs = {
+      ...notifPrefs,
+      reminders: notifPrefs.reminders.filter((r) => r.id !== id),
+    };
+    persistPrefs(next);
   };
 
   const parseTime = (v: string): { hour: number; minute: number } => {
@@ -282,14 +315,15 @@ function Settings() {
                     get local device notifications at your chosen times.
                   </div>
                 </>
+              ) : notifChecking ? (
+                <div className="py-2 text-xs opacity-60">Checking notification permission...</div>
               ) : !notifEnabled ? (
                 <>
                   <div className="text-sm" style={{ fontWeight: 600 }}>
                     Daily Adhkar Reminders
                   </div>
                   <div className="mt-1 text-xs opacity-70">
-                    Get a local notification on your device every morning and
-                    evening. No internet needed.
+                    Get local notifications on your device at times you choose. No internet needed.
                   </div>
                   <button
                     onClick={handleEnableNotifications}
@@ -314,49 +348,38 @@ function Settings() {
                 </>
               ) : (
                 <div className="space-y-3">
-                  {(["morning", "evening", "nudge"] as ReminderId[]).map((id) => {
-                    const r = notifPrefs[id];
-                    const label =
-                      id === "morning"
-                        ? "Morning reminder"
-                        : id === "evening"
-                        ? "Evening reminder"
-                        : "Gentle nudge if the day is incomplete";
-                    return (
-                      <div
-                        key={id}
-                        className="flex items-center justify-between gap-3 rounded-2xl px-3 py-2.5"
-                        style={{
-                          background: "var(--background)",
-                          border: "1px solid var(--border)",
-                        }}
-                      >
-                        <div className="flex min-w-0 flex-col">
-                          <span className="text-sm font-semibold">{label}</span>
-                          <input
-                            type="time"
-                            value={formatTime(r.hour, r.minute)}
-                            onChange={(e) => {
-                              const { hour, minute } = parseTime(e.target.value);
-                              void updateReminder(id, { hour, minute });
-                            }}
-                            disabled={!r.enabled}
-                            className="mt-1 rounded-md bg-transparent text-sm font-semibold outline-none"
-                            style={{
-                              color: "var(--foreground)",
-                              opacity: r.enabled ? 1 : 0.5,
-                            }}
-                          />
-                        </div>
+                  {notifPrefs.reminders.length === 0 && (
+                    <div className="text-xs opacity-70">
+                      No reminders yet. Add one below to get a daily notification at your chosen time.
+                    </div>
+                  )}
+                  {notifPrefs.reminders.map((r) => (
+                    <div
+                      key={r.id}
+                      className="flex flex-col gap-2 rounded-2xl px-3 py-2.5"
+                      style={{
+                        background: "var(--background)",
+                        border: "1px solid var(--border)",
+                      }}
+                    >
+                      <div className="flex items-center gap-2">
+                        <input
+                          type="text"
+                          value={r.label}
+                          onChange={(e) => void updateReminder(r.id, { label: e.target.value })}
+                          placeholder="Reminder name"
+                          className="min-w-0 flex-1 rounded-md bg-transparent text-sm font-semibold outline-none"
+                          style={{ color: "var(--foreground)" }}
+                        />
                         <button
-                          onClick={() => void updateReminder(id, { enabled: !r.enabled })}
+                          onClick={() => void updateReminder(r.id, { enabled: !r.enabled })}
                           className="relative inline-block h-6 w-11 shrink-0 rounded-full transition"
                           style={{
                             background: r.enabled
                               ? "var(--accent)"
                               : "color-mix(in oklab, var(--foreground) 20%, transparent)",
                           }}
-                          aria-label={`Toggle ${label}`}
+                          aria-label={`Toggle ${r.label}`}
                         >
                           <span
                             className="absolute top-0.5 h-5 w-5 rounded-full bg-white transition-all"
@@ -364,10 +387,48 @@ function Settings() {
                           />
                         </button>
                       </div>
-                    );
-                  })}
+                      <div className="flex items-center justify-between gap-2">
+                        <input
+                          type="time"
+                          value={formatTime(r.hour, r.minute)}
+                          onChange={(e) => {
+                            const { hour, minute } = parseTime(e.target.value);
+                            void updateReminder(r.id, { hour, minute });
+                          }}
+                          disabled={!r.enabled}
+                          className="rounded-md bg-transparent text-sm font-semibold outline-none"
+                          style={{
+                            color: "var(--foreground)",
+                            opacity: r.enabled ? 1 : 0.5,
+                          }}
+                        />
+                        <button
+                          onClick={() => void removeReminder(r.id)}
+                          className="rounded-full px-3 py-1 text-xs font-semibold"
+                          style={{
+                            background: "rgba(220, 38, 38, 0.1)",
+                            color: "#b91c1c",
+                            border: "1px solid rgba(220, 38, 38, 0.3)",
+                          }}
+                        >
+                          Remove
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                  <button
+                    onClick={addReminder}
+                    className="w-full rounded-full py-2 text-sm font-semibold"
+                    style={{
+                      background: "var(--background)",
+                      border: "1px dashed var(--border)",
+                      color: "var(--foreground)",
+                    }}
+                  >
+                    + Add reminder
+                  </button>
                   <div className="text-[11px] opacity-60">
-                    Reminders fire on your device using your local time.
+                    Reminders fire on your device using your local time. Set as many as you like at any times that suit your schedule.
                   </div>
                 </div>
               )}
