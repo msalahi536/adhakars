@@ -46,6 +46,7 @@ function Settings() {
   const [confirmReset, setConfirmReset] = useState(false);
   const [confirmResetAll, setConfirmResetAll] = useState(false);
   const [notifEnabled, setNotifEnabled] = useState(false);
+  const [notifChecking, setNotifChecking] = useState(true);
   const [notifRequesting, setNotifRequesting] = useState(false);
   const [notifError, setNotifError] = useState<string | null>(null);
   const [notifPrefs, setNotifPrefsState] = useState<NotificationPrefs>(() => getNotificationPrefs());
