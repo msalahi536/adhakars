@@ -70,8 +70,7 @@ export const isNativePlatform = (): boolean => {
 const loadPlugin = async (): Promise<any> => {
   if (!isNativePlatform()) return null;
   try {
-    const modName = "@capacitor/local-notifications";
-    const mod: any = await import(/* @vite-ignore */ modName).catch(() => null);
+    const mod = await import("@capacitor/local-notifications");
     return mod?.LocalNotifications ?? null;
   } catch {
     return null;
