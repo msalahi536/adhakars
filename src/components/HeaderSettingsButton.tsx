@@ -8,7 +8,7 @@ import { Settings as SettingsIcon } from "lucide-react";
 export function HeaderSettingsButton() {
   return (
     <Link
-      to="/settings"
+      to="/app/settings"
       aria-label="Settings"
       className="absolute z-10 flex items-center justify-center rounded-full transition-transform active:scale-90"
       style={{

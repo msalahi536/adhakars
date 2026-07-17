@@ -166,8 +166,8 @@ function Sleep() {
             persistKey={storageKey}
             finishCta={
               isSleep
-                ? { label: "Go to Wake Adhkar", to: "/sleep" }
-                : { label: "Go to Morning Adhkar", to: "/" }
+                ? { label: "Go to Wake Adhkar", to: "/app/sleep" }
+                : { label: "Go to Morning Adhkar", to: "/app" }
             }
             onFinishNav={isSleep ? () => setMode("wake") : undefined}
           />

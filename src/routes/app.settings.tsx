@@ -106,7 +106,7 @@ function Settings() {
   const choose = (m: ThemeMode) => {
     setModeState(m);
     setMode(m);
-    applyTheme(resolveTheme(m, "/settings"));
+    applyTheme(resolveTheme(m, "/app/settings"));
   };
 
   const updateDisplay = (patch: Partial<typeof display>) => {
