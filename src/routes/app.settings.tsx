@@ -30,7 +30,7 @@ import {
   cancelReminder,
   isNativePlatform,
   type NotificationPrefs,
-  type ReminderId,
+  type Reminder,
 } from "@/lib/notifications";
 
 const APP_VERSION = "1.0.3";
