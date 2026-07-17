@@ -17,10 +17,6 @@ import { reconcileStreak } from "@/lib/storage";
 import { applyReminders, getNotificationPrefs, checkNotificationPermission } from "@/lib/notifications";
 import { supabase } from "@/integrations/supabase/client";
 
-import { applyTheme, getMode, resolveTheme } from "@/lib/theme";
-import { reconcileStreak } from "@/lib/storage";
-import { applyReminders, getNotificationPrefs, checkNotificationPermission } from "@/lib/notifications";
-import { supabase } from "@/integrations/supabase/client";
 
 function NotFoundComponent() {
   return (
