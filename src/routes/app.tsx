@@ -13,11 +13,24 @@ function AppLayout() {
     if (!hasOnboarded()) setShowOnboarding(true);
   }, []);
 
+  // Lock the viewport while inside /app so .scroll-area handles scrolling.
+  useEffect(() => {
+    const html = document.documentElement;
+    const body = document.body;
+    html.classList.add("app-mode");
+    body.classList.add("app-mode");
+    return () => {
+      html.classList.remove("app-mode");
+      body.classList.remove("app-mode");
+    };
+  }, []);
+
   return (
-    <div className="app-shell">
+    <>
       <Outlet />
       <BottomNav />
       {showOnboarding && <Onboarding onDone={() => setShowOnboarding(false)} />}
-    </div>
+    </>
   );
 }
+
