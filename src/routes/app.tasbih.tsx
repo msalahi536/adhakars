@@ -52,14 +52,14 @@ function Tasbih() {
   };
 
   const tap = () => {
-    triggerHaptic("light");
+    triggerHaptic("heavy");
     bumpLifetime("tasbih", 1);
     setTapped(true);
     setTimeout(() => setTapped(false), 200);
     setTotal((n) => {
       const next = n + 1;
       if (hasMilestone && next % milestone === 0) {
-        triggerHaptic("medium");
+        triggerHaptic("double");
         setFlash(true);
         setTimeout(() => setFlash(false), 260);
       }
@@ -69,7 +69,7 @@ function Tasbih() {
 
   const undo = (e: React.MouseEvent) => {
     e.stopPropagation();
-    triggerHaptic("light");
+    triggerHaptic("heavy");
     setTotal((n) => Math.max(0, n - 1));
   };
 
