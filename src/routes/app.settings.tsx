@@ -70,6 +70,8 @@ function Settings() {
     return () => {
       cancelled = true;
     };
+  }, []);
+
 
   const handleEnableNotifications = async () => {
     setNotifRequesting(true);
