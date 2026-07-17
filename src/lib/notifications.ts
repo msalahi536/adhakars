@@ -77,14 +77,32 @@ const loadPlugin = async (): Promise<any> => {
   }
 };
 
-export const requestNotificationPermission = async (): Promise<boolean> => {
-  const plugin = await loadPlugin();
-  if (!plugin) return false;
+export type PermissionResult =
+  | { granted: true }
+  | { granted: false; reason: "unavailable" | "denied" | "error"; error?: string };
+
+export const requestNotificationPermission = async (): Promise<PermissionResult> => {
+  if (!isNativePlatform()) {
+    return { granted: false, reason: "unavailable", error: "Not running in native app" };
+  }
+  let plugin: any;
+  try {
+    const mod = await import("@capacitor/local-notifications");
+    plugin = mod?.LocalNotifications;
+  } catch (e) {
+    console.error("Notification permission error:", e);
+    return { granted: false, reason: "unavailable", error: (e as Error)?.message ?? "Plugin unavailable" };
+  }
+  if (!plugin) {
+    return { granted: false, reason: "unavailable", error: "LocalNotifications plugin missing" };
+  }
   try {
     const res = await plugin.requestPermissions();
-    return res?.display === "granted";
-  } catch {
-    return false;
+    if (res?.display === "granted") return { granted: true };
+    return { granted: false, reason: "denied", error: `Permission ${res?.display ?? "unknown"}` };
+  } catch (e) {
+    console.error("Notification permission error:", e);
+    return { granted: false, reason: "error", error: (e as Error)?.message ?? "Unknown error" };
   }
 };
 
