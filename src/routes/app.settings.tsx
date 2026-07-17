@@ -46,6 +46,8 @@ function Settings() {
   const [confirmReset, setConfirmReset] = useState(false);
   const [confirmResetAll, setConfirmResetAll] = useState(false);
   const [notifEnabled, setNotifEnabled] = useState(false);
+  const [notifRequesting, setNotifRequesting] = useState(false);
+  const [notifError, setNotifError] = useState<string | null>(null);
   const [notifPrefs, setNotifPrefsState] = useState<NotificationPrefs>(() => getNotificationPrefs());
   const [commitment, setCommitmentState] = useState<Record<CommitmentSection, boolean>>(() => getCommitment());
   const [hasCustom, setHasCustom] = useState(false);
@@ -67,10 +69,30 @@ function Settings() {
   }, []);
 
   const handleEnableNotifications = async () => {
-    const granted = await requestNotificationPermission();
-    setNotifEnabled(granted);
-    if (granted) {
-      await applyReminders(notifPrefs);
+    setNotifRequesting(true);
+    setNotifError(null);
+    try {
+      const result = await requestNotificationPermission();
+      if (result.granted) {
+        setNotifEnabled(true);
+        await applyReminders(notifPrefs);
+      } else {
+        setNotifEnabled(false);
+        if (result.reason === "denied") {
+          setNotifError("Notification permission denied. Please enable in device settings.");
+        } else if (result.reason === "unavailable") {
+          setNotifError("Notifications are not available on this device.");
+        } else {
+          setNotifError(
+            `Could not request notification permission. ${result.error ?? "Please check your device settings."}`,
+          );
+        }
+      }
+    } catch (error) {
+      console.error("Notification permission error:", error);
+      setNotifError("Could not request notification permission. Please check your device settings.");
+    } finally {
+      setNotifRequesting(false);
     }
   };
 
@@ -271,11 +293,24 @@ function Settings() {
                   </div>
                   <button
                     onClick={handleEnableNotifications}
-                    className="mt-3 w-full rounded-full py-2 text-sm font-semibold"
+                    disabled={notifRequesting}
+                    className="mt-3 w-full rounded-full py-2 text-sm font-semibold disabled:opacity-70"
                     style={{ background: "#c9a84c", color: "#ffffff" }}
                   >
-                    Enable Reminders
+                    {notifRequesting ? "Requesting..." : "Enable Reminders"}
                   </button>
+                  {notifError && (
+                    <div
+                      className="mt-2 rounded-lg px-3 py-2 text-xs"
+                      style={{
+                        background: "rgba(220, 38, 38, 0.1)",
+                        color: "#b91c1c",
+                        border: "1px solid rgba(220, 38, 38, 0.3)",
+                      }}
+                    >
+                      {notifError}
+                    </div>
+                  )}
                 </>
               ) : (
                 <div className="space-y-3">
