@@ -293,11 +293,24 @@ function Settings() {
                   </div>
                   <button
                     onClick={handleEnableNotifications}
-                    className="mt-3 w-full rounded-full py-2 text-sm font-semibold"
+                    disabled={notifRequesting}
+                    className="mt-3 w-full rounded-full py-2 text-sm font-semibold disabled:opacity-70"
                     style={{ background: "#c9a84c", color: "#ffffff" }}
                   >
-                    Enable Reminders
+                    {notifRequesting ? "Requesting..." : "Enable Reminders"}
                   </button>
+                  {notifError && (
+                    <div
+                      className="mt-2 rounded-lg px-3 py-2 text-xs"
+                      style={{
+                        background: "rgba(220, 38, 38, 0.1)",
+                        color: "#b91c1c",
+                        border: "1px solid rgba(220, 38, 38, 0.3)",
+                      }}
+                    >
+                      {notifError}
+                    </div>
+                  )}
                 </>
               ) : (
                 <div className="space-y-3">
