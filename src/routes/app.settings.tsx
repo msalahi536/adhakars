@@ -356,64 +356,59 @@ function Settings() {
                   {notifPrefs.reminders.map((r) => (
                     <div
                       key={r.id}
-                      className="flex flex-col gap-2 rounded-2xl px-3 py-2.5"
+                      className="flex items-center gap-2 rounded-2xl px-3 py-2"
                       style={{
                         background: "var(--background)",
                         border: "1px solid var(--border)",
                       }}
                     >
-                      <div className="flex items-center gap-2">
-                        <input
-                          type="text"
-                          value={r.label}
-                          onChange={(e) => void updateReminder(r.id, { label: e.target.value })}
-                          placeholder="Reminder name"
-                          className="min-w-0 flex-1 rounded-md bg-transparent text-sm font-semibold outline-none"
-                          style={{ color: "var(--foreground)" }}
+                      <input
+                        type="text"
+                        value={r.label}
+                        onChange={(e) => void updateReminder(r.id, { label: e.target.value })}
+                        placeholder="Reminder"
+                        className="min-w-0 flex-1 rounded-md bg-transparent text-sm font-semibold outline-none"
+                        style={{ color: "var(--foreground)", opacity: r.enabled ? 1 : 0.6 }}
+                      />
+                      <input
+                        type="time"
+                        value={formatTime(r.hour, r.minute)}
+                        onChange={(e) => {
+                          const { hour, minute } = parseTime(e.target.value);
+                          void updateReminder(r.id, { hour, minute });
+                        }}
+                        disabled={!r.enabled}
+                        className="shrink-0 rounded-md px-2 py-1 text-sm font-semibold outline-none"
+                        style={{
+                          background: "var(--surface)",
+                          border: "1px solid var(--border)",
+                          color: "var(--foreground)",
+                          opacity: r.enabled ? 1 : 0.5,
+                        }}
+                      />
+                      <button
+                        onClick={() => void updateReminder(r.id, { enabled: !r.enabled })}
+                        className="relative inline-block h-6 w-11 shrink-0 rounded-full transition"
+                        style={{
+                          background: r.enabled
+                            ? "var(--accent)"
+                            : "color-mix(in oklab, var(--foreground) 20%, transparent)",
+                        }}
+                        aria-label={`Toggle ${r.label}`}
+                      >
+                        <span
+                          className="absolute top-0.5 h-5 w-5 rounded-full bg-white transition-all"
+                          style={{ left: r.enabled ? 22 : 2 }}
                         />
-                        <button
-                          onClick={() => void updateReminder(r.id, { enabled: !r.enabled })}
-                          className="relative inline-block h-6 w-11 shrink-0 rounded-full transition"
-                          style={{
-                            background: r.enabled
-                              ? "var(--accent)"
-                              : "color-mix(in oklab, var(--foreground) 20%, transparent)",
-                          }}
-                          aria-label={`Toggle ${r.label}`}
-                        >
-                          <span
-                            className="absolute top-0.5 h-5 w-5 rounded-full bg-white transition-all"
-                            style={{ left: r.enabled ? 22 : 2 }}
-                          />
-                        </button>
-                      </div>
-                      <div className="flex items-center justify-between gap-2">
-                        <input
-                          type="time"
-                          value={formatTime(r.hour, r.minute)}
-                          onChange={(e) => {
-                            const { hour, minute } = parseTime(e.target.value);
-                            void updateReminder(r.id, { hour, minute });
-                          }}
-                          disabled={!r.enabled}
-                          className="rounded-md bg-transparent text-sm font-semibold outline-none"
-                          style={{
-                            color: "var(--foreground)",
-                            opacity: r.enabled ? 1 : 0.5,
-                          }}
-                        />
-                        <button
-                          onClick={() => void removeReminder(r.id)}
-                          className="rounded-full px-3 py-1 text-xs font-semibold"
-                          style={{
-                            background: "rgba(220, 38, 38, 0.1)",
-                            color: "#b91c1c",
-                            border: "1px solid rgba(220, 38, 38, 0.3)",
-                          }}
-                        >
-                          Remove
-                        </button>
-                      </div>
+                      </button>
+                      <button
+                        onClick={() => void removeReminder(r.id)}
+                        className="shrink-0 rounded-full text-lg leading-none opacity-50 hover:opacity-100"
+                        style={{ color: "var(--foreground)", padding: "2px 6px" }}
+                        aria-label={`Remove ${r.label}`}
+                      >
+                        ×
+                      </button>
                     </div>
                   ))}
                   <button
