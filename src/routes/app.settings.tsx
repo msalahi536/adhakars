@@ -62,12 +62,14 @@ function Settings() {
     setHasCustom(getCustomAdhkarRows().length > 0);
     let cancelled = false;
     checkNotificationPermission().then((v) => {
-      if (!cancelled) setNotifEnabled(v);
+      if (!cancelled) {
+        setNotifEnabled(v);
+        setNotifChecking(false);
+      }
     });
     return () => {
       cancelled = true;
     };
-  }, []);
 
   const handleEnableNotifications = async () => {
     setNotifRequesting(true);
