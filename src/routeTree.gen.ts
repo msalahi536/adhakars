@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as DownloadRouteImport } from './routes/download'
 import { Route as DonateRouteImport } from './routes/donate'
 import { Route as AppRouteImport } from './routes/app'
@@ -25,6 +26,11 @@ import { Route as AppMoreRouteImport } from './routes/app.more'
 import { Route as AppEveningRouteImport } from './routes/app.evening'
 import { Route as AppAboutRouteImport } from './routes/app.about'
 
+const PrivacyRoute = PrivacyRouteImport.update({
+  id: '/privacy',
+  path: '/privacy',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const DownloadRoute = DownloadRouteImport.update({
   id: '/download',
   path: '/download',
@@ -107,6 +113,7 @@ export interface FileRoutesByFullPath {
   '/app': typeof AppRouteWithChildren
   '/donate': typeof DonateRoute
   '/download': typeof DownloadRoute
+  '/privacy': typeof PrivacyRoute
   '/app/about': typeof AppAboutRoute
   '/app/evening': typeof AppEveningRoute
   '/app/more': typeof AppMoreRoute
@@ -123,6 +130,7 @@ export interface FileRoutesByTo {
   '/about': typeof AboutRoute
   '/donate': typeof DonateRoute
   '/download': typeof DownloadRoute
+  '/privacy': typeof PrivacyRoute
   '/app/about': typeof AppAboutRoute
   '/app/evening': typeof AppEveningRoute
   '/app/more': typeof AppMoreRoute
@@ -141,6 +149,7 @@ export interface FileRoutesById {
   '/app': typeof AppRouteWithChildren
   '/donate': typeof DonateRoute
   '/download': typeof DownloadRoute
+  '/privacy': typeof PrivacyRoute
   '/app/about': typeof AppAboutRoute
   '/app/evening': typeof AppEveningRoute
   '/app/more': typeof AppMoreRoute
@@ -160,6 +169,7 @@ export interface FileRouteTypes {
     | '/app'
     | '/donate'
     | '/download'
+    | '/privacy'
     | '/app/about'
     | '/app/evening'
     | '/app/more'
@@ -176,6 +186,7 @@ export interface FileRouteTypes {
     | '/about'
     | '/donate'
     | '/download'
+    | '/privacy'
     | '/app/about'
     | '/app/evening'
     | '/app/more'
@@ -193,6 +204,7 @@ export interface FileRouteTypes {
     | '/app'
     | '/donate'
     | '/download'
+    | '/privacy'
     | '/app/about'
     | '/app/evening'
     | '/app/more'
@@ -211,10 +223,18 @@ export interface RootRouteChildren {
   AppRoute: typeof AppRouteWithChildren
   DonateRoute: typeof DonateRoute
   DownloadRoute: typeof DownloadRoute
+  PrivacyRoute: typeof PrivacyRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/privacy': {
+      id: '/privacy'
+      path: '/privacy'
+      fullPath: '/privacy'
+      preLoaderRoute: typeof PrivacyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/download': {
       id: '/download'
       path: '/download'
@@ -357,6 +377,7 @@ const rootRouteChildren: RootRouteChildren = {
   AppRoute: AppRouteWithChildren,
   DonateRoute: DonateRoute,
   DownloadRoute: DownloadRoute,
+  PrivacyRoute: PrivacyRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
