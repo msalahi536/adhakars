@@ -6,7 +6,7 @@ import { ConcentricCirclesPattern } from "@/components/HeaderPatterns";
 import { SALAH_PRAYERS, getSalahItems, isItemComplete, type SalahPrayer } from "@/data/salah";
 import { getCounts, setCount, clearCounts, bumpLifetime } from "@/lib/storage";
 
-export const Route = createFileRoute("/salah")({
+export const Route = createFileRoute("/app/salah")({
   head: () => ({ meta: [{ title: "Salah Adhkar, Sahih Al-Adhkar" }] }),
   component: Salah,
 });

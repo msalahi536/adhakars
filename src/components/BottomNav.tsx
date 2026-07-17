@@ -3,14 +3,14 @@ import { Link, useRouterState } from "@tanstack/react-router";
 import { Sunrise, Moon, CircleDot, Hand, MoreHorizontal } from "lucide-react";
 import { getStreak } from "@/lib/storage";
 
-const MORE_NESTED = ["/sleep", "/wake", "/qibla", "/my-adhkar", "/settings", "/about", "/privacy", "/terms"];
+const MORE_NESTED = ["/app/sleep", "/app/wake", "/app/qibla", "/app/my-adhkar", "/app/settings", "/app/about"];
 
 const tabs = [
-  { to: "/" as const, label: "Morning", Icon: Sunrise },
-  { to: "/evening" as const, label: "Evening", Icon: Moon },
-  { to: "/salah" as const, label: "Salah", Icon: Hand },
-  { to: "/tasbih" as const, label: "Tasbih", Icon: CircleDot },
-  { to: "/more" as const, label: "More", Icon: MoreHorizontal },
+  { to: "/app" as const, label: "Morning", Icon: Sunrise },
+  { to: "/app/evening" as const, label: "Evening", Icon: Moon },
+  { to: "/app/salah" as const, label: "Salah", Icon: Hand },
+  { to: "/app/tasbih" as const, label: "Tasbih", Icon: CircleDot },
+  { to: "/app/more" as const, label: "More", Icon: MoreHorizontal },
 ];
 
 const DARK_THEMES = new Set(["dark-emerald", "deep-navy"]);
@@ -68,7 +68,7 @@ export function BottomNav() {
             style={{ transition: "color 0.25s ease", minWidth: 0 }}
           >
             {({ isActive }) => {
-              const active = isActive || (t.to === "/more" && moreNestedActive);
+              const active = isActive || (t.to === "/app/more" && moreNestedActive);
               const color = active ? activeColor : iconColor;
               const opacity = active ? 1 : 0.6;
               return (
@@ -85,7 +85,7 @@ export function BottomNav() {
                   >
                     {t.label}
                   </span>
-                  {t.to === "/more" && streak > 0 && (
+                  {t.to === "/app/more" && streak > 0 && (
                     <span
                       className="absolute right-0 top-0 rounded-[10px] px-1 py-0.5 text-[8px] font-bold"
                       style={{ background: activeColor, color: isDark ? "#0a0a0a" : "#ffffff" }}

@@ -10,46 +10,26 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as TermsRouteImport } from './routes/terms'
-import { Route as TasbihRouteImport } from './routes/tasbih'
-import { Route as SleepRouteImport } from './routes/sleep'
-import { Route as SettingsRouteImport } from './routes/settings'
-import { Route as SalahRouteImport } from './routes/salah'
-import { Route as QiblaRouteImport } from './routes/qibla'
 import { Route as PrivacyRouteImport } from './routes/privacy'
-import { Route as MyAdhkarRouteImport } from './routes/my-adhkar'
-import { Route as MoreRouteImport } from './routes/more'
-import { Route as EveningRouteImport } from './routes/evening'
+import { Route as DownloadRouteImport } from './routes/download'
+import { Route as DonateRouteImport } from './routes/donate'
+import { Route as AppRouteImport } from './routes/app'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AppIndexRouteImport } from './routes/app.index'
+import { Route as AppTasbihRouteImport } from './routes/app.tasbih'
+import { Route as AppSleepRouteImport } from './routes/app.sleep'
+import { Route as AppSettingsRouteImport } from './routes/app.settings'
+import { Route as AppSalahRouteImport } from './routes/app.salah'
+import { Route as AppQiblaRouteImport } from './routes/app.qibla'
+import { Route as AppMyAdhkarRouteImport } from './routes/app.my-adhkar'
+import { Route as AppMoreRouteImport } from './routes/app.more'
+import { Route as AppEveningRouteImport } from './routes/app.evening'
+import { Route as AppAboutRouteImport } from './routes/app.about'
 
 const TermsRoute = TermsRouteImport.update({
   id: '/terms',
   path: '/terms',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const TasbihRoute = TasbihRouteImport.update({
-  id: '/tasbih',
-  path: '/tasbih',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const SleepRoute = SleepRouteImport.update({
-  id: '/sleep',
-  path: '/sleep',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const SettingsRoute = SettingsRouteImport.update({
-  id: '/settings',
-  path: '/settings',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const SalahRoute = SalahRouteImport.update({
-  id: '/salah',
-  path: '/salah',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const QiblaRoute = QiblaRouteImport.update({
-  id: '/qibla',
-  path: '/qibla',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PrivacyRoute = PrivacyRouteImport.update({
@@ -57,19 +37,19 @@ const PrivacyRoute = PrivacyRouteImport.update({
   path: '/privacy',
   getParentRoute: () => rootRouteImport,
 } as any)
-const MyAdhkarRoute = MyAdhkarRouteImport.update({
-  id: '/my-adhkar',
-  path: '/my-adhkar',
+const DownloadRoute = DownloadRouteImport.update({
+  id: '/download',
+  path: '/download',
   getParentRoute: () => rootRouteImport,
 } as any)
-const MoreRoute = MoreRouteImport.update({
-  id: '/more',
-  path: '/more',
+const DonateRoute = DonateRouteImport.update({
+  id: '/donate',
+  path: '/donate',
   getParentRoute: () => rootRouteImport,
 } as any)
-const EveningRoute = EveningRouteImport.update({
-  id: '/evening',
-  path: '/evening',
+const AppRoute = AppRouteImport.update({
+  id: '/app',
+  path: '/app',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AboutRoute = AboutRouteImport.update({
@@ -82,107 +62,180 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AppIndexRoute = AppIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppTasbihRoute = AppTasbihRouteImport.update({
+  id: '/tasbih',
+  path: '/tasbih',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppSleepRoute = AppSleepRouteImport.update({
+  id: '/sleep',
+  path: '/sleep',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppSettingsRoute = AppSettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppSalahRoute = AppSalahRouteImport.update({
+  id: '/salah',
+  path: '/salah',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppQiblaRoute = AppQiblaRouteImport.update({
+  id: '/qibla',
+  path: '/qibla',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppMyAdhkarRoute = AppMyAdhkarRouteImport.update({
+  id: '/my-adhkar',
+  path: '/my-adhkar',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppMoreRoute = AppMoreRouteImport.update({
+  id: '/more',
+  path: '/more',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppEveningRoute = AppEveningRouteImport.update({
+  id: '/evening',
+  path: '/evening',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppAboutRoute = AppAboutRouteImport.update({
+  id: '/about',
+  path: '/about',
+  getParentRoute: () => AppRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
-  '/evening': typeof EveningRoute
-  '/more': typeof MoreRoute
-  '/my-adhkar': typeof MyAdhkarRoute
+  '/app': typeof AppRouteWithChildren
+  '/donate': typeof DonateRoute
+  '/download': typeof DownloadRoute
   '/privacy': typeof PrivacyRoute
-  '/qibla': typeof QiblaRoute
-  '/salah': typeof SalahRoute
-  '/settings': typeof SettingsRoute
-  '/sleep': typeof SleepRoute
-  '/tasbih': typeof TasbihRoute
   '/terms': typeof TermsRoute
+  '/app/about': typeof AppAboutRoute
+  '/app/evening': typeof AppEveningRoute
+  '/app/more': typeof AppMoreRoute
+  '/app/my-adhkar': typeof AppMyAdhkarRoute
+  '/app/qibla': typeof AppQiblaRoute
+  '/app/salah': typeof AppSalahRoute
+  '/app/settings': typeof AppSettingsRoute
+  '/app/sleep': typeof AppSleepRoute
+  '/app/tasbih': typeof AppTasbihRoute
+  '/app/': typeof AppIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
-  '/evening': typeof EveningRoute
-  '/more': typeof MoreRoute
-  '/my-adhkar': typeof MyAdhkarRoute
+  '/donate': typeof DonateRoute
+  '/download': typeof DownloadRoute
   '/privacy': typeof PrivacyRoute
-  '/qibla': typeof QiblaRoute
-  '/salah': typeof SalahRoute
-  '/settings': typeof SettingsRoute
-  '/sleep': typeof SleepRoute
-  '/tasbih': typeof TasbihRoute
   '/terms': typeof TermsRoute
+  '/app/about': typeof AppAboutRoute
+  '/app/evening': typeof AppEveningRoute
+  '/app/more': typeof AppMoreRoute
+  '/app/my-adhkar': typeof AppMyAdhkarRoute
+  '/app/qibla': typeof AppQiblaRoute
+  '/app/salah': typeof AppSalahRoute
+  '/app/settings': typeof AppSettingsRoute
+  '/app/sleep': typeof AppSleepRoute
+  '/app/tasbih': typeof AppTasbihRoute
+  '/app': typeof AppIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
-  '/evening': typeof EveningRoute
-  '/more': typeof MoreRoute
-  '/my-adhkar': typeof MyAdhkarRoute
+  '/app': typeof AppRouteWithChildren
+  '/donate': typeof DonateRoute
+  '/download': typeof DownloadRoute
   '/privacy': typeof PrivacyRoute
-  '/qibla': typeof QiblaRoute
-  '/salah': typeof SalahRoute
-  '/settings': typeof SettingsRoute
-  '/sleep': typeof SleepRoute
-  '/tasbih': typeof TasbihRoute
   '/terms': typeof TermsRoute
+  '/app/about': typeof AppAboutRoute
+  '/app/evening': typeof AppEveningRoute
+  '/app/more': typeof AppMoreRoute
+  '/app/my-adhkar': typeof AppMyAdhkarRoute
+  '/app/qibla': typeof AppQiblaRoute
+  '/app/salah': typeof AppSalahRoute
+  '/app/settings': typeof AppSettingsRoute
+  '/app/sleep': typeof AppSleepRoute
+  '/app/tasbih': typeof AppTasbihRoute
+  '/app/': typeof AppIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
     | '/about'
-    | '/evening'
-    | '/more'
-    | '/my-adhkar'
+    | '/app'
+    | '/donate'
+    | '/download'
     | '/privacy'
-    | '/qibla'
-    | '/salah'
-    | '/settings'
-    | '/sleep'
-    | '/tasbih'
     | '/terms'
+    | '/app/about'
+    | '/app/evening'
+    | '/app/more'
+    | '/app/my-adhkar'
+    | '/app/qibla'
+    | '/app/salah'
+    | '/app/settings'
+    | '/app/sleep'
+    | '/app/tasbih'
+    | '/app/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/about'
-    | '/evening'
-    | '/more'
-    | '/my-adhkar'
+    | '/donate'
+    | '/download'
     | '/privacy'
-    | '/qibla'
-    | '/salah'
-    | '/settings'
-    | '/sleep'
-    | '/tasbih'
     | '/terms'
+    | '/app/about'
+    | '/app/evening'
+    | '/app/more'
+    | '/app/my-adhkar'
+    | '/app/qibla'
+    | '/app/salah'
+    | '/app/settings'
+    | '/app/sleep'
+    | '/app/tasbih'
+    | '/app'
   id:
     | '__root__'
     | '/'
     | '/about'
-    | '/evening'
-    | '/more'
-    | '/my-adhkar'
+    | '/app'
+    | '/donate'
+    | '/download'
     | '/privacy'
-    | '/qibla'
-    | '/salah'
-    | '/settings'
-    | '/sleep'
-    | '/tasbih'
     | '/terms'
+    | '/app/about'
+    | '/app/evening'
+    | '/app/more'
+    | '/app/my-adhkar'
+    | '/app/qibla'
+    | '/app/salah'
+    | '/app/settings'
+    | '/app/sleep'
+    | '/app/tasbih'
+    | '/app/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AboutRoute: typeof AboutRoute
-  EveningRoute: typeof EveningRoute
-  MoreRoute: typeof MoreRoute
-  MyAdhkarRoute: typeof MyAdhkarRoute
+  AppRoute: typeof AppRouteWithChildren
+  DonateRoute: typeof DonateRoute
+  DownloadRoute: typeof DownloadRoute
   PrivacyRoute: typeof PrivacyRoute
-  QiblaRoute: typeof QiblaRoute
-  SalahRoute: typeof SalahRoute
-  SettingsRoute: typeof SettingsRoute
-  SleepRoute: typeof SleepRoute
-  TasbihRoute: typeof TasbihRoute
   TermsRoute: typeof TermsRoute
 }
 
@@ -195,41 +248,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof TermsRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/tasbih': {
-      id: '/tasbih'
-      path: '/tasbih'
-      fullPath: '/tasbih'
-      preLoaderRoute: typeof TasbihRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/sleep': {
-      id: '/sleep'
-      path: '/sleep'
-      fullPath: '/sleep'
-      preLoaderRoute: typeof SleepRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/settings': {
-      id: '/settings'
-      path: '/settings'
-      fullPath: '/settings'
-      preLoaderRoute: typeof SettingsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/salah': {
-      id: '/salah'
-      path: '/salah'
-      fullPath: '/salah'
-      preLoaderRoute: typeof SalahRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/qibla': {
-      id: '/qibla'
-      path: '/qibla'
-      fullPath: '/qibla'
-      preLoaderRoute: typeof QiblaRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/privacy': {
       id: '/privacy'
       path: '/privacy'
@@ -237,25 +255,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PrivacyRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/my-adhkar': {
-      id: '/my-adhkar'
-      path: '/my-adhkar'
-      fullPath: '/my-adhkar'
-      preLoaderRoute: typeof MyAdhkarRouteImport
+    '/download': {
+      id: '/download'
+      path: '/download'
+      fullPath: '/download'
+      preLoaderRoute: typeof DownloadRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/more': {
-      id: '/more'
-      path: '/more'
-      fullPath: '/more'
-      preLoaderRoute: typeof MoreRouteImport
+    '/donate': {
+      id: '/donate'
+      path: '/donate'
+      fullPath: '/donate'
+      preLoaderRoute: typeof DonateRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/evening': {
-      id: '/evening'
-      path: '/evening'
-      fullPath: '/evening'
-      preLoaderRoute: typeof EveningRouteImport
+    '/app': {
+      id: '/app'
+      path: '/app'
+      fullPath: '/app'
+      preLoaderRoute: typeof AppRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/about': {
@@ -272,21 +290,114 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/app/': {
+      id: '/app/'
+      path: '/'
+      fullPath: '/app/'
+      preLoaderRoute: typeof AppIndexRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/tasbih': {
+      id: '/app/tasbih'
+      path: '/tasbih'
+      fullPath: '/app/tasbih'
+      preLoaderRoute: typeof AppTasbihRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/sleep': {
+      id: '/app/sleep'
+      path: '/sleep'
+      fullPath: '/app/sleep'
+      preLoaderRoute: typeof AppSleepRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/settings': {
+      id: '/app/settings'
+      path: '/settings'
+      fullPath: '/app/settings'
+      preLoaderRoute: typeof AppSettingsRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/salah': {
+      id: '/app/salah'
+      path: '/salah'
+      fullPath: '/app/salah'
+      preLoaderRoute: typeof AppSalahRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/qibla': {
+      id: '/app/qibla'
+      path: '/qibla'
+      fullPath: '/app/qibla'
+      preLoaderRoute: typeof AppQiblaRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/my-adhkar': {
+      id: '/app/my-adhkar'
+      path: '/my-adhkar'
+      fullPath: '/app/my-adhkar'
+      preLoaderRoute: typeof AppMyAdhkarRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/more': {
+      id: '/app/more'
+      path: '/more'
+      fullPath: '/app/more'
+      preLoaderRoute: typeof AppMoreRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/evening': {
+      id: '/app/evening'
+      path: '/evening'
+      fullPath: '/app/evening'
+      preLoaderRoute: typeof AppEveningRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/about': {
+      id: '/app/about'
+      path: '/about'
+      fullPath: '/app/about'
+      preLoaderRoute: typeof AppAboutRouteImport
+      parentRoute: typeof AppRoute
+    }
   }
 }
+
+interface AppRouteChildren {
+  AppAboutRoute: typeof AppAboutRoute
+  AppEveningRoute: typeof AppEveningRoute
+  AppMoreRoute: typeof AppMoreRoute
+  AppMyAdhkarRoute: typeof AppMyAdhkarRoute
+  AppQiblaRoute: typeof AppQiblaRoute
+  AppSalahRoute: typeof AppSalahRoute
+  AppSettingsRoute: typeof AppSettingsRoute
+  AppSleepRoute: typeof AppSleepRoute
+  AppTasbihRoute: typeof AppTasbihRoute
+  AppIndexRoute: typeof AppIndexRoute
+}
+
+const AppRouteChildren: AppRouteChildren = {
+  AppAboutRoute: AppAboutRoute,
+  AppEveningRoute: AppEveningRoute,
+  AppMoreRoute: AppMoreRoute,
+  AppMyAdhkarRoute: AppMyAdhkarRoute,
+  AppQiblaRoute: AppQiblaRoute,
+  AppSalahRoute: AppSalahRoute,
+  AppSettingsRoute: AppSettingsRoute,
+  AppSleepRoute: AppSleepRoute,
+  AppTasbihRoute: AppTasbihRoute,
+  AppIndexRoute: AppIndexRoute,
+}
+
+const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
-  EveningRoute: EveningRoute,
-  MoreRoute: MoreRoute,
-  MyAdhkarRoute: MyAdhkarRoute,
+  AppRoute: AppRouteWithChildren,
+  DonateRoute: DonateRoute,
+  DownloadRoute: DownloadRoute,
   PrivacyRoute: PrivacyRoute,
-  QiblaRoute: QiblaRoute,
-  SalahRoute: SalahRoute,
-  SettingsRoute: SettingsRoute,
-  SleepRoute: SleepRoute,
-  TasbihRoute: TasbihRoute,
   TermsRoute: TermsRoute,
 }
 export const routeTree = rootRouteImport

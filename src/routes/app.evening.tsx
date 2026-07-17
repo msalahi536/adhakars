@@ -3,7 +3,7 @@ import { AdhkarPage } from "@/components/AdhkarPage";
 import { InterlockingArcsPattern } from "@/components/HeaderPatterns";
 import { eveningAdhkar, baqarahLastTwo } from "@/data/adhkar";
 
-export const Route = createFileRoute("/evening")({
+export const Route = createFileRoute("/app/evening")({
   head: () => ({
     meta: [
       { title: "Evening Adhkar, Sahih Al-Adhkar" },

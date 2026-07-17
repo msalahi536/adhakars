@@ -1,5 +1,5 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import {
   Outlet,
   Link,
@@ -11,13 +11,12 @@ import {
 } from "@tanstack/react-router";
 
 import appCss from "../styles.css?url";
-import { BottomNav } from "@/components/BottomNav";
-import { Onboarding, hasOnboarded } from "@/components/Onboarding";
 
 import { applyTheme, getMode, resolveTheme } from "@/lib/theme";
 import { reconcileStreak } from "@/lib/storage";
 import { applyReminders, getNotificationPrefs, checkNotificationPermission } from "@/lib/notifications";
 import { supabase } from "@/integrations/supabase/client";
+
 
 function NotFoundComponent() {
   return (
@@ -93,7 +92,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
       {
         rel: "stylesheet",
-        href: "https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Scheherazade+New:wght@400;500;600;700&display=swap",
+        href: "https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Scheherazade+New:wght@400;500;600;700&display=swap",
       },
     ],
   }),
@@ -149,16 +148,9 @@ function RootComponent() {
     return () => sub.subscription.unsubscribe();
   }, [router]);
 
-  const [showOnboarding, setShowOnboarding] = useState(false);
-  useEffect(() => {
-    if (!hasOnboarded()) setShowOnboarding(true);
-  }, []);
-
   return (
     <QueryClientProvider client={queryClient}>
       <Outlet />
-      <BottomNav />
-      {showOnboarding && <Onboarding onDone={() => setShowOnboarding(false)} />}
     </QueryClientProvider>
   );
 }

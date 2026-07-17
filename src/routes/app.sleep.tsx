@@ -8,7 +8,7 @@ import { sleepItems, wakeItems, type SleepMode } from "@/data/sleep";
 import { isItemComplete } from "@/data/salah";
 import { getCounts, setCount, clearCounts, bumpLifetime } from "@/lib/storage";
 
-export const Route = createFileRoute("/sleep")({
+export const Route = createFileRoute("/app/sleep")({
   head: () => ({
     meta: [
       { title: "Sleep & Wake Adhkar, Sahih Al-Adhkar" },
@@ -166,8 +166,8 @@ function Sleep() {
             persistKey={storageKey}
             finishCta={
               isSleep
-                ? { label: "Go to Wake Adhkar", to: "/sleep" }
-                : { label: "Go to Morning Adhkar", to: "/" }
+                ? { label: "Go to Wake Adhkar", to: "/app/sleep" }
+                : { label: "Go to Morning Adhkar", to: "/app" }
             }
             onFinishNav={isSleep ? () => setMode("wake") : undefined}
           />

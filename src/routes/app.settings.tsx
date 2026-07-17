@@ -35,7 +35,7 @@ import {
 
 const APP_VERSION = "1.0.3";
 
-export const Route = createFileRoute("/settings")({
+export const Route = createFileRoute("/app/settings")({
   head: () => ({ meta: [{ title: "Settings, Sahih Al-Adhkar" }] }),
   component: Settings,
 });
@@ -106,7 +106,7 @@ function Settings() {
   const choose = (m: ThemeMode) => {
     setModeState(m);
     setMode(m);
-    applyTheme(resolveTheme(m, "/settings"));
+    applyTheme(resolveTheme(m, "/app/settings"));
   };
 
   const updateDisplay = (patch: Partial<typeof display>) => {

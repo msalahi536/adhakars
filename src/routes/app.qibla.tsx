@@ -8,7 +8,7 @@ const CAL_OPEN_COUNT_KEY = "qibla-open-count";
 const CAL_AUTO_LIMIT = 3;
 
 
-export const Route = createFileRoute("/qibla")({
+export const Route = createFileRoute("/app/qibla")({
   head: () => ({
     meta: [
       { title: "Qibla Finder, Sahih Al-Adhkar" },

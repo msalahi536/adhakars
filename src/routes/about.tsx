@@ -1,135 +1,107 @@
-import { createFileRoute } from "@tanstack/react-router";
-import { HeaderBackButton } from "@/components/HeaderBackButton";
-import { HeaderSettingsButton } from "@/components/HeaderSettingsButton";
-import { ConcentricCirclesPattern } from "@/components/HeaderPatterns";
-import { Heart, Mail } from "lucide-react";
-
-// TODO: Replace with real donation URL when available.
-const DONATE_URL = "#";
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { MarketingLayout, ArcsTexture } from "@/components/marketing/MarketingLayout";
 
 export const Route = createFileRoute("/about")({
   head: () => ({
     meta: [
-      { title: "About & Support, Sahih Al-Adhkar" },
+      { title: "About, Sahih Al-Adhkar" },
       {
         name: "description",
         content:
-          "About the Sahih Al-Adhkar project, how to support it, and how to get in touch.",
+          "Sahih Al-Adhkar is a simple, offline friendly companion for the daily remembrance of Allah, sourced from authentic narrations.",
+      },
+      { property: "og:title", content: "About Sahih Al-Adhkar" },
+      {
+        property: "og:description",
+        content: "About the Sahih Al-Adhkar project and the sources behind it.",
       },
     ],
   }),
-  component: About,
+  component: AboutPage,
 });
 
-function About() {
+function AboutPage() {
   return (
-    <>
-      <header
-        className="page-header relative overflow-hidden"
-        style={{ background: "var(--grad-header)", color: "var(--header-fg)" }}
-      >
-        <ConcentricCirclesPattern />
-        <HeaderBackButton />
-        <HeaderSettingsButton />
-        <div
-          className="relative mx-auto max-w-md px-4 pb-5 pt-4"
-          style={{ paddingLeft: 60, paddingRight: 60 }}
-        >
-          <div className="label-caps" style={{ color: "var(--header-sub)", opacity: 1 }}>
-            Information
+    <MarketingLayout>
+      <section className="relative overflow-hidden">
+        <ArcsTexture opacity={0.06} />
+        <div className="relative mx-auto max-w-3xl px-5 pb-16 pt-16 md:px-10 md:pb-24 md:pt-24">
+          <div
+            className="text-xs font-semibold uppercase tracking-[0.2em]"
+            style={{ color: "#C9A84C" }}
+          >
+            About
           </div>
-          <h1 className="mt-1 text-3xl font-bold tracking-tight">About &amp; Support</h1>
-        </div>
-      </header>
-
-      <main className="scroll-area">
-        <div className="mx-auto max-w-md px-4 py-4 space-y-4">
-          <section
-            className="rounded-[24px] p-5"
-            style={{ background: "var(--surface)", border: "1px solid var(--border)" }}
+          <h1
+            className="mt-3 text-5xl leading-tight tracking-tight md:text-6xl"
+            style={{ fontFamily: "'Fraunces', Georgia, serif", fontWeight: 500 }}
           >
-            <h2 className="label-caps mb-2">About the project</h2>
-            <p className="text-sm leading-relaxed" style={{ color: "var(--foreground)" }}>
-              Sahih Al-Adhkar is a simple, offline friendly companion for the
-              daily remembrance of Allah. Every dhikr and du'a in this app is
-              taken from authentic narrations, with the source listed on each
-              card so you can verify it yourself.
-            </p>
+            About the project
+          </h1>
+          <p
+            className="mt-8 text-lg leading-relaxed md:text-xl"
+            style={{ color: "rgba(31, 61, 43, 0.82)" }}
+          >
+            Sahih Al-Adhkar is a simple, offline friendly companion for the
+            daily remembrance of Allah. Every dhikr and du'a is taken from
+            authentic narrations, with the source shown on each one so you
+            can verify it yourself.
+          </p>
+          <p
+            className="mt-6 text-base leading-relaxed"
+            style={{ color: "rgba(31, 61, 43, 0.7)" }}
+          >
+            Based on the authentic adhkar compiled by Shaykh Abdul Aziz At-Tarefe.
+          </p>
+
+          <div
+            className="mt-14 rounded-3xl p-7 md:p-9"
+            style={{
+              background: "#FFFFFF",
+              border: "1px solid rgba(31, 61, 43, 0.08)",
+              boxShadow: "0 10px 30px rgba(31, 61, 43, 0.05)",
+            }}
+          >
+            <h2
+              className="text-2xl"
+              style={{ fontFamily: "'Fraunces', Georgia, serif", fontWeight: 600 }}
+            >
+              Contact and feedback
+            </h2>
             <p
-              className="mt-3 text-xs leading-relaxed"
-              style={{ color: "var(--muted-foreground)" }}
+              className="mt-3 text-sm leading-relaxed"
+              style={{ color: "rgba(31, 61, 43, 0.72)" }}
             >
-            Based on the authentic adhkar compiled by our team.
-            </p>
-          </section>
-
-          <section
-            className="rounded-[24px] p-5"
-            style={{ background: "var(--surface)", border: "1px solid var(--border)" }}
-          >
-            <h2 className="label-caps mb-2">Support this project</h2>
-            <p className="text-sm leading-relaxed" style={{ color: "var(--foreground)" }}>
-              This app is free. There are no ads and nothing is sold. If it
-              has benefited you, a donation helps cover hosting and keeps the
-              work going, as sadaqah jariyah, in sha' Allah.
-            </p>
-            <p className="mt-3 text-sm leading-relaxed" style={{ color: "var(--foreground)" }}>
-              And if you are not able to give, please make du'a for this
-              project and for everyone who uses it. That is a support worth
-              more than any amount.
-            </p>
-            <a
-              href={DONATE_URL}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-full py-3 text-sm font-semibold"
-              style={{
-                background: "linear-gradient(135deg, #c9a84c, #b8923a)",
-                color: "#ffffff",
-              }}
-            >
-              <Heart size={16} strokeWidth={2.4} />
-              Donate
-            </a>
-            <div
-              className="mt-2 text-[11px]"
-              style={{ color: "var(--muted-foreground)" }}
-            >
-              {/* TODO: replace # with the real donation URL */}
-              Donation link coming soon.
-            </div>
-          </section>
-
-          <section
-            className="rounded-[24px] p-5"
-            style={{ background: "var(--surface)", border: "1px solid var(--border)" }}
-          >
-            <h2 className="label-caps mb-2">Contact &amp; feedback</h2>
-            <p className="text-sm leading-relaxed" style={{ color: "var(--foreground)" }}>
               Found a mistake in an adhkar? Have an idea for a feature? Want
-              to share how the app has helped you? Please reach out, I would
-              love to hear from you.
+              to share how the app has helped you? Please reach out.
             </p>
             <a
               href="mailto:msalahi536@gmail.com"
-              className="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-full py-3 text-sm font-semibold"
-              style={{
-                background: "var(--accent)",
-                color: "var(--accent-foreground)",
-              }}
+              className="mt-5 inline-flex rounded-full px-6 py-3 text-sm font-semibold"
+              style={{ background: "#1F3D2B", color: "#FAF6EC" }}
             >
-              <Mail size={16} strokeWidth={2.4} />
               msalahi536@gmail.com
             </a>
-            <div
-              className="mt-2 text-center text-[11px]"
-              style={{ color: "var(--muted-foreground)" }}
+          </div>
+
+          <div className="mt-10 flex flex-wrap gap-3">
+            <Link
+              to="/app"
+              className="rounded-full px-6 py-3 text-sm font-semibold"
+              style={{ background: "#C9A84C", color: "#1F3D2B" }}
             >
-              Mohammad Salahi
-            </div>
-          </section>
+              Open the app
+            </Link>
+            <Link
+              to="/donate"
+              className="rounded-full border px-6 py-3 text-sm font-semibold"
+              style={{ borderColor: "rgba(31, 61, 43, 0.2)", color: "#1F3D2B" }}
+            >
+              Support the project
+            </Link>
+          </div>
         </div>
-      </main>
-    </>
+      </section>
+    </MarketingLayout>
   );
 }

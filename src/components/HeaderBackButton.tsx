@@ -6,7 +6,7 @@ import { ChevronLeft } from "lucide-react";
  * block, mirroring HeaderSettingsButton on the right. Parent header MUST
  * be `position: relative`.
  */
-export function HeaderBackButton({ fallbackTo = "/more" }: { fallbackTo?: string }) {
+export function HeaderBackButton({ fallbackTo = "/app/more" }: { fallbackTo?: string }) {
   const router = useRouter();
 
   const onClick = () => {
