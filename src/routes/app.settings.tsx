@@ -101,22 +101,50 @@ function Settings() {
     }
   };
 
-  const updateReminder = async (
-    id: ReminderId,
-    patch: Partial<NotificationPrefs["morning"]>,
-  ) => {
-    const next: NotificationPrefs = {
-      ...notifPrefs,
-      [id]: { ...notifPrefs[id], ...patch },
-    };
+  const persistPrefs = (next: NotificationPrefs) => {
     setNotifPrefsState(next);
     setNotificationPrefs(next);
-    const r = next[id];
+  };
+
+  const updateReminder = async (id: number, patch: Partial<Reminder>) => {
+    const next: NotificationPrefs = {
+      ...notifPrefs,
+      reminders: notifPrefs.reminders.map((r) => (r.id === id ? { ...r, ...patch } : r)),
+    };
+    persistPrefs(next);
+    const r = next.reminders.find((x) => x.id === id);
+    if (!r) return;
     if (r.enabled && notifEnabled) {
-      await scheduleReminder(id, r.hour, r.minute);
+      await scheduleReminder(r);
     } else {
-      await cancelReminder(id);
+      await cancelReminder(r.id);
     }
+  };
+
+  const addReminder = () => {
+    const now = new Date();
+    const newReminder: Reminder = {
+      id: notifPrefs.nextId,
+      label: "New reminder",
+      hour: now.getHours(),
+      minute: 0,
+      enabled: true,
+    };
+    const next: NotificationPrefs = {
+      reminders: [...notifPrefs.reminders, newReminder],
+      nextId: notifPrefs.nextId + 1,
+    };
+    persistPrefs(next);
+    if (notifEnabled) void scheduleReminder(newReminder);
+  };
+
+  const removeReminder = async (id: number) => {
+    await cancelReminder(id);
+    const next: NotificationPrefs = {
+      ...notifPrefs,
+      reminders: notifPrefs.reminders.filter((r) => r.id !== id),
+    };
+    persistPrefs(next);
   };
 
   const parseTime = (v: string): { hour: number; minute: number } => {
