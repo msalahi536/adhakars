@@ -50,8 +50,8 @@ export const vibrateIfEnabled = (pattern: number | number[]) => {
   navigator.vibrate(pattern);
 };
 
-export type HapticStrength = "light" | "medium" | "heavy";
-export const triggerHaptic = async (strength: HapticStrength = "light") => {
+export type HapticStrength = "light" | "medium" | "heavy" | "double";
+export const triggerHaptic = async (strength: HapticStrength = "heavy") => {
   if (typeof window === "undefined") return;
   if (!getDisplay().haptics) return;
   const cap = (window as unknown as { Capacitor?: { isNativePlatform?: () => boolean } }).Capacitor;
@@ -59,19 +59,29 @@ export const triggerHaptic = async (strength: HapticStrength = "light") => {
     try {
       const { Haptics, ImpactStyle } = await import("@capacitor/haptics");
       const style =
-        strength === "heavy"
+        strength === "heavy" || strength === "double"
           ? ImpactStyle.Heavy
           : strength === "medium"
             ? ImpactStyle.Medium
             : ImpactStyle.Light;
-      await Haptics.impact({ style });
+      if (strength === "double") {
+        await Haptics.impact({ style });
+        await new Promise((r) => setTimeout(r, 120));
+        await Haptics.impact({ style });
+      } else {
+        await Haptics.impact({ style });
+      }
       return;
     } catch {
       // fall through to web vibrate
     }
   }
   if (typeof navigator !== "undefined" && navigator.vibrate) {
-    navigator.vibrate(strength === "medium" ? 25 : strength === "heavy" ? 40 : 12);
+    if (strength === "double") {
+      navigator.vibrate([40, 80, 40]);
+    } else {
+      navigator.vibrate(strength === "medium" ? 25 : strength === "heavy" ? 40 : 12);
+    }
   }
 };
 

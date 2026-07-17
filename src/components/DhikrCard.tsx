@@ -45,7 +45,7 @@ export function DhikrCard({ dhikr, count, onIncrement, isSpecial, specialLabel, 
   const handleTap = () => {
     if (complete) return;
     const willComplete = count + 1 >= dhikr.target;
-    triggerHaptic(willComplete ? "medium" : "light");
+    triggerHaptic(willComplete ? "double" : "heavy");
     setTapped(true);
     setTimeout(() => setTapped(false), 260);
     if (willComplete) {

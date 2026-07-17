@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import type { ComboDhikr } from "@/data/salah";
-import { vibrateIfEnabled } from "@/lib/theme";
+import { triggerHaptic } from "@/lib/theme";
 
 type Props = {
   combo: ComboDhikr;
@@ -111,7 +111,7 @@ export function TasbeehComboCard({ combo, counts, onIncrement, index, total }: P
                     <button
                       onClick={() => {
                         if (done) return;
-                        vibrateIfEnabled(15);
+                        triggerHaptic("heavy");
                         onIncrement(part.id, part.target);
                       }}
                       disabled={done}
