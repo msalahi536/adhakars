@@ -1,39 +1,68 @@
 // Local device notifications via @capacitor/local-notifications.
 
-import { isDayComplete } from "@/lib/storage";
-
-export type ReminderId = "morning" | "evening" | "nudge";
-
 export type Reminder = {
-  enabled: boolean;
+  id: number;
+  label: string;
   hour: number;
   minute: number;
+  enabled: boolean;
 };
 
 export type NotificationPrefs = {
-  morning: Reminder;
-  evening: Reminder;
-  nudge: Reminder;
+  reminders: Reminder[];
+  nextId: number;
 };
 
 const PREFS_KEY = "adhkar:notifications";
 
-const NOTIF_IDS: Record<ReminderId, number> = {
-  morning: 1,
-  evening: 2,
-  nudge: 3,
-};
-
-const NOTIF_COPY: Record<ReminderId, { title: string; body: string }> = {
-  morning: { title: "Morning Adhkar", body: "Time for your morning adhkar." },
-  evening: { title: "Evening Adhkar", body: "Time for your evening adhkar." },
-  nudge: { title: "Sahih Al-Adhkar", body: "Your adhkar are still waiting. There is still time today." },
-};
-
 const defaults: NotificationPrefs = {
-  morning: { enabled: false, hour: 6, minute: 0 },
-  evening: { enabled: false, hour: 16, minute: 30 },
-  nudge: { enabled: false, hour: 20, minute: 0 },
+  reminders: [
+    { id: 1, label: "Morning Adhkar", hour: 6, minute: 0, enabled: false },
+    { id: 2, label: "Evening Adhkar", hour: 16, minute: 30, enabled: false },
+  ],
+  nextId: 3,
+};
+
+type LegacyReminder = { enabled?: boolean; hour?: number; minute?: number };
+type LegacyPrefs = {
+  morning?: LegacyReminder;
+  evening?: LegacyReminder;
+  nudge?: LegacyReminder;
+  reminders?: Reminder[];
+  nextId?: number;
+};
+
+const migrate = (parsed: LegacyPrefs): NotificationPrefs => {
+  if (Array.isArray(parsed.reminders)) {
+    const reminders = parsed.reminders.filter(
+      (r) => r && typeof r.id === "number" && typeof r.hour === "number",
+    );
+    const maxId = reminders.reduce((m, r) => Math.max(m, r.id), 0);
+    return {
+      reminders,
+      nextId: Math.max(parsed.nextId ?? 0, maxId + 1, 1),
+    };
+  }
+  // Migrate legacy morning/evening/nudge shape.
+  const legacy: Array<[string, LegacyReminder | undefined, number, number]> = [
+    ["Morning Adhkar", parsed.morning, 6, 0],
+    ["Evening Adhkar", parsed.evening, 16, 30],
+    ["Gentle nudge", parsed.nudge, 20, 0],
+  ];
+  const reminders: Reminder[] = [];
+  let idCounter = 1;
+  for (const [label, r, defH, defM] of legacy) {
+    if (!r) continue;
+    reminders.push({
+      id: idCounter++,
+      label,
+      hour: typeof r.hour === "number" ? r.hour : defH,
+      minute: typeof r.minute === "number" ? r.minute : defM,
+      enabled: r.enabled === true,
+    });
+  }
+  if (reminders.length === 0) return defaults;
+  return { reminders, nextId: idCounter };
 };
 
 export const getNotificationPrefs = (): NotificationPrefs => {
@@ -41,12 +70,7 @@ export const getNotificationPrefs = (): NotificationPrefs => {
   try {
     const raw = localStorage.getItem(PREFS_KEY);
     if (!raw) return defaults;
-    const parsed = JSON.parse(raw) as Partial<NotificationPrefs>;
-    return {
-      morning: { ...defaults.morning, ...(parsed.morning ?? {}) },
-      evening: { ...defaults.evening, ...(parsed.evening ?? {}) },
-      nudge: { ...defaults.nudge, ...(parsed.nudge ?? {}) },
-    };
+    return migrate(JSON.parse(raw) as LegacyPrefs);
   } catch {
     return defaults;
   }
@@ -117,34 +141,29 @@ export const checkNotificationPermission = async (): Promise<boolean> => {
   }
 };
 
-export const cancelReminder = async (id: ReminderId): Promise<void> => {
+export const cancelReminder = async (id: number): Promise<void> => {
   const plugin = await loadPlugin();
   if (!plugin) return;
   try {
-    await plugin.cancel({ notifications: [{ id: NOTIF_IDS[id] }] });
+    await plugin.cancel({ notifications: [{ id }] });
   } catch {
     // ignore
   }
 };
 
-export const scheduleReminder = async (
-  id: ReminderId,
-  hour: number,
-  minute: number,
-): Promise<boolean> => {
+export const scheduleReminder = async (r: Reminder): Promise<boolean> => {
   const plugin = await loadPlugin();
   if (!plugin) return false;
   try {
-    await plugin.cancel({ notifications: [{ id: NOTIF_IDS[id] }] }).catch(() => {});
-    const copy = NOTIF_COPY[id];
+    await plugin.cancel({ notifications: [{ id: r.id }] }).catch(() => {});
     await plugin.schedule({
       notifications: [
         {
-          id: NOTIF_IDS[id],
-          title: copy.title,
-          body: copy.body,
+          id: r.id,
+          title: r.label || "Adhkar reminder",
+          body: `Time for ${r.label || "your adhkar"}.`,
           schedule: {
-            on: { hour, minute },
+            on: { hour: r.hour, minute: r.minute },
             repeats: true,
             allowWhileIdle: true,
           },
@@ -161,17 +180,11 @@ export const scheduleReminder = async (
 
 export const applyReminders = async (prefs: NotificationPrefs): Promise<void> => {
   if (!isNativePlatform()) return;
-  for (const key of ["morning", "evening", "nudge"] as ReminderId[]) {
-    const r = prefs[key];
+  for (const r of prefs.reminders) {
     if (r.enabled) {
-      // For nudge: only keep scheduled while day is incomplete.
-      if (key === "nudge" && isDayComplete()) {
-        await cancelReminder(key);
-        continue;
-      }
-      await scheduleReminder(key, r.hour, r.minute);
+      await scheduleReminder(r);
     } else {
-      await cancelReminder(key);
+      await cancelReminder(r.id);
     }
   }
 };
