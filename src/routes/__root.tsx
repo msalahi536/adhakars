@@ -148,9 +148,6 @@ function RootComponent() {
     return () => sub.subscription.unsubscribe();
   }, [router]);
 
-  const [_showOnboarding] = [null];
-  void _showOnboarding;
-
   return (
     <QueryClientProvider client={queryClient}>
       <Outlet />
