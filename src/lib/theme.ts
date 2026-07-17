@@ -54,24 +54,21 @@ export type HapticStrength = "light" | "medium" | "heavy";
 export const triggerHaptic = async (strength: HapticStrength = "light") => {
   if (typeof window === "undefined") return;
   if (!getDisplay().haptics) return;
-  try {
-    const cap = (window as unknown as { Capacitor?: { isNativePlatform?: () => boolean } }).Capacitor;
-    if (cap?.isNativePlatform?.()) {
-      const modName = "@capacitor/haptics";
-      const mod: any = await import(/* @vite-ignore */ modName).catch(() => null);
-      if (mod?.Haptics && mod?.ImpactStyle) {
-        const style =
-          strength === "heavy"
-            ? mod.ImpactStyle.Heavy
-            : strength === "medium"
-              ? mod.ImpactStyle.Medium
-              : mod.ImpactStyle.Light;
-        await mod.Haptics.impact({ style });
-        return;
-      }
+  const cap = (window as unknown as { Capacitor?: { isNativePlatform?: () => boolean } }).Capacitor;
+  if (cap?.isNativePlatform?.()) {
+    try {
+      const { Haptics, ImpactStyle } = await import("@capacitor/haptics");
+      const style =
+        strength === "heavy"
+          ? ImpactStyle.Heavy
+          : strength === "medium"
+            ? ImpactStyle.Medium
+            : ImpactStyle.Light;
+      await Haptics.impact({ style });
+      return;
+    } catch {
+      // fall through to web vibrate
     }
-  } catch {
-    // swallow — fall through to web vibrate
   }
   if (typeof navigator !== "undefined" && navigator.vibrate) {
     navigator.vibrate(strength === "medium" ? 25 : strength === "heavy" ? 40 : 12);
