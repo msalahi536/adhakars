@@ -68,7 +68,7 @@ export function BottomNav() {
             style={{ transition: "color 0.25s ease", minWidth: 0 }}
           >
             {({ isActive }) => {
-              const active = isActive || (t.to === "/more" && moreNestedActive);
+              const active = isActive || (t.to === "/app/more" && moreNestedActive);
               const color = active ? activeColor : iconColor;
               const opacity = active ? 1 : 0.6;
               return (
@@ -85,7 +85,7 @@ export function BottomNav() {
                   >
                     {t.label}
                   </span>
-                  {t.to === "/more" && streak > 0 && (
+                  {t.to === "/app/more" && streak > 0 && (
                     <span
                       className="absolute right-0 top-0 rounded-[10px] px-1 py-0.5 text-[8px] font-bold"
                       style={{ background: activeColor, color: isDark ? "#0a0a0a" : "#ffffff" }}
