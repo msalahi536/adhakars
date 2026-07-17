@@ -7,7 +7,7 @@ import { MuqarnasPattern } from "@/components/HeaderPatterns";
 import { triggerHaptic } from "@/lib/theme";
 import { bumpLifetime } from "@/lib/storage";
 
-export const Route = createFileRoute("/tasbih")({
+export const Route = createFileRoute("/app/tasbih")({
   head: () => ({ meta: [{ title: "Tasbih, Sahih Al-Adhkar" }] }),
   component: Tasbih,
 });

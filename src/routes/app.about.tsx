@@ -7,7 +7,7 @@ import { Heart, Mail } from "lucide-react";
 // TODO: Replace with real donation URL when available.
 const DONATE_URL = "#";
 
-export const Route = createFileRoute("/about")({
+export const Route = createFileRoute("/app/about")({
   head: () => ({
     meta: [
       { title: "About & Support, Sahih Al-Adhkar" },

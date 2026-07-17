@@ -11,7 +11,7 @@ import {
   type LifetimeCounts,
 } from "@/lib/storage";
 
-export const Route = createFileRoute("/more")({
+export const Route = createFileRoute("/app/more")({
   head: () => ({
     meta: [
       { title: "More, Sahih Al-Adhkar" },

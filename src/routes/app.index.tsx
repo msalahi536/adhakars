@@ -3,7 +3,7 @@ import { AdhkarPage } from "@/components/AdhkarPage";
 import { GirihStarPattern } from "@/components/HeaderPatterns";
 import { morningAdhkar } from "@/data/adhkar";
 
-export const Route = createFileRoute("/")({
+export const Route = createFileRoute("/app/")({
   head: () => ({
     meta: [
       { title: "Morning Adhkar, Sahih Al-Adhkar" },

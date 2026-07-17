@@ -8,7 +8,7 @@ import { sleepItems, wakeItems, type SleepMode } from "@/data/sleep";
 import { isItemComplete } from "@/data/salah";
 import { getCounts, setCount, clearCounts, bumpLifetime } from "@/lib/storage";
 
-export const Route = createFileRoute("/sleep")({
+export const Route = createFileRoute("/app/sleep")({
   head: () => ({
     meta: [
       { title: "Sleep & Wake Adhkar, Sahih Al-Adhkar" },

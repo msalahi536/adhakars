@@ -9,7 +9,7 @@ import {
 } from "@/components/CustomAdhkarForm";
 import type { Dhikr } from "@/data/adhkar";
 
-export const Route = createFileRoute("/my-adhkar")({
+export const Route = createFileRoute("/app/my-adhkar")({
   head: () => ({
     meta: [
       { title: "My Adhkar, Sahih Al-Adhkar" },
