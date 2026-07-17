@@ -3,14 +3,14 @@ import { Link, useRouterState } from "@tanstack/react-router";
 import { Sunrise, Moon, CircleDot, Hand, MoreHorizontal } from "lucide-react";
 import { getStreak } from "@/lib/storage";
 
-const MORE_NESTED = ["/sleep", "/wake", "/qibla", "/my-adhkar", "/settings", "/about", "/privacy", "/terms"];
+const MORE_NESTED = ["/app/sleep", "/app/wake", "/app/qibla", "/app/my-adhkar", "/app/settings", "/app/about"];
 
 const tabs = [
-  { to: "/" as const, label: "Morning", Icon: Sunrise },
-  { to: "/evening" as const, label: "Evening", Icon: Moon },
-  { to: "/salah" as const, label: "Salah", Icon: Hand },
-  { to: "/tasbih" as const, label: "Tasbih", Icon: CircleDot },
-  { to: "/more" as const, label: "More", Icon: MoreHorizontal },
+  { to: "/app" as const, label: "Morning", Icon: Sunrise },
+  { to: "/app/evening" as const, label: "Evening", Icon: Moon },
+  { to: "/app/salah" as const, label: "Salah", Icon: Hand },
+  { to: "/app/tasbih" as const, label: "Tasbih", Icon: CircleDot },
+  { to: "/app/more" as const, label: "More", Icon: MoreHorizontal },
 ];
 
 const DARK_THEMES = new Set(["dark-emerald", "deep-navy"]);
