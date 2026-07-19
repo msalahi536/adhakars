@@ -90,14 +90,14 @@ function More() {
           <section
             className="overflow-hidden rounded-[24px] p-4"
             style={{
-              background: "linear-gradient(135deg, #1f3d2b 0%, #2d5a3d 100%)",
-              color: "#ffffff",
+              background: "var(--surface-deep-gradient, var(--surface-deep))",
+              color: "var(--surface-deep-fg)",
             }}
           >
-            <div className="label-caps" style={{ color: "rgba(255,255,255,0.85)", opacity: 1 }}>
+            <div className="label-caps" style={{ color: "var(--surface-deep-muted)", opacity: 1 }}>
               Consistency
             </div>
-            <p className="mt-2 text-sm font-semibold" style={{ color: "#ffffff" }}>
+            <p className="mt-2 text-sm font-semibold" style={{ color: "var(--surface-deep-fg)" }}>
               You have remembered Allah on {consistency.completedCount} of the last 30 days.
             </p>
             {(() => {
@@ -117,27 +117,41 @@ function More() {
               }
               return (
                 <>
-                  <div className="mt-2 text-[11px] font-semibold uppercase tracking-wider" style={{ color: "rgba(255,255,255,0.7)" }}>
+                  <div
+                    className="mt-2 text-[11px] font-semibold uppercase tracking-wider"
+                    style={{ color: "var(--surface-deep-muted)" }}
+                  >
                     {monthLabel}
                   </div>
                   <div className="mt-1 grid gap-0.5" style={{ gridTemplateColumns: "repeat(7, minmax(0, 1fr))" }}>
                     {weekdays.map((w, i) => (
-                      <div key={`w${i}`} className="text-center text-[9px]" style={{ color: "rgba(255,255,255,0.55)" }}>{w}</div>
+                      <div
+                        key={`w${i}`}
+                        className="text-center text-[9px]"
+                        style={{ color: "color-mix(in oklab, var(--surface-deep-fg) 55%, transparent)" }}
+                      >
+                        {w}
+                      </div>
                     ))}
                     {cells.map((c) => {
                       if (!c.date) return <div key={c.key} style={{ height: 26 }} />;
                       const status = statusByDate.get(c.date);
                       const isToday = c.date === todayDate;
-                      const isFuture = c.date > todayDate;
+                      const isFuture = todayDate ? c.date > todayDate : false;
                       let bg = "transparent";
-                      let border = "1px solid rgba(255,255,255,0.25)";
-                      let color = "rgba(255,255,255,0.7)";
+                      let border = "1px solid var(--surface-deep-border)";
+                      let color = "color-mix(in oklab, var(--surface-deep-fg) 70%, transparent)";
                       if (status === "complete") {
-                        bg = "#c9a84c"; border = "1px solid #c9a84c"; color = "#1f3d2b";
+                        bg = "var(--accent)";
+                        border = "1px solid var(--accent)";
+                        color = "var(--surface-deep-accent-fg)";
                       } else if (status === "grace") {
-                        bg = "#f5c542"; border = "1px solid #f5c542"; color = "#1f3d2b";
+                        bg = "color-mix(in oklab, var(--accent) 75%, #ffd54f)";
+                        border = "1px solid color-mix(in oklab, var(--accent) 75%, #ffd54f)";
+                        color = "var(--surface-deep-accent-fg)";
                       } else if (isFuture) {
-                        border = "1px dashed rgba(255,255,255,0.15)"; color = "rgba(255,255,255,0.35)";
+                        border = "1px dashed color-mix(in oklab, var(--surface-deep-fg) 20%, transparent)";
+                        color = "color-mix(in oklab, var(--surface-deep-fg) 35%, transparent)";
                       }
                       return (
                         <div
@@ -150,7 +164,9 @@ function More() {
                             background: bg,
                             border,
                             color,
-                            boxShadow: isToday ? "0 0 0 1.5px rgba(255,255,255,0.9)" : undefined,
+                            boxShadow: isToday
+                              ? "0 0 0 1.5px color-mix(in oklab, var(--surface-deep-fg) 90%, transparent)"
+                              : undefined,
                           }}
                         >
                           {c.day}
@@ -162,13 +178,16 @@ function More() {
               );
             })()}
             {consistency.graceUsedRecently && (
-              <p className="mt-2 text-xs" style={{ color: "rgba(255,255,255,0.9)" }}>
+              <p className="mt-2 text-xs" style={{ color: "var(--surface-deep-fg)" }}>
                 You missed a day. Your streak is still going. Begin again today.
               </p>
             )}
             <div
               className="mt-2 flex items-center justify-between border-t pt-2 text-[11px]"
-              style={{ borderColor: "rgba(255,255,255,0.18)", color: "rgba(255,255,255,0.75)" }}
+              style={{
+                borderColor: "var(--surface-deep-border)",
+                color: "var(--surface-deep-muted)",
+              }}
             >
               <span>Current streak: {consistency.current} days</span>
               <span>Longest: {consistency.longest} days</span>
@@ -179,17 +198,17 @@ function More() {
           <section
             className="overflow-hidden rounded-[24px] p-5"
             style={{
-              background: "linear-gradient(135deg, #1f3d2b 0%, #2d5a3d 100%)",
-              color: "#ffffff",
+              background: "var(--surface-deep-gradient, var(--surface-deep))",
+              color: "var(--surface-deep-fg)",
             }}
           >
             <div className="flex items-center justify-between">
-              <div className="label-caps" style={{ color: "rgba(255,255,255,0.85)", opacity: 1 }}>
+              <div className="label-caps" style={{ color: "var(--surface-deep-muted)", opacity: 1 }}>
                 My Dhikr
               </div>
               <div
                 className="flex items-center rounded-full p-0.5 text-[11px] font-semibold"
-                style={{ background: "rgba(255,255,255,0.12)" }}
+                style={{ background: "color-mix(in oklab, var(--surface-deep-fg) 12%, transparent)" }}
               >
                 {(["days", "count"] as const).map((v) => {
                   const active = lifetimeView === v;
@@ -199,8 +218,8 @@ function More() {
                       onClick={() => setLifetimeView(v)}
                       className="rounded-full px-3 py-1"
                       style={{
-                        background: active ? "#c9a84c" : "transparent",
-                        color: active ? "#1f3d2b" : "#ffffff",
+                        background: active ? "var(--accent)" : "transparent",
+                        color: active ? "var(--surface-deep-accent-fg)" : "var(--surface-deep-fg)",
                       }}
                     >
                       {v === "days" ? "Days" : "Count"}
@@ -214,14 +233,14 @@ function More() {
               <>
                 <div
                   className="mt-2 text-[11px] font-semibold uppercase tracking-wider"
-                  style={{ color: "rgba(255,255,255,0.7)" }}
+                  style={{ color: "var(--surface-deep-muted)" }}
                 >
                   Days of remembrance
                 </div>
-                <div style={{ fontSize: 40, fontWeight: 800, color: "#c9a84c", lineHeight: 1.1 }}>
+                <div style={{ fontSize: 40, fontWeight: 800, color: "var(--accent)", lineHeight: 1.1 }}>
                   {daysOfRem.toLocaleString()} days of remembrance
                 </div>
-                <div className="mt-1 text-sm" style={{ color: "rgba(255,255,255,0.85)" }}>
+                <div className="mt-1 text-sm" style={{ color: "var(--surface-deep-muted)" }}>
                   {weeksConsistent} weeks consistent
                 </div>
               </>
@@ -229,26 +248,26 @@ function More() {
               <>
                 <div
                   className="mt-2 text-[11px] font-semibold uppercase tracking-wider"
-                  style={{ color: "rgba(255,255,255,0.7)" }}
+                  style={{ color: "var(--surface-deep-muted)" }}
                 >
                   Total Remembrances
                 </div>
-                <div style={{ fontSize: 48, fontWeight: 800, color: "#c9a84c", lineHeight: 1.1 }}>
+                <div style={{ fontSize: 48, fontWeight: 800, color: "var(--accent)", lineHeight: 1.1 }}>
                   {lifetime.total.toLocaleString()}
                 </div>
                 <div
                   className="mt-4 grid grid-cols-4 gap-2 border-t pt-3"
-                  style={{ borderColor: "rgba(255,255,255,0.18)" }}
+                  style={{ borderColor: "var(--surface-deep-border)" }}
                 >
                   {(["morning", "evening", "salah", "tasbih"] as const).map((k) => (
                     <div key={k} className="flex flex-col items-center">
                       <span
                         className="text-[10px] font-semibold uppercase tracking-wider"
-                        style={{ color: "rgba(255,255,255,0.6)" }}
+                        style={{ color: "color-mix(in oklab, var(--surface-deep-fg) 60%, transparent)" }}
                       >
                         {k}
                       </span>
-                      <span style={{ fontSize: 16, fontWeight: 700, color: "#ffffff" }}>
+                      <span style={{ fontSize: 16, fontWeight: 700, color: "var(--surface-deep-fg)" }}>
                         {lifetime[k].toLocaleString()}
                       </span>
                     </div>

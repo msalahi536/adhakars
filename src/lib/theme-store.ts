@@ -1,6 +1,6 @@
-// Persistent theme store: seed, mode, section overrides, preset id.
+// Persistent theme store: seed, mode, section overrides, preset id, custom triplet.
 
-import type { Mode, SectionKey } from "./theming";
+import type { Mode, SectionKey, CustomOverrides } from "./theming";
 import {
   applyTokens,
   deriveSectionSeed,
@@ -12,16 +12,17 @@ const K_MODE = "adhkar:mode";
 const K_SEED = "adhkar:seed";
 const K_PRESET = "adhkar:preset";
 const K_OVERRIDES = "adhkar:section-overrides";
+const K_CUSTOM = "adhkar:custom-triplet";
 
 export type ModeSetting = "light" | "dark" | "auto";
 
-export const DEFAULT_SEED = "#c9a84c"; // Classic gold
+export const DEFAULT_SEED = "#c9a84c";
 export const DEFAULT_PRESET_ID = "classic";
 
 export type Preset = { id: string; name: string; seed: string };
 
 export const PRESETS: Preset[] = [
-  { id: "classic",   name: "Classic",   seed: "#c9a84c" }, // warm gold
+  { id: "classic",   name: "Classic",   seed: "#c9a84c" },
   { id: "rose",      name: "Rose",      seed: "#d47a8b" },
   { id: "lavender",  name: "Twilight",  seed: "#8a7bd0" },
   { id: "sakura",    name: "Sakura",    seed: "#e69ba5" },
@@ -31,8 +32,6 @@ export const PRESETS: Preset[] = [
   { id: "midnight",  name: "Midnight",  seed: "#5b6ea8" },
 ];
 
-// --------- storage helpers ---------
-
 const readLS = (k: string): string | null => {
   if (typeof window === "undefined") return null;
   try { return window.localStorage.getItem(k); } catch { return null; }
@@ -40,6 +39,10 @@ const readLS = (k: string): string | null => {
 const writeLS = (k: string, v: string) => {
   if (typeof window === "undefined") return;
   try { window.localStorage.setItem(k, v); } catch {}
+};
+const removeLS = (k: string) => {
+  if (typeof window === "undefined") return;
+  try { window.localStorage.removeItem(k); } catch {}
 };
 
 export const getModeSetting = (): ModeSetting => {
@@ -69,7 +72,15 @@ export const setSectionOverride = (section: SectionKey, hex: string | null) => {
   setOverrides(cur);
 };
 
-// --------- mode resolution ---------
+export const getCustomTriplet = (): CustomOverrides => {
+  const raw = readLS(K_CUSTOM);
+  if (!raw) return {};
+  try { return JSON.parse(raw); } catch { return {}; }
+};
+export const setCustomTriplet = (t: CustomOverrides) => {
+  writeLS(K_CUSTOM, JSON.stringify(t));
+};
+export const clearCustomTriplet = () => removeLS(K_CUSTOM);
 
 export const resolveMode = (setting: ModeSetting = getModeSetting()): Mode => {
   if (setting === "light") return "light";
@@ -79,8 +90,6 @@ export const resolveMode = (setting: ModeSetting = getModeSetting()): Mode => {
   }
   return "light";
 };
-
-// --------- route → section ---------
 
 export const sectionForRoute = (pathname: string): SectionKey => {
   if (pathname === "/app" || pathname === "/app/") return "morning";
@@ -93,28 +102,40 @@ export const sectionForRoute = (pathname: string): SectionKey => {
   return "default";
 };
 
-// --------- apply ---------
-
 export const applyThemeForRoute = (pathname: string) => {
   const mode = resolveMode();
   const base = getSeed();
   const overrides = getOverrides();
   const section = sectionForRoute(pathname);
-  const seed = overrides[section] ?? deriveSectionSeed(base, section);
-  const tokens = deriveTokens({ seed, mode });
+  const isCustom = getPresetId() === "custom";
+  const triplet = isCustom ? getCustomTriplet() : {};
+
+  // Per-section override always wins for the header hue.
+  const sectionOverride = overrides[section];
+  const seed = sectionOverride ?? deriveSectionSeed(triplet.accent ?? base, section);
+
+  // Custom overrides for background / accent are global; header is
+  // per-section-derived unless overridden.
+  const custom: CustomOverrides = {
+    background: triplet.background,
+    accent: triplet.accent,
+    header: sectionOverride ? undefined : triplet.header
+      ? deriveSectionSeed(triplet.header, section)
+      : undefined,
+  };
+
+  const tokens = deriveTokens({ seed, mode, custom });
   applyTokens(tokens, mode);
 };
 
-// Reset everything to default.
 export const resetTheme = () => {
-  if (typeof window === "undefined") return;
-  window.localStorage.removeItem(K_MODE);
-  window.localStorage.removeItem(K_SEED);
-  window.localStorage.removeItem(K_PRESET);
-  window.localStorage.removeItem(K_OVERRIDES);
+  removeLS(K_MODE);
+  removeLS(K_SEED);
+  removeLS(K_PRESET);
+  removeLS(K_OVERRIDES);
+  removeLS(K_CUSTOM);
 };
 
-// Bootstrap: script content to inline in <head> before first paint.
 export const PRE_PAINT_SCRIPT = `(function(){try{
 var m=localStorage.getItem('${K_MODE}')||'auto';
 var mode = m==='light'?'light':(m==='dark'?'dark':(window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'));

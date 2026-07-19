@@ -12,6 +12,8 @@ import {
   setPresetId,
   getOverrides,
   setSectionOverride,
+  getCustomTriplet,
+  setCustomTriplet,
   resolveMode,
   resetTheme,
   PRESETS,
@@ -19,9 +21,10 @@ import {
   DEFAULT_PRESET_ID,
   type ModeSetting,
 } from "@/lib/theme-store";
-import { deriveSectionSeed, type SectionKey } from "@/lib/theming";
+import { deriveSectionSeed, type SectionKey, type CustomOverrides } from "@/lib/theming";
 import { MiniPreview } from "@/components/theme/MiniPreview";
 import { ThemePicker } from "@/components/theme/ThemePicker";
+import { CustomThemeSheet } from "@/components/theme/CustomThemeSheet";
 import {
   resetToday,
   resetAllProgress,
@@ -56,7 +59,9 @@ function Settings() {
   const [presetId, setPresetIdState] = useState<string>(DEFAULT_PRESET_ID);
   const [overrides, setOverridesState] = useState<Partial<Record<SectionKey, string>>>({});
   const [showAdvanced, setShowAdvanced] = useState(false);
-  const [pickerOpen, setPickerOpen] = useState<null | { target: "base" | SectionKey; seed: string }>(null);
+  const [pickerOpen, setPickerOpen] = useState<null | { target: SectionKey; seed: string }>(null);
+  const [customSheetOpen, setCustomSheetOpen] = useState(false);
+  const [triplet, setTripletState] = useState<CustomOverrides>({});
   const [display, setDisplayState] = useState(getDisplay());
   const [confirmReset, setConfirmReset] = useState(false);
   const [confirmResetAll, setConfirmResetAll] = useState(false);
@@ -74,6 +79,7 @@ function Settings() {
     setSeedState(getSeed());
     setPresetIdState(getPresetId());
     setOverridesState(getOverrides());
+    setTripletState(getCustomTriplet());
     setDisplayState(getDisplay());
     setNotifPrefsState(getNotificationPrefs());
     setCommitmentState(getCommitment());
@@ -187,15 +193,18 @@ function Settings() {
     setPresetId(p.id);
     setSeedState(p.seed);
     setSeed(p.seed);
+    setTripletState({});
+    setCustomTriplet({});
     window.dispatchEvent(new Event("adhkar:theme-change"));
   };
 
-  const applyCustomSeed = (hex: string) => {
+  const applyCustomTriplet = (t: CustomOverrides, nextSeed: string) => {
     setPresetIdState("custom");
     setPresetId("custom");
-    setSeedState(hex);
-    setSeed(hex);
-    setPickerOpen(null);
+    setSeedState(nextSeed);
+    setSeed(nextSeed);
+    setTripletState(t);
+    setCustomTriplet(t);
     window.dispatchEvent(new Event("adhkar:theme-change"));
   };
 
@@ -221,6 +230,7 @@ function Settings() {
     setSeedState(DEFAULT_SEED);
     setPresetIdState(DEFAULT_PRESET_ID);
     setOverridesState({});
+    setTripletState({});
     window.dispatchEvent(new Event("adhkar:theme-change"));
   };
 
@@ -324,7 +334,7 @@ function Settings() {
                 );
               })}
               <button
-                onClick={() => setPickerOpen({ target: "base", seed })}
+                onClick={() => setCustomSheetOpen(true)}
                 className="flex flex-col items-center justify-center gap-1 rounded-2xl p-2 transition"
                 style={{
                   background: "var(--surface)",
@@ -337,8 +347,8 @@ function Settings() {
                     height: 40,
                     borderRadius: 10,
                     background:
-                      presetId === "custom"
-                        ? seed
+                      presetId === "custom" && (triplet.header || triplet.background || triplet.accent)
+                        ? `linear-gradient(135deg, ${triplet.header ?? seed} 0%, ${triplet.accent ?? seed} 100%)`
                         : "conic-gradient(from 0deg, #ff3b3b, #ffb03b, #f8ff3b, #7dff3b, #3bffcf, #3ba7ff, #7d3bff, #ff3bd0, #ff3b3b)",
                   }}
                 />
@@ -417,8 +427,18 @@ function Settings() {
             onClose={() => setPickerOpen(null)}
             onApply={(hex) => {
               if (!pickerOpen) return;
-              if (pickerOpen.target === "base") applyCustomSeed(hex);
-              else applySectionOverride(pickerOpen.target, hex);
+              applySectionOverride(pickerOpen.target, hex);
+            }}
+          />
+
+          <CustomThemeSheet
+            open={customSheetOpen}
+            initial={{ seed, triplet }}
+            mode={previewMode}
+            onClose={() => setCustomSheetOpen(false)}
+            onApply={({ header, background, accent, seed: nextSeed }) => {
+              applyCustomTriplet({ header, background, accent }, nextSeed);
+              setCustomSheetOpen(false);
             }}
           />
 
