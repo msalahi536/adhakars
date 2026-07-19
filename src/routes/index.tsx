@@ -104,11 +104,7 @@ function HomePage() {
         .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 14px 32px -12px rgba(31,61,43,0.42), 0 4px 10px rgba(31,61,43,0.16); }
         .btn-ghost { transition: transform 160ms ease, border-color 220ms ease, background 220ms ease; }
         .btn-ghost:hover { transform: translateY(-1px); border-color: rgba(31,61,43,0.38); background: #FFFFFF; }
-        .phone-float { animation: phoneFloat 9s ease-in-out infinite; }
-        @keyframes phoneFloat {
-          0%, 100% { transform: translateY(0) rotate(-3deg); }
-          50% { transform: translateY(-10px) rotate(-3deg); }
-        }
+        html { scroll-behavior: smooth; }
         html { scroll-behavior: smooth; }
       `}</style>
 
