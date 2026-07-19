@@ -51,7 +51,12 @@ export const Route = createFileRoute("/app/settings")({
 });
 
 function Settings() {
-  const [mode, setModeState] = useState<ThemeMode>("auto");
+  const [mode, setModeState] = useState<ModeSetting>("auto");
+  const [seed, setSeedState] = useState<string>(DEFAULT_SEED);
+  const [presetId, setPresetIdState] = useState<string>(DEFAULT_PRESET_ID);
+  const [overrides, setOverridesState] = useState<Partial<Record<SectionKey, string>>>({});
+  const [showAdvanced, setShowAdvanced] = useState(false);
+  const [pickerOpen, setPickerOpen] = useState<null | { target: "base" | SectionKey; seed: string }>(null);
   const [display, setDisplayState] = useState(getDisplay());
   const [confirmReset, setConfirmReset] = useState(false);
   const [confirmResetAll, setConfirmResetAll] = useState(false);
