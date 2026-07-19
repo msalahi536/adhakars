@@ -121,24 +121,6 @@ function HomePage() {
         />
         <div className="relative mx-auto max-w-[1200px] px-6 pb-24 pt-16 md:px-10 md:pb-40 md:pt-28 lg:grid lg:grid-cols-[1.1fr,1fr] lg:items-center lg:gap-16">
           <div>
-            <span
-              className="inline-flex items-center gap-2 rounded-full border px-3.5 py-1.5"
-              style={{
-                borderColor: "rgba(31, 61, 43, 0.18)",
-                background: "rgba(255,255,255,0.6)",
-                color: INK,
-                fontSize: 11,
-                fontWeight: 600,
-                letterSpacing: "0.16em",
-                textTransform: "uppercase",
-              }}
-            >
-              <span
-                className="inline-block h-1.5 w-1.5 rounded-full"
-                style={{ background: GOLD, boxShadow: `0 0 0 3px rgba(201,168,76,0.18)` }}
-              />
-              From the Sunnah
-            </span>
 
             <h1
               className="mt-8"
