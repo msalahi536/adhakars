@@ -79,6 +79,7 @@ function Settings() {
     setSeedState(getSeed());
     setPresetIdState(getPresetId());
     setOverridesState(getOverrides());
+    setTripletState(getCustomTriplet());
     setDisplayState(getDisplay());
     setNotifPrefsState(getNotificationPrefs());
     setCommitmentState(getCommitment());
