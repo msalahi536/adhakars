@@ -126,6 +126,18 @@ function RootComponent() {
     applyThemeForRoute(pathname);
   }, [pathname]);
 
+  // Re-apply theme when user changes it in Settings, or system dark mode flips.
+  useEffect(() => {
+    const reapply = () => applyThemeForRoute(window.location.pathname);
+    window.addEventListener("adhkar:theme-change", reapply);
+    const mm = window.matchMedia?.("(prefers-color-scheme: dark)");
+    mm?.addEventListener?.("change", reapply);
+    return () => {
+      window.removeEventListener("adhkar:theme-change", reapply);
+      mm?.removeEventListener?.("change", reapply);
+    };
+  }, []);
+
   useEffect(() => {
     reconcileStreak();
     const reapply = async () => {
