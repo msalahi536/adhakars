@@ -1,6 +1,9 @@
 // Derived-token theming engine.
-// Given a single seed hex + mode (light/dark), computes a full semantic token
-// map with WCAG-validated contrast, and writes CSS variables to <html>.
+// Given a seed hex + mode (light/dark), computes a full semantic token map
+// with WCAG-validated contrast, and writes CSS variables to <html>.
+//
+// Optional `custom` overrides let the user directly set the top bar,
+// background, and/or accent independently — text colors auto-derive.
 
 export type Mode = "light" | "dark";
 export type SectionKey =
@@ -12,6 +15,12 @@ export type SectionKey =
   | "wake"
   | "custom"
   | "default";
+
+export type CustomOverrides = {
+  header?: string;      // top bar seed
+  background?: string;  // page background
+  accent?: string;      // rings / buttons / active nav
+};
 
 // ---------- color math ----------
 
@@ -74,7 +83,6 @@ export const hslToHex = (h: number, s: number, l: number): string => {
   return rgbToHex(r, g, b);
 };
 
-// WCAG relative luminance and contrast
 const chan = (c: number) => {
   const s = c / 255;
   return s <= 0.03928 ? s / 12.92 : Math.pow((s + 0.055) / 1.055, 2.4);
@@ -94,12 +102,12 @@ export const readableOn = (bg: string): string => {
   return contrast("#ffffff", bg) >= contrast("#0f0f10", bg) ? "#ffffff" : "#0f0f10";
 };
 
-/** Nudge a color's lightness until contrast(fg, result) >= min. Returns adjusted hex. */
+/** Nudge bg's lightness until contrast(bg, fg) >= min. */
 export const ensureContrast = (bg: string, fg: string, min = 4.5): string => {
   if (contrast(bg, fg) >= min) return bg;
   const [h, s] = hexToHsl(bg);
   const fgL = luminance(fg);
-  const goDarker = fgL > 0.5; // if fg is light (white), darken bg
+  const goDarker = fgL > 0.5;
   let l = hexToHsl(bg)[2];
   for (let i = 0; i < 100; i++) {
     l = goDarker ? Math.max(0, l - 0.01) : Math.min(1, l + 0.01);
@@ -110,14 +118,12 @@ export const ensureContrast = (bg: string, fg: string, min = 4.5): string => {
   return hslToHex(h, s, l);
 };
 
-// Blend two hex colors by t in [0,1]
 export const mix = (a: string, b: string, t: number): string => {
   const [ar, ag, ab] = hexToRgb(a);
   const [br, bg, bb] = hexToRgb(b);
   return rgbToHex(ar + (br - ar) * t, ag + (bg - ag) * t, ab + (bb - ab) * t);
 };
 
-// rgba string from hex
 export const rgba = (hex: string, alpha: number): string => {
   const [r, g, b] = hexToRgb(hex);
   return `rgba(${Math.round(r)}, ${Math.round(g)}, ${Math.round(b)}, ${alpha})`;
@@ -125,79 +131,113 @@ export const rgba = (hex: string, alpha: number): string => {
 
 // ---------- seed clamping ----------
 
-/** Clamp a seed into a "safe" range: bounded chroma & mid lightness. */
 export const clampSeed = (hex: string): string => {
   const [h, s, l] = hexToHsl(hex);
-  const s2 = clamp(s, 0.18, 0.78); // never grey, never neon
-  const l2 = clamp(l, 0.35, 0.72); // never near-black or near-white
+  const s2 = clamp(s, 0.18, 0.82);
+  const l2 = clamp(l, 0.32, 0.75);
   return hslToHex(h, s2, l2);
 };
 
 // ---------- section derivation ----------
+// Tonal-only variation of the SAME hue: keep every section on the base hue,
+// separate them by lightness / saturation only. Family-of-one, not rainbow.
 
-const SECTION_ROTATION: Record<SectionKey, { dh: number; dl: number; ds: number }> = {
-  morning: { dh: -8, dl: 0.02, ds: 0.02 },
-  evening: { dh: 22, dl: -0.06, ds: 0 },
-  salah:   { dh: -22, dl: 0, ds: 0.04 },
-  tasbih:  { dh: 12, dl: 0.01, ds: 0 },
-  sleep:   { dh: 40, dl: -0.14, ds: -0.02 },
-  wake:    { dh: -6, dl: 0.06, ds: 0.02 },
-  custom:  { dh: 30, dl: 0, ds: 0 },
-  default: { dh: 0, dl: 0, ds: 0 },
+const SECTION_TONE: Record<SectionKey, { dl: number; ds: number }> = {
+  morning: { dl:  0.04, ds: -0.04 }, // warm & light
+  evening: { dl: -0.06, ds:  0.03 }, // deeper
+  salah:   { dl: -0.10, ds:  0.06 }, // richest
+  tasbih:  { dl:  0.01, ds: -0.06 }, // soft
+  sleep:   { dl: -0.14, ds:  0.04 }, // deep, quiet
+  wake:    { dl:  0.07, ds: -0.03 }, // bright
+  custom:  { dl:  0.00, ds:  0.00 },
+  default: { dl:  0.00, ds:  0.00 },
 };
 
 export const deriveSectionSeed = (baseSeed: string, section: SectionKey): string => {
-  const { dh, dl, ds } = SECTION_ROTATION[section];
+  const { dl, ds } = SECTION_TONE[section];
   const [h, s, l] = hexToHsl(baseSeed);
-  return clampSeed(hslToHex(h + dh, clamp(s + ds, 0.18, 0.78), clamp(l + dl, 0.32, 0.75)));
+  return clampSeed(hslToHex(h, clamp(s + ds, 0.18, 0.82), clamp(l + dl, 0.28, 0.78)));
 };
 
 // ---------- token derivation ----------
 
 export type Tokens = Record<string, string>;
 
-export const deriveTokens = (opts: { seed: string; mode: Mode }): Tokens => {
+export const deriveTokens = (opts: {
+  seed: string;
+  mode: Mode;
+  custom?: CustomOverrides;
+}): Tokens => {
   const seed = clampSeed(opts.seed);
   const [h, s, l] = hexToHsl(seed);
   const isDark = opts.mode === "dark";
+  const c = opts.custom ?? {};
 
-  // Surfaces
-  const background = isDark
-    ? hslToHex(h, Math.min(0.14, s * 0.3), 0.09)               // deep near-black with tint
-    : hslToHex(h, Math.min(0.22, s * 0.35), 0.965);            // very light tinted cream
+  // --- surfaces ---
+  const bgDefault = isDark
+    ? hslToHex(h, Math.min(0.14, s * 0.3), 0.09)
+    : hslToHex(h, Math.min(0.22, s * 0.35), 0.965);
+  const background = c.background ? clampSurface(c.background, isDark) : bgDefault;
+  const [bh, bs] = hexToHsl(background);
+
   const surface = isDark
-    ? hslToHex(h, Math.min(0.16, s * 0.35), 0.13)
-    : hslToHex(h, Math.min(0.22, s * 0.35), 0.99);
+    ? hslToHex(bh, Math.min(0.16, bs + 0.02), Math.min(0.18, hexToHsl(background)[2] + 0.04))
+    : hslToHex(bh, Math.min(0.22, bs + 0.02), Math.min(0.99, hexToHsl(background)[2] + 0.025));
   const surfaceCard = isDark
-    ? hslToHex(h, Math.min(0.16, s * 0.35), 0.16)              // slightly elevated
-    : hslToHex(h, Math.min(0.22, s * 0.35), 1.0);
+    ? hslToHex(bh, Math.min(0.16, bs + 0.02), Math.min(0.20, hexToHsl(background)[2] + 0.07))
+    : hslToHex(bh, Math.min(0.22, bs + 0.02), 1.0);
   const muted = isDark
-    ? hslToHex(h, Math.min(0.18, s * 0.4), 0.22)
-    : hslToHex(h, Math.min(0.28, s * 0.5), 0.92);
+    ? hslToHex(bh, Math.min(0.18, bs + 0.04), Math.min(0.28, hexToHsl(background)[2] + 0.13))
+    : hslToHex(bh, Math.min(0.28, bs + 0.06), 0.92);
 
-  // Text
-  const textPrimary = isDark
-    ? hslToHex(h, 0.06, 0.94)                                   // near-white, softened
-    : hslToHex(h, 0.4, 0.14);                                   // deep tinted near-black
+  // --- surface-deep: rich dark theme-tinted card
+  // Same theme hue, always dark, regardless of app mode. Used by After Salah
+  // ayah card, Consistency card, My Dhikr card.
+  const deepH = h;
+  const deepS = Math.min(0.55, Math.max(0.32, s * 0.85));
+  const deepL = isDark ? 0.13 : 0.20;
+  const surfaceDeep = hslToHex(deepH, deepS, deepL);
+  const surfaceDeepFg = "#ffffff";
+  const surfaceDeepMuted = rgba("#ffffff", 0.78);
+  const surfaceDeepBorder = rgba("#ffffff", 0.18);
+
+  // --- text ---
+  const textPrimaryRaw = isDark
+    ? hslToHex(bh, 0.06, 0.94)
+    : hslToHex(bh, 0.4, 0.14);
   const textSecondary = isDark
-    ? hslToHex(h, 0.08, 0.72)
-    : hslToHex(h, 0.25, 0.38);
+    ? hslToHex(bh, 0.08, 0.72)
+    : hslToHex(bh, 0.25, 0.38);
 
-  // Border
+  // border
   const border = isDark
-    ? rgba(hslToHex(h, 0.3, 0.6), 0.14)
-    : rgba(hslToHex(h, 0.5, 0.35), 0.14);
+    ? rgba(hslToHex(bh, 0.3, 0.6), 0.14)
+    : rgba(hslToHex(bh, 0.5, 0.35), 0.14);
 
-  // Accent — desaturate a notch in dark, keep vivid in light
+  // --- accent ---
+  const accentSource = c.accent ? clampSeed(c.accent) : seed;
+  const [ah, as, al] = hexToHsl(accentSource);
   const accent = isDark
-    ? hslToHex(h, Math.max(0.32, s * 0.75), Math.max(0.5, l))
-    : hslToHex(h, Math.min(0.75, s), Math.min(0.55, Math.max(0.42, l)));
+    ? hslToHex(ah, Math.max(0.32, as * 0.75), Math.max(0.5, al))
+    : hslToHex(ah, Math.min(0.75, as), Math.min(0.55, Math.max(0.42, al)));
   const textOnAccent = readableOn(accent);
   const accentValidated = ensureContrast(accent, textOnAccent, 4.5);
+  // Text-on-accent when accent sits on the deep surface (calendar/badge cells)
+  const surfaceDeepAccentFg = readableOn(accentValidated);
 
-  // Header gradient — richer in dark, lighter in light
+  // --- header ---
   let headerFrom: string, headerTo: string;
-  if (isDark) {
+  if (c.header) {
+    const hs2 = clampSeed(c.header);
+    const [hh, hss, hll] = hexToHsl(hs2);
+    if (isDark) {
+      headerFrom = hslToHex(hh, Math.min(0.7, hss), Math.max(0.20, hll * 0.55));
+      headerTo   = hslToHex(hh - 8, Math.min(0.7, hss), Math.max(0.14, hll * 0.42));
+    } else {
+      headerFrom = hslToHex(hh, Math.min(0.62, hss), Math.min(0.72, Math.max(0.5, hll + 0.08)));
+      headerTo   = hslToHex(hh + 6, Math.min(0.68, hss), Math.max(0.42, hll - 0.06));
+    }
+  } else if (isDark) {
     headerFrom = hslToHex(h, Math.min(0.65, s), 0.28);
     headerTo   = hslToHex(h - 8, Math.min(0.7, s), 0.18);
   } else {
@@ -209,40 +249,32 @@ export const deriveTokens = (opts: { seed: string; mode: Mode }): Tokens => {
   headerFrom = ensureContrast(headerFrom, headerFg, 4.5);
   headerTo   = ensureContrast(headerTo,   headerFg, 4.5);
   headerFg   = readableOn(mix(headerFrom, headerTo, 0.5));
-  const headerSub = headerFg === "#ffffff"
-    ? rgba("#ffffff", 0.82)
-    : rgba("#000000", 0.65);
+  const headerSub = headerFg === "#ffffff" ? rgba("#ffffff", 0.82) : rgba("#000000", 0.65);
 
-  // Validate primary body text against surface
-  const cardFg = ensureContrast(textPrimary, surfaceCard, 4.5) === textPrimary
-    ? textPrimary
+  // validated body / card text
+  const cardFg = ensureContrast(textPrimaryRaw, surfaceCard, 4.5) === textPrimaryRaw
+    ? textPrimaryRaw
     : (isDark ? "#ffffff" : "#0f0f10");
-  const bgFg  = ensureContrast(textPrimary, background, 4.5) === textPrimary
-    ? textPrimary
+  const bgFg = ensureContrast(textPrimaryRaw, background, 4.5) === textPrimaryRaw
+    ? textPrimaryRaw
     : (isDark ? "#ffffff" : "#0f0f10");
 
-  // Ring track — very low contrast neutral
-  const ringTrack = isDark
-    ? rgba("#ffffff", 0.10)
-    : rgba("#000000", 0.10);
-
-  // Count fg validated against card (this is the ring center number)
+  const ringTrack = isDark ? rgba("#ffffff", 0.10) : rgba("#000000", 0.10);
   const countFg = ensureContrast(cardFg, surfaceCard, 4.5);
 
   // Nav
   const navBg = isDark
-    ? rgba(hslToHex(h, Math.min(0.12, s * 0.3), 0.08), 0.94)
-    : rgba(hslToHex(h, Math.min(0.20, s * 0.3), 0.98), 0.94);
+    ? rgba(hslToHex(bh, Math.min(0.12, bs * 0.7), 0.08), 0.94)
+    : rgba(hslToHex(bh, Math.min(0.20, bs * 0.7), 0.98), 0.94);
   const navBorder = isDark ? rgba("#ffffff", 0.08) : rgba("#000000", 0.08);
   const navActive = accentValidated;
   const navInactive = isDark ? rgba("#ffffff", 0.55) : rgba("#000000", 0.5);
 
-  // Shadow
   const cardShadow = isDark
     ? "0 6px 20px rgba(0,0,0,0.35)"
-    : `0 4px 16px ${rgba(hslToHex(h, 0.4, 0.15), 0.08)}`;
+    : `0 4px 16px ${rgba(hslToHex(bh, 0.4, 0.15), 0.08)}`;
 
-  // Legacy aliases the codebase reads
+  // legacy aliases
   const translit  = isDark ? mix(accentValidated, "#ffffff", 0.35) : mix(accentValidated, "#000000", 0.1);
   const btnSurface = isDark ? rgba(accentValidated, 0.18) : rgba(accentValidated, 0.14);
   const btnFg = textSecondary;
@@ -252,7 +284,6 @@ export const deriveTokens = (opts: { seed: string; mode: Mode }): Tokens => {
   const sourceFg = textSecondary;
 
   return {
-    // core
     "--background": background,
     "--foreground": bgFg,
     "--surface": surface,
@@ -273,26 +304,30 @@ export const deriveTokens = (opts: { seed: string; mode: Mode }): Tokens => {
     "--text-on-accent": textOnAccent,
     "--text-on-header": headerFg,
 
-    // header
+    // deep, richly-tinted feature surface
+    "--surface-deep": surfaceDeep,
+    "--surface-deep-fg": surfaceDeepFg,
+    "--surface-deep-muted": surfaceDeepMuted,
+    "--surface-deep-border": surfaceDeepBorder,
+    "--surface-deep-accent-fg": surfaceDeepAccentFg,
+    "--surface-deep-gradient": `linear-gradient(135deg, ${hslToHex(deepH, deepS, deepL + 0.04)} 0%, ${surfaceDeep} 100%)`,
+
     "--header-from": headerFrom,
     "--header-to": headerTo,
     "--grad-header": `linear-gradient(135deg, ${headerFrom} 0%, ${headerTo} 100%)`,
     "--header-fg": headerFg,
     "--header-sub": headerSub,
 
-    // nav
     "--nav-bg": navBg,
     "--nav-safe-area-bg": background,
     "--nav-border": navBorder,
     "--nav-active": navActive,
     "--nav-inactive": navInactive,
 
-    // rings / counters
     "--ring-track": ringTrack,
     "--ring-fill": accentValidated,
     "--count-fg": countFg,
 
-    // legacy pill/badge/dot aliases
     "--index-badge-bg": accentValidated,
     "--index-badge-fg": textOnAccent,
     "--btn-surface": btnSurface,
@@ -307,6 +342,15 @@ export const deriveTokens = (opts: { seed: string; mode: Mode }): Tokens => {
   };
 };
 
+// Allow user-picked background to be anywhere on the wheel, but clamp
+// its lightness to something usable (near-white in light, near-black in dark).
+const clampSurface = (hex: string, isDark: boolean): string => {
+  const [hh, ss] = hexToHsl(hex);
+  const s2 = clamp(ss, 0.02, 0.35);
+  const l2 = isDark ? clamp(hexToHsl(hex)[2] * 0.15 + 0.05, 0.05, 0.14) : clamp(hexToHsl(hex)[2] * 0.15 + 0.9, 0.90, 0.99);
+  return hslToHex(hh, s2, l2);
+};
+
 // ---------- apply to DOM ----------
 
 export const applyTokens = (tokens: Tokens, mode: Mode) => {
@@ -314,10 +358,7 @@ export const applyTokens = (tokens: Tokens, mode: Mode) => {
   const el = document.documentElement;
   for (const k in tokens) el.style.setProperty(k, tokens[k]);
   el.setAttribute("data-theme-mode", mode);
-  // Legacy attribute for any old CSS selectors
   el.setAttribute("data-theme", mode === "dark" ? "dark" : "dawn");
-
-  // Native status bar sync (best-effort, no-op on web)
   void syncStatusBar(tokens["--header-from"] ?? tokens["--background"], mode);
 };
 
@@ -332,6 +373,6 @@ const syncStatusBar = async (color: string, mode: Mode) => {
     await StatusBar.setBackgroundColor({ color });
     await StatusBar.setStyle({ style: mode === "dark" ? Style.Dark : Style.Light });
   } catch {
-    // plugin not installed or web — ignore
+    // ignore
   }
 };
