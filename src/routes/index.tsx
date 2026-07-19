@@ -205,8 +205,9 @@ function HomePage() {
           </div>
 
           <div className="mt-16 flex items-center justify-center lg:mt-0">
-            <IPhoneFrame src={appScreenshot.url} />
+            <IPhoneFrame />
           </div>
+
 
         </div>
       </section>
