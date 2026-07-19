@@ -12,6 +12,8 @@ import {
   setPresetId,
   getOverrides,
   setSectionOverride,
+  getCustomTriplet,
+  setCustomTriplet,
   resolveMode,
   resetTheme,
   PRESETS,
@@ -19,9 +21,10 @@ import {
   DEFAULT_PRESET_ID,
   type ModeSetting,
 } from "@/lib/theme-store";
-import { deriveSectionSeed, type SectionKey } from "@/lib/theming";
+import { deriveSectionSeed, type SectionKey, type CustomOverrides } from "@/lib/theming";
 import { MiniPreview } from "@/components/theme/MiniPreview";
 import { ThemePicker } from "@/components/theme/ThemePicker";
+import { CustomThemeSheet } from "@/components/theme/CustomThemeSheet";
 import {
   resetToday,
   resetAllProgress,
