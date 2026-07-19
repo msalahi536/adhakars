@@ -683,9 +683,121 @@ function HomePage() {
 }
 
 /* ============================================================
+   iPhone frame wrapping a static screenshot.
+   ============================================================ */
+function IPhoneFrame({ src }: { src: string }) {
+  return (
+    <div
+      className="relative"
+      style={{
+        width: "min(340px, 82vw)",
+        aspectRatio: "9 / 19.5",
+        filter:
+          "drop-shadow(0 40px 60px rgba(31,61,43,0.28)) drop-shadow(0 12px 24px rgba(31,61,43,0.16))",
+      }}
+    >
+      <div
+        className="absolute inset-0"
+        style={{
+          borderRadius: 52,
+          background:
+            "linear-gradient(160deg, #1c1c1e 0%, #0a0a0b 45%, #1c1c1e 100%)",
+          padding: 10,
+          boxShadow:
+            "inset 0 0 0 1.5px rgba(255,255,255,0.09), inset 0 1px 0 rgba(255,255,255,0.14), inset 0 -1px 0 rgba(0,0,0,0.6)",
+        }}
+      >
+        <div
+          aria-hidden
+          className="pointer-events-none absolute inset-0"
+          style={{
+            borderRadius: 52,
+            background:
+              "linear-gradient(120deg, transparent 0%, rgba(255,255,255,0.06) 30%, transparent 55%, rgba(255,255,255,0.04) 78%, transparent 100%)",
+            zIndex: 3,
+          }}
+        />
+        <div
+          className="relative h-full w-full overflow-hidden"
+          style={{
+            borderRadius: 44,
+            background: CREAM,
+            boxShadow: "inset 0 0 0 1px rgba(0,0,0,0.6)",
+          }}
+        >
+          <img
+            src={src}
+            alt="Sahih Al-Adhkar app screenshot showing Morning Adhkar"
+            style={{
+              position: "absolute",
+              inset: 0,
+              width: "100%",
+              height: "100%",
+              objectFit: "cover",
+              objectPosition: "top center",
+            }}
+          />
+          {/* Status bar overlay */}
+          <div
+            className="relative flex items-center justify-between"
+            style={{
+              padding: "14px 26px 4px",
+              color: INK,
+              fontSize: 12,
+              fontWeight: 600,
+              fontFamily: "'Hanken Grotesk', system-ui, sans-serif",
+              zIndex: 2,
+            }}
+          >
+            <span style={{ letterSpacing: 0.2 }}>9:41</span>
+            <div
+              style={{
+                position: "absolute",
+                left: "50%",
+                top: 10,
+                transform: "translateX(-50%)",
+                width: 96,
+                height: 28,
+                borderRadius: 999,
+                background: "#0a0a0b",
+                boxShadow: "0 1px 2px rgba(0,0,0,0.35)",
+              }}
+            />
+            <div className="flex items-center gap-1.5">
+              <svg width="16" height="11" viewBox="0 0 14 10">
+                <rect x="0" y="7" width="2.5" height="3" rx="0.6" fill={INK} />
+                <rect x="3.5" y="5" width="2.5" height="5" rx="0.6" fill={INK} />
+                <rect x="7" y="3" width="2.5" height="7" rx="0.6" fill={INK} />
+                <rect x="10.5" y="1" width="2.5" height="9" rx="0.6" fill={INK} />
+              </svg>
+              <svg width="15" height="11" viewBox="0 0 13 10" fill="none">
+                <path d="M6.5 8.5a1 1 0 100-2 1 1 0 000 2z" fill={INK} />
+                <path
+                  d="M2 4.5a7 7 0 019 0M3.7 6.2a4.5 4.5 0 015.6 0"
+                  stroke={INK}
+                  strokeWidth="1.1"
+                  strokeLinecap="round"
+                  fill="none"
+                />
+              </svg>
+              <svg width="24" height="11" viewBox="0 0 22 10">
+                <rect x="0.5" y="0.5" width="18" height="9" rx="2" fill="none" stroke={INK} strokeOpacity="0.5" />
+                <rect x="2" y="2" width="13" height="6" rx="1" fill={INK} />
+                <rect x="19.5" y="3" width="1.5" height="4" rx="0.5" fill={INK} opacity="0.5" />
+              </svg>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ============================================================
    Phone mockup, rendered as live HTML.
    ============================================================ */
 function PhoneMockup() {
+
   return (
     <div
       className="relative"
