@@ -70,7 +70,10 @@ function Settings() {
   const nativeAvailable = isNativePlatform();
 
   useEffect(() => {
-    setModeState(getMode());
+    setModeState(getModeSetting());
+    setSeedState(getSeed());
+    setPresetIdState(getPresetId());
+    setOverridesState(getOverrides());
     setDisplayState(getDisplay());
     setNotifPrefsState(getNotificationPrefs());
     setCommitmentState(getCommitment());
