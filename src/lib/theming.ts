@@ -326,7 +326,8 @@ const syncStatusBar = async (color: string, mode: Mode) => {
     if (typeof window === "undefined") return;
     const cap = (window as unknown as { Capacitor?: { isNativePlatform?: () => boolean } }).Capacitor;
     if (!cap?.isNativePlatform?.()) return;
-    const mod: any = await import(/* @vite-ignore */ "@capacitor/status-bar");
+    const modName = "@capacitor/status-bar";
+    const mod: any = await import(/* @vite-ignore */ modName);
     const { StatusBar, Style } = mod;
     await StatusBar.setBackgroundColor({ color });
     await StatusBar.setStyle({ style: mode === "dark" ? Style.Dark : Style.Light });
