@@ -59,7 +59,9 @@ function Settings() {
   const [presetId, setPresetIdState] = useState<string>(DEFAULT_PRESET_ID);
   const [overrides, setOverridesState] = useState<Partial<Record<SectionKey, string>>>({});
   const [showAdvanced, setShowAdvanced] = useState(false);
-  const [pickerOpen, setPickerOpen] = useState<null | { target: "base" | SectionKey; seed: string }>(null);
+  const [pickerOpen, setPickerOpen] = useState<null | { target: SectionKey; seed: string }>(null);
+  const [customSheetOpen, setCustomSheetOpen] = useState(false);
+  const [triplet, setTripletState] = useState<CustomOverrides>({});
   const [display, setDisplayState] = useState(getDisplay());
   const [confirmReset, setConfirmReset] = useState(false);
   const [confirmResetAll, setConfirmResetAll] = useState(false);
