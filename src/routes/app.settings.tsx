@@ -330,7 +330,7 @@ function Settings() {
                 );
               })}
               <button
-                onClick={() => setPickerOpen({ target: "base", seed })}
+                onClick={() => setCustomSheetOpen(true)}
                 className="flex flex-col items-center justify-center gap-1 rounded-2xl p-2 transition"
                 style={{
                   background: "var(--surface)",
@@ -343,8 +343,8 @@ function Settings() {
                     height: 40,
                     borderRadius: 10,
                     background:
-                      presetId === "custom"
-                        ? seed
+                      presetId === "custom" && (triplet.header || triplet.background || triplet.accent)
+                        ? `linear-gradient(135deg, ${triplet.header ?? seed} 0%, ${triplet.accent ?? seed} 100%)`
                         : "conic-gradient(from 0deg, #ff3b3b, #ffb03b, #f8ff3b, #7dff3b, #3bffcf, #3ba7ff, #7d3bff, #ff3bd0, #ff3b3b)",
                   }}
                 />
