@@ -205,18 +205,9 @@ function HomePage() {
           </div>
 
           <div className="mt-16 flex items-center justify-center lg:mt-0">
-            <img
-              src={appScreenshot.url}
-              alt="Sahih Al-Adhkar app screenshot showing Morning Adhkar"
-              style={{
-                width: "min(340px, 82vw)",
-                height: "auto",
-                borderRadius: 44,
-                boxShadow:
-                  "0 40px 60px rgba(31,61,43,0.28), 0 12px 24px rgba(31,61,43,0.16)",
-              }}
-            />
+            <IPhoneFrame src={appScreenshot.url} />
           </div>
+
         </div>
       </section>
 
