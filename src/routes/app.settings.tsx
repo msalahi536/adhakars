@@ -423,8 +423,18 @@ function Settings() {
             onClose={() => setPickerOpen(null)}
             onApply={(hex) => {
               if (!pickerOpen) return;
-              if (pickerOpen.target === "base") applyCustomSeed(hex);
-              else applySectionOverride(pickerOpen.target, hex);
+              applySectionOverride(pickerOpen.target, hex);
+            }}
+          />
+
+          <CustomThemeSheet
+            open={customSheetOpen}
+            initial={{ seed, triplet }}
+            mode={previewMode}
+            onClose={() => setCustomSheetOpen(false)}
+            onApply={({ header, background, accent, seed: nextSeed }) => {
+              applyCustomTriplet({ header, background, accent }, nextSeed);
+              setCustomSheetOpen(false);
             }}
           />
 
