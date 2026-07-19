@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { ArcsTexture, MarketingLayout } from "@/components/marketing/MarketingLayout";
-import appScreenshot from "@/assets/app-screenshot.png.asset.json";
+import { ArcsTexture, IPhoneFrame, MarketingLayout } from "@/components/marketing/MarketingLayout";
+
 import {
   Sunrise,
   Moon,
