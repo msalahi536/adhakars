@@ -2,16 +2,26 @@ import { useEffect, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { ConcentricCirclesPattern } from "@/components/HeaderPatterns";
 import { HeaderBackButton } from "@/components/HeaderBackButton";
+import { getDisplay, setDisplay } from "@/lib/theme";
 import {
-  themes,
-  getMode,
-  setMode,
-  applyTheme,
-  resolveTheme,
-  getDisplay,
-  setDisplay,
-  type ThemeMode,
-} from "@/lib/theme";
+  getModeSetting,
+  setModeSetting,
+  getSeed,
+  setSeed,
+  getPresetId,
+  setPresetId,
+  getOverrides,
+  setSectionOverride,
+  resolveMode,
+  resetTheme,
+  PRESETS,
+  DEFAULT_SEED,
+  DEFAULT_PRESET_ID,
+  type ModeSetting,
+} from "@/lib/theme-store";
+import { deriveSectionSeed, type SectionKey } from "@/lib/theming";
+import { MiniPreview } from "@/components/theme/MiniPreview";
+import { ThemePicker } from "@/components/theme/ThemePicker";
 import {
   resetToday,
   resetAllProgress,
