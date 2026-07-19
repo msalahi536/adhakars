@@ -2,6 +2,8 @@ import { useEffect, useState, type ReactNode } from "react";
 import { Link, useRouterState } from "@tanstack/react-router";
 import { Menu, X } from "lucide-react";
 import logoAsset from "@/assets/logo.png.asset.json";
+import appScreenshot from "@/assets/app-screenshot.png.asset.json";
+
 
 const NAV = [
   { to: "/", label: "Home" },
