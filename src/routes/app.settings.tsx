@@ -176,11 +176,55 @@ function Settings() {
   const formatTime = (hour: number, minute: number) =>
     `${String(hour).padStart(2, "0")}:${String(minute).padStart(2, "0")}`;
 
-  const choose = (m: ThemeMode) => {
+  const chooseMode = (m: ModeSetting) => {
     setModeState(m);
-    setMode(m);
-    applyTheme(resolveTheme(m, "/app/settings"));
+    setModeSetting(m);
+    window.dispatchEvent(new Event("adhkar:theme-change"));
   };
+
+  const choosePreset = (p: { id: string; seed: string }) => {
+    setPresetIdState(p.id);
+    setPresetId(p.id);
+    setSeedState(p.seed);
+    setSeed(p.seed);
+    window.dispatchEvent(new Event("adhkar:theme-change"));
+  };
+
+  const applyCustomSeed = (hex: string) => {
+    setPresetIdState("custom");
+    setPresetId("custom");
+    setSeedState(hex);
+    setSeed(hex);
+    setPickerOpen(null);
+    window.dispatchEvent(new Event("adhkar:theme-change"));
+  };
+
+  const applySectionOverride = (section: SectionKey, hex: string) => {
+    const next = { ...overrides, [section]: hex };
+    setOverridesState(next);
+    setSectionOverride(section, hex);
+    setPickerOpen(null);
+    window.dispatchEvent(new Event("adhkar:theme-change"));
+  };
+
+  const clearSectionOverride = (section: SectionKey) => {
+    const next = { ...overrides };
+    delete next[section];
+    setOverridesState(next);
+    setSectionOverride(section, null);
+    window.dispatchEvent(new Event("adhkar:theme-change"));
+  };
+
+  const doReset = () => {
+    resetTheme();
+    setModeState("auto");
+    setSeedState(DEFAULT_SEED);
+    setPresetIdState(DEFAULT_PRESET_ID);
+    setOverridesState({});
+    window.dispatchEvent(new Event("adhkar:theme-change"));
+  };
+
+  const previewMode = resolveMode(mode);
 
   const updateDisplay = (patch: Partial<typeof display>) => {
     const d = { ...display, ...patch };
@@ -189,34 +233,13 @@ function Settings() {
     window.dispatchEvent(new Event("adhkar:display-update"));
   };
 
-  const themePreview = (variant: "morning" | "evening") => {
-    const isMorning = variant === "morning";
-    const bg = isMorning ? "#faf6ec" : "#eef2f8";
-    const card = isMorning ? "#fffcf4" : "#f5f8fc";
-    const border = isMorning ? "rgba(184,146,58,0.25)" : "rgba(74,107,154,0.25)";
-    const text = isMorning ? "#2d1f00" : "#1f3a5c";
-    const accent = isMorning ? "#c9a84c" : "#4a6b9a";
-    const translit = isMorning ? "#b8923a" : "#4a6b9a";
-    return (
-      <div
-        className="flex h-24 items-center justify-center rounded-2xl p-3"
-        style={{ background: bg }}
-      >
-        <div
-          className="flex w-full max-w-[180px] flex-col items-center gap-1 rounded-xl px-3 py-2"
-          style={{ background: card, border: `1px solid ${border}`, color: text }}
-        >
-          <div className="text-[14px] font-bold" style={{ fontFamily: "Scheherazade New, serif" }}>
-            ٱ
-          </div>
-          <div className="text-[9px] italic" style={{ color: translit }}>
-            bismillah
-          </div>
-          <div className="h-1 w-6 rounded-full" style={{ background: accent }} />
-        </div>
-      </div>
-    );
-  };
+  const sectionList: { key: SectionKey; label: string }[] = [
+    { key: "morning", label: "Morning" },
+    { key: "evening", label: "Evening" },
+    { key: "salah", label: "After Salah" },
+    { key: "tasbih", label: "Tasbih" },
+    { key: "sleep", label: "Sleep & Wake" },
+  ];
 
   return (
     <>
