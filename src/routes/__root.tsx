@@ -12,7 +12,7 @@ import {
 
 import appCss from "../styles.css?url";
 
-import { applyTheme, getMode, resolveTheme } from "@/lib/theme";
+import { applyThemeForRoute, PRE_PAINT_SCRIPT } from "@/lib/theme-store";
 import { reconcileStreak } from "@/lib/storage";
 import { applyReminders, getNotificationPrefs, checkNotificationPermission } from "@/lib/notifications";
 import { supabase } from "@/integrations/supabase/client";
