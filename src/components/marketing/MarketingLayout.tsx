@@ -31,7 +31,7 @@ export function MarketingLayout({ children }: { children: ReactNode }) {
       style={{
         background: "#FAF6EC",
         color: "#1F3D2B",
-        fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif",
+        fontFamily: "'Hanken Grotesk', 'Plus Jakarta Sans', system-ui, sans-serif",
       }}
     >
       <header
