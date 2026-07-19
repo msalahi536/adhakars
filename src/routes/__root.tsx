@@ -12,7 +12,7 @@ import {
 
 import appCss from "../styles.css?url";
 
-import { applyTheme, getMode, resolveTheme } from "@/lib/theme";
+import { applyThemeForRoute, PRE_PAINT_SCRIPT } from "@/lib/theme-store";
 import { reconcileStreak } from "@/lib/storage";
 import { applyReminders, getNotificationPrefs, checkNotificationPermission } from "@/lib/notifications";
 import { supabase } from "@/integrations/supabase/client";
@@ -107,6 +107,7 @@ function RootShell({ children }: { children: React.ReactNode }) {
     <html lang="en">
       <head>
         <HeadContent />
+        <script dangerouslySetInnerHTML={{ __html: PRE_PAINT_SCRIPT }} />
       </head>
       <body>
         {children}
@@ -122,8 +123,20 @@ function RootComponent() {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
 
   useEffect(() => {
-    applyTheme(resolveTheme(getMode(), pathname));
+    applyThemeForRoute(pathname);
   }, [pathname]);
+
+  // Re-apply theme when user changes it in Settings, or system dark mode flips.
+  useEffect(() => {
+    const reapply = () => applyThemeForRoute(window.location.pathname);
+    window.addEventListener("adhkar:theme-change", reapply);
+    const mm = window.matchMedia?.("(prefers-color-scheme: dark)");
+    mm?.addEventListener?.("change", reapply);
+    return () => {
+      window.removeEventListener("adhkar:theme-change", reapply);
+      mm?.removeEventListener?.("change", reapply);
+    };
+  }, []);
 
   useEffect(() => {
     reconcileStreak();

@@ -2,16 +2,26 @@ import { useEffect, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { ConcentricCirclesPattern } from "@/components/HeaderPatterns";
 import { HeaderBackButton } from "@/components/HeaderBackButton";
+import { getDisplay, setDisplay } from "@/lib/theme";
 import {
-  themes,
-  getMode,
-  setMode,
-  applyTheme,
-  resolveTheme,
-  getDisplay,
-  setDisplay,
-  type ThemeMode,
-} from "@/lib/theme";
+  getModeSetting,
+  setModeSetting,
+  getSeed,
+  setSeed,
+  getPresetId,
+  setPresetId,
+  getOverrides,
+  setSectionOverride,
+  resolveMode,
+  resetTheme,
+  PRESETS,
+  DEFAULT_SEED,
+  DEFAULT_PRESET_ID,
+  type ModeSetting,
+} from "@/lib/theme-store";
+import { deriveSectionSeed, type SectionKey } from "@/lib/theming";
+import { MiniPreview } from "@/components/theme/MiniPreview";
+import { ThemePicker } from "@/components/theme/ThemePicker";
 import {
   resetToday,
   resetAllProgress,
@@ -41,7 +51,12 @@ export const Route = createFileRoute("/app/settings")({
 });
 
 function Settings() {
-  const [mode, setModeState] = useState<ThemeMode>("auto");
+  const [mode, setModeState] = useState<ModeSetting>("auto");
+  const [seed, setSeedState] = useState<string>(DEFAULT_SEED);
+  const [presetId, setPresetIdState] = useState<string>(DEFAULT_PRESET_ID);
+  const [overrides, setOverridesState] = useState<Partial<Record<SectionKey, string>>>({});
+  const [showAdvanced, setShowAdvanced] = useState(false);
+  const [pickerOpen, setPickerOpen] = useState<null | { target: "base" | SectionKey; seed: string }>(null);
   const [display, setDisplayState] = useState(getDisplay());
   const [confirmReset, setConfirmReset] = useState(false);
   const [confirmResetAll, setConfirmResetAll] = useState(false);
@@ -55,7 +70,10 @@ function Settings() {
   const nativeAvailable = isNativePlatform();
 
   useEffect(() => {
-    setModeState(getMode());
+    setModeState(getModeSetting());
+    setSeedState(getSeed());
+    setPresetIdState(getPresetId());
+    setOverridesState(getOverrides());
     setDisplayState(getDisplay());
     setNotifPrefsState(getNotificationPrefs());
     setCommitmentState(getCommitment());
@@ -158,11 +176,55 @@ function Settings() {
   const formatTime = (hour: number, minute: number) =>
     `${String(hour).padStart(2, "0")}:${String(minute).padStart(2, "0")}`;
 
-  const choose = (m: ThemeMode) => {
+  const chooseMode = (m: ModeSetting) => {
     setModeState(m);
-    setMode(m);
-    applyTheme(resolveTheme(m, "/app/settings"));
+    setModeSetting(m);
+    window.dispatchEvent(new Event("adhkar:theme-change"));
   };
+
+  const choosePreset = (p: { id: string; seed: string }) => {
+    setPresetIdState(p.id);
+    setPresetId(p.id);
+    setSeedState(p.seed);
+    setSeed(p.seed);
+    window.dispatchEvent(new Event("adhkar:theme-change"));
+  };
+
+  const applyCustomSeed = (hex: string) => {
+    setPresetIdState("custom");
+    setPresetId("custom");
+    setSeedState(hex);
+    setSeed(hex);
+    setPickerOpen(null);
+    window.dispatchEvent(new Event("adhkar:theme-change"));
+  };
+
+  const applySectionOverride = (section: SectionKey, hex: string) => {
+    const next = { ...overrides, [section]: hex };
+    setOverridesState(next);
+    setSectionOverride(section, hex);
+    setPickerOpen(null);
+    window.dispatchEvent(new Event("adhkar:theme-change"));
+  };
+
+  const clearSectionOverride = (section: SectionKey) => {
+    const next = { ...overrides };
+    delete next[section];
+    setOverridesState(next);
+    setSectionOverride(section, null);
+    window.dispatchEvent(new Event("adhkar:theme-change"));
+  };
+
+  const doReset = () => {
+    resetTheme();
+    setModeState("auto");
+    setSeedState(DEFAULT_SEED);
+    setPresetIdState(DEFAULT_PRESET_ID);
+    setOverridesState({});
+    window.dispatchEvent(new Event("adhkar:theme-change"));
+  };
+
+  const previewMode = resolveMode(mode);
 
   const updateDisplay = (patch: Partial<typeof display>) => {
     const d = { ...display, ...patch };
@@ -171,34 +233,13 @@ function Settings() {
     window.dispatchEvent(new Event("adhkar:display-update"));
   };
 
-  const themePreview = (variant: "morning" | "evening") => {
-    const isMorning = variant === "morning";
-    const bg = isMorning ? "#faf6ec" : "#eef2f8";
-    const card = isMorning ? "#fffcf4" : "#f5f8fc";
-    const border = isMorning ? "rgba(184,146,58,0.25)" : "rgba(74,107,154,0.25)";
-    const text = isMorning ? "#2d1f00" : "#1f3a5c";
-    const accent = isMorning ? "#c9a84c" : "#4a6b9a";
-    const translit = isMorning ? "#b8923a" : "#4a6b9a";
-    return (
-      <div
-        className="flex h-24 items-center justify-center rounded-2xl p-3"
-        style={{ background: bg }}
-      >
-        <div
-          className="flex w-full max-w-[180px] flex-col items-center gap-1 rounded-xl px-3 py-2"
-          style={{ background: card, border: `1px solid ${border}`, color: text }}
-        >
-          <div className="text-[14px] font-bold" style={{ fontFamily: "Scheherazade New, serif" }}>
-            ٱ
-          </div>
-          <div className="text-[9px] italic" style={{ color: translit }}>
-            bismillah
-          </div>
-          <div className="h-1 w-6 rounded-full" style={{ background: accent }} />
-        </div>
-      </div>
-    );
-  };
+  const sectionList: { key: SectionKey; label: string }[] = [
+    { key: "morning", label: "Morning" },
+    { key: "evening", label: "Evening" },
+    { key: "salah", label: "After Salah" },
+    { key: "tasbih", label: "Tasbih" },
+    { key: "sleep", label: "Sleep & Wake" },
+  ];
 
   return (
     <>
@@ -222,35 +263,139 @@ function Settings() {
           {/* APPEARANCE */}
           <section className="mb-6">
             <h2 className="label-caps mb-3">Appearance</h2>
-            <div className="space-y-3">
-              {themes.map((t) => {
-                const active = mode === t.id;
+
+            {/* Mode segmented control */}
+            <div className="mb-3 text-xs font-semibold opacity-70">MODE</div>
+            <div
+              className="mb-4 grid grid-cols-3 gap-1 rounded-full p-1"
+              style={{ background: "var(--muted)" }}
+            >
+              {(["light", "dark", "auto"] as ModeSetting[]).map((m) => {
+                const active = mode === m;
                 return (
                   <button
-                    key={t.id}
-                    onClick={() => choose(t.id)}
-                    className="w-full overflow-hidden rounded-[24px] p-3 text-left transition"
+                    key={m}
+                    onClick={() => chooseMode(m)}
+                    className="rounded-full py-2 text-xs font-semibold transition"
                     style={{
-                      background: "var(--surface)",
-                      border: active ? "2px solid #c9a84c" : "1px solid var(--border)",
+                      background: active ? "var(--surface-card)" : "transparent",
+                      color: "var(--foreground)",
+                      boxShadow: active ? "0 1px 4px rgba(0,0,0,0.08)" : "none",
                     }}
                   >
-                    {t.id === "auto" ? (
-                      <div className="mb-2 grid grid-cols-2 gap-2">
-                        {themePreview("morning")}
-                        {themePreview("evening")}
-                      </div>
-                    ) : (
-                      <div className="mb-2">{themePreview("morning")}</div>
-                    )}
-                    <div className="px-1">
-                      <div className="text-sm font-semibold">{t.name}</div>
-                      <div className="text-xs opacity-70">{t.description}</div>
-                    </div>
+                    {m === "light" ? "Light" : m === "dark" ? "Dark" : "Auto"}
                   </button>
                 );
               })}
             </div>
+
+            {/* Preview */}
+            <div className="mb-4 flex justify-center">
+              <MiniPreview seed={seed} mode={previewMode} width={200} height={340} />
+            </div>
+
+            {/* Preset grid */}
+            <div className="mb-2 text-xs font-semibold opacity-70">THEME</div>
+            <div className="mb-3 grid grid-cols-4 gap-2">
+              {PRESETS.map((p) => {
+                const active = presetId === p.id;
+                const morningSeed = deriveSectionSeed(p.seed, "morning");
+                return (
+                  <button
+                    key={p.id}
+                    onClick={() => choosePreset(p)}
+                    className="flex flex-col items-center gap-1 rounded-2xl p-2 transition"
+                    style={{
+                      background: "var(--surface)",
+                      border: active ? "2px solid var(--accent)" : "1px solid var(--border)",
+                    }}
+                    aria-label={p.name}
+                  >
+                    <div
+                      style={{
+                        width: "100%",
+                        height: 40,
+                        borderRadius: 10,
+                        background: `linear-gradient(135deg, ${morningSeed} 0%, ${p.seed} 100%)`,
+                      }}
+                    />
+                    <span className="text-[10px] font-semibold">{p.name}</span>
+                  </button>
+                );
+              })}
+              <button
+                onClick={() => setPickerOpen({ target: "base", seed })}
+                className="flex flex-col items-center justify-center gap-1 rounded-2xl p-2 transition"
+                style={{
+                  background: "var(--surface)",
+                  border: presetId === "custom" ? "2px solid var(--accent)" : "1px dashed var(--border)",
+                }}
+              >
+                <div
+                  style={{
+                    width: "100%",
+                    height: 40,
+                    borderRadius: 10,
+                    background:
+                      presetId === "custom"
+                        ? seed
+                        : "conic-gradient(from 0deg, #ff3b3b, #ffb03b, #f8ff3b, #7dff3b, #3bffcf, #3ba7ff, #7d3bff, #ff3bd0, #ff3b3b)",
+                  }}
+                />
+                <span className="text-[10px] font-semibold">Custom</span>
+              </button>
+            </div>
+
+            {/* Advanced */}
+            <button
+              onClick={() => setShowAdvanced((v) => !v)}
+              className="mb-2 text-xs font-semibold opacity-70"
+              style={{ color: "var(--foreground)" }}
+            >
+              {showAdvanced ? "▾" : "▸"} Customize each section
+            </button>
+            {showAdvanced && (
+              <div
+                className="mb-3 space-y-2 rounded-2xl p-3"
+                style={{ background: "var(--surface)", border: "1px solid var(--border)" }}
+              >
+                {sectionList.map(({ key, label }) => {
+                  const current = overrides[key] ?? deriveSectionSeed(seed, key);
+                  const isOverride = !!overrides[key];
+                  return (
+                    <div key={key} className="flex items-center gap-3">
+                      <button
+                        onClick={() => setPickerOpen({ target: key, seed: current })}
+                        className="h-8 w-8 shrink-0 rounded-full"
+                        style={{ background: current, border: "2px solid var(--surface-card)" }}
+                        aria-label={`${label} color`}
+                      />
+                      <div className="flex-1 text-sm font-semibold">{label}</div>
+                      {isOverride && (
+                        <button
+                          onClick={() => clearSectionOverride(key)}
+                          className="text-xs opacity-60"
+                        >
+                          Reset
+                        </button>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+
+            <button
+              onClick={doReset}
+              className="mb-4 w-full rounded-full py-2 text-xs font-semibold"
+              style={{
+                background: "var(--muted)",
+                color: "var(--foreground)",
+              }}
+            >
+              Reset theme to default
+            </button>
+
             <div className="mt-3 space-y-3">
               <Toggle
                 label="Show transliteration"
@@ -264,6 +409,19 @@ function Settings() {
               />
             </div>
           </section>
+
+          <ThemePicker
+            open={!!pickerOpen}
+            initialSeed={pickerOpen?.seed ?? seed}
+            mode={previewMode}
+            onClose={() => setPickerOpen(null)}
+            onApply={(hex) => {
+              if (!pickerOpen) return;
+              if (pickerOpen.target === "base") applyCustomSeed(hex);
+              else applySectionOverride(pickerOpen.target, hex);
+            }}
+          />
+
 
           {/* MY DAILY COMMITMENT */}
           <section className="mb-6">
