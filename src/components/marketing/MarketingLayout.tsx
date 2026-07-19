@@ -202,21 +202,14 @@ function Footer() {
 
 function BrandMark() {
   return (
-    <span
-      className="grid h-8 w-8 place-items-center rounded-lg"
-      style={{
-        background: "linear-gradient(135deg, #1F3D2B 0%, #2E5A3F 100%)",
-        color: "#C9A84C",
-        boxShadow: "0 6px 18px rgba(31, 61, 43, 0.22)",
-      }}
-    >
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-        <path
-          d="M12 2 L14.5 8.5 L21.5 9 L16 13.5 L17.8 20.5 L12 16.8 L6.2 20.5 L8 13.5 L2.5 9 L9.5 8.5 Z"
-          fill="currentColor"
-        />
-      </svg>
-    </span>
+    <img
+      src={logoAsset.url}
+      alt="Sahih Al-Adhkar logo"
+      width={32}
+      height={32}
+      className="h-8 w-8 rounded-lg"
+      style={{ boxShadow: "0 6px 18px rgba(31, 61, 43, 0.22)" }}
+    />
   );
 }
 
