@@ -193,15 +193,18 @@ function Settings() {
     setPresetId(p.id);
     setSeedState(p.seed);
     setSeed(p.seed);
+    setTripletState({});
+    setCustomTriplet({});
     window.dispatchEvent(new Event("adhkar:theme-change"));
   };
 
-  const applyCustomSeed = (hex: string) => {
+  const applyCustomTriplet = (t: CustomOverrides, nextSeed: string) => {
     setPresetIdState("custom");
     setPresetId("custom");
-    setSeedState(hex);
-    setSeed(hex);
-    setPickerOpen(null);
+    setSeedState(nextSeed);
+    setSeed(nextSeed);
+    setTripletState(t);
+    setCustomTriplet(t);
     window.dispatchEvent(new Event("adhkar:theme-change"));
   };
 
@@ -227,6 +230,7 @@ function Settings() {
     setSeedState(DEFAULT_SEED);
     setPresetIdState(DEFAULT_PRESET_ID);
     setOverridesState({});
+    setTripletState({});
     window.dispatchEvent(new Event("adhkar:theme-change"));
   };
 
