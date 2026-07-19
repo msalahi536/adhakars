@@ -13,32 +13,30 @@ const tabs = [
   { to: "/app/more" as const, label: "More", Icon: MoreHorizontal },
 ];
 
-const DARK_THEMES = new Set(["dark-emerald", "deep-navy"]);
-
 export function BottomNav() {
   const [streak, setStreak] = useState(0);
-  const [theme, setTheme] = useState<string>("dawn");
+  const [isDark, setIsDark] = useState(false);
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const moreNestedActive = MORE_NESTED.some((p) => pathname === p || pathname.startsWith(p + "/"));
 
   useEffect(() => {
     setStreak(getStreak().current);
-    const update = () => setTheme(document.documentElement.getAttribute("data-theme") || "dawn");
+    const update = () =>
+      setIsDark(document.documentElement.getAttribute("data-theme-mode") === "dark");
     update();
     const onStreak = () => setStreak(getStreak().current);
     window.addEventListener("adhkar:streak-update", onStreak);
     const obs = new MutationObserver(update);
-    obs.observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
+    obs.observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme-mode"] });
     return () => {
       window.removeEventListener("adhkar:streak-update", onStreak);
       obs.disconnect();
     };
   }, []);
 
-  const isDark = DARK_THEMES.has(theme);
-  const iconColor = isDark ? "#ffffff" : "#4a5568";
-  const activeColor = theme === "dusk" ? "#667eea" : "#c9a84c";
-  const borderColor = isDark ? "rgba(255,255,255,0.08)" : "rgba(0,0,0,0.08)";
+  const iconColor = "var(--nav-inactive)";
+  const activeColor = "var(--nav-active)";
+  const borderColor = "var(--nav-border)";
 
   return (
     <nav
