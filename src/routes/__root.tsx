@@ -122,7 +122,7 @@ function RootComponent() {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
 
   useEffect(() => {
-    applyTheme(resolveTheme(getMode(), pathname));
+    applyThemeForRoute(pathname);
   }, [pathname]);
 
   useEffect(() => {
