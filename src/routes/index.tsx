@@ -1,5 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArcsTexture, MarketingLayout } from "@/components/marketing/MarketingLayout";
+import appScreenshot from "@/assets/app-screenshot.png.asset.json";
 import {
   Sunrise,
   Moon,
@@ -103,11 +104,7 @@ function HomePage() {
         .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 14px 32px -12px rgba(31,61,43,0.42), 0 4px 10px rgba(31,61,43,0.16); }
         .btn-ghost { transition: transform 160ms ease, border-color 220ms ease, background 220ms ease; }
         .btn-ghost:hover { transform: translateY(-1px); border-color: rgba(31,61,43,0.38); background: #FFFFFF; }
-        .phone-float { animation: phoneFloat 9s ease-in-out infinite; }
-        @keyframes phoneFloat {
-          0%, 100% { transform: translateY(0) rotate(-3deg); }
-          50% { transform: translateY(-10px) rotate(-3deg); }
-        }
+        html { scroll-behavior: smooth; }
         html { scroll-behavior: smooth; }
       `}</style>
 
@@ -124,24 +121,6 @@ function HomePage() {
         />
         <div className="relative mx-auto max-w-[1200px] px-6 pb-24 pt-16 md:px-10 md:pb-40 md:pt-28 lg:grid lg:grid-cols-[1.1fr,1fr] lg:items-center lg:gap-16">
           <div>
-            <span
-              className="inline-flex items-center gap-2 rounded-full border px-3.5 py-1.5"
-              style={{
-                borderColor: "rgba(31, 61, 43, 0.18)",
-                background: "rgba(255,255,255,0.6)",
-                color: INK,
-                fontSize: 11,
-                fontWeight: 600,
-                letterSpacing: "0.16em",
-                textTransform: "uppercase",
-              }}
-            >
-              <span
-                className="inline-block h-1.5 w-1.5 rounded-full"
-                style={{ background: GOLD, boxShadow: `0 0 0 3px rgba(201,168,76,0.18)` }}
-              />
-              From the Sunnah
-            </span>
 
             <h1
               className="mt-8"
@@ -226,9 +205,17 @@ function HomePage() {
           </div>
 
           <div className="mt-16 flex items-center justify-center lg:mt-0">
-            <div className="phone-float">
-              <PhoneMockup />
-            </div>
+            <img
+              src={appScreenshot.url}
+              alt="Sahih Al-Adhkar app screenshot showing Morning Adhkar"
+              style={{
+                width: "min(340px, 82vw)",
+                height: "auto",
+                borderRadius: 44,
+                boxShadow:
+                  "0 40px 60px rgba(31,61,43,0.28), 0 12px 24px rgba(31,61,43,0.16)",
+              }}
+            />
           </div>
         </div>
       </section>
