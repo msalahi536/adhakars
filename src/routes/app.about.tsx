@@ -2,10 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { HeaderBackButton } from "@/components/HeaderBackButton";
 import { HeaderSettingsButton } from "@/components/HeaderSettingsButton";
 import { ConcentricCirclesPattern } from "@/components/HeaderPatterns";
-import { Heart, Mail } from "lucide-react";
-
-// TODO: Replace with real donation URL when available.
-const DONATE_URL = "#";
+import { Mail } from "lucide-react";
 
 export const Route = createFileRoute("/app/about")({
   head: () => ({
