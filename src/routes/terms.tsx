@@ -31,10 +31,6 @@ const SECTIONS: { heading: string; body: string }[] = [
     body: "Custom adhkar that you create are stored on your device only. You are responsible for what you add. We do not review, store, or have access to this content.",
   },
   {
-    heading: "DONATIONS",
-    body: "Donations are voluntary. They are not payment for any feature or content, they unlock nothing, and they are non refundable. Every part of this app is free whether you donate or not.",
-  },
-  {
     heading: "LIMITATION OF LIABILITY",
     body: "This app is provided without warranty. We are not responsible for any loss of data, including counts, streaks, or custom adhkar.",
   },

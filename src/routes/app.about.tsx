@@ -2,10 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { HeaderBackButton } from "@/components/HeaderBackButton";
 import { HeaderSettingsButton } from "@/components/HeaderSettingsButton";
 import { ConcentricCirclesPattern } from "@/components/HeaderPatterns";
-import { Heart, Mail } from "lucide-react";
-
-// TODO: Replace with real donation URL when available.
-const DONATE_URL = "#";
+import { Mail } from "lucide-react";
 
 export const Route = createFileRoute("/app/about")({
   head: () => ({
@@ -69,35 +66,10 @@ function About() {
           >
             <h2 className="label-caps mb-2">Support this project</h2>
             <p className="text-sm leading-relaxed" style={{ color: "var(--foreground)" }}>
-              This app is free. There are no ads and nothing is sold. If it
-              has benefited you, a donation helps cover hosting and keeps the
-              work going, as sadaqah jariyah, in sha' Allah.
+              This app is free. There are no ads and nothing is sold. If it has
+              benefited you, please make du'a for this project and for everyone
+              who uses it.
             </p>
-            <p className="mt-3 text-sm leading-relaxed" style={{ color: "var(--foreground)" }}>
-              And if you are not able to give, please make du'a for this
-              project and for everyone who uses it. That is a support worth
-              more than any amount.
-            </p>
-            <a
-              href={DONATE_URL}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-full py-3 text-sm font-semibold"
-              style={{
-                background: "linear-gradient(135deg, #c9a84c, #b8923a)",
-                color: "#ffffff",
-              }}
-            >
-              <Heart size={16} strokeWidth={2.4} />
-              Donate
-            </a>
-            <div
-              className="mt-2 text-[11px]"
-              style={{ color: "var(--muted-foreground)" }}
-            >
-              {/* TODO: replace # with the real donation URL */}
-              Donation link coming soon.
-            </div>
           </section>
 
           <section

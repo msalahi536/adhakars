@@ -12,7 +12,6 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as TermsRouteImport } from './routes/terms'
 import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as DownloadRouteImport } from './routes/download'
-import { Route as DonateRouteImport } from './routes/donate'
 import { Route as AppRouteImport } from './routes/app'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
@@ -40,11 +39,6 @@ const PrivacyRoute = PrivacyRouteImport.update({
 const DownloadRoute = DownloadRouteImport.update({
   id: '/download',
   path: '/download',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const DonateRoute = DonateRouteImport.update({
-  id: '/donate',
-  path: '/donate',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AppRoute = AppRouteImport.update({
@@ -117,7 +111,6 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/app': typeof AppRouteWithChildren
-  '/donate': typeof DonateRoute
   '/download': typeof DownloadRoute
   '/privacy': typeof PrivacyRoute
   '/terms': typeof TermsRoute
@@ -135,7 +128,6 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
-  '/donate': typeof DonateRoute
   '/download': typeof DownloadRoute
   '/privacy': typeof PrivacyRoute
   '/terms': typeof TermsRoute
@@ -155,7 +147,6 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/app': typeof AppRouteWithChildren
-  '/donate': typeof DonateRoute
   '/download': typeof DownloadRoute
   '/privacy': typeof PrivacyRoute
   '/terms': typeof TermsRoute
@@ -176,7 +167,6 @@ export interface FileRouteTypes {
     | '/'
     | '/about'
     | '/app'
-    | '/donate'
     | '/download'
     | '/privacy'
     | '/terms'
@@ -194,7 +184,6 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/about'
-    | '/donate'
     | '/download'
     | '/privacy'
     | '/terms'
@@ -213,7 +202,6 @@ export interface FileRouteTypes {
     | '/'
     | '/about'
     | '/app'
-    | '/donate'
     | '/download'
     | '/privacy'
     | '/terms'
@@ -233,7 +221,6 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AboutRoute: typeof AboutRoute
   AppRoute: typeof AppRouteWithChildren
-  DonateRoute: typeof DonateRoute
   DownloadRoute: typeof DownloadRoute
   PrivacyRoute: typeof PrivacyRoute
   TermsRoute: typeof TermsRoute
@@ -260,13 +247,6 @@ declare module '@tanstack/react-router' {
       path: '/download'
       fullPath: '/download'
       preLoaderRoute: typeof DownloadRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/donate': {
-      id: '/donate'
-      path: '/donate'
-      fullPath: '/donate'
-      preLoaderRoute: typeof DonateRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/app': {
@@ -395,7 +375,6 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
   AppRoute: AppRouteWithChildren,
-  DonateRoute: DonateRoute,
   DownloadRoute: DownloadRoute,
   PrivacyRoute: PrivacyRoute,
   TermsRoute: TermsRoute,
