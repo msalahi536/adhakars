@@ -497,22 +497,6 @@ function AboutPage() {
                 <ArrowRight size={16} />
               </Link>
               <Link
-                to="/donate"
-                className="btn-ghost inline-flex items-center justify-between"
-                style={{
-                  border: "1px solid rgba(250,246,236,0.32)",
-                  background: "rgba(250,246,236,0.06)",
-                  color: CREAM,
-                  padding: "17px 24px",
-                  borderRadius: RADIUS.pill,
-                  fontWeight: 600,
-                  fontSize: 15,
-                }}
-              >
-                Support the project
-                <ArrowRight size={16} />
-              </Link>
-              <Link
                 to="/download"
                 className="btn-ghost inline-flex items-center justify-between"
                 style={{

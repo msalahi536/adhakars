@@ -9,7 +9,7 @@ const NAV = [
   { to: "/", label: "Home" },
   { to: "/about", label: "About" },
   { to: "/download", label: "Download" },
-  { to: "/donate", label: "Donate" },
+  
 ] as const;
 
 export function MarketingLayout({ children }: { children: ReactNode }) {
@@ -169,7 +169,7 @@ function Footer() {
               <li><Link to="/" style={{ color: "#1F3D2B" }}>Home</Link></li>
               <li><Link to="/about" style={{ color: "#1F3D2B" }}>About</Link></li>
               <li><Link to="/download" style={{ color: "#1F3D2B" }}>Download</Link></li>
-              <li><Link to="/donate" style={{ color: "#1F3D2B" }}>Donate</Link></li>
+              
               <li><Link to="/app" style={{ color: "#1F3D2B" }}>Open app</Link></li>
             </ul>
           </div>

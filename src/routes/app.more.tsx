@@ -32,7 +32,7 @@ const tiles: Tile[] = [
   { to: "/app/my-adhkar", title: "My Adhkar", subtitle: "Your own custom adhkar", Icon: BookPlus },
   { to: "/app/sleep", title: "Sleep & Wake", subtitle: "17 sleep + 7 wake adhkar", Icon: BedDouble },
   { to: "/app/qibla", title: "Qibla Finder", subtitle: "Find the direction of the Ka'bah", Icon: Compass },
-  { to: "/app/about", title: "About & Support", subtitle: "The project, donate, contact", Icon: HandHeart },
+  { to: "/app/about", title: "About & Support", subtitle: "The project and contact", Icon: HandHeart },
 ];
 
 function More() {

@@ -527,21 +527,6 @@ function DownloadPage() {
                 Open the app
                 <ArrowRight size={16} />
               </Link>
-              <Link
-                to="/donate"
-                className="btn-ghost"
-                style={{
-                  border: "1px solid rgba(250,246,236,0.32)",
-                  background: "rgba(250,246,236,0.06)",
-                  color: CREAM,
-                  padding: "15px 26px",
-                  borderRadius: RADIUS.pill,
-                  fontWeight: 600,
-                  fontSize: 15,
-                }}
-              >
-                Support the project
-              </Link>
             </div>
           </div>
         </div>
