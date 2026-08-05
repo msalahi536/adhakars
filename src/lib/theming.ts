@@ -164,7 +164,7 @@ export const deriveSectionSeed = (baseSeed: string, section: SectionKey): string
 export const ORIGINAL_SECTION_SEEDS: Record<SectionKey, string> = {
   morning: "#c9a84c",
   evening: "#3b5a86",
-  salah:   "#0f5c46",
+  salah:   "#1e4a30",
   tasbih:  "#c9a84c",
 
   sleep:   "#2c3e63",

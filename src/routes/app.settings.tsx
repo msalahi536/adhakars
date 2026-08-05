@@ -718,7 +718,7 @@ function Settings() {
               <span className="opacity-70">{APP_VERSION}</span>
             </div>
             <Link
-              to="/privacy"
+              to="/app/privacy"
               className="flex w-full items-center justify-between rounded-2xl px-4 py-3 text-sm font-semibold"
               style={{ background: "var(--surface)", border: "1px solid var(--border)" }}
             >
@@ -726,13 +726,14 @@ function Settings() {
               <span className="opacity-40">›</span>
             </Link>
             <Link
-              to="/terms"
+              to="/app/terms"
               className="flex w-full items-center justify-between rounded-2xl px-4 py-3 text-sm font-semibold"
               style={{ background: "var(--surface)", border: "1px solid var(--border)" }}
             >
               <span>Terms of Service</span>
               <span className="opacity-40">›</span>
             </Link>
+
           </section>
         </div>
       </main>
