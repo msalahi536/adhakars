@@ -565,8 +565,12 @@ function Settings() {
                         value={r.label}
                         onChange={(e) => void updateReminder(r.id, { label: e.target.value })}
                         placeholder="Reminder"
-                        className="min-w-0 flex-1 rounded-md bg-transparent text-sm font-semibold outline-none"
-                        style={{ color: "var(--foreground)", opacity: r.enabled ? 1 : 0.6 }}
+                        className="min-w-0 flex-1 rounded-md bg-transparent font-semibold outline-none"
+                        style={{
+                          color: "var(--foreground)",
+                          opacity: r.enabled ? 1 : 0.6,
+                          fontSize: 16,
+                        }}
                       />
                       <input
                         type="time"
@@ -576,12 +580,13 @@ function Settings() {
                           void updateReminder(r.id, { hour, minute });
                         }}
                         disabled={!r.enabled}
-                        className="shrink-0 rounded-md px-2 py-1 text-sm font-semibold outline-none"
+                        className="shrink-0 rounded-md px-2 py-1 font-semibold outline-none"
                         style={{
                           background: "var(--surface)",
                           border: "1px solid var(--border)",
                           color: "var(--foreground)",
                           opacity: r.enabled ? 1 : 0.5,
+                          fontSize: 16,
                         }}
                       />
                       <button
