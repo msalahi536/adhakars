@@ -121,16 +121,29 @@ export function CustomAdhkarForm({ open, mode, initial, onCancel, onSubmit }: Pr
         if (!v && !saving) onCancel();
       }}
     >
-      <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-lg">
-        <DialogHeader>
+      <DialogContent
+        className="w-[calc(100%-24px)] max-w-lg gap-3 overflow-hidden rounded-[28px] border-0 p-0 shadow-2xl sm:max-w-lg sm:rounded-[28px]"
+        style={{
+          background: "var(--surface, var(--card))",
+          color: "var(--foreground)",
+          maxHeight: "min(86vh, calc(100dvh - 120px))",
+          display: "flex",
+          flexDirection: "column",
+        }}
+      >
+        <DialogHeader className="shrink-0 px-5 pb-1 pt-5 text-left">
           <DialogTitle>{mode === "create" ? "Add adhkar" : "Edit adhkar"}</DialogTitle>
           <DialogDescription>
-            Save an adhkar you want to recite regularly. Only Arabic text and a target count are
-            required.
+            Save an adhkar you want to recite regularly. Every field is optional, just fill in
+            what you need.
           </DialogDescription>
         </DialogHeader>
 
-        <form onSubmit={submit} className="space-y-4">
+        <form
+          onSubmit={submit}
+          className="min-h-0 flex-1 space-y-4 overflow-y-auto overscroll-contain px-5 pb-5"
+          style={{ WebkitOverflowScrolling: "touch" }}
+        >
           <Field label="Title (optional)" error={errors.title}>
             <Input
               value={values.title}
@@ -140,7 +153,8 @@ export function CustomAdhkarForm({ open, mode, initial, onCancel, onSubmit }: Pr
             />
           </Field>
 
-          <Field label="Arabic text" required error={errors.arabic_text}>
+          <Field label="Arabic text (optional)" error={errors.arabic_text}>
+
             <Textarea
               dir="rtl"
               lang="ar"
