@@ -130,16 +130,75 @@ export const requestNotificationPermission = async (): Promise<PermissionResult>
   }
 };
 
+const withTimeout = <T,>(p: Promise<T>, ms: number, fallback: T): Promise<T> =>
+  new Promise<T>((resolve) => {
+    let done = false;
+    const timer = setTimeout(() => {
+      if (!done) {
+        done = true;
+        resolve(fallback);
+      }
+    }, ms);
+    p.then((v) => {
+      if (!done) {
+        done = true;
+        clearTimeout(timer);
+        resolve(v);
+      }
+    }).catch(() => {
+      if (!done) {
+        done = true;
+        clearTimeout(timer);
+        resolve(fallback);
+      }
+    });
+  });
+
 export const checkNotificationPermission = async (): Promise<boolean> => {
-  const plugin = await loadPlugin();
+  const plugin = await withTimeout(loadPlugin(), 4000, null);
   if (!plugin) return false;
   try {
-    const res = await plugin.checkPermissions();
+    const res = await withTimeout(plugin.checkPermissions(), 4000, null);
     return res?.display === "granted";
   } catch {
     return false;
   }
 };
+
+/** Fires a notification a few seconds from now so the user can verify setup. */
+export const sendTestNotification = async (): Promise<boolean> => {
+  const plugin = await loadPlugin();
+  if (!plugin) return false;
+  try {
+    await plugin.schedule({
+      notifications: [
+        {
+          id: 999999,
+          title: "Sahih Al-Adhkar",
+          body: "Test reminder. Notifications are working.",
+          schedule: { at: new Date(Date.now() + 5000), allowWhileIdle: true },
+        },
+      ],
+    });
+    return true;
+  } catch (e) {
+    console.error("sendTestNotification failed", e);
+    return false;
+  }
+};
+
+/** Notification ids that are currently scheduled on the device. */
+export const getScheduledIds = async (): Promise<number[]> => {
+  const plugin = await loadPlugin();
+  if (!plugin) return [];
+  try {
+    const res = await plugin.getPending();
+    return (res?.notifications ?? []).map((n: { id: number }) => n.id);
+  } catch {
+    return [];
+  }
+};
+
 
 export const cancelReminder = async (id: number): Promise<void> => {
   const plugin = await loadPlugin();
