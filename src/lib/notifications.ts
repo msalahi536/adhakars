@@ -158,8 +158,9 @@ export const checkNotificationPermission = async (): Promise<boolean> => {
   const plugin = await withTimeout(loadPlugin(), 4000, null);
   if (!plugin) return false;
   try {
-    const res = await withTimeout(plugin.checkPermissions(), 4000, null);
+    const res = await withTimeout<any>(plugin.checkPermissions(), 4000, null);
     return res?.display === "granted";
+
   } catch {
     return false;
   }
