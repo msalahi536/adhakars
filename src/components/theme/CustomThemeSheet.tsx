@@ -52,9 +52,9 @@ export function CustomThemeSheet({ open, initial, mode, onClose, onApply }: Prop
     else setAccent(v);
   };
 
-  if (!open) return null;
+  if (!open || typeof document === "undefined") return null;
 
-  return (
+  return createPortal(
     <div
       style={{
         position: "fixed",
@@ -64,6 +64,7 @@ export function CustomThemeSheet({ open, initial, mode, onClose, onApply }: Prop
         display: "flex",
         alignItems: "flex-end",
         justifyContent: "center",
+        touchAction: "none",
       }}
       onClick={onClose}
     >
@@ -77,10 +78,14 @@ export function CustomThemeSheet({ open, initial, mode, onClose, onApply }: Prop
           borderTopLeftRadius: 28,
           borderTopRightRadius: 28,
           padding: "18px 20px calc(env(safe-area-inset-bottom) + 20px)",
-          maxHeight: "92vh",
+          maxHeight: "88dvh",
           overflowY: "auto",
+          overscrollBehavior: "contain",
+          WebkitOverflowScrolling: "touch",
+          touchAction: "pan-y",
         }}
       >
+
         <div style={{ display: "flex", justifyContent: "center", marginBottom: 6 }}>
           <div style={{ width: 36, height: 4, borderRadius: 2, background: "var(--border)" }} />
         </div>
