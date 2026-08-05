@@ -44,6 +44,7 @@ import {
   isNativePlatform,
   sendTestNotification,
   getScheduledIds,
+  getDiagnostics,
   type NotificationPrefs,
   type Reminder,
 } from "@/lib/notifications";
@@ -84,7 +85,8 @@ function Settings() {
   const [notifPrefs, setNotifPrefsState] = useState<NotificationPrefs>(() => getNotificationPrefs());
   const [commitment, setCommitmentState] = useState<Record<CommitmentSection, boolean>>(() => getCommitment());
   const [hasCustom, setHasCustom] = useState(false);
-  const nativeAvailable = isNativePlatform();
+  const [nativeAvailable, setNativeAvailable] = useState(false);
+  const [notifDiag, setNotifDiag] = useState<string | null>(null);
 
   useEffect(() => {
     setModeState(getModeSetting());
@@ -96,6 +98,8 @@ function Settings() {
     setNotifPrefsState(getNotificationPrefs());
     setCommitmentState(getCommitment());
     setHasCustom(getCustomAdhkarRows().length > 0);
+    setNativeAvailable(isNativePlatform());
+    void getDiagnostics().then((d) => setNotifDiag(d));
     let cancelled = false;
     const refresh = () => {
       checkNotificationPermission().then((v) => {
@@ -165,7 +169,8 @@ function Settings() {
     const r = next.reminders.find((x) => x.id === id);
     if (!r) return;
     if (r.enabled && notifEnabled) {
-      await scheduleReminder(r);
+      const res = await scheduleReminder(r);
+      if (!res.ok) setNotifTestMsg(`Could not schedule "${r.label}". ${res.error}`);
     } else {
       await cancelReminder(r.id);
     }
@@ -550,6 +555,9 @@ function Settings() {
                       {notifError}
                     </div>
                   )}
+                  {notifDiag && (
+                    <div className="mt-2 text-[11px] opacity-50">{notifDiag}</div>
+                  )}
                 </>
               ) : (
                 <div className="space-y-3">
@@ -635,13 +643,14 @@ function Settings() {
                   <button
                     onClick={async () => {
                       setNotifTestMsg("Sending...");
-                      const ok = await sendTestNotification();
+                      const res = await sendTestNotification();
                       const ids = await getScheduledIds();
                       setNotifTestMsg(
-                        ok
+                        res.ok
                           ? `Test sent, it will appear in about 5 seconds. ${ids.length} notification(s) scheduled.`
-                          : "Could not send a test notification on this device.",
+                          : `Could not send a test notification. ${res.error}`,
                       );
+                      setNotifDiag(await getDiagnostics());
                     }}
                     className="w-full rounded-full py-2 text-sm font-semibold"
                     style={{
@@ -654,6 +663,9 @@ function Settings() {
                   </button>
                   {notifTestMsg && (
                     <div className="text-[11px] opacity-70">{notifTestMsg}</div>
+                  )}
+                  {notifDiag && (
+                    <div className="text-[11px] opacity-50">{notifDiag}</div>
                   )}
                   <div className="text-[11px] opacity-60">
                     Reminders fire on your device using your local time. Set as many as you like at any times that suit your schedule.
