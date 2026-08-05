@@ -213,8 +213,10 @@ export function CustomThemeSheet({ open, initial, mode, onClose, onApply }: Prop
           />
         )}
       </div>
-    </div>
+    </div>,
+    document.body,
   );
+
 }
 
 // ------- inner: color wheel modal -------
