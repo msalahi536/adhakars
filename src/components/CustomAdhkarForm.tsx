@@ -22,22 +22,29 @@ export type CustomAdhkarFormValues = {
   target_count: number;
 };
 
-const schema = z.object({
-  title: z.string().trim().max(120, "Title is too long"),
-  arabic_text: z
-    .string()
-    .trim()
-    .min(1, "Arabic text is required")
-    .max(2000, "Arabic text is too long"),
-  transliteration: z.string().trim().max(500, "Too long"),
-  translation: z.string().trim().max(1000, "Too long"),
-  source_reference: z.string().trim().max(200, "Too long"),
-  target_count: z
-    .number({ invalid_type_error: "Target must be a number" })
-    .int("Target must be a whole number")
-    .min(1, "Target must be at least 1")
-    .max(10000, "Target is too large"),
-});
+const schema = z
+  .object({
+    title: z.string().trim().max(120, "Title is too long"),
+    arabic_text: z.string().trim().max(2000, "Arabic text is too long"),
+    transliteration: z.string().trim().max(500, "Too long"),
+    translation: z.string().trim().max(1000, "Too long"),
+    source_reference: z.string().trim().max(200, "Too long"),
+    target_count: z
+      .number()
+      .int("Target must be a whole number")
+      .min(1, "Target must be at least 1")
+      .max(10000, "Target is too large")
+      .catch(1),
+  })
+  .refine(
+    (v) =>
+      !!(v.arabic_text || v.translation || v.transliteration || v.title),
+    {
+      message: "Add at least one of: Arabic, transliteration, translation, or a title.",
+      path: ["arabic_text"],
+    },
+  );
+
 
 type Props = {
   open: boolean;
