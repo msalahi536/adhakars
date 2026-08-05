@@ -252,6 +252,12 @@ export const deriveTokens = (opts: {
   const surfaceDeepAccentFg = readableOn(accentValidated);
 
   // --- header ---
+  // A deliberately dark seed (Salah forest green, Evening navy) keeps a dark
+  // header even in light mode, instead of being washed out to a pale tint.
+  // Use the raw seed here: clampSeed floors lightness for the rest of the system.
+  const l0 = hexToHsl(opts.seed)[2];
+  const seedIsDark = l0 < 0.34;
+
   let headerFrom: string, headerTo: string;
   if (c.header) {
     const hs2 = clampSeed(c.header);
@@ -259,6 +265,9 @@ export const deriveTokens = (opts: {
     if (isDark) {
       headerFrom = hslToHex(hh, Math.min(0.7, hss), Math.max(0.20, hll * 0.55));
       headerTo   = hslToHex(hh - 8, Math.min(0.7, hss), Math.max(0.14, hll * 0.42));
+    } else if (hll < 0.38) {
+      headerFrom = hslToHex(hh, Math.min(0.8, hss), Math.min(0.34, hll + 0.07));
+      headerTo   = hslToHex(hh + 6, Math.min(0.85, hss), Math.max(0.10, hll - 0.05));
     } else {
       headerFrom = hslToHex(hh, Math.min(0.62, hss), Math.min(0.72, Math.max(0.5, hll + 0.08)));
       headerTo   = hslToHex(hh + 6, Math.min(0.68, hss), Math.max(0.42, hll - 0.06));
@@ -266,10 +275,14 @@ export const deriveTokens = (opts: {
   } else if (isDark) {
     headerFrom = hslToHex(h, Math.min(0.65, s), 0.28);
     headerTo   = hslToHex(h - 8, Math.min(0.7, s), 0.18);
+  } else if (seedIsDark) {
+    headerFrom = hslToHex(h, Math.min(0.8, s), Math.min(0.34, l0 + 0.07));
+    headerTo   = hslToHex(h + 6, Math.min(0.85, s), Math.max(0.10, l0 - 0.05));
   } else {
     headerFrom = hslToHex(h, Math.min(0.55, s * 0.9), 0.72);
     headerTo   = hslToHex(h + 6, Math.min(0.62, s), 0.55);
   }
+
   const headerMid = mix(headerFrom, headerTo, 0.5);
   let headerFg = readableOn(headerMid);
   headerFrom = ensureContrast(headerFrom, headerFg, 4.5);

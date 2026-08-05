@@ -120,13 +120,16 @@ export const applyThemeForRoute = (pathname: string) => {
 
   // Custom overrides for background / accent are global; header is
   // per-section-derived unless overridden.
+  // The Original preset keeps one gold accent everywhere, so buttons, pills and
+  // progress bars stay gold while each section keeps its own header hue.
   const custom: CustomOverrides = {
     background: triplet.background,
-    accent: triplet.accent,
+    accent: presetId === DEFAULT_PRESET_ID ? DEFAULT_SEED : triplet.accent,
     header: sectionOverride ? undefined : triplet.header
       ? deriveSectionSeed(triplet.header, section)
       : undefined,
   };
+
 
   const tokens = deriveTokens({ seed, mode, custom });
   applyTokens(tokens, mode);
