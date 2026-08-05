@@ -67,30 +67,36 @@ export function MiniPreview({
           position: "relative",
         }}
       >
-        {/* status bar + dynamic island, tinted with the header */}
+        {/* status bar + header share one continuous gradient */}
         <div
           style={{
-            height: px(20),
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            background: t["--header-from"],
-          }}
-        >
-          <div
-            style={{ width: px(42), height: px(11), borderRadius: px(6), background: "#0a0a0a" }}
-          />
-        </div>
-
-        {/* header */}
-        <div
-          style={{
-            padding: `${px(9)}px ${px(13)}px ${px(11)}px`,
             background: t["--grad-header"],
             color: t["--header-fg"],
             position: "relative",
           }}
         >
+          <div
+            style={{
+              height: px(24),
+              display: "flex",
+              alignItems: "flex-end",
+              justifyContent: "center",
+              paddingBottom: px(3),
+            }}
+          >
+            <div
+              style={{ width: px(42), height: px(11), borderRadius: px(6), background: "#0a0a0a" }}
+            />
+          </div>
+
+          {/* header */}
+          <div
+            style={{
+              padding: `${px(9)}px ${px(13)}px ${px(11)}px`,
+              position: "relative",
+            }}
+          >
+
           <div
             style={{
               position: "absolute",
