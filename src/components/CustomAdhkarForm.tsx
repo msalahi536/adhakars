@@ -196,16 +196,17 @@ export function CustomAdhkarForm({ open, mode, initial, onCancel, onSubmit }: Pr
             />
           </Field>
 
-          <Field label="Target count" required error={errors.target_count}>
+          <Field label="Target count (optional)" error={errors.target_count}>
             <Input
               type="number"
               inputMode="numeric"
               min={1}
               max={10000}
               value={Number.isFinite(values.target_count) ? values.target_count : ""}
-              onChange={(e) => update("target_count", parseInt(e.target.value, 10) || 0)}
+              onChange={(e) => update("target_count", parseInt(e.target.value, 10) || 1)}
             />
           </Field>
+
 
           <div>
             <div
