@@ -189,7 +189,7 @@ export function Onboarding({ onDone }: { onDone: () => void }) {
 
   return (
     <div
-      className="fixed inset-0 z-[100] flex flex-col justify-end"
+      className="fixed inset-0 z-[100] flex flex-col justify-center"
       style={{
         background: "color-mix(in oklab, var(--background) 45%, transparent)",
         backdropFilter: "blur(6px) saturate(120%)",
@@ -199,28 +199,9 @@ export function Onboarding({ onDone }: { onDone: () => void }) {
       onTouchMove={onTouchMove}
       onTouchEnd={onTouchEnd}
     >
-      {/* Skip, always visible */}
-      <div className="flex items-center justify-between px-5 pt-6">
-        <div className="text-xs font-semibold opacity-50">
-          {index + 1} / {SLIDES.length}
-        </div>
-        <button
-          type="button"
-          onClick={finish}
-          className="rounded-full px-3 py-1.5 text-xs font-semibold"
-          style={{
-            background: "color-mix(in oklab, var(--foreground) 8%, transparent)",
-            color: "var(--foreground)",
-          }}
-        >
-          Skip onboarding
-        </button>
-      </div>
+      {/* Popup card, centered */}
+      <div className="px-4">
 
-      <div className="flex-1" onClick={finish} />
-
-      {/* Popup card */}
-      <div className="px-4 pb-8">
         <div
           key={index}
           className="mx-auto w-full max-w-md rounded-[24px] p-5"
