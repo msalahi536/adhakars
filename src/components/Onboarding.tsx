@@ -1,9 +1,8 @@
-import { useEffect, useRef, useState } from "react";
-import { BookOpen, Hand, Compass, Bell } from "lucide-react";
+import React, { useEffect, useRef, useState } from "react";
+import { BookOpen, Hand, Compass, Bell, Sparkles, Shield } from "lucide-react";
 import {
   requestNotificationPermission,
   checkNotificationPermission,
-
   isNativePlatform,
   getNotificationPrefs,
   setNotificationPrefs,
@@ -29,19 +28,127 @@ const markOnboarded = () => {
   }
 };
 
+const BenefitsList = () => {
+  const listClass = "mt-2 space-y-1 text-[13px] leading-snug";
+  const itemClass = "flex items-start gap-2";
+  const dotClass = "mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full";
+  const sectionClass = "mt-3";
+  const headingClass = "label-caps flex items-center gap-2";
+  return (
+    <div className="max-h-[38vh] overflow-y-auto pr-1">
+      <div className={sectionClass}>
+        <div className={headingClass} style={{ color: "var(--accent)" }}>
+          <Sparkles size={14} strokeWidth={2.2} />
+          INCREASES YOU IN
+        </div>
+        <ul className={listClass} style={{ color: "var(--muted-foreground)" }}>
+          <li className={itemClass}>
+            <span className={dotClass} style={{ background: "var(--accent)" }} />
+            Eman and Closeness to Allah
+          </li>
+          <li className={itemClass}>
+            <span className={dotClass} style={{ background: "var(--accent)" }} />
+            Allah Remembering you
+          </li>
+          <li className={itemClass}>
+            <span className={dotClass} style={{ background: "var(--accent)" }} />
+            Tranquility of the Heart
+          </li>
+          <li className={itemClass}>
+            <span className={dotClass} style={{ background: "var(--accent)" }} />
+            Wealth and Good Health
+          </li>
+          <li className={itemClass}>
+            <span className={dotClass} style={{ background: "var(--accent)" }} />
+            Good Deeds and Rewards
+          </li>
+          <li className={itemClass}>
+            <span className={dotClass} style={{ background: "var(--accent)" }} />
+            Blessings in all Affairs
+          </li>
+          <li className={itemClass}>
+            <span className={dotClass} style={{ background: "var(--accent)" }} />
+            Means of Entering Jannah
+          </li>
+          <li className={itemClass}>
+            <span className={dotClass} style={{ background: "var(--accent)" }} />
+            Sins Forgiven and Erased
+          </li>
+          <li className={itemClass}>
+            <span className={dotClass} style={{ background: "var(--accent)" }} />
+            Contentment in all Affairs
+          </li>
+          <li className={itemClass}>
+            <span className={dotClass} style={{ background: "var(--accent)" }} />
+            Strenthening of the Body
+          </li>
+        </ul>
+      </div>
+      <div className={sectionClass}>
+        <div className={headingClass} style={{ color: "var(--accent)" }}>
+          <Shield size={14} strokeWidth={2.2} />
+          PROTECTS YOU FROM
+        </div>
+        <ul className={listClass} style={{ color: "var(--muted-foreground)" }}>
+          <li className={itemClass}>
+            <span className={dotClass} style={{ background: "var(--accent)" }} />
+            All types of Evil and Harm
+          </li>
+          <li className={itemClass}>
+            <span className={dotClass} style={{ background: "var(--accent)" }} />
+            The Shaytan and his Devils
+          </li>
+          <li className={itemClass}>
+            <span className={dotClass} style={{ background: "var(--accent)" }} />
+            The Hellfire
+          </li>
+          <li className={itemClass}>
+            <span className={dotClass} style={{ background: "var(--accent)" }} />
+            Depression, Anxiety &amp; Grief
+          </li>
+          <li className={itemClass}>
+            <span className={dotClass} style={{ background: "var(--accent)" }} />
+            Evil Eye &amp; Magic
+          </li>
+          <li className={itemClass}>
+            <span className={dotClass} style={{ background: "var(--accent)" }} />
+            Illnesses
+          </li>
+          <li className={itemClass}>
+            <span className={dotClass} style={{ background: "var(--accent)" }} />
+            Laziness &amp; Procrastination
+          </li>
+          <li className={itemClass}>
+            <span className={dotClass} style={{ background: "var(--accent)" }} />
+            Poverty
+          </li>
+          <li className={itemClass}>
+            <span className={dotClass} style={{ background: "var(--accent)" }} />
+            Disbelief
+          </li>
+          <li className={itemClass}>
+            <span className={dotClass} style={{ background: "var(--accent)" }} />
+            Evil Whispers
+          </li>
+        </ul>
+      </div>
+    </div>
+  );
+};
+
 type Slide = {
   Icon: typeof BookOpen;
   label: string;
   title: string;
-  body: string;
+  body: string | React.ReactNode;
 };
 
 const SLIDES: Slide[] = [
   {
     Icon: BookOpen,
     label: "Welcome",
-    title: "Authentic adhkar, every day",
-    body: "Every dhikr is sourced from Sahih hadith or the Qur'an. Pure and trustworthy.",
+    title: "How Adhkar Benefits You",
+    body: <BenefitsList />,
   },
   {
     Icon: Hand,
@@ -232,12 +339,16 @@ export function Onboarding({ onDone }: { onDone: () => void }) {
               </h2>
             </div>
           </div>
-          <p
-            className="mt-3 text-[14px] leading-relaxed"
-            style={{ color: "var(--muted-foreground)" }}
-          >
-            {slide.body}
-          </p>
+          {typeof slide.body === "string" ? (
+            <p
+              className="mt-3 text-[14px] leading-relaxed"
+              style={{ color: "var(--muted-foreground)" }}
+            >
+              {slide.body}
+            </p>
+          ) : (
+            <div className="mt-2">{slide.body}</div>
+          )}
 
           {isLast ? (
             <div className="mt-4 space-y-2">
