@@ -88,16 +88,30 @@ function Settings() {
     setCommitmentState(getCommitment());
     setHasCustom(getCustomAdhkarRows().length > 0);
     let cancelled = false;
-    checkNotificationPermission().then((v) => {
-      if (!cancelled) {
-        setNotifEnabled(v);
-        setNotifChecking(false);
-      }
-    });
+    const refresh = () => {
+      checkNotificationPermission().then((v) => {
+        if (!cancelled) {
+          setNotifEnabled(v);
+          setNotifChecking(false);
+        }
+      });
+    };
+    refresh();
+    // Safety net: never leave the UI stuck on "Checking...".
+    const t = setTimeout(() => {
+      if (!cancelled) setNotifChecking(false);
+    }, 5000);
+    const onVisible = () => {
+      if (document.visibilityState === "visible") refresh();
+    };
+    document.addEventListener("visibilitychange", onVisible);
     return () => {
       cancelled = true;
+      clearTimeout(t);
+      document.removeEventListener("visibilitychange", onVisible);
     };
   }, []);
+
 
 
   const handleEnableNotifications = async () => {
