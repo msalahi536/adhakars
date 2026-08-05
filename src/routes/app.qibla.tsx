@@ -211,7 +211,7 @@ function Qibla() {
 
 
 
-          {permState === "granted" && (
+          {permState === "ready" && (
             <>
               <div
                 className="relative mt-4 flex items-center justify-center"
