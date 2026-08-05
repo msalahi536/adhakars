@@ -4,8 +4,8 @@ import { HeaderSettingsButton } from "@/components/HeaderSettingsButton";
 import { HeaderBackButton } from "@/components/HeaderBackButton";
 import { CompassCalibrationCard } from "@/components/CompassCalibrationCard";
 
-const CAL_OPEN_COUNT_KEY = "qibla-open-count";
-const CAL_AUTO_LIMIT = 3;
+
+
 
 
 export const Route = createFileRoute("/app/qibla")({
