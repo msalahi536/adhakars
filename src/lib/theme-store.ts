@@ -4,6 +4,7 @@ import type { Mode, SectionKey, CustomOverrides } from "./theming";
 import {
   applyTokens,
   deriveSectionSeed,
+  sectionSeedFor,
   deriveTokens,
   clampSeed,
 } from "./theming";
@@ -17,11 +18,12 @@ const K_CUSTOM = "adhkar:custom-triplet";
 export type ModeSetting = "light" | "dark" | "auto";
 
 export const DEFAULT_SEED = "#c9a84c";
-export const DEFAULT_PRESET_ID = "classic";
+export const DEFAULT_PRESET_ID = "original";
 
 export type Preset = { id: string; name: string; seed: string };
 
 export const PRESETS: Preset[] = [
+  { id: "original",  name: "Original",  seed: "#c9a84c" },
   { id: "classic",   name: "Classic",   seed: "#c9a84c" },
   { id: "rose",      name: "Rose",      seed: "#d47a8b" },
   { id: "lavender",  name: "Twilight",  seed: "#8a7bd0" },
@@ -47,7 +49,7 @@ const removeLS = (k: string) => {
 
 export const getModeSetting = (): ModeSetting => {
   const v = readLS(K_MODE);
-  return v === "light" || v === "dark" || v === "auto" ? v : "auto";
+  return v === "light" || v === "dark" || v === "auto" ? v : "light";
 };
 export const setModeSetting = (m: ModeSetting) => writeLS(K_MODE, m);
 
@@ -112,7 +114,9 @@ export const applyThemeForRoute = (pathname: string) => {
 
   // Per-section override always wins for the header hue.
   const sectionOverride = overrides[section];
-  const seed = sectionOverride ?? deriveSectionSeed(triplet.accent ?? base, section);
+  const presetId = getPresetId();
+  const seed =
+    sectionOverride ?? sectionSeedFor(presetId, triplet.accent ?? base, section);
 
   // Custom overrides for background / accent are global; header is
   // per-section-derived unless overridden.
@@ -137,7 +141,7 @@ export const resetTheme = () => {
 };
 
 export const PRE_PAINT_SCRIPT = `(function(){try{
-var m=localStorage.getItem('${K_MODE}')||'auto';
+var m=localStorage.getItem('${K_MODE}')||'light';
 var mode = m==='light'?'light':(m==='dark'?'dark':(window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'));
 document.documentElement.setAttribute('data-theme-mode',mode);
 document.documentElement.setAttribute('data-theme', mode==='dark'?'dark':'dawn');

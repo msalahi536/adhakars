@@ -159,6 +159,31 @@ export const deriveSectionSeed = (baseSeed: string, section: SectionKey): string
   return clampSeed(hslToHex(h, clamp(s + ds, 0.18, 0.82), clamp(l + dl, 0.28, 0.78)));
 };
 
+// The original hand-picked palette: warm gold mornings, deep blue evenings,
+// green after salah. Used by the "Original" preset.
+export const ORIGINAL_SECTION_SEEDS: Record<SectionKey, string> = {
+  morning: "#c9a84c",
+  evening: "#3b5a86",
+  salah:   "#2f6f57",
+  tasbih:  "#b8925a",
+  sleep:   "#2c3e63",
+  wake:    "#d8b45a",
+  custom:  "#c9a84c",
+  default: "#c9a84c",
+};
+
+export const ORIGINAL_PRESET_ID = "original";
+
+/** Section seed for a given preset. The Original preset uses fixed hues. */
+export const sectionSeedFor = (
+  presetId: string,
+  baseSeed: string,
+  section: SectionKey,
+): string =>
+  presetId === ORIGINAL_PRESET_ID
+    ? ORIGINAL_SECTION_SEEDS[section]
+    : deriveSectionSeed(baseSeed, section);
+
 // ---------- token derivation ----------
 
 export type Tokens = Record<string, string>;
