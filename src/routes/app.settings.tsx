@@ -618,9 +618,33 @@ function Settings() {
                   >
                     + Add reminder
                   </button>
+                  <button
+                    onClick={async () => {
+                      setNotifTestMsg("Sending...");
+                      const ok = await sendTestNotification();
+                      const ids = await getScheduledIds();
+                      setNotifTestMsg(
+                        ok
+                          ? `Test sent, it will appear in about 5 seconds. ${ids.length} notification(s) scheduled.`
+                          : "Could not send a test notification on this device.",
+                      );
+                    }}
+                    className="w-full rounded-full py-2 text-sm font-semibold"
+                    style={{
+                      background: "var(--background)",
+                      border: "1px solid var(--border)",
+                      color: "var(--foreground)",
+                    }}
+                  >
+                    Send test notification
+                  </button>
+                  {notifTestMsg && (
+                    <div className="text-[11px] opacity-70">{notifTestMsg}</div>
+                  )}
                   <div className="text-[11px] opacity-60">
                     Reminders fire on your device using your local time. Set as many as you like at any times that suit your schedule.
                   </div>
+
                 </div>
               )}
             </div>
