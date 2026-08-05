@@ -106,6 +106,8 @@ function Settings() {
         if (!cancelled) {
           setNotifEnabled(v);
           setNotifChecking(false);
+          // Re-arm reminders on the device (they can be lost after reinstall or reboot).
+          if (v) void applyReminders(getNotificationPrefs());
         }
       });
     };
