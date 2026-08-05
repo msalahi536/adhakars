@@ -43,6 +43,7 @@ import {
   cancelReminder,
   isNativePlatform,
   sendTestNotification,
+  scheduleOneMinuteTest,
   getScheduledIds,
   getDiagnostics,
   type NotificationPrefs,
@@ -176,6 +177,7 @@ function Settings() {
     } else {
       await cancelReminder(r.id);
     }
+    setNotifDiag(await getDiagnostics());
   };
 
   const addReminder = () => {
@@ -192,8 +194,11 @@ function Settings() {
       nextId: notifPrefs.nextId + 1,
     };
     persistPrefs(next);
-    if (notifEnabled) void scheduleReminder(newReminder);
+    if (notifEnabled) {
+      void scheduleReminder(newReminder).then(async () => setNotifDiag(await getDiagnostics()));
+    }
   };
+
 
   const removeReminder = async (id: number) => {
     await cancelReminder(id);
@@ -662,6 +667,27 @@ function Settings() {
                     }}
                   >
                     Send test notification
+                  </button>
+                  <button
+                    onClick={async () => {
+                      setNotifTestMsg("Scheduling...");
+                      const res = await scheduleOneMinuteTest();
+                      const ids = await getScheduledIds();
+                      setNotifTestMsg(
+                        res.ok
+                          ? `Scheduled for 1 minute from now. ${ids.length} notification(s) pending.`
+                          : `Could not schedule. ${res.error}`,
+                      );
+                      setNotifDiag(await getDiagnostics());
+                    }}
+                    className="w-full rounded-full py-2 text-sm font-semibold"
+                    style={{
+                      background: "var(--background)",
+                      border: "1px solid var(--border)",
+                      color: "var(--foreground)",
+                    }}
+                  >
+                    Schedule test in 1 minute
                   </button>
                   {notifTestMsg && (
                     <div className="text-[11px] opacity-70">{notifTestMsg}</div>

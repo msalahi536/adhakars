@@ -227,6 +227,18 @@ const nextOccurrence = (hour: number, minute: number): Date => {
 
 export type ActionResult = { ok: true } | { ok: false; error: string };
 
+/** Test notification id, kept far away from reminder id ranges. */
+const TEST_ID = 990001;
+/** How many future days each reminder is pre-scheduled for. */
+const DAYS_AHEAD = 14;
+/** Derived notification ids for a reminder: id*1000 + dayOffset. */
+const idsFor = (reminderId: number) =>
+  Array.from({ length: DAYS_AHEAD }, (_, i) => reminderId * 1000 + i);
+
+/** Last schedule payload passed to the plugin, for diagnostics. */
+let lastSchedule: { at: string; count: number; ids: number[]; label: string } | null = null;
+export const getLastSchedule = () => lastSchedule;
+
 /** Fires a notification a few seconds from now so the user can verify setup. */
 export const sendTestNotification = async (): Promise<ActionResult> => {
   if (!isNativePlatform()) {
@@ -246,7 +258,7 @@ export const sendTestNotification = async (): Promise<ActionResult> => {
     await plugin.schedule({
       notifications: [
         {
-          id: 999,
+          id: TEST_ID,
           title: "Sahih Al-Adhkar",
           body: "Test reminder. Notifications are working.",
           schedule: { at: new Date(Date.now() + 5000), allowWhileIdle: true },
@@ -285,51 +297,78 @@ export const getDiagnostics = async (): Promise<string> => {
     // ignore
   }
   const pending = await getScheduledIds();
-  return `Platform: ${platform}, permission: ${perm}, scheduled: ${pending.length}`;
+  const last = lastSchedule
+    ? ` | last: "${lastSchedule.label}" at ${lastSchedule.at} (${lastSchedule.count} slots, ids ${lastSchedule.ids[0]}..${lastSchedule.ids[lastSchedule.ids.length - 1]})`
+    : "";
+  return `Platform: ${platform}, permission: ${perm}, pending: ${pending.length}${last}`;
 };
 
 export const cancelReminder = async (id: number): Promise<void> => {
   const plugin = await loadPlugin();
   if (!plugin) return;
   try {
-    await plugin.cancel({ notifications: [{ id }] });
+    await plugin.cancel({
+      notifications: [{ id }, ...idsFor(id).map((n) => ({ id: n }))],
+    });
   } catch {
     // ignore
   }
 };
 
-export const scheduleReminder = async (r: Reminder): Promise<ActionResult> => {
+export const scheduleReminder = async (r: Reminder, firstAt?: Date): Promise<ActionResult> => {
   if (!isNativePlatform()) return { ok: false, error: "Not running in the native app" };
   const plugin = await loadPlugin();
   if (!plugin) return { ok: false, error: "Notifications plugin is missing from this build." };
   try {
     await ensureChannel(plugin);
-    try {
-      await plugin.cancel({ notifications: [{ id: r.id }] });
-    } catch {
-      // ignore
-    }
-    await plugin.schedule({
-      notifications: [
-        {
-          id: r.id,
-          title: r.label || "Adhkar reminder",
-          body: `Time for ${r.label || "your adhkar"}.`,
-          schedule: {
-            at: nextOccurrence(r.hour, r.minute),
-            repeats: true,
-            every: "day",
-            allowWhileIdle: true,
-          },
-          channelId: ANDROID_CHANNEL,
-        },
-      ],
+    await cancelReminder(r.id);
+
+    const first = firstAt ?? nextOccurrence(r.hour, r.minute);
+    const ids = idsFor(r.id);
+    const notifications = ids.map((id, i) => {
+      const at = new Date(first.getTime());
+      at.setDate(at.getDate() + i);
+      return {
+        id,
+        title: r.label || "Adhkar reminder",
+        body: `Time for ${r.label || "your adhkar"}.`,
+        schedule: { at, allowWhileIdle: true },
+        channelId: ANDROID_CHANNEL,
+      };
     });
+
+    lastSchedule = {
+      at: first.toLocaleString(),
+      count: notifications.length,
+      ids,
+      label: r.label || "Adhkar reminder",
+    };
+    console.log(
+      "[notifications] schedule payload",
+      JSON.stringify(
+        notifications.map((n) => ({ ...n, schedule: { ...n.schedule, at: n.schedule.at.toISOString() } })),
+        null,
+        2,
+      ),
+    );
+
+    await plugin.schedule({ notifications });
+    const pending = await getScheduledIds();
+    console.log("[notifications] pending after schedule:", pending.length, pending);
     return { ok: true };
   } catch (e) {
     console.error("[notifications] scheduleReminder failed", e);
     return { ok: false, error: (e as Error)?.message ?? "Could not schedule this reminder." };
   }
+};
+
+/** Debug helper: schedules through the exact reminder code path, 60s from now. */
+export const scheduleOneMinuteTest = async (): Promise<ActionResult> => {
+  const t = new Date(Date.now() + 60_000);
+  return scheduleReminder(
+    { id: 995, label: "1 minute test", hour: t.getHours(), minute: t.getMinutes(), enabled: true },
+    t,
+  );
 };
 
 export const applyReminders = async (prefs: NotificationPrefs): Promise<void> => {
@@ -342,3 +381,4 @@ export const applyReminders = async (prefs: NotificationPrefs): Promise<void> =>
     }
   }
 };
+
