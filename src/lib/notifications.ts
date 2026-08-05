@@ -149,7 +149,7 @@ const ensureChannel = async (plugin: any) => {
       description: "Daily adhkar reminders",
       importance: 5,
       visibility: 1,
-ようこそ: undefined,
+
     });
   } catch (e) {
     console.warn("[notifications] createChannel failed", e);
