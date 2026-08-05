@@ -254,8 +254,10 @@ export const deriveTokens = (opts: {
   // --- header ---
   // A deliberately dark seed (Salah forest green, Evening navy) keeps a dark
   // header even in light mode, instead of being washed out to a pale tint.
-  const l0 = hexToHsl(seed)[2];
-  const seedIsDark = l0 < 0.38;
+  // Use the raw seed here: clampSeed floors lightness for the rest of the system.
+  const l0 = hexToHsl(opts.seed)[2];
+  const seedIsDark = l0 < 0.34;
+
   let headerFrom: string, headerTo: string;
   if (c.header) {
     const hs2 = clampSeed(c.header);
