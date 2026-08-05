@@ -84,7 +84,7 @@ function Settings() {
   const [commitment, setCommitmentState] = useState<Record<CommitmentSection, boolean>>(() => getCommitment());
   const [hasCustom, setHasCustom] = useState(false);
   const [nativeAvailable, setNativeAvailable] = useState(false);
-  const [notifDiag, setNotifDiag] = useState<string | null>(null);
+  
 
   useEffect(() => {
     setModeState(getModeSetting());
