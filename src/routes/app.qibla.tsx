@@ -409,6 +409,18 @@ function Qibla() {
                 </button>
               )}
 
+              {absolute === false && (
+                <p
+                  className="mt-3 text-center text-[11px]"
+                  style={{ color: "#c0392b" }}
+                >
+                  This device reports a relative compass, so the direction may drift. Calibrate,
+                  then hold the phone flat and face North once to reset it.
+                </p>
+              )}
+
+
+
               <div
                 className="mt-6 w-full space-y-1.5 text-center text-xs"
                 style={{ color: "var(--muted-foreground)" }}
