@@ -69,7 +69,6 @@ export function Onboarding({ onDone }: { onDone: () => void }) {
   const [notifStatus, setNotifStatus] = useState<
     "idle" | "granted" | "denied" | "unavailable" | "error"
   >("idle");
-  const trackRef = useRef<HTMLDivElement>(null);
   const startX = useRef<number | null>(null);
   const deltaX = useRef(0);
 
@@ -147,11 +146,14 @@ export function Onboarding({ onDone }: { onDone: () => void }) {
         setNotifStatus("granted");
         // Never block the UI on scheduling.
         void applyReminders(updated).catch(() => {});
+        // Cut straight to the app once reminders are on.
+        setTimeout(() => finish(), 250);
       } else if (reason === "denied") {
         setNotifStatus("denied");
       } else {
         setNotifStatus("unavailable");
       }
+
     } catch {
       setNotifStatus("error");
     } finally {
@@ -182,167 +184,160 @@ export function Onboarding({ onDone }: { onDone: () => void }) {
   }, [index]);
 
   const isLast = index === SLIDES.length - 1;
+  const slide = SLIDES[index];
+  const Icon = slide.Icon;
 
   return (
     <div
-      className="fixed inset-0 z-[100] flex flex-col"
-      style={{ background: "var(--background)", color: "var(--foreground)" }}
+      className="fixed inset-0 z-[100] flex flex-col justify-end"
+      style={{
+        background: "color-mix(in oklab, var(--background) 45%, transparent)",
+        backdropFilter: "blur(6px) saturate(120%)",
+        color: "var(--foreground)",
+      }}
+      onTouchStart={onTouchStart}
+      onTouchMove={onTouchMove}
+      onTouchEnd={onTouchEnd}
     >
-      {/* Top bar */}
+      {/* Skip, always visible */}
       <div className="flex items-center justify-between px-5 pt-6">
-        <div className="text-xs font-semibold opacity-60">
+        <div className="text-xs font-semibold opacity-50">
           {index + 1} / {SLIDES.length}
         </div>
         <button
           type="button"
           onClick={finish}
-          className="text-sm font-semibold opacity-70 active:opacity-100"
-          style={{ color: "var(--foreground)" }}
+          className="rounded-full px-3 py-1.5 text-xs font-semibold"
+          style={{
+            background: "color-mix(in oklab, var(--foreground) 8%, transparent)",
+            color: "var(--foreground)",
+          }}
         >
-          Skip
+          Skip onboarding
         </button>
       </div>
 
-      {/* Slides */}
-      <div
-        className="flex-1 overflow-hidden"
-        onTouchStart={onTouchStart}
-        onTouchMove={onTouchMove}
-        onTouchEnd={onTouchEnd}
-      >
+      <div className="flex-1" onClick={finish} />
+
+      {/* Popup card */}
+      <div className="px-4 pb-8">
         <div
-          ref={trackRef}
-          className="flex h-full transition-transform duration-300 ease-out"
-          style={{ transform: `translateX(-${index * 100}%)` }}
+          key={index}
+          className="mx-auto w-full max-w-md rounded-[24px] p-5"
+          style={{
+            background: "color-mix(in oklab, var(--card) 88%, transparent)",
+            border: "1px solid color-mix(in oklab, var(--border) 80%, transparent)",
+            boxShadow: "0 18px 50px rgba(0,0,0,0.22)",
+            backdropFilter: "blur(18px) saturate(140%)",
+            color: "var(--foreground)",
+            animation: "onb-pop 260ms ease-out",
+          }}
         >
-          {SLIDES.map((s, i) => {
-            const Icon = s.Icon;
-            return (
-              <div
-                key={i}
-                className="flex h-full w-full shrink-0 items-center justify-center px-5"
+          <div className="flex items-start gap-3">
+            <div
+              className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl"
+              style={{
+                background: "color-mix(in oklab, var(--accent) 18%, transparent)",
+                color: "var(--accent)",
+              }}
+            >
+              <Icon size={22} strokeWidth={2.2} />
+            </div>
+            <div className="min-w-0">
+              <div className="label-caps" style={{ color: "var(--accent)" }}>
+                {slide.label}
+              </div>
+              <h2 className="mt-0.5 text-lg font-bold leading-tight">
+                {slide.title}
+              </h2>
+            </div>
+          </div>
+          <p
+            className="mt-3 text-[14px] leading-relaxed"
+            style={{ color: "var(--muted-foreground)" }}
+          >
+            {slide.body}
+          </p>
+
+          {isLast ? (
+            <div className="mt-4 space-y-2">
+              <button
+                type="button"
+                onClick={enableReminders}
+                disabled={notifBusy || notifStatus === "granted"}
+                className="w-full rounded-full px-5 py-3 text-sm font-semibold disabled:opacity-70"
+                style={{
+                  background: "var(--accent)",
+                  color: "var(--accent-foreground)",
+                }}
               >
-                <div
-                  className="w-full max-w-md rounded-[24px] p-6"
+                {notifBusy
+                  ? "Requesting permission..."
+                  : notifStatus === "granted"
+                    ? "Reminders enabled"
+                    : notifStatus === "idle"
+                      ? "Enable Reminders"
+                      : "Try again"}
+              </button>
+              {notifStatus !== "idle" && !notifBusy && (
+                <p
+                  className="px-1 text-[13px] leading-snug"
                   style={{
-                    background: "var(--surface, var(--card))",
-                    border: "1px solid var(--border)",
-                    boxShadow: "var(--card-shadow, 0 4px 16px rgba(0,0,0,0.06))",
-                    color: "var(--foreground)",
+                    color:
+                      notifStatus === "granted"
+                        ? "var(--accent)"
+                        : "var(--muted-foreground)",
                   }}
                 >
-                  <div
-                    className="flex h-16 w-16 items-center justify-center rounded-2xl"
-                    style={{
-                      background: "color-mix(in oklab, var(--accent) 18%, transparent)",
-                      color: "var(--accent)",
-                    }}
-                  >
-                    <Icon size={30} strokeWidth={2.2} />
-                  </div>
-                  <div
-                    className="label-caps mt-5"
-                    style={{ color: "var(--accent)" }}
-                  >
-                    {s.label}
-                  </div>
-                  <h2 className="mt-1 text-2xl font-bold leading-tight">
-                    {s.title}
-                  </h2>
-                  <p
-                    className="mt-3 text-[15px] leading-relaxed"
-                    style={{ color: "var(--muted-foreground)" }}
-                  >
-                    {s.body}
-                  </p>
-
-                  {i === SLIDES.length - 1 && (
-                    <div className="mt-6 space-y-2">
-                      <button
-                        type="button"
-                        onClick={enableReminders}
-                        disabled={notifBusy || notifStatus === "granted"}
-                        className="w-full rounded-full px-5 py-3 text-sm font-semibold disabled:opacity-70"
-                        style={{
-                          background: "var(--accent)",
-                          color: "var(--accent-foreground)",
-                        }}
-                      >
-                        {notifBusy
-                          ? "Requesting permission..."
-                          : notifStatus === "granted"
-                            ? "Reminders enabled"
-                            : notifStatus === "idle"
-                              ? "Enable Reminders"
-                              : "Try again"}
-                      </button>
-                      {notifStatus !== "idle" && !notifBusy && (
-                        <p
-                          className="px-1 text-[13px] leading-snug"
-                          style={{
-                            color:
-                              notifStatus === "granted"
-                                ? "var(--accent)"
-                                : "var(--muted-foreground)",
-                          }}
-                        >
-                          {notifMessage[notifStatus]}
-                        </p>
-                      )}
-                      <button
-                        type="button"
-                        onClick={finish}
-                        className="w-full rounded-full px-5 py-3 text-sm font-semibold"
-                        style={{
-                          background: "transparent",
-                          color: "var(--foreground)",
-                        }}
-                      >
-                        {notifStatus === "idle" ? "Maybe later" : "Continue"}
-                      </button>
-                    </div>
-                  )}
-                </div>
-              </div>
-            );
-          })}
-        </div>
-      </div>
-
-      {/* Dots + primary action */}
-      <div className="flex flex-col items-center gap-4 px-5 pb-8 pt-4">
-        <div className="flex items-center gap-2">
-          {SLIDES.map((_, i) => (
+                  {notifMessage[notifStatus]}
+                </p>
+              )}
+              <button
+                type="button"
+                onClick={finish}
+                className="w-full rounded-full px-5 py-2.5 text-sm font-semibold"
+                style={{ background: "transparent", color: "var(--foreground)" }}
+              >
+                {notifStatus === "idle" ? "Maybe later" : "Continue"}
+              </button>
+            </div>
+          ) : (
             <button
-              key={i}
               type="button"
-              aria-label={`Go to slide ${i + 1}`}
-              onClick={() => goTo(i)}
-              className="h-1.5 rounded-full transition-all"
+              onClick={next}
+              className="mt-4 w-full rounded-full px-5 py-3 text-sm font-semibold"
               style={{
-                width: i === index ? 20 : 6,
-                background:
-                  i === index
-                    ? "var(--accent)"
-                    : "color-mix(in oklab, var(--foreground) 20%, transparent)",
+                background: "var(--accent)",
+                color: "var(--accent-foreground)",
               }}
-            />
-          ))}
+            >
+              Continue
+            </button>
+          )}
+
+          <div className="mt-4 flex items-center justify-center gap-2">
+            {SLIDES.map((_, i) => (
+              <button
+                key={i}
+                type="button"
+                aria-label={`Go to slide ${i + 1}`}
+                onClick={() => goTo(i)}
+                className="h-1.5 rounded-full transition-all"
+                style={{
+                  width: i === index ? 20 : 6,
+                  background:
+                    i === index
+                      ? "var(--accent)"
+                      : "color-mix(in oklab, var(--foreground) 20%, transparent)",
+                }}
+              />
+            ))}
+          </div>
         </div>
-        {!isLast && (
-          <button
-            type="button"
-            onClick={next}
-            className="w-full max-w-md rounded-full px-5 py-3 text-sm font-semibold"
-            style={{
-              background: "var(--accent)",
-              color: "var(--accent-foreground)",
-            }}
-          >
-            Continue
-          </button>
-        )}
       </div>
+
+      <style>{`@keyframes onb-pop{from{opacity:0;transform:translateY(10px) scale(.98)}to{opacity:1;transform:none}}`}</style>
     </div>
   );
 }
+
