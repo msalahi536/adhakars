@@ -42,13 +42,10 @@ import {
   scheduleReminder,
   cancelReminder,
   isNativePlatform,
-  sendTestNotification,
-  scheduleOneMinuteTest,
-  getScheduledIds,
-  getDiagnostics,
   type NotificationPrefs,
   type Reminder,
 } from "@/lib/notifications";
+
 
 
 const APP_VERSION = "1.0.3";
