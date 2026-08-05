@@ -315,7 +315,22 @@ export function Onboarding({ onDone }: { onDone: () => void }) {
             ))}
           </div>
         </div>
+
+        <div className="mx-auto mt-4 flex w-full max-w-md items-center justify-center">
+          <button
+            type="button"
+            onClick={finish}
+            className="rounded-full px-4 py-2 text-xs font-semibold"
+            style={{
+              background: "color-mix(in oklab, var(--foreground) 8%, transparent)",
+              color: "var(--foreground)",
+            }}
+          >
+            Skip onboarding
+          </button>
+        </div>
       </div>
+
 
       <style>{`@keyframes onb-pop{from{opacity:0;transform:translateY(10px) scale(.98)}to{opacity:1;transform:none}}`}</style>
     </div>
