@@ -1,0 +1,197 @@
+// Compass + location helpers shared by the Qibla finder.
+// Everything is defensive: web, iOS Safari, and the Capacitor native wrapper
+// all behave differently, so each call is guarded and time limited.
+
+type DeviceOrientationEventStatic = typeof DeviceOrientationEvent & {
+  requestPermission?: () => Promise<"granted" | "denied">;
+};
+type DeviceMotionEventStatic = typeof DeviceMotionEvent & {
+  requestPermission?: () => Promise<"granted" | "denied">;
+};
+
+export type PermResult = "granted" | "denied" | "unsupported";
+
+function withTimeout<T>(p: Promise<T>, ms: number, fallback: T): Promise<T> {
+  return new Promise((resolve) => {
+    let done = false;
+    const t = setTimeout(() => {
+      if (!done) {
+        done = true;
+        resolve(fallback);
+      }
+    }, ms);
+    p.then(
+      (v) => {
+        if (!done) {
+          done = true;
+          clearTimeout(t);
+          resolve(v);
+        }
+      },
+      () => {
+        if (!done) {
+          done = true;
+          clearTimeout(t);
+          resolve(fallback);
+        }
+      },
+    );
+  });
+}
+
+export function isNative(): boolean {
+  if (typeof window === "undefined") return false;
+  const cap = (window as unknown as { Capacitor?: { isNativePlatform?: () => boolean } }).Capacitor;
+  try {
+    return cap?.isNativePlatform?.() === true;
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * Ask iOS for motion + orientation access. Must be called directly from a user
+ * gesture. On platforms without the prompt this resolves "granted" when the
+ * orientation API exists at all.
+ */
+export async function requestOrientationPermission(): Promise<PermResult> {
+  if (typeof window === "undefined" || typeof DeviceOrientationEvent === "undefined") {
+    return "unsupported";
+  }
+  const DOE = DeviceOrientationEvent as DeviceOrientationEventStatic;
+  const DME =
+    typeof DeviceMotionEvent !== "undefined"
+      ? (DeviceMotionEvent as DeviceMotionEventStatic)
+      : undefined;
+
+  if (typeof DOE.requestPermission === "function") {
+    const r = await withTimeout<PermResult>(
+      DOE.requestPermission().then((v) => (v === "granted" ? "granted" : "denied")),
+      12000,
+      "denied",
+    );
+    return r;
+  }
+  if (DME && typeof DME.requestPermission === "function") {
+    return withTimeout<PermResult>(
+      DME.requestPermission().then((v) => (v === "granted" ? "granted" : "denied")),
+      12000,
+      "denied",
+    );
+  }
+  return "granted";
+}
+
+export type Coords = { lat: number; lng: number };
+
+/** Get a position once, preferring the native plugin inside Capacitor. */
+export async function getPosition(): Promise<
+  { ok: true; coords: Coords } | { ok: false; error: string }
+> {
+  if (isNative()) {
+    try {
+      const { Geolocation } = await import("@capacitor/geolocation");
+      try {
+        const perm = await Geolocation.requestPermissions();
+        if (perm.location === "denied" && perm.coarseLocation === "denied") {
+          return {
+            ok: false,
+            error: "Location permission denied. Enable location for this app in your device settings.",
+          };
+        }
+      } catch {
+        // some platforms do not implement requestPermissions, keep going
+      }
+      const pos = await Geolocation.getCurrentPosition({
+        enableHighAccuracy: true,
+        timeout: 15000,
+      });
+      return { ok: true, coords: { lat: pos.coords.latitude, lng: pos.coords.longitude } };
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : String(e);
+      return { ok: false, error: `Could not get your location. ${msg}` };
+    }
+  }
+
+  if (typeof navigator === "undefined" || !("geolocation" in navigator)) {
+    return { ok: false, error: "Location is not supported on this device." };
+  }
+  return new Promise((resolve) => {
+    let settled = false;
+    const timer = setTimeout(() => {
+      if (!settled) {
+        settled = true;
+        resolve({ ok: false, error: "Location timed out. Check that location access is allowed, then try again." });
+      }
+    }, 18000);
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        if (settled) return;
+        settled = true;
+        clearTimeout(timer);
+        resolve({ ok: true, coords: { lat: pos.coords.latitude, lng: pos.coords.longitude } });
+      },
+      (err) => {
+        if (settled) return;
+        settled = true;
+        clearTimeout(timer);
+        resolve({
+          ok: false,
+          error:
+            err.code === err.PERMISSION_DENIED
+              ? "Location permission denied. Allow location access for this app, then try again."
+              : `Could not get your location. ${err.message}`,
+        });
+      },
+      { enableHighAccuracy: true, timeout: 15000, maximumAge: 30000 },
+    );
+  });
+}
+
+export function normalizeHeading(h: number) {
+  return ((h % 360) + 360) % 360;
+}
+
+export type Reading = {
+  heading: number | null;
+  absolute: boolean;
+  alpha: number | null;
+  beta: number | null;
+  gamma: number | null;
+};
+
+export function readOrientation(e: DeviceOrientationEvent): Reading {
+  const anyE = e as DeviceOrientationEvent & { webkitCompassHeading?: number };
+  let heading: number | null = null;
+  let absolute = e.absolute === true;
+  if (typeof anyE.webkitCompassHeading === "number" && anyE.webkitCompassHeading >= 0) {
+    heading = normalizeHeading(anyE.webkitCompassHeading);
+    absolute = true;
+  } else if (typeof e.alpha === "number") {
+    const so =
+      typeof window !== "undefined" ? ((window.screen?.orientation?.angle ?? 0) as number) : 0;
+    heading = normalizeHeading(360 - e.alpha + so);
+  }
+  return {
+    heading,
+    absolute,
+    alpha: typeof e.alpha === "number" ? e.alpha : null,
+    beta: typeof e.beta === "number" ? e.beta : null,
+    gamma: typeof e.gamma === "number" ? e.gamma : null,
+  };
+}
+
+/** Subscribe to orientation events. Returns an unsubscribe function. */
+export function subscribeOrientation(cb: (r: Reading, raw: DeviceOrientationEvent) => void) {
+  if (typeof window === "undefined") return () => {};
+  const handler = (e: Event) => {
+    const doe = e as DeviceOrientationEvent;
+    cb(readOrientation(doe), doe);
+  };
+  window.addEventListener("deviceorientationabsolute", handler, true);
+  window.addEventListener("deviceorientation", handler, true);
+  return () => {
+    window.removeEventListener("deviceorientationabsolute", handler, true);
+    window.removeEventListener("deviceorientation", handler, true);
+  };
+}

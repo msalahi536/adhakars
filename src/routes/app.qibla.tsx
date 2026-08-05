@@ -3,6 +3,13 @@ import { createFileRoute } from "@tanstack/react-router";
 import { HeaderSettingsButton } from "@/components/HeaderSettingsButton";
 import { HeaderBackButton } from "@/components/HeaderBackButton";
 import { CompassCalibrationCard } from "@/components/CompassCalibrationCard";
+import {
+  getPosition,
+  normalizeHeading,
+  requestOrientationPermission,
+  subscribeOrientation,
+} from "@/lib/compass";
+
 
 
 
@@ -48,63 +55,23 @@ function distanceKm(lat: number, lng: number): number {
   return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 }
 
-type DeviceOrientationEventStatic = typeof DeviceOrientationEvent & {
-  requestPermission?: () => Promise<"granted" | "denied">;
-};
-
 const CAL_DONE_KEY = "qibla-calibrated";
 
-function normalizeHeading(h: number) {
-  return ((h % 360) + 360) % 360;
-}
-
 function Qibla() {
-  const [locStatus, setLocStatus] = useState<"idle" | "requesting" | "ok" | "error">("idle");
-  const [locError, setLocError] = useState<string | null>(null);
-  const [sensorStatus, setSensorStatus] = useState<"idle" | "requesting" | "ok" | "error">("idle");
-  const [sensorError, setSensorError] = useState<string | null>(null);
+  const [phase, setPhase] = useState<"intro" | "requesting" | "ready" | "error">("intro");
+  const [step, setStep] = useState<string>("");
+  const [error, setError] = useState<string | null>(null);
   const [absolute, setAbsolute] = useState<boolean | null>(null);
   const [coords, setCoords] = useState<{ lat: number; lng: number } | null>(null);
-  const [heading, setHeading] = useState<number | null>(null); // 0 = true/magnetic North
+  const [heading, setHeading] = useState<number | null>(null);
   const [qiblaBearing, setQiblaBearing] = useState<number | null>(null);
   const [showCalibration, setShowCalibration] = useState(false);
-  const [calibrated, setCalibrated] = useState(true);
-  const listenerRef = useRef<((e: DeviceOrientationEvent) => void) | null>(null);
-  const watchIdRef = useRef<number | null>(null);
+  const unsubRef = useRef<(() => void) | null>(null);
   const smoothRef = useRef<number | null>(null);
-
-  const permState: "idle" | "requesting" | "granted" | "denied" =
-    sensorStatus === "ok" && locStatus === "ok"
-      ? "granted"
-      : sensorStatus === "requesting" || locStatus === "requesting"
-        ? "requesting"
-        : sensorStatus === "error" || locStatus === "error"
-          ? "denied"
-          : "idle";
-  const error = locError ?? sensorError;
-
-  // First open: guide the user through calibration before showing the compass.
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-    let done = false;
-    try {
-      done = localStorage.getItem(CAL_DONE_KEY) === "1";
-    } catch {
-      // ignore
-    }
-    setCalibrated(done);
-    if (!done) setShowCalibration(true);
-  }, []);
 
   useEffect(() => {
     return () => {
-      if (listenerRef.current) {
-        window.removeEventListener("deviceorientationabsolute", listenerRef.current as EventListener, true);
-        window.removeEventListener("deviceorientation", listenerRef.current as EventListener, true);
-      }
-      if (watchIdRef.current !== null && typeof navigator !== "undefined") {
-        navigator.geolocation.clearWatch(watchIdRef.current);
-      }
+      unsubRef.current?.();
     };
   }, []);
 
@@ -114,123 +81,77 @@ function Qibla() {
     } catch {
       // ignore
     }
-    setCalibrated(true);
     setShowCalibration(false);
   };
 
-  const startLocation = () => {
-    if (typeof navigator === "undefined" || !("geolocation" in navigator)) {
-      setLocError("Location is not supported on this device.");
-      setLocStatus("error");
-      return;
-    }
-    setLocStatus("requesting");
-    setLocError(null);
-    const onPos = (pos: GeolocationPosition) => {
-      const lat = pos.coords.latitude;
-      const lng = pos.coords.longitude;
-      setCoords({ lat, lng });
-      setQiblaBearing(bearingToKaaba(lat, lng));
-      setLocStatus("ok");
-      setLocError(null);
-    };
-    const onErr = (err: GeolocationPositionError) => {
-      setLocError(
-        err.code === err.PERMISSION_DENIED
-          ? "Location permission denied. Allow location access for this app in your device settings, then try again."
-          : `Could not get your location. ${err.message}`,
-      );
-      setLocStatus("error");
-    };
-    navigator.geolocation.getCurrentPosition(onPos, onErr, {
-      enableHighAccuracy: true,
-      timeout: 15000,
-      maximumAge: 30000,
-    });
-    // Keep it fresh while the page is open.
-    try {
-      watchIdRef.current = navigator.geolocation.watchPosition(onPos, () => {}, {
-        enableHighAccuracy: true,
-        maximumAge: 30000,
-      });
-    } catch {
-      // ignore
-    }
-  };
-
-  const startCompass = async () => {
-    setSensorStatus("requesting");
-    setSensorError(null);
-    const DOE = (typeof window !== "undefined" ? DeviceOrientationEvent : undefined) as
-      | DeviceOrientationEventStatic
-      | undefined;
-    if (!DOE) {
-      setSensorError("This device has no compass sensor.");
-      setSensorStatus("error");
-      return;
-    }
-    if (typeof DOE.requestPermission === "function") {
-      try {
-        const resp = await DOE.requestPermission();
-        if (resp !== "granted") {
-          setSensorError("Motion and orientation access was denied, so the compass cannot run.");
-          setSensorStatus("error");
-          return;
-        }
-      } catch {
-        setSensorError("Motion and orientation access was blocked, so the compass cannot run.");
-        setSensorStatus("error");
-        return;
-      }
-    }
-
-    let gotEvent = false;
-    const handler = (e: DeviceOrientationEvent) => {
-      const anyE = e as DeviceOrientationEvent & {
-        webkitCompassHeading?: number;
-        webkitCompassAccuracy?: number;
-      };
-      let h: number | null = null;
-      if (typeof anyE.webkitCompassHeading === "number" && anyE.webkitCompassHeading >= 0) {
-        h = anyE.webkitCompassHeading; // already true north, iOS
-        setAbsolute(true);
-      } else if (typeof e.alpha === "number") {
-        h = normalizeHeading(360 - e.alpha);
-        // Compensate for a rotated screen where available.
-        const so = (window.screen?.orientation?.angle ?? 0) as number;
-        h = normalizeHeading(h + so);
-        setAbsolute(e.absolute === true);
-      }
-      if (h === null) return;
-      gotEvent = true;
-      if (sensorStatus !== "ok") setSensorStatus("ok");
-      // Smooth across the 0/360 wrap so the needle does not jitter.
+  const attachCompass = () => {
+    unsubRef.current?.();
+    let got = false;
+    unsubRef.current = subscribeOrientation((r) => {
+      if (r.heading === null) return;
+      got = true;
+      setAbsolute(r.absolute);
       const prev = smoothRef.current;
-      let next = h;
+      let next = r.heading;
       if (prev !== null) {
-        let delta = ((h - prev + 540) % 360) - 180;
+        const delta = ((r.heading - prev + 540) % 360) - 180;
         next = normalizeHeading(prev + delta * 0.25);
       }
       smoothRef.current = next;
       setHeading(next);
-    };
-    listenerRef.current = handler;
-    window.addEventListener("deviceorientationabsolute", handler as EventListener, true);
-    window.addEventListener("deviceorientation", handler as EventListener, true);
-    setSensorStatus("ok");
-
+    });
     setTimeout(() => {
-      if (!gotEvent) {
-        setSensorError("No compass readings from this device. Try calibrating, or open the app on a phone.");
-        setSensorStatus("error");
+      if (!got) {
+        setError(
+          "No compass readings from this device. Try calibrating, or open the app on a phone.",
+        );
       }
-    }, 2500);
+    }, 3000);
   };
 
+  // Permissions first, then calibration. Runs from a real user gesture.
   const start = async () => {
-    startLocation();
-    await startCompass();
+    setPhase("requesting");
+    setError(null);
+
+    setStep("Requesting motion access…");
+    const sensor = await requestOrientationPermission();
+    if (sensor === "denied") {
+      setError(
+        "Motion and orientation access was denied. Allow it for this app in your device settings, then try again.",
+      );
+      setPhase("error");
+      return;
+    }
+
+    setStep("Getting your location…");
+    const pos = await getPosition();
+    if (!pos.ok) {
+      setError(pos.error);
+      setPhase("error");
+      return;
+    }
+    setCoords(pos.coords);
+    setQiblaBearing(bearingToKaaba(pos.coords.lat, pos.coords.lng));
+
+    setStep("");
+    if (sensor === "unsupported") {
+      setError("This device has no compass sensor, so only the bearing is shown.");
+    } else {
+      attachCompass();
+    }
+    setPhase("ready");
+
+    let calibrated = false;
+    try {
+      calibrated = localStorage.getItem(CAL_DONE_KEY) === "1";
+    } catch {
+      // ignore
+    }
+    if (!calibrated && sensor !== "unsupported") setShowCalibration(true);
   };
+
+  const permState = phase;
 
   // Rotation to apply to the qibla arrow: bearing - heading
   const arrowRotation =
@@ -262,12 +183,10 @@ function Qibla() {
           style={{ color: "var(--foreground)" }}
         >
           {showCalibration && (
-            <div className="mb-5 w-full">
-              <CompassCalibrationCard onDismiss={markCalibrated} />
-            </div>
+            <CompassCalibrationCard onDone={markCalibrated} onSkip={() => setShowCalibration(false)} />
           )}
 
-          {permState !== "granted" && !showCalibration && (
+          {permState !== "ready" && (
             <div className="mt-6 flex w-full flex-col items-center gap-4">
               <p
                 className="text-center text-sm"
@@ -286,21 +205,8 @@ function Qibla() {
                   boxShadow: "var(--card-shadow)",
                 }}
               >
-                {permState === "requesting" ? "Requesting…" : "Enable Compass"}
+                {permState === "requesting" ? (step || "Requesting…") : permState === "error" ? "Try again" : "Enable Compass"}
               </button>
-              {calibrated && (
-                <button
-                  onClick={() => setShowCalibration(true)}
-                  className="rounded-full px-4 py-2 text-xs font-bold"
-                  style={{
-                    background: "var(--btn-surface)",
-                    color: "var(--btn-fg)",
-                    border: "1px solid color-mix(in oklab, var(--accent) 40%, transparent)",
-                  }}
-                >
-                  Calibrate compass
-                </button>
-              )}
               {error && (
                 <p className="text-center text-xs" style={{ color: "#c0392b" }}>
                   {error}
@@ -310,7 +216,9 @@ function Qibla() {
           )}
 
 
-          {permState === "granted" && (
+
+
+          {permState === "ready" && (
             <>
               <div
                 className="relative mt-4 flex items-center justify-center"
