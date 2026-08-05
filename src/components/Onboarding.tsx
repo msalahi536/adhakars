@@ -102,6 +102,16 @@ export function Onboarding({ onDone }: { onDone: () => void }) {
     else goTo(index - 1);
   };
 
+  const withTimeout = async <T,>(p: Promise<T>, ms: number): Promise<T | "timeout"> => {
+    let t: ReturnType<typeof setTimeout>;
+    return Promise.race([
+      p,
+      new Promise<"timeout">((res) => {
+        t = setTimeout(() => res("timeout"), ms);
+      }),
+    ]).finally(() => clearTimeout(t!)) as Promise<T | "timeout">;
+  };
+
   const enableReminders = async () => {
     setNotifBusy(true);
     try {
@@ -109,17 +119,31 @@ export function Onboarding({ onDone }: { onDone: () => void }) {
         setNotifStatus("unavailable");
         return;
       }
-      const result = await requestNotificationPermission();
-      if (result.granted) {
+      const raced = await withTimeout(requestNotificationPermission(), 12000);
+      let granted = false;
+      let reason: string | undefined;
+      if (raced === "timeout") {
+        // The native dialog may resolve late; fall back to reading the state.
+        granted = await withTimeout(checkNotificationPermission(), 4000).then(
+          (r) => r === true,
+        );
+        reason = granted ? undefined : "denied";
+      } else {
+        granted = raced.granted;
+        reason = raced.reason;
+      }
+
+      if (granted) {
         const prefs = getNotificationPrefs();
         const updated = {
           ...prefs,
           reminders: prefs.reminders.map((r) => ({ ...r, enabled: true })),
         };
         setNotificationPrefs(updated);
-        await applyReminders(updated);
         setNotifStatus("granted");
-      } else if (result.reason === "denied") {
+        // Never block the UI on scheduling.
+        void applyReminders(updated).catch(() => {});
+      } else if (reason === "denied") {
         setNotifStatus("denied");
       } else {
         setNotifStatus("unavailable");
@@ -130,6 +154,7 @@ export function Onboarding({ onDone }: { onDone: () => void }) {
       setNotifBusy(false);
     }
   };
+
 
   const notifMessage: Record<string, string> = {
     granted:
