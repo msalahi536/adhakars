@@ -64,7 +64,9 @@ const SLIDES: Slide[] = [
 export function Onboarding({ onDone }: { onDone: () => void }) {
   const [index, setIndex] = useState(0);
   const [notifBusy, setNotifBusy] = useState(false);
-  const [notifDone, setNotifDone] = useState(false);
+  const [notifStatus, setNotifStatus] = useState<
+    "idle" | "granted" | "denied" | "unavailable" | "error"
+  >("idle");
   const trackRef = useRef<HTMLDivElement>(null);
   const startX = useRef<number | null>(null);
   const deltaX = useRef(0);
@@ -104,7 +106,7 @@ export function Onboarding({ onDone }: { onDone: () => void }) {
     setNotifBusy(true);
     try {
       if (!isNativePlatform()) {
-        setNotifDone(true);
+        setNotifStatus("unavailable");
         return;
       }
       const result = await requestNotificationPermission();
@@ -116,13 +118,27 @@ export function Onboarding({ onDone }: { onDone: () => void }) {
         };
         setNotificationPrefs(updated);
         await applyReminders(updated);
+        setNotifStatus("granted");
+      } else if (result.reason === "denied") {
+        setNotifStatus("denied");
+      } else {
+        setNotifStatus("unavailable");
       }
-      setNotifDone(true);
     } catch {
-      setNotifDone(true);
+      setNotifStatus("error");
     } finally {
       setNotifBusy(false);
     }
+  };
+
+  const notifMessage: Record<string, string> = {
+    granted:
+      "Reminders are on. Morning and evening, right on time. You can change the times in Settings.",
+    denied:
+      "Notifications are turned off for this app. You can allow them later in your device settings, then enable reminders in Settings.",
+    unavailable:
+      "Reminders are available in the mobile app. Everything else works right here.",
+    error: "Something went wrong. You can try again from Settings at any time.",
   };
 
   useEffect(() => {
@@ -216,21 +232,34 @@ export function Onboarding({ onDone }: { onDone: () => void }) {
                       <button
                         type="button"
                         onClick={enableReminders}
-                        disabled={notifBusy || notifDone}
+                        disabled={notifBusy || notifStatus === "granted"}
                         className="w-full rounded-full px-5 py-3 text-sm font-semibold disabled:opacity-70"
                         style={{
                           background: "var(--accent)",
                           color: "var(--accent-foreground)",
                         }}
                       >
-                        {notifDone
-                          ? isNativePlatform()
+                        {notifBusy
+                          ? "Requesting permission..."
+                          : notifStatus === "granted"
                             ? "Reminders enabled"
-                            : "Available in the mobile app"
-                          : notifBusy
-                            ? "Requesting…"
-                            : "Enable Reminders"}
+                            : notifStatus === "idle"
+                              ? "Enable Reminders"
+                              : "Try again"}
                       </button>
+                      {notifStatus !== "idle" && !notifBusy && (
+                        <p
+                          className="px-1 text-[13px] leading-snug"
+                          style={{
+                            color:
+                              notifStatus === "granted"
+                                ? "var(--accent)"
+                                : "var(--muted-foreground)",
+                          }}
+                        >
+                          {notifMessage[notifStatus]}
+                        </p>
+                      )}
                       <button
                         type="button"
                         onClick={finish}
@@ -240,7 +269,7 @@ export function Onboarding({ onDone }: { onDone: () => void }) {
                           color: "var(--foreground)",
                         }}
                       >
-                        Maybe later
+                        {notifStatus === "idle" ? "Maybe later" : "Continue"}
                       </button>
                     </div>
                   )}
