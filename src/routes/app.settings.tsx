@@ -68,6 +68,13 @@ function Settings() {
   const [display, setDisplayState] = useState(getDisplay());
   const [confirmReset, setConfirmReset] = useState(false);
   const [confirmResetAll, setConfirmResetAll] = useState(false);
+  const [resetNote, setResetNote] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!resetNote) return;
+    const t = setTimeout(() => setResetNote(null), 2500);
+    return () => clearTimeout(t);
+  }, [resetNote]);
   const [notifEnabled, setNotifEnabled] = useState(false);
   const [notifChecking, setNotifChecking] = useState(true);
   const [notifRequesting, setNotifRequesting] = useState(false);
@@ -671,6 +678,18 @@ function Settings() {
           {/* DATA */}
           <section className="mb-6 space-y-3">
             <h2 className="label-caps mb-1">Data</h2>
+            {resetNote && (
+              <div
+                className="rounded-2xl px-4 py-3 text-sm font-medium"
+                style={{
+                  background: "color-mix(in oklab, var(--accent) 16%, var(--surface))",
+                  border: "1px solid var(--border)",
+                  color: "var(--foreground)",
+                }}
+              >
+                {resetNote}
+              </div>
+            )}
             {confirmReset ? (
               <div
                 className="rounded-2xl p-4"
@@ -682,7 +701,8 @@ function Settings() {
                     onClick={() => {
                       resetToday();
                       setConfirmReset(false);
-                      window.location.reload();
+                      window.dispatchEvent(new Event("adhkar:streak-update"));
+                      setResetNote("Today's progress has been reset.");
                     }}
                     className="flex-1 rounded-full py-2 text-sm font-semibold"
                     style={{ background: "var(--accent)", color: "var(--accent-foreground)" }}
@@ -728,7 +748,7 @@ function Settings() {
                     onClick={() => {
                       resetAllProgress();
                       setConfirmResetAll(false);
-                      window.location.reload();
+                      setResetNote("All progress has been reset.");
                     }}
                     className="flex-1 rounded-full py-2 text-sm font-semibold text-white"
                     style={{ background: "#dc2626" }}
