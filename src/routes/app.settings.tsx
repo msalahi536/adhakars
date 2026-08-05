@@ -177,6 +177,7 @@ function Settings() {
     } else {
       await cancelReminder(r.id);
     }
+    setNotifDiag(await getDiagnostics());
   };
 
   const addReminder = () => {
@@ -193,8 +194,11 @@ function Settings() {
       nextId: notifPrefs.nextId + 1,
     };
     persistPrefs(next);
-    if (notifEnabled) void scheduleReminder(newReminder);
+    if (notifEnabled) {
+      void scheduleReminder(newReminder).then(async () => setNotifDiag(await getDiagnostics()));
+    }
   };
+
 
   const removeReminder = async (id: number) => {
     await cancelReminder(id);
