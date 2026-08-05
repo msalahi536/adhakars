@@ -233,14 +233,20 @@ export function CustomAdhkarForm({ open, mode, initial, onCancel, onSubmit }: Pr
             </div>
           </div>
 
-          <DialogFooter className="gap-2 sm:gap-2">
+          <DialogFooter
+            className="sticky bottom-0 -mx-5 flex-row gap-2 px-5 pb-1 pt-3 sm:gap-2"
+            style={{
+              background: "var(--surface, var(--card))",
+              borderTop: "1px solid var(--border)",
+            }}
+          >
             <button
               type="button"
               disabled={saving}
               onClick={onCancel}
-              className="rounded-full px-4 py-2 text-sm font-semibold transition active:scale-95 disabled:opacity-60"
+              className="flex-1 rounded-full px-4 py-2.5 text-sm font-semibold transition active:scale-95 disabled:opacity-60"
               style={{
-                background: "var(--surface, var(--card))",
+                background: "var(--muted)",
                 color: "var(--foreground)",
                 border: "1px solid var(--border)",
               }}
@@ -250,12 +256,13 @@ export function CustomAdhkarForm({ open, mode, initial, onCancel, onSubmit }: Pr
             <button
               type="submit"
               disabled={saving}
-              className="rounded-full px-4 py-2 text-sm font-bold transition active:scale-95 disabled:opacity-60"
+              className="flex-1 rounded-full px-4 py-2.5 text-sm font-bold transition active:scale-95 disabled:opacity-60"
               style={{ background: "var(--accent)", color: "var(--accent-foreground)" }}
             >
               {saving ? "Saving…" : mode === "create" ? "Add adhkar" : "Save changes"}
             </button>
           </DialogFooter>
+
         </form>
       </DialogContent>
     </Dialog>
