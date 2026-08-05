@@ -78,9 +78,9 @@ function Settings() {
   const [notifChecking, setNotifChecking] = useState(true);
   const [notifRequesting, setNotifRequesting] = useState(false);
   const [notifError, setNotifError] = useState<string | null>(null);
-  const [notifTestMsg, setNotifTestMsg] = useState<string | null>(null);
 
   const [notifPrefs, setNotifPrefsState] = useState<NotificationPrefs>(() => getNotificationPrefs());
+
   const [commitment, setCommitmentState] = useState<Record<CommitmentSection, boolean>>(() => getCommitment());
   const [hasCustom, setHasCustom] = useState(false);
   const [nativeAvailable, setNativeAvailable] = useState(false);
