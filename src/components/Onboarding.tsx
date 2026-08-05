@@ -80,7 +80,7 @@ const BenefitsList = () => {
           </li>
           <li className={itemClass}>
             <span className={dotClass} style={{ background: "var(--accent)" }} />
-            Strengthening of the Body
+            Strenthening of the Body
           </li>
         </ul>
       </div>
