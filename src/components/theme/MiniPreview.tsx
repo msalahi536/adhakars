@@ -334,45 +334,8 @@ export function MiniPreview({
           </div>
         </div>
 
-        {/* bottom nav, labelled */}
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-around",
-            background: t["--nav-bg"],
-            borderTop: `1px solid ${t["--nav-border"]}`,
-            padding: `${px(5)}px ${px(6)}px ${px(7)}px`,
-          }}
-        >
-          {NAV.map((label, i) => {
-            const active = i === 0;
-            const color = active ? t["--nav-active"] : t["--nav-inactive"];
-            return (
-              <div
-                key={label}
-                style={{
-                  display: "flex",
-                  flexDirection: "column",
-                  alignItems: "center",
-                  gap: px(2),
-                  color,
-                }}
-              >
-                <div
-                  style={{
-                    width: px(10),
-                    height: px(10),
-                    borderRadius: px(3),
-                    background: active ? color : "transparent",
-                    border: active ? "none" : `${Math.max(1, px(1.2))}px solid ${color}`,
-                  }}
-                />
-                <span style={{ fontSize: px(5.4), fontWeight: active ? 800 : 600 }}>{label}</span>
-              </div>
-            );
-          })}
-        </div>
+        <div style={{ height: px(8) }} />
+
       </div>
     </div>
   );
