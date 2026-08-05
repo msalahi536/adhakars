@@ -3,6 +3,7 @@ import { HeaderBackButton } from "@/components/HeaderBackButton";
 import { HeaderSettingsButton } from "@/components/HeaderSettingsButton";
 import { ConcentricCirclesPattern } from "@/components/HeaderPatterns";
 import { Mail } from "lucide-react";
+import { BenefitsList } from "@/components/BenefitsList";
 
 export const Route = createFileRoute("/app/about")({
   head: () => ({
@@ -58,6 +59,14 @@ function About() {
             >
             Based on the authentic adhkar compiled by our team.
             </p>
+          </section>
+
+          <section
+            className="rounded-[24px] p-5"
+            style={{ background: "var(--surface)", border: "1px solid var(--border)" }}
+          >
+            <h2 className="label-caps mb-3">How Adhkar benefits you</h2>
+            <BenefitsList />
           </section>
 
           <section
