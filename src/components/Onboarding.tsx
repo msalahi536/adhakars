@@ -69,7 +69,6 @@ export function Onboarding({ onDone }: { onDone: () => void }) {
   const [notifStatus, setNotifStatus] = useState<
     "idle" | "granted" | "denied" | "unavailable" | "error"
   >("idle");
-  const trackRef = useRef<HTMLDivElement>(null);
   const startX = useRef<number | null>(null);
   const deltaX = useRef(0);
 
