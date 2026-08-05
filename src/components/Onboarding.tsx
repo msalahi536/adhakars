@@ -147,11 +147,14 @@ export function Onboarding({ onDone }: { onDone: () => void }) {
         setNotifStatus("granted");
         // Never block the UI on scheduling.
         void applyReminders(updated).catch(() => {});
+        // Cut straight to the app once reminders are on.
+        setTimeout(() => finish(), 250);
       } else if (reason === "denied") {
         setNotifStatus("denied");
       } else {
         setNotifStatus("unavailable");
       }
+
     } catch {
       setNotifStatus("error");
     } finally {
