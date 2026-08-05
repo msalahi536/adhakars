@@ -140,7 +140,9 @@ export function MiniPreview({
             </div>
             <div style={{ fontSize: px(6.5), fontWeight: 700, opacity: 0.9 }}>0 / 14</div>
           </div>
+          </div>
         </div>
+
 
         {/* progress pill */}
         <div style={{ display: "flex", justifyContent: "center", marginTop: px(7) }}>
