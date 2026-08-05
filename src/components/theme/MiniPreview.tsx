@@ -23,7 +23,7 @@ const LABELS: Record<string, { caps: string; title: string }> = {
   salah: { caps: "AFTER EVERY PRAYER", title: "After Salah" },
 };
 
-const NAV = ["Morning", "Evening", "Salah", "Tasbih", "More"];
+
 
 export function MiniPreview({
   seed,
