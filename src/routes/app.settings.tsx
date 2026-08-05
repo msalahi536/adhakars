@@ -21,7 +21,7 @@ import {
   DEFAULT_PRESET_ID,
   type ModeSetting,
 } from "@/lib/theme-store";
-import { deriveSectionSeed, type SectionKey, type CustomOverrides } from "@/lib/theming";
+import { deriveSectionSeed, sectionSeedFor, type SectionKey, type CustomOverrides } from "@/lib/theming";
 import { MiniPreview } from "@/components/theme/MiniPreview";
 import { ThemePicker } from "@/components/theme/ThemePicker";
 import { CustomThemeSheet } from "@/components/theme/CustomThemeSheet";
@@ -54,7 +54,7 @@ export const Route = createFileRoute("/app/settings")({
 });
 
 function Settings() {
-  const [mode, setModeState] = useState<ModeSetting>("auto");
+  const [mode, setModeState] = useState<ModeSetting>("light");
   const [seed, setSeedState] = useState<string>(DEFAULT_SEED);
   const [presetId, setPresetIdState] = useState<string>(DEFAULT_PRESET_ID);
   const [overrides, setOverridesState] = useState<Partial<Record<SectionKey, string>>>({});
@@ -226,7 +226,7 @@ function Settings() {
 
   const doReset = () => {
     resetTheme();
-    setModeState("auto");
+    setModeState("light");
     setSeedState(DEFAULT_SEED);
     setPresetIdState(DEFAULT_PRESET_ID);
     setOverridesState({});
@@ -301,7 +301,7 @@ function Settings() {
 
             {/* Preview */}
             <div className="mb-4 flex justify-center">
-              <MiniPreview seed={seed} mode={previewMode} width={200} height={340} />
+              <MiniPreview seed={seed} mode={previewMode} presetId={presetId} width={200} height={340} />
             </div>
 
             {/* Preset grid */}
@@ -309,7 +309,8 @@ function Settings() {
             <div className="mb-3 grid grid-cols-4 gap-2">
               {PRESETS.map((p) => {
                 const active = presetId === p.id;
-                const morningSeed = deriveSectionSeed(p.seed, "morning");
+                const morningSeed = sectionSeedFor(p.id, p.seed, "morning");
+                const eveningSeed = sectionSeedFor(p.id, p.seed, "evening");
                 return (
                   <button
                     key={p.id}
@@ -326,7 +327,7 @@ function Settings() {
                         width: "100%",
                         height: 40,
                         borderRadius: 10,
-                        background: `linear-gradient(135deg, ${morningSeed} 0%, ${p.seed} 100%)`,
+                        background: `linear-gradient(135deg, ${morningSeed} 0%, ${eveningSeed} 100%)`,
                       }}
                     />
                     <span className="text-[10px] font-semibold">{p.name}</span>
@@ -370,7 +371,7 @@ function Settings() {
                 style={{ background: "var(--surface)", border: "1px solid var(--border)" }}
               >
                 {sectionList.map(({ key, label }) => {
-                  const current = overrides[key] ?? deriveSectionSeed(seed, key);
+                  const current = overrides[key] ?? sectionSeedFor(presetId, seed, key);
                   const isOverride = !!overrides[key];
                   return (
                     <div key={key} className="flex items-center gap-3">
