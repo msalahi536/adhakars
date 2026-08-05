@@ -639,6 +639,7 @@ function Settings() {
                   >
                     + Add reminder
                   </button>
+                  <div className="text-[11px] opacity-60">
                     Reminders fire on your device using your local time. Set as many as you like at any times that suit your schedule.
                   </div>
 
