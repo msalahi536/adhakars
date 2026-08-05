@@ -84,44 +84,21 @@ export async function requestOrientationPermission(): Promise<PermResult> {
 
 export type Coords = { lat: number; lng: number };
 
-/** Get a position once, preferring the native plugin inside Capacitor. */
-export async function getPosition(): Promise<
-  { ok: true; coords: Coords } | { ok: false; error: string }
-> {
-  if (isNative()) {
-    try {
-      const { Geolocation } = await import("@capacitor/geolocation");
-      try {
-        const perm = await Geolocation.requestPermissions();
-        if (perm.location === "denied" && perm.coarseLocation === "denied") {
-          return {
-            ok: false,
-            error: "Location permission denied. Enable location for this app in your device settings.",
-          };
-        }
-      } catch {
-        // some platforms do not implement requestPermissions, keep going
-      }
-      const pos = await Geolocation.getCurrentPosition({
-        enableHighAccuracy: true,
-        timeout: 15000,
-      });
-      return { ok: true, coords: { lat: pos.coords.latitude, lng: pos.coords.longitude } };
-    } catch (e) {
-      const msg = e instanceof Error ? e.message : String(e);
-      return { ok: false, error: `Could not get your location. ${msg}` };
-    }
-  }
+export type PositionResult = { ok: true; coords: Coords } | { ok: false; error: string };
 
+function webPosition(): Promise<PositionResult> {
   if (typeof navigator === "undefined" || !("geolocation" in navigator)) {
-    return { ok: false, error: "Location is not supported on this device." };
+    return Promise.resolve({ ok: false, error: "Location is not supported on this device." });
   }
   return new Promise((resolve) => {
     let settled = false;
     const timer = setTimeout(() => {
       if (!settled) {
         settled = true;
-        resolve({ ok: false, error: "Location timed out. Check that location access is allowed, then try again." });
+        resolve({
+          ok: false,
+          error: "Location timed out. Check that location access is allowed, then try again.",
+        });
       }
     }, 18000);
     navigator.geolocation.getCurrentPosition(
@@ -147,6 +124,43 @@ export async function getPosition(): Promise<
     );
   });
 }
+
+/**
+ * Get a position once. Inside the native wrapper we try the native plugin
+ * first, but if it is not present in that build (older binaries) we fall back
+ * to the web geolocation API instead of failing.
+ */
+export async function getPosition(): Promise<PositionResult> {
+  if (isNative()) {
+    try {
+      const { Geolocation } = await import("@capacitor/geolocation");
+      try {
+        const perm = await Geolocation.requestPermissions();
+        if (perm.location === "denied" && perm.coarseLocation === "denied") {
+          return {
+            ok: false,
+            error:
+              "Location permission denied. Enable location for this app in your device settings.",
+          };
+        }
+      } catch {
+        // requestPermissions may be unimplemented; continue and let the read decide
+      }
+      const pos = await Geolocation.getCurrentPosition({
+        enableHighAccuracy: true,
+        timeout: 15000,
+      });
+      return { ok: true, coords: { lat: pos.coords.latitude, lng: pos.coords.longitude } };
+    } catch {
+      // Plugin missing or unimplemented in this native build: use the web API.
+      const fallback = await webPosition();
+      return fallback;
+    }
+  }
+
+  return webPosition();
+}
+
 
 export function normalizeHeading(h: number) {
   return ((h % 360) + 360) % 360;
