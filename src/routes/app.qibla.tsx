@@ -3,6 +3,13 @@ import { createFileRoute } from "@tanstack/react-router";
 import { HeaderSettingsButton } from "@/components/HeaderSettingsButton";
 import { HeaderBackButton } from "@/components/HeaderBackButton";
 import { CompassCalibrationCard } from "@/components/CompassCalibrationCard";
+import {
+  getPosition,
+  normalizeHeading,
+  requestOrientationPermission,
+  subscribeOrientation,
+} from "@/lib/compass";
+
 
 
 
