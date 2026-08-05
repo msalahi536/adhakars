@@ -315,7 +315,7 @@ export const cancelReminder = async (id: number): Promise<void> => {
   }
 };
 
-export const scheduleReminder = async (r: Reminder): Promise<ActionResult> => {
+export const scheduleReminder = async (r: Reminder, firstAt?: Date): Promise<ActionResult> => {
   if (!isNativePlatform()) return { ok: false, error: "Not running in the native app" };
   const plugin = await loadPlugin();
   if (!plugin) return { ok: false, error: "Notifications plugin is missing from this build." };
@@ -323,7 +323,7 @@ export const scheduleReminder = async (r: Reminder): Promise<ActionResult> => {
     await ensureChannel(plugin);
     await cancelReminder(r.id);
 
-    const first = nextOccurrence(r.hour, r.minute);
+    const first = firstAt ?? nextOccurrence(r.hour, r.minute);
     const ids = idsFor(r.id);
     const notifications = ids.map((id, i) => {
       const at = new Date(first.getTime());
@@ -365,13 +365,10 @@ export const scheduleReminder = async (r: Reminder): Promise<ActionResult> => {
 /** Debug helper: schedules through the exact reminder code path, 60s from now. */
 export const scheduleOneMinuteTest = async (): Promise<ActionResult> => {
   const t = new Date(Date.now() + 60_000);
-  return scheduleReminder({
-    id: 995,
-    label: "1 minute test",
-    hour: t.getHours(),
-    minute: t.getMinutes(),
-    enabled: true,
-  });
+  return scheduleReminder(
+    { id: 995, label: "1 minute test", hour: t.getHours(), minute: t.getMinutes(), enabled: true },
+    t,
+  );
 };
 
 export const applyReminders = async (prefs: NotificationPrefs): Promise<void> => {
