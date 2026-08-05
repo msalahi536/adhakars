@@ -130,10 +130,12 @@ export function Onboarding({ onDone }: { onDone: () => void }) {
           (r) => r === true,
         );
         reason = granted ? undefined : "denied";
+      } else if (raced.granted) {
+        granted = true;
       } else {
-        granted = raced.granted;
         reason = raced.reason;
       }
+
 
       if (granted) {
         const prefs = getNotificationPrefs();
