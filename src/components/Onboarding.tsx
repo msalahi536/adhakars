@@ -350,8 +350,6 @@ export function Onboarding({ onDone }: { onDone: () => void }) {
             <div className="mt-2">{slide.body}</div>
           )}
 
-          <div className="mt-4 max-h-[34vh] overflow-y-auto pr-1">
-
           {isLast ? (
             <div className="mt-4 space-y-2">
               <button
