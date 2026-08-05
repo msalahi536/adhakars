@@ -2,8 +2,10 @@
 // Each swatch opens a color wheel; text colors auto-derive & auto-contrast.
 
 import { useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { MiniPreview } from "./MiniPreview";
 import { clampSeed, hexToHsl, hslToHex, type Mode, type CustomOverrides } from "@/lib/theming";
+
 
 type Target = "header" | "background" | "accent";
 
