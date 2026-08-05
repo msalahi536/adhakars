@@ -2,6 +2,8 @@ import { useEffect, useRef, useState } from "react";
 import { BookOpen, Hand, Compass, Bell } from "lucide-react";
 import {
   requestNotificationPermission,
+  checkNotificationPermission,
+
   isNativePlatform,
   getNotificationPrefs,
   setNotificationPrefs,
