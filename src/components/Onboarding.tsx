@@ -146,8 +146,7 @@ export function Onboarding({ onDone }: { onDone: () => void }) {
         setNotifStatus("granted");
         // Never block the UI on scheduling.
         void applyReminders(updated).catch(() => {});
-        // Cut straight to the app once reminders are on.
-        setTimeout(() => finish(), 250);
+
       } else if (reason === "denied") {
         setNotifStatus("denied");
       } else {
@@ -277,10 +276,23 @@ export function Onboarding({ onDone }: { onDone: () => void }) {
                 type="button"
                 onClick={finish}
                 className="w-full rounded-full px-5 py-2.5 text-sm font-semibold"
-                style={{ background: "transparent", color: "var(--foreground)" }}
+                style={
+                  notifStatus === "granted"
+                    ? {
+                        background: "color-mix(in oklab, var(--accent) 16%, transparent)",
+                        color: "var(--foreground)",
+                        border: "1px solid color-mix(in oklab, var(--accent) 45%, transparent)",
+                      }
+                    : { background: "transparent", color: "var(--foreground)" }
+                }
               >
-                {notifStatus === "idle" ? "Maybe later" : "Continue"}
+                {notifStatus === "idle"
+                  ? "Maybe later"
+                  : notifStatus === "granted"
+                    ? "Continue to app"
+                    : "Continue"}
               </button>
+
             </div>
           ) : (
             <button

@@ -23,7 +23,7 @@ const LABELS: Record<string, { caps: string; title: string }> = {
   salah: { caps: "AFTER EVERY PRAYER", title: "After Salah" },
 };
 
-const NAV = ["Morning", "Evening", "Salah", "Tasbih", "More"];
+
 
 export function MiniPreview({
   seed,
@@ -67,30 +67,36 @@ export function MiniPreview({
           position: "relative",
         }}
       >
-        {/* status bar + dynamic island, tinted with the header */}
+        {/* status bar + header share one continuous gradient */}
         <div
           style={{
-            height: px(20),
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            background: t["--header-from"],
-          }}
-        >
-          <div
-            style={{ width: px(42), height: px(11), borderRadius: px(6), background: "#0a0a0a" }}
-          />
-        </div>
-
-        {/* header */}
-        <div
-          style={{
-            padding: `${px(9)}px ${px(13)}px ${px(11)}px`,
             background: t["--grad-header"],
             color: t["--header-fg"],
             position: "relative",
           }}
         >
+          <div
+            style={{
+              height: px(24),
+              display: "flex",
+              alignItems: "flex-end",
+              justifyContent: "center",
+              paddingBottom: px(3),
+            }}
+          >
+            <div
+              style={{ width: px(42), height: px(11), borderRadius: px(6), background: "#0a0a0a" }}
+            />
+          </div>
+
+          {/* header */}
+          <div
+            style={{
+              padding: `${px(9)}px ${px(13)}px ${px(11)}px`,
+              position: "relative",
+            }}
+          >
+
           <div
             style={{
               position: "absolute",
@@ -134,7 +140,9 @@ export function MiniPreview({
             </div>
             <div style={{ fontSize: px(6.5), fontWeight: 700, opacity: 0.9 }}>0 / 14</div>
           </div>
+          </div>
         </div>
+
 
         {/* progress pill */}
         <div style={{ display: "flex", justifyContent: "center", marginTop: px(7) }}>
@@ -326,45 +334,8 @@ export function MiniPreview({
           </div>
         </div>
 
-        {/* bottom nav, labelled */}
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-around",
-            background: t["--nav-bg"],
-            borderTop: `1px solid ${t["--nav-border"]}`,
-            padding: `${px(5)}px ${px(6)}px ${px(7)}px`,
-          }}
-        >
-          {NAV.map((label, i) => {
-            const active = i === 0;
-            const color = active ? t["--nav-active"] : t["--nav-inactive"];
-            return (
-              <div
-                key={label}
-                style={{
-                  display: "flex",
-                  flexDirection: "column",
-                  alignItems: "center",
-                  gap: px(2),
-                  color,
-                }}
-              >
-                <div
-                  style={{
-                    width: px(10),
-                    height: px(10),
-                    borderRadius: px(3),
-                    background: active ? color : "transparent",
-                    border: active ? "none" : `${Math.max(1, px(1.2))}px solid ${color}`,
-                  }}
-                />
-                <span style={{ fontSize: px(5.4), fontWeight: active ? 800 : 600 }}>{label}</span>
-              </div>
-            );
-          })}
-        </div>
+        <div style={{ height: px(8) }} />
+
       </div>
     </div>
   );

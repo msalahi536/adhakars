@@ -22,22 +22,29 @@ export type CustomAdhkarFormValues = {
   target_count: number;
 };
 
-const schema = z.object({
-  title: z.string().trim().max(120, "Title is too long"),
-  arabic_text: z
-    .string()
-    .trim()
-    .min(1, "Arabic text is required")
-    .max(2000, "Arabic text is too long"),
-  transliteration: z.string().trim().max(500, "Too long"),
-  translation: z.string().trim().max(1000, "Too long"),
-  source_reference: z.string().trim().max(200, "Too long"),
-  target_count: z
-    .number({ invalid_type_error: "Target must be a number" })
-    .int("Target must be a whole number")
-    .min(1, "Target must be at least 1")
-    .max(10000, "Target is too large"),
-});
+const schema = z
+  .object({
+    title: z.string().trim().max(120, "Title is too long"),
+    arabic_text: z.string().trim().max(2000, "Arabic text is too long"),
+    transliteration: z.string().trim().max(500, "Too long"),
+    translation: z.string().trim().max(1000, "Too long"),
+    source_reference: z.string().trim().max(200, "Too long"),
+    target_count: z
+      .number()
+      .int("Target must be a whole number")
+      .min(1, "Target must be at least 1")
+      .max(10000, "Target is too large")
+      .catch(1),
+  })
+  .refine(
+    (v) =>
+      !!(v.arabic_text || v.translation || v.transliteration || v.title),
+    {
+      message: "Add at least one of: Arabic, transliteration, translation, or a title.",
+      path: ["arabic_text"],
+    },
+  );
+
 
 type Props = {
   open: boolean;
@@ -114,16 +121,29 @@ export function CustomAdhkarForm({ open, mode, initial, onCancel, onSubmit }: Pr
         if (!v && !saving) onCancel();
       }}
     >
-      <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-lg">
-        <DialogHeader>
+      <DialogContent
+        className="w-[calc(100%-24px)] max-w-lg gap-3 overflow-hidden rounded-[28px] border-0 p-0 shadow-2xl sm:max-w-lg sm:rounded-[28px]"
+        style={{
+          background: "var(--surface, var(--card))",
+          color: "var(--foreground)",
+          maxHeight: "min(86vh, calc(100dvh - 120px))",
+          display: "flex",
+          flexDirection: "column",
+        }}
+      >
+        <DialogHeader className="shrink-0 px-5 pb-1 pt-5 text-left">
           <DialogTitle>{mode === "create" ? "Add adhkar" : "Edit adhkar"}</DialogTitle>
           <DialogDescription>
-            Save an adhkar you want to recite regularly. Only Arabic text and a target count are
-            required.
+            Save an adhkar you want to recite regularly. Every field is optional, just fill in
+            what you need.
           </DialogDescription>
         </DialogHeader>
 
-        <form onSubmit={submit} className="space-y-4">
+        <form
+          onSubmit={submit}
+          className="min-h-0 flex-1 space-y-4 overflow-y-auto overscroll-contain px-5 pb-5"
+          style={{ WebkitOverflowScrolling: "touch" }}
+        >
           <Field label="Title (optional)" error={errors.title}>
             <Input
               value={values.title}
@@ -133,7 +153,8 @@ export function CustomAdhkarForm({ open, mode, initial, onCancel, onSubmit }: Pr
             />
           </Field>
 
-          <Field label="Arabic text" required error={errors.arabic_text}>
+          <Field label="Arabic text (optional)" error={errors.arabic_text}>
+
             <Textarea
               dir="rtl"
               lang="ar"
@@ -175,16 +196,17 @@ export function CustomAdhkarForm({ open, mode, initial, onCancel, onSubmit }: Pr
             />
           </Field>
 
-          <Field label="Target count" required error={errors.target_count}>
+          <Field label="Target count (optional)" error={errors.target_count}>
             <Input
               type="number"
               inputMode="numeric"
               min={1}
               max={10000}
               value={Number.isFinite(values.target_count) ? values.target_count : ""}
-              onChange={(e) => update("target_count", parseInt(e.target.value, 10) || 0)}
+              onChange={(e) => update("target_count", parseInt(e.target.value, 10) || 1)}
             />
           </Field>
+
 
           <div>
             <div
@@ -211,14 +233,20 @@ export function CustomAdhkarForm({ open, mode, initial, onCancel, onSubmit }: Pr
             </div>
           </div>
 
-          <DialogFooter className="gap-2 sm:gap-2">
+          <DialogFooter
+            className="sticky bottom-0 -mx-5 flex-row gap-2 px-5 pb-1 pt-3 sm:gap-2"
+            style={{
+              background: "var(--surface, var(--card))",
+              borderTop: "1px solid var(--border)",
+            }}
+          >
             <button
               type="button"
               disabled={saving}
               onClick={onCancel}
-              className="rounded-full px-4 py-2 text-sm font-semibold transition active:scale-95 disabled:opacity-60"
+              className="flex-1 rounded-full px-4 py-2.5 text-sm font-semibold transition active:scale-95 disabled:opacity-60"
               style={{
-                background: "var(--surface, var(--card))",
+                background: "var(--muted)",
                 color: "var(--foreground)",
                 border: "1px solid var(--border)",
               }}
@@ -228,12 +256,13 @@ export function CustomAdhkarForm({ open, mode, initial, onCancel, onSubmit }: Pr
             <button
               type="submit"
               disabled={saving}
-              className="rounded-full px-4 py-2 text-sm font-bold transition active:scale-95 disabled:opacity-60"
+              className="flex-1 rounded-full px-4 py-2.5 text-sm font-bold transition active:scale-95 disabled:opacity-60"
               style={{ background: "var(--accent)", color: "var(--accent-foreground)" }}
             >
               {saving ? "Saving…" : mode === "create" ? "Add adhkar" : "Save changes"}
             </button>
           </DialogFooter>
+
         </form>
       </DialogContent>
     </Dialog>

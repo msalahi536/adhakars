@@ -16,11 +16,13 @@ import { Route as AppRouteImport } from './routes/app'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AppIndexRouteImport } from './routes/app.index'
+import { Route as AppTermsRouteImport } from './routes/app.terms'
 import { Route as AppTasbihRouteImport } from './routes/app.tasbih'
 import { Route as AppSleepRouteImport } from './routes/app.sleep'
 import { Route as AppSettingsRouteImport } from './routes/app.settings'
 import { Route as AppSalahRouteImport } from './routes/app.salah'
 import { Route as AppQiblaRouteImport } from './routes/app.qibla'
+import { Route as AppPrivacyRouteImport } from './routes/app.privacy'
 import { Route as AppMyAdhkarRouteImport } from './routes/app.my-adhkar'
 import { Route as AppMoreRouteImport } from './routes/app.more'
 import { Route as AppEveningRouteImport } from './routes/app.evening'
@@ -61,6 +63,11 @@ const AppIndexRoute = AppIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AppRoute,
 } as any)
+const AppTermsRoute = AppTermsRouteImport.update({
+  id: '/terms',
+  path: '/terms',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppTasbihRoute = AppTasbihRouteImport.update({
   id: '/tasbih',
   path: '/tasbih',
@@ -84,6 +91,11 @@ const AppSalahRoute = AppSalahRouteImport.update({
 const AppQiblaRoute = AppQiblaRouteImport.update({
   id: '/qibla',
   path: '/qibla',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppPrivacyRoute = AppPrivacyRouteImport.update({
+  id: '/privacy',
+  path: '/privacy',
   getParentRoute: () => AppRoute,
 } as any)
 const AppMyAdhkarRoute = AppMyAdhkarRouteImport.update({
@@ -118,11 +130,13 @@ export interface FileRoutesByFullPath {
   '/app/evening': typeof AppEveningRoute
   '/app/more': typeof AppMoreRoute
   '/app/my-adhkar': typeof AppMyAdhkarRoute
+  '/app/privacy': typeof AppPrivacyRoute
   '/app/qibla': typeof AppQiblaRoute
   '/app/salah': typeof AppSalahRoute
   '/app/settings': typeof AppSettingsRoute
   '/app/sleep': typeof AppSleepRoute
   '/app/tasbih': typeof AppTasbihRoute
+  '/app/terms': typeof AppTermsRoute
   '/app/': typeof AppIndexRoute
 }
 export interface FileRoutesByTo {
@@ -135,11 +149,13 @@ export interface FileRoutesByTo {
   '/app/evening': typeof AppEveningRoute
   '/app/more': typeof AppMoreRoute
   '/app/my-adhkar': typeof AppMyAdhkarRoute
+  '/app/privacy': typeof AppPrivacyRoute
   '/app/qibla': typeof AppQiblaRoute
   '/app/salah': typeof AppSalahRoute
   '/app/settings': typeof AppSettingsRoute
   '/app/sleep': typeof AppSleepRoute
   '/app/tasbih': typeof AppTasbihRoute
+  '/app/terms': typeof AppTermsRoute
   '/app': typeof AppIndexRoute
 }
 export interface FileRoutesById {
@@ -154,11 +170,13 @@ export interface FileRoutesById {
   '/app/evening': typeof AppEveningRoute
   '/app/more': typeof AppMoreRoute
   '/app/my-adhkar': typeof AppMyAdhkarRoute
+  '/app/privacy': typeof AppPrivacyRoute
   '/app/qibla': typeof AppQiblaRoute
   '/app/salah': typeof AppSalahRoute
   '/app/settings': typeof AppSettingsRoute
   '/app/sleep': typeof AppSleepRoute
   '/app/tasbih': typeof AppTasbihRoute
+  '/app/terms': typeof AppTermsRoute
   '/app/': typeof AppIndexRoute
 }
 export interface FileRouteTypes {
@@ -174,11 +192,13 @@ export interface FileRouteTypes {
     | '/app/evening'
     | '/app/more'
     | '/app/my-adhkar'
+    | '/app/privacy'
     | '/app/qibla'
     | '/app/salah'
     | '/app/settings'
     | '/app/sleep'
     | '/app/tasbih'
+    | '/app/terms'
     | '/app/'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -191,11 +211,13 @@ export interface FileRouteTypes {
     | '/app/evening'
     | '/app/more'
     | '/app/my-adhkar'
+    | '/app/privacy'
     | '/app/qibla'
     | '/app/salah'
     | '/app/settings'
     | '/app/sleep'
     | '/app/tasbih'
+    | '/app/terms'
     | '/app'
   id:
     | '__root__'
@@ -209,11 +231,13 @@ export interface FileRouteTypes {
     | '/app/evening'
     | '/app/more'
     | '/app/my-adhkar'
+    | '/app/privacy'
     | '/app/qibla'
     | '/app/salah'
     | '/app/settings'
     | '/app/sleep'
     | '/app/tasbih'
+    | '/app/terms'
     | '/app/'
   fileRoutesById: FileRoutesById
 }
@@ -277,6 +301,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppIndexRouteImport
       parentRoute: typeof AppRoute
     }
+    '/app/terms': {
+      id: '/app/terms'
+      path: '/terms'
+      fullPath: '/app/terms'
+      preLoaderRoute: typeof AppTermsRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/app/tasbih': {
       id: '/app/tasbih'
       path: '/tasbih'
@@ -310,6 +341,13 @@ declare module '@tanstack/react-router' {
       path: '/qibla'
       fullPath: '/app/qibla'
       preLoaderRoute: typeof AppQiblaRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/privacy': {
+      id: '/app/privacy'
+      path: '/privacy'
+      fullPath: '/app/privacy'
+      preLoaderRoute: typeof AppPrivacyRouteImport
       parentRoute: typeof AppRoute
     }
     '/app/my-adhkar': {
@@ -348,11 +386,13 @@ interface AppRouteChildren {
   AppEveningRoute: typeof AppEveningRoute
   AppMoreRoute: typeof AppMoreRoute
   AppMyAdhkarRoute: typeof AppMyAdhkarRoute
+  AppPrivacyRoute: typeof AppPrivacyRoute
   AppQiblaRoute: typeof AppQiblaRoute
   AppSalahRoute: typeof AppSalahRoute
   AppSettingsRoute: typeof AppSettingsRoute
   AppSleepRoute: typeof AppSleepRoute
   AppTasbihRoute: typeof AppTasbihRoute
+  AppTermsRoute: typeof AppTermsRoute
   AppIndexRoute: typeof AppIndexRoute
 }
 
@@ -361,11 +401,13 @@ const AppRouteChildren: AppRouteChildren = {
   AppEveningRoute: AppEveningRoute,
   AppMoreRoute: AppMoreRoute,
   AppMyAdhkarRoute: AppMyAdhkarRoute,
+  AppPrivacyRoute: AppPrivacyRoute,
   AppQiblaRoute: AppQiblaRoute,
   AppSalahRoute: AppSalahRoute,
   AppSettingsRoute: AppSettingsRoute,
   AppSleepRoute: AppSleepRoute,
   AppTasbihRoute: AppTasbihRoute,
+  AppTermsRoute: AppTermsRoute,
   AppIndexRoute: AppIndexRoute,
 }
 

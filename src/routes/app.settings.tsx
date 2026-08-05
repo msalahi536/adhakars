@@ -42,9 +42,12 @@ import {
   scheduleReminder,
   cancelReminder,
   isNativePlatform,
+  sendTestNotification,
+  getScheduledIds,
   type NotificationPrefs,
   type Reminder,
 } from "@/lib/notifications";
+
 
 const APP_VERSION = "1.0.3";
 
@@ -69,6 +72,8 @@ function Settings() {
   const [notifChecking, setNotifChecking] = useState(true);
   const [notifRequesting, setNotifRequesting] = useState(false);
   const [notifError, setNotifError] = useState<string | null>(null);
+  const [notifTestMsg, setNotifTestMsg] = useState<string | null>(null);
+
   const [notifPrefs, setNotifPrefsState] = useState<NotificationPrefs>(() => getNotificationPrefs());
   const [commitment, setCommitmentState] = useState<Record<CommitmentSection, boolean>>(() => getCommitment());
   const [hasCustom, setHasCustom] = useState(false);
@@ -85,16 +90,30 @@ function Settings() {
     setCommitmentState(getCommitment());
     setHasCustom(getCustomAdhkarRows().length > 0);
     let cancelled = false;
-    checkNotificationPermission().then((v) => {
-      if (!cancelled) {
-        setNotifEnabled(v);
-        setNotifChecking(false);
-      }
-    });
+    const refresh = () => {
+      checkNotificationPermission().then((v) => {
+        if (!cancelled) {
+          setNotifEnabled(v);
+          setNotifChecking(false);
+        }
+      });
+    };
+    refresh();
+    // Safety net: never leave the UI stuck on "Checking...".
+    const t = setTimeout(() => {
+      if (!cancelled) setNotifChecking(false);
+    }, 5000);
+    const onVisible = () => {
+      if (document.visibilityState === "visible") refresh();
+    };
+    document.addEventListener("visibilitychange", onVisible);
     return () => {
       cancelled = true;
+      clearTimeout(t);
+      document.removeEventListener("visibilitychange", onVisible);
     };
   }, []);
+
 
 
   const handleEnableNotifications = async () => {
@@ -601,9 +620,33 @@ function Settings() {
                   >
                     + Add reminder
                   </button>
+                  <button
+                    onClick={async () => {
+                      setNotifTestMsg("Sending...");
+                      const ok = await sendTestNotification();
+                      const ids = await getScheduledIds();
+                      setNotifTestMsg(
+                        ok
+                          ? `Test sent, it will appear in about 5 seconds. ${ids.length} notification(s) scheduled.`
+                          : "Could not send a test notification on this device.",
+                      );
+                    }}
+                    className="w-full rounded-full py-2 text-sm font-semibold"
+                    style={{
+                      background: "var(--background)",
+                      border: "1px solid var(--border)",
+                      color: "var(--foreground)",
+                    }}
+                  >
+                    Send test notification
+                  </button>
+                  {notifTestMsg && (
+                    <div className="text-[11px] opacity-70">{notifTestMsg}</div>
+                  )}
                   <div className="text-[11px] opacity-60">
                     Reminders fire on your device using your local time. Set as many as you like at any times that suit your schedule.
                   </div>
+
                 </div>
               )}
             </div>
@@ -718,7 +761,7 @@ function Settings() {
               <span className="opacity-70">{APP_VERSION}</span>
             </div>
             <Link
-              to="/privacy"
+              to="/app/privacy"
               className="flex w-full items-center justify-between rounded-2xl px-4 py-3 text-sm font-semibold"
               style={{ background: "var(--surface)", border: "1px solid var(--border)" }}
             >
@@ -726,13 +769,14 @@ function Settings() {
               <span className="opacity-40">›</span>
             </Link>
             <Link
-              to="/terms"
+              to="/app/terms"
               className="flex w-full items-center justify-between rounded-2xl px-4 py-3 text-sm font-semibold"
               style={{ background: "var(--surface)", border: "1px solid var(--border)" }}
             >
               <span>Terms of Service</span>
               <span className="opacity-40">›</span>
             </Link>
+
           </section>
         </div>
       </main>
