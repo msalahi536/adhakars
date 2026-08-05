@@ -339,12 +339,18 @@ export function Onboarding({ onDone }: { onDone: () => void }) {
               </h2>
             </div>
           </div>
-          <p
-            className="mt-3 text-[14px] leading-relaxed"
-            style={{ color: "var(--muted-foreground)" }}
-          >
-            {slide.body}
-          </p>
+          {typeof slide.body === "string" ? (
+            <p
+              className="mt-3 text-[14px] leading-relaxed"
+              style={{ color: "var(--muted-foreground)" }}
+            >
+              {slide.body}
+            </p>
+          ) : (
+            <div className="mt-2">{slide.body}</div>
+          )}
+
+          <div className="mt-4 max-h-[34vh] overflow-y-auto pr-1">
 
           {isLast ? (
             <div className="mt-4 space-y-2">
