@@ -208,13 +208,13 @@ export const deriveTokens = (opts: {
 
   const surface = isDark
     ? hslToHex(bh, Math.min(0.16, bs + 0.02), Math.min(0.18, hexToHsl(background)[2] + 0.04))
-    : hslToHex(bh, Math.min(0.22, bs + 0.02), Math.min(0.99, hexToHsl(background)[2] + 0.025));
+    : hslToHex(bh, Math.min(0.35, bs * 0.5), Math.min(0.99, hexToHsl(background)[2] + 0.035));
   const surfaceCard = isDark
     ? hslToHex(bh, Math.min(0.16, bs + 0.02), Math.min(0.20, hexToHsl(background)[2] + 0.07))
-    : hslToHex(bh, Math.min(0.22, bs + 0.02), 1.0);
+    : hslToHex(bh, Math.min(0.3, bs * 0.4), Math.min(1, hexToHsl(background)[2] + 0.06));
   const muted = isDark
     ? hslToHex(bh, Math.min(0.18, bs + 0.04), Math.min(0.28, hexToHsl(background)[2] + 0.13))
-    : hslToHex(bh, Math.min(0.28, bs + 0.06), 0.92);
+    : hslToHex(bh, Math.min(0.4, bs * 0.6), Math.max(0.86, hexToHsl(background)[2] - 0.06));
 
   // --- surface-deep: rich dark theme-tinted card
   // Same theme hue, always dark, regardless of app mode. Used by After Salah
