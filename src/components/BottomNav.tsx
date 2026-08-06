@@ -1,4 +1,3 @@
-import { useEffect, useState } from "react";
 import { Link, useRouterState } from "@tanstack/react-router";
 import { Sunrise, Moon, CircleDot, Hand, MoreHorizontal } from "lucide-react";
 
@@ -13,21 +12,8 @@ const tabs = [
 ];
 
 export function BottomNav() {
-  const [isDark, setIsDark] = useState(false);
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const moreNestedActive = MORE_NESTED.some((p) => pathname === p || pathname.startsWith(p + "/"));
-
-  useEffect(() => {
-    const update = () =>
-      setIsDark(document.documentElement.getAttribute("data-theme-mode") === "dark");
-    update();
-    const obs = new MutationObserver(update);
-    obs.observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme-mode"] });
-    return () => {
-      obs.disconnect();
-    };
-  }, []);
-
 
   const iconColor = "var(--nav-inactive)";
   const activeColor = "var(--nav-active)";
@@ -78,14 +64,6 @@ export function BottomNav() {
                   >
                     {t.label}
                   </span>
-                  {t.to === "/app/more" && streak > 0 && (
-                    <span
-                      className="absolute right-0 top-0 rounded-[10px] px-1 py-0.5 text-[8px] font-bold"
-                      style={{ background: activeColor, color: isDark ? "#0a0a0a" : "#ffffff" }}
-                    >
-                      {streak}
-                    </span>
-                  )}
                 </>
               );
             }}
