@@ -277,7 +277,7 @@ function ColorWheelModal({
   const wheelSize = 220;
   const wheelR = wheelSize / 2;
   const satT = Math.min(1, Math.max(0, (s - S_MIN) / (S_MAX - S_MIN)));
-  const knobAngle = (h * Math.PI) / 180;
+  const knobAngle = ((h - 90) * Math.PI) / 180;
   const knobX = wheelR + Math.cos(knobAngle) * satT * (wheelR - 6);
   const knobY = wheelR + Math.sin(knobAngle) * satT * (wheelR - 6);
 
