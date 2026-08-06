@@ -232,37 +232,53 @@ function ColorWheelModal({
   onDone: (hex: string) => void;
   onCancel: () => void;
 }) {
-  const [seed, setSeedState] = useState(value);
-  const [hex, setHex] = useState(value);
+  const [seed, setSeedState] = useState(clampSeed(value));
+  const [hex, setHex] = useState(clampSeed(value));
   const wheelRef = useRef<HTMLDivElement>(null);
+  const dragging = useRef(false);
 
   const [h, s, l] = hexToHsl(seed);
 
+  const S_MIN = 0.18;
+  const S_MAX = 0.82;
+  const L_MIN = 0.32;
+  const L_MAX = 0.75;
+
+  const commit = (hue: number, sat: number, light: number) => {
+    const next = hslToHex(
+      (hue + 360) % 360,
+      Math.min(S_MAX, Math.max(S_MIN, sat)),
+      Math.min(L_MAX, Math.max(L_MIN, light)),
+    );
+    setSeedState(next);
+    setHex(next);
+  };
+
+  // Pick anywhere inside the disc: angle sets hue, distance from the centre
+  // sets saturation (centre = muted, edge = vivid).
   const pickFromWheel = (clientX: number, clientY: number) => {
     const el = wheelRef.current;
     if (!el) return;
     const rect = el.getBoundingClientRect();
     const cx = rect.left + rect.width / 2;
     const cy = rect.top + rect.height / 2;
-    const angle = (Math.atan2(clientY - cy, clientX - cx) * 180) / Math.PI;
-    const hue = (angle + 360) % 360;
-    const next = clampSeed(hslToHex(hue, Math.max(0.35, s), Math.max(0.45, Math.min(0.62, l))));
-    setSeedState(next);
-    setHex(next);
+    const dx = clientX - cx;
+    const dy = clientY - cy;
+    const radius = rect.width / 2;
+    const dist = Math.min(1, Math.hypot(dx, dy) / radius);
+    const hue = (Math.atan2(dy, dx) * 180) / Math.PI;
+    commit(hue, S_MIN + dist * (S_MAX - S_MIN), l);
   };
 
-  const updateSoftness = (t: number) => {
-    const nextS = 0.82 - t * (0.82 - 0.15);
-    const next = clampSeed(hslToHex(h, nextS, l));
-    setSeedState(next);
-    setHex(next);
-  };
-  const softness = 1 - Math.min(1, Math.max(0, (s - 0.15) / (0.82 - 0.15)));
+  const updateLightness = (t: number) => commit(h, s, L_MIN + t * (L_MAX - L_MIN));
+  const lightness = Math.min(1, Math.max(0, (l - L_MIN) / (L_MAX - L_MIN)));
 
-  const wheelSize = 170;
+  const wheelSize = 220;
+  const wheelR = wheelSize / 2;
+  const satT = Math.min(1, Math.max(0, (s - S_MIN) / (S_MAX - S_MIN)));
   const knobAngle = (h * Math.PI) / 180;
-  const knobX = wheelSize / 2 + Math.cos(knobAngle) * (wheelSize / 2 - 12);
-  const knobY = wheelSize / 2 + Math.sin(knobAngle) * (wheelSize / 2 - 12);
+  const knobX = wheelR + Math.cos(knobAngle) * satT * (wheelR - 6);
+  const knobY = wheelR + Math.sin(knobAngle) * satT * (wheelR - 6);
 
   return (
     <div
@@ -293,21 +309,24 @@ function ColorWheelModal({
           <div
             ref={wheelRef}
             onPointerDown={(e) => {
-              (e.target as HTMLElement).setPointerCapture?.(e.pointerId);
+              dragging.current = true;
+              (e.currentTarget as HTMLElement).setPointerCapture?.(e.pointerId);
               pickFromWheel(e.clientX, e.clientY);
             }}
             onPointerMove={(e) => {
-              if (e.buttons !== 1 && e.pressure === 0) return;
+              if (!dragging.current) return;
               pickFromWheel(e.clientX, e.clientY);
             }}
+            onPointerUp={() => { dragging.current = false; }}
+            onPointerCancel={() => { dragging.current = false; }}
             style={{
               width: wheelSize,
               height: wheelSize,
               borderRadius: "50%",
               background:
-                "conic-gradient(from 0deg, #ff3b3b, #ffb03b, #f8ff3b, #7dff3b, #3bffcf, #3ba7ff, #7d3bff, #ff3bd0, #ff3b3b)",
+                "radial-gradient(circle at 50% 50%, rgba(255,255,255,1) 0%, rgba(255,255,255,0) 72%), conic-gradient(from 0deg, #ff3b3b, #ffb03b, #f8ff3b, #7dff3b, #3bffcf, #3ba7ff, #7d3bff, #ff3bd0, #ff3b3b)",
               position: "relative",
-              boxShadow: "inset 0 0 0 8px var(--surface)",
+              boxShadow: "0 2px 10px rgba(0,0,0,0.18)",
               touchAction: "none",
               cursor: "crosshair",
             }}
@@ -315,10 +334,10 @@ function ColorWheelModal({
             <div
               style={{
                 position: "absolute",
-                left: knobX - 10,
-                top: knobY - 10,
-                width: 20,
-                height: 20,
+                left: knobX - 11,
+                top: knobY - 11,
+                width: 22,
+                height: 22,
                 borderRadius: "50%",
                 background: seed,
                 border: "3px solid #fff",
@@ -328,19 +347,23 @@ function ColorWheelModal({
             />
           </div>
         </div>
+        <div style={{ fontSize: 11, opacity: 0.6, marginTop: 8, textAlign: "center" }}>
+          Drag anywhere in the circle. Centre is soft, edge is vivid.
+        </div>
 
         <div style={{ marginTop: 14 }}>
-          <div style={{ fontSize: 11, fontWeight: 700, opacity: 0.7, marginBottom: 6 }}>SOFTNESS</div>
+          <div style={{ fontSize: 11, fontWeight: 700, opacity: 0.7, marginBottom: 6 }}>BRIGHTNESS</div>
           <input
             type="range"
             min={0}
             max={1}
             step={0.01}
-            value={softness}
-            onChange={(e) => updateSoftness(parseFloat(e.target.value))}
+            value={lightness}
+            onChange={(e) => updateLightness(parseFloat(e.target.value))}
             style={{ width: "100%", accentColor: seed }}
           />
         </div>
+
 
         <div style={{ display: "flex", alignItems: "center", gap: 8, marginTop: 12 }}>
           <div style={{ width: 32, height: 32, borderRadius: 8, background: seed, border: "1px solid var(--border)" }} />
