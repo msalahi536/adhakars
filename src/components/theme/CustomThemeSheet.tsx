@@ -266,7 +266,8 @@ function ColorWheelModal({
     const dy = clientY - cy;
     const radius = rect.width / 2;
     const dist = Math.min(1, Math.hypot(dx, dy) / radius);
-    const hue = (Math.atan2(dy, dx) * 180) / Math.PI;
+    // conic-gradient starts at 12 o'clock; atan2 starts at 3 o'clock
+    const hue = (Math.atan2(dy, dx) * 180) / Math.PI + 90;
     commit(hue, S_MIN + dist * (S_MAX - S_MIN), l);
   };
 
