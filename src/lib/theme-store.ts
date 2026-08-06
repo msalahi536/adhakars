@@ -104,11 +104,11 @@ export const sectionForRoute = (pathname: string): SectionKey => {
   return "default";
 };
 
-export const applyThemeForRoute = (pathname: string) => {
+export const applyThemeForRoute = (pathname: string, sectionKey?: SectionKey) => {
   const mode = resolveMode();
   const base = getSeed();
   const overrides = getOverrides();
-  const section = sectionForRoute(pathname);
+  const section = sectionKey ?? sectionForRoute(pathname);
   const isCustom = getPresetId() === "custom";
   const triplet = isCustom ? getCustomTriplet() : {};
 
