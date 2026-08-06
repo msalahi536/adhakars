@@ -232,37 +232,53 @@ function ColorWheelModal({
   onDone: (hex: string) => void;
   onCancel: () => void;
 }) {
-  const [seed, setSeedState] = useState(value);
-  const [hex, setHex] = useState(value);
+  const [seed, setSeedState] = useState(clampSeed(value));
+  const [hex, setHex] = useState(clampSeed(value));
   const wheelRef = useRef<HTMLDivElement>(null);
+  const dragging = useRef(false);
 
   const [h, s, l] = hexToHsl(seed);
 
+  const S_MIN = 0.18;
+  const S_MAX = 0.82;
+  const L_MIN = 0.32;
+  const L_MAX = 0.75;
+
+  const commit = (hue: number, sat: number, light: number) => {
+    const next = hslToHex(
+      (hue + 360) % 360,
+      Math.min(S_MAX, Math.max(S_MIN, sat)),
+      Math.min(L_MAX, Math.max(L_MIN, light)),
+    );
+    setSeedState(next);
+    setHex(next);
+  };
+
+  // Pick anywhere inside the disc: angle sets hue, distance from the centre
+  // sets saturation (centre = muted, edge = vivid).
   const pickFromWheel = (clientX: number, clientY: number) => {
     const el = wheelRef.current;
     if (!el) return;
     const rect = el.getBoundingClientRect();
     const cx = rect.left + rect.width / 2;
     const cy = rect.top + rect.height / 2;
-    const angle = (Math.atan2(clientY - cy, clientX - cx) * 180) / Math.PI;
-    const hue = (angle + 360) % 360;
-    const next = clampSeed(hslToHex(hue, Math.max(0.35, s), Math.max(0.45, Math.min(0.62, l))));
-    setSeedState(next);
-    setHex(next);
+    const dx = clientX - cx;
+    const dy = clientY - cy;
+    const radius = rect.width / 2;
+    const dist = Math.min(1, Math.hypot(dx, dy) / radius);
+    const hue = (Math.atan2(dy, dx) * 180) / Math.PI;
+    commit(hue, S_MIN + dist * (S_MAX - S_MIN), l);
   };
 
-  const updateSoftness = (t: number) => {
-    const nextS = 0.82 - t * (0.82 - 0.15);
-    const next = clampSeed(hslToHex(h, nextS, l));
-    setSeedState(next);
-    setHex(next);
-  };
-  const softness = 1 - Math.min(1, Math.max(0, (s - 0.15) / (0.82 - 0.15)));
+  const updateLightness = (t: number) => commit(h, s, L_MIN + t * (L_MAX - L_MIN));
+  const lightness = Math.min(1, Math.max(0, (l - L_MIN) / (L_MAX - L_MIN)));
 
-  const wheelSize = 170;
+  const wheelSize = 220;
+  const wheelR = wheelSize / 2;
+  const satT = Math.min(1, Math.max(0, (s - S_MIN) / (S_MAX - S_MIN)));
   const knobAngle = (h * Math.PI) / 180;
-  const knobX = wheelSize / 2 + Math.cos(knobAngle) * (wheelSize / 2 - 12);
-  const knobY = wheelSize / 2 + Math.sin(knobAngle) * (wheelSize / 2 - 12);
+  const knobX = wheelR + Math.cos(knobAngle) * satT * (wheelR - 6);
+  const knobY = wheelR + Math.sin(knobAngle) * satT * (wheelR - 6);
 
   return (
     <div
