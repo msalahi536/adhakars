@@ -1,7 +1,5 @@
-import { useEffect, useState } from "react";
 import { Link, useRouterState } from "@tanstack/react-router";
 import { Sunrise, Moon, CircleDot, Hand, MoreHorizontal } from "lucide-react";
-import { getStreak } from "@/lib/storage";
 
 const MORE_NESTED = ["/app/sleep", "/app/wake", "/app/qibla", "/app/my-adhkar", "/app/settings", "/app/about"];
 
@@ -14,25 +12,8 @@ const tabs = [
 ];
 
 export function BottomNav() {
-  const [streak, setStreak] = useState(0);
-  const [isDark, setIsDark] = useState(false);
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const moreNestedActive = MORE_NESTED.some((p) => pathname === p || pathname.startsWith(p + "/"));
-
-  useEffect(() => {
-    setStreak(getStreak().current);
-    const update = () =>
-      setIsDark(document.documentElement.getAttribute("data-theme-mode") === "dark");
-    update();
-    const onStreak = () => setStreak(getStreak().current);
-    window.addEventListener("adhkar:streak-update", onStreak);
-    const obs = new MutationObserver(update);
-    obs.observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme-mode"] });
-    return () => {
-      window.removeEventListener("adhkar:streak-update", onStreak);
-      obs.disconnect();
-    };
-  }, []);
 
   const iconColor = "var(--nav-inactive)";
   const activeColor = "var(--nav-active)";
@@ -83,14 +64,6 @@ export function BottomNav() {
                   >
                     {t.label}
                   </span>
-                  {t.to === "/app/more" && streak > 0 && (
-                    <span
-                      className="absolute right-0 top-0 rounded-[10px] px-1 py-0.5 text-[8px] font-bold"
-                      style={{ background: activeColor, color: isDark ? "#0a0a0a" : "#ffffff" }}
-                    >
-                      {streak}
-                    </span>
-                  )}
                 </>
               );
             }}
