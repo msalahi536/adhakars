@@ -166,11 +166,35 @@ export const setCommitment = (c: Record<CommitmentSection, boolean>) => {
 };
 
 export const isDayComplete = (date = todayKey()): boolean => {
-  const c = getCommitment();
-  const enabled = (Object.keys(c) as CommitmentSection[]).filter((k) => c[k]);
-  if (enabled.length === 0) return false;
-  return enabled.every((s) => isSectionComplete(s, date));
+  // A day counts as complete if the user has interacted with ANY counter that day.
+  // Previously this required every enabled "Daily Commitment" section to be fully finished,
+  // which was too strict. Now even a single tap on any adhkar counts as remembrance.
+  return hasAnyActivity(date);
 };
+
+// True if any tracked section has a recorded count > 0 for the given date.
+function hasAnyActivity(date: string): boolean {
+  if (typeof window === "undefined") return false;
+  const tracked = [
+    "morning",
+    "evening",
+    "sleep",
+    "wake",
+    "custom_adhkar",
+    ...SALAH_PRAYERS.map((p) => `salah_${p.id}`),
+  ];
+  for (const kind of tracked) {
+    const raw = localStorage.getItem(countsKey(date, kind));
+    if (!raw) continue;
+    try {
+      const counts = JSON.parse(raw) as CountMap;
+      if (Object.values(counts).some((v) => (Number(v) || 0) > 0)) return true;
+    } catch {
+      // ignore malformed entries
+    }
+  }
+  return false;
+}
 
 // ============ Consistency (streak w/ grace) ============
 

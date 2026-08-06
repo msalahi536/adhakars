@@ -481,7 +481,7 @@ function Settings() {
           <section className="mb-6">
             <h2 className="label-caps mb-1">My Daily Commitment</h2>
             <p className="mb-3 text-xs opacity-70">
-              Choose what counts as a complete day. Only what you select is tracked.
+              Choose which sections you want to aim to complete. Any single counter tap already counts as a day of remembrance.
             </p>
             <div className="space-y-2">
               {(
