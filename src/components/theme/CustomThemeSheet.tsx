@@ -325,7 +325,9 @@ function ColorWheelModal({
               height: wheelSize,
               borderRadius: "50%",
               background:
-                "radial-gradient(circle at 50% 50%, rgba(255,255,255,1) 0%, rgba(255,255,255,0) 72%), conic-gradient(from 0deg, #ff3b3b, #ffb03b, #f8ff3b, #7dff3b, #3bffcf, #3ba7ff, #7d3bff, #ff3bd0, #ff3b3b)",
+                "radial-gradient(circle at 50% 50%, rgba(255,255,255,1) 0%, rgba(255,255,255,0) 72%), conic-gradient(from 0deg, " +
+                Array.from({ length: 13 }, (_, i) => `hsl(${i * 30} 90% 55%) ${i * 30}deg`).join(", ") +
+                ")",
               position: "relative",
               boxShadow: "0 2px 10px rgba(0,0,0,0.18)",
               touchAction: "none",
