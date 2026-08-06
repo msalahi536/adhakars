@@ -7,6 +7,7 @@ import { DiagonalLatticePattern } from "@/components/HeaderPatterns";
 import { sleepItems, wakeItems, type SleepMode } from "@/data/sleep";
 import { isItemComplete } from "@/data/salah";
 import { getCounts, setCount, clearCounts, bumpLifetime } from "@/lib/storage";
+import { applyThemeForRoute } from "@/lib/theme-store";
 
 export const Route = createFileRoute("/app/sleep")({
   head: () => ({
