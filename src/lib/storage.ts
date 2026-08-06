@@ -173,7 +173,7 @@ export const isDayComplete = (date = todayKey()): boolean => {
 };
 
 // True if any tracked section has a recorded count > 0 for the given date.
-const hasAnyActivity = (date: string): boolean => {
+function hasAnyActivity(date: string): boolean {
   if (typeof window === "undefined") return false;
   const tracked = [
     "morning",
@@ -194,7 +194,7 @@ const hasAnyActivity = (date: string): boolean => {
     }
   }
   return false;
-};
+}
 
 // ============ Consistency (streak w/ grace) ============
 
