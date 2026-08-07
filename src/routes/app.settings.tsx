@@ -45,6 +45,18 @@ import {
   type NotificationPrefs,
   type Reminder,
 } from "@/lib/notifications";
+import {
+  getPrayerSettings,
+  setPrayerSettings,
+  lookupCity,
+  resolveLocation,
+  CALC_METHODS,
+  SALAH_IDS,
+  PRAYER_LABELS,
+  type PrayerSettings,
+  type AdhanSound,
+} from "@/lib/prayer-times";
+import { rescheduleAdhanNotifications } from "@/lib/adhan-notifications";
 
 
 
