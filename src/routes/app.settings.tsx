@@ -740,6 +740,7 @@ function Settings() {
                         updatePrayerSettings({ location: loc });
                         setCityOpen(false);
                         setLocationSaved(`Location saved: ${loc.label}`);
+                        setLocationSaved(`Location saved: ${loc.label}`);
                       }}
                       className="w-full rounded-full py-2 text-xs font-semibold"
                       style={{ background: "var(--muted)", color: "var(--foreground)" }}
