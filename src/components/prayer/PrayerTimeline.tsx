@@ -144,7 +144,7 @@ function DayList({
     );
   });
   return (
-    <div className="relative" style={{ opacity: dim ? 0.45 : 1 }}>
+    <div className="relative" style={{ opacity: dim ? 0.72 : 1 }}>
       <span
         className="absolute top-2 bottom-2"
         style={{
