@@ -45,6 +45,18 @@ import {
   type NotificationPrefs,
   type Reminder,
 } from "@/lib/notifications";
+import {
+  getPrayerSettings,
+  setPrayerSettings,
+  lookupCity,
+  resolveLocation,
+  CALC_METHODS,
+  SALAH_IDS,
+  PRAYER_LABELS,
+  type PrayerSettings,
+  type AdhanSound,
+} from "@/lib/prayer-times";
+import { rescheduleAdhanNotifications } from "@/lib/adhan-notifications";
 
 
 
@@ -84,7 +96,20 @@ function Settings() {
   const [commitment, setCommitmentState] = useState<Record<CommitmentSection, boolean>>(() => getCommitment());
   const [hasCustom, setHasCustom] = useState(false);
   const [nativeAvailable, setNativeAvailable] = useState(false);
-  
+  const [prayerSettings, setPrayerSettingsState] = useState<PrayerSettings>(() =>
+    getPrayerSettings(),
+  );
+  const [cityInput, setCityInput] = useState("");
+  const [cityOpen, setCityOpen] = useState(false);
+  const [cityBusy, setCityBusy] = useState(false);
+  const [cityError, setCityError] = useState<string | null>(null);
+
+  const updatePrayerSettings = (patch: Partial<PrayerSettings>) => {
+    const next = { ...getPrayerSettings(), ...patch };
+    setPrayerSettingsState(next);
+    setPrayerSettings(next);
+    void rescheduleAdhanNotifications(next);
+  };
 
   useEffect(() => {
     setModeState(getModeSetting());
@@ -93,7 +118,9 @@ function Settings() {
     setOverridesState(getOverrides());
     setTripletState(getCustomTriplet());
     setDisplayState(getDisplay());
+    setPrayerSettingsState(getPrayerSettings());
     setNotifPrefsState(getNotificationPrefs());
+
     setCommitmentState(getCommitment());
     setHasCustom(getCustomAdhkarRows().length > 0);
     setNativeAvailable(isNativePlatform());
@@ -509,6 +536,207 @@ function Settings() {
           </section>
 
 
+
+          {/* PRAYER TIMES */}
+          <section className="mb-6">
+            <h2 className="label-caps mb-3">Prayer Times</h2>
+            <div className="space-y-3">
+              <div
+                className="rounded-2xl px-4 py-3"
+                style={{ background: "var(--surface)", border: "1px solid var(--border)" }}
+              >
+                <div className="mb-2 text-sm font-semibold">Calculation method</div>
+                <select
+                  value={prayerSettings.method}
+                  onChange={(e) => updatePrayerSettings({ method: parseInt(e.target.value, 10) })}
+                  className="w-full rounded-xl px-3 py-2 outline-none"
+                  style={{
+                    fontSize: 16,
+                    background: "var(--background)",
+                    color: "var(--foreground)",
+                    border: "1px solid var(--border)",
+                  }}
+                >
+                  {CALC_METHODS.map((m) => (
+                    <option key={m.id} value={m.id}>
+                      {m.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <Toggle
+                label="Hanafi Asr"
+                description="Asr time calculated at double shadow length."
+                value={prayerSettings.hanafi}
+                onChange={(v) => updatePrayerSettings({ hanafi: v })}
+              />
+
+              {!nativeAvailable ? (
+                <div
+                  className="rounded-2xl px-4 py-3"
+                  style={{ background: "var(--surface)", border: "1px solid var(--border)" }}
+                >
+                  <div className="text-sm font-semibold">Adhan notifications</div>
+                  <div className="mt-1 text-xs opacity-70">
+                    Adhan notifications are available in the mobile app.
+                  </div>
+                </div>
+              ) : (
+                <>
+                  <Toggle
+                    label="Adhan notifications"
+                    description="A local notification at each prayer time."
+                    value={prayerSettings.adhanEnabled}
+                    onChange={(v) => {
+                      void (async () => {
+                        if (v && !notifEnabled) {
+                          const res = await requestNotificationPermission();
+                          setNotifEnabled(res.granted);
+                          if (!res.granted) {
+                            setNotifError(
+                              res.granted === false && res.error
+                                ? res.error
+                                : "Could not request notification permission.",
+                            );
+                            return;
+                          }
+                        }
+                        updatePrayerSettings({ adhanEnabled: v });
+                      })();
+                    }}
+                  />
+
+                  {prayerSettings.adhanEnabled && (
+                    <div className="space-y-2 pl-1">
+                      {SALAH_IDS.map((id) => (
+                        <Toggle
+                          key={id}
+                          label={PRAYER_LABELS[id]}
+                          value={prayerSettings.perPrayer[id]}
+                          onChange={(v) =>
+                            updatePrayerSettings({
+                              perPrayer: { ...prayerSettings.perPrayer, [id]: v },
+                            })
+                          }
+                        />
+                      ))}
+                    </div>
+                  )}
+                </>
+              )}
+
+              <div
+                className="rounded-2xl px-4 py-3"
+                style={{ background: "var(--surface)", border: "1px solid var(--border)" }}
+              >
+                <div className="mb-2 text-sm font-semibold">Notification sound</div>
+                <div className="grid grid-cols-3 gap-1 rounded-full p-1" style={{ background: "var(--muted)" }}>
+                  {(
+                    [
+                      { id: "adhan", label: "Adhan" },
+                      { id: "takbir", label: "Takbir only" },
+                      { id: "silent", label: "Silent notification" },
+                    ] as { id: AdhanSound; label: string }[]
+                  ).map((o) => {
+                    const active = prayerSettings.sound === o.id;
+                    return (
+                      <button
+                        key={o.id}
+                        onClick={() => updatePrayerSettings({ sound: o.id })}
+                        className="rounded-full px-2 py-2 text-[11px] font-semibold transition"
+                        style={{
+                          background: active ? "var(--surface-card)" : "transparent",
+                          color: "var(--foreground)",
+                          boxShadow: active ? "0 1px 4px rgba(0,0,0,0.08)" : "none",
+                        }}
+                      >
+                        {o.label}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              <div
+                className="rounded-2xl px-4 py-3"
+                style={{ background: "var(--surface)", border: "1px solid var(--border)" }}
+              >
+                <div className="flex items-center justify-between gap-3">
+                  <div className="min-w-0">
+                    <div className="text-sm font-semibold">Location</div>
+                    <div className="mt-0.5 truncate text-xs opacity-70">
+                      {prayerSettings.location ? prayerSettings.location.label : "Not set"}
+                    </div>
+                  </div>
+                  <button
+                    onClick={() => setCityOpen((v) => !v)}
+                    className="shrink-0 rounded-full px-3 py-1.5 text-xs font-semibold"
+                    style={{ background: "var(--muted)", color: "var(--foreground)" }}
+                  >
+                    Change
+                  </button>
+                </div>
+                {cityOpen && (
+                  <div className="mt-3 space-y-2">
+                    <div className="flex gap-2">
+                      <input
+                        value={cityInput}
+                        onChange={(e) => setCityInput(e.target.value)}
+                        placeholder="City, country"
+                        className="min-w-0 flex-1 rounded-full px-3 py-2 outline-none"
+                        style={{
+                          fontSize: 16,
+                          background: "var(--background)",
+                          color: "var(--foreground)",
+                          border: "1px solid var(--border)",
+                        }}
+                      />
+                      <button
+                        onClick={async () => {
+                          setCityBusy(true);
+                          setCityError(null);
+                          const loc = await lookupCity(cityInput, prayerSettings);
+                          setCityBusy(false);
+                          if (!loc) {
+                            setCityError("We could not find that place. Try a city and country.");
+                            return;
+                          }
+                          updatePrayerSettings({ location: loc });
+                          setCityInput("");
+                          setCityOpen(false);
+                        }}
+                        disabled={cityBusy}
+                        className="shrink-0 rounded-full px-4 text-sm font-bold"
+                        style={{ background: "var(--accent)", color: "var(--accent-foreground)" }}
+                      >
+                        {cityBusy ? "..." : "Set"}
+                      </button>
+                    </div>
+                    <button
+                      onClick={async () => {
+                        setCityBusy(true);
+                        setCityError(null);
+                        const loc = await resolveLocation(true);
+                        setCityBusy(false);
+                        if (!loc) {
+                          setCityError("We could not get your location. Type a city instead.");
+                          return;
+                        }
+                        updatePrayerSettings({ location: loc });
+                        setCityOpen(false);
+                      }}
+                      className="w-full rounded-full py-2 text-xs font-semibold"
+                      style={{ background: "var(--muted)", color: "var(--foreground)" }}
+                    >
+                      Use my current location
+                    </button>
+                    {cityError && <div className="text-[11px] opacity-70">{cityError}</div>}
+                  </div>
+                )}
+              </div>
+            </div>
+          </section>
 
           {/* REMINDERS */}
           <section className="mb-6">
