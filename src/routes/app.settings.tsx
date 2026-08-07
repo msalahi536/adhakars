@@ -105,6 +105,26 @@ function Settings() {
     setOverridesState(getOverrides());
     setTripletState(getCustomTriplet());
     setDisplayState(getDisplay());
+  const [prayerSettings, setPrayerSettingsState] = useState<PrayerSettings>(() =>
+    getPrayerSettings(),
+  );
+  const [cityInput, setCityInput] = useState("");
+  const [cityOpen, setCityOpen] = useState(false);
+  const [cityBusy, setCityBusy] = useState(false);
+  const [cityError, setCityError] = useState<string | null>(null);
+
+  const updatePrayerSettings = (patch: Partial<PrayerSettings>) => {
+    const next = { ...getPrayerSettings(), ...patch };
+    setPrayerSettingsState(next);
+    setPrayerSettings(next);
+    void rescheduleAdhanNotifications(next);
+  };
+
+  useEffect(() => {
+    setPrayerSettingsState(getPrayerSettings());
+  }, []);
+
+  useEffect(() => {
     setNotifPrefsState(getNotificationPrefs());
     setCommitmentState(getCommitment());
     setHasCustom(getCustomAdhkarRows().length > 0);
