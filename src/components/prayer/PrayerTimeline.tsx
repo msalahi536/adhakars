@@ -28,7 +28,7 @@ function Row({
 }) {
   const sunrise = isSunrise(slot);
   const color = state === "next" ? "var(--accent)" : "var(--foreground)";
-  const opacity = state === "past" ? 0.4 : sunrise ? 0.72 : 1;
+  const opacity = state === "past" ? 0.72 : sunrise ? 0.85 : 1;
   const clickable = !!onPick && !sunrise;
   return (
     <div
@@ -78,8 +78,11 @@ function Row({
       </div>
       <div
         style={{
-          color: state === "next" ? "var(--accent)" : "var(--muted-foreground)",
-          fontWeight: state === "next" ? 700 : 500,
+          color:
+            state === "next"
+              ? "var(--accent)"
+              : "color-mix(in oklab, var(--foreground) 78%, transparent)",
+          fontWeight: state === "next" ? 700 : 600,
           fontSize: sunrise ? 12 : 13,
         }}
       >
@@ -141,7 +144,7 @@ function DayList({
     );
   });
   return (
-    <div className="relative" style={{ opacity: dim ? 0.45 : 1 }}>
+    <div className="relative" style={{ opacity: dim ? 0.72 : 1 }}>
       <span
         className="absolute top-2 bottom-2"
         style={{

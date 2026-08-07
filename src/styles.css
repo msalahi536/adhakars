@@ -385,3 +385,14 @@
   padding-bottom: calc(var(--bottom-nav-row) + env(safe-area-inset-bottom) + 12px);
 }
 
+
+@keyframes sheet-up {
+  from {
+    transform: translateY(24px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
