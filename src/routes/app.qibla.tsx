@@ -68,6 +68,10 @@ function Qibla() {
   const [showCalibration, setShowCalibration] = useState(false);
   const unsubRef = useRef<(() => void) | null>(null);
   const smoothRef = useRef<number | null>(null);
+  // Continuous (unwrapped) rotation so the arrow never spins the long way
+  // around when the heading crosses 360 back to 0.
+  const contRef = useRef(0);
+  const [arrowAngle, setArrowAngle] = useState(0);
 
   useEffect(() => {
     return () => {
@@ -95,7 +99,9 @@ function Qibla() {
       let next = r.heading;
       if (prev !== null) {
         const delta = ((r.heading - prev + 540) % 360) - 180;
-        next = normalizeHeading(prev + delta * 0.25);
+        // Ignore tiny jitter so the arrow sits still when the phone does.
+        if (Math.abs(delta) < 0.6) return;
+        next = normalizeHeading(prev + delta * 0.18);
       }
       smoothRef.current = next;
       setHeading(next);
@@ -153,10 +159,20 @@ function Qibla() {
 
   const permState = phase;
 
-  // Rotation to apply to the qibla arrow: bearing - heading
-  const arrowRotation =
+  // Rotation to apply to the qibla arrow: bearing - heading, unwrapped.
+  const targetRotation =
     qiblaBearing !== null && heading !== null ? (qiblaBearing - heading + 360) % 360 : null;
-  const aligned = arrowRotation !== null && (arrowRotation < 5 || arrowRotation > 355);
+
+  useEffect(() => {
+    if (targetRotation === null) return;
+    const current = contRef.current;
+    const delta = ((targetRotation - (((current % 360) + 360) % 360) + 540) % 360) - 180;
+    contRef.current = current + delta;
+    setArrowAngle(contRef.current);
+  }, [targetRotation]);
+
+  const aligned = targetRotation !== null && (targetRotation < 5 || targetRotation > 355);
+
 
   return (
     <>
@@ -230,16 +246,20 @@ function Qibla() {
                   style={{
                     background:
                       "radial-gradient(circle, var(--card) 0%, var(--muted) 75%)",
-                    border: "2px solid color-mix(in oklab, var(--accent) 45%, transparent)",
-                    boxShadow: "var(--card-shadow)",
+                    border: `2px solid ${aligned ? "color-mix(in oklab, #3d8f5c 70%, transparent)" : "color-mix(in oklab, var(--accent) 45%, transparent)"}`,
+                    boxShadow: aligned
+                      ? "0 0 28px color-mix(in oklab, #3d8f5c 35%, transparent), var(--card-shadow)"
+                      : "var(--card-shadow)",
+                    transition: "border-color 300ms ease, box-shadow 300ms ease",
                   }}
                 />
+
                 {/* Cardinal marks rotate with device so N always points to true North */}
                 <div
                   className="absolute inset-0"
                   style={{
-                    transform: `rotate(${heading !== null ? -heading : 0}deg)`,
-                    transition: "transform 120ms linear",
+                    transform: `rotate(${qiblaBearing !== null && heading !== null ? arrowAngle - qiblaBearing : 0}deg)`,
+                    transition: "transform 280ms cubic-bezier(0.22, 1, 0.36, 1)",
                   }}
                 >
                   {(["N", "E", "S", "W"] as const).map((label, i) => (
@@ -259,27 +279,27 @@ function Qibla() {
                   ))}
                 </div>
                 {/* Qibla arrow */}
-                {arrowRotation !== null && (
+                {targetRotation !== null && (
                   <div
                     className="absolute inset-0 flex items-center justify-center"
                     style={{
-                      transform: `rotate(${arrowRotation}deg)`,
-                      transition: "transform 200ms ease-out",
+                      transform: `rotate(${arrowAngle}deg)`,
+                      transition: "transform 280ms cubic-bezier(0.22, 1, 0.36, 1)",
                     }}
                   >
-                    <div className="flex flex-col items-center" style={{ transform: "translateY(-40px)" }}>
-                      <div
-                        style={{
-                          width: 0,
-                          height: 0,
-                          borderLeft: "18px solid transparent",
-                          borderRight: "18px solid transparent",
-                          borderBottom: `40px solid ${aligned ? "#3d8f5c" : "var(--accent)"}`,
-                          filter: aligned
-                            ? "drop-shadow(0 0 12px color-mix(in oklab, #3d8f5c 60%, transparent))"
-                            : "none",
-                        }}
-                      />
+                    <div
+                      className="flex flex-col items-center"
+                      style={{ transform: "translateY(-40px)" }}
+                    >
+                      <svg width={40} height={46} viewBox="0 0 40 46" aria-hidden="true">
+                        <path
+                          d="M20 2 L36 42 L20 33 L4 42 Z"
+                          fill={aligned ? "#3d8f5c" : "var(--accent)"}
+                          stroke={aligned ? "#3d8f5c" : "var(--accent)"}
+                          strokeWidth={1}
+                          strokeLinejoin="round"
+                        />
+                      </svg>
                       <div
                         className="mt-1 text-[10px] font-bold tracking-wide"
                         style={{ color: aligned ? "#3d8f5c" : "var(--accent)" }}
@@ -289,6 +309,7 @@ function Qibla() {
                     </div>
                   </div>
                 )}
+
                 {/* Center dot */}
                 <div
                   className="absolute rounded-full"
