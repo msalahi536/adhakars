@@ -208,13 +208,13 @@ export const deriveTokens = (opts: {
 
   const surface = isDark
     ? hslToHex(bh, Math.min(0.16, bs + 0.02), Math.min(0.18, hexToHsl(background)[2] + 0.04))
-    : hslToHex(bh, Math.min(0.35, bs * 0.5), Math.min(0.99, hexToHsl(background)[2] + 0.035));
+    : hslToHex(bh, Math.min(0.22, bs + 0.02), Math.min(0.99, hexToHsl(background)[2] + 0.025));
   const surfaceCard = isDark
     ? hslToHex(bh, Math.min(0.16, bs + 0.02), Math.min(0.20, hexToHsl(background)[2] + 0.07))
-    : hslToHex(bh, Math.min(0.3, bs * 0.4), Math.min(1, hexToHsl(background)[2] + 0.06));
+    : hslToHex(bh, Math.min(0.22, bs + 0.02), 1.0);
   const muted = isDark
     ? hslToHex(bh, Math.min(0.18, bs + 0.04), Math.min(0.28, hexToHsl(background)[2] + 0.13))
-    : hslToHex(bh, Math.min(0.4, bs * 0.6), Math.max(0.86, hexToHsl(background)[2] - 0.06));
+    : hslToHex(bh, Math.min(0.28, bs + 0.06), 0.92);
 
   // --- surface-deep: rich dark theme-tinted card
   // Same theme hue, always dark, regardless of app mode. Used by After Salah
@@ -384,13 +384,12 @@ export const deriveTokens = (opts: {
 // Allow user-picked background to be anywhere on the wheel, but clamp
 // its lightness to something usable (near-white in light, near-black in dark).
 const clampSurface = (hex: string, isDark: boolean): string => {
-  const [hh, ss, ll] = hexToHsl(hex);
-  if (isDark) {
-    return hslToHex(hh, clamp(ss, 0.02, 0.55), clamp(ll * 0.2 + 0.05, 0.05, 0.2));
-  }
-  // Keep it light enough to read on, but preserve a visible tint.
-  const l2 = clamp(0.97 - (1 - ll) * 0.22, 0.8, 0.98);
-  return hslToHex(hh, clamp(ss, 0.02, 0.7), l2);
+  const [hh, ss] = hexToHsl(hex);
+  const s2 = clamp(ss, 0.02, 0.35);
+  const l2 = isDark
+    ? clamp(hexToHsl(hex)[2] * 0.15 + 0.05, 0.05, 0.14)
+    : clamp(hexToHsl(hex)[2] * 0.15 + 0.9, 0.90, 0.99);
+  return hslToHex(hh, s2, l2);
 };
 
 // ---------- apply to DOM ----------
