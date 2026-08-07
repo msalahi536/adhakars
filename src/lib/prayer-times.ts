@@ -220,10 +220,12 @@ export const fetchDay = async (
   if (cached) return cached;
   const loc = settings.location;
   if (!loc) return null;
+  const tz = deviceTimeZone();
   const url =
     `https://api.aladhan.com/v1/timings/${apiDate(date)}` +
     `?latitude=${loc.lat}&longitude=${loc.lng}` +
-    `&method=${settings.method}&school=${settings.hanafi ? 1 : 0}`;
+    `&method=${settings.method}&school=${settings.hanafi ? 1 : 0}` +
+    (tz ? `&timezonestring=${encodeURIComponent(tz)}` : "");
   try {
     const res = await fetch(url);
     if (!res.ok) return null;
