@@ -125,12 +125,41 @@ function webPosition(): Promise<PositionResult> {
   });
 }
 
+const POS_CACHE_KEY = "qibla-pos-cache";
+const POS_CACHE_MAX_AGE = 1000 * 60 * 60 * 24 * 14; // 14 days
+
+export function getCachedPosition(): Coords | null {
+  try {
+    const raw = localStorage.getItem(POS_CACHE_KEY);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw) as { lat: number; lng: number; at: number };
+    if (typeof parsed.lat !== "number" || typeof parsed.lng !== "number") return null;
+    if (Date.now() - parsed.at > POS_CACHE_MAX_AGE) return null;
+    return { lat: parsed.lat, lng: parsed.lng };
+  } catch {
+    return null;
+  }
+}
+
+function cachePosition(coords: Coords) {
+  try {
+    localStorage.setItem(POS_CACHE_KEY, JSON.stringify({ ...coords, at: Date.now() }));
+  } catch {
+    // ignore
+  }
+}
+
 /**
- * Get a position once. Inside the native wrapper we try the native plugin
- * first, but if it is not present in that build (older binaries) we fall back
- * to the web geolocation API instead of failing.
+ * Get a position once. A recent cached fix is reused so the browser does not
+ * prompt for location on every visit. Inside the native wrapper we try the
+ * native plugin first, falling back to the web geolocation API.
  */
-export async function getPosition(): Promise<PositionResult> {
+export async function getPosition(opts?: { force?: boolean }): Promise<PositionResult> {
+  if (!opts?.force) {
+    const cached = getCachedPosition();
+    if (cached) return { ok: true, coords: cached };
+  }
+
   if (isNative()) {
     try {
       const { Geolocation } = await import("@capacitor/geolocation");
@@ -150,16 +179,22 @@ export async function getPosition(): Promise<PositionResult> {
         enableHighAccuracy: true,
         timeout: 15000,
       });
-      return { ok: true, coords: { lat: pos.coords.latitude, lng: pos.coords.longitude } };
+      const coords = { lat: pos.coords.latitude, lng: pos.coords.longitude };
+      cachePosition(coords);
+      return { ok: true, coords };
     } catch {
       // Plugin missing or unimplemented in this native build: use the web API.
       const fallback = await webPosition();
+      if (fallback.ok) cachePosition(fallback.coords);
       return fallback;
     }
   }
 
-  return webPosition();
+  const web = await webPosition();
+  if (web.ok) cachePosition(web.coords);
+  return web;
 }
+
 
 
 export function normalizeHeading(h: number) {
