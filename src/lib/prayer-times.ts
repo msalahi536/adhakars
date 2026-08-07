@@ -42,7 +42,13 @@ export const CALC_METHODS: { id: number; name: string }[] = [
 
 export type AdhanSound = "adhan" | "takbir" | "silent";
 
-export type PrayerLocation = { lat: number; lng: number; label: string };
+export type PrayerLocation = {
+  lat: number;
+  lng: number;
+  label: string;
+  /** true once the coordinates came from a trusted geocoder or the device */
+  verified?: boolean;
+};
 
 export type PrayerSettings = {
   method: number;
