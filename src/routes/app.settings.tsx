@@ -116,8 +116,6 @@ function Settings() {
     setPrayerSettingsState(getPrayerSettings());
     setNotifPrefsState(getNotificationPrefs());
 
-    setCommitmentState(getCommitment());
-    setHasCustom(getCustomAdhkarRows().length > 0);
     setNativeAvailable(isNativePlatform());
     let cancelled = false;
     const refresh = () => {
