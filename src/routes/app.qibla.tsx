@@ -254,8 +254,8 @@ function Qibla() {
                 <div
                   className="absolute inset-0"
                   style={{
-                    transform: `rotate(${heading !== null ? -heading : 0}deg)`,
-                    transition: "transform 120ms linear",
+                    transform: `rotate(${qiblaBearing !== null && heading !== null ? arrowAngle - qiblaBearing : 0}deg)`,
+                    transition: "transform 280ms cubic-bezier(0.22, 1, 0.36, 1)",
                   }}
                 >
                   {(["N", "E", "S", "W"] as const).map((label, i) => (
@@ -275,27 +275,27 @@ function Qibla() {
                   ))}
                 </div>
                 {/* Qibla arrow */}
-                {arrowRotation !== null && (
+                {targetRotation !== null && (
                   <div
                     className="absolute inset-0 flex items-center justify-center"
                     style={{
-                      transform: `rotate(${arrowRotation}deg)`,
-                      transition: "transform 200ms ease-out",
+                      transform: `rotate(${arrowAngle}deg)`,
+                      transition: "transform 280ms cubic-bezier(0.22, 1, 0.36, 1)",
                     }}
                   >
-                    <div className="flex flex-col items-center" style={{ transform: "translateY(-40px)" }}>
-                      <div
-                        style={{
-                          width: 0,
-                          height: 0,
-                          borderLeft: "18px solid transparent",
-                          borderRight: "18px solid transparent",
-                          borderBottom: `40px solid ${aligned ? "#3d8f5c" : "var(--accent)"}`,
-                          filter: aligned
-                            ? "drop-shadow(0 0 12px color-mix(in oklab, #3d8f5c 60%, transparent))"
-                            : "none",
-                        }}
-                      />
+                    <div
+                      className="flex flex-col items-center"
+                      style={{ transform: "translateY(-40px)" }}
+                    >
+                      <svg width={40} height={46} viewBox="0 0 40 46" aria-hidden="true">
+                        <path
+                          d="M20 2 L36 42 L20 33 L4 42 Z"
+                          fill={aligned ? "#3d8f5c" : "var(--accent)"}
+                          stroke={aligned ? "#3d8f5c" : "var(--accent)"}
+                          strokeWidth={1}
+                          strokeLinejoin="round"
+                        />
+                      </svg>
                       <div
                         className="mt-1 text-[10px] font-bold tracking-wide"
                         style={{ color: aligned ? "#3d8f5c" : "var(--accent)" }}
@@ -305,6 +305,7 @@ function Qibla() {
                     </div>
                   </div>
                 )}
+
                 {/* Center dot */}
                 <div
                   className="absolute rounded-full"
