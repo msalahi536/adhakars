@@ -230,17 +230,35 @@ export function readOrientation(e: DeviceOrientationEvent): Reading {
   };
 }
 
-/** Subscribe to orientation events. Returns an unsubscribe function. */
+/**
+ * Subscribe to orientation events. Both `deviceorientationabsolute` and
+ * `deviceorientation` are attached, but only ONE source is ever used: the
+ * absolute event wins as soon as it fires. Mixing the two makes the heading
+ * flip between two different reference frames, which looks like a compass
+ * spinning a full turn or two arrows fighting each other.
+ */
 export function subscribeOrientation(cb: (r: Reading, raw: DeviceOrientationEvent) => void) {
   if (typeof window === "undefined") return () => {};
-  const handler = (e: Event) => {
+  let source: "absolute" | "plain" | null = null;
+
+  const make = (kind: "absolute" | "plain") => (e: Event) => {
+    if (source === null) source = kind;
+    // Once an absolute feed exists, ignore the relative one entirely.
+    if (kind !== source) {
+      if (kind === "absolute") source = "absolute";
+      else return;
+    }
     const doe = e as DeviceOrientationEvent;
     cb(readOrientation(doe), doe);
   };
-  window.addEventListener("deviceorientationabsolute", handler, true);
-  window.addEventListener("deviceorientation", handler, true);
+
+  const absHandler = make("absolute");
+  const plainHandler = make("plain");
+  window.addEventListener("deviceorientationabsolute", absHandler, true);
+  window.addEventListener("deviceorientation", plainHandler, true);
   return () => {
-    window.removeEventListener("deviceorientationabsolute", handler, true);
-    window.removeEventListener("deviceorientation", handler, true);
+    window.removeEventListener("deviceorientationabsolute", absHandler, true);
+    window.removeEventListener("deviceorientation", plainHandler, true);
   };
+
 }
