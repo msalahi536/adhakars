@@ -588,18 +588,22 @@ function Settings() {
                     label="Adhan notifications"
                     description="A local notification at each prayer time."
                     value={prayerSettings.adhanEnabled}
-                    onChange={async (v) => {
-                      if (v && !notifEnabled) {
-                        const res = await requestNotificationPermission();
-                        setNotifEnabled(res.granted);
-                        if (!res.granted) {
-                          setNotifError(
-                            res.error ?? "Could not request notification permission.",
-                          );
-                          return;
+                    onChange={(v) => {
+                      void (async () => {
+                        if (v && !notifEnabled) {
+                          const res = await requestNotificationPermission();
+                          setNotifEnabled(res.granted);
+                          if (!res.granted) {
+                            setNotifError(
+                              res.granted === false && res.error
+                                ? res.error
+                                : "Could not request notification permission.",
+                            );
+                            return;
+                          }
                         }
-                      }
-                      updatePrayerSettings({ adhanEnabled: v });
+                        updatePrayerSettings({ adhanEnabled: v });
+                      })();
                     }}
                   />
 
