@@ -60,7 +60,7 @@ export type PrayerSettings = {
 };
 
 const SETTINGS_KEY = "adhkar:prayer-settings";
-const CACHE_PREFIX = "adhkar:prayer-cache:v2:";
+const CACHE_PREFIX = "adhkar:prayer-cache:v3:";
 const DISMISS_KEY = "adhkar:adhan-dismiss";
 const MUTE_ALL_KEY = "adhkar:adhan-mute-all";
 
