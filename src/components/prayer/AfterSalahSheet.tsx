@@ -145,7 +145,6 @@ export function AfterSalahSheet({ open, prayer, onPrayer, onClose }: Props) {
             {
               paddingBottom:
                 "calc(var(--bottom-nav-row, 56px) + env(safe-area-inset-bottom) + 12px)",
-            {
               ["--card" as string]: "var(--surface-deep)",
               ["--card-foreground" as string]: "var(--surface-deep-fg)",
               ["--translit" as string]: "var(--surface-deep-muted)",
