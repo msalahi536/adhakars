@@ -246,10 +246,14 @@ function Qibla() {
                   style={{
                     background:
                       "radial-gradient(circle, var(--card) 0%, var(--muted) 75%)",
-                    border: "2px solid color-mix(in oklab, var(--accent) 45%, transparent)",
-                    boxShadow: "var(--card-shadow)",
+                    border: `2px solid ${aligned ? "color-mix(in oklab, #3d8f5c 70%, transparent)" : "color-mix(in oklab, var(--accent) 45%, transparent)"}`,
+                    boxShadow: aligned
+                      ? "0 0 28px color-mix(in oklab, #3d8f5c 35%, transparent), var(--card-shadow)"
+                      : "var(--card-shadow)",
+                    transition: "border-color 300ms ease, box-shadow 300ms ease",
                   }}
                 />
+
                 {/* Cardinal marks rotate with device so N always points to true North */}
                 <div
                   className="absolute inset-0"
