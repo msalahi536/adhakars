@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
-import { Bell, BellOff, Check, ChevronRight, Clock } from "lucide-react";
+import { Bell, BellOff, ChevronDown, MapPin, Play } from "lucide-react";
 import { HeaderSettingsButton } from "@/components/HeaderSettingsButton";
 import { ConcentricCirclesPattern } from "@/components/HeaderPatterns";
 import { PrayerTimeline } from "@/components/prayer/PrayerTimeline";
