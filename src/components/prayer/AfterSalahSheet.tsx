@@ -140,8 +140,11 @@ export function AfterSalahSheet({ open, prayer, onPrayer, onClose }: Props) {
         </div>
 
         <div
-          className="flex min-h-0 flex-1 flex-col pb-4"
+          className="flex min-h-0 flex-1 flex-col"
           style={
+            {
+              paddingBottom:
+                "calc(var(--bottom-nav-row, 56px) + env(safe-area-inset-bottom) + 12px)",
             {
               ["--card" as string]: "var(--surface-deep)",
               ["--card-foreground" as string]: "var(--surface-deep-fg)",
