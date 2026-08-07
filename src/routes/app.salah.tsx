@@ -10,6 +10,7 @@ import { SALAH_PRAYERS, getSalahItems, isItemComplete, type SalahPrayer } from "
 import { getCounts } from "@/lib/storage";
 
 import {
+  DEFAULT_PRAYER_SETTINGS,
   addDays,
   currentPrayer,
   dateKey,
@@ -28,6 +29,7 @@ import {
   setPrayerSettings,
   slotsForDay,
   type DayTimes,
+  type PrayerSettings,
   type Slot,
 } from "@/lib/prayer-times";
 import { rescheduleAdhanNotifications } from "@/lib/adhan-notifications";
@@ -51,7 +53,29 @@ export const Route = createFileRoute("/app/salah")({
     ],
   }),
   component: Salah,
+  errorComponent: SalahError,
 });
+
+function SalahError() {
+  return (
+    <main
+      className="scroll-area flex flex-col items-center justify-center px-6 text-center"
+      style={{ background: "var(--background)", color: "var(--foreground)" }}
+    >
+      <div className="text-lg font-bold">Prayer times could not load</div>
+      <p className="mt-2 text-sm" style={{ color: "var(--muted-foreground)" }}>
+        Check your connection or set your location again in Settings.
+      </p>
+      <button
+        onClick={() => window.location.reload()}
+        className="mt-5 rounded-full px-5 py-2.5 text-sm font-bold"
+        style={{ background: "var(--accent)", color: "var(--accent-foreground)" }}
+      >
+        Try again
+      </button>
+    </main>
+  );
+}
 
 const PRAYER_KEY = "selectedPrayer";
 const validPrayer = (v: string | null): SalahPrayer => {
