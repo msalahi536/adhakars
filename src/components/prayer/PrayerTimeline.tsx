@@ -185,10 +185,25 @@ export function PrayerTimeline({ days, now, todayKey, tone = "light", onPickPray
   const [expanded, setExpanded] = useState(false);
   const [dragY, setDragY] = useState(0);
   const [startY, setStartY] = useState<number | null>(null);
+  const scrollRef = useRef<HTMLDivElement | null>(null);
+  const nextRowRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
-    if (!expanded) setDragY(0);
+    if (!expanded) {
+      setDragY(0);
+      return;
+    }
+    // Center the next prayer when the timeline opens, even if it is tomorrow.
+    const t = window.setTimeout(() => {
+      const box = scrollRef.current;
+      const row = nextRowRef.current;
+      if (!box || !row) return;
+      const top = row.offsetTop - box.clientHeight / 2 + row.clientHeight / 2;
+      box.scrollTo({ top: Math.max(0, top), behavior: "auto" });
+    }, 40);
+    return () => window.clearTimeout(t);
   }, [expanded]);
+
 
   const all = days.flatMap((d) => d.slots);
   const next = all.find((s) => s.at.getTime() > now.getTime()) ?? null;
