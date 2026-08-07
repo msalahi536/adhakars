@@ -696,7 +696,7 @@ function Settings() {
                         onClick={async () => {
                           setCityBusy(true);
                           setCityError(null);
-                          const loc = await lookupCity(cityInput, prayerSettings);
+                          const loc = await lookupCity(cityInput);
                           setCityBusy(false);
                           if (!loc) {
                             setCityError("We could not find that place. Try a city and country.");

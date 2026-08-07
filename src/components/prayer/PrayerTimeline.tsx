@@ -9,6 +9,8 @@ type Props = {
   days: { key: string; label: string; slots: Slot[] }[];
   now: Date;
   todayKey: string;
+  /** card styling: light surface or the deep tinted surface */
+  tone?: "light" | "deep";
   /** open the after salah adhkar for a tapped prayer */
   onPickPrayer?: (id: Exclude<PrayerId, "sunrise">) => void;
 };
@@ -168,7 +170,7 @@ function DayPill({ label }: { label: string }) {
   );
 }
 
-export function PrayerTimeline({ days, now, todayKey, onPickPrayer }: Props) {
+export function PrayerTimeline({ days, now, todayKey, tone = "light", onPickPrayer }: Props) {
   const [expanded, setExpanded] = useState(false);
   const [dragY, setDragY] = useState(0);
   const [startY, setStartY] = useState<number | null>(null);
@@ -189,22 +191,33 @@ export function PrayerTimeline({ days, now, todayKey, onPickPrayer }: Props) {
     ...(tomorrow ? tomorrow.slots : []),
   ].slice(0, 6);
 
+  const deep = tone === "deep";
+  const cardStyle: React.CSSProperties = deep
+    ? ({
+        background: "var(--surface-deep-gradient)",
+        color: "var(--surface-deep-fg)",
+        boxShadow: "var(--card-shadow)",
+        ["--foreground" as string]: "var(--surface-deep-fg)",
+        ["--muted-foreground" as string]: "var(--surface-deep-muted)",
+      } as React.CSSProperties)
+    : {
+        background: "var(--surface-card)",
+        border: "1px solid var(--border)",
+        boxShadow: "var(--card-shadow)",
+        color: "var(--foreground)",
+      };
+
   return (
     <>
       <button
         onClick={() => setExpanded(true)}
-        className="w-full rounded-[26px] px-4 py-3 text-left"
-        style={{
-          background: "var(--surface-card)",
-          border: "1px solid var(--border)",
-          boxShadow: "var(--card-shadow)",
-          color: "var(--foreground)",
-        }}
+        className="h-full w-full rounded-[26px] px-4 py-3 text-left active:scale-[0.99]"
+        style={cardStyle}
       >
-        <div className="mb-1 flex items-center justify-between">
+        <div className="mb-1 flex items-center justify-between gap-2">
           <span className="label-caps">Upcoming</span>
-          <span className="text-[11px]" style={{ color: "var(--muted-foreground)" }}>
-            Tap for full timeline
+          <span className="text-[10px]" style={{ color: "var(--muted-foreground)" }}>
+            Tap for all
           </span>
         </div>
         {compact.length === 0 ? (
