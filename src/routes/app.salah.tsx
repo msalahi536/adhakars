@@ -63,14 +63,15 @@ const DAY_LABELS = ["Yesterday", "Today", "Tomorrow", "Day after"];
 
 function Salah() {
   /* ---------------- prayer times ---------------- */
-  const [settings, setSettingsState] = useState(() => getPrayerSettings());
+  const [settings, setSettingsState] = useState<PrayerSettings>(DEFAULT_PRAYER_SETTINGS);
   const [days, setDays] = useState<DayTimes[]>([]);
   const [now, setNow] = useState(() => new Date());
   const [loading, setLoading] = useState(true);
   const [cityInput, setCityInput] = useState("");
   const [cityError, setCityError] = useState<string | null>(null);
   const [locating, setLocating] = useState(false);
-  const [dismissed, setDismissedState] = useState(() => getDismissed());
+  const [dismissed, setDismissedState] = useState<ReturnType<typeof getDismissed>>(null);
+
   const [mutedAll, setMutedAll] = useState(false);
   const autoSelected = useRef(false);
 
@@ -209,10 +210,11 @@ function Salah() {
   };
 
   /* ---------------- adhkar ---------------- */
-  const [prayer, setPrayerState] = useState<SalahPrayer>(() => {
-    if (typeof window === "undefined") return "fajr";
-    return validPrayer(window.localStorage.getItem(PRAYER_KEY));
-  });
+  const [prayer, setPrayerState] = useState<SalahPrayer>("fajr");
+  useEffect(() => {
+    setPrayerState(validPrayer(window.localStorage.getItem(PRAYER_KEY)));
+  }, []);
+
   const [sheetOpen, setSheetOpen] = useState(false);
   const [pickerOpen, setPickerOpen] = useState(false);
   const setPrayer = (p: SalahPrayer) => {
