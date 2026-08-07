@@ -255,6 +255,18 @@ function Salah() {
   const cur = progress[prayer] ?? { done: 0, total: 0 };
   const pct = cur.total ? Math.round((cur.done / cur.total) * 100) : 0;
 
+  // Countdown urgency: amber inside 30 minutes, red inside 10 minutes.
+  const msLeft = next ? next.at.getTime() - now.getTime() : null;
+  const urgencyColor =
+    msLeft === null || msLeft < 0
+      ? null
+      : msLeft <= 10 * 60 * 1000
+        ? "#ff9a8a"
+        : msLeft <= 30 * 60 * 1000
+          ? "#ffd166"
+          : null;
+
+
 
   return (
     <>
