@@ -340,7 +340,66 @@ function Salah() {
 
       <main className="scroll-area flex flex-col" style={{ background: "var(--background)" }}>
         <div className="mx-auto w-full max-w-md px-5 pb-8 pt-4">
+          {!settings.location && (
+            <div
+              className="mb-3 w-full overflow-hidden rounded-[30px] p-5"
+              style={{
+                background: "var(--surface-card)",
+                border: "1px solid var(--border)",
+                color: "var(--foreground)",
+                boxShadow: "var(--card-shadow)",
+              }}
+            >
+              <div className="label-caps" style={{ color: "var(--muted-foreground)" }}>
+                Location
+              </div>
+              <div className="mt-1 text-xl font-bold tracking-tight">Set your location</div>
+              <p className="mt-1 text-sm" style={{ color: "var(--muted-foreground)" }}>
+                We use it only to calculate your prayer times. Nothing leaves your device except
+                the coordinates used to look up the times.
+              </p>
+              <button
+                onClick={() => void useMyLocation()}
+                disabled={locating}
+                className="mt-4 w-full rounded-full py-3 text-sm font-bold active:scale-[0.99]"
+                style={{ background: "var(--accent)", color: "var(--accent-foreground)" }}
+              >
+                {locating ? "Locating..." : "Use my location"}
+              </button>
+              <div className="mt-2 flex gap-2">
+                <input
+                  value={cityInput}
+                  onChange={(e) => setCityInput(e.target.value)}
+                  placeholder="Or type a city"
+                  className="min-w-0 flex-1 rounded-full px-4 py-2.5 outline-none"
+                  style={{
+                    fontSize: 16,
+                    background: "var(--background)",
+                    color: "var(--foreground)",
+                    border: "1px solid var(--border)",
+                  }}
+                />
+                <button
+                  onClick={() => void submitCity()}
+                  className="shrink-0 rounded-full px-5 text-sm font-bold"
+                  style={{
+                    background: "color-mix(in oklab, var(--foreground) 8%, transparent)",
+                    color: "var(--foreground)",
+                  }}
+                >
+                  Set
+                </button>
+              </div>
+              {cityError && (
+                <div className="mt-2 text-[12px]" style={{ color: "var(--muted-foreground)" }}>
+                  {cityError}
+                </div>
+              )}
+            </div>
+          )}
+
           {/* Recommended: entry into the after salah adhkar */}
+
           <div
             className="w-full overflow-hidden rounded-[30px] p-5"
             style={{
