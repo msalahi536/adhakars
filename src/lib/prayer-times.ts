@@ -303,10 +303,15 @@ export type Slot = {
 
 export const slotsForDay = (day: DayTimes): Slot[] => {
   const [y, m, d] = day.key.split("-").map((n) => parseInt(n, 10));
+  let prev = -1;
   return PRAYER_ORDER.map((id) => {
+    const mins = day.times[id];
+    // Isha can fall after midnight: keep the sequence moving forward.
+    const adjusted = mins < prev ? mins + 24 * 60 : mins;
+    prev = adjusted;
     const at = new Date(y, m - 1, d, 0, 0, 0, 0);
-    at.setMinutes(day.times[id]);
-    return { id, label: PRAYER_LABELS[id], at, dayKey: day.key, minutes: day.times[id] };
+    at.setMinutes(adjusted);
+    return { id, label: PRAYER_LABELS[id], at, dayKey: day.key, minutes: mins };
   });
 };
 
