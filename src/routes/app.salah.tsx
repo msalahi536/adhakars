@@ -1,9 +1,8 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
-import { Check, ChevronRight } from "lucide-react";
+import { Bell, BellOff, Check, ChevronRight, Clock } from "lucide-react";
 import { HeaderSettingsButton } from "@/components/HeaderSettingsButton";
 import { ConcentricCirclesPattern } from "@/components/HeaderPatterns";
-import { MiniQibla } from "@/components/prayer/MiniQibla";
 import { PrayerTimeline } from "@/components/prayer/PrayerTimeline";
 import { AfterSalahSheet } from "@/components/prayer/AfterSalahSheet";
 import { SALAH_PRAYERS, getSalahItems, isItemComplete, type SalahPrayer } from "@/data/salah";
@@ -15,11 +14,13 @@ import {
   dateKey,
   fetchDay,
   formatCountdown,
+  formatMinutes,
   getDismissed,
   getPrayerSettings,
   isMutedAllToday,
   lookupCity,
   prunePrayerCache,
+  repairLocation,
   resolveLocation,
   setDismissed,
   setMuteAllToday,
