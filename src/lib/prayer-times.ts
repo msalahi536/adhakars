@@ -149,7 +149,7 @@ const sig = (s: PrayerSettings): string => {
   const loc = s.location;
   const lat = loc ? loc.lat.toFixed(2) : "0";
   const lng = loc ? loc.lng.toFixed(2) : "0";
-  return `${lat},${lng},${s.method},${s.hanafi ? 1 : 0}`;
+  return `${lat},${lng},${s.method},${s.hanafi ? 1 : 0},${deviceTimeZone()}`;
 };
 
 const readCache = (key: string, s: PrayerSettings): DayTimes | null => {
