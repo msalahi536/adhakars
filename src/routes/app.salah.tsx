@@ -277,102 +277,64 @@ function Salah() {
         <ConcentricCirclesPattern />
         <HeaderSettingsButton />
         <div className="relative mx-auto max-w-md px-5 pb-6 pt-5">
-          {settings.location ? (
-            <div className="flex flex-col items-center pt-6 pb-1 text-center">
-              <div
-                className="text-[15px] font-semibold tracking-wide"
+          <div className="flex flex-col items-center pt-6 pb-1 text-center">
+            <div
+              className="text-[15px] font-semibold tracking-wide"
+              style={{ color: "var(--header-sub)" }}
+            >
+              {!settings.location
+                ? "Prayer times"
+                : next
+                  ? `${next.label} in`
+                  : loading
+                    ? "Loading prayer times"
+                    : "No times yet"}
+            </div>
+            <div
+              className="mt-1 font-bold"
+              style={{
+                fontSize: 52,
+                lineHeight: 1.02,
+                letterSpacing: "-0.02em",
+                fontVariantNumeric: "tabular-nums",
+                textShadow: "0 10px 30px rgba(0,0,0,0.22)",
+                color: urgencyColor ?? "inherit",
+                transition: "color 400ms ease",
+                opacity: settings.location ? 1 : 0.55,
+              }}
+            >
+              {next ? formatCountdown(next.at.getTime() - now.getTime()) : "--:--:--"}
+            </div>
+
+            <button
+              onClick={toggleDismissNext}
+              disabled={!next}
+              className="mt-4 rounded-full px-5 py-2 text-[13px] font-bold active:scale-95"
+              style={{
+                background: nextIsDismissed
+                  ? "color-mix(in oklab, var(--header-fg) 16%, transparent)"
+                  : "color-mix(in oklab, var(--header-fg) 12%, transparent)",
+                color: "var(--header-fg)",
+                border: "1px solid color-mix(in oklab, var(--header-fg) 22%, transparent)",
+                backdropFilter: "blur(6px)",
+                transition: "background 200ms ease",
+                opacity: next ? 1 : 0.45,
+              }}
+            >
+              {nextIsDismissed ? "Tap to unmute next salah" : "Tap to dismiss"}
+            </button>
+
+            <div className="mt-3 flex items-center gap-2 text-[11px]">
+              <span
+                className="inline-flex items-center gap-1"
                 style={{ color: "var(--header-sub)" }}
               >
-                {next ? `${next.label} in` : loading ? "Loading prayer times" : "No times yet"}
-              </div>
-              <div
-                className="mt-1 font-bold"
-                style={{
-                  fontSize: 52,
-                  lineHeight: 1.02,
-                  letterSpacing: "-0.02em",
-                  fontVariantNumeric: "tabular-nums",
-                  textShadow: "0 10px 30px rgba(0,0,0,0.22)",
-                  color: urgencyColor ?? "inherit",
-                  transition: "color 400ms ease",
-                }}
-              >
-                {next ? formatCountdown(next.at.getTime() - now.getTime()) : "--:--:--"}
-              </div>
-
-              <button
-                onClick={toggleDismissNext}
-                disabled={!next}
-                className="mt-4 rounded-full px-5 py-2 text-[13px] font-bold active:scale-95"
-                style={{
-                  background: nextIsDismissed
-                    ? "color-mix(in oklab, var(--header-fg) 16%, transparent)"
-                    : "color-mix(in oklab, var(--header-fg) 12%, transparent)",
-                  color: "var(--header-fg)",
-                  border: "1px solid color-mix(in oklab, var(--header-fg) 22%, transparent)",
-                  backdropFilter: "blur(6px)",
-                  transition: "background 200ms ease",
-                }}
-              >
-                {nextIsDismissed ? "Tap to unmute next salah" : "Tap to dismiss"}
-              </button>
-
-              <div className="mt-3 flex items-center gap-2 text-[11px]">
-                <span
-                  className="inline-flex items-center gap-1"
-                  style={{ color: "var(--header-sub)" }}
-                >
-                  <MapPin size={11} />
-                  {settings.location.label}
-                </span>
-              </div>
-
+                <MapPin size={11} />
+                {settings.location ? settings.location.label : "Location not set"}
+              </span>
             </div>
-          ) : (
-            <div
-              className="mt-4 rounded-2xl p-3"
-              style={{ background: "color-mix(in oklab, var(--header-fg) 12%, transparent)" }}
-            >
-              <p className="text-xs" style={{ color: "var(--header-sub)" }}>
-                We need your location to calculate prayer times. Nothing leaves your device except
-                the coordinates used to look up the times.
-              </p>
-              <button
-                onClick={() => void useMyLocation()}
-                disabled={locating}
-                className="mt-3 w-full rounded-full py-2 text-sm font-bold"
-                style={{ background: "var(--accent)", color: "var(--accent-foreground)" }}
-              >
-                {locating ? "Locating..." : "Use my location"}
-              </button>
-              <div className="mt-2 flex gap-2">
-                <input
-                  value={cityInput}
-                  onChange={(e) => setCityInput(e.target.value)}
-                  placeholder="Or type a city"
-                  className="min-w-0 flex-1 rounded-full px-3 py-2 outline-none"
-                  style={{
-                    fontSize: 16,
-                    background: "var(--surface-card)",
-                    color: "var(--foreground)",
-                    border: "1px solid var(--border)",
-                  }}
-                />
-                <button
-                  onClick={() => void submitCity()}
-                  className="rounded-full px-4 text-sm font-bold"
-                  style={{ background: "var(--accent)", color: "var(--accent-foreground)" }}
-                >
-                  Set
-                </button>
-              </div>
-              {cityError && (
-                <div className="mt-2 text-[11px]" style={{ color: "var(--header-sub)" }}>
-                  {cityError}
-                </div>
-              )}
-            </div>
-          )}
+          </div>
+
         </div>
       </header>
 
