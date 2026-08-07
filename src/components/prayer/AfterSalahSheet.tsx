@@ -1,5 +1,6 @@
 // Full screen sheet holding the after salah adhkar for one prayer.
 
+import { Portal } from "@/components/Portal";
 import { useEffect, useState } from "react";
 import { X } from "lucide-react";
 import { SwipeStack } from "@/components/SwipeStack";
@@ -44,9 +45,10 @@ export function AfterSalahSheet({ open, prayer, onPrayer, onClose }: Props) {
   const label = SALAH_PRAYERS.find((p) => p.id === prayer)?.label ?? "";
 
   return (
+    <Portal>
     <div
-      className="fixed inset-0 z-50 flex flex-col justify-end"
-      style={{ background: "rgba(0,0,0,0.5)", backdropFilter: "blur(6px)" }}
+      className="fixed inset-0 flex flex-col justify-end"
+      style={{ background: "rgba(0,0,0,0.5)", backdropFilter: "blur(6px)", zIndex: 200 }}
       onClick={onClose}
     >
       <div
@@ -169,5 +171,6 @@ export function AfterSalahSheet({ open, prayer, onPrayer, onClose }: Props) {
         </div>
       </div>
     </div>
+  </Portal>
   );
 }

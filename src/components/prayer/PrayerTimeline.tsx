@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { X } from "lucide-react";
+import { Portal } from "@/components/Portal";
 import { formatMinutes, type PrayerId, type Slot } from "@/lib/prayer-times";
 
 type Props = {
@@ -261,9 +262,12 @@ export function PrayerTimeline({ days, now, todayKey, tone = "light", onPickPray
       </button>
 
       {expanded && (
+        <Portal>
         <div
-          className="fixed inset-0 z-50 flex flex-col justify-end"
-          style={{ background: "rgba(0,0,0,0.5)", backdropFilter: "blur(6px)" }}
+          className="fixed inset-0 flex flex-col justify-end"
+          // eslint-disable-next-line
+          data-overlay="prayer-timeline"
+          style={{ background: "rgba(0,0,0,0.5)", backdropFilter: "blur(6px)", zIndex: 200 }}
           onClick={() => setExpanded(false)}
         >
           <div
@@ -349,6 +353,7 @@ export function PrayerTimeline({ days, now, todayKey, tone = "light", onPickPray
             </div>
           </div>
         </div>
+        </Portal>
       )}
     </>
   );

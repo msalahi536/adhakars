@@ -1,5 +1,6 @@
 // Bottom sheet for choosing which prayer's after salah adhkar to open.
 
+import { Portal } from "@/components/Portal";
 import { Check } from "lucide-react";
 import { SALAH_PRAYERS, type SalahPrayer } from "@/data/salah";
 
@@ -15,7 +16,13 @@ export function PrayerPicker({ open, selected, progress, onPick, onClose }: Prop
   if (!open) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-end" role="dialog" aria-label="Choose a prayer">
+    <Portal>
+    <div
+      className="fixed inset-0 flex items-end"
+      style={{ zIndex: 200 }}
+      role="dialog"
+      aria-label="Choose a prayer"
+    >
       <button
         aria-label="Close"
         onClick={onClose}
@@ -90,5 +97,6 @@ export function PrayerPicker({ open, selected, progress, onPick, onClose }: Prop
         </div>
       </div>
     </div>
+  </Portal>
   );
 }
