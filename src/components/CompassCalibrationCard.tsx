@@ -6,55 +6,80 @@ type Props = {
   onSkip: () => void;
 };
 
-const SEGMENTS = 8; // 45 degree sectors around the phone
-const NEEDED = 5; // only 5 of 8 sectors are required, so this is quick
-const SWEEP_TARGET = 320; // or this much total rotation, whichever lands first
+// Field the marker moves in (px)
+const W = 260;
+const H = 168;
+
+// Lemniscate (figure 8) checkpoints. x = sin(t), y = sin(t)cos(t)
+const NODES = Array.from({ length: 14 }, (_, i) => {
+  const t = (i / 14) * Math.PI * 2;
+  return {
+    x: W / 2 + Math.sin(t) * (W / 2 - 26),
+    y: H / 2 + Math.sin(t) * Math.cos(t) * (H / 2 - 18) * 2,
+  };
+});
+
+const HIT = 30; // generous hit radius so it is easy
+const TILT_RANGE = 30; // degrees of wrist tilt that reaches the edge
+
+function pathD() {
+  const pts = Array.from({ length: 80 }, (_, i) => {
+    const t = (i / 79) * Math.PI * 2;
+    return [
+      W / 2 + Math.sin(t) * (W / 2 - 26),
+      H / 2 + Math.sin(t) * Math.cos(t) * (H / 2 - 18) * 2,
+    ];
+  });
+  return pts.map(([x, y], i) => `${i === 0 ? "M" : "L"}${x.toFixed(1)} ${y.toFixed(1)}`).join(" ") + " Z";
+}
+const D = pathD();
 
 /**
- * Light, quick calibration. The phone glyph is surrounded by eight petals that
- * light up as the magnetometer sees each sector. It also accepts plain total
- * rotation, so a couple of relaxed wrist turns is enough.
+ * Trace the figure 8. A dot follows how the phone is tilted, and the user
+ * steers it over the glowing checkpoints. Tilting is far easier and far more
+ * responsive than spinning in place, so this finishes in a few seconds.
  */
 export function CompassCalibrationCard({ onDone, onSkip }: Props) {
-  const [lit, setLit] = useState<boolean[]>(() => Array.from({ length: SEGMENTS }, () => false));
-  const [progress, setProgress] = useState(0);
+  const [hit, setHit] = useState<boolean[]>(() => NODES.map(() => false));
+  const [pos, setPos] = useState({ x: W / 2, y: H / 2 });
   const [complete, setComplete] = useState(false);
   const [mode, setMode] = useState<"waiting" | "live" | "nosensor">("waiting");
 
-  const binsRef = useRef<boolean[]>(Array.from({ length: SEGMENTS }, () => false));
-  const sweepRef = useRef(0);
-  const lastRef = useRef<number | null>(null);
+  const hitRef = useRef<boolean[]>(NODES.map(() => false));
   const gotRef = useRef(false);
   const doneRef = useRef(false);
+  const baseRef = useRef<{ beta: number; gamma: number } | null>(null);
 
   useEffect(() => {
     const unsub = subscribeOrientation((r) => {
       if (doneRef.current) return;
+      if (r.beta === null || r.gamma === null) return;
       gotRef.current = true;
       setMode("live");
-      if (r.heading === null) return;
 
-      const idx = Math.floor((r.heading / 360) * SEGMENTS) % SEGMENTS;
-      if (!binsRef.current[idx]) {
-        binsRef.current[idx] = true;
-        setLit([...binsRef.current]);
-      }
+      if (!baseRef.current) baseRef.current = { beta: r.beta, gamma: r.gamma };
+      const base = baseRef.current;
 
-      const last = lastRef.current;
-      if (last !== null) {
-        const delta = Math.abs(((r.heading - last + 540) % 360) - 180);
-        if (delta > 1.5 && delta < 90) sweepRef.current += delta;
-      }
-      lastRef.current = r.heading;
+      const dx = Math.max(-1, Math.min(1, (r.gamma - base.gamma) / TILT_RANGE));
+      const dy = Math.max(-1, Math.min(1, (r.beta - base.beta) / TILT_RANGE));
+      const x = W / 2 + dx * (W / 2 - 14);
+      const y = H / 2 + dy * (H / 2 - 12);
+      setPos({ x, y });
 
-      const byBins = binsRef.current.filter(Boolean).length / NEEDED;
-      const bySweep = sweepRef.current / SWEEP_TARGET;
-      const p = Math.min(1, Math.max(byBins, bySweep));
-      setProgress(p);
-      if (p >= 1) {
-        doneRef.current = true;
-        setComplete(true);
-        setLit(Array.from({ length: SEGMENTS }, () => true));
+      let changed = false;
+      NODES.forEach((n, i) => {
+        if (hitRef.current[i]) return;
+        if (Math.hypot(n.x - x, n.y - y) < HIT) {
+          hitRef.current[i] = true;
+          changed = true;
+        }
+      });
+      if (changed) {
+        setHit([...hitRef.current]);
+        if (hitRef.current.every(Boolean)) {
+          doneRef.current = true;
+          setComplete(true);
+        }
       }
     });
 
@@ -68,7 +93,8 @@ export function CompassCalibrationCard({ onDone, onSkip }: Props) {
     };
   }, []);
 
-  const pct = Math.round(progress * 100);
+  const done = hit.filter(Boolean).length;
+  const pct = Math.round((done / NODES.length) * 100);
 
   return (
     <div
@@ -91,77 +117,98 @@ export function CompassCalibrationCard({ onDone, onSkip }: Props) {
         <div className="label-caps" style={{ color: "var(--muted-foreground)" }}>
           Compass
         </div>
-        <h2 className="mt-1 text-lg font-bold">
-          {complete ? "All set" : "Quick calibration"}
-        </h2>
-        <p className="mt-2 text-sm" style={{ color: "var(--muted-foreground)" }}>
-          {mode === "nosensor"
-            ? "This device is not sending compass readings. Open the app on a phone, and make sure motion access is allowed."
-            : complete
-              ? "Your compass is calibrated. You can find the Qibla now."
-              : "Hold your phone flat and turn your wrist side to side a couple of times. The petals light up as it tunes in."}
-        </p>
+        <h2 className="mt-1 text-lg font-bold">{complete ? "All set" : "Trace the figure 8"}</h2>
+
+        {mode === "nosensor" ? (
+          <p className="mt-2 text-sm" style={{ color: "var(--muted-foreground)" }}>
+            This device is not sending motion readings. Open the app on a phone, and make sure
+            motion access is allowed.
+          </p>
+        ) : complete ? (
+          <p className="mt-2 text-sm" style={{ color: "var(--muted-foreground)" }}>
+            Your compass is calibrated. You can find the Qibla now.
+          </p>
+        ) : (
+          <ol
+            className="mt-2 space-y-1 text-sm"
+            style={{ color: "var(--muted-foreground)", listStyle: "decimal", paddingLeft: 18 }}
+          >
+            <li>Hold the phone flat in front of you, screen up.</li>
+            <li>Tilt it left and right, and forward and back, to move the dot.</li>
+            <li>Steer the dot over every glowing point on the figure 8.</li>
+          </ol>
+        )}
 
         {mode !== "nosensor" && (
-          <div className="mt-6 flex flex-col items-center">
-            <div className="relative" style={{ width: 168, height: 168 }}>
-              {/* Petals */}
-              {lit.map((on, i) => (
-                <div
-                  key={i}
-                  className="absolute left-1/2 top-1/2"
-                  style={{
-                    transform: `translate(-50%, -50%) rotate(${i * (360 / SEGMENTS)}deg) translateY(-64px)`,
-                  }}
-                >
-                  <div
-                    style={{
-                      width: 10,
-                      height: 26,
-                      borderRadius: 999,
-                      background: on
+          <div className="mt-5 flex flex-col items-center">
+            <div
+              className="relative overflow-hidden rounded-[20px]"
+              style={{
+                width: W,
+                height: H,
+                background: "color-mix(in oklab, var(--accent) 6%, transparent)",
+                border: "1px solid color-mix(in oklab, var(--foreground) 10%, transparent)",
+              }}
+            >
+              <svg width={W} height={H} className="absolute inset-0">
+                <path
+                  d={D}
+                  fill="none"
+                  stroke="color-mix(in oklab, var(--foreground) 14%, transparent)"
+                  strokeWidth={2}
+                  strokeDasharray="5 6"
+                />
+                {NODES.map((n, i) => (
+                  <circle
+                    key={i}
+                    cx={n.x}
+                    cy={n.y}
+                    r={hit[i] ? 7 : 5.5}
+                    fill={
+                      hit[i]
                         ? complete
                           ? "#3d8f5c"
                           : "var(--accent)"
-                        : "color-mix(in oklab, var(--foreground) 10%, transparent)",
-                      transform: on ? "scaleY(1.12)" : "scaleY(1)",
-                      boxShadow: on
-                        ? "0 0 14px color-mix(in oklab, var(--accent) 45%, transparent)"
+                        : "color-mix(in oklab, var(--foreground) 16%, transparent)"
+                    }
+                    style={{
+                      filter: hit[i]
+                        ? "drop-shadow(0 0 6px color-mix(in oklab, var(--accent) 60%, transparent))"
                         : "none",
-                      transition: "background 260ms ease, transform 260ms ease, box-shadow 260ms ease",
+                      transition: "r 200ms ease, fill 240ms ease",
                     }}
                   />
-                </div>
-              ))}
+                ))}
+              </svg>
 
-              {/* Phone glyph */}
-              <div className="absolute inset-0 flex items-center justify-center">
-                <div
-                  className="flex flex-col items-center justify-center"
-                  style={{
-                    width: 58,
-                    height: 92,
-                    borderRadius: 14,
-                    border: "2px solid color-mix(in oklab, var(--foreground) 22%, transparent)",
-                    background: "color-mix(in oklab, var(--accent) 8%, transparent)",
-                    animation: complete ? "none" : "qibla-tilt 2.6s ease-in-out infinite",
-                  }}
-                >
-                  <div className="text-sm font-bold">{complete ? "✓" : `${pct}%`}</div>
-                </div>
-              </div>
+              {/* Tilt marker */}
+              <div
+                className="absolute"
+                style={{
+                  left: pos.x,
+                  top: pos.y,
+                  width: 20,
+                  height: 20,
+                  marginLeft: -10,
+                  marginTop: -10,
+                  borderRadius: 999,
+                  background: "var(--accent)",
+                  boxShadow: "0 0 0 5px color-mix(in oklab, var(--accent) 22%, transparent)",
+                  transition: "left 90ms linear, top 90ms linear",
+                }}
+              />
             </div>
             <div className="mt-3 text-[11px]" style={{ color: "var(--muted-foreground)" }}>
               {mode === "waiting"
                 ? "Waiting for sensor"
                 : complete
                   ? "Calibrated"
-                  : "Keep turning gently"}
+                  : `${done} of ${NODES.length} points, ${pct}%`}
             </div>
           </div>
         )}
 
-        <p className="mt-5 text-[11px]" style={{ color: "var(--muted-foreground)" }}>
+        <p className="mt-4 text-[11px]" style={{ color: "var(--muted-foreground)" }}>
           Keep away from magnets, metal, and magnetic phone cases, as these affect accuracy.
         </p>
 
@@ -188,13 +235,6 @@ export function CompassCalibrationCard({ onDone, onSkip }: Props) {
           </button>
         </div>
       </div>
-
-      <style>{`
-        @keyframes qibla-tilt {
-          0%, 100% { transform: rotate(-14deg); }
-          50% { transform: rotate(14deg); }
-        }
-      `}</style>
     </div>
   );
 }

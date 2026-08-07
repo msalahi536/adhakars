@@ -11,6 +11,35 @@ type DeviceMotionEventStatic = typeof DeviceMotionEvent & {
 
 export type PermResult = "granted" | "denied" | "unsupported";
 
+/**
+ * True when this device (iOS Safari) requires a real user gesture before
+ * motion/orientation access can be requested. Everywhere else we can start
+ * the compass automatically as soon as the page opens.
+ */
+export function needsGesturePermission(): boolean {
+  if (typeof window === "undefined" || typeof DeviceOrientationEvent === "undefined") return false;
+  const DOE = DeviceOrientationEvent as unknown as { requestPermission?: unknown };
+  return typeof DOE.requestPermission === "function";
+}
+
+const PERM_OK_KEY = "qibla-perm-granted";
+
+export function hasStoredPermission(): boolean {
+  try {
+    return localStorage.getItem(PERM_OK_KEY) === "1";
+  } catch {
+    return false;
+  }
+}
+
+export function storePermissionGranted() {
+  try {
+    localStorage.setItem(PERM_OK_KEY, "1");
+  } catch {
+    // ignore
+  }
+}
+
 function withTimeout<T>(p: Promise<T>, ms: number, fallback: T): Promise<T> {
   return new Promise((resolve) => {
     let done = false;

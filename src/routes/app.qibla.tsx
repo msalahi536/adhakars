@@ -5,8 +5,11 @@ import { HeaderBackButton } from "@/components/HeaderBackButton";
 import { CompassCalibrationCard } from "@/components/CompassCalibrationCard";
 import {
   getPosition,
+  hasStoredPermission,
+  needsGesturePermission,
   normalizeHeading,
   requestOrientationPermission,
+  storePermissionGranted,
   subscribeOrientation,
 } from "@/lib/compass";
 
@@ -129,6 +132,8 @@ function Qibla() {
       setPhase("error");
       return;
     }
+    if (sensor === "granted") storePermissionGranted();
+
 
     setStep("Getting your location…");
     const pos = await getPosition();
@@ -157,7 +162,19 @@ function Qibla() {
     if (!calibrated && sensor !== "unsupported") setShowCalibration(true);
   };
 
+  // Auto start when opening the page. iOS only allows the motion prompt from a
+  // real tap, so the button is kept for that first run; once granted (or on
+  // platforms with no prompt) the compass comes up on its own.
+  const autoRef = useRef(false);
+  useEffect(() => {
+    if (autoRef.current) return;
+    autoRef.current = true;
+    if (!needsGesturePermission() || hasStoredPermission()) void start();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   const permState = phase;
+
 
   // Rotation to apply to the qibla arrow: bearing - heading, unwrapped.
   const targetRotation =
