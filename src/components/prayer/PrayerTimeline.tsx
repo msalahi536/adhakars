@@ -1,6 +1,6 @@
 // Vertical mini timeline of prayer times, with an expanded multi day view.
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { X } from "lucide-react";
 import { formatMinutes, type PrayerId, type Slot } from "@/lib/prayer-times";
 
@@ -21,10 +21,12 @@ function Row({
   slot,
   state,
   onPick,
+  rowRef,
 }: {
   slot: Slot;
   state: "past" | "next" | "future";
   onPick?: () => void;
+  rowRef?: (el: HTMLDivElement | null) => void;
 }) {
   const sunrise = isSunrise(slot);
   const color = state === "next" ? "var(--accent)" : "var(--foreground)";
@@ -32,11 +34,13 @@ function Row({
   const clickable = !!onPick && !sunrise;
   return (
     <div
+      ref={rowRef}
       onClick={clickable ? onPick : undefined}
       role={clickable ? "button" : undefined}
       className={`relative flex items-center gap-3 rounded-2xl py-2 ${clickable ? "active:scale-[0.99]" : ""}`}
       style={{ opacity, cursor: clickable ? "pointer" : undefined }}
     >
+
       <div className="relative flex w-4 shrink-0 justify-center">
         {sunrise ? (
           <span
@@ -99,6 +103,7 @@ function DayList({
   showNowDivider,
   dim,
   onPickPrayer,
+  nextRef,
 }: {
   slots: Slot[];
   now: Date;
@@ -106,6 +111,7 @@ function DayList({
   showNowDivider?: boolean;
   dim?: boolean;
   onPickPrayer?: (id: Exclude<PrayerId, "sunrise">) => void;
+  nextRef?: (el: HTMLDivElement | null) => void;
 }) {
   const rows: React.ReactNode[] = [];
   let dividerPlaced = false;
@@ -135,6 +141,7 @@ function DayList({
         key={`${s.dayKey}-${s.id}`}
         slot={s}
         state={state}
+        rowRef={state === "next" ? nextRef : undefined}
         onPick={
           onPickPrayer && s.id !== "sunrise"
             ? () => onPickPrayer(s.id as Exclude<PrayerId, "sunrise">)
@@ -143,6 +150,7 @@ function DayList({
       />,
     );
   });
+
   return (
     <div className="relative" style={{ opacity: dim ? 0.72 : 1 }}>
       <span
@@ -177,10 +185,30 @@ export function PrayerTimeline({ days, now, todayKey, tone = "light", onPickPray
   const [expanded, setExpanded] = useState(false);
   const [dragY, setDragY] = useState(0);
   const [startY, setStartY] = useState<number | null>(null);
+  const scrollRef = useRef<HTMLDivElement | null>(null);
+  const nextRowRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
-    if (!expanded) setDragY(0);
+    if (!expanded) {
+      setDragY(0);
+      return;
+    }
+    // Center the next prayer when the timeline opens, even if it is tomorrow.
+    const t = window.setTimeout(() => {
+      const box = scrollRef.current;
+      const row = nextRowRef.current;
+      if (!box || !row) return;
+      const top =
+        box.scrollTop +
+        (row.getBoundingClientRect().top - box.getBoundingClientRect().top) -
+        box.clientHeight / 2 +
+        row.clientHeight / 2;
+      box.scrollTo({ top: Math.max(0, top), behavior: "auto" });
+
+    }, 40);
+    return () => window.clearTimeout(t);
   }, [expanded]);
+
 
   const all = days.flatMap((d) => d.slots);
   const next = all.find((s) => s.at.getTime() > now.getTime()) ?? null;
@@ -283,7 +311,15 @@ export function PrayerTimeline({ days, now, todayKey, tone = "light", onPickPray
                 <X size={17} />
               </button>
             </div>
-            <div className="overflow-y-auto" style={{ maxHeight: "72vh" }}>
+            <div
+              ref={scrollRef}
+              className="overflow-y-auto overscroll-contain"
+              style={{
+                maxHeight: "72vh",
+                position: "relative",
+                paddingBottom: "calc(var(--bottom-nav-row) + env(safe-area-inset-bottom))",
+              }}
+            >
               {days.map((d) => (
                 <div key={d.key} className="mb-3">
                   <div className="mb-1">
@@ -293,6 +329,9 @@ export function PrayerTimeline({ days, now, todayKey, tone = "light", onPickPray
                     slots={d.slots}
                     now={now}
                     nextAt={nextAt}
+                    nextRef={(el) => {
+                      if (el) nextRowRef.current = el;
+                    }}
                     showNowDivider={d.key === todayKey}
                     dim={d.key < todayKey}
                     onPickPrayer={
@@ -305,6 +344,7 @@ export function PrayerTimeline({ days, now, todayKey, tone = "light", onPickPray
                     }
                   />
                 </div>
+
               ))}
             </div>
           </div>

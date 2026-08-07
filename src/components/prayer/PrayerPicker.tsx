@@ -27,9 +27,12 @@ export function PrayerPicker({ open, selected, progress, onPick, onClose }: Prop
         style={{
           background: "var(--surface-card)",
           color: "var(--foreground)",
-          paddingBottom: "calc(env(safe-area-inset-bottom) + 20px)",
+          paddingBottom: "calc(var(--bottom-nav-row) + env(safe-area-inset-bottom) + 20px)",
           boxShadow: "0 -20px 50px -20px rgba(0,0,0,0.4)",
           animation: "sheet-up 260ms cubic-bezier(0.22,1,0.36,1)",
+          maxHeight: "82vh",
+          display: "flex",
+          flexDirection: "column",
         }}
       >
         <div
@@ -44,7 +47,8 @@ export function PrayerPicker({ open, selected, progress, onPick, onClose }: Prop
           After Salah Adhkar
         </div>
 
-        <div className="flex flex-col">
+        <div className="flex flex-col overflow-y-auto overscroll-contain">
+
           {SALAH_PRAYERS.map((p) => {
             const pr = progress[p.id] ?? { done: 0, total: 0 };
             const pct = pr.total ? Math.round((pr.done / pr.total) * 100) : 0;

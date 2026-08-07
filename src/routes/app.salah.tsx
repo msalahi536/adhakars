@@ -255,6 +255,18 @@ function Salah() {
   const cur = progress[prayer] ?? { done: 0, total: 0 };
   const pct = cur.total ? Math.round((cur.done / cur.total) * 100) : 0;
 
+  // Countdown urgency: amber inside 30 minutes, red inside 10 minutes.
+  const msLeft = next ? next.at.getTime() - now.getTime() : null;
+  const urgencyColor =
+    msLeft === null || msLeft < 0
+      ? null
+      : msLeft <= 10 * 60 * 1000
+        ? "#ff9a8a"
+        : msLeft <= 30 * 60 * 1000
+          ? "#ffd166"
+          : null;
+
+
 
   return (
     <>
@@ -281,6 +293,8 @@ function Salah() {
                   letterSpacing: "-0.02em",
                   fontVariantNumeric: "tabular-nums",
                   textShadow: "0 10px 30px rgba(0,0,0,0.22)",
+                  color: urgencyColor ?? "inherit",
+                  transition: "color 400ms ease",
                 }}
               >
                 {next ? formatCountdown(next.at.getTime() - now.getTime()) : "--:--:--"}
@@ -311,15 +325,8 @@ function Salah() {
                   <MapPin size={11} />
                   {settings.location.label}
                 </span>
-                <span style={{ color: "var(--header-sub)", opacity: 0.5 }}>·</span>
-                <button
-                  onClick={toggleMuteAll}
-                  className="font-semibold underline"
-                  style={{ color: "var(--header-sub)" }}
-                >
-                  {mutedAll ? "Unmute today" : "Mute all today"}
-                </button>
               </div>
+
             </div>
           ) : (
             <div
