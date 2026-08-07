@@ -156,11 +156,16 @@ function Salah() {
   const nextIsDismissed =
     !!next && !!dismissed && dismissed.dayKey === next.dayKey && dismissed.prayer === next.id;
 
-  const dismissNext = () => {
+  const toggleDismissNext = () => {
     if (!next) return;
-    const v = { dayKey: next.dayKey, prayer: next.id };
-    setDismissed(v);
-    setDismissedState(v);
+    if (nextIsDismissed) {
+      setDismissed(null);
+      setDismissedState(null);
+    } else {
+      const v = { dayKey: next.dayKey, prayer: next.id };
+      setDismissed(v);
+      setDismissedState(v);
+    }
     void rescheduleAdhanNotifications(getPrayerSettings());
   };
 
