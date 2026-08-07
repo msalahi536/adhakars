@@ -488,7 +488,7 @@ function Salah() {
             </div>
           </div>
 
-          {settings.location && (
+          {settings.location ? (
             <div className="mt-3">
               <PrayerTimeline
                 days={timelineDays}
@@ -498,7 +498,44 @@ function Salah() {
                 onPickPrayer={(id) => openAdhkar(id as SalahPrayer)}
               />
             </div>
+          ) : (
+            <div
+              className="mt-3 w-full overflow-hidden rounded-[30px] p-5"
+              style={{
+                background: "var(--surface-deep, var(--surface-card))",
+                border: "1px solid var(--border)",
+                color: "var(--foreground)",
+                boxShadow: "var(--card-shadow)",
+              }}
+            >
+              <div className="label-caps" style={{ color: "var(--muted-foreground)" }}>
+                Upcoming
+              </div>
+              <div className="mt-3 space-y-3">
+                {["Fajr", "Sunrise", "Dhuhr", "Asr", "Maghrib", "Isha"].map((label) => (
+                  <div key={label} className="flex items-center gap-3">
+                    <span
+                      className="h-2 w-2 shrink-0 rounded-full"
+                      style={{ background: "color-mix(in oklab, var(--foreground) 18%, transparent)" }}
+                    />
+                    <span className="flex-1 text-sm font-semibold" style={{ opacity: 0.5 }}>
+                      {label}
+                    </span>
+                    <span
+                      className="text-sm font-semibold"
+                      style={{ color: "var(--muted-foreground)", fontVariantNumeric: "tabular-nums" }}
+                    >
+                      --:--
+                    </span>
+                  </div>
+                ))}
+              </div>
+              <div className="mt-4 text-xs" style={{ color: "var(--muted-foreground)" }}>
+                Times appear once your location is set.
+              </div>
+            </div>
           )}
+
 
           <button
             onClick={toggleMuteAll}
