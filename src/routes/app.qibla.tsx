@@ -68,6 +68,10 @@ function Qibla() {
   const [showCalibration, setShowCalibration] = useState(false);
   const unsubRef = useRef<(() => void) | null>(null);
   const smoothRef = useRef<number | null>(null);
+  // Continuous (unwrapped) rotation so the arrow never spins the long way
+  // around when the heading crosses 360 back to 0.
+  const contRef = useRef(0);
+  const [arrowAngle, setArrowAngle] = useState(0);
 
   useEffect(() => {
     return () => {
@@ -95,7 +99,9 @@ function Qibla() {
       let next = r.heading;
       if (prev !== null) {
         const delta = ((r.heading - prev + 540) % 360) - 180;
-        next = normalizeHeading(prev + delta * 0.25);
+        // Ignore tiny jitter so the arrow sits still when the phone does.
+        if (Math.abs(delta) < 0.6) return;
+        next = normalizeHeading(prev + delta * 0.18);
       }
       smoothRef.current = next;
       setHeading(next);
@@ -153,10 +159,20 @@ function Qibla() {
 
   const permState = phase;
 
-  // Rotation to apply to the qibla arrow: bearing - heading
-  const arrowRotation =
+  // Rotation to apply to the qibla arrow: bearing - heading, unwrapped.
+  const targetRotation =
     qiblaBearing !== null && heading !== null ? (qiblaBearing - heading + 360) % 360 : null;
-  const aligned = arrowRotation !== null && (arrowRotation < 5 || arrowRotation > 355);
+
+  useEffect(() => {
+    if (targetRotation === null) return;
+    const current = contRef.current;
+    const delta = ((targetRotation - (((current % 360) + 360) % 360) + 540) % 360) - 180;
+    contRef.current = current + delta;
+    setArrowAngle(contRef.current);
+  }, [targetRotation]);
+
+  const aligned = targetRotation !== null && (targetRotation < 5 || targetRotation > 355);
+
 
   return (
     <>
