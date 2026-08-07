@@ -157,6 +157,12 @@ const ensureChannel = async (plugin: any) => {
   channelReady = true;
 };
 
+/** Shared with the adhan scheduler so both use the same plugin resolution. */
+export const loadNotificationPlugin = loadPlugin;
+export const ensureNotificationChannel = ensureChannel;
+export const NOTIFICATION_CHANNEL = ANDROID_CHANNEL;
+
+
 export type PermissionResult =
   | { granted: true }
   | { granted: false; reason: "unavailable" | "denied" | "error"; error?: string };
