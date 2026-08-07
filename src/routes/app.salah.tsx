@@ -263,51 +263,56 @@ function Salah() {
         <ConcentricCirclesPattern />
         <HeaderSettingsButton />
         <div className="relative mx-auto max-w-md px-5 pb-6 pt-5">
-          <div className="flex items-start justify-between gap-3">
-            <div style={{ marginRight: 44 }}>
-              <div className="label-caps" style={{ color: "var(--header-sub)", opacity: 1 }}>
-                Prayer Times
-              </div>
-              <h1 className="mt-1 text-2xl font-bold tracking-tight">
-                {settings.location ? settings.location.label : "Set your location"}
-              </h1>
-            </div>
-          </div>
-
           {settings.location ? (
-            <div className="mt-5">
-              <div className="text-sm font-semibold" style={{ color: "var(--header-sub)" }}>
+            <div className="flex flex-col items-center pt-6 pb-1 text-center">
+              <div
+                className="text-[15px] font-semibold tracking-wide"
+                style={{ color: "var(--header-sub)" }}
+              >
                 {next ? `${next.label} in` : loading ? "Loading prayer times" : "No times yet"}
               </div>
               <div
-                className="mt-1 font-bold tabular-nums"
-                style={{ fontSize: 44, lineHeight: 1.05, fontVariantNumeric: "tabular-nums" }}
+                className="mt-1 font-bold"
+                style={{
+                  fontSize: 52,
+                  lineHeight: 1.02,
+                  letterSpacing: "-0.02em",
+                  fontVariantNumeric: "tabular-nums",
+                  textShadow: "0 10px 30px rgba(0,0,0,0.22)",
+                }}
               >
                 {next ? formatCountdown(next.at.getTime() - now.getTime()) : "--:--:--"}
               </div>
 
-              <div className="mt-4 flex flex-wrap items-center gap-3">
-                <button
-                  onClick={toggleDismissNext}
-                  disabled={!next}
-                  className="rounded-full px-4 py-2 text-xs font-bold active:scale-95"
-                  style={
-                    nextIsDismissed
-                      ? {
-                          background: "color-mix(in oklab, var(--header-fg) 14%, transparent)",
-                          color: "var(--header-fg)",
-                        }
-                      : {
-                          background: "var(--accent)",
-                          color: "var(--accent-foreground)",
-                        }
-                  }
+              <button
+                onClick={toggleDismissNext}
+                disabled={!next}
+                className="mt-4 rounded-full px-5 py-2 text-[13px] font-bold active:scale-95"
+                style={{
+                  background: nextIsDismissed
+                    ? "color-mix(in oklab, var(--header-fg) 16%, transparent)"
+                    : "color-mix(in oklab, var(--header-fg) 12%, transparent)",
+                  color: "var(--header-fg)",
+                  border: "1px solid color-mix(in oklab, var(--header-fg) 22%, transparent)",
+                  backdropFilter: "blur(6px)",
+                  transition: "background 200ms ease",
+                }}
+              >
+                {nextIsDismissed ? "Tap to unmute next salah" : "Tap to dismiss"}
+              </button>
+
+              <div className="mt-3 flex items-center gap-2 text-[11px]">
+                <span
+                  className="inline-flex items-center gap-1"
+                  style={{ color: "var(--header-sub)" }}
                 >
-                  {nextIsDismissed ? "Muted, tap to restore" : "Tap to dismiss"}
-                </button>
+                  <MapPin size={11} />
+                  {settings.location.label}
+                </span>
+                <span style={{ color: "var(--header-sub)", opacity: 0.5 }}>·</span>
                 <button
                   onClick={toggleMuteAll}
-                  className="text-xs font-semibold underline"
+                  className="font-semibold underline"
                   style={{ color: "var(--header-sub)" }}
                 >
                   {mutedAll ? "Unmute today" : "Mute all today"}
