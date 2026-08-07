@@ -254,36 +254,58 @@ export const fetchDay = async (
   }
 };
 
-/** Look a city up by name through the Al-Adhan address endpoint. */
-export const lookupCity = async (
-  query: string,
-  settings: PrayerSettings,
-): Promise<PrayerLocation | null> => {
+/**
+ * Look a city up by name. The Al-Adhan address endpoint returns placeholder
+ * coordinates for many queries, so we geocode with Open Meteo instead.
+ */
+export const lookupCity = async (query: string): Promise<PrayerLocation | null> => {
   const q = query.trim();
   if (!q) return null;
   const url =
-    `https://api.aladhan.com/v1/timingsByAddress/${apiDate(new Date())}` +
-    `?address=${encodeURIComponent(q)}&method=${settings.method}&school=${settings.hanafi ? 1 : 0}`;
+    `https://geocoding-api.open-meteo.com/v1/search` +
+    `?name=${encodeURIComponent(q)}&count=1&language=en&format=json`;
   try {
     const res = await fetch(url);
     if (!res.ok) return null;
-    const json = (await res.json()) as ApiResponse;
-    const lat = json.data?.meta?.latitude;
-    const lng = json.data?.meta?.longitude;
-    if (typeof lat !== "number" || typeof lng !== "number") return null;
-    return { lat, lng, label: q };
+    const json = (await res.json()) as {
+      results?: {
+        name?: string;
+        latitude?: number;
+        longitude?: number;
+        admin1?: string;
+        country_code?: string;
+      }[];
+    };
+    const r = json.results?.[0];
+    if (!r || typeof r.latitude !== "number" || typeof r.longitude !== "number") return null;
+    const label = [r.name ?? q, r.country_code].filter(Boolean).join(", ");
+    return { lat: r.latitude, lng: r.longitude, label, verified: true };
   } catch {
     return null;
   }
 };
 
+/**
+ * Older builds saved city coordinates from an endpoint that sometimes replied
+ * with placeholder values. Re-geocode those once so times are correct.
+ */
+export const repairLocation = async (
+  loc: PrayerLocation | null,
+): Promise<PrayerLocation | null> => {
+  if (!loc || loc.verified) return null;
+  // Device fixes are stored with a numeric label and are always trustworthy.
+  if (/^-?\d/.test(loc.label)) return { ...loc, verified: true };
+  const fixed = await lookupCity(loc.label);
+  return fixed ?? { ...loc, verified: true };
+};
+
 /** Resolve a device location, reusing the cached Qibla fix when possible. */
 export const resolveLocation = async (force = false): Promise<PrayerLocation | null> => {
   const cached: Coords | null = force ? null : getCachedPosition();
-  if (cached) return { ...cached, label: formatCoords(cached) };
+  if (cached) return { ...cached, label: formatCoords(cached), verified: true };
   const pos = await getPosition({ force });
   if (!pos.ok) return null;
-  return { ...pos.coords, label: formatCoords(pos.coords) };
+  return { ...pos.coords, label: formatCoords(pos.coords), verified: true };
 };
 
 export const formatCoords = (c: Coords) =>
