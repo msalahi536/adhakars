@@ -132,6 +132,8 @@ function Qibla() {
       setPhase("error");
       return;
     }
+    if (sensor === "granted") storePermissionGranted();
+
 
     setStep("Getting your location…");
     const pos = await getPosition();
