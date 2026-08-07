@@ -364,63 +364,122 @@ function Salah() {
 
       <main className="scroll-area flex flex-col" style={{ background: "var(--background)" }}>
         <div className="mx-auto w-full max-w-md px-5 pb-8 pt-4">
-          {settings.location && (
-            <PrayerTimeline
-              days={timelineDays}
-              now={now}
-              todayKey={todayKey}
-              onPickPrayer={(id) => openAdhkar(id as SalahPrayer)}
-            />
-          )}
-
-          {/* Entry card into the after salah adhkar */}
+          {/* Recommended: entry into the after salah adhkar */}
           <button
             onClick={() => setSheetOpen(true)}
-            className="mt-4 w-full overflow-hidden rounded-[26px] p-5 text-left active:scale-[0.99]"
+            className="w-full overflow-hidden rounded-[28px] p-5 text-left active:scale-[0.99]"
             style={{
-              background: "var(--surface-deep-gradient)",
-              color: "var(--surface-deep-fg)",
+              background: "var(--surface-card)",
+              border: "1px solid var(--border)",
+              color: "var(--foreground)",
               boxShadow: "var(--card-shadow)",
               transition: "transform 160ms ease",
             }}
           >
-            <div className="flex items-start justify-between gap-3">
-              <div>
-                <div className="label-caps" style={{ color: "var(--surface-deep-muted)" }}>
-                  After Salah Adhkar
-                </div>
-                <div className="mt-1 text-xl font-bold">After {selectedLabel}</div>
-              </div>
+            <div className="label-caps" style={{ color: "var(--muted-foreground)" }}>
+              After Salah Adhkar
+            </div>
+            <div className="mt-1 text-2xl font-bold tracking-tight">After {selectedLabel}</div>
+            <div className="mt-0.5 text-sm" style={{ color: "var(--muted-foreground)" }}>
+              {cur.done} of {cur.total} complete
+            </div>
+
+            <div className="mt-4 flex items-center gap-3">
               <span
                 className="flex shrink-0 items-center justify-center rounded-full"
                 style={{
-                  width: 40,
-                  height: 40,
+                  width: 52,
+                  height: 52,
                   background: "var(--accent)",
                   color: "var(--accent-foreground)",
+                  boxShadow: "0 10px 22px -12px color-mix(in oklab, var(--accent) 80%, transparent)",
                 }}
               >
-                <ChevronRight size={20} />
+                <ChevronRight size={24} />
               </span>
-            </div>
-
-            <div
-              className="mt-4 h-1.5 w-full overflow-hidden rounded-full"
-              style={{ background: "rgba(255,255,255,0.18)" }}
-            >
-              <span
-                className="block h-full rounded-full"
-                style={{
-                  width: `${pct}%`,
-                  background: "var(--accent)",
-                  transition: "width 300ms ease",
-                }}
-              />
-            </div>
-            <div className="mt-2 text-xs" style={{ color: "var(--surface-deep-muted)" }}>
-              {cur.done} of {cur.total} complete, tap to begin
+              <div className="min-w-0 flex-1">
+                <div
+                  className="h-1.5 w-full overflow-hidden rounded-full"
+                  style={{ background: "color-mix(in oklab, var(--foreground) 10%, transparent)" }}
+                >
+                  <span
+                    className="block h-full rounded-full"
+                    style={{
+                      width: `${pct}%`,
+                      background: "var(--accent)",
+                      transition: "width 300ms ease",
+                    }}
+                  />
+                </div>
+                <div className="mt-1.5 text-xs" style={{ color: "var(--muted-foreground)" }}>
+                  Tap to begin
+                </div>
+              </div>
             </div>
           </button>
+
+          {settings.location && (
+            <div className="mt-3 grid grid-cols-5 gap-3">
+              <div className="col-span-3">
+                <PrayerTimeline
+                  days={timelineDays}
+                  now={now}
+                  todayKey={todayKey}
+                  tone="deep"
+                  onPickPrayer={(id) => openAdhkar(id as SalahPrayer)}
+                />
+              </div>
+
+              <div className="col-span-2 flex flex-col gap-3">
+                <div
+                  className="flex flex-1 flex-col justify-between rounded-[24px] p-4"
+                  style={{
+                    background: "var(--surface-card)",
+                    border: "1px solid var(--border)",
+                    boxShadow: "var(--card-shadow)",
+                  }}
+                >
+                  <Clock size={18} style={{ color: "var(--accent)" }} />
+                  <div>
+                    <div className="label-caps" style={{ color: "var(--muted-foreground)" }}>
+                      Next
+                    </div>
+                    <div className="text-base font-bold leading-tight">{next?.label ?? "--"}</div>
+                    <div className="text-sm font-semibold" style={{ color: "var(--accent)" }}>
+                      {next ? formatMinutes(next.minutes) : "--:--"}
+                    </div>
+                  </div>
+                </div>
+
+                <button
+                  onClick={toggleMuteAll}
+                  className="flex flex-1 flex-col justify-between rounded-[24px] p-4 text-left active:scale-[0.98]"
+                  style={{
+                    background: mutedAll
+                      ? "color-mix(in oklab, var(--foreground) 8%, transparent)"
+                      : "var(--surface-deep-gradient)",
+                    color: mutedAll ? "var(--foreground)" : "var(--surface-deep-fg)",
+                    boxShadow: "var(--card-shadow)",
+                  }}
+                >
+                  {mutedAll ? <BellOff size={18} /> : <Bell size={18} />}
+                  <div>
+                    <div className="mt-3 text-base font-bold leading-tight">
+                      {mutedAll ? "Adhan off" : "Adhan on"}
+                    </div>
+                    <div
+                      className="text-[11px]"
+                      style={{
+                        color: mutedAll ? "var(--muted-foreground)" : "var(--surface-deep-muted)",
+                      }}
+                    >
+                      {mutedAll ? "Muted today" : "Tap to mute today"}
+                    </div>
+                  </div>
+                </button>
+              </div>
+            </div>
+          )}
 
           {/* Quick jump into any prayer */}
           <div
