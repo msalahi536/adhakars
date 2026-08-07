@@ -264,16 +264,13 @@ function Salah() {
         <HeaderSettingsButton />
         <div className="relative mx-auto max-w-md px-5 pb-6 pt-5">
           <div className="flex items-start justify-between gap-3">
-            <div>
+            <div style={{ marginRight: 44 }}>
               <div className="label-caps" style={{ color: "var(--header-sub)", opacity: 1 }}>
                 Prayer Times
               </div>
               <h1 className="mt-1 text-2xl font-bold tracking-tight">
                 {settings.location ? settings.location.label : "Set your location"}
               </h1>
-            </div>
-            <div style={{ marginRight: 44 }}>
-              <MiniQibla />
             </div>
           </div>
 
@@ -291,14 +288,14 @@ function Salah() {
 
               <div className="mt-4 flex flex-wrap items-center gap-3">
                 <button
-                  onClick={dismissNext}
-                  disabled={!next || nextIsDismissed}
-                  className="rounded-full px-4 py-2 text-xs font-bold"
+                  onClick={toggleDismissNext}
+                  disabled={!next}
+                  className="rounded-full px-4 py-2 text-xs font-bold active:scale-95"
                   style={
                     nextIsDismissed
                       ? {
-                          background: "color-mix(in oklab, var(--header-fg) 12%, transparent)",
-                          color: "var(--header-sub)",
+                          background: "color-mix(in oklab, var(--header-fg) 14%, transparent)",
+                          color: "var(--header-fg)",
                         }
                       : {
                           background: "var(--accent)",
@@ -306,7 +303,7 @@ function Salah() {
                         }
                   }
                 >
-                  {nextIsDismissed ? "Next adhan muted" : "Tap to dismiss"}
+                  {nextIsDismissed ? "Muted, tap to restore" : "Tap to dismiss"}
                 </button>
                 <button
                   onClick={toggleMuteAll}
