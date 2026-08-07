@@ -718,6 +718,7 @@ function Settings() {
                           setCityInput("");
                           setCityOpen(false);
                           setLocationSaved(`Location saved: ${loc.label}`);
+                          setLocationSaved(`Location saved: ${loc.label}`);
                         }}
                         disabled={cityBusy}
                         className="shrink-0 rounded-full px-4 text-sm font-bold"
