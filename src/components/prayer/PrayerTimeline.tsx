@@ -21,10 +21,12 @@ function Row({
   slot,
   state,
   onPick,
+  rowRef,
 }: {
   slot: Slot;
   state: "past" | "next" | "future";
   onPick?: () => void;
+  rowRef?: (el: HTMLDivElement | null) => void;
 }) {
   const sunrise = isSunrise(slot);
   const color = state === "next" ? "var(--accent)" : "var(--foreground)";
@@ -32,11 +34,13 @@ function Row({
   const clickable = !!onPick && !sunrise;
   return (
     <div
+      ref={rowRef}
       onClick={clickable ? onPick : undefined}
       role={clickable ? "button" : undefined}
       className={`relative flex items-center gap-3 rounded-2xl py-2 ${clickable ? "active:scale-[0.99]" : ""}`}
       style={{ opacity, cursor: clickable ? "pointer" : undefined }}
     >
+
       <div className="relative flex w-4 shrink-0 justify-center">
         {sunrise ? (
           <span
