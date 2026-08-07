@@ -89,8 +89,6 @@ function Settings() {
 
   const [notifPrefs, setNotifPrefsState] = useState<NotificationPrefs>(() => getNotificationPrefs());
 
-  const [commitment, setCommitmentState] = useState<Record<CommitmentSection, boolean>>(() => getCommitment());
-  const [hasCustom, setHasCustom] = useState(false);
   const [nativeAvailable, setNativeAvailable] = useState(false);
   const [prayerSettings, setPrayerSettingsState] = useState<PrayerSettings>(() =>
     getPrayerSettings(),
