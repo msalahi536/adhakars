@@ -54,9 +54,18 @@ export type PrayerSettings = {
 };
 
 const SETTINGS_KEY = "adhkar:prayer-settings";
-const CACHE_PREFIX = "adhkar:prayer-cache:";
+const CACHE_PREFIX = "adhkar:prayer-cache:v2:";
 const DISMISS_KEY = "adhkar:adhan-dismiss";
 const MUTE_ALL_KEY = "adhkar:adhan-mute-all";
+
+/** Device timezone, so the API returns times in the user's own clock. */
+export const deviceTimeZone = (): string => {
+  try {
+    return Intl.DateTimeFormat().resolvedOptions().timeZone || "";
+  } catch {
+    return "";
+  }
+};
 
 export const DEFAULT_PRAYER_SETTINGS: PrayerSettings = {
   method: 2,
