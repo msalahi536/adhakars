@@ -9,6 +9,8 @@ type Props = {
   days: { key: string; label: string; slots: Slot[] }[];
   now: Date;
   todayKey: string;
+  /** card styling: light surface or the deep tinted surface */
+  tone?: "light" | "deep";
   /** open the after salah adhkar for a tapped prayer */
   onPickPrayer?: (id: Exclude<PrayerId, "sunrise">) => void;
 };
