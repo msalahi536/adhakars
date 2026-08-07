@@ -28,7 +28,7 @@ function Row({
 }) {
   const sunrise = isSunrise(slot);
   const color = state === "next" ? "var(--accent)" : "var(--foreground)";
-  const opacity = state === "past" ? 0.4 : sunrise ? 0.72 : 1;
+  const opacity = state === "past" ? 0.72 : sunrise ? 0.85 : 1;
   const clickable = !!onPick && !sunrise;
   return (
     <div
