@@ -5,8 +5,11 @@ import { HeaderBackButton } from "@/components/HeaderBackButton";
 import { CompassCalibrationCard } from "@/components/CompassCalibrationCard";
 import {
   getPosition,
+  hasStoredPermission,
+  needsGesturePermission,
   normalizeHeading,
   requestOrientationPermission,
+  storePermissionGranted,
   subscribeOrientation,
 } from "@/lib/compass";
 
