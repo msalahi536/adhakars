@@ -96,15 +96,6 @@ function Settings() {
   const [commitment, setCommitmentState] = useState<Record<CommitmentSection, boolean>>(() => getCommitment());
   const [hasCustom, setHasCustom] = useState(false);
   const [nativeAvailable, setNativeAvailable] = useState(false);
-  
-
-  useEffect(() => {
-    setModeState(getModeSetting());
-    setSeedState(getSeed());
-    setPresetIdState(getPresetId());
-    setOverridesState(getOverrides());
-    setTripletState(getCustomTriplet());
-    setDisplayState(getDisplay());
   const [prayerSettings, setPrayerSettingsState] = useState<PrayerSettings>(() =>
     getPrayerSettings(),
   );
@@ -121,11 +112,15 @@ function Settings() {
   };
 
   useEffect(() => {
+    setModeState(getModeSetting());
+    setSeedState(getSeed());
+    setPresetIdState(getPresetId());
+    setOverridesState(getOverrides());
+    setTripletState(getCustomTriplet());
+    setDisplayState(getDisplay());
     setPrayerSettingsState(getPrayerSettings());
-  }, []);
-
-  useEffect(() => {
     setNotifPrefsState(getNotificationPrefs());
+
     setCommitmentState(getCommitment());
     setHasCustom(getCustomAdhkarRows().length > 0);
     setNativeAvailable(isNativePlatform());
