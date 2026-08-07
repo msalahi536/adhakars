@@ -78,8 +78,11 @@ function Row({
       </div>
       <div
         style={{
-          color: state === "next" ? "var(--accent)" : "var(--muted-foreground)",
-          fontWeight: state === "next" ? 700 : 500,
+          color:
+            state === "next"
+              ? "var(--accent)"
+              : "color-mix(in oklab, var(--foreground) 78%, transparent)",
+          fontWeight: state === "next" ? 700 : 600,
           fontSize: sunrise ? 12 : 13,
         }}
       >
