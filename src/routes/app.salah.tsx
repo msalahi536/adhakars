@@ -197,9 +197,14 @@ function Salah() {
     if (typeof window === "undefined") return "fajr";
     return validPrayer(window.localStorage.getItem(PRAYER_KEY));
   });
+  const [sheetOpen, setSheetOpen] = useState(false);
   const setPrayer = (p: SalahPrayer) => {
     if (typeof window !== "undefined") window.localStorage.setItem(PRAYER_KEY, p);
     setPrayerState(p);
+  };
+  const openAdhkar = (p: SalahPrayer) => {
+    setPrayer(p);
+    setSheetOpen(true);
   };
 
   // Auto select the most recent prayer once times are known.
@@ -213,26 +218,26 @@ function Salah() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [timelineDays, todayKey]);
 
-  const [counts, setCounts] = useState<Record<string, number>>({});
-  const storageKey = `salah_${prayer}`;
-  const items = getSalahItems(prayer);
-  const completed = items.filter((i) => isItemComplete(i, counts)).length;
-
+  // Progress per prayer, refreshed whenever the sheet closes.
+  const [progress, setProgress] = useState<Record<string, { done: number; total: number }>>({});
   useEffect(() => {
-    setCounts(getCounts(storageKey));
-  }, [storageKey]);
-
-  const inc = (id: string, target: number) => {
-    const prev = counts[id] ?? 0;
-    const nextCount = Math.min(target, prev + 1);
-    if (nextCount === prev) return;
-    const updated = { ...counts, [id]: nextCount };
-    setCounts(updated);
-    setCount(storageKey, id, nextCount);
-    bumpLifetime("salah", nextCount - prev);
-  };
+    if (sheetOpen) return;
+    const out: Record<string, { done: number; total: number }> = {};
+    SALAH_PRAYERS.forEach((p) => {
+      const items = getSalahItems(p.id);
+      const counts = getCounts(`salah_${p.id}`);
+      out[p.id] = {
+        done: items.filter((i) => isItemComplete(i, counts)).length,
+        total: items.length,
+      };
+    });
+    setProgress(out);
+  }, [sheetOpen]);
 
   const selectedLabel = SALAH_PRAYERS.find((p) => p.id === prayer)?.label ?? "";
+  const cur = progress[prayer] ?? { done: 0, total: 0 };
+  const pct = cur.total ? Math.round((cur.done / cur.total) * 100) : 0;
+
 
   return (
     <>
