@@ -28,10 +28,6 @@ import { CustomThemeSheet } from "@/components/theme/CustomThemeSheet";
 import {
   resetToday,
   resetAllProgress,
-  getCommitment,
-  setCommitment,
-  getCustomAdhkarRows,
-  type CommitmentSection,
 } from "@/lib/storage";
 import {
   getNotificationPrefs,
