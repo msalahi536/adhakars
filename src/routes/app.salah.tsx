@@ -10,6 +10,7 @@ import { SALAH_PRAYERS, getSalahItems, isItemComplete, type SalahPrayer } from "
 import { getCounts } from "@/lib/storage";
 
 import {
+  DEFAULT_PRAYER_SETTINGS,
   addDays,
   currentPrayer,
   dateKey,
@@ -28,6 +29,7 @@ import {
   setPrayerSettings,
   slotsForDay,
   type DayTimes,
+  type PrayerSettings,
   type Slot,
 } from "@/lib/prayer-times";
 import { rescheduleAdhanNotifications } from "@/lib/adhan-notifications";
@@ -51,7 +53,29 @@ export const Route = createFileRoute("/app/salah")({
     ],
   }),
   component: Salah,
+  errorComponent: SalahError,
 });
+
+function SalahError() {
+  return (
+    <main
+      className="scroll-area flex flex-col items-center justify-center px-6 text-center"
+      style={{ background: "var(--background)", color: "var(--foreground)" }}
+    >
+      <div className="text-lg font-bold">Prayer times could not load</div>
+      <p className="mt-2 text-sm" style={{ color: "var(--muted-foreground)" }}>
+        Check your connection or set your location again in Settings.
+      </p>
+      <button
+        onClick={() => window.location.reload()}
+        className="mt-5 rounded-full px-5 py-2.5 text-sm font-bold"
+        style={{ background: "var(--accent)", color: "var(--accent-foreground)" }}
+      >
+        Try again
+      </button>
+    </main>
+  );
+}
 
 const PRAYER_KEY = "selectedPrayer";
 const validPrayer = (v: string | null): SalahPrayer => {
@@ -63,14 +87,15 @@ const DAY_LABELS = ["Yesterday", "Today", "Tomorrow", "Day after"];
 
 function Salah() {
   /* ---------------- prayer times ---------------- */
-  const [settings, setSettingsState] = useState(() => getPrayerSettings());
+  const [settings, setSettingsState] = useState<PrayerSettings>(DEFAULT_PRAYER_SETTINGS);
   const [days, setDays] = useState<DayTimes[]>([]);
   const [now, setNow] = useState(() => new Date());
   const [loading, setLoading] = useState(true);
   const [cityInput, setCityInput] = useState("");
   const [cityError, setCityError] = useState<string | null>(null);
   const [locating, setLocating] = useState(false);
-  const [dismissed, setDismissedState] = useState(() => getDismissed());
+  const [dismissed, setDismissedState] = useState<ReturnType<typeof getDismissed>>(null);
+
   const [mutedAll, setMutedAll] = useState(false);
   const autoSelected = useRef(false);
 
@@ -209,10 +234,11 @@ function Salah() {
   };
 
   /* ---------------- adhkar ---------------- */
-  const [prayer, setPrayerState] = useState<SalahPrayer>(() => {
-    if (typeof window === "undefined") return "fajr";
-    return validPrayer(window.localStorage.getItem(PRAYER_KEY));
-  });
+  const [prayer, setPrayerState] = useState<SalahPrayer>("fajr");
+  useEffect(() => {
+    setPrayerState(validPrayer(window.localStorage.getItem(PRAYER_KEY)));
+  }, []);
+
   const [sheetOpen, setSheetOpen] = useState(false);
   const [pickerOpen, setPickerOpen] = useState(false);
   const setPrayer = (p: SalahPrayer) => {
@@ -277,70 +303,91 @@ function Salah() {
         <ConcentricCirclesPattern />
         <HeaderSettingsButton />
         <div className="relative mx-auto max-w-md px-5 pb-6 pt-5">
-          {settings.location ? (
-            <div className="flex flex-col items-center pt-6 pb-1 text-center">
-              <div
-                className="text-[15px] font-semibold tracking-wide"
+          <div className="flex flex-col items-center pt-6 pb-1 text-center">
+            <div
+              className="text-[15px] font-semibold tracking-wide"
+              style={{ color: "var(--header-sub)" }}
+            >
+              {!settings.location
+                ? "Prayer times"
+                : next
+                  ? `${next.label} in`
+                  : loading
+                    ? "Loading prayer times"
+                    : "No times yet"}
+            </div>
+            <div
+              className="mt-1 font-bold"
+              style={{
+                fontSize: 52,
+                lineHeight: 1.02,
+                letterSpacing: "-0.02em",
+                fontVariantNumeric: "tabular-nums",
+                textShadow: "0 10px 30px rgba(0,0,0,0.22)",
+                color: urgencyColor ?? "inherit",
+                transition: "color 400ms ease",
+                opacity: settings.location ? 1 : 0.55,
+              }}
+            >
+              {next ? formatCountdown(next.at.getTime() - now.getTime()) : "--:--:--"}
+            </div>
+
+            <button
+              onClick={toggleDismissNext}
+              disabled={!next}
+              className="mt-4 rounded-full px-5 py-2 text-[13px] font-bold active:scale-95"
+              style={{
+                background: nextIsDismissed
+                  ? "color-mix(in oklab, var(--header-fg) 16%, transparent)"
+                  : "color-mix(in oklab, var(--header-fg) 12%, transparent)",
+                color: "var(--header-fg)",
+                border: "1px solid color-mix(in oklab, var(--header-fg) 22%, transparent)",
+                backdropFilter: "blur(6px)",
+                transition: "background 200ms ease",
+                opacity: next ? 1 : 0.45,
+              }}
+            >
+              {nextIsDismissed ? "Tap to unmute next salah" : "Tap to dismiss"}
+            </button>
+
+            <div className="mt-3 flex items-center gap-2 text-[11px]">
+              <span
+                className="inline-flex items-center gap-1"
                 style={{ color: "var(--header-sub)" }}
               >
-                {next ? `${next.label} in` : loading ? "Loading prayer times" : "No times yet"}
-              </div>
-              <div
-                className="mt-1 font-bold"
-                style={{
-                  fontSize: 52,
-                  lineHeight: 1.02,
-                  letterSpacing: "-0.02em",
-                  fontVariantNumeric: "tabular-nums",
-                  textShadow: "0 10px 30px rgba(0,0,0,0.22)",
-                  color: urgencyColor ?? "inherit",
-                  transition: "color 400ms ease",
-                }}
-              >
-                {next ? formatCountdown(next.at.getTime() - now.getTime()) : "--:--:--"}
-              </div>
-
-              <button
-                onClick={toggleDismissNext}
-                disabled={!next}
-                className="mt-4 rounded-full px-5 py-2 text-[13px] font-bold active:scale-95"
-                style={{
-                  background: nextIsDismissed
-                    ? "color-mix(in oklab, var(--header-fg) 16%, transparent)"
-                    : "color-mix(in oklab, var(--header-fg) 12%, transparent)",
-                  color: "var(--header-fg)",
-                  border: "1px solid color-mix(in oklab, var(--header-fg) 22%, transparent)",
-                  backdropFilter: "blur(6px)",
-                  transition: "background 200ms ease",
-                }}
-              >
-                {nextIsDismissed ? "Tap to unmute next salah" : "Tap to dismiss"}
-              </button>
-
-              <div className="mt-3 flex items-center gap-2 text-[11px]">
-                <span
-                  className="inline-flex items-center gap-1"
-                  style={{ color: "var(--header-sub)" }}
-                >
-                  <MapPin size={11} />
-                  {settings.location.label}
-                </span>
-              </div>
-
+                <MapPin size={11} />
+                {settings.location ? settings.location.label : "Location not set"}
+              </span>
             </div>
-          ) : (
+          </div>
+
+        </div>
+      </header>
+
+      <main className="scroll-area flex flex-col" style={{ background: "var(--background)" }}>
+        <div className="mx-auto w-full max-w-md px-5 pb-8 pt-4">
+          {!settings.location && (
             <div
-              className="mt-4 rounded-2xl p-3"
-              style={{ background: "color-mix(in oklab, var(--header-fg) 12%, transparent)" }}
+              className="mb-3 w-full overflow-hidden rounded-[30px] p-5"
+              style={{
+                background: "var(--surface-card)",
+                border: "1px solid var(--border)",
+                color: "var(--foreground)",
+                boxShadow: "var(--card-shadow)",
+              }}
             >
-              <p className="text-xs" style={{ color: "var(--header-sub)" }}>
-                We need your location to calculate prayer times. Nothing leaves your device except
+              <div className="label-caps" style={{ color: "var(--muted-foreground)" }}>
+                Location
+              </div>
+              <div className="mt-1 text-xl font-bold tracking-tight">Set your location</div>
+              <p className="mt-1 text-sm" style={{ color: "var(--muted-foreground)" }}>
+                We use it only to calculate your prayer times. Nothing leaves your device except
                 the coordinates used to look up the times.
               </p>
               <button
                 onClick={() => void useMyLocation()}
                 disabled={locating}
-                className="mt-3 w-full rounded-full py-2 text-sm font-bold"
+                className="mt-4 w-full rounded-full py-3 text-sm font-bold active:scale-[0.99]"
                 style={{ background: "var(--accent)", color: "var(--accent-foreground)" }}
               >
                 {locating ? "Locating..." : "Use my location"}
@@ -350,35 +397,35 @@ function Salah() {
                   value={cityInput}
                   onChange={(e) => setCityInput(e.target.value)}
                   placeholder="Or type a city"
-                  className="min-w-0 flex-1 rounded-full px-3 py-2 outline-none"
+                  className="min-w-0 flex-1 rounded-full px-4 py-2.5 outline-none"
                   style={{
                     fontSize: 16,
-                    background: "var(--surface-card)",
+                    background: "var(--background)",
                     color: "var(--foreground)",
                     border: "1px solid var(--border)",
                   }}
                 />
                 <button
                   onClick={() => void submitCity()}
-                  className="rounded-full px-4 text-sm font-bold"
-                  style={{ background: "var(--accent)", color: "var(--accent-foreground)" }}
+                  className="shrink-0 rounded-full px-5 text-sm font-bold"
+                  style={{
+                    background: "color-mix(in oklab, var(--foreground) 8%, transparent)",
+                    color: "var(--foreground)",
+                  }}
                 >
                   Set
                 </button>
               </div>
               {cityError && (
-                <div className="mt-2 text-[11px]" style={{ color: "var(--header-sub)" }}>
+                <div className="mt-2 text-[12px]" style={{ color: "var(--muted-foreground)" }}>
                   {cityError}
                 </div>
               )}
             </div>
           )}
-        </div>
-      </header>
 
-      <main className="scroll-area flex flex-col" style={{ background: "var(--background)" }}>
-        <div className="mx-auto w-full max-w-md px-5 pb-8 pt-4">
           {/* Recommended: entry into the after salah adhkar */}
+
           <div
             className="w-full overflow-hidden rounded-[30px] p-5"
             style={{
@@ -467,7 +514,7 @@ function Salah() {
             </div>
           </div>
 
-          {settings.location && (
+          {settings.location ? (
             <div className="mt-3">
               <PrayerTimeline
                 days={timelineDays}
@@ -477,7 +524,44 @@ function Salah() {
                 onPickPrayer={(id) => openAdhkar(id as SalahPrayer)}
               />
             </div>
+          ) : (
+            <div
+              className="mt-3 w-full overflow-hidden rounded-[30px] p-5"
+              style={{
+                background: "var(--surface-deep, var(--surface-card))",
+                border: "1px solid var(--border)",
+                color: "var(--foreground)",
+                boxShadow: "var(--card-shadow)",
+              }}
+            >
+              <div className="label-caps" style={{ color: "var(--muted-foreground)" }}>
+                Upcoming
+              </div>
+              <div className="mt-3 space-y-3">
+                {["Fajr", "Sunrise", "Dhuhr", "Asr", "Maghrib", "Isha"].map((label) => (
+                  <div key={label} className="flex items-center gap-3">
+                    <span
+                      className="h-2 w-2 shrink-0 rounded-full"
+                      style={{ background: "color-mix(in oklab, var(--foreground) 18%, transparent)" }}
+                    />
+                    <span className="flex-1 text-sm font-semibold" style={{ opacity: 0.5 }}>
+                      {label}
+                    </span>
+                    <span
+                      className="text-sm font-semibold"
+                      style={{ color: "var(--muted-foreground)", fontVariantNumeric: "tabular-nums" }}
+                    >
+                      --:--
+                    </span>
+                  </div>
+                ))}
+              </div>
+              <div className="mt-4 text-xs" style={{ color: "var(--muted-foreground)" }}>
+                Times appear once your location is set.
+              </div>
+            </div>
           )}
+
 
           <button
             onClick={toggleMuteAll}

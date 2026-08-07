@@ -104,6 +104,7 @@ function Settings() {
   const [cityBusy, setCityBusy] = useState(false);
   const [cityError, setCityError] = useState<string | null>(null);
 
+  const [locationSaved, setLocationSaved] = useState<string | null>(null);
   const updatePrayerSettings = (patch: Partial<PrayerSettings>) => {
     const next = { ...getPrayerSettings(), ...patch };
     setPrayerSettingsState(next);
@@ -677,6 +678,17 @@ function Settings() {
                     Change
                   </button>
                 </div>
+                {locationSaved && !cityOpen && (
+                  <div
+                    className="mt-2 rounded-xl px-3 py-2 text-xs font-semibold"
+                    style={{
+                      background: "color-mix(in oklab, var(--accent) 14%, transparent)",
+                      color: "var(--foreground)",
+                    }}
+                  >
+                    {locationSaved}
+                  </div>
+                )}
                 {cityOpen && (
                   <div className="mt-3 space-y-2">
                     <div className="flex gap-2">
@@ -705,6 +717,8 @@ function Settings() {
                           updatePrayerSettings({ location: loc });
                           setCityInput("");
                           setCityOpen(false);
+                          setLocationSaved(`Location saved: ${loc.label}`);
+                          setLocationSaved(`Location saved: ${loc.label}`);
                         }}
                         disabled={cityBusy}
                         className="shrink-0 rounded-full px-4 text-sm font-bold"
@@ -725,6 +739,8 @@ function Settings() {
                         }
                         updatePrayerSettings({ location: loc });
                         setCityOpen(false);
+                        setLocationSaved(`Location saved: ${loc.label}`);
+                        setLocationSaved(`Location saved: ${loc.label}`);
                       }}
                       className="w-full rounded-full py-2 text-xs font-semibold"
                       style={{ background: "var(--muted)", color: "var(--foreground)" }}
