@@ -292,20 +292,53 @@ export const lookupCity = async (query: string): Promise<PrayerLocation | null> 
 export const repairLocation = async (
   loc: PrayerLocation | null,
 ): Promise<PrayerLocation | null> => {
-  if (!loc || loc.verified) return null;
-  // Device fixes are stored with a numeric label and are always trustworthy.
-  if (/^-?\d/.test(loc.label)) return { ...loc, verified: true };
+  if (!loc) return null;
+  // A raw coordinate label means an older device fix; give it a place name.
+  if (/^-?\d/.test(loc.label)) {
+    const label = await reverseGeocode(loc);
+    return label === loc.label ? null : { ...loc, label, verified: true };
+  }
+  if (loc.verified) return null;
+
   const fixed = await lookupCity(loc.label);
   return fixed ?? { ...loc, verified: true };
+};
+
+/**
+ * Turn a device fix into a readable place name, e.g. "San Diego, US".
+ * Falls back to the coordinate string when the lookup fails.
+ */
+export const reverseGeocode = async (c: Coords): Promise<string> => {
+  const url =
+    `https://api-bdc.net/data/reverse-geocode-client` +
+    `?latitude=${c.lat}&longitude=${c.lng}&localityLanguage=en`;
+  try {
+    const res = await fetch(url);
+    if (!res.ok) return formatCoords(c);
+    const j = (await res.json()) as {
+      city?: string;
+      locality?: string;
+      principalSubdivision?: string;
+      countryCode?: string;
+    };
+    const place = j.city || j.locality || j.principalSubdivision;
+    if (!place) return formatCoords(c);
+    return [place, j.countryCode].filter(Boolean).join(", ");
+  } catch {
+    return formatCoords(c);
+  }
 };
 
 /** Resolve a device location, reusing the cached Qibla fix when possible. */
 export const resolveLocation = async (force = false): Promise<PrayerLocation | null> => {
   const cached: Coords | null = force ? null : getCachedPosition();
-  if (cached) return { ...cached, label: formatCoords(cached), verified: true };
-  const pos = await getPosition({ force });
-  if (!pos.ok) return null;
-  return { ...pos.coords, label: formatCoords(pos.coords), verified: true };
+  const coords = cached ?? (await (async () => {
+    const pos = await getPosition({ force });
+    return pos.ok ? pos.coords : null;
+  })());
+  if (!coords) return null;
+  const label = await reverseGeocode(coords);
+  return { ...coords, label, verified: true };
 };
 
 export const formatCoords = (c: Coords) =>
