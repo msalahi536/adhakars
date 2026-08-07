@@ -213,6 +213,7 @@ function Salah() {
     return validPrayer(window.localStorage.getItem(PRAYER_KEY));
   });
   const [sheetOpen, setSheetOpen] = useState(false);
+  const [pickerOpen, setPickerOpen] = useState(false);
   const setPrayer = (p: SalahPrayer) => {
     if (typeof window !== "undefined") window.localStorage.setItem(PRAYER_KEY, p);
     setPrayerState(p);
