@@ -306,7 +306,15 @@ export function PrayerTimeline({ days, now, todayKey, tone = "light", onPickPray
                 <X size={17} />
               </button>
             </div>
-            <div className="overflow-y-auto" style={{ maxHeight: "72vh" }}>
+            <div
+              ref={scrollRef}
+              className="overflow-y-auto overscroll-contain"
+              style={{
+                maxHeight: "72vh",
+                position: "relative",
+                paddingBottom: "calc(var(--bottom-nav-row) + env(safe-area-inset-bottom))",
+              }}
+            >
               {days.map((d) => (
                 <div key={d.key} className="mb-3">
                   <div className="mb-1">
@@ -316,6 +324,9 @@ export function PrayerTimeline({ days, now, todayKey, tone = "light", onPickPray
                     slots={d.slots}
                     now={now}
                     nextAt={nextAt}
+                    nextRef={(el) => {
+                      if (el) nextRowRef.current = el;
+                    }}
                     showNowDivider={d.key === todayKey}
                     dim={d.key < todayKey}
                     onPickPrayer={
@@ -328,6 +339,7 @@ export function PrayerTimeline({ days, now, todayKey, tone = "light", onPickPray
                     }
                   />
                 </div>
+
               ))}
             </div>
           </div>
