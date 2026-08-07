@@ -198,8 +198,13 @@ export function PrayerTimeline({ days, now, todayKey, tone = "light", onPickPray
       const box = scrollRef.current;
       const row = nextRowRef.current;
       if (!box || !row) return;
-      const top = row.offsetTop - box.clientHeight / 2 + row.clientHeight / 2;
+      const top =
+        box.scrollTop +
+        (row.getBoundingClientRect().top - box.getBoundingClientRect().top) -
+        box.clientHeight / 2 +
+        row.clientHeight / 2;
       box.scrollTo({ top: Math.max(0, top), behavior: "auto" });
+
     }, 40);
     return () => window.clearTimeout(t);
   }, [expanded]);
