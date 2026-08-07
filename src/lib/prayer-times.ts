@@ -292,13 +292,14 @@ export const lookupCity = async (query: string): Promise<PrayerLocation | null> 
 export const repairLocation = async (
   loc: PrayerLocation | null,
 ): Promise<PrayerLocation | null> => {
-  if (!loc || loc.verified) return null;
-  // Device fixes are stored with a numeric label and are always trustworthy.
+  if (!loc) return null;
+  // A raw coordinate label means an older device fix; give it a place name.
   if (/^-?\d/.test(loc.label)) {
-    // Older device fixes were saved with a raw coordinate label; name them.
     const label = await reverseGeocode(loc);
-    return { ...loc, label, verified: true };
+    return label === loc.label ? null : { ...loc, label, verified: true };
   }
+  if (loc.verified) return null;
+
   const fixed = await lookupCity(loc.label);
   return fixed ?? { ...loc, verified: true };
 };
