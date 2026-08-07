@@ -28,10 +28,6 @@ import { CustomThemeSheet } from "@/components/theme/CustomThemeSheet";
 import {
   resetToday,
   resetAllProgress,
-  getCommitment,
-  setCommitment,
-  getCustomAdhkarRows,
-  type CommitmentSection,
 } from "@/lib/storage";
 import {
   getNotificationPrefs,
@@ -93,8 +89,6 @@ function Settings() {
 
   const [notifPrefs, setNotifPrefsState] = useState<NotificationPrefs>(() => getNotificationPrefs());
 
-  const [commitment, setCommitmentState] = useState<Record<CommitmentSection, boolean>>(() => getCommitment());
-  const [hasCustom, setHasCustom] = useState(false);
   const [nativeAvailable, setNativeAvailable] = useState(false);
   const [prayerSettings, setPrayerSettingsState] = useState<PrayerSettings>(() =>
     getPrayerSettings(),
@@ -122,8 +116,6 @@ function Settings() {
     setPrayerSettingsState(getPrayerSettings());
     setNotifPrefsState(getNotificationPrefs());
 
-    setCommitmentState(getCommitment());
-    setHasCustom(getCustomAdhkarRows().length > 0);
     setNativeAvailable(isNativePlatform());
     let cancelled = false;
     const refresh = () => {
@@ -505,36 +497,6 @@ function Settings() {
           />
 
 
-          {/* MY DAILY COMMITMENT */}
-          <section className="mb-6">
-            <h2 className="label-caps mb-1">My Daily Commitment</h2>
-            <p className="mb-3 text-xs opacity-70">
-              Choose which sections you want to aim to complete. Any single counter tap already counts as a day of remembrance.
-            </p>
-            <div className="space-y-2">
-              {(
-                [
-                  { id: "morning", label: "Morning Adhkar" },
-                  { id: "evening", label: "Evening Adhkar" },
-                  { id: "salah", label: "After Salah" },
-                  { id: "sleep", label: "Sleep Adhkar" },
-                  { id: "wake", label: "Wake Adhkar" },
-                  ...(hasCustom ? [{ id: "custom" as CommitmentSection, label: "My Adhkar" }] : []),
-                ] as { id: CommitmentSection; label: string }[]
-              ).map(({ id, label }) => (
-                <Toggle
-                  key={id}
-                  label={label}
-                  value={commitment[id]}
-                  onChange={(v) => {
-                    const next = { ...commitment, [id]: v };
-                    setCommitmentState(next);
-                    setCommitment(next);
-                  }}
-                />
-              ))}
-            </div>
-          </section>
 
 
 
