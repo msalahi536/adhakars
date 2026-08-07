@@ -110,6 +110,13 @@ function Salah() {
           s = { ...s, location: loc };
           setPrayerSettings(s);
         }
+      } else {
+        // One time repair for city coordinates saved by an older build.
+        const fixed = await repairLocation(s.location);
+        if (fixed) {
+          s = { ...s, location: fixed };
+          setPrayerSettings(s);
+        }
       }
       if (cancelled) return;
       setSettingsState(s);
