@@ -103,6 +103,7 @@ function DayList({
   showNowDivider,
   dim,
   onPickPrayer,
+  nextRef,
 }: {
   slots: Slot[];
   now: Date;
@@ -110,6 +111,7 @@ function DayList({
   showNowDivider?: boolean;
   dim?: boolean;
   onPickPrayer?: (id: Exclude<PrayerId, "sunrise">) => void;
+  nextRef?: (el: HTMLDivElement | null) => void;
 }) {
   const rows: React.ReactNode[] = [];
   let dividerPlaced = false;
@@ -139,6 +141,7 @@ function DayList({
         key={`${s.dayKey}-${s.id}`}
         slot={s}
         state={state}
+        rowRef={state === "next" ? nextRef : undefined}
         onPick={
           onPickPrayer && s.id !== "sunrise"
             ? () => onPickPrayer(s.id as Exclude<PrayerId, "sunrise">)
@@ -147,6 +150,7 @@ function DayList({
       />,
     );
   });
+
   return (
     <div className="relative" style={{ opacity: dim ? 0.72 : 1 }}>
       <span
