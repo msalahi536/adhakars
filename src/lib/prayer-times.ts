@@ -54,9 +54,18 @@ export type PrayerSettings = {
 };
 
 const SETTINGS_KEY = "adhkar:prayer-settings";
-const CACHE_PREFIX = "adhkar:prayer-cache:";
+const CACHE_PREFIX = "adhkar:prayer-cache:v2:";
 const DISMISS_KEY = "adhkar:adhan-dismiss";
 const MUTE_ALL_KEY = "adhkar:adhan-mute-all";
+
+/** Device timezone, so the API returns times in the user's own clock. */
+export const deviceTimeZone = (): string => {
+  try {
+    return Intl.DateTimeFormat().resolvedOptions().timeZone || "";
+  } catch {
+    return "";
+  }
+};
 
 export const DEFAULT_PRAYER_SETTINGS: PrayerSettings = {
   method: 2,
@@ -140,7 +149,7 @@ const sig = (s: PrayerSettings): string => {
   const loc = s.location;
   const lat = loc ? loc.lat.toFixed(2) : "0";
   const lng = loc ? loc.lng.toFixed(2) : "0";
-  return `${lat},${lng},${s.method},${s.hanafi ? 1 : 0}`;
+  return `${lat},${lng},${s.method},${s.hanafi ? 1 : 0},${deviceTimeZone()}`;
 };
 
 const readCache = (key: string, s: PrayerSettings): DayTimes | null => {
@@ -168,7 +177,13 @@ export const prunePrayerCache = () => {
     const drop: string[] = [];
     for (let i = 0; i < window.localStorage.length; i++) {
       const k = window.localStorage.key(i);
-      if (k && k.startsWith(CACHE_PREFIX) && k.slice(CACHE_PREFIX.length) < cutoff) drop.push(k);
+      if (!k) continue;
+      // legacy cache written before timezone handling
+      if (k.startsWith("adhkar:prayer-cache:") && !k.startsWith(CACHE_PREFIX)) {
+        drop.push(k);
+        continue;
+      }
+      if (k.startsWith(CACHE_PREFIX) && k.slice(CACHE_PREFIX.length) < cutoff) drop.push(k);
     }
     drop.forEach((k) => window.localStorage.removeItem(k));
   } catch {
@@ -211,10 +226,12 @@ export const fetchDay = async (
   if (cached) return cached;
   const loc = settings.location;
   if (!loc) return null;
+  const tz = deviceTimeZone();
   const url =
     `https://api.aladhan.com/v1/timings/${apiDate(date)}` +
     `?latitude=${loc.lat}&longitude=${loc.lng}` +
-    `&method=${settings.method}&school=${settings.hanafi ? 1 : 0}`;
+    `&method=${settings.method}&school=${settings.hanafi ? 1 : 0}` +
+    (tz ? `&timezonestring=${encodeURIComponent(tz)}` : "");
   try {
     const res = await fetch(url);
     if (!res.ok) return null;
@@ -286,10 +303,15 @@ export type Slot = {
 
 export const slotsForDay = (day: DayTimes): Slot[] => {
   const [y, m, d] = day.key.split("-").map((n) => parseInt(n, 10));
+  let prev = -1;
   return PRAYER_ORDER.map((id) => {
+    const mins = day.times[id];
+    // Isha can fall after midnight: keep the sequence moving forward.
+    const adjusted = mins < prev ? mins + 24 * 60 : mins;
+    prev = adjusted;
     const at = new Date(y, m - 1, d, 0, 0, 0, 0);
-    at.setMinutes(day.times[id]);
-    return { id, label: PRAYER_LABELS[id], at, dayKey: day.key, minutes: day.times[id] };
+    at.setMinutes(adjusted);
+    return { id, label: PRAYER_LABELS[id], at, dayKey: day.key, minutes: mins };
   });
 };
 

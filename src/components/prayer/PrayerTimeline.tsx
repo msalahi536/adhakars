@@ -1,13 +1,16 @@
 // Vertical mini timeline of prayer times, with an expanded multi day view.
 
 import { useEffect, useState } from "react";
-import { formatMinutes, type Slot } from "@/lib/prayer-times";
+import { X } from "lucide-react";
+import { formatMinutes, type PrayerId, type Slot } from "@/lib/prayer-times";
 
 type Props = {
   /** yesterday, today, tomorrow, day after, in order */
   days: { key: string; label: string; slots: Slot[] }[];
   now: Date;
   todayKey: string;
+  /** open the after salah adhkar for a tapped prayer */
+  onPickPrayer?: (id: Exclude<PrayerId, "sunrise">) => void;
 };
 
 const isSunrise = (s: Slot) => s.id === "sunrise";
@@ -15,16 +18,23 @@ const isSunrise = (s: Slot) => s.id === "sunrise";
 function Row({
   slot,
   state,
+  onPick,
 }: {
   slot: Slot;
   state: "past" | "next" | "future";
+  onPick?: () => void;
 }) {
   const sunrise = isSunrise(slot);
-  const color =
-    state === "next" ? "var(--accent)" : "var(--foreground)";
+  const color = state === "next" ? "var(--accent)" : "var(--foreground)";
   const opacity = state === "past" ? 0.4 : sunrise ? 0.72 : 1;
+  const clickable = !!onPick && !sunrise;
   return (
-    <div className="relative flex items-center gap-3 py-2" style={{ opacity }}>
+    <div
+      onClick={clickable ? onPick : undefined}
+      role={clickable ? "button" : undefined}
+      className={`relative flex items-center gap-3 rounded-2xl py-2 ${clickable ? "active:scale-[0.99]" : ""}`}
+      style={{ opacity, cursor: clickable ? "pointer" : undefined }}
+    >
       <div className="relative flex w-4 shrink-0 justify-center">
         {sunrise ? (
           <span
@@ -42,7 +52,10 @@ function Row({
             style={{
               width: state === "next" ? 11 : 8,
               height: state === "next" ? 11 : 8,
-              background: state === "next" ? "var(--accent)" : "color-mix(in oklab, var(--foreground) 35%, transparent)",
+              background:
+                state === "next"
+                  ? "var(--accent)"
+                  : "color-mix(in oklab, var(--foreground) 35%, transparent)",
               boxShadow:
                 state === "next"
                   ? "0 0 0 4px color-mix(in oklab, var(--accent) 22%, transparent)"
@@ -80,12 +93,14 @@ function DayList({
   nextAt,
   showNowDivider,
   dim,
+  onPickPrayer,
 }: {
   slots: Slot[];
   now: Date;
   nextAt: number | null;
   showNowDivider?: boolean;
   dim?: boolean;
+  onPickPrayer?: (id: Exclude<PrayerId, "sunrise">) => void;
 }) {
   const rows: React.ReactNode[] = [];
   let dividerPlaced = false;
@@ -110,7 +125,18 @@ function DayList({
         : s.at.getTime() <= now.getTime()
           ? "past"
           : "future";
-    rows.push(<Row key={`${s.dayKey}-${s.id}`} slot={s} state={state} />);
+    rows.push(
+      <Row
+        key={`${s.dayKey}-${s.id}`}
+        slot={s}
+        state={state}
+        onPick={
+          onPickPrayer && s.id !== "sunrise"
+            ? () => onPickPrayer(s.id as Exclude<PrayerId, "sunrise">)
+            : undefined
+        }
+      />,
+    );
   });
   return (
     <div className="relative" style={{ opacity: dim ? 0.45 : 1 }}>
@@ -127,7 +153,22 @@ function DayList({
   );
 }
 
-export function PrayerTimeline({ days, now, todayKey }: Props) {
+function DayPill({ label }: { label: string }) {
+  return (
+    <span
+      className="inline-flex items-center rounded-full px-4 py-1.5 text-sm font-bold"
+      style={{
+        background: "var(--surface-card)",
+        color: "var(--foreground)",
+        boxShadow: "var(--card-shadow)",
+      }}
+    >
+      {label}
+    </span>
+  );
+}
+
+export function PrayerTimeline({ days, now, todayKey, onPickPrayer }: Props) {
   const [expanded, setExpanded] = useState(false);
   const [dragY, setDragY] = useState(0);
   const [startY, setStartY] = useState<number | null>(null);
@@ -146,7 +187,7 @@ export function PrayerTimeline({ days, now, todayKey }: Props) {
   const compact = [
     ...(today ? today.slots.filter((s) => s.at.getTime() > now.getTime()) : []),
     ...(tomorrow ? tomorrow.slots : []),
-  ].slice(0, 8);
+  ].slice(0, 6);
 
   return (
     <>
@@ -178,7 +219,7 @@ export function PrayerTimeline({ days, now, todayKey }: Props) {
       {expanded && (
         <div
           className="fixed inset-0 z-50 flex flex-col justify-end"
-          style={{ background: "rgba(0,0,0,0.45)", backdropFilter: "blur(4px)" }}
+          style={{ background: "rgba(0,0,0,0.5)", backdropFilter: "blur(6px)" }}
           onClick={() => setExpanded(false)}
         >
           <div
@@ -214,22 +255,38 @@ export function PrayerTimeline({ days, now, todayKey }: Props) {
               <h2 className="text-lg font-bold">Prayer timeline</h2>
               <button
                 onClick={() => setExpanded(false)}
-                className="rounded-full px-3 py-1 text-sm font-semibold"
-                style={{ background: "var(--muted)", color: "var(--foreground)" }}
+                aria-label="Close"
+                className="flex items-center justify-center rounded-full"
+                style={{
+                  width: 34,
+                  height: 34,
+                  background: "color-mix(in oklab, var(--foreground) 8%, transparent)",
+                  color: "var(--foreground)",
+                }}
               >
-                Close
+                <X size={17} />
               </button>
             </div>
             <div className="overflow-y-auto" style={{ maxHeight: "72vh" }}>
               {days.map((d) => (
                 <div key={d.key} className="mb-3">
-                  <div className="label-caps mb-1">{d.label}</div>
+                  <div className="mb-1">
+                    <DayPill label={d.label} />
+                  </div>
                   <DayList
                     slots={d.slots}
                     now={now}
                     nextAt={nextAt}
                     showNowDivider={d.key === todayKey}
                     dim={d.key < todayKey}
+                    onPickPrayer={
+                      onPickPrayer
+                        ? (id) => {
+                            setExpanded(false);
+                            onPickPrayer(id);
+                          }
+                        : undefined
+                    }
                   />
                 </div>
               ))}
