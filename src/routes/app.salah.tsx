@@ -181,7 +181,7 @@ function Salah() {
   const submitCity = async () => {
     setLocating(true);
     setCityError(null);
-    const loc = await lookupCity(cityInput, settings);
+    const loc = await lookupCity(cityInput);
     setLocating(false);
     if (!loc) {
       setCityError("We could not find that place. Try a city and country.");
