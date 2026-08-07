@@ -1,6 +1,6 @@
 // Vertical mini timeline of prayer times, with an expanded multi day view.
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { X } from "lucide-react";
 import { formatMinutes, type PrayerId, type Slot } from "@/lib/prayer-times";
 
