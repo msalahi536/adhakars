@@ -177,7 +177,13 @@ export const prunePrayerCache = () => {
     const drop: string[] = [];
     for (let i = 0; i < window.localStorage.length; i++) {
       const k = window.localStorage.key(i);
-      if (k && k.startsWith(CACHE_PREFIX) && k.slice(CACHE_PREFIX.length) < cutoff) drop.push(k);
+      if (!k) continue;
+      // legacy cache written before timezone handling
+      if (k.startsWith("adhkar:prayer-cache:") && !k.startsWith(CACHE_PREFIX)) {
+        drop.push(k);
+        continue;
+      }
+      if (k.startsWith(CACHE_PREFIX) && k.slice(CACHE_PREFIX.length) < cutoff) drop.push(k);
     }
     drop.forEach((k) => window.localStorage.removeItem(k));
   } catch {
