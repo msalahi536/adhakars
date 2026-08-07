@@ -513,6 +513,16 @@ function Salah() {
         onPrayer={setPrayer}
         onClose={() => setSheetOpen(false)}
       />
+      <PrayerPicker
+        open={pickerOpen}
+        selected={prayer}
+        progress={progress}
+        onPick={(p) => {
+          setPrayer(p);
+          setPickerOpen(false);
+        }}
+        onClose={() => setPickerOpen(false)}
+      />
 
     </>
   );
