@@ -17,13 +17,13 @@ const K_CUSTOM = "adhkar:custom-triplet";
 
 export type ModeSetting = "light" | "dark" | "auto";
 
-export const DEFAULT_SEED = "#c9a84c";
+export const DEFAULT_SEED = "#606c38";
 export const DEFAULT_PRESET_ID = "original";
 
 export type Preset = { id: string; name: string; seed: string };
 
 export const PRESETS: Preset[] = [
-  { id: "original",  name: "Original",  seed: "#c9a84c" },
+  { id: "original",  name: "Original",  seed: "#606c38" },
   { id: "classic",   name: "Classic",   seed: "#c9a84c" },
   { id: "rose",      name: "Rose",      seed: "#d47a8b" },
   { id: "lavender",  name: "Twilight",  seed: "#8a7bd0" },
@@ -133,6 +133,32 @@ export const applyThemeForRoute = (pathname: string, sectionKey?: SectionKey) =>
 
 
   const tokens = deriveTokens({ seed, mode, custom });
+
+  // The default light theme uses a calm, high-end botanical surface system.
+  // Section accents and headers still come from their individual green tones.
+  if (presetId === DEFAULT_PRESET_ID && mode === "light") {
+    Object.assign(tokens, {
+      "--background": "#f1f3ee",
+      "--foreground": "#263326",
+      "--surface": "#f7faf4",
+      "--surface-card": "#fdfcf8",
+      "--card": "#fdfcf8",
+      "--card-2": "#fdfcf8",
+      "--card-foreground": "#263326",
+      "--muted": "#e2e8da",
+      "--muted-foreground": "#606c38",
+      "--border": "rgba(40, 54, 24, 0.12)",
+      "--text-primary": "#263326",
+      "--text-secondary": "#606c38",
+      "--nav-bg": "rgba(247, 250, 244, 0.96)",
+      "--nav-safe-area-bg": "#f1f3ee",
+      "--nav-border": "rgba(40, 54, 24, 0.10)",
+      "--nav-inactive": "rgba(38, 51, 38, 0.52)",
+      "--ring-track": "rgba(40, 54, 24, 0.10)",
+      "--dot-inactive": "rgba(40, 54, 24, 0.16)",
+      "--card-shadow": "0 10px 28px rgba(40, 54, 24, 0.08)",
+    });
+  }
   applyTokens(tokens, mode);
 };
 
