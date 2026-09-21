@@ -716,11 +716,6 @@ html[data-preset][data-section="tasbih"] {
   backdrop-filter: blur(20px) saturate(120%);
 }
 
-@media (max-height: 720px) {
-  html[data-section="morning"] .bottom-nav,
-  html[data-section="evening"] .bottom-nav { bottom: calc(20px + env(safe-area-inset-bottom)); }
-}
-
 @media (max-width: 360px) {
   .adhkar-header-content { padding-inline: 50px; }
 }
