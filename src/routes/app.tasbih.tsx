@@ -1,8 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { RotateCcw, Undo2 } from "lucide-react";
-import { ProgressRing } from "@/components/ProgressRing";
-import { SettingsButton } from "@/components/SettingsButton";
 import { triggerHaptic } from "@/lib/theme";
 import { bumpLifetime } from "@/lib/storage";
 
@@ -87,26 +85,15 @@ function Tasbih() {
 
   return (
     <>
-      <header
-        className="page-header relative overflow-hidden"
-        style={{ background: "var(--grad-header)", color: "var(--header-fg)" }}
-      >
-        <SettingsButton />
-        <div className="relative mx-auto max-w-md px-7 pb-5 pt-9 text-center">
-          <div
-            className="label-caps"
-            style={{ color: "var(--header-sub)", opacity: 1, letterSpacing: "0.2em" }}
-          >
+      <header className="tasbih-header">
+        <div className="tasbih-header-inner">
+          <div className="tasbih-eyebrow">
             Dhikr Counter
           </div>
-          <h1
-            className="app-page-title mt-2"
-          >
-            Tasbih
-          </h1>
+          <h1 className="tasbih-title">Tasbih</h1>
 
           {/* Cycle target selector, centered, all four fit */}
-          <div className="mt-4 flex items-center justify-center gap-2">
+          <div className="tasbih-targets">
             {MILESTONES.map((t) => {
               const active = milestone === t;
               const label = t === 0 ? "∞" : String(t);
@@ -114,19 +101,7 @@ function Tasbih() {
                 <button
                   key={t}
                   onClick={() => setMilestone(t)}
-                  className="flex shrink-0 items-center justify-center font-bold transition-all active:scale-95"
-                  style={{
-                    flex: "1 1 0",
-                    maxWidth: 78,
-                    height: 36,
-                    borderRadius: 18,
-                    fontSize: 13,
-                    background: active
-                      ? "var(--accent)"
-                      : "color-mix(in oklab, var(--header-fg) 15%, transparent)",
-                    color: active ? "var(--accent-foreground)" : "var(--header-fg)",
-                    border: "none",
-                  }}
+                  className={`tasbih-target ${active ? "is-active" : ""}`}
                 >
                   {label}
                 </button>
@@ -136,8 +111,8 @@ function Tasbih() {
         </div>
       </header>
 
-      <main className="scroll-area flex flex-col">
-        <div className="mx-auto flex min-h-0 w-full max-w-md flex-1 flex-col px-4 pt-4">
+      <main className="tasbih-main">
+        <div className="tasbih-card-wrap">
           <div
             role="button"
             tabIndex={0}
@@ -150,40 +125,24 @@ function Tasbih() {
             onPointerUp={() => setPressed(false)}
             onPointerLeave={() => setPressed(false)}
             onPointerCancel={() => setPressed(false)}
-            className="dhikr-card relative flex w-full flex-1 flex-col items-center justify-center overflow-hidden outline-none"
-            style={{
-              background: "var(--card)",
-              color: "var(--card-foreground)",
-              border: "1px solid var(--border)",
-              boxShadow: "var(--card-shadow, 0 4px 16px rgba(0,0,0,0.08))",
-              transform: pressed ? "scale(0.985)" : "scale(1)",
-              transition: "transform 120ms ease",
-              padding: "28px 20px 32px",
-              touchAction: "manipulation",
-              cursor: "pointer",
-              userSelect: "none",
-            }}
+            className={`tasbih-card ${pressed ? "is-pressed" : ""}`}
             aria-label="tap to count"
           >
             {/* Top corner controls */}
             <div
-              className="absolute left-3 top-3 z-10"
+              className="tasbih-corner-control left"
               onPointerDown={(e) => e.stopPropagation()}
             >
               <button
                 onClick={undo}
-                className="flex h-9 w-9 items-center justify-center rounded-full transition-transform active:scale-90"
-                style={{
-                  background: "var(--btn-surface)",
-                  color: "var(--btn-fg)",
-                }}
+                className="tasbih-control"
                 aria-label="undo"
               >
                 <Undo2 size={16} />
               </button>
             </div>
             <div
-              className="absolute right-3 top-3 z-10"
+              className="tasbih-corner-control right"
               onPointerDown={(e) => e.stopPropagation()}
             >
               <button
@@ -192,11 +151,7 @@ function Tasbih() {
                 onMouseLeave={onResetEnd}
                 onTouchStart={onResetStart}
                 onTouchEnd={onResetEnd}
-                className="flex h-9 w-9 items-center justify-center rounded-full transition-transform active:scale-90"
-                style={{
-                  background: "var(--btn-surface)",
-                  color: "var(--btn-fg)",
-                }}
+                className="tasbih-control"
                 aria-label="hold to reset"
               >
                 <RotateCcw size={16} />
@@ -204,56 +159,28 @@ function Tasbih() {
             </div>
 
             {/* Big progress ring with count */}
-            <div className={`relative flex items-center justify-center ${tapped ? "tap-pulse" : ""}`}>
-              <ProgressRing
-                value={ringValue}
-                max={ringMax}
-                size={240}
-                stroke={14}
-                complete={complete}
-              />
-              <div className="absolute inset-0 flex flex-col items-center justify-center">
-                <span
-                  className="font-bold leading-none"
-                  style={{
-                    fontSize: 64,
-                    color: "var(--count-fg, var(--card-foreground))",
-                    fontVariantNumeric: "tabular-nums",
-                    transition: "color 200ms",
-                  }}
-                >
+            <div className={`tasbih-disc ${tapped ? "tasbih-disc-tapped" : ""}`}>
+              <div className="tasbih-disc-content">
+                <span className="tasbih-count">
                   {total}
                 </span>
-                <span
-                  className="mt-2 text-[12px]"
-                  style={{ color: "var(--muted-foreground)", letterSpacing: "0.05em" }}
-                >
-                  {hasMilestone
-                    ? `cycle ${cycleNum} · ${cycleCount}/${milestone}`
-                    : "∞ continuous"}
-                </span>
+                {hasMilestone && <span className="tasbih-cycle">Cycle {cycleNum} of {milestone}</span>}
               </div>
               {flash && (
                 <span
-                  className="radial-pulse pointer-events-none absolute inset-0 rounded-full"
+                    className="radial-pulse pointer-events-none absolute inset-0 rounded-full"
                   style={{ background: "color-mix(in oklab, var(--accent) 45%, transparent)" }}
                 />
               )}
             </div>
 
             {/* Helper text */}
-            <div className="mt-8 text-center">
-              <div
-                className="label-caps"
-                style={{ color: "var(--muted-foreground)", opacity: 0.85 }}
-              >
+            <div className="tasbih-helper">
+              <div className="tasbih-helper-primary">
                 Tap anywhere to count
               </div>
-              <div
-                className="mt-1 text-[11px]"
-                style={{ color: "var(--muted-foreground)", opacity: 0.7 }}
-              >
-                Hold reset 2.5s to clear
+              <div className="tasbih-helper-secondary">
+                Hold to reset
               </div>
             </div>
           </div>

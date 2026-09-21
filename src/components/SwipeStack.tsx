@@ -100,6 +100,13 @@ export function SwipeStack({ items, counts, onIncrement, onReset, persistKey, fi
     if (animating.current || i === idx) return;
     animateTo(i > idx ? "next" : "prev", i);
   };
+  const scrubTo = (i: number) => {
+    if (animating.current || i === idx) return;
+    setDragOffset(0);
+    setPhase("idle");
+    setEnter(false);
+    setIdx(i);
+  };
 
   const current = items[idx];
 
@@ -345,6 +352,7 @@ export function SwipeStack({ items, counts, onIncrement, onReset, persistKey, fi
           onSelect={goTo}
           onPrevious={goPrev}
           onNext={goNext}
+          onScrub={scrubTo}
         />
       ) : <div className="mt-2 flex items-center justify-center px-6">
         <button

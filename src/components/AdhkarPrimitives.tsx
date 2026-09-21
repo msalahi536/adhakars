@@ -1,5 +1,7 @@
-import { BookOpen, ChevronLeft, ChevronRight } from "lucide-react";
+import { useRef } from "react";
+import { BookOpen, Check, ChevronLeft, ChevronRight } from "lucide-react";
 import { ProgressRing } from "./ProgressRing";
+import { triggerHaptic } from "@/lib/theme";
 
 export function IslamicOrnament({ size = 24, className = "" }: { size?: number; className?: string }) {
   return (
@@ -16,7 +18,6 @@ export function ProgressBar({ value, total }: { value: number; total: number }) 
       <div className="adhkar-progress-track">
         <div className="adhkar-progress-value" style={{ width: `${total ? (value / total) * 100 : 0}%` }} />
       </div>
-      <span className="adhkar-progress-count">{value} / {total}</span>
     </div>
   );
 }
@@ -52,22 +53,23 @@ type RepeatCounterProps = {
   complete: boolean;
   tapped: boolean;
   bursts: number[];
+  justCompleted?: boolean;
   onClick: () => void;
   size?: number;
 };
 
-export function RepeatCounter({ count, target, complete, tapped, bursts, onClick, size = 88 }: RepeatCounterProps) {
+export function RepeatCounter({ count, target, complete, tapped, bursts, justCompleted = false, onClick, size = 88 }: RepeatCounterProps) {
   return (
     <button
       onClick={onClick}
       disabled={complete}
-      className={`adhkar-repeat-counter relative flex shrink-0 items-center justify-center rounded-full ${tapped ? "tap-pulse" : ""}`}
+      className={`adhkar-repeat-counter relative flex shrink-0 items-center justify-center rounded-full ${tapped ? "tap-pulse" : ""} ${justCompleted ? "is-completing" : ""}`}
       aria-label="increment counter"
     >
       <ProgressRing value={count} max={target} size={size} stroke={4} complete={complete} />
       <span className="absolute inset-0 flex flex-col items-center justify-center">
         {complete ? (
-          <span className="text-3xl" style={{ color: "var(--accent)" }}>✓</span>
+          <Check className="adhkar-complete-check" size={30} strokeWidth={1.8} />
         ) : (
           <>
             <span className="adhkar-counter-value">{count}</span>
@@ -88,19 +90,72 @@ export function Pagination({
   onSelect,
   onPrevious,
   onNext,
+  onScrub,
 }: {
   total: number;
   active: number;
   onSelect: (index: number) => void;
   onPrevious: () => void;
   onNext: () => void;
+  onScrub: (index: number) => void;
 }) {
+  const holdTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const scrubbing = useRef(false);
+  const lastIndex = useRef(active);
+
+  const indexFromPointer = (clientX: number, element: HTMLElement) => {
+    const rect = element.getBoundingClientRect();
+    const ratio = Math.max(0, Math.min(0.999, (clientX - rect.left) / rect.width));
+    return Math.min(total - 1, Math.floor(ratio * total));
+  };
+
+  const updateScrub = (clientX: number, element: HTMLElement) => {
+    const next = indexFromPointer(clientX, element);
+    if (next === lastIndex.current) return;
+    lastIndex.current = next;
+    onScrub(next);
+    void triggerHaptic("light");
+  };
+
+  const stopScrub = (event: React.PointerEvent<HTMLDivElement>) => {
+    if (holdTimer.current) clearTimeout(holdTimer.current);
+    holdTimer.current = null;
+    if (scrubbing.current) event.currentTarget.releasePointerCapture(event.pointerId);
+    scrubbing.current = false;
+  };
+
   return (
     <div className="adhkar-pagination-row">
       <button type="button" className="adhkar-pagination-arrow" onClick={onPrevious} disabled={active === 0} aria-label="previous">
         <ChevronLeft size={12} strokeWidth={2} />
       </button>
-      <div className="adhkar-pagination">
+      <div
+        className="adhkar-pagination"
+        onPointerDown={(event) => {
+          lastIndex.current = active;
+          const x = event.clientX;
+          const element = event.currentTarget;
+          holdTimer.current = setTimeout(() => {
+            scrubbing.current = true;
+            element.setPointerCapture(event.pointerId);
+            updateScrub(x, element);
+          }, 250);
+        }}
+        onPointerMove={(event) => {
+          if (!scrubbing.current) return;
+          event.preventDefault();
+          updateScrub(event.clientX, event.currentTarget);
+        }}
+        onPointerUp={stopScrub}
+        onPointerCancel={stopScrub}
+        onPointerLeave={(event) => {
+          if (!scrubbing.current && holdTimer.current) {
+            clearTimeout(holdTimer.current);
+            holdTimer.current = null;
+          }
+          if (scrubbing.current && event.buttons === 0) stopScrub(event);
+        }}
+      >
         {Array.from({ length: total }, (_, index) => (
           <button
             key={index}
@@ -110,7 +165,6 @@ export function Pagination({
             aria-label={`go to ${index + 1}`}
           />
         ))}
-        <IslamicOrnament size={14} />
       </div>
       <button type="button" className="adhkar-pagination-arrow" onClick={onNext} disabled={active === total - 1} aria-label="next">
         <ChevronRight size={12} strokeWidth={2} />

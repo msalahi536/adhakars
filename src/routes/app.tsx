@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { createFileRoute, Outlet, useRouterState } from "@tanstack/react-router";
 import { BottomNav } from "@/components/BottomNav";
+import { SettingsButton } from "@/components/SettingsButton";
 import { Onboarding, hasOnboarded } from "@/components/Onboarding";
 import morningBackground from "@/assets/morning-landscape.png.asset.json";
 import eveningBackground from "@/assets/evening-landscape.png.asset.json";
@@ -13,6 +14,7 @@ function AppLayout() {
   const [showOnboarding, setShowOnboarding] = useState(false);
   const pathname = useRouterState({ select: (state) => state.location.pathname });
   const isEvening = pathname === "/app/evening";
+  const showSettings = ["/app", "/app/", "/app/evening", "/app/salah", "/app/tasbih", "/app/more"].includes(pathname);
   useEffect(() => {
     if (!hasOnboarded()) setShowOnboarding(true);
   }, []);
@@ -41,6 +43,7 @@ function AppLayout() {
         style={{ "--screen-background": `url(${eveningBackground.url})` } as React.CSSProperties}
         aria-hidden="true"
       />
+      {showSettings && <SettingsButton />}
       <Outlet />
       <BottomNav />
       {showOnboarding && <Onboarding onDone={() => setShowOnboarding(false)} />}

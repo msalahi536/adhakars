@@ -1,4 +1,3 @@
-import { SettingsButton } from "./SettingsButton";
 import { ProgressBar } from "./AdhkarPrimitives";
 
 type Props = {
@@ -15,7 +14,6 @@ export function AdhkarHeader({ title, subtitle, completed, total, action, style,
   return (
     <header className="page-header adhkar-header relative shrink-0 overflow-hidden" style={style}>
       {pattern}
-      <SettingsButton />
       {action && <div className="adhkar-header-action absolute z-10">{action}</div>}
       <div className="adhkar-header-content mx-auto max-w-md px-7 text-center">
         <div className="label-caps">{subtitle}</div>
