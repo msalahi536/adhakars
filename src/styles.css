@@ -152,8 +152,8 @@
 
 @layer base {
   :root {
-    --bottom-nav-row: 56px;
-    --bottom-nav-height: 56px;
+    --bottom-nav-row: 72px;
+    --bottom-nav-height: 94px;
   }
   * {
     border-color: var(--color-border);
@@ -192,31 +192,55 @@
     flex-direction: column;
     -webkit-touch-callout: none;
   }
+  .app-shell {
+    isolation: isolate;
+    position: relative;
+    display: flex;
+    min-height: 100dvh;
+    width: 100%;
+    flex: 1;
+    flex-direction: column;
+    overflow: hidden;
+    background-color: var(--background);
+    background-image:
+      linear-gradient(color-mix(in oklab, var(--background) 16%, transparent), color-mix(in oklab, var(--background) 16%, transparent)),
+      var(--app-background-image);
+    background-position: center top;
+    background-size: cover;
+  }
+  .app-shell::after {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background: color-mix(in oklab, var(--background) 12%, transparent);
+    content: "";
+    pointer-events: none;
+  }
   .page-header {
     flex-shrink: 0;
     padding-top: env(safe-area-inset-top);
+    background: transparent !important;
+    color: var(--foreground) !important;
   }
   .scroll-area {
     flex: 1;
     min-height: 0;
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
-    background: var(--background);
-    padding-bottom: calc(var(--bottom-nav-row) + env(safe-area-inset-bottom) + 12px);
+    background: transparent !important;
+    padding-bottom: calc(var(--bottom-nav-height) + env(safe-area-inset-bottom) + 12px);
   }
   .bottom-nav {
     position: fixed;
-    inset-inline: 0;
-    bottom: 0;
+    inset-inline: 14px;
+    bottom: calc(10px + env(safe-area-inset-bottom));
     width: 100%;
-    height: calc(var(--bottom-nav-row) + env(safe-area-inset-bottom));
-    min-height: calc(var(--bottom-nav-row) + env(safe-area-inset-bottom));
-    margin: 0;
-    padding-top: 0;
-    padding-right: 0;
-    padding-bottom: env(safe-area-inset-bottom);
-    padding-left: 0;
-    background: var(--nav-bg);
+    width: auto;
+    height: var(--bottom-nav-row);
+    min-height: var(--bottom-nav-row);
+    margin: 0 auto;
+    padding: 0;
+    background: transparent;
     z-index: 100;
     box-sizing: border-box;
     display: flex;
@@ -230,6 +254,23 @@
     display: flex;
     align-items: center;
     justify-content: space-around;
+    overflow: hidden;
+    border: 1px solid;
+    border-radius: 24px;
+    background: color-mix(in oklab, var(--nav-bg) 88%, transparent);
+    box-shadow: 0 14px 34px color-mix(in oklab, var(--foreground) 14%, transparent);
+    backdrop-filter: blur(24px) saturate(150%);
+    -webkit-backdrop-filter: blur(24px) saturate(150%);
+  }
+  .nav-item {
+    height: 100%;
+  }
+  .nav-active-mark {
+    position: absolute;
+    bottom: 5px;
+    width: 20px;
+    height: 3px;
+    border-radius: 999px;
   }
   .tasbih-shell-wrapper {
     overflow: visible;
@@ -248,6 +289,41 @@
   text-align: center;
   line-height: 1.9;
   letter-spacing: 0;
+}
+
+.app-page-title {
+  font-family: "Fraunces", Georgia, serif;
+  font-size: 2.25rem;
+  font-weight: 500;
+  line-height: 1.1;
+  letter-spacing: 0;
+}
+
+.header-icon-button {
+  border-radius: 16px;
+}
+
+.dhikr-card {
+  border-radius: 26px;
+  background: color-mix(in oklab, var(--card) 90%, transparent) !important;
+  border-color: color-mix(in oklab, var(--border) 75%, transparent) !important;
+  box-shadow: 0 18px 48px color-mix(in oklab, var(--foreground) 12%, transparent) !important;
+  backdrop-filter: blur(20px) saturate(115%);
+  -webkit-backdrop-filter: blur(20px) saturate(115%);
+}
+
+@media (max-height: 720px) {
+  .app-page-title { font-size: 1.9rem; }
+  .page-header .label-caps { font-size: 0.62rem; }
+  .bottom-nav { bottom: calc(6px + env(safe-area-inset-bottom)); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+  }
 }
 
 .label-caps {

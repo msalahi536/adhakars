@@ -3,7 +3,6 @@ import { createFileRoute } from "@tanstack/react-router";
 import { SwipeStack } from "@/components/SwipeStack";
 import { HeaderSettingsButton } from "@/components/HeaderSettingsButton";
 import { HeaderBackButton } from "@/components/HeaderBackButton";
-import { DiagonalLatticePattern } from "@/components/HeaderPatterns";
 import { sleepItems, wakeItems, type SleepMode } from "@/data/sleep";
 import { isItemComplete } from "@/data/salah";
 import { getCounts, setCount, clearCounts, bumpLifetime } from "@/lib/storage";
@@ -67,21 +66,20 @@ function Sleep() {
         className="page-header relative overflow-hidden"
         style={{ background: "var(--grad-header)", color: headerFg }}
       >
-        <DiagonalLatticePattern />
         <HeaderBackButton />
         <HeaderSettingsButton />
-        <div className="relative mx-auto max-w-md px-5 pb-4 pt-5" style={{ paddingLeft: 60, paddingRight: 60 }}>
+        <div className="relative mx-auto max-w-md px-16 pb-5 pt-9 text-center">
           <div
             className="label-caps"
             style={{ color: `var(--header-sub, ${headerFg})`, opacity: 1 }}
           >
             {isSleep ? "Before Sleep" : "Upon Waking"}
           </div>
-          <h1 className="mt-1 text-2xl font-bold tracking-tight">
+          <h1 className="app-page-title mt-2">
             {isSleep ? "Sleep Adhkar" : "Wake Adhkar"}
           </h1>
 
-          <div className="mt-3 flex items-center gap-3">
+          <div className="mx-auto mt-5 flex max-w-[300px] items-center gap-3">
             <div
               className="h-1.5 flex-1 overflow-hidden rounded-full"
               style={{ background: `color-mix(in oklab, ${headerFg} 22%, transparent)` }}
