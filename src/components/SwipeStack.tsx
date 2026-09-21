@@ -301,6 +301,7 @@ export function SwipeStack({ items, counts, onIncrement, onReset, persistKey, fi
                 isSpecial={current.isSpecial}
                 specialLabel={current.specialLabel}
                 isPersonalDua={current.isPersonalDua}
+                referenceLayout={dailyLayout}
               />
             ) : (
               <TasbeehComboCard

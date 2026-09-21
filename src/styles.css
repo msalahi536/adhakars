@@ -315,7 +315,7 @@
 
 /* Shared Morning and Evening recitation layout */
 .adhkar-header {
-  min-height: 170px;
+  min-height: 150px;
 }
 
 html[data-preset="original"][data-section="morning"] {
@@ -336,8 +336,8 @@ html[data-preset="original"][data-section="evening"] {
 }
 
 .adhkar-header-content {
-  padding-top: 36px;
-  padding-bottom: 14px;
+  padding-top: 30px;
+  padding-bottom: 10px;
 }
 
 .adhkar-header .label-caps {
@@ -363,7 +363,7 @@ html[data-preset="original"][data-section="evening"] {
   align-items: center;
   gap: 16px;
   width: min(76vw, 310px);
-  margin: 28px auto 0;
+  margin: 20px auto 0;
 }
 
 .adhkar-progress-track {
@@ -395,13 +395,13 @@ html[data-preset="original"][data-section="evening"] {
 
 .daily-swipe-stack {
   flex: none;
-  min-height: 810px;
+  min-height: 620px;
   overflow: visible;
 }
 
 .daily-swipe-stack .adhkar-index-row {
-  min-height: 52px;
-  margin-bottom: 6px;
+  min-height: 46px;
+  margin-bottom: 2px;
 }
 
 .daily-swipe-stack .adhkar-index-row > span {
@@ -413,13 +413,13 @@ html[data-preset="original"][data-section="evening"] {
 }
 
 .daily-swipe-stack .adhkar-card-stage {
-  height: 690px;
+  height: 520px;
   flex: none;
   padding: 8px 20px 10px;
 }
 
 .adhkar-card-heading {
-  padding: 24px 26px 0;
+  padding: 20px 26px 0;
 }
 
 .adhkar-card-ornament {
@@ -431,7 +431,7 @@ html[data-preset="original"][data-section="evening"] {
   max-width: 100%;
   color: var(--card-foreground);
   font-weight: 500;
-  line-height: 1.8;
+  line-height: 1.65;
 }
 
 .adhkar-divider {
@@ -440,7 +440,7 @@ html[data-preset="original"][data-section="evening"] {
   justify-content: center;
   gap: 5px;
   width: 94px;
-  margin: 20px auto 15px;
+  margin: 14px auto 12px;
   color: var(--accent);
 }
 
@@ -467,12 +467,12 @@ html[data-preset="original"][data-section="evening"] {
   color: var(--translit);
   font-size: 13px;
   font-style: italic;
-  line-height: 1.65;
+  line-height: 1.6;
   text-align: center;
 }
 
 .adhkar-card-footer {
-  padding: 12px 24px 22px;
+  padding: 8px 24px 18px;
 }
 
 .adhkar-source-badge {

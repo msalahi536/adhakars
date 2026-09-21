@@ -13,9 +13,10 @@ type Props = {
   isSpecial?: boolean;
   specialLabel?: string;
   isPersonalDua?: boolean;
+  referenceLayout?: boolean;
 };
 
-export function DhikrCard({ dhikr, count, onIncrement, isSpecial, specialLabel, isPersonalDua }: Props) {
+export function DhikrCard({ dhikr, count, onIncrement, isSpecial, specialLabel, isPersonalDua, referenceLayout = false }: Props) {
   const [tapped, setTapped] = useState(false);
   const [bursts, setBursts] = useState<number[]>([]);
   const [display, setDisplay] = useState(getDisplay());
@@ -144,7 +145,7 @@ export function DhikrCard({ dhikr, count, onIncrement, isSpecial, specialLabel, 
             </div>
           )}
 
-          {hasTranslation && dhikr.translation && !dhikr.arabicMulti && (
+          {!referenceLayout && hasTranslation && dhikr.translation && !dhikr.arabicMulti && (
             <div className="mt-4">
               <div className="label-caps mb-1">Translation</div>
               <p className="text-[13px] opacity-90" style={{ lineHeight: 1.55 }}>
@@ -153,7 +154,7 @@ export function DhikrCard({ dhikr, count, onIncrement, isSpecial, specialLabel, 
             </div>
           )}
 
-          {hasCommentary && (
+          {!referenceLayout && hasCommentary && (
             <div className="mt-4">
               <div className="label-caps mb-1">Commentary</div>
               <p className="text-[13px] opacity-90" style={{ lineHeight: 1.55 }}>
