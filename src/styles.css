@@ -576,32 +576,12 @@ html[data-section="evening"] .bottom-nav-row { height: 100px; border-color: var(
 }
 
 @media (max-height: 720px) {
-  .app-page-title { font-size: 1.9rem; }
-  .page-header .label-caps { font-size: 0.62rem; }
-  .bottom-nav { bottom: calc(6px + env(safe-area-inset-bottom)); }
-  .adhkar-header { min-height: 138px; }
-  .adhkar-header-content { padding-top: 26px; padding-bottom: 4px; }
-  .adhkar-header .app-page-title { margin-top: 6px; }
-  .adhkar-progress-row { margin-top: 10px; }
-  .daily-swipe-stack .adhkar-index-row { min-height: 38px; }
-  .daily-swipe-stack .adhkar-index-row > span { padding-block: 7px; }
-  .adhkar-card-heading { padding: 14px 20px 0; }
-  .adhkar-reference-content { padding: 10px 22px 8px; }
-  .adhkar-card-footer { padding: 8px 20px 10px; }
-  .adhkar-repeat-counter { width: 76px; height: 76px; }
-  .adhkar-repeat-counter svg { width: 76px; height: 76px; }
-  .adhkar-transliteration { font-size: 12.5px; line-height: 1.55; }
-  .adhkar-divider { margin-block: 6px; }
-  .adhkar-pagination-row { min-height: 44px; padding-block: 5px 7px; }
+  html[data-section="morning"] .bottom-nav,
+  html[data-section="evening"] .bottom-nav { bottom: calc(20px + env(safe-area-inset-bottom)); }
 }
 
 @media (max-width: 360px) {
-  .adhkar-header-content { padding-inline: 60px; }
-  .adhkar-header .app-page-title { font-size: 1.82rem; }
-  .daily-swipe-stack .adhkar-card-stage { padding-inline: 22px; }
-  .adhkar-card-heading { padding-inline: 22px; }
-  .adhkar-arabic { font-size: 22px !important; }
-  .adhkar-transliteration { font-size: 12px; }
+  .adhkar-header-content { padding-inline: 50px; }
 }
 
 @media (prefers-reduced-motion: reduce) {
