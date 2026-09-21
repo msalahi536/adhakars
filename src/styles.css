@@ -529,7 +529,9 @@ html[data-section="evening"] .adhkar-card-heading h3 { color: #cfc8e8 !important
 .adhkar-reference-content:not(:has(.adhkar-arabic-scroll)) {
   display: block;
   width: 100%;
+  height: 100%;
   min-width: 0;
+  min-height: 0;
   padding: 0 !important;
   overflow-x: hidden;
   overflow-y: auto;
