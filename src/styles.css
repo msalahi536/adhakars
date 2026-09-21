@@ -24,8 +24,9 @@
   --color-border: var(--border);
   --color-surface: var(--surface);
   --color-translit: var(--translit);
-  --font-arabic: "Scheherazade New", "Amiri", serif;
-  --font-sans: "Plus Jakarta Sans", system-ui, sans-serif;
+  --font-arabic: "Amiri", serif;
+  --font-sans: "Jost", system-ui, sans-serif;
+  --font-display: "Cormorant Garamond", Georgia, serif;
 }
 
 /* ===== Dawn (morning) — warm cream + gold accent, light cards ===== */
@@ -288,8 +289,7 @@
     border-radius: 26px;
     background: color-mix(in oklab, var(--nav-bg) 84%, transparent);
     box-shadow: 0 12px 34px color-mix(in oklab, var(--foreground) 10%, transparent);
-    backdrop-filter: blur(24px) saturate(150%);
-    -webkit-backdrop-filter: blur(24px) saturate(150%);
+    backdrop-filter: blur(24px);
   }
   .nav-item {
     height: 100%;
@@ -337,8 +337,7 @@
   background: color-mix(in oklab, var(--card) 94%, transparent) !important;
   border-color: color-mix(in oklab, var(--border) 75%, transparent) !important;
   box-shadow: 0 12px 30px color-mix(in oklab, var(--foreground) 7%, transparent) !important;
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
+  backdrop-filter: blur(24px);
 }
 
 /* Shared Morning and Evening recitation layout */
@@ -672,7 +671,6 @@ html[data-section="evening"] .app-shell::after {
   border: 1px solid color-mix(in oklab, var(--border) 76%, transparent) !important;
   box-shadow: 0 14px 38px color-mix(in oklab, var(--foreground) 10%, transparent);
   backdrop-filter: blur(20px) saturate(120%);
-  -webkit-backdrop-filter: blur(20px) saturate(120%);
 }
 
 @media (max-height: 720px) {
@@ -723,7 +721,6 @@ html[data-section="evening"] .app-shell::after {
 .glass-nav {
   background: var(--nav-bg, color-mix(in oklab, var(--surface) 92%, transparent));
   backdrop-filter: blur(10px) saturate(180%);
-  -webkit-backdrop-filter: blur(10px) saturate(180%);
 }
 
 .card-grad {
