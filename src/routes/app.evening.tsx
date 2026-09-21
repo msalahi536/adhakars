@@ -21,7 +21,7 @@ function Evening() {
       title="Evening Adhkar"
       subtitle="Between 'Asr & Maghrib"
       list={eveningAdhkar}
-      headerPattern={<InterlockingArcsPattern />}
+      headerPattern={null}
       extras={[
         { dhikr: baqarahLastTwo, isSpecial: true, specialLabel: "After Sunset. Recite after the sun has set" },
       ]}

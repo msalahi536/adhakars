@@ -1,12 +1,12 @@
 import { Link, useRouterState } from "@tanstack/react-router";
-import { Sunrise, Moon, CircleDot, Hand, MoreHorizontal } from "lucide-react";
+import { Sun, Moon, CircleDot, Landmark, MoreHorizontal } from "lucide-react";
 
 const MORE_NESTED = ["/app/sleep", "/app/wake", "/app/qibla", "/app/my-adhkar", "/app/settings", "/app/about"];
 
 const tabs = [
-  { to: "/app" as const, label: "Morning", Icon: Sunrise },
+  { to: "/app" as const, label: "Morning", Icon: Sun },
   { to: "/app/evening" as const, label: "Evening", Icon: Moon },
-  { to: "/app/salah" as const, label: "Salah", Icon: Hand },
+  { to: "/app/salah" as const, label: "Salah", Icon: Landmark },
   { to: "/app/tasbih" as const, label: "Tasbih", Icon: CircleDot },
   { to: "/app/more" as const, label: "More", Icon: MoreHorizontal },
 ];
@@ -20,30 +20,17 @@ export function BottomNav() {
   const borderColor = "var(--nav-border)";
 
   return (
-    <nav
-      className="bottom-nav"
-      style={{
-        position: "fixed",
-        bottom: 0,
-        left: 0,
-        right: 0,
-        width: "100%",
-        zIndex: 100,
-        boxSizing: "border-box",
-        paddingBottom: "env(safe-area-inset-bottom)",
-        background: "var(--nav-bg)",
-        backdropFilter: "blur(12px) saturate(180%)",
-        WebkitBackdropFilter: "blur(12px) saturate(180%)",
-        borderTop: `1px solid ${borderColor}`,
-      }}
-    >
-      <div className="bottom-nav-row mx-auto max-w-md px-1">
+    <nav className="bottom-nav" aria-label="Main navigation">
+      <div
+        className="bottom-nav-row mx-auto max-w-md px-2"
+        style={{ borderColor }}
+      >
         {tabs.map((t) => (
           <Link
             key={t.to}
             to={t.to}
             activeOptions={{ exact: true }}
-            className="relative flex flex-1 flex-col items-center justify-center gap-0.5 px-0 text-[9px] font-semibold"
+            className="nav-item relative flex flex-1 flex-col items-center justify-center gap-1 px-0 font-medium"
             style={{ transition: "color 0.25s ease", minWidth: 0 }}
           >
             {({ isActive }) => {
@@ -52,18 +39,23 @@ export function BottomNav() {
               const opacity = active ? 1 : 0.6;
               return (
                 <>
-                  <t.Icon size={19} strokeWidth={active ? 2.4 : 2} style={{ color, opacity }} />
+                  <t.Icon size={22} strokeWidth={active ? 2.2 : 1.8} style={{ color, opacity }} />
                   <span
                     style={{
                       color,
                       opacity,
-                      fontSize: 9,
+                      fontSize: 11,
                       whiteSpace: "nowrap",
-                      lineHeight: 1,
+                      lineHeight: 1.1,
                     }}
                   >
                     {t.label}
                   </span>
+                  <span
+                    aria-hidden
+                    className="nav-active-mark"
+                    style={{ background: active ? activeColor : "transparent" }}
+                  />
                 </>
               );
             }}

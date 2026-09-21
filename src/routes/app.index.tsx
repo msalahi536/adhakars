@@ -21,7 +21,7 @@ function Morning() {
       title="Morning Adhkar"
       subtitle="Between Fajr & Sunrise"
       list={morningAdhkar}
-      headerPattern={<GirihStarPattern />}
+      headerPattern={null}
     />
   );
 }
