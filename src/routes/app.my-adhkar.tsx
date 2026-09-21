@@ -2,7 +2,6 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { Plus } from "lucide-react";
 import { AdhkarPage } from "@/components/AdhkarPage";
-import { GirihStarPattern } from "@/components/HeaderPatterns";
 import {
   CustomAdhkarForm,
   type CustomAdhkarFormValues,
