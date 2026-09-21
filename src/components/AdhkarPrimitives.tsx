@@ -1,4 +1,4 @@
-import { BookOpen } from "lucide-react";
+import { BookOpen, ChevronLeft, ChevronRight } from "lucide-react";
 import { ProgressRing } from "./ProgressRing";
 
 export function IslamicOrnament({ size = 24, className = "" }: { size?: number; className?: string }) {
@@ -39,10 +39,10 @@ export function OrnamentalDivider() {
 
 export function SourceBadge({ source }: { source: string }) {
   return (
-    <span className="adhkar-source-badge">
+    <button type="button" className="adhkar-source-badge" title={source} aria-label={source}>
       <BookOpen size={13} strokeWidth={1.5} />
-      {source}
-    </span>
+      <span>{source}</span>
+    </button>
   );
 }
 
@@ -86,13 +86,20 @@ export function Pagination({
   total,
   active,
   onSelect,
+  onPrevious,
+  onNext,
 }: {
   total: number;
   active: number;
   onSelect: (index: number) => void;
+  onPrevious: () => void;
+  onNext: () => void;
 }) {
   return (
     <div className="adhkar-pagination-row">
+      <button type="button" className="adhkar-pagination-arrow" onClick={onPrevious} disabled={active === 0} aria-label="previous">
+        <ChevronLeft size={12} strokeWidth={2} />
+      </button>
       <div className="adhkar-pagination">
         {Array.from({ length: total }, (_, index) => (
           <button
@@ -105,6 +112,9 @@ export function Pagination({
         ))}
         <IslamicOrnament size={14} />
       </div>
+      <button type="button" className="adhkar-pagination-arrow" onClick={onNext} disabled={active === total - 1} aria-label="next">
+        <ChevronRight size={12} strokeWidth={2} />
+      </button>
     </div>
   );
 }

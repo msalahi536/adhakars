@@ -36,13 +36,14 @@ function Row({
   return (
     <div
       ref={rowRef}
+      data-state={state}
       onClick={clickable ? onPick : undefined}
       role={clickable ? "button" : undefined}
-      className={`relative flex items-center gap-3 rounded-2xl py-2 ${clickable ? "active:scale-[0.99]" : ""}`}
+      className={`prayer-timeline-row relative flex items-center ${clickable ? "active:scale-[0.99]" : ""}`}
       style={{ opacity, cursor: clickable ? "pointer" : undefined }}
     >
 
-      <div className="relative flex w-4 shrink-0 justify-center">
+      <div className="prayer-timeline-marker relative flex shrink-0 justify-center">
         {sunrise ? (
           <span
             className="rounded-full"
@@ -72,7 +73,7 @@ function Row({
         )}
       </div>
       <div
-        className="flex-1"
+        className="prayer-timeline-name flex-1"
         style={{
           color,
           fontWeight: state === "next" ? 700 : sunrise ? 500 : 600,
@@ -82,6 +83,7 @@ function Row({
         {slot.label}
       </div>
       <div
+        className="prayer-timeline-time"
         style={{
           color:
             state === "next"
@@ -153,7 +155,7 @@ function DayList({
   });
 
   return (
-    <div className="relative" style={{ opacity: dim ? 0.72 : 1 }}>
+    <div className="prayer-timeline-list relative" style={{ opacity: dim ? 0.72 : 1 }}>
       <span
         className="absolute top-2 bottom-2"
         style={{
@@ -218,10 +220,8 @@ export function PrayerTimeline({ days, now, todayKey, tone = "light", onPickPray
   const today = days.find((d) => d.key === todayKey);
   const tomorrow = days[days.findIndex((d) => d.key === todayKey) + 1];
 
-  const compact = [
-    ...(today ? today.slots.filter((s) => s.at.getTime() > now.getTime()) : []),
-    ...(tomorrow ? tomorrow.slots : []),
-  ].slice(0, 6);
+  const displayDay = days.find((d) => d.key === next?.dayKey) ?? today ?? tomorrow;
+  const compact = displayDay?.slots.slice(0, 6) ?? [];
 
   const deep = tone === "deep";
   const cardStyle: React.CSSProperties = deep
@@ -243,10 +243,10 @@ export function PrayerTimeline({ days, now, todayKey, tone = "light", onPickPray
     <>
       <button
         onClick={() => setExpanded(true)}
-        className="h-full w-full rounded-[26px] px-4 py-3 text-left active:scale-[0.99]"
+        className="prayer-timeline-card h-full w-full text-left active:scale-[0.99]"
         style={cardStyle}
       >
-        <div className="mb-1 flex items-center justify-between gap-2">
+        <div className="prayer-timeline-heading flex items-center justify-between gap-2">
           <span className="label-caps">Upcoming</span>
           <span className="text-[10px]" style={{ color: "var(--muted-foreground)" }}>
             Tap for all

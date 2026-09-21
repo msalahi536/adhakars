@@ -328,8 +328,16 @@
   letter-spacing: 0;
 }
 
-.header-icon-button {
-  border-radius: 16px;
+.settings-button {
+  top: calc(env(safe-area-inset-top) + 14px);
+  right: 24px;
+  width: 36px;
+  height: 36px;
+  border: 1px solid var(--card-border, var(--border));
+  border-radius: 12px;
+  background: var(--pill-bg, var(--source-bg));
+  color: var(--eyebrow, var(--muted-foreground));
+  backdrop-filter: blur(20px);
 }
 
 .dhikr-card {
@@ -439,19 +447,6 @@ html[data-section="evening"] .app-shell { background: linear-gradient(180deg, #1
   white-space: nowrap;
 }
 
-.adhkar-header .header-icon-button {
-  top: calc(env(safe-area-inset-top) + 98px);
-  right: 24px;
-  width: 36px;
-  height: 36px;
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  background: var(--source-bg);
-  color: var(--eyebrow);
-  box-shadow: none;
-  backdrop-filter: blur(20px);
-}
-
 .adhkar-progress-row {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
@@ -498,14 +493,17 @@ html[data-section="evening"] .adhkar-progress-value { background: #2c2a54; }
 }
 .daily-swipe-stack .adhkar-index-row > button { position: absolute; right: 20px; }
 
-.daily-swipe-stack .adhkar-card-stage { min-height: 0; flex: 1; overflow: hidden; padding: 0 28px; }
-.adhkar-card-motion { display: flex; height: 100%; min-height: 0; }
+.daily-swipe-stack .adhkar-card-stage { display: flex; min-height: 0; flex: 1; overflow: hidden; padding: 0 28px; }
+.adhkar-card-motion { display: flex; width: 100%; height: 100%; max-height: 100%; min-height: 0; align-self: flex-start; }
 .adhkar-reference-card {
-  display: grid;
-  grid-template-rows: auto minmax(0, 1fr) auto;
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
   width: 100%;
-  height: 100%;
+  height: fit-content;
+  max-height: 100%;
   min-height: 0;
+  overflow: hidden;
   padding: 18px 20px 16px;
   border-radius: 20px;
   background: var(--card) !important;
@@ -525,13 +523,17 @@ html[data-section="evening"] .adhkar-progress-value { background: #2c2a54; }
 .adhkar-card-ornament { color: var(--accent); }
 html[data-section="evening"] .adhkar-card-heading h3 { color: #cfc8e8 !important; }
 
-.adhkar-reference-body { min-height: 0; overflow: visible; }
+.adhkar-reference-body { width: 100%; min-width: 0; min-height: 0; overflow: hidden; }
 .adhkar-reference-content,
 .adhkar-reference-content:has(.adhkar-arabic-scroll),
 .adhkar-reference-content:not(:has(.adhkar-arabic-scroll)) {
   display: block;
+  width: 100%;
   height: 100%;
+  min-width: 0;
+  min-height: 0;
   padding: 0 !important;
+  overflow-x: hidden;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
   overscroll-behavior: contain;
@@ -540,38 +542,49 @@ html[data-section="evening"] .adhkar-card-heading h3 { color: #cfc8e8 !important
 .adhkar-reference-content::-webkit-scrollbar { display: none; }
 
 .adhkar-arabic {
-  width: calc(100% + 64px);
-  max-width: none;
-  margin-left: -32px;
+  display: block;
+  width: 100%;
+  max-width: 100%;
   margin-top: 0;
-  margin-right: auto;
   margin-bottom: 16px;
+  margin-left: 0;
+  margin-right: 0;
   color: var(--card-foreground);
   font-family: var(--font-arabic);
-  font-size: 26px !important;
+  font-size: 24px !important;
   font-feature-settings: "liga", "calt";
   font-weight: 400;
-  line-height: 1.55;
+  line-height: 1.9;
+  letter-spacing: 0;
+  word-spacing: 0.08em;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  word-break: normal;
+  text-align: center;
 }
 .adhkar-divider { display: flex; align-items: center; justify-content: center; gap: 6px; width: 60px; margin: 0 auto 14px; color: color-mix(in oklab, var(--accent) 70%, transparent); }
 .adhkar-divider span { width: 24px; height: 1px; background: currentColor; }
 .adhkar-divider i { width: 6px; height: 6px; rotate: 45deg; background: currentColor; }
-.adhkar-transliteration { width: calc(100% + 64px); max-width: none; margin: 0 0 16px -32px; color: var(--translit); font-family: var(--font-sans); font-size: 13px; font-style: italic; font-weight: 400; line-height: 1.45; text-align: center; }
-.adhkar-translation { width: calc(100% + 64px); max-width: none; margin: 0 0 0 -32px; color: var(--text-muted); font-family: var(--font-sans); font-size: 13px; font-weight: 400; line-height: 1.45; text-align: center; }
+.adhkar-transliteration { display: block; width: 100%; max-width: 100%; margin: 0 0 16px; color: var(--translit); font-family: var(--font-sans); font-size: 13px; font-style: italic; font-weight: 400; line-height: 1.5; text-align: center; white-space: normal; overflow-wrap: anywhere; word-break: normal; }
+.adhkar-translation { display: block; width: 100%; max-width: 100%; margin: 0; color: var(--text-muted); font-family: var(--font-sans); font-size: 13px; font-weight: 400; line-height: 1.5; text-align: center; white-space: normal; overflow-wrap: anywhere; word-break: normal; }
 
-.adhkar-card-footer { position: relative; z-index: 1; margin-top: 14px; padding: 0; background: transparent; border: 0; }
-.adhkar-source-column { gap: 0; max-width: calc(100% - 96px); }
-.adhkar-source-badge { display: inline-flex; height: 28px; min-height: 28px; align-items: center; gap: 8px; align-self: flex-start; max-width: 100%; padding: 0 14px; border-radius: 999px; background: var(--source-bg); color: var(--source-fg); font-size: 12px; font-weight: 500; line-height: 1.25; white-space: nowrap; }
+.adhkar-card-footer { position: relative; z-index: 1; display: flex; align-items: flex-end; gap: 12px; margin-top: 14px; padding: 0; background: transparent; border: 0; }
+.adhkar-source-column { flex: 1; min-width: 0; gap: 0; max-width: none; }
+.adhkar-source-badge { display: inline-flex; width: auto; height: 28px; min-height: 28px; min-width: 0; align-items: center; gap: 8px; align-self: flex-start; max-width: 100%; padding: 0 14px; border-radius: 999px; background: var(--source-bg); color: var(--source-fg); font-size: 12px; font-weight: 500; line-height: 1.25; white-space: nowrap; }
+.adhkar-source-badge svg { flex: 0 0 auto; }
+.adhkar-source-badge span { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .adhkar-target-label { margin-top: 12px; color: var(--text-muted); font-size: 13px; font-weight: 400; }
 .adhkar-repeat-counter { width: 84px; height: 84px; color: var(--count-fg); touch-action: manipulation; }
 .adhkar-counter-value { color: var(--count-fg); font-size: 40px; font-weight: 600; line-height: 1; }
 .adhkar-counter-target { margin-top: 2px; color: var(--text-muted); font-size: 12px; font-weight: 400; line-height: 1; }
 
-.adhkar-pagination-row { display: flex; min-height: 30px; align-items: flex-start; justify-content: center; padding: 16px 20px 0; }
+.adhkar-pagination-row { display: flex; min-height: 40px; align-items: flex-start; justify-content: center; gap: 12px; padding: 16px 20px 0; }
 .adhkar-pagination { display: flex; min-width: 0; align-items: center; justify-content: center; gap: 5px; color: var(--text-muted); }
 .adhkar-pagination button { width: 7px; height: 7px; flex: 0 0 auto; border-radius: 999px; background: var(--dot-inactive); transition: width 250ms ease, background-color 250ms ease; }
 .adhkar-pagination button.is-active { width: 7px; background: var(--dot-active); }
 .adhkar-pagination svg { margin-left: 5px; }
+.adhkar-pagination-arrow { display: inline-flex; width: 24px; height: 24px; flex: 0 0 24px; align-items: center; justify-content: center; border: 1px solid var(--card-border, var(--border)); border-radius: 999px; background: var(--pill-bg, var(--source-bg)); color: var(--text-muted); }
+.adhkar-pagination-arrow:disabled { opacity: 0.35; }
 
 html[data-section="morning"] .bottom-nav,
 html[data-section="evening"] .bottom-nav { inset-inline: 28px; bottom: calc(14px + env(safe-area-inset-bottom)); height: 60px; min-height: 60px; }
@@ -579,6 +592,71 @@ html[data-section="morning"] .bottom-nav-row,
 html[data-section="evening"] .bottom-nav-row { height: 60px; border-color: var(--border); border-radius: 18px; background: var(--nav-bg); box-shadow: 0 6px 24px rgba(0, 0, 0, 0.12); backdrop-filter: blur(20px); }
 .nav-item { gap: 4px; font-family: var(--font-sans); }
 .nav-active-mark { bottom: 2px; width: 16px; height: 2px; }
+
+/* Compact prayer hub */
+.salah-page {
+  --pill-bg: rgba(233, 233, 222, 0.9);
+  --card-border: rgba(255, 255, 255, 0.8);
+  --eyebrow: #3f5a3c;
+  position: relative;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+  color: #2f4f34;
+  font-family: var(--font-display);
+}
+.salah-hero { position: relative; height: 220px; flex: 0 0 220px; text-align: center; }
+.salah-next-label { position: absolute; top: 53px; inset-inline: 70px; color: #3f5a3c; font-size: 18px; font-weight: 500; line-height: 22px; }
+.salah-countdown { position: absolute; top: 79px; inset-inline: 24px; color: #2f4f34; font-size: 52px; font-weight: 500; line-height: 52px; letter-spacing: 0; font-variant-numeric: tabular-nums; transition: color 400ms ease; }
+.salah-dismiss { position: absolute; top: 147px; left: 50%; display: inline-flex; height: 32px; align-items: center; justify-content: center; padding: 0 22px; transform: translateX(-50%); border: 1px solid rgba(255, 255, 255, 0.8); border-radius: 999px; background: rgba(233, 233, 222, 0.9); color: #2f4f34; font-size: 15px; font-weight: 500; line-height: 1; white-space: nowrap; backdrop-filter: blur(20px); }
+.salah-dismiss:active { transform: translateX(-50%) scale(0.95); }
+.salah-dismiss:disabled { opacity: 0.45; }
+.salah-location { position: absolute; top: 192px; inset-inline: 24px; display: flex; align-items: center; justify-content: center; gap: 6px; color: #5f7a5a; font-size: 13px; font-weight: 400; line-height: 16px; }
+.salah-content { flex: 1; min-height: 0; overflow: hidden; }
+.salah-content-inner { display: grid; grid-template-rows: 170px 242px 62px; gap: 12px; width: 100%; max-width: 390px; height: 498px; margin: 30px auto 0; padding: 0 28px; box-sizing: border-box; }
+.salah-location-card { position: absolute; z-index: 5; inset-inline: 28px; top: 220px; }
+.salah-recommended-card { box-sizing: border-box; height: 170px; padding: 18px 20px; border: 1px solid rgba(255, 255, 255, 0.8); border-radius: 18px; background: rgba(250, 247, 240, 0.92); box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06); backdrop-filter: blur(20px); }
+.salah-recommended-top { height: 26px; }
+.salah-kicker { color: #8a9a80; font-family: var(--font-sans); font-size: 11px; font-weight: 500; line-height: 1; letter-spacing: 0.18em; text-transform: uppercase; }
+.salah-change { height: 26px; padding: 0 12px; border-radius: 999px; background: #ebe9e0; color: #2f4f34; font-family: var(--font-sans); font-size: 12px; font-weight: 500; }
+.salah-recommended-title { margin-top: 6px; color: #2f4f34; font-size: 26px; font-weight: 500; line-height: 28px; }
+.salah-recommended-progress { margin-top: 2px; color: #5f7a5a; font-size: 15px; font-weight: 400; line-height: 18px; }
+.salah-recommended-action { gap: 16px; margin-top: 14px; }
+.salah-play { width: 48px; height: 48px; background: #2f5a3c; color: #ffffff; box-shadow: 0 6px 16px rgba(47, 90, 60, 0.35); }
+.salah-play svg { margin-left: 2px; }
+.salah-action-label { color: #2f4f34; font-size: 16px; font-weight: 500; line-height: 19px; }
+.salah-action-track { height: 4px; margin-top: 8px; overflow: hidden; border-radius: 999px; background: rgba(0, 0, 0, 0.08); }
+.salah-action-track span { display: block; height: 100%; border-radius: inherit; background: #2f5a3c; transition: width 300ms ease; }
+.salah-upcoming-wrap { height: 242px; }
+.prayer-timeline-card { box-sizing: border-box; height: 242px !important; padding: 16px 20px 14px; border-radius: 18px !important; background: #2f5a3c !important; color: #ffffff !important; box-shadow: 0 8px 24px rgba(47, 90, 60, 0.25) !important; }
+.prayer-timeline-heading { margin-bottom: 12px; }
+.prayer-timeline-heading .label-caps { color: rgba(255, 255, 255, 0.85); font-family: var(--font-sans); font-size: 11px; font-weight: 500; letter-spacing: 0.18em; opacity: 1; }
+.prayer-timeline-heading > span:last-child { color: rgba(255, 255, 255, 0.85) !important; font-family: var(--font-display); font-size: 13px !important; font-weight: 400; }
+.prayer-timeline-list::before { position: absolute; top: 15px; bottom: 15px; left: 3px; width: 1px; background: rgba(255, 255, 255, 0.3); content: ""; }
+.prayer-timeline-list > span { display: none; }
+.prayer-timeline-row { height: 30px; gap: 18px !important; padding: 0 !important; border-radius: 0 !important; opacity: 1 !important; }
+.prayer-timeline-marker { width: 7px !important; }
+.prayer-timeline-marker span { z-index: 1; width: 6px !important; height: 6px !important; border: 0 !important; background: rgba(255, 255, 255, 0.5) !important; box-shadow: none !important; }
+.prayer-timeline-row[data-state="next"] .prayer-timeline-marker span { width: 10px !important; height: 10px !important; background: #8fd39a !important; box-shadow: 0 0 0 4px rgba(143, 211, 154, 0.3) !important; }
+.prayer-timeline-name,
+.prayer-timeline-time { color: #ffffff !important; font-family: var(--font-display); font-size: 16px !important; font-weight: 500 !important; line-height: 30px; }
+.prayer-timeline-row[data-state="next"] .prayer-timeline-name,
+.prayer-timeline-row[data-state="next"] .prayer-timeline-time { color: #8fd39a !important; }
+.salah-upcoming-placeholder { height: 242px; margin: 0; border-radius: 18px; }
+.salah-adhan-card { box-sizing: border-box; height: 62px; gap: 14px; padding: 14px 18px; border: 1px solid rgba(255, 255, 255, 0.8); border-radius: 18px; background: rgba(250, 247, 240, 0.92); color: #2f4f34; backdrop-filter: blur(20px); }
+.salah-adhan-icon { width: 34px; height: 34px; background: #dfe9dc; color: #2f5a3c; }
+.salah-adhan-title { color: #2f4f34; font-size: 16px; font-weight: 500; line-height: 18px; }
+.salah-adhan-subtitle { margin-top: 2px; overflow: hidden; color: #6b6f64; font-size: 13px; font-weight: 400; line-height: 15px; text-overflow: ellipsis; white-space: nowrap; }
+.salah-adhan-chevron { flex: 0 0 auto; color: #9aa094; }
+html[data-section="salah"] .bottom-nav { inset-inline: 28px; bottom: calc(14px + env(safe-area-inset-bottom)); height: 60px; min-height: 60px; }
+html[data-section="salah"] .bottom-nav-row { height: 60px; border-color: rgba(255,255,255,0.9); border-radius: 18px; background: rgba(255,255,255,0.9); box-shadow: 0 6px 24px rgba(0,0,0,0.12); backdrop-filter: blur(20px); }
+html[data-section="salah"] .nav-item { gap: 4px; font-family: var(--font-sans); }
+html[data-section="salah"] .nav-active-mark { bottom: 2px; width: 16px; height: 2px; }
+
+@media (max-height: 779px) {
+  .salah-page { overflow-y: auto; -webkit-overflow-scrolling: touch; padding-bottom: 88px; }
+  .salah-content { flex: none; overflow: visible; }
+}
 
 .glass-card {
   border-radius: 24px;

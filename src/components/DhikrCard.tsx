@@ -57,7 +57,7 @@ export function DhikrCard({ dhikr, count, onIncrement, isSpecial, specialLabel, 
     onIncrement();
   };
 
-  const arabicSize = 26;
+  const arabicSize = 24;
 
   const hasTranslation = !!(dhikr.translation || dhikr.arabicMulti);
   const hasCommentary = !!dhikr.commentary;

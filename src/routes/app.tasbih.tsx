@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { RotateCcw, Undo2 } from "lucide-react";
 import { ProgressRing } from "@/components/ProgressRing";
-import { HeaderSettingsButton } from "@/components/HeaderSettingsButton";
+import { SettingsButton } from "@/components/SettingsButton";
 import { triggerHaptic } from "@/lib/theme";
 import { bumpLifetime } from "@/lib/storage";
 
@@ -91,7 +91,7 @@ function Tasbih() {
         className="page-header relative overflow-hidden"
         style={{ background: "var(--grad-header)", color: "var(--header-fg)" }}
       >
-        <HeaderSettingsButton />
+        <SettingsButton />
         <div className="relative mx-auto max-w-md px-7 pb-5 pt-9 text-center">
           <div
             className="label-caps"
