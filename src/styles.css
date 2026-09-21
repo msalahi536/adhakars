@@ -481,7 +481,7 @@ html[data-preset="original"][data-section="evening"] {
 
 .adhkar-reference-card {
   display: grid;
-  grid-template-rows: auto minmax(0, auto) auto;
+  grid-template-rows: auto minmax(0, 1fr) auto;
   width: 100%;
   height: auto;
   max-height: 100%;
@@ -578,6 +578,8 @@ html[data-preset="original"][data-section="evening"] {
 }
 
 .adhkar-card-footer {
+  position: relative;
+  z-index: 1;
   padding: 12px 24px 20px;
   background: color-mix(in oklab, var(--card) 96%, transparent);
 }
