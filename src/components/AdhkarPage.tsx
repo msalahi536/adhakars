@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { SwipeStack } from "./SwipeStack";
-import { HeaderSettingsButton } from "./HeaderSettingsButton";
+import { AdhkarHeader } from "./AdhkarHeader";
 import type { Dhikr } from "@/data/adhkar";
 import type { SalahItem } from "@/data/salah";
 import { isItemComplete } from "@/data/salah";
@@ -57,63 +57,21 @@ export function AdhkarPage({
     bumpLifetime(lifetimeCategory, next - prev);
   };
 
-  const defaultHeader: React.CSSProperties = {
-    background: "var(--grad-header)",
-    color: "var(--header-fg, var(--accent-foreground))",
-  };
+  const dailyLayout = storageKey === "morning" || storageKey === "evening";
 
   return (
     <>
-      <header className="page-header relative overflow-hidden" style={{ ...defaultHeader, ...headerStyle }}>
-        {headerPattern}
-        <HeaderSettingsButton />
-        {headerAction && (
-          <div
-            className="absolute z-10"
-            style={{ top: "calc(env(safe-area-inset-top) + 10px)", right: 56 }}
-          >
-            {headerAction}
-          </div>
-        )}
-        <div className="relative mx-auto max-w-md px-7 pb-5 pt-9 text-center">
+      {dailyLayout ? (
+        <AdhkarHeader title={title} subtitle={subtitle} completed={completed} total={items.length} action={headerAction} />
+      ) : (
+        <header className="page-header relative overflow-hidden" style={headerStyle}>
+          {headerPattern}
+          <AdhkarHeader title={title} subtitle={subtitle} completed={completed} total={items.length} action={headerAction} />
+        </header>
+      )}
 
-
-          <div
-            className="label-caps"
-            style={{
-              color: "var(--header-sub, var(--header-fg, var(--accent-foreground)))",
-              opacity: 1,
-            }}
-          >
-            {subtitle}
-          </div>
-
-          <h1 className="app-page-title mt-2">{title}</h1>
-          <div className="mx-auto mt-5 flex max-w-[300px] items-center gap-4">
-            <div
-                className="h-2 flex-1 overflow-hidden rounded-full"
-              style={{
-                background:
-                  "color-mix(in oklab, var(--header-fg, var(--accent-foreground)) 22%, transparent)",
-              }}
-            >
-              <div
-                className="h-full rounded-full transition-all duration-500"
-                style={{
-                  width: `${items.length ? (completed / items.length) * 100 : 0}%`,
-                  background: "var(--accent)",
-                }}
-              />
-            </div>
-            <div className="min-w-[44px] text-sm font-medium tabular-nums">
-              {completed} / {items.length}
-            </div>
-          </div>
-        </div>
-      </header>
-
-      <main className="scroll-area flex flex-col">
-        <div className="mx-auto flex min-h-0 w-full max-w-md flex-1 flex-col pt-2">
+      <main className={`scroll-area flex flex-col ${dailyLayout ? "daily-adhkar-page" : ""}`}>
+        <div className="mx-auto flex min-h-0 w-full max-w-md flex-1 flex-col">
           {items.length === 0 && emptyState ? (
             emptyState
           ) : (
@@ -128,6 +86,7 @@ export function AdhkarPage({
               persistKey={storageKey}
               onEditItem={onEditItem}
               onDeleteItem={onDeleteItem}
+              dailyLayout={dailyLayout}
             />
           )}
         </div>

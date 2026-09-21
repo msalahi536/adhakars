@@ -65,3 +65,5 @@ export function BottomNav() {
     </nav>
   );
 }
+
+export const BottomNavigation = BottomNav;
