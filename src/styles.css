@@ -496,8 +496,32 @@ html[data-preset="original"][data-section="evening"] {
 
 .adhkar-reference-content {
   height: 100%;
+  overflow: hidden;
+  overscroll-behavior: contain;
+}
+
+.adhkar-reference-content:not(:has(.adhkar-arabic-scroll)) {
+  overflow-y: auto;
+}
+
+.adhkar-reference-content:has(.adhkar-arabic-scroll) {
+  display: flex;
+  flex-direction: column;
+}
+
+.adhkar-arabic-scroll {
+  min-height: 76px;
+  flex: 1 1 auto;
   overflow-y: auto;
   overscroll-behavior: contain;
+  scrollbar-width: none;
+}
+
+.adhkar-arabic-scroll::-webkit-scrollbar { display: none; }
+
+.adhkar-reference-content .adhkar-divider,
+.adhkar-reference-content .adhkar-transliteration {
+  flex: 0 0 auto;
 }
 
 .adhkar-card-heading {

@@ -98,8 +98,8 @@ export function DhikrCard({ dhikr, count, onIncrement, isSpecial, specialLabel, 
       {/* Scrollable content area */}
       <div className={`relative min-h-0 flex-1 ${referenceLayout ? "adhkar-reference-body" : ""}`}>
         <div
-          ref={scrollRef}
-          onScroll={handleScroll}
+          ref={dhikr.arabicMulti ? scrollRef : undefined}
+          onScroll={dhikr.arabicMulti ? handleScroll : undefined}
           data-no-swipe
           className={`hide-scrollbar px-7 pb-4 pt-5 ${referenceLayout ? "adhkar-reference-content" : "h-full overflow-y-auto"}`}
           style={{ scrollbarWidth: "none", WebkitOverflowScrolling: "touch" }}
@@ -129,7 +129,14 @@ export function DhikrCard({ dhikr, count, onIncrement, isSpecial, specialLabel, 
           ) : (
             <>
               {dhikr.arabic && (
-                <ArabicText size={arabicSize}>{dhikr.arabic}</ArabicText>
+                <div
+                  ref={scrollRef}
+                  onScroll={handleScroll}
+                  data-no-swipe
+                  className="adhkar-arabic-scroll hide-scrollbar"
+                >
+                  <ArabicText size={arabicSize}>{dhikr.arabic}</ArabicText>
+                </div>
               )}
               {dhikr.arabic && dhikr.transliteration && <OrnamentalDivider />}
               {display.showTransliteration && dhikr.transliteration && (
