@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
-import { Bell, BellOff, ChevronDown, MapPin, Play } from "lucide-react";
-import { HeaderSettingsButton } from "@/components/HeaderSettingsButton";
+import { Bell, BellOff, ChevronDown, ChevronRight, MapPin, Play } from "lucide-react";
+import { SettingsButton } from "@/components/SettingsButton";
 import { PrayerTimeline } from "@/components/prayer/PrayerTimeline";
 import { AfterSalahSheet } from "@/components/prayer/AfterSalahSheet";
 import { PrayerPicker } from "@/components/prayer/PrayerPicker";
@@ -294,79 +294,38 @@ function Salah() {
 
 
   return (
-    <>
-      <header
-        className="page-header relative overflow-hidden"
-        style={{ background: "var(--grad-header)", color: "var(--header-fg)" }}
-      >
-        <HeaderSettingsButton />
-        <div className="relative mx-auto max-w-md px-5 pb-6 pt-5">
-          <div className="flex flex-col items-center pt-6 pb-1 text-center">
-            <div
-              className="text-[15px] font-semibold tracking-wide"
-              style={{ color: "var(--header-sub)" }}
-            >
-              {!settings.location
-                ? "Prayer times"
-                : next
-                  ? `${next.label} in`
-                  : loading
-                    ? "Loading prayer times"
-                    : "No times yet"}
-            </div>
-            <div
-              className="mt-1 font-bold"
-              style={{
-                fontSize: 52,
-                lineHeight: 1.02,
-                letterSpacing: "-0.02em",
-                fontVariantNumeric: "tabular-nums",
-                textShadow: "none",
-                color: urgencyColor ?? "inherit",
-                transition: "color 400ms ease",
-                opacity: settings.location ? 1 : 0.55,
-              }}
-            >
-              {next ? formatCountdown(next.at.getTime() - now.getTime()) : "--:--:--"}
-            </div>
-
-            <button
-              onClick={toggleDismissNext}
-              disabled={!next}
-              className="mt-4 rounded-full px-5 py-2 text-[13px] font-bold active:scale-95"
-              style={{
-                background: nextIsDismissed
-                  ? "color-mix(in oklab, var(--header-fg) 16%, transparent)"
-                  : "color-mix(in oklab, var(--header-fg) 12%, transparent)",
-                color: "var(--header-fg)",
-                border: "1px solid color-mix(in oklab, var(--header-fg) 22%, transparent)",
-                backdropFilter: "blur(6px)",
-                transition: "background 200ms ease",
-                opacity: next ? 1 : 0.45,
-              }}
-            >
-              {nextIsDismissed ? "Tap to unmute next salah" : "Tap to dismiss"}
-            </button>
-
-            <div className="mt-3 flex items-center gap-2 text-[11px]">
-              <span
-                className="inline-flex items-center gap-1"
-                style={{ color: "var(--header-sub)" }}
-              >
-                <MapPin size={11} />
-                {settings.location ? settings.location.label : "Location not set"}
-              </span>
-            </div>
-          </div>
-
+    <div className="salah-page">
+      <SettingsButton />
+      <header className="salah-hero">
+        <div className="salah-next-label">
+          {!settings.location
+            ? "Prayer times"
+            : next
+              ? `${next.label} in`
+              : loading
+                ? "Loading prayer times"
+                : "No times yet"}
+        </div>
+        <div
+          className="salah-countdown"
+          style={{ color: urgencyColor ?? undefined, opacity: settings.location ? 1 : 0.55 }}
+        >
+          {next ? formatCountdown(next.at.getTime() - now.getTime()) : "--:--:--"}
+        </div>
+        <button onClick={toggleDismissNext} disabled={!next} className="salah-dismiss active:scale-95">
+          {nextIsDismissed ? "Tap to unmute next salah" : "Tap to dismiss"}
+        </button>
+        <div className="salah-location">
+          <MapPin size={12} strokeWidth={1.5} />
+          {settings.location ? settings.location.label : "Location not set"}
         </div>
       </header>
 
-      <main className="scroll-area flex flex-col">
-        <div className="mx-auto w-full max-w-md px-5 pb-8 pt-4">
+      <main className="salah-content">
+        <div className="salah-content-inner">
           {!settings.location && (
             <div
-               className="dhikr-card mb-3 w-full overflow-hidden p-5"
+               className="dhikr-card salah-location-card w-full overflow-hidden p-5"
               style={{
                 background: "var(--surface-card)",
                 border: "1px solid var(--border)",
@@ -424,96 +383,45 @@ function Salah() {
 
           {/* Recommended: entry into the after salah adhkar */}
 
-          <div
-            className="dhikr-card w-full overflow-hidden p-5"
-            style={{
-              background: "var(--surface-card)",
-              border: "1px solid var(--border)",
-              color: "var(--foreground)",
-              boxShadow: "var(--card-shadow)",
-            }}
-          >
-            <div className="flex items-start justify-between gap-3">
+          <section className="salah-recommended-card">
+            <div className="salah-recommended-top flex items-center justify-between gap-3">
               <div className="min-w-0">
-                <div className="label-caps" style={{ color: "var(--muted-foreground)" }}>
+                <div className="salah-kicker">
                   Recommended
-                </div>
-                <div className="mt-1 text-2xl font-bold tracking-tight">
-                  After {selectedLabel} Adhkar
-                </div>
-                <div className="mt-0.5 text-sm" style={{ color: "var(--muted-foreground)" }}>
-                  {cur.done} of {cur.total} complete
                 </div>
               </div>
               <button
                 onClick={() => setPickerOpen(true)}
-                className="flex shrink-0 items-center gap-1 rounded-full px-3 py-1.5 text-xs font-bold active:scale-95"
-                style={{
-                  background: "color-mix(in oklab, var(--foreground) 7%, transparent)",
-                  color: "var(--foreground)",
-                }}
+                className="salah-change flex shrink-0 items-center gap-1 active:scale-95"
               >
                 Change
-                <ChevronDown size={14} />
+                <ChevronDown size={12} strokeWidth={2} />
               </button>
             </div>
+            <div className="salah-recommended-title">After {selectedLabel} Adhkar</div>
+            <div className="salah-recommended-progress">{cur.done} of {cur.total} complete</div>
 
-            <div className="mt-5 flex items-center gap-4">
+            <div className="salah-recommended-action flex items-center">
               <button
                 onClick={() => setSheetOpen(true)}
                 aria-label={`Open after ${selectedLabel} adhkar`}
-                className="relative flex shrink-0 items-center justify-center rounded-full active:scale-95"
-                style={{
-                  width: 64,
-                  height: 64,
-                  background: "var(--accent)",
-                  color: "var(--accent-foreground)",
-                  boxShadow: "0 16px 30px -14px color-mix(in oklab, var(--accent) 90%, transparent)",
-                  transition: "transform 160ms ease",
-                }}
+                className="salah-play flex shrink-0 items-center justify-center rounded-full active:scale-95"
               >
-                <Play size={24} fill="currentColor" style={{ marginLeft: 3 }} />
-                <svg
-                  className="pointer-events-none absolute inset-0"
-                  viewBox="0 0 64 64"
-                  aria-hidden
-                >
-                  <circle
-                    cx="32"
-                    cy="32"
-                    r="30"
-                    fill="none"
-                    stroke="color-mix(in oklab, var(--accent-foreground) 30%, transparent)"
-                    strokeWidth="2.5"
-                    strokeDasharray={`${(pct / 100) * 2 * Math.PI * 30} ${2 * Math.PI * 30}`}
-                    strokeLinecap="round"
-                    transform="rotate(-90 32 32)"
-                  />
-                </svg>
+                <Play size={18} fill="currentColor" strokeWidth={1.5} />
               </button>
               <div className="min-w-0 flex-1">
-                <div className="text-sm font-semibold">
+                <div className="salah-action-label">
                   {pct === 100 ? "Completed today" : pct > 0 ? "Continue" : "Begin the adhkar"}
                 </div>
-                <div
-                  className="mt-2 h-1.5 w-full overflow-hidden rounded-full"
-                  style={{ background: "color-mix(in oklab, var(--foreground) 10%, transparent)" }}
-                >
-                  <span
-                    className="block h-full rounded-full"
-                    style={{
-                      width: `${pct}%`,
-                      background: "var(--accent)",
-                      transition: "width 300ms ease",
-                    }}
-                  />
+                <div className="salah-action-track">
+                  <span style={{ width: `${pct}%` }} />
                 </div>
               </div>
             </div>
-          </div>
+          </section>
 
           {settings.location ? (
-            <div className="mt-3">
+            <div className="salah-upcoming-wrap">
               <PrayerTimeline
                 days={timelineDays}
                 now={now}
@@ -524,7 +432,7 @@ function Salah() {
             </div>
           ) : (
             <div
-              className="dhikr-card mt-3 w-full overflow-hidden p-5"
+              className="dhikr-card salah-upcoming-placeholder w-full overflow-hidden p-5"
               style={{
                 background: "var(--surface-deep, var(--surface-card))",
                 border: "1px solid var(--border)",
@@ -563,35 +471,20 @@ function Salah() {
 
           <button
             onClick={toggleMuteAll}
-            className="dhikr-card mt-3 flex w-full items-center gap-3 px-5 py-4 text-left active:scale-[0.99]"
-            style={{
-              background: "var(--surface-card)",
-              border: "1px solid var(--border)",
-              color: "var(--foreground)",
-              boxShadow: "var(--card-shadow)",
-            }}
+            className="salah-adhan-card flex w-full items-center text-left active:scale-[0.99]"
           >
-            <span
-              className="flex shrink-0 items-center justify-center rounded-full"
-              style={{
-                width: 38,
-                height: 38,
-                background: mutedAll
-                  ? "color-mix(in oklab, var(--foreground) 8%, transparent)"
-                  : "color-mix(in oklab, var(--accent) 16%, transparent)",
-                color: mutedAll ? "var(--muted-foreground)" : "var(--accent)",
-              }}
-            >
-              {mutedAll ? <BellOff size={18} /> : <Bell size={18} />}
+            <span className="salah-adhan-icon flex shrink-0 items-center justify-center rounded-full">
+              {mutedAll ? <BellOff size={16} /> : <Bell size={16} />}
             </span>
             <span className="min-w-0 flex-1">
-              <span className="block text-sm font-bold">
+              <span className="salah-adhan-title block">
                 {mutedAll ? "Adhan muted today" : "Adhan notifications on"}
               </span>
-              <span className="block text-xs" style={{ color: "var(--muted-foreground)" }}>
+              <span className="salah-adhan-subtitle block">
                 {mutedAll ? "Tap to turn back on" : "Tap to mute for the rest of today"}
               </span>
             </span>
+            <ChevronRight size={16} strokeWidth={1.5} className="salah-adhan-chevron" />
           </button>
         </div>
       </main>
@@ -613,6 +506,6 @@ function Salah() {
         onClose={() => setPickerOpen(false)}
       />
 
-    </>
+    </div>
   );
 }
