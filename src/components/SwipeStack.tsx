@@ -287,7 +287,7 @@ export function SwipeStack({ items, counts, onIncrement, onReset, persistKey, fi
       >
         {current && (
           <div
-            className="h-full w-full"
+            className={dailyLayout ? "w-full" : "h-full w-full"}
             style={{ transform, opacity, transition, willChange: "transform, opacity" }}
           >
             {current.dhikr ? (
