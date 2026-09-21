@@ -254,6 +254,9 @@
     padding-bottom: 18px;
     scrollbar-width: none;
   }
+  .daily-adhkar-page.scroll-area {
+    overflow: hidden;
+  }
   .scroll-area::-webkit-scrollbar { display: none; }
   .bottom-nav {
     position: fixed;
@@ -444,9 +447,9 @@ html[data-preset="original"][data-section="evening"] {
 }
 
 .daily-swipe-stack {
-  flex: none;
+  flex: 1;
   min-height: 0;
-  overflow: visible;
+  overflow: hidden;
 }
 
 .daily-swipe-stack .adhkar-index-row {
@@ -463,16 +466,37 @@ html[data-preset="original"][data-section="evening"] {
 }
 
 .daily-swipe-stack .adhkar-card-stage {
-  height: auto;
   min-height: 0;
-  flex: none;
-  overflow: visible;
-  padding: 8px 22px 10px;
+  flex: 1;
+  overflow: hidden;
+  padding: 8px 24px 8px;
 }
 
-.adhkar-reference-card { min-height: 590px; height: auto; }
-.adhkar-reference-body { flex: 0 0 auto; }
-.adhkar-reference-content { height: auto; overflow: visible; }
+.adhkar-card-motion {
+  display: flex;
+  height: 100%;
+  min-height: 0;
+  align-items: flex-start;
+}
+
+.adhkar-reference-card {
+  width: 100%;
+  height: auto;
+  max-height: 100%;
+  min-height: 0;
+}
+
+.adhkar-reference-body {
+  min-height: 0;
+  flex: 1 1 auto;
+}
+
+.adhkar-reference-content {
+  height: auto;
+  max-height: 100%;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
 
 .adhkar-card-heading {
   padding: 20px 26px 0;
@@ -521,14 +545,14 @@ html[data-preset="original"][data-section="evening"] {
   max-width: 80%;
   margin: 0 auto;
   color: var(--translit);
-  font-size: 13px;
+  font-size: 15px;
   font-style: italic;
   line-height: 1.65;
   text-align: center;
 }
 
 .adhkar-card-footer {
-  padding: 14px 24px 22px;
+  padding: 12px 24px 20px;
 }
 
 .adhkar-source-badge {
@@ -536,7 +560,7 @@ html[data-preset="original"][data-section="evening"] {
   align-items: center;
   gap: 7px;
   align-self: flex-start;
-  max-width: 210px;
+  max-width: min(210px, calc(100vw - 180px));
   padding: 8px 13px;
   border-radius: 999px;
   background: var(--source-bg);
@@ -544,6 +568,7 @@ html[data-preset="original"][data-section="evening"] {
   font-size: 10px;
   font-weight: 600;
   line-height: 1.2;
+  white-space: normal;
 }
 
 .adhkar-repeat-counter {
@@ -553,15 +578,38 @@ html[data-preset="original"][data-section="evening"] {
   touch-action: manipulation;
 }
 
+.adhkar-pagination-row {
+  display: grid;
+  grid-template-columns: 32px minmax(0, 1fr) 32px;
+  min-height: 50px;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 24px 11px;
+}
+
 .adhkar-pagination {
   display: flex;
-  min-height: 42px;
+  min-width: 0;
   align-items: center;
   justify-content: center;
-  gap: 8px;
-  padding: 10px 24px 12px;
+  gap: clamp(4px, 1.5vw, 7px);
   color: var(--accent);
 }
+
+.adhkar-pagination-arrow {
+  display: grid;
+  width: 32px;
+  height: 32px;
+  place-items: center;
+  border: 1px solid color-mix(in oklab, var(--accent) 14%, transparent);
+  border-radius: 999px;
+  background: color-mix(in oklab, var(--surface-card) 68%, transparent);
+  color: var(--accent);
+  transition: opacity 180ms ease, transform 180ms ease, background-color 300ms ease;
+}
+
+.adhkar-pagination-arrow:active:not(:disabled) { transform: scale(0.94); }
+.adhkar-pagination-arrow:disabled { opacity: 0.28; }
 
 html[data-section="evening"] .dhikr-card {
   box-shadow: 0 16px 42px rgba(4, 8, 24, 0.2) !important;
@@ -572,8 +620,8 @@ html[data-section="evening"] .app-shell::after {
 }
 
 .adhkar-pagination button {
-  width: 8px;
-  height: 8px;
+  width: 7px;
+  height: 7px;
   flex: 0 0 auto;
   border-radius: 999px;
   background: var(--dot-inactive);
@@ -581,7 +629,7 @@ html[data-section="evening"] .app-shell::after {
 }
 
 .adhkar-pagination button.is-active {
-  width: 20px;
+  width: 19px;
   background: var(--dot-active);
 }
 
@@ -598,6 +646,14 @@ html[data-section="evening"] .app-shell::after {
   .app-page-title { font-size: 1.9rem; }
   .page-header .label-caps { font-size: 0.62rem; }
   .bottom-nav { bottom: calc(6px + env(safe-area-inset-bottom)); }
+  .adhkar-header { min-height: 136px; }
+  .adhkar-header-content { padding-top: 22px; }
+  .adhkar-progress-row { margin-top: 14px; }
+  .daily-swipe-stack .adhkar-index-row { min-height: 42px; }
+  .adhkar-card-heading { padding-top: 16px; }
+  .adhkar-reference-content { padding-top: 14px; }
+  .adhkar-card-footer { padding-bottom: 16px; }
+  .adhkar-pagination-row { min-height: 44px; padding-block: 5px 7px; }
 }
 
 @media (max-width: 360px) {

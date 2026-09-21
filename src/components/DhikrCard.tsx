@@ -60,8 +60,12 @@ export function DhikrCard({ dhikr, count, onIncrement, isSpecial, specialLabel, 
   const totalArabicLen = dhikr.arabicMulti
     ? dhikr.arabicMulti.reduce((s, p) => s + p.arabic.length, 0)
     : dhikr.arabic.length;
-  const baseArabic = display.arabicLarge ? 28 : 25;
-  const arabicSize = totalArabicLen > 200 ? (display.arabicLarge ? 24 : 21) : baseArabic;
+  const baseArabic = display.arabicLarge ? 32 : 29;
+  const arabicSize = totalArabicLen > 300
+    ? (display.arabicLarge ? 24 : 22)
+    : totalArabicLen > 180
+      ? (display.arabicLarge ? 27 : 24)
+      : baseArabic;
 
   const hasTranslation = !!(dhikr.translation || dhikr.arabicMulti);
   const hasCommentary = !!dhikr.commentary;
