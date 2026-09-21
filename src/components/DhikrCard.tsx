@@ -60,12 +60,14 @@ export function DhikrCard({ dhikr, count, onIncrement, isSpecial, specialLabel, 
   const totalArabicLen = dhikr.arabicMulti
     ? dhikr.arabicMulti.reduce((s, p) => s + p.arabic.length, 0)
     : dhikr.arabic.length;
-  const baseArabic = display.arabicLarge ? 32 : 29;
+  const baseArabic = display.arabicLarge ? 29 : 27;
   const arabicSize = totalArabicLen > 300
-    ? (display.arabicLarge ? 24 : 22)
+    ? (display.arabicLarge ? 23 : 21)
     : totalArabicLen > 180
-      ? (display.arabicLarge ? 27 : 24)
-      : baseArabic;
+      ? (display.arabicLarge ? 25 : 23)
+      : totalArabicLen > 120
+        ? (display.arabicLarge ? 21 : 20)
+        : baseArabic;
 
   const hasTranslation = !!(dhikr.translation || dhikr.arabicMulti);
   const hasCommentary = !!dhikr.commentary;
@@ -76,14 +78,14 @@ export function DhikrCard({ dhikr, count, onIncrement, isSpecial, specialLabel, 
       style={{ background: "var(--card)", color: "var(--card-foreground)", border: "1px solid var(--border)", boxShadow: "var(--card-shadow, 0 4px 16px rgba(0,0,0,0.08))" }}
     >
       <div className="adhkar-card-heading grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-4">
-        <ListenButton dhikrId={dhikr.id} size={50} />
+        <ListenButton dhikrId={dhikr.id} size={46} />
         <h3
           className="min-w-0 text-[12px] font-semibold uppercase"
           style={{ letterSpacing: "0.16em", color: "var(--accent)", opacity: 1 }}
         >
           {dhikr.title}
         </h3>
-        <IslamicOrnament size={30} className="adhkar-card-ornament shrink-0" />
+        <IslamicOrnament size={28} className="adhkar-card-ornament shrink-0" />
       </div>
 
       {isSpecial && specialLabel && (
