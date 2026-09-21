@@ -1,4 +1,4 @@
-import { BookOpen, ChevronLeft, ChevronRight } from "lucide-react";
+import { BookOpen } from "lucide-react";
 import { ProgressRing } from "./ProgressRing";
 
 export function IslamicOrnament({ size = 24, className = "" }: { size?: number; className?: string }) {
@@ -22,7 +22,7 @@ export function ProgressBar({ value, total }: { value: number; total: number }) 
 }
 
 export function ArabicText({ children, size }: { children: React.ReactNode; size: number }) {
-  return <p className="arabic adhkar-arabic" style={{ fontSize: size }}>{children}</p>;
+  return <p className="arabic adhkar-arabic" lang="ar" dir="rtl" style={{ fontSize: size }}>{children}</p>;
 }
 
 export function Transliteration({ children }: { children: React.ReactNode }) {
@@ -40,7 +40,7 @@ export function OrnamentalDivider() {
 export function SourceBadge({ source }: { source: string }) {
   return (
     <span className="adhkar-source-badge">
-      <BookOpen size={13} strokeWidth={1.8} />
+      <BookOpen size={20} strokeWidth={1.5} />
       {source}
     </span>
   );
@@ -53,9 +53,10 @@ type RepeatCounterProps = {
   tapped: boolean;
   bursts: number[];
   onClick: () => void;
+  size?: number;
 };
 
-export function RepeatCounter({ count, target, complete, tapped, bursts, onClick }: RepeatCounterProps) {
+export function RepeatCounter({ count, target, complete, tapped, bursts, onClick, size = 88 }: RepeatCounterProps) {
   return (
     <button
       onClick={onClick}
@@ -63,14 +64,14 @@ export function RepeatCounter({ count, target, complete, tapped, bursts, onClick
       className={`adhkar-repeat-counter relative flex shrink-0 items-center justify-center rounded-full ${tapped ? "tap-pulse" : ""}`}
       aria-label="increment counter"
     >
-      <ProgressRing value={count} max={target} size={88} stroke={7} complete={complete} />
+      <ProgressRing value={count} max={target} size={size} stroke={6} complete={complete} />
       <span className="absolute inset-0 flex flex-col items-center justify-center">
         {complete ? (
           <span className="text-3xl" style={{ color: "var(--accent)" }}>✓</span>
         ) : (
           <>
-            <span className="text-[32px] font-semibold leading-none">{count}</span>
-            <span className="mt-1 text-[11px] opacity-65">/ {target}</span>
+            <span className="adhkar-counter-value">{count}</span>
+            <span className="adhkar-counter-target">/ {target}</span>
           </>
         )}
       </span>
@@ -85,26 +86,13 @@ export function Pagination({
   total,
   active,
   onSelect,
-  onPrevious,
-  onNext,
 }: {
   total: number;
   active: number;
   onSelect: (index: number) => void;
-  onPrevious?: () => void;
-  onNext?: () => void;
 }) {
   return (
     <div className="adhkar-pagination-row">
-      <button
-        type="button"
-        onClick={onPrevious}
-        disabled={active === 0}
-        className="adhkar-pagination-arrow"
-        aria-label="previous adhkar"
-      >
-        <ChevronLeft size={17} strokeWidth={1.7} />
-      </button>
       <div className="adhkar-pagination">
         {Array.from({ length: total }, (_, index) => (
           <button
@@ -115,17 +103,8 @@ export function Pagination({
             aria-label={`go to ${index + 1}`}
           />
         ))}
-        <IslamicOrnament size={18} />
+        <IslamicOrnament size={16} />
       </div>
-      <button
-        type="button"
-        onClick={onNext}
-        disabled={active === total - 1}
-        className="adhkar-pagination-arrow"
-        aria-label="next adhkar"
-      >
-        <ChevronRight size={17} strokeWidth={1.7} />
-      </button>
     </div>
   );
 }

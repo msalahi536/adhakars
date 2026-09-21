@@ -47,7 +47,7 @@ export function BottomNav() {
             key={t.to}
             to={t.to}
             activeOptions={{ exact: true }}
-            className="nav-item relative flex flex-1 flex-col items-center justify-center gap-1 px-0 font-medium"
+            className="nav-item relative flex flex-1 flex-col items-center justify-center px-0 font-medium"
             style={{ transition: "color 0.25s ease", minWidth: 0 }}
           >
             {({ isActive }) => {
@@ -56,14 +56,14 @@ export function BottomNav() {
               const opacity = active ? 1 : 0.6;
               return (
                 <>
-                  <t.Icon size={24} strokeWidth={active ? 1.9 : 1.6} style={{ color, opacity }} />
+                  <t.Icon size={26} strokeWidth={1.5} style={{ color, opacity }} />
                   <span
                     style={{
                       color,
                       opacity,
-                      fontSize: 12,
+                      fontSize: 13,
                       whiteSpace: "nowrap",
-                      lineHeight: 1.1,
+                      lineHeight: 1,
                     }}
                   >
                     {t.label}

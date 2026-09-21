@@ -343,8 +343,6 @@ export function SwipeStack({ items, counts, onIncrement, onReset, persistKey, fi
           total={items.length}
           active={idx}
           onSelect={goTo}
-          onPrevious={goPrev}
-          onNext={goNext}
         />
       ) : <div className="mt-2 flex items-center justify-center px-6">
         <button
