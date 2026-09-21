@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { SwipeStack } from "@/components/SwipeStack";
-import { HeaderSettingsButton } from "@/components/HeaderSettingsButton";
+import { SettingsButton } from "@/components/SettingsButton";
 import { HeaderBackButton } from "@/components/HeaderBackButton";
 import { sleepItems, wakeItems, type SleepMode } from "@/data/sleep";
 import { isItemComplete } from "@/data/salah";
@@ -67,7 +67,7 @@ function Sleep() {
         style={{ background: "var(--grad-header)", color: headerFg }}
       >
         <HeaderBackButton />
-        <HeaderSettingsButton />
+        <SettingsButton />
         <div className="relative mx-auto max-w-md px-16 pb-5 pt-9 text-center">
           <div
             className="label-caps"

@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
-import { HeaderSettingsButton } from "@/components/HeaderSettingsButton";
+import { SettingsButton } from "@/components/SettingsButton";
 import { HeaderBackButton } from "@/components/HeaderBackButton";
 import { CompassCalibrationCard } from "@/components/CompassCalibrationCard";
 import {
@@ -198,7 +198,7 @@ function Qibla() {
         style={{ background: "var(--grad-header)", color: "var(--header-fg)" }}
       >
         <HeaderBackButton />
-        <HeaderSettingsButton />
+        <SettingsButton />
         <div className="mx-auto max-w-md px-16 pb-6 pt-9 text-center">
           <div className="label-caps" style={{ color: "var(--header-sub)", opacity: 1 }}>
             Direction of Prayer
