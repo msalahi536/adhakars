@@ -480,6 +480,8 @@ html[data-preset="original"][data-section="evening"] {
 }
 
 .adhkar-reference-card {
+  display: grid;
+  grid-template-rows: auto minmax(0, auto) auto;
   width: 100%;
   height: auto;
   max-height: 100%;
@@ -487,13 +489,13 @@ html[data-preset="original"][data-section="evening"] {
 }
 
 .adhkar-reference-body {
+  max-height: clamp(140px, calc(100dvh - 526px), 420px);
   min-height: 0;
-  flex: 1 1 auto;
+  overflow: hidden;
 }
 
 .adhkar-reference-content {
-  height: auto;
-  max-height: 100%;
+  height: 100%;
   overflow-y: auto;
   overscroll-behavior: contain;
 }
@@ -553,6 +555,7 @@ html[data-preset="original"][data-section="evening"] {
 
 .adhkar-card-footer {
   padding: 12px 24px 20px;
+  background: color-mix(in oklab, var(--card) 96%, transparent);
 }
 
 .adhkar-source-badge {
@@ -652,7 +655,9 @@ html[data-section="evening"] .app-shell::after {
   .daily-swipe-stack .adhkar-index-row { min-height: 42px; }
   .adhkar-card-heading { padding-top: 16px; }
   .adhkar-reference-content { padding-top: 14px; }
-  .adhkar-card-footer { padding-bottom: 16px; }
+  .adhkar-card-footer { padding: 10px 20px 14px; }
+  .adhkar-repeat-counter { width: 76px; height: 76px; }
+  .adhkar-repeat-counter svg { width: 76px; height: 76px; }
   .adhkar-pagination-row { min-height: 44px; padding-block: 5px 7px; }
 }
 

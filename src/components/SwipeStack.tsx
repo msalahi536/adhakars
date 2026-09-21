@@ -34,9 +34,7 @@ const readPersistedIdx = (key?: string): number => {
 
 export function SwipeStack({ items, counts, onIncrement, onReset, persistKey, finishCta, onFinishNav, onEditItem, onDeleteItem, dailyLayout = false }: Props) {
   const navigate = useNavigate();
-  const [idx, setIdxState] = useState(() =>
-    Math.min(readPersistedIdx(persistKey), Math.max(0, items.length - 1)),
-  );
+  const [idx, setIdxState] = useState(0);
   const setIdx = (updater: number | ((i: number) => number)) => {
     setIdxState((prev) => {
       const next = typeof updater === "function" ? (updater as (i: number) => number)(prev) : updater;
