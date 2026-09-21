@@ -1,5 +1,4 @@
 import { ExternalLink } from "lucide-react";
-import { ConcentricCirclesPattern } from "@/components/HeaderPatterns";
 import { HeaderBackButton } from "@/components/HeaderBackButton";
 import { LEGAL_UPDATED, SITE_ORIGIN, type LegalSection } from "@/data/legal";
 
@@ -17,21 +16,20 @@ export function LegalScreen({ title, intro, sections, webPath }: Props) {
         className="page-header relative overflow-hidden"
         style={{ background: "var(--background)", color: "var(--foreground)" }}
       >
-        <ConcentricCirclesPattern />
         <HeaderBackButton />
         <div
-          className="relative mx-auto max-w-md px-4 pb-5 pt-4"
+          className="relative mx-auto max-w-md px-16 pb-6 pt-9 text-center"
           style={{ paddingLeft: 60, paddingRight: 60 }}
         >
           <div className="label-caps">Legal</div>
-          <h1 className="mt-1 text-2xl font-bold">{title}</h1>
+          <h1 className="app-page-title mt-2">{title}</h1>
         </div>
       </header>
 
       <main className="scroll-area">
         <div className="mx-auto max-w-md px-4 py-4" style={{ color: "var(--foreground)" }}>
           <div
-            className="rounded-[24px] p-4"
+            className="glass-card p-5"
             style={{ background: "var(--surface)", border: "1px solid var(--border)" }}
           >
             <p className="text-xs" style={{ color: "var(--muted-foreground)" }}>

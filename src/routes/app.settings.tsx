@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { ConcentricCirclesPattern } from "@/components/HeaderPatterns";
 import { HeaderBackButton } from "@/components/HeaderBackButton";
 import { getDisplay, setDisplay } from "@/lib/theme";
 import {
@@ -310,19 +309,18 @@ function Settings() {
         className="page-header relative overflow-hidden"
         style={{ background: "var(--background)", color: "var(--foreground)" }}
       >
-        <ConcentricCirclesPattern />
         <HeaderBackButton />
         <div
-          className="relative mx-auto max-w-md px-4 pb-5 pt-4"
+          className="relative mx-auto max-w-md px-16 pb-6 pt-9 text-center"
           style={{ paddingLeft: 60, paddingRight: 60 }}
         >
           <div className="label-caps">Preferences</div>
-          <h1 className="mt-1 text-3xl font-bold">Settings</h1>
+          <h1 className="app-page-title mt-2">Settings</h1>
         </div>
       </header>
 
       <main className="scroll-area">
-        <div className="mx-auto max-w-md px-4 py-4">
+        <div className="mx-auto max-w-md px-5 py-3">
           {/* APPEARANCE */}
           <section className="mb-6">
             <h2 className="label-caps mb-3">Appearance</h2>
