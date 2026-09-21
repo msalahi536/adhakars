@@ -245,7 +245,7 @@ export function SwipeStack({ items, counts, onIncrement, onReset, persistKey, fi
         >
           {idx + 1} / {items.length}
         </span>
-        {idx > 0 && (
+        {!dailyLayout && idx > 0 && (
           <button
             onClick={restart}
             className="flex items-center gap-1 rounded-[12px] px-2.5 py-1 text-[11px] font-semibold transition active:scale-95"
@@ -315,7 +315,7 @@ export function SwipeStack({ items, counts, onIncrement, onReset, persistKey, fi
         )}
       </div>
 
-      {isLast && (finishCta || true) && (
+      {!dailyLayout && isLast && (finishCta || true) && (
         <div className="mt-2 flex flex-col gap-2 px-4">
           {finishCta && (
             <button
