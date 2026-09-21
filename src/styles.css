@@ -230,7 +230,7 @@
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
     background: transparent !important;
-    padding-bottom: calc(var(--bottom-nav-height) + env(safe-area-inset-bottom) + 12px);
+    padding-bottom: calc(var(--bottom-nav-height) + env(safe-area-inset-bottom) + 30px);
   }
   .bottom-nav {
     position: fixed;
@@ -503,7 +503,7 @@ html[data-preset="original"][data-section="evening"] {
   align-items: center;
   justify-content: center;
   gap: 8px;
-  padding: 5px 24px 8px;
+  padding: 5px 24px 24px;
   color: var(--accent);
 }
 
