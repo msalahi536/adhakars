@@ -33,12 +33,12 @@ function AppLayout() {
     <div className={`app-shell ${isEvening ? "is-evening" : ""}`}>
       <div
         className="app-background app-background-morning"
-        style={{ backgroundImage: `url(${morningBackground.url})` }}
+        style={{ "--screen-background": `url(${morningBackground.url})` } as React.CSSProperties}
         aria-hidden="true"
       />
       <div
         className="app-background app-background-evening"
-        style={{ backgroundImage: `url(${eveningBackground.url})` }}
+        style={{ "--screen-background": `url(${eveningBackground.url})` } as React.CSSProperties}
         aria-hidden="true"
       />
       <Outlet />

@@ -4,7 +4,8 @@ import { Sun, Moon, MoreHorizontal } from "lucide-react";
 function SalahIcon({ size = 22, strokeWidth = 1.8 }: { size?: number; strokeWidth?: number }) {
   return (
     <svg aria-hidden viewBox="0 0 24 24" width={size} height={size} fill="none" stroke="currentColor" strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round">
-      <path d="M4 20h16M5.5 20V9.5L12 4l6.5 5.5V20M9 20v-6a3 3 0 0 1 6 0v6M3.5 9.5 12 2l8.5 7.5" />
+      <path d="M3 20.5h18M5 20.5v-9.2h3v9.2M16 20.5v-9.2h3v9.2M4.3 8.8h4.4M15.3 8.8h4.4M5.7 8.8V6.2M18.3 8.8V6.2" />
+      <path d="M8 20.5v-7.2c0-2.6 1.8-4.9 4-5.8 2.2.9 4 3.2 4 5.8v7.2M10.2 20.5v-4.1a1.8 1.8 0 0 1 3.6 0v4.1M12 7.5V3.3M12 3.3c1.1.2 1.8.8 2.2 1.6-1 .3-1.8.1-2.2-.5" />
     </svg>
   );
 }
@@ -12,7 +13,7 @@ function SalahIcon({ size = 22, strokeWidth = 1.8 }: { size?: number; strokeWidt
 function TasbihIcon({ size = 22, strokeWidth = 1.8 }: { size?: number; strokeWidth?: number }) {
   return (
     <svg aria-hidden viewBox="0 0 24 24" width={size} height={size} fill="none" stroke="currentColor" strokeWidth={strokeWidth} strokeLinecap="round">
-      <circle cx="12" cy="3.2" r="1.4" /><circle cx="17.7" cy="5.4" r="1.4" /><circle cx="20.7" cy="10.7" r="1.4" /><circle cx="19.2" cy="16.5" r="1.4" /><circle cx="14.4" cy="20" r="1.4" /><circle cx="8.3" cy="19.4" r="1.4" /><circle cx="4.1" cy="15.2" r="1.4" /><circle cx="3.7" cy="9.2" r="1.4" /><circle cx="7" cy="4.7" r="1.4" />
+      <circle cx="12" cy="3" r="1.25" /><circle cx="17" cy="4.8" r="1.25" /><circle cx="20.2" cy="9" r="1.25" /><circle cx="20" cy="14.3" r="1.25" /><circle cx="16.6" cy="18.2" r="1.25" /><circle cx="11.5" cy="19.4" r="1.25" /><circle cx="6.8" cy="17.2" r="1.25" /><circle cx="4" cy="12.7" r="1.25" /><circle cx="4.7" cy="7.4" r="1.25" /><circle cx="8.2" cy="4" r="1.25" /><path d="M11.5 20.7v1.6M9.7 23h3.6" />
     </svg>
   );
 }

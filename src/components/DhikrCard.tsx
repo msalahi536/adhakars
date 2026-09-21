@@ -68,7 +68,7 @@ export function DhikrCard({ dhikr, count, onIncrement, isSpecial, specialLabel, 
 
   return (
     <div
-      className="dhikr-card relative flex h-full w-full flex-col overflow-hidden"
+      className={`dhikr-card relative flex w-full flex-col overflow-hidden ${referenceLayout ? "adhkar-reference-card" : "h-full"}`}
       style={{ background: "var(--card)", color: "var(--card-foreground)", border: "1px solid var(--border)", boxShadow: "var(--card-shadow, 0 4px 16px rgba(0,0,0,0.08))" }}
     >
       <div className="adhkar-card-heading grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-4">
@@ -92,12 +92,12 @@ export function DhikrCard({ dhikr, count, onIncrement, isSpecial, specialLabel, 
       )}
 
       {/* Scrollable content area */}
-      <div className="relative min-h-0 flex-1">
+      <div className={`relative min-h-0 flex-1 ${referenceLayout ? "adhkar-reference-body" : ""}`}>
         <div
           ref={scrollRef}
           onScroll={handleScroll}
           data-no-swipe
-          className="hide-scrollbar h-full overflow-y-auto px-7 pb-4 pt-5"
+          className={`hide-scrollbar px-7 pb-4 pt-5 ${referenceLayout ? "adhkar-reference-content" : "h-full overflow-y-auto"}`}
           style={{ scrollbarWidth: "none", WebkitOverflowScrolling: "touch" }}
         >
           {dhikr.arabicMulti ? (
@@ -165,7 +165,7 @@ export function DhikrCard({ dhikr, count, onIncrement, isSpecial, specialLabel, 
         </div>
 
         {/* Bottom fade hint */}
-        <div
+        {!referenceLayout && <div
           aria-hidden
           className="pointer-events-none absolute bottom-0 left-0 right-0 h-10 transition-opacity duration-200"
           style={{
@@ -173,7 +173,7 @@ export function DhikrCard({ dhikr, count, onIncrement, isSpecial, specialLabel, 
             background:
               "linear-gradient(to bottom, color-mix(in oklab, var(--card) 0%, transparent), var(--card))",
           }}
-        />
+        />}
       </div>
 
       {/* Sticky footer */}
