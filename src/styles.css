@@ -343,7 +343,7 @@
 
 /* Shared Morning and Evening recitation layout */
 .adhkar-header {
-  min-height: 176px;
+  min-height: 160px;
 }
 
 html[data-preset="original"][data-section="morning"] {
@@ -391,7 +391,7 @@ html[data-preset="original"][data-section="evening"] {
 }
 
 .adhkar-header-content {
-  padding-top: 52px;
+  padding-top: 42px;
   padding-bottom: 10px;
 }
 
@@ -499,6 +499,7 @@ html[data-preset="original"][data-section="evening"] {
 
 .adhkar-reference-content {
   height: 100%;
+  padding-inline: 18px !important;
   overflow: hidden;
   overscroll-behavior: contain;
 }
@@ -583,7 +584,7 @@ html[data-preset="original"][data-section="evening"] {
 .adhkar-card-footer {
   position: relative;
   z-index: 1;
-  padding: 9px 24px 11px;
+  padding: 7px 24px 9px;
   background: color-mix(in oklab, var(--card) 96%, transparent);
 }
 

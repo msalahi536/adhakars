@@ -66,7 +66,7 @@ export function DhikrCard({ dhikr, count, onIncrement, isSpecial, specialLabel, 
     : totalArabicLen > 180
       ? (display.arabicLarge ? 25 : 23)
       : totalArabicLen > 120
-        ? (display.arabicLarge ? 24 : 22)
+        ? (display.arabicLarge ? 21 : 20)
         : baseArabic;
 
   const hasTranslation = !!(dhikr.translation || dhikr.arabicMulti);
