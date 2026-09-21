@@ -57,7 +57,7 @@ export function DhikrCard({ dhikr, count, onIncrement, isSpecial, specialLabel, 
     onIncrement();
   };
 
-  const arabicSize = display.arabicLarge ? 36 : 34;
+  const arabicSize = display.arabicLarge ? 30 : 28;
 
   const hasTranslation = !!(dhikr.translation || dhikr.arabicMulti);
   const hasCommentary = !!dhikr.commentary;
@@ -68,7 +68,7 @@ export function DhikrCard({ dhikr, count, onIncrement, isSpecial, specialLabel, 
       style={{ background: "var(--card)", color: "var(--card-foreground)", border: "1px solid var(--border)", boxShadow: "var(--card-shadow, 0 4px 16px rgba(0,0,0,0.08))" }}
     >
       <div className="adhkar-card-heading grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-4">
-        <ListenButton dhikrId={dhikr.id} size={72} />
+        <ListenButton dhikrId={dhikr.id} size={56} />
         <h3
           className="min-w-0 uppercase"
           style={{ letterSpacing: "0.16em", color: "var(--accent)", opacity: 1 }}
@@ -194,7 +194,7 @@ export function DhikrCard({ dhikr, count, onIncrement, isSpecial, specialLabel, 
             {complete ? "✓ Done" : "Done"}
           </button>
         ) : (
-           <RepeatCounter count={count} target={dhikr.target} complete={complete} tapped={tapped} bursts={bursts} onClick={handleTap} size={referenceLayout ? 170 : 88} />
+           <RepeatCounter count={count} target={dhikr.target} complete={complete} tapped={tapped} bursts={bursts} onClick={handleTap} size={referenceLayout ? 96 : 88} />
         )}
       </div>
     </div>
