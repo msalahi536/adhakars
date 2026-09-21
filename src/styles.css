@@ -202,11 +202,25 @@
     flex-direction: column;
     overflow: hidden;
     background-color: var(--background);
-    background-image:
-      linear-gradient(color-mix(in oklab, var(--background) 30%, transparent), color-mix(in oklab, var(--background) 22%, transparent)),
-      var(--app-background-image);
+  }
+  .app-background {
+    position: absolute;
+    inset: 0;
+    z-index: -2;
     background-position: center top;
     background-size: cover;
+    opacity: 0;
+    transition: opacity 1200ms ease-in-out;
+    pointer-events: none;
+  }
+  .app-background-morning {
+    opacity: 1;
+  }
+  .app-shell.is-evening .app-background-morning {
+    opacity: 0;
+  }
+  .app-shell.is-evening .app-background-evening {
+    opacity: 1;
   }
   .app-shell::after {
     position: absolute;
@@ -215,6 +229,11 @@
     background: color-mix(in oklab, var(--background) 12%, transparent);
     content: "";
     pointer-events: none;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .app-background {
+      transition: none;
+    }
   }
   .page-header {
     --header-fg: var(--foreground);
