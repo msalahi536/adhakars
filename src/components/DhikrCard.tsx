@@ -57,17 +57,7 @@ export function DhikrCard({ dhikr, count, onIncrement, isSpecial, specialLabel, 
     onIncrement();
   };
 
-  const totalArabicLen = dhikr.arabicMulti
-    ? dhikr.arabicMulti.reduce((s, p) => s + p.arabic.length, 0)
-    : dhikr.arabic.length;
-  const baseArabic = display.arabicLarge ? 29 : 27;
-  const arabicSize = totalArabicLen > 300
-    ? (display.arabicLarge ? 23 : 21)
-    : totalArabicLen > 180
-      ? (display.arabicLarge ? 25 : 23)
-      : totalArabicLen > 120
-        ? (display.arabicLarge ? 21 : 20)
-        : baseArabic;
+  const arabicSize = display.arabicLarge ? 36 : 34;
 
   const hasTranslation = !!(dhikr.translation || dhikr.arabicMulti);
   const hasCommentary = !!dhikr.commentary;
@@ -78,9 +68,9 @@ export function DhikrCard({ dhikr, count, onIncrement, isSpecial, specialLabel, 
       style={{ background: "var(--card)", color: "var(--card-foreground)", border: "1px solid var(--border)", boxShadow: "var(--card-shadow, 0 4px 16px rgba(0,0,0,0.08))" }}
     >
       <div className="adhkar-card-heading grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-4">
-        <ListenButton dhikrId={dhikr.id} size={46} />
+        <ListenButton dhikrId={dhikr.id} size={72} />
         <h3
-          className="min-w-0 text-[12px] font-semibold uppercase"
+          className="min-w-0 uppercase"
           style={{ letterSpacing: "0.16em", color: "var(--accent)", opacity: 1 }}
         >
           {dhikr.title}
@@ -100,8 +90,8 @@ export function DhikrCard({ dhikr, count, onIncrement, isSpecial, specialLabel, 
       {/* Scrollable content area */}
       <div className={`relative min-h-0 flex-1 ${referenceLayout ? "adhkar-reference-body" : ""}`}>
         <div
-          ref={dhikr.arabicMulti ? scrollRef : undefined}
-          onScroll={dhikr.arabicMulti ? handleScroll : undefined}
+          ref={scrollRef}
+          onScroll={handleScroll}
           data-no-swipe
           className={`hide-scrollbar px-7 pb-4 pt-5 ${referenceLayout ? "adhkar-reference-content" : "h-full overflow-y-auto"}`}
           style={{ scrollbarWidth: "none", WebkitOverflowScrolling: "touch" }}
@@ -112,16 +102,13 @@ export function DhikrCard({ dhikr, count, onIncrement, isSpecial, specialLabel, 
                 <div key={part.label}>
                   <div className="label-caps mb-1.5 text-center">{part.label}</div>
                     <ArabicText size={arabicSize}>{part.arabic}</ArabicText>
-                  {display.showTransliteration && part.transliteration && (
-                    <p
-                      className="mt-4 text-center italic"
-                      style={{ fontSize: 14, color: "var(--translit)", lineHeight: 1.75 }}
-                    >
+                   {part.transliteration && (
+                     <p className="adhkar-transliteration">
                       {part.transliteration}
                     </p>
                   )}
                   {part.translation && (
-                    <p className="mt-2 text-[13px] opacity-90" style={{ lineHeight: 1.55 }}>
+                     <p className="adhkar-translation">
                       {part.translation}
                     </p>
                   )}
@@ -131,19 +118,13 @@ export function DhikrCard({ dhikr, count, onIncrement, isSpecial, specialLabel, 
           ) : (
             <>
               {dhikr.arabic && (
-                <div
-                  ref={scrollRef}
-                  onScroll={handleScroll}
-                  data-no-swipe
-                  className="adhkar-arabic-scroll hide-scrollbar"
-                >
-                  <ArabicText size={arabicSize}>{dhikr.arabic}</ArabicText>
-                </div>
+                <ArabicText size={arabicSize}>{dhikr.arabic}</ArabicText>
               )}
               {dhikr.arabic && dhikr.transliteration && <OrnamentalDivider />}
-              {display.showTransliteration && dhikr.transliteration && (
+               {dhikr.transliteration && (
                 <Transliteration>{dhikr.transliteration}</Transliteration>
               )}
+               {dhikr.translation && <p className="adhkar-translation">{dhikr.translation}</p>}
             </>
           )}
 
@@ -190,11 +171,11 @@ export function DhikrCard({ dhikr, count, onIncrement, isSpecial, specialLabel, 
       </div>
 
       {/* Sticky footer */}
-      <div className="adhkar-card-footer flex items-end justify-between gap-3">
-        <div className="flex flex-col gap-1.5">
+       <div className="adhkar-card-footer flex items-end justify-between gap-3">
+         <div className="adhkar-source-column flex min-w-0 flex-col">
           <SourceBadge source={dhikr.source} />
-          <div className="text-[12px] opacity-70">
-            Target: <span className="font-semibold opacity-100">{dhikr.target}x</span>
+           <div className="adhkar-target-label">
+             Target: {dhikr.target}x
           </div>
         </div>
 
@@ -213,7 +194,7 @@ export function DhikrCard({ dhikr, count, onIncrement, isSpecial, specialLabel, 
             {complete ? "✓ Done" : "Done"}
           </button>
         ) : (
-          <RepeatCounter count={count} target={dhikr.target} complete={complete} tapped={tapped} bursts={bursts} onClick={handleTap} />
+           <RepeatCounter count={count} target={dhikr.target} complete={complete} tapped={tapped} bursts={bursts} onClick={handleTap} size={referenceLayout ? 170 : 88} />
         )}
       </div>
     </div>
