@@ -395,7 +395,7 @@ html[data-preset="original"][data-section="evening"] {
 
 .daily-swipe-stack {
   flex: none;
-  min-height: 620px;
+  min-height: 710px;
   overflow: visible;
 }
 
@@ -413,7 +413,7 @@ html[data-preset="original"][data-section="evening"] {
 }
 
 .daily-swipe-stack .adhkar-card-stage {
-  height: 520px;
+  height: 610px;
   flex: none;
   padding: 8px 20px 10px;
 }
