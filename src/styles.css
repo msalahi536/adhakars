@@ -318,6 +318,23 @@
   min-height: 170px;
 }
 
+html[data-preset="original"][data-section="morning"] {
+  --accent: #49683e;
+  --primary: #49683e;
+  --nav-active: #49683e;
+  --dot-active: #49683e;
+  --translit: #637d58;
+  --source-fg: #49683e;
+}
+
+html[data-preset="original"][data-section="evening"] {
+  --accent: #777aa2;
+  --primary: #777aa2;
+  --nav-active: #8f91ba;
+  --dot-active: #8f91ba;
+  --translit: #8f91ba;
+}
+
 .adhkar-header-content {
   padding-top: 36px;
   padding-bottom: 14px;
@@ -378,7 +395,7 @@
 
 .daily-swipe-stack {
   flex: none;
-  min-height: 690px;
+  min-height: 810px;
   overflow: visible;
 }
 
@@ -396,7 +413,7 @@
 }
 
 .daily-swipe-stack .adhkar-card-stage {
-  height: 570px;
+  height: 690px;
   flex: none;
   padding: 8px 20px 10px;
 }

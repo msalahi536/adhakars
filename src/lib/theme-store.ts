@@ -115,6 +115,10 @@ export const applyThemeForRoute = (pathname: string, sectionKey?: SectionKey) =>
   // Per-section override always wins for the header hue.
   const sectionOverride = overrides[section];
   const presetId = getPresetId();
+  if (typeof document !== "undefined") {
+    document.documentElement.dataset.section = section;
+    document.documentElement.dataset.preset = presetId;
+  }
   const seed =
     sectionOverride ?? sectionSeedFor(presetId, triplet.accent ?? base, section);
 
