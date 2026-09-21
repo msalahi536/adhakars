@@ -203,7 +203,7 @@
     overflow: hidden;
     background-color: var(--background);
     background-image:
-      linear-gradient(color-mix(in oklab, var(--background) 16%, transparent), color-mix(in oklab, var(--background) 16%, transparent)),
+      linear-gradient(color-mix(in oklab, var(--background) 30%, transparent), color-mix(in oklab, var(--background) 22%, transparent)),
       var(--app-background-image);
     background-position: center top;
     background-size: cover;
@@ -234,9 +234,8 @@
   }
   .bottom-nav {
     position: fixed;
-    inset-inline: 14px;
-    bottom: calc(10px + env(safe-area-inset-bottom));
-    width: 100%;
+    inset-inline: 20px;
+    bottom: calc(16px + env(safe-area-inset-bottom));
     width: auto;
     height: var(--bottom-nav-row);
     min-height: var(--bottom-nav-row);
@@ -258,9 +257,9 @@
     justify-content: space-around;
     overflow: hidden;
     border: 1px solid;
-    border-radius: 24px;
-    background: color-mix(in oklab, var(--nav-bg) 88%, transparent);
-    box-shadow: 0 14px 34px color-mix(in oklab, var(--foreground) 14%, transparent);
+    border-radius: 26px;
+    background: color-mix(in oklab, var(--nav-bg) 84%, transparent);
+    box-shadow: 0 12px 34px color-mix(in oklab, var(--foreground) 10%, transparent);
     backdrop-filter: blur(24px) saturate(150%);
     -webkit-backdrop-filter: blur(24px) saturate(150%);
   }
@@ -295,8 +294,8 @@
 
 .app-page-title {
   font-family: "Fraunces", Georgia, serif;
-  font-size: 2.25rem;
-  font-weight: 500;
+  font-size: 2rem;
+  font-weight: 400;
   line-height: 1.1;
   letter-spacing: 0;
 }
@@ -309,9 +308,200 @@
   border-radius: 26px;
   background: color-mix(in oklab, var(--card) 90%, transparent) !important;
   border-color: color-mix(in oklab, var(--border) 75%, transparent) !important;
-  box-shadow: 0 18px 48px color-mix(in oklab, var(--foreground) 12%, transparent) !important;
+  box-shadow: 0 16px 42px color-mix(in oklab, var(--foreground) 9%, transparent) !important;
   backdrop-filter: blur(20px) saturate(115%);
   -webkit-backdrop-filter: blur(20px) saturate(115%);
+}
+
+/* Shared Morning and Evening recitation layout */
+.adhkar-header {
+  min-height: 170px;
+}
+
+.adhkar-header-content {
+  padding-top: 36px;
+  padding-bottom: 14px;
+}
+
+.adhkar-header .label-caps {
+  color: var(--accent);
+  font-size: 0.68rem;
+  letter-spacing: 0.18em;
+  opacity: 1;
+}
+
+.adhkar-header .app-page-title {
+  margin-top: 10px;
+  color: var(--foreground);
+}
+
+.adhkar-header-action {
+  top: calc(env(safe-area-inset-top) + 14px);
+  right: 74px;
+}
+
+.adhkar-progress-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 50px;
+  align-items: center;
+  gap: 16px;
+  width: min(76vw, 310px);
+  margin: 28px auto 0;
+}
+
+.adhkar-progress-track {
+  height: 8px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: color-mix(in oklab, var(--accent) 11%, transparent);
+}
+
+.adhkar-progress-value {
+  height: 100%;
+  min-width: 0;
+  border-radius: inherit;
+  background: var(--accent);
+  transition: width 500ms ease;
+}
+
+.adhkar-progress-count {
+  color: var(--foreground);
+  font-size: 0.8rem;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.daily-adhkar-page {
+  padding-top: 0;
+}
+
+.daily-swipe-stack {
+  flex: none;
+  min-height: 690px;
+  overflow: visible;
+}
+
+.daily-swipe-stack .adhkar-index-row {
+  min-height: 52px;
+  margin-bottom: 6px;
+}
+
+.daily-swipe-stack .adhkar-index-row > span {
+  min-width: 72px;
+  padding: 9px 16px;
+  border-color: color-mix(in oklab, var(--accent) 16%, transparent) !important;
+  background: color-mix(in oklab, var(--surface-card) 76%, transparent) !important;
+  box-shadow: 0 5px 18px color-mix(in oklab, var(--foreground) 5%, transparent) !important;
+}
+
+.daily-swipe-stack .adhkar-card-stage {
+  height: 570px;
+  flex: none;
+  padding: 8px 20px 10px;
+}
+
+.adhkar-card-heading {
+  padding: 24px 26px 0;
+}
+
+.adhkar-card-ornament {
+  color: var(--accent);
+}
+
+.adhkar-arabic {
+  margin: 0 auto;
+  max-width: 100%;
+  color: var(--card-foreground);
+  font-weight: 500;
+  line-height: 1.8;
+}
+
+.adhkar-divider {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  width: 94px;
+  margin: 20px auto 15px;
+  color: var(--accent);
+}
+
+.adhkar-divider span {
+  width: 34px;
+  height: 1px;
+  background: linear-gradient(to right, transparent, currentColor);
+}
+
+.adhkar-divider span:last-child {
+  background: linear-gradient(to left, transparent, currentColor);
+}
+
+.adhkar-divider i {
+  width: 8px;
+  height: 8px;
+  rotate: 45deg;
+  background: currentColor;
+}
+
+.adhkar-transliteration {
+  max-width: 92%;
+  margin: 0 auto;
+  color: var(--translit);
+  font-size: 13px;
+  font-style: italic;
+  line-height: 1.65;
+  text-align: center;
+}
+
+.adhkar-card-footer {
+  padding: 12px 24px 22px;
+}
+
+.adhkar-source-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  align-self: flex-start;
+  max-width: 210px;
+  padding: 8px 13px;
+  border-radius: 999px;
+  background: var(--source-bg);
+  color: var(--source-fg);
+  font-size: 10px;
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+.adhkar-repeat-counter {
+  width: 88px;
+  height: 88px;
+  color: var(--count-fg, var(--card-foreground));
+  touch-action: manipulation;
+}
+
+.adhkar-pagination {
+  display: flex;
+  min-height: 42px;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 5px 24px 8px;
+  color: var(--accent);
+}
+
+.adhkar-pagination button {
+  width: 8px;
+  height: 8px;
+  flex: 0 0 auto;
+  border-radius: 999px;
+  background: var(--dot-inactive);
+  transition: width 250ms ease, background-color 250ms ease;
+}
+
+.adhkar-pagination button.is-active {
+  width: 20px;
+  background: var(--dot-active);
 }
 
 .glass-card {
@@ -327,6 +517,15 @@
   .app-page-title { font-size: 1.9rem; }
   .page-header .label-caps { font-size: 0.62rem; }
   .bottom-nav { bottom: calc(6px + env(safe-area-inset-bottom)); }
+}
+
+@media (max-width: 360px) {
+  .adhkar-header-content { padding-inline: 60px; }
+  .adhkar-header .app-page-title { font-size: 1.82rem; }
+  .daily-swipe-stack .adhkar-card-stage { padding-inline: 14px; }
+  .adhkar-card-heading { padding-inline: 22px; }
+  .adhkar-arabic { font-size: 22px !important; }
+  .adhkar-transliteration { font-size: 12px; }
 }
 
 @media (prefers-reduced-motion: reduce) {

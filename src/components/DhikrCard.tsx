@@ -1,6 +1,5 @@
 import { useEffect, useRef, useState } from "react";
 import type { Dhikr } from "@/data/adhkar";
-import { ProgressRing } from "./ProgressRing";
 import { ListenButton } from "./ListenButton";
 import { ArabicText, IslamicOrnament, OrnamentalDivider, RepeatCounter, SourceBadge, Transliteration } from "./AdhkarPrimitives";
 import { getDisplay, triggerHaptic } from "@/lib/theme";
