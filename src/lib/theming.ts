@@ -159,17 +159,18 @@ export const deriveSectionSeed = (baseSeed: string, section: SectionKey): string
   return clampSeed(hslToHex(h, clamp(s + ds, 0.18, 0.82), clamp(l + dl, 0.28, 0.78)));
 };
 
-// The original hand-picked palette: one botanical family with enough tonal
-// range to keep every section distinct without changing the app's structure.
+// The original hand-picked palette: warm gold mornings, deep blue evenings,
+// green after salah. Used by the "Original" preset.
 export const ORIGINAL_SECTION_SEEDS: Record<SectionKey, string> = {
-  morning: "#88a66b",
-  evening: "#526a50",
-  salah:   "#283618",
-  tasbih:  "#6b7c43",
-  sleep:   "#36453b",
-  wake:    "#9bae75",
-  custom:  "#606c38",
-  default: "#606c38",
+  morning: "#c9a84c",
+  evening: "#3b5a86",
+  salah:   "#1e4a30",
+  tasbih:  "#c9a84c",
+
+  sleep:   "#2c3e63",
+  wake:    "#d8b45a",
+  custom:  "#c9a84c",
+  default: "#c9a84c",
 };
 
 export const ORIGINAL_PRESET_ID = "original";
