@@ -40,7 +40,7 @@ export function OrnamentalDivider() {
 export function SourceBadge({ source }: { source: string }) {
   return (
     <span className="adhkar-source-badge">
-      <BookOpen size={20} strokeWidth={1.5} />
+      <BookOpen size={13} strokeWidth={1.5} />
       {source}
     </span>
   );
@@ -64,7 +64,7 @@ export function RepeatCounter({ count, target, complete, tapped, bursts, onClick
       className={`adhkar-repeat-counter relative flex shrink-0 items-center justify-center rounded-full ${tapped ? "tap-pulse" : ""}`}
       aria-label="increment counter"
     >
-      <ProgressRing value={count} max={target} size={size} stroke={6} complete={complete} />
+      <ProgressRing value={count} max={target} size={size} stroke={4} complete={complete} />
       <span className="absolute inset-0 flex flex-col items-center justify-center">
         {complete ? (
           <span className="text-3xl" style={{ color: "var(--accent)" }}>✓</span>
@@ -103,7 +103,7 @@ export function Pagination({
             aria-label={`go to ${index + 1}`}
           />
         ))}
-        <IslamicOrnament size={16} />
+        <IslamicOrnament size={14} />
       </div>
     </div>
   );

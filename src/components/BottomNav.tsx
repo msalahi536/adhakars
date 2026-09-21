@@ -56,12 +56,12 @@ export function BottomNav() {
               const opacity = active ? 1 : 0.6;
               return (
                 <>
-                  <t.Icon size={26} strokeWidth={1.5} style={{ color, opacity }} />
+                   <t.Icon size={22} strokeWidth={1.5} style={{ color, opacity }} />
                   <span
                     style={{
                       color,
                       opacity,
-                      fontSize: 13,
+                       fontSize: 12,
                       whiteSpace: "nowrap",
                       lineHeight: 1,
                     }}
