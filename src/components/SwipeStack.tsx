@@ -5,6 +5,7 @@ import { TasbeehComboCard } from "./TasbeehComboCard";
 import { ChevronLeft, ChevronRight, RotateCcw, ArrowRight, Pencil, Trash2 } from "lucide-react";
 import type { SalahItem } from "@/data/salah";
 import { isItemComplete, itemId } from "@/data/salah";
+import { Pagination } from "./AdhkarPrimitives";
 
 type Props = {
   items: SalahItem[];
@@ -16,6 +17,7 @@ type Props = {
   onFinishNav?: () => void;
   onEditItem?: (id: string) => void;
   onDeleteItem?: (id: string) => void;
+  dailyLayout?: boolean;
 };
 
 type Phase = "idle" | "out-left" | "out-right" | "in-left" | "in-right";
@@ -30,7 +32,7 @@ const readPersistedIdx = (key?: string): number => {
   return Number.isFinite(n) && n >= 0 ? n : 0;
 };
 
-export function SwipeStack({ items, counts, onIncrement, onReset, persistKey, finishCta, onFinishNav, onEditItem, onDeleteItem }: Props) {
+export function SwipeStack({ items, counts, onIncrement, onReset, persistKey, finishCta, onFinishNav, onEditItem, onDeleteItem, dailyLayout = false }: Props) {
   const navigate = useNavigate();
   const [idx, setIdxState] = useState(() =>
     Math.min(readPersistedIdx(persistKey), Math.max(0, items.length - 1)),
@@ -237,8 +239,8 @@ export function SwipeStack({ items, counts, onIncrement, onReset, persistKey, fi
   };
 
   return (
-    <div className="flex flex-1 flex-col overflow-hidden">
-      <div className="mb-1 flex min-h-9 items-center justify-center gap-2 px-4">
+    <div className={`flex flex-1 flex-col overflow-hidden ${dailyLayout ? "daily-swipe-stack" : ""}`}>
+      <div className="adhkar-index-row mb-1 flex min-h-9 items-center justify-center gap-2 px-4">
         <span
           className="rounded-full px-4 py-1.5 text-sm font-medium tabular-nums"
           style={{ background: "color-mix(in oklab, var(--surface-card) 82%, transparent)", border: "1px solid var(--border)", boxShadow: "0 5px 18px color-mix(in oklab, var(--foreground) 7%, transparent)" }}
@@ -280,8 +282,8 @@ export function SwipeStack({ items, counts, onIncrement, onReset, persistKey, fi
 
       <div
         ref={wrapperRef}
-        className="relative min-h-0 flex-1 overflow-hidden"
-        style={{ touchAction: "pan-y", padding: "10px 18px 8px" }}
+        className="adhkar-card-stage relative min-h-0 flex-1 overflow-hidden"
+        style={{ touchAction: "pan-y" }}
       >
         {current && (
           <div
@@ -299,6 +301,7 @@ export function SwipeStack({ items, counts, onIncrement, onReset, persistKey, fi
                 isSpecial={current.isSpecial}
                 specialLabel={current.specialLabel}
                 isPersonalDua={current.isPersonalDua}
+                referenceLayout={dailyLayout}
               />
             ) : (
               <TasbeehComboCard
@@ -337,7 +340,9 @@ export function SwipeStack({ items, counts, onIncrement, onReset, persistKey, fi
 
 
 
-      <div className="mt-2 flex items-center justify-center px-6">
+      {dailyLayout ? (
+        <Pagination total={items.length} active={idx} onSelect={goTo} />
+      ) : <div className="mt-2 flex items-center justify-center px-6">
         <button
           onClick={goPrev}
           disabled={idx === 0}
@@ -380,7 +385,7 @@ export function SwipeStack({ items, counts, onIncrement, onReset, persistKey, fi
         >
           <ChevronRight size={20} />
         </button>
-      </div>
+      </div>}
     </div>
   );
 }

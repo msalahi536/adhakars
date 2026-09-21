@@ -7,6 +7,10 @@ export const Route = createFileRoute("/app/evening")({
     meta: [
       { title: "Evening Adhkar, Sahih Al-Adhkar" },
       { name: "description", content: "Recite your evening adhkar with counters and streaks." },
+      { property: "og:title", content: "Evening Adhkar, Sahih Al-Adhkar" },
+      { property: "og:description", content: "Recite your evening adhkar with counters and streaks." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
     ],
   }),
   component: Evening,

@@ -159,11 +159,11 @@ export const deriveSectionSeed = (baseSeed: string, section: SectionKey): string
   return clampSeed(hslToHex(h, clamp(s + ds, 0.18, 0.82), clamp(l + dl, 0.28, 0.78)));
 };
 
-// The original hand-picked palette: warm gold mornings, deep blue evenings,
+// The original hand-picked palette: quiet sage mornings, deep blue evenings,
 // green after salah. Used by the "Original" preset.
 export const ORIGINAL_SECTION_SEEDS: Record<SectionKey, string> = {
-  morning: "#c9a84c",
-  evening: "#3b5a86",
+  morning: "#49683e",
+  evening: "#555b7e",
   salah:   "#1e4a30",
   tasbih:  "#c9a84c",
 
