@@ -315,7 +315,7 @@ export function SwipeStack({ items, counts, onIncrement, onReset, persistKey, fi
         )}
       </div>
 
-      {isLast && (finishCta || true) && (
+      {!dailyLayout && isLast && (finishCta || true) && (
         <div className="mt-2 flex flex-col gap-2 px-4">
           {finishCta && (
             <button

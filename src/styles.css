@@ -440,7 +440,7 @@ html[data-section="evening"] .app-shell { background: linear-gradient(180deg, #1
 }
 
 .adhkar-header .header-icon-button {
-  top: calc(env(safe-area-inset-top) + 103px);
+  top: calc(env(safe-area-inset-top) + 98px);
   right: 24px;
   width: 36px;
   height: 36px;
@@ -459,7 +459,7 @@ html[data-section="evening"] .app-shell { background: linear-gradient(180deg, #1
   gap: 14px;
   grid-template-columns: 210px auto;
   width: max-content;
-  margin: 30px auto 0;
+  margin: 30px 0 0 18px;
 }
 
 .adhkar-progress-track {
@@ -540,8 +540,12 @@ html[data-section="evening"] .adhkar-card-heading h3 { color: #cfc8e8 !important
 .adhkar-reference-content::-webkit-scrollbar { display: none; }
 
 .adhkar-arabic {
-  width: 100%;
-  margin: 0 auto 16px;
+  width: calc(100% + 32px);
+  max-width: none;
+  margin-left: -16px;
+  margin-top: 0;
+  margin-right: auto;
+  margin-bottom: 16px;
   color: var(--card-foreground);
   font-family: var(--font-arabic);
   font-size: 26px !important;
