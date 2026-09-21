@@ -19,6 +19,7 @@ type Props = {
 export function DhikrCard({ dhikr, count, onIncrement, isSpecial, specialLabel, isPersonalDua, referenceLayout = false }: Props) {
   const [tapped, setTapped] = useState(false);
   const [bursts, setBursts] = useState<number[]>([]);
+  const [justCompleted, setJustCompleted] = useState(false);
   const [display, setDisplay] = useState(getDisplay());
   const [showBottomFade, setShowBottomFade] = useState(true);
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -46,13 +47,12 @@ export function DhikrCard({ dhikr, count, onIncrement, isSpecial, specialLabel, 
   const handleTap = () => {
     if (complete) return;
     const willComplete = count + 1 >= dhikr.target;
-    triggerHaptic(willComplete ? "double" : "heavy");
+    triggerHaptic(willComplete ? "medium" : "heavy");
     setTapped(true);
     setTimeout(() => setTapped(false), 260);
     if (willComplete) {
-      const id = Date.now();
-      setBursts((b) => [...b, id]);
-      setTimeout(() => setBursts((b) => b.filter((x) => x !== id)), 900);
+      setJustCompleted(true);
+      setTimeout(() => setJustCompleted(false), 500);
     }
     onIncrement();
   };
@@ -194,7 +194,7 @@ export function DhikrCard({ dhikr, count, onIncrement, isSpecial, specialLabel, 
             {complete ? "✓ Done" : "Done"}
           </button>
         ) : (
-           <RepeatCounter count={count} target={dhikr.target} complete={complete} tapped={tapped} bursts={bursts} onClick={handleTap} size={referenceLayout ? 84 : 88} />
+           <RepeatCounter count={count} target={dhikr.target} complete={complete} tapped={tapped && !justCompleted} bursts={bursts} justCompleted={justCompleted} onClick={handleTap} size={referenceLayout ? 84 : 88} />
         )}
       </div>
     </div>

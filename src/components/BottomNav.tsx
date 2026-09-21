@@ -1,19 +1,19 @@
 import { Link, useRouterState } from "@tanstack/react-router";
 import { Sun, Moon, MoreHorizontal } from "lucide-react";
 
-function SalahIcon({ size = 22, strokeWidth = 1.8 }: { size?: number; strokeWidth?: number }) {
+function SalahIcon({ size = 22, strokeWidth = 1.5 }: { size?: number; strokeWidth?: number }) {
   return (
     <svg aria-hidden viewBox="0 0 24 24" width={size} height={size} fill="none" stroke="currentColor" strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round">
-      <path d="M3 20.5h18M5 20.5v-9.2h3v9.2M16 20.5v-9.2h3v9.2M4.3 8.8h4.4M15.3 8.8h4.4M5.7 8.8V6.2M18.3 8.8V6.2" />
-      <path d="M8 20.5v-7.2c0-2.6 1.8-4.9 4-5.8 2.2.9 4 3.2 4 5.8v7.2M10.2 20.5v-4.1a1.8 1.8 0 0 1 3.6 0v4.1M12 7.5V3.3M12 3.3c1.1.2 1.8.8 2.2 1.6-1 .3-1.8.1-2.2-.5" />
+      <path d="M3 21h18M5 21V10h3v11M16 21V10h3v11M4 10h5M15 10h5M6.5 10V7M17.5 10V7" />
+      <path d="M8 21v-7.5A4.7 4.7 0 0 1 12 8a4.7 4.7 0 0 1 4 5.5V21M10.5 21v-4a1.5 1.5 0 0 1 3 0v4M12 8V3M12 3c1.2.2 2 .8 2.5 1.7-1.1.3-2 .1-2.5-.6" />
     </svg>
   );
 }
 
-function TasbihIcon({ size = 22, strokeWidth = 1.8 }: { size?: number; strokeWidth?: number }) {
+function TasbihIcon({ size = 22, strokeWidth = 1.5 }: { size?: number; strokeWidth?: number }) {
   return (
     <svg aria-hidden viewBox="0 0 24 24" width={size} height={size} fill="none" stroke="currentColor" strokeWidth={strokeWidth} strokeLinecap="round">
-      <circle cx="12" cy="3" r="1.25" /><circle cx="17" cy="4.8" r="1.25" /><circle cx="20.2" cy="9" r="1.25" /><circle cx="20" cy="14.3" r="1.25" /><circle cx="16.6" cy="18.2" r="1.25" /><circle cx="11.5" cy="19.4" r="1.25" /><circle cx="6.8" cy="17.2" r="1.25" /><circle cx="4" cy="12.7" r="1.25" /><circle cx="4.7" cy="7.4" r="1.25" /><circle cx="8.2" cy="4" r="1.25" /><path d="M11.5 20.7v1.6M9.7 23h3.6" />
+      <circle cx="12" cy="3" r="1.15" /><circle cx="17" cy="4.8" r="1.15" /><circle cx="20.2" cy="9" r="1.15" /><circle cx="20" cy="14.3" r="1.15" /><circle cx="16.6" cy="18.2" r="1.15" /><circle cx="11.5" cy="19.4" r="1.15" /><circle cx="6.8" cy="17.2" r="1.15" /><circle cx="4" cy="12.7" r="1.15" /><circle cx="4.7" cy="7.4" r="1.15" /><circle cx="8.2" cy="4" r="1.15" /><path d="M11.5 20.55v1.65M9.8 23h3.4" />
     </svg>
   );
 }

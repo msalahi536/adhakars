@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { BedDouble, Compass, BookPlus, ChevronRight, HandHeart } from "lucide-react";
-import { SettingsButton } from "@/components/SettingsButton";
 import {
   getConsistency,
   getLifetime,
@@ -78,7 +77,6 @@ function More() {
         className="page-header relative overflow-hidden"
         style={{ background: "var(--grad-header)", color: "var(--header-fg)" }}
       >
-        <SettingsButton />
         <div className="relative mx-auto max-w-md px-16 pb-6 pt-9 text-center">
           <div className="label-caps" style={{ color: "var(--header-sub)", opacity: 1 }}>More</div>
           <h1 className="app-page-title mt-2">Tools</h1>

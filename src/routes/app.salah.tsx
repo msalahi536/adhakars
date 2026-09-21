@@ -1,7 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { Bell, BellOff, ChevronDown, ChevronRight, MapPin, Play } from "lucide-react";
-import { SettingsButton } from "@/components/SettingsButton";
 import { PrayerTimeline } from "@/components/prayer/PrayerTimeline";
 import { AfterSalahSheet } from "@/components/prayer/AfterSalahSheet";
 import { PrayerPicker } from "@/components/prayer/PrayerPicker";
@@ -295,7 +294,6 @@ function Salah() {
 
   return (
     <div className="salah-page">
-      <SettingsButton />
       <header className="salah-hero">
         <div className="salah-next-label">
           {!settings.location
