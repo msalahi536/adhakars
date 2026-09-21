@@ -34,9 +34,7 @@ const readPersistedIdx = (key?: string): number => {
 
 export function SwipeStack({ items, counts, onIncrement, onReset, persistKey, finishCta, onFinishNav, onEditItem, onDeleteItem, dailyLayout = false }: Props) {
   const navigate = useNavigate();
-  const [idx, setIdxState] = useState(() =>
-    Math.min(readPersistedIdx(persistKey), Math.max(0, items.length - 1)),
-  );
+  const [idx, setIdxState] = useState(0);
   const setIdx = (updater: number | ((i: number) => number)) => {
     setIdxState((prev) => {
       const next = typeof updater === "function" ? (updater as (i: number) => number)(prev) : updater;
@@ -72,7 +70,7 @@ export function SwipeStack({ items, counts, onIncrement, onReset, persistKey, fi
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [items.length]);
 
-  const animateTo = (dir: "next" | "prev") => {
+  const animateTo = (dir: "next" | "prev", destination?: number) => {
     if (animating.current) return;
     if (dir === "next" && idx >= items.length - 1) return;
     if (dir === "prev" && idx <= 0) return;
@@ -81,7 +79,7 @@ export function SwipeStack({ items, counts, onIncrement, onReset, persistKey, fi
     setDragOffset(0);
 
     setTimeout(() => {
-      setIdx((i) => i + (dir === "next" ? 1 : -1));
+      setIdx((i) => destination ?? i + (dir === "next" ? 1 : -1));
       setPhase(dir === "next" ? "in-right" : "in-left");
       setEnter(false);
       requestAnimationFrame(() => {
@@ -100,7 +98,7 @@ export function SwipeStack({ items, counts, onIncrement, onReset, persistKey, fi
   const goPrev = () => animateTo("prev");
   const goTo = (i: number) => {
     if (animating.current || i === idx) return;
-    animateTo(i > idx ? "next" : "prev");
+    animateTo(i > idx ? "next" : "prev", i);
   };
 
   const current = items[idx];
@@ -287,7 +285,7 @@ export function SwipeStack({ items, counts, onIncrement, onReset, persistKey, fi
       >
         {current && (
           <div
-            className={dailyLayout ? "w-full" : "h-full w-full"}
+            className={dailyLayout ? "adhkar-card-motion w-full" : "h-full w-full"}
             style={{ transform, opacity, transition, willChange: "transform, opacity" }}
           >
             {current.dhikr ? (
@@ -341,7 +339,13 @@ export function SwipeStack({ items, counts, onIncrement, onReset, persistKey, fi
 
 
       {dailyLayout ? (
-        <Pagination total={items.length} active={idx} onSelect={goTo} />
+        <Pagination
+          total={items.length}
+          active={idx}
+          onSelect={goTo}
+          onPrevious={goPrev}
+          onNext={goNext}
+        />
       ) : <div className="mt-2 flex items-center justify-center px-6">
         <button
           onClick={goPrev}

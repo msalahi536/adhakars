@@ -60,8 +60,12 @@ export function DhikrCard({ dhikr, count, onIncrement, isSpecial, specialLabel, 
   const totalArabicLen = dhikr.arabicMulti
     ? dhikr.arabicMulti.reduce((s, p) => s + p.arabic.length, 0)
     : dhikr.arabic.length;
-  const baseArabic = display.arabicLarge ? 28 : 25;
-  const arabicSize = totalArabicLen > 200 ? (display.arabicLarge ? 24 : 21) : baseArabic;
+  const baseArabic = display.arabicLarge ? 32 : 29;
+  const arabicSize = totalArabicLen > 300
+    ? (display.arabicLarge ? 24 : 22)
+    : totalArabicLen > 180
+      ? (display.arabicLarge ? 27 : 24)
+      : baseArabic;
 
   const hasTranslation = !!(dhikr.translation || dhikr.arabicMulti);
   const hasCommentary = !!dhikr.commentary;
@@ -94,8 +98,8 @@ export function DhikrCard({ dhikr, count, onIncrement, isSpecial, specialLabel, 
       {/* Scrollable content area */}
       <div className={`relative min-h-0 flex-1 ${referenceLayout ? "adhkar-reference-body" : ""}`}>
         <div
-          ref={scrollRef}
-          onScroll={handleScroll}
+          ref={dhikr.arabicMulti ? scrollRef : undefined}
+          onScroll={dhikr.arabicMulti ? handleScroll : undefined}
           data-no-swipe
           className={`hide-scrollbar px-7 pb-4 pt-5 ${referenceLayout ? "adhkar-reference-content" : "h-full overflow-y-auto"}`}
           style={{ scrollbarWidth: "none", WebkitOverflowScrolling: "touch" }}
@@ -125,7 +129,14 @@ export function DhikrCard({ dhikr, count, onIncrement, isSpecial, specialLabel, 
           ) : (
             <>
               {dhikr.arabic && (
-                <ArabicText size={arabicSize}>{dhikr.arabic}</ArabicText>
+                <div
+                  ref={scrollRef}
+                  onScroll={handleScroll}
+                  data-no-swipe
+                  className="adhkar-arabic-scroll hide-scrollbar"
+                >
+                  <ArabicText size={arabicSize}>{dhikr.arabic}</ArabicText>
+                </div>
               )}
               {dhikr.arabic && dhikr.transliteration && <OrnamentalDivider />}
               {display.showTransliteration && dhikr.transliteration && (

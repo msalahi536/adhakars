@@ -1,4 +1,4 @@
-import { BookOpen } from "lucide-react";
+import { BookOpen, ChevronLeft, ChevronRight } from "lucide-react";
 import { ProgressRing } from "./ProgressRing";
 
 export function IslamicOrnament({ size = 24, className = "" }: { size?: number; className?: string }) {
@@ -85,22 +85,47 @@ export function Pagination({
   total,
   active,
   onSelect,
+  onPrevious,
+  onNext,
 }: {
   total: number;
   active: number;
   onSelect: (index: number) => void;
+  onPrevious?: () => void;
+  onNext?: () => void;
 }) {
   return (
-    <div className="adhkar-pagination">
-      {Array.from({ length: total }, (_, index) => (
-        <button
-          key={index}
-          onClick={() => onSelect(index)}
-          className={index === active ? "is-active" : ""}
-          aria-label={`go to ${index + 1}`}
-        />
-      ))}
-      <IslamicOrnament size={19} />
+    <div className="adhkar-pagination-row">
+      <button
+        type="button"
+        onClick={onPrevious}
+        disabled={active === 0}
+        className="adhkar-pagination-arrow"
+        aria-label="previous adhkar"
+      >
+        <ChevronLeft size={17} strokeWidth={1.7} />
+      </button>
+      <div className="adhkar-pagination">
+        {Array.from({ length: total }, (_, index) => (
+          <button
+            key={index}
+            type="button"
+            onClick={() => onSelect(index)}
+            className={index === active ? "is-active" : ""}
+            aria-label={`go to ${index + 1}`}
+          />
+        ))}
+        <IslamicOrnament size={18} />
+      </div>
+      <button
+        type="button"
+        onClick={onNext}
+        disabled={active === total - 1}
+        className="adhkar-pagination-arrow"
+        aria-label="next adhkar"
+      >
+        <ChevronRight size={17} strokeWidth={1.7} />
+      </button>
     </div>
   );
 }
