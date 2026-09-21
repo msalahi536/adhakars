@@ -45,7 +45,7 @@ export function ListenButton({ size = 32 }: Props) {
           color: "var(--index-badge-fg, var(--accent-foreground))",
         }}
       >
-        <Volume2 size={iconSize} strokeWidth={2.4} />
+        <Volume2 size={iconSize} strokeWidth={1.8} />
       </button>
 
       {open && (
