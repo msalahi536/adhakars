@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import type { Dhikr } from "@/data/adhkar";
 import { ProgressRing } from "./ProgressRing";
 import { ListenButton } from "./ListenButton";
+import { ArabicText, IslamicOrnament, OrnamentalDivider, RepeatCounter, SourceBadge, Transliteration } from "./AdhkarPrimitives";
 import { getDisplay, triggerHaptic } from "@/lib/theme";
 
 type Props = {
@@ -59,8 +60,8 @@ export function DhikrCard({ dhikr, count, onIncrement, isSpecial, specialLabel, 
   const totalArabicLen = dhikr.arabicMulti
     ? dhikr.arabicMulti.reduce((s, p) => s + p.arabic.length, 0)
     : dhikr.arabic.length;
-  const baseArabic = display.arabicLarge ? 34 : 30;
-  const arabicSize = totalArabicLen > 200 ? (display.arabicLarge ? 26 : 22) : baseArabic;
+  const baseArabic = display.arabicLarge ? 28 : 25;
+  const arabicSize = totalArabicLen > 200 ? (display.arabicLarge ? 24 : 21) : baseArabic;
 
   const hasTranslation = !!(dhikr.translation || dhikr.arabicMulti);
   const hasCommentary = !!dhikr.commentary;
@@ -70,14 +71,15 @@ export function DhikrCard({ dhikr, count, onIncrement, isSpecial, specialLabel, 
       className="dhikr-card relative flex h-full w-full flex-col overflow-hidden"
       style={{ background: "var(--card)", color: "var(--card-foreground)", border: "1px solid var(--border)", boxShadow: "var(--card-shadow, 0 4px 16px rgba(0,0,0,0.08))" }}
     >
-      <div className="flex items-center gap-4 px-6 pt-6">
-        <ListenButton dhikrId={dhikr.id} size={40} />
+      <div className="adhkar-card-heading grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-4">
+        <ListenButton dhikrId={dhikr.id} size={50} />
         <h3
-          className="flex-1 text-[13px] font-semibold uppercase"
+          className="min-w-0 text-[12px] font-semibold uppercase"
           style={{ letterSpacing: "0.16em", color: "var(--accent)", opacity: 1 }}
         >
           {dhikr.title}
         </h3>
+        <IslamicOrnament size={30} className="adhkar-card-ornament shrink-0" />
       </div>
 
       {isSpecial && specialLabel && (
@@ -103,12 +105,7 @@ export function DhikrCard({ dhikr, count, onIncrement, isSpecial, specialLabel, 
               {dhikr.arabicMulti.map((part) => (
                 <div key={part.label}>
                   <div className="label-caps mb-1.5 text-center">{part.label}</div>
-                  <p
-                    className="arabic font-bold"
-                    style={{ fontSize: arabicSize, lineHeight: 1.75, color: "var(--card-foreground)" }}
-                  >
-                    {part.arabic}
-                  </p>
+                    <ArabicText size={arabicSize}>{part.arabic}</ArabicText>
                   {display.showTransliteration && part.transliteration && (
                     <p
                       className="mt-4 text-center italic"
@@ -128,20 +125,11 @@ export function DhikrCard({ dhikr, count, onIncrement, isSpecial, specialLabel, 
           ) : (
             <>
               {dhikr.arabic && (
-                <p
-                  className="arabic font-bold"
-                  style={{ fontSize: arabicSize, lineHeight: 1.8, color: "var(--card-foreground)" }}
-                >
-                  {dhikr.arabic}
-                </p>
+                <ArabicText size={arabicSize}>{dhikr.arabic}</ArabicText>
               )}
+              {dhikr.arabic && dhikr.transliteration && <OrnamentalDivider />}
               {display.showTransliteration && dhikr.transliteration && (
-                <p
-                  className="mt-5 text-center italic"
-                  style={{ fontSize: 14, color: "var(--translit)", lineHeight: 1.75 }}
-                >
-                  {dhikr.transliteration}
-                </p>
+                <Transliteration>{dhikr.transliteration}</Transliteration>
               )}
             </>
           )}
@@ -189,17 +177,9 @@ export function DhikrCard({ dhikr, count, onIncrement, isSpecial, specialLabel, 
       </div>
 
       {/* Sticky footer */}
-      <div className="flex items-end justify-between gap-3 px-6 pb-6 pt-3">
+      <div className="adhkar-card-footer flex items-end justify-between gap-3">
         <div className="flex flex-col gap-1.5">
-          <span
-            className="self-start rounded-full px-4 py-2 text-[11px] font-semibold"
-            style={{
-              background: "var(--source-bg, color-mix(in oklab, var(--card-foreground) 12%, transparent))",
-              color: "var(--source-fg, var(--card-foreground))",
-            }}
-          >
-            {dhikr.source}
-          </span>
+          <SourceBadge source={dhikr.source} />
           <div className="text-[12px] opacity-70">
             Target: <span className="font-semibold opacity-100">{dhikr.target}x</span>
           </div>
@@ -220,32 +200,7 @@ export function DhikrCard({ dhikr, count, onIncrement, isSpecial, specialLabel, 
             {complete ? "✓ Done" : "Done"}
           </button>
         ) : (
-          <button
-            onClick={handleTap}
-            disabled={complete}
-            className={`relative flex h-[96px] w-[96px] shrink-0 items-center justify-center rounded-full ${tapped ? "tap-pulse" : ""}`}
-            style={{ touchAction: "manipulation" }}
-            aria-label="increment counter"
-          >
-            <ProgressRing value={count} max={dhikr.target} size={96} stroke={8} complete={complete} />
-            <div className="absolute inset-0 flex flex-col items-center justify-center">
-              {complete ? (
-                <span className="text-3xl" style={{ color: "var(--accent)" }}>✓</span>
-              ) : (
-                <>
-                  <span className="text-3xl font-bold leading-none" style={{ color: "var(--count-fg, var(--card-foreground))" }}>{count}</span>
-                  <span className="mt-1 text-[10px] opacity-70">/ {dhikr.target}</span>
-                </>
-              )}
-            </div>
-            {bursts.map((b) => (
-              <span
-                key={b}
-                className="radial-pulse pointer-events-none absolute inset-0 rounded-full"
-                style={{ background: "color-mix(in oklab, var(--accent) 50%, transparent)" }}
-              />
-            ))}
-          </button>
+          <RepeatCounter count={count} target={dhikr.target} complete={complete} tapped={tapped} bursts={bursts} onClick={handleTap} />
         )}
       </div>
     </div>

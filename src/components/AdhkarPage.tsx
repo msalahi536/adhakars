@@ -61,14 +61,15 @@ export function AdhkarPage({
 
   return (
     <>
-      {dailyLayout ? (
-        <AdhkarHeader title={title} subtitle={subtitle} completed={completed} total={items.length} action={headerAction} />
-      ) : (
-        <header className="page-header relative overflow-hidden" style={headerStyle}>
-          {headerPattern}
-          <AdhkarHeader title={title} subtitle={subtitle} completed={completed} total={items.length} action={headerAction} />
-        </header>
-      )}
+      <AdhkarHeader
+        title={title}
+        subtitle={subtitle}
+        completed={completed}
+        total={items.length}
+        action={headerAction}
+        style={headerStyle}
+        pattern={headerPattern}
+      />
 
       <main className={`scroll-area flex flex-col ${dailyLayout ? "daily-adhkar-page" : ""}`}>
         <div className="mx-auto flex min-h-0 w-full max-w-md flex-1 flex-col">
