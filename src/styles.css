@@ -256,6 +256,8 @@
   }
   .daily-adhkar-page.scroll-area {
     overflow: hidden;
+  margin-bottom: calc(82px + env(safe-area-inset-bottom));
+  padding-bottom: 0;
   }
   .scroll-area::-webkit-scrollbar { display: none; }
   .bottom-nav {
@@ -490,7 +492,7 @@ html[data-preset="original"][data-section="evening"] {
 }
 
 .adhkar-reference-body {
-  max-height: clamp(170px, calc(100dvh - 510px), 380px);
+  max-height: clamp(188px, calc(100dvh - 482px), 402px);
   min-height: 0;
   overflow: hidden;
 }
@@ -569,7 +571,7 @@ html[data-preset="original"][data-section="evening"] {
 }
 
 .adhkar-transliteration {
-  max-width: 88%;
+  max-width: 94%;
   margin: 0 auto;
   color: var(--translit);
   font-size: 14px;
