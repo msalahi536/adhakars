@@ -342,47 +342,47 @@
 }
 
 html[data-preset="original"][data-section="morning"] {
-  --background: #f7f6ee;
-  --foreground: #263721;
-  --card: rgba(251, 250, 245, 0.92);
-  --card-foreground: #263721;
-  --surface: #fbfaf5;
-  --surface-card: #fbfaf5;
-  --accent: #49683e;
-  --primary: #49683e;
-  --nav-active: #49683e;
-  --dot-active: #49683e;
-  --translit: #637d58;
-  --source-fg: #49683e;
-  --source-bg: rgba(125, 149, 108, 0.15);
-  --border: rgba(73, 104, 62, 0.11);
-  --nav-bg: rgba(251, 250, 245, 0.88);
-  --nav-inactive: #788176;
-  --dot-inactive: rgba(73, 104, 62, 0.2);
-  --ring-track: rgba(73, 104, 62, 0.13);
-  --count-fg: #263721;
+  --background: #f7f6ee !important;
+  --foreground: #263721 !important;
+  --card: rgba(251, 250, 245, 0.92) !important;
+  --card-foreground: #263721 !important;
+  --surface: #fbfaf5 !important;
+  --surface-card: #fbfaf5 !important;
+  --accent: #49683e !important;
+  --primary: #49683e !important;
+  --nav-active: #49683e !important;
+  --dot-active: #49683e !important;
+  --translit: #637d58 !important;
+  --source-fg: #49683e !important;
+  --source-bg: rgba(125, 149, 108, 0.15) !important;
+  --border: rgba(73, 104, 62, 0.11) !important;
+  --nav-bg: rgba(251, 250, 245, 0.88) !important;
+  --nav-inactive: #788176 !important;
+  --dot-inactive: rgba(73, 104, 62, 0.2) !important;
+  --ring-track: rgba(73, 104, 62, 0.13) !important;
+  --count-fg: #263721 !important;
 }
 
 html[data-preset="original"][data-section="evening"] {
-  --background: #10172f;
-  --foreground: #eeeaf7;
-  --card: rgba(24, 31, 59, 0.9);
-  --card-foreground: #f3eff8;
-  --surface: #202746;
-  --surface-card: #202746;
-  --accent: #aaa8cc;
-  --primary: #aaa8cc;
-  --nav-active: #c1bfdf;
-  --dot-active: #aaa8cc;
-  --translit: #c0bdd8;
-  --source-fg: #d0cde5;
-  --source-bg: rgba(170, 168, 204, 0.13);
-  --border: rgba(221, 217, 240, 0.13);
-  --nav-bg: rgba(18, 24, 48, 0.9);
-  --nav-inactive: #aaaabd;
-  --dot-inactive: rgba(207, 204, 228, 0.22);
-  --ring-track: rgba(207, 204, 228, 0.16);
-  --count-fg: #f3eff8;
+  --background: #10172f !important;
+  --foreground: #eeeaf7 !important;
+  --card: rgba(24, 31, 59, 0.9) !important;
+  --card-foreground: #f3eff8 !important;
+  --surface: #202746 !important;
+  --surface-card: #202746 !important;
+  --accent: #aaa8cc !important;
+  --primary: #aaa8cc !important;
+  --nav-active: #c1bfdf !important;
+  --dot-active: #aaa8cc !important;
+  --translit: #c0bdd8 !important;
+  --source-fg: #d0cde5 !important;
+  --source-bg: rgba(170, 168, 204, 0.13) !important;
+  --border: rgba(221, 217, 240, 0.13) !important;
+  --nav-bg: rgba(18, 24, 48, 0.9) !important;
+  --nav-inactive: #aaaabd !important;
+  --dot-inactive: rgba(207, 204, 228, 0.22) !important;
+  --ring-track: rgba(207, 204, 228, 0.16) !important;
+  --count-fg: #f3eff8 !important;
 }
 
 .adhkar-header-content {
@@ -561,6 +561,14 @@ html[data-preset="original"][data-section="evening"] {
   gap: 8px;
   padding: 10px 24px 12px;
   color: var(--accent);
+}
+
+html[data-section="evening"] .dhikr-card {
+  box-shadow: 0 16px 42px rgba(4, 8, 24, 0.2) !important;
+}
+
+html[data-section="evening"] .app-shell::after {
+  background: rgba(12, 17, 39, 0.08);
 }
 
 .adhkar-pagination button {
