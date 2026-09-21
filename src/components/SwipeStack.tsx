@@ -238,10 +238,10 @@ export function SwipeStack({ items, counts, onIncrement, onReset, persistKey, fi
 
   return (
     <div className="flex flex-1 flex-col overflow-hidden">
-      <div className="mb-2 flex items-center justify-center gap-2 px-4">
+      <div className="mb-1 flex min-h-9 items-center justify-center gap-2 px-4">
         <span
-          className="rounded-[12px] px-3 py-1 text-xs font-semibold"
-          style={{ background: "var(--surface)" }}
+          className="rounded-full px-4 py-1.5 text-sm font-medium tabular-nums"
+          style={{ background: "color-mix(in oklab, var(--surface-card) 82%, transparent)", border: "1px solid var(--border)", boxShadow: "0 5px 18px color-mix(in oklab, var(--foreground) 7%, transparent)" }}
         >
           {idx + 1} / {items.length}
         </span>
@@ -281,7 +281,7 @@ export function SwipeStack({ items, counts, onIncrement, onReset, persistKey, fi
       <div
         ref={wrapperRef}
         className="relative min-h-0 flex-1 overflow-hidden"
-        style={{ touchAction: "pan-y", padding: "12px 16px" }}
+        style={{ touchAction: "pan-y", padding: "10px 18px 8px" }}
       >
         {current && (
           <div
@@ -337,11 +337,11 @@ export function SwipeStack({ items, counts, onIncrement, onReset, persistKey, fi
 
 
 
-      <div className="mt-3 flex items-center justify-between px-6">
+      <div className="mt-2 flex items-center justify-center px-6">
         <button
           onClick={goPrev}
           disabled={idx === 0}
-          className="flex h-11 w-11 items-center justify-center rounded-full transition-transform active:scale-95 disabled:opacity-30"
+          className="sr-only"
           style={{
             background: "var(--arrow-bg, var(--surface))",
             color: "var(--arrow-fg, var(--foreground))",
@@ -351,14 +351,14 @@ export function SwipeStack({ items, counts, onIncrement, onReset, persistKey, fi
         >
           <ChevronLeft size={20} />
         </button>
-        <div className="flex flex-wrap items-center justify-center gap-1.5">
+        <div className="flex max-w-[250px] flex-wrap items-center justify-center gap-2">
           {items.map((it, i) => (
             <button
               key={itemId(it) + i}
               onClick={() => goTo(i)}
-              className="h-1.5 rounded-full transition-all"
+               className="h-2 rounded-full transition-all"
               style={{
-                width: i === idx ? 20 : 6,
+                 width: i === idx ? 20 : 8,
                 background: i === idx
                   ? "var(--dot-active, var(--accent))"
                   : "var(--dot-inactive, color-mix(in oklab, var(--foreground) 22%, transparent))",
@@ -370,7 +370,7 @@ export function SwipeStack({ items, counts, onIncrement, onReset, persistKey, fi
         <button
           onClick={goNext}
           disabled={idx === items.length - 1}
-          className="flex h-11 w-11 items-center justify-center rounded-full transition-transform active:scale-95 disabled:opacity-30"
+          className="sr-only"
           style={{
             background: "var(--arrow-bg, var(--surface))",
             color: "var(--arrow-fg, var(--foreground))",

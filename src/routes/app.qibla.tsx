@@ -199,11 +199,11 @@ function Qibla() {
       >
         <HeaderBackButton />
         <HeaderSettingsButton />
-        <div className="mx-auto max-w-md px-5 pb-4 pt-5" style={{ paddingLeft: 60, paddingRight: 60 }}>
+        <div className="mx-auto max-w-md px-16 pb-6 pt-9 text-center">
           <div className="label-caps" style={{ color: "var(--header-sub)", opacity: 1 }}>
             Direction of Prayer
           </div>
-          <h1 className="mt-1 text-2xl font-bold tracking-tight">Qibla Finder</h1>
+          <h1 className="app-page-title mt-2">Qibla Finder</h1>
           <p className="mt-2 text-xs" style={{ color: "var(--header-sub)" }}>
             Point your phone flat. The arrow will point toward the Kaaba.
           </p>

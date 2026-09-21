@@ -67,14 +67,14 @@ export function DhikrCard({ dhikr, count, onIncrement, isSpecial, specialLabel, 
 
   return (
     <div
-      className="relative flex h-full w-full flex-col overflow-hidden rounded-[24px]"
+      className="dhikr-card relative flex h-full w-full flex-col overflow-hidden"
       style={{ background: "var(--card)", color: "var(--card-foreground)", border: "1px solid var(--border)", boxShadow: "var(--card-shadow, 0 4px 16px rgba(0,0,0,0.08))" }}
     >
-      <div className="flex items-center gap-3 px-5 pt-5">
-        <ListenButton dhikrId={dhikr.id} size={32} />
+      <div className="flex items-center gap-4 px-6 pt-6">
+        <ListenButton dhikrId={dhikr.id} size={40} />
         <h3
-          className="flex-1 text-[12px] font-semibold uppercase"
-          style={{ letterSpacing: "0.12em", color: "var(--card-foreground)", opacity: 0.85 }}
+          className="flex-1 text-[13px] font-semibold uppercase"
+          style={{ letterSpacing: "0.16em", color: "var(--accent)", opacity: 1 }}
         >
           {dhikr.title}
         </h3>
@@ -95,7 +95,7 @@ export function DhikrCard({ dhikr, count, onIncrement, isSpecial, specialLabel, 
           ref={scrollRef}
           onScroll={handleScroll}
           data-no-swipe
-          className="hide-scrollbar h-full overflow-y-auto px-5 pb-4 pt-3"
+          className="hide-scrollbar h-full overflow-y-auto px-7 pb-4 pt-5"
           style={{ scrollbarWidth: "none", WebkitOverflowScrolling: "touch" }}
         >
           {dhikr.arabicMulti ? (
@@ -111,8 +111,8 @@ export function DhikrCard({ dhikr, count, onIncrement, isSpecial, specialLabel, 
                   </p>
                   {display.showTransliteration && part.transliteration && (
                     <p
-                      className="mt-2 text-center italic"
-                      style={{ fontSize: 13, color: "var(--translit)", lineHeight: 1.55 }}
+                      className="mt-4 text-center italic"
+                      style={{ fontSize: 14, color: "var(--translit)", lineHeight: 1.75 }}
                     >
                       {part.transliteration}
                     </p>
@@ -137,8 +137,8 @@ export function DhikrCard({ dhikr, count, onIncrement, isSpecial, specialLabel, 
               )}
               {display.showTransliteration && dhikr.transliteration && (
                 <p
-                  className="mt-3 text-center italic"
-                  style={{ fontSize: 13, color: "var(--translit)", lineHeight: 1.55 }}
+                  className="mt-5 text-center italic"
+                  style={{ fontSize: 14, color: "var(--translit)", lineHeight: 1.75 }}
                 >
                   {dhikr.transliteration}
                 </p>
@@ -189,10 +189,10 @@ export function DhikrCard({ dhikr, count, onIncrement, isSpecial, specialLabel, 
       </div>
 
       {/* Sticky footer */}
-      <div className="flex items-end justify-between gap-3 px-5 pb-5 pt-2">
+      <div className="flex items-end justify-between gap-3 px-6 pb-6 pt-3">
         <div className="flex flex-col gap-1.5">
           <span
-            className="self-start rounded-full px-2.5 py-1 text-[11px] font-semibold"
+            className="self-start rounded-full px-4 py-2 text-[11px] font-semibold"
             style={{
               background: "var(--source-bg, color-mix(in oklab, var(--card-foreground) 12%, transparent))",
               color: "var(--source-fg, var(--card-foreground))",
@@ -201,7 +201,7 @@ export function DhikrCard({ dhikr, count, onIncrement, isSpecial, specialLabel, 
             {dhikr.source}
           </span>
           <div className="text-[12px] opacity-70">
-            Target · <span className="font-semibold opacity-100">{dhikr.target}×</span>
+            Target: <span className="font-semibold opacity-100">{dhikr.target}x</span>
           </div>
         </div>
 
@@ -223,11 +223,11 @@ export function DhikrCard({ dhikr, count, onIncrement, isSpecial, specialLabel, 
           <button
             onClick={handleTap}
             disabled={complete}
-            className={`relative flex h-[104px] w-[104px] shrink-0 items-center justify-center rounded-full ${tapped ? "tap-pulse" : ""}`}
+            className={`relative flex h-[96px] w-[96px] shrink-0 items-center justify-center rounded-full ${tapped ? "tap-pulse" : ""}`}
             style={{ touchAction: "manipulation" }}
             aria-label="increment counter"
           >
-            <ProgressRing value={count} max={dhikr.target} size={104} stroke={9} complete={complete} />
+            <ProgressRing value={count} max={dhikr.target} size={96} stroke={8} complete={complete} />
             <div className="absolute inset-0 flex flex-col items-center justify-center">
               {complete ? (
                 <span className="text-3xl" style={{ color: "var(--accent)" }}>✓</span>

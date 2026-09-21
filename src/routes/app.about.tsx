@@ -1,7 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { HeaderBackButton } from "@/components/HeaderBackButton";
 import { HeaderSettingsButton } from "@/components/HeaderSettingsButton";
-import { ConcentricCirclesPattern } from "@/components/HeaderPatterns";
 import { Mail } from "lucide-react";
 import { BenefitsList } from "@/components/BenefitsList";
 
@@ -26,24 +25,23 @@ function About() {
         className="page-header relative overflow-hidden"
         style={{ background: "var(--grad-header)", color: "var(--header-fg)" }}
       >
-        <ConcentricCirclesPattern />
         <HeaderBackButton />
         <HeaderSettingsButton />
         <div
-          className="relative mx-auto max-w-md px-4 pb-5 pt-4"
+          className="relative mx-auto max-w-md px-16 pb-6 pt-9 text-center"
           style={{ paddingLeft: 60, paddingRight: 60 }}
         >
           <div className="label-caps" style={{ color: "var(--header-sub)", opacity: 1 }}>
             Information
           </div>
-          <h1 className="mt-1 text-3xl font-bold tracking-tight">About &amp; Support</h1>
+          <h1 className="app-page-title mt-2">About &amp; Support</h1>
         </div>
       </header>
 
       <main className="scroll-area">
         <div className="mx-auto max-w-md px-4 py-4 space-y-4">
           <section
-            className="rounded-[24px] p-5"
+            className="glass-card p-5"
             style={{ background: "var(--surface)", border: "1px solid var(--border)" }}
           >
             <h2 className="label-caps mb-2">About the project</h2>
@@ -62,7 +60,7 @@ function About() {
           </section>
 
           <section
-            className="rounded-[24px] p-5"
+            className="glass-card p-5"
             style={{ background: "var(--surface)", border: "1px solid var(--border)" }}
           >
             <h2 className="label-caps mb-3">How Adhkar benefits you</h2>
@@ -70,7 +68,7 @@ function About() {
           </section>
 
           <section
-            className="rounded-[24px] p-5"
+            className="glass-card p-5"
             style={{ background: "var(--surface)", border: "1px solid var(--border)" }}
           >
             <h2 className="label-caps mb-2">Support this project</h2>
@@ -82,7 +80,7 @@ function About() {
           </section>
 
           <section
-            className="rounded-[24px] p-5"
+            className="glass-card p-5"
             style={{ background: "var(--surface)", border: "1px solid var(--border)" }}
           >
             <h2 className="label-caps mb-2">Contact &amp; feedback</h2>

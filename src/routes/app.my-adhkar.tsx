@@ -2,7 +2,6 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { Plus } from "lucide-react";
 import { AdhkarPage } from "@/components/AdhkarPage";
-import { GirihStarPattern } from "@/components/HeaderPatterns";
 import {
   CustomAdhkarForm,
   type CustomAdhkarFormValues,
@@ -156,13 +155,13 @@ function MyAdhkar() {
       type="button"
       onClick={openAdd}
       aria-label="Add adhkar"
-      className="flex items-center justify-center rounded-full transition-transform active:scale-90"
+        className="header-icon-button flex items-center justify-center transition-transform active:scale-90"
       style={{
-        width: 36,
-        height: 36,
+        width: 44,
+        height: 44,
         color: "currentColor",
-        background: "color-mix(in oklab, currentColor 14%, transparent)",
-        border: "none",
+        background: "color-mix(in oklab, var(--surface-card) 72%, transparent)",
+        border: "1px solid color-mix(in oklab, currentColor 12%, transparent)",
       }}
     >
       <Plus size={20} />
@@ -172,7 +171,7 @@ function MyAdhkar() {
   const emptyState = (
     <div className="mx-auto flex w-full max-w-md flex-col items-center px-6 py-10 text-center">
       <div
-        className="rounded-[24px] p-6"
+        className="glass-card p-6"
         style={{
           background: "var(--surface, var(--card))",
           border: "1px solid var(--border)",
@@ -208,7 +207,7 @@ function MyAdhkar() {
         title="My Adhkar"
         subtitle="Your personal collection"
         items={items}
-        headerPattern={<GirihStarPattern />}
+        headerPattern={null}
         headerAction={headerAction}
         emptyState={emptyState}
         onEditItem={openEdit}

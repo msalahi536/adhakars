@@ -3,7 +3,6 @@ import { createFileRoute } from "@tanstack/react-router";
 import { RotateCcw, Undo2 } from "lucide-react";
 import { ProgressRing } from "@/components/ProgressRing";
 import { HeaderSettingsButton } from "@/components/HeaderSettingsButton";
-import { MuqarnasPattern } from "@/components/HeaderPatterns";
 import { triggerHaptic } from "@/lib/theme";
 import { bumpLifetime } from "@/lib/storage";
 
@@ -92,19 +91,8 @@ function Tasbih() {
         className="page-header relative overflow-hidden"
         style={{ background: "var(--grad-header)", color: "var(--header-fg)" }}
       >
-        {/* Soft radial glow (kept for depth) */}
-        <div
-          aria-hidden
-          className="pointer-events-none absolute inset-0"
-          style={{
-            background:
-              "radial-gradient(120% 80% at 100% 0%, color-mix(in oklab, var(--header-fg) 12%, transparent) 0%, transparent 55%)",
-            opacity: 0.5,
-          }}
-        />
-        <MuqarnasPattern />
         <HeaderSettingsButton />
-        <div className="relative mx-auto max-w-md px-5 pb-5 pt-6 text-center">
+        <div className="relative mx-auto max-w-md px-7 pb-5 pt-9 text-center">
           <div
             className="label-caps"
             style={{ color: "var(--header-sub)", opacity: 1, letterSpacing: "0.2em" }}
@@ -112,8 +100,7 @@ function Tasbih() {
             Dhikr Counter
           </div>
           <h1
-            className="mt-1.5 font-bold tracking-tight"
-            style={{ fontSize: 34, lineHeight: 1.1 }}
+            className="app-page-title mt-2"
           >
             Tasbih
           </h1>
@@ -163,7 +150,7 @@ function Tasbih() {
             onPointerUp={() => setPressed(false)}
             onPointerLeave={() => setPressed(false)}
             onPointerCancel={() => setPressed(false)}
-            className="relative flex w-full flex-1 flex-col items-center justify-center overflow-hidden rounded-[24px] outline-none"
+            className="dhikr-card relative flex w-full flex-1 flex-col items-center justify-center overflow-hidden outline-none"
             style={{
               background: "var(--card)",
               color: "var(--card-foreground)",

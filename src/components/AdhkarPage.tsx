@@ -75,7 +75,7 @@ export function AdhkarPage({
             {headerAction}
           </div>
         )}
-        <div className="relative mx-auto max-w-md px-5 pb-4 pt-5">
+        <div className="relative mx-auto max-w-md px-7 pb-5 pt-9 text-center">
 
 
           <div
@@ -88,10 +88,10 @@ export function AdhkarPage({
             {subtitle}
           </div>
 
-          <h1 className="mt-1 text-2xl font-bold tracking-tight">{title}</h1>
-          <div className="mt-3 flex items-center gap-3">
+          <h1 className="app-page-title mt-2">{title}</h1>
+          <div className="mx-auto mt-5 flex max-w-[300px] items-center gap-4">
             <div
-              className="h-1.5 flex-1 overflow-hidden rounded-full"
+                className="h-2 flex-1 overflow-hidden rounded-full"
               style={{
                 background:
                   "color-mix(in oklab, var(--header-fg, var(--accent-foreground)) 22%, transparent)",
@@ -105,7 +105,7 @@ export function AdhkarPage({
                 }}
               />
             </div>
-            <div className="text-xs font-bold">
+            <div className="min-w-[44px] text-sm font-medium tabular-nums">
               {completed} / {items.length}
             </div>
           </div>
@@ -113,7 +113,7 @@ export function AdhkarPage({
       </header>
 
       <main className="scroll-area flex flex-col">
-        <div className="mx-auto flex min-h-0 w-full max-w-md flex-1 flex-col pt-3">
+        <div className="mx-auto flex min-h-0 w-full max-w-md flex-1 flex-col pt-2">
           {items.length === 0 && emptyState ? (
             emptyState
           ) : (

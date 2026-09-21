@@ -2,7 +2,6 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { Bell, BellOff, ChevronDown, MapPin, Play } from "lucide-react";
 import { HeaderSettingsButton } from "@/components/HeaderSettingsButton";
-import { ConcentricCirclesPattern } from "@/components/HeaderPatterns";
 import { PrayerTimeline } from "@/components/prayer/PrayerTimeline";
 import { AfterSalahSheet } from "@/components/prayer/AfterSalahSheet";
 import { PrayerPicker } from "@/components/prayer/PrayerPicker";
@@ -300,7 +299,6 @@ function Salah() {
         className="page-header relative overflow-hidden"
         style={{ background: "var(--grad-header)", color: "var(--header-fg)" }}
       >
-        <ConcentricCirclesPattern />
         <HeaderSettingsButton />
         <div className="relative mx-auto max-w-md px-5 pb-6 pt-5">
           <div className="flex flex-col items-center pt-6 pb-1 text-center">
@@ -323,7 +321,7 @@ function Salah() {
                 lineHeight: 1.02,
                 letterSpacing: "-0.02em",
                 fontVariantNumeric: "tabular-nums",
-                textShadow: "0 10px 30px rgba(0,0,0,0.22)",
+                textShadow: "none",
                 color: urgencyColor ?? "inherit",
                 transition: "color 400ms ease",
                 opacity: settings.location ? 1 : 0.55,
@@ -364,11 +362,11 @@ function Salah() {
         </div>
       </header>
 
-      <main className="scroll-area flex flex-col" style={{ background: "var(--background)" }}>
+      <main className="scroll-area flex flex-col">
         <div className="mx-auto w-full max-w-md px-5 pb-8 pt-4">
           {!settings.location && (
             <div
-              className="mb-3 w-full overflow-hidden rounded-[30px] p-5"
+               className="dhikr-card mb-3 w-full overflow-hidden p-5"
               style={{
                 background: "var(--surface-card)",
                 border: "1px solid var(--border)",
@@ -427,7 +425,7 @@ function Salah() {
           {/* Recommended: entry into the after salah adhkar */}
 
           <div
-            className="w-full overflow-hidden rounded-[30px] p-5"
+            className="dhikr-card w-full overflow-hidden p-5"
             style={{
               background: "var(--surface-card)",
               border: "1px solid var(--border)",
@@ -526,7 +524,7 @@ function Salah() {
             </div>
           ) : (
             <div
-              className="mt-3 w-full overflow-hidden rounded-[30px] p-5"
+              className="dhikr-card mt-3 w-full overflow-hidden p-5"
               style={{
                 background: "var(--surface-deep, var(--surface-card))",
                 border: "1px solid var(--border)",
@@ -565,7 +563,7 @@ function Salah() {
 
           <button
             onClick={toggleMuteAll}
-            className="mt-3 flex w-full items-center gap-3 rounded-[24px] px-5 py-4 text-left active:scale-[0.99]"
+            className="dhikr-card mt-3 flex w-full items-center gap-3 px-5 py-4 text-left active:scale-[0.99]"
             style={{
               background: "var(--surface-card)",
               border: "1px solid var(--border)",

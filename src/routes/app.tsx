@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { createFileRoute, Outlet } from "@tanstack/react-router";
 import { BottomNav } from "@/components/BottomNav";
 import { Onboarding, hasOnboarded } from "@/components/Onboarding";
+import botanicalBackground from "@/assets/botanical-background.png.asset.json";
 
 export const Route = createFileRoute("/app")({
   component: AppLayout,
@@ -26,11 +27,14 @@ function AppLayout() {
   }, []);
 
   return (
-    <>
+    <div
+      className="app-shell"
+      style={{ "--app-background-image": `url(${botanicalBackground.url})` } as React.CSSProperties}
+    >
       <Outlet />
       <BottomNav />
       {showOnboarding && <Onboarding onDone={() => setShowOnboarding(false)} />}
-    </>
+    </div>
   );
 }
 

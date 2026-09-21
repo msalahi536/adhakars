@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { BedDouble, Compass, BookPlus, ChevronRight, HandHeart } from "lucide-react";
 import { HeaderSettingsButton } from "@/components/HeaderSettingsButton";
-import { ConcentricCirclesPattern } from "@/components/HeaderPatterns";
 import {
   getConsistency,
   getLifetime,
@@ -79,17 +78,16 @@ function More() {
         className="page-header relative overflow-hidden"
         style={{ background: "var(--grad-header)", color: "var(--header-fg)" }}
       >
-        <ConcentricCirclesPattern />
         <HeaderSettingsButton />
-        <div className="relative mx-auto max-w-md px-4 pb-5 pt-4" style={{ paddingRight: 60 }}>
+        <div className="relative mx-auto max-w-md px-16 pb-6 pt-9 text-center">
           <div className="label-caps" style={{ color: "var(--header-sub)", opacity: 1 }}>More</div>
-          <h1 className="mt-1 text-3xl font-bold tracking-tight">Tools</h1>
+          <h1 className="app-page-title mt-2">Tools</h1>
           <p className="mt-2 text-xs opacity-90">Sleep, wake, qibla and your own adhkar.</p>
         </div>
       </header>
 
       <main className="scroll-area">
-        <div className="mx-auto max-w-md px-4 py-4 space-y-4">
+         <div className="mx-auto max-w-md px-5 py-3 space-y-4">
           {/* Consistency card */}
           <section
             className="overflow-hidden rounded-[24px] p-4"
