@@ -546,7 +546,7 @@ html[data-preset="original"][data-section="evening"] {
   justify-content: center;
   gap: 5px;
   width: 94px;
-  margin: 14px auto 12px;
+  margin: 10px auto 9px;
   color: var(--accent);
 }
 
@@ -568,10 +568,10 @@ html[data-preset="original"][data-section="evening"] {
 }
 
 .adhkar-transliteration {
-  max-width: 80%;
+  max-width: 90%;
   margin: 0 auto;
   color: var(--translit);
-  font-size: 15px;
+  font-size: 13.5px;
   font-style: italic;
   line-height: 1.65;
   text-align: center;
@@ -675,15 +675,19 @@ html[data-section="evening"] .app-shell::after {
   .app-page-title { font-size: 1.9rem; }
   .page-header .label-caps { font-size: 0.62rem; }
   .bottom-nav { bottom: calc(6px + env(safe-area-inset-bottom)); }
-  .adhkar-header { min-height: 136px; }
-  .adhkar-header-content { padding-top: 22px; }
-  .adhkar-progress-row { margin-top: 14px; }
-  .daily-swipe-stack .adhkar-index-row { min-height: 42px; }
-  .adhkar-card-heading { padding-top: 16px; }
-  .adhkar-reference-content { padding-top: 14px; }
-  .adhkar-card-footer { padding: 10px 20px 14px; }
+  .adhkar-header { min-height: 112px; }
+  .adhkar-header-content { padding-top: 14px; padding-bottom: 4px; }
+  .adhkar-header .app-page-title { margin-top: 6px; }
+  .adhkar-progress-row { margin-top: 10px; }
+  .daily-swipe-stack .adhkar-index-row { min-height: 38px; }
+  .daily-swipe-stack .adhkar-index-row > span { padding-block: 7px; }
+  .adhkar-card-heading { padding: 14px 20px 0; }
+  .adhkar-reference-content { padding: 10px 22px 8px; }
+  .adhkar-card-footer { padding: 8px 20px 10px; }
   .adhkar-repeat-counter { width: 76px; height: 76px; }
   .adhkar-repeat-counter svg { width: 76px; height: 76px; }
+  .adhkar-transliteration { font-size: 12.5px; line-height: 1.55; }
+  .adhkar-divider { margin-block: 6px; }
   .adhkar-pagination-row { min-height: 44px; padding-block: 5px 7px; }
 }
 
