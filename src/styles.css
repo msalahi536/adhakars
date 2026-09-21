@@ -153,8 +153,8 @@
 
 @layer base {
   :root {
-    --bottom-nav-row: 72px;
-    --bottom-nav-height: 94px;
+    --bottom-nav-row: 60px;
+    --bottom-nav-height: 74px;
   }
   * {
     border-color: var(--color-border);
@@ -263,8 +263,8 @@
   .scroll-area::-webkit-scrollbar { display: none; }
   .bottom-nav {
     position: fixed;
-    inset-inline: 20px;
-    bottom: calc(16px + env(safe-area-inset-bottom));
+    inset-inline: 28px;
+    bottom: calc(14px + env(safe-area-inset-bottom));
     width: auto;
     height: var(--bottom-nav-row);
     min-height: var(--bottom-nav-row);
@@ -286,19 +286,22 @@
     justify-content: space-around;
     overflow: hidden;
     border: 1px solid;
-    border-radius: 26px;
+    border-radius: 18px;
     background: color-mix(in oklab, var(--nav-bg) 84%, transparent);
     box-shadow: 0 12px 34px color-mix(in oklab, var(--foreground) 10%, transparent);
     backdrop-filter: blur(24px);
   }
   .nav-item {
     height: 100%;
+    gap: 4px;
+    font-family: var(--font-sans);
   }
+  .nav-item > svg { width: 22px; height: 22px; flex: 0 0 22px; fill: none; stroke-width: 1.5; }
   .nav-active-mark {
     position: absolute;
-    bottom: 5px;
-    width: 20px;
-    height: 3px;
+    bottom: 2px;
+    width: 16px;
+    height: 2px;
     border-radius: 999px;
   }
   .tasbih-shell-wrapper {
@@ -372,30 +375,35 @@ html[data-section="morning"] {
   --index-badge-bg: #4f6d4a;
   --index-badge-fg: #fff;
   --count-fg: #4f6d4a;
+  --pill-bg: rgba(240, 236, 226, 0.9);
+  --card-border: rgba(255, 255, 255, 0.8);
 }
 
 html[data-section="evening"] {
-  --background: #1c1d3a;
-  --foreground: #ece8f8;
-  --title: #ece8f8;
-  --eyebrow: #bdb3dc;
-  --accent: #b7a7e3;
-  --card: rgba(40, 38, 74, 0.88);
-  --card-foreground: #f1ecff;
-  --surface-card: #28264a;
-  --border: rgba(255, 255, 255, 0.12);
-  --translit: #b7a7e3;
-  --text-muted: #948db5;
-  --source-bg: rgba(255, 255, 255, 0.1);
+  --background: #0e0f22;
+  --foreground: #ebe7f7;
+  --title: #ebe7f7;
+  --eyebrow: #a9a0cc;
+  --accent: #a99bd8;
+  --card: rgba(22, 20, 50, 0.92);
+  --card-foreground: #efeafe;
+  --surface-card: #161432;
+  --border: rgba(255, 255, 255, 0.09);
+  --card-border: rgba(255, 255, 255, 0.09);
+  --translit: #a99bd8;
+  --text-muted: #8a83ac;
+  --pill-bg: rgba(255, 255, 255, 0.08);
+  --source-bg: rgba(255, 255, 255, 0.08);
   --source-fg: #cfc8e8;
-  --ring-track: rgba(183, 167, 227, 0.25);
-  --nav-bg: rgba(66, 60, 104, 0.8);
+  --ring-track: rgba(169, 155, 216, 0.22);
+  --nav-bg: rgba(24, 22, 54, 0.92);
+  --nav-border: rgba(255, 255, 255, 0.14);
   --nav-active: #cdbff5;
-  --nav-inactive: #948db5;
-  --dot-active: #b7a7e3;
-  --dot-inactive: rgba(148, 141, 181, 0.4);
-  --index-badge-bg: rgba(183, 167, 227, 0.35);
-  --index-badge-fg: #ece8f8;
+  --nav-inactive: #a39dc4;
+  --dot-active: #a99bd8;
+  --dot-inactive: rgba(169, 155, 216, 0.3);
+  --index-badge-bg: rgba(255, 255, 255, 0.08);
+  --index-badge-fg: #ebe7f7;
   --count-fg: #cfc8e8;
 }
 
@@ -403,26 +411,26 @@ html[data-preset][data-section="morning"] {
   --background: #f5efe3 !important; --foreground: #3d5a3c !important; --title: #3d5a3c !important; --eyebrow: #5f7a5a !important; --accent: #4f6d4a !important; --card: rgba(250, 247, 240, 0.92) !important; --card-foreground: #2a2a2a !important; --surface-card: #f7f3e9 !important; --border: rgba(255, 255, 255, 0.8) !important; --translit: #5f7a5a !important; --text-muted: #6b6f64 !important; --source-bg: rgba(233, 233, 222, 0.9) !important; --source-fg: #3d5a3c !important; --ring-track: rgba(90, 110, 85, 0.18) !important; --nav-bg: rgba(255, 255, 255, 0.9) !important; --nav-active: #4f6d4a !important; --nav-inactive: #6b6f64 !important; --dot-active: #4f6d4a !important; --dot-inactive: rgba(107, 111, 100, 0.4) !important; --index-badge-bg: #4f6d4a !important; --index-badge-fg: #fff !important; --count-fg: #4f6d4a !important;
 }
 html[data-preset][data-section="evening"] {
-  --background: #1c1d3a !important; --foreground: #ece8f8 !important; --title: #ece8f8 !important; --eyebrow: #bdb3dc !important; --accent: #b7a7e3 !important; --card: rgba(40, 38, 74, 0.88) !important; --card-foreground: #f1ecff !important; --surface-card: #28264a !important; --border: rgba(255, 255, 255, 0.12) !important; --translit: #b7a7e3 !important; --text-muted: #948db5 !important; --source-bg: rgba(255, 255, 255, 0.1) !important; --source-fg: #cfc8e8 !important; --ring-track: rgba(183, 167, 227, 0.25) !important; --nav-bg: rgba(66, 60, 104, 0.8) !important; --nav-active: #cdbff5 !important; --nav-inactive: #a39dc4 !important; --dot-active: #b7a7e3 !important; --dot-inactive: rgba(148, 141, 181, 0.4) !important; --index-badge-bg: rgba(190, 180, 232, 0.42) !important; --index-badge-fg: #f0ecff !important; --count-fg: #d3cbf0 !important;
+  --background: #0e0f22 !important; --foreground: #ebe7f7 !important; --title: #ebe7f7 !important; --eyebrow: #a9a0cc !important; --accent: #a99bd8 !important; --card: rgba(22, 20, 50, 0.92) !important; --card-foreground: #efeafe !important; --surface-card: #161432 !important; --border: rgba(255,255,255,0.09) !important; --card-border: rgba(255,255,255,0.09) !important; --translit: #a99bd8 !important; --text-muted: #8a83ac !important; --pill-bg: rgba(255,255,255,0.08) !important; --source-bg: rgba(255,255,255,0.08) !important; --source-fg: #cfc8e8 !important; --ring-track: rgba(169,155,216,0.22) !important; --nav-bg: rgba(24,22,54,0.92) !important; --nav-border: rgba(255,255,255,0.14) !important; --nav-active: #cdbff5 !important; --nav-inactive: #a39dc4 !important; --dot-active: #a99bd8 !important; --dot-inactive: rgba(169,155,216,0.3) !important; --index-badge-bg: rgba(255,255,255,0.08) !important; --index-badge-fg: #ebe7f7 !important; --count-fg: #cfc8e8 !important;
 }
 
 html[data-section="morning"] .app-shell { background: linear-gradient(180deg, #f5efe3 0%, #efe4d1 45%, #e6dccb 100%); }
-html[data-section="evening"] .app-shell { background: linear-gradient(180deg, #1c1d3a 0%, #262347 55%, #3a2f4f 100%); }
+html[data-section="evening"] .app-shell { background: radial-gradient(circle at 85% 95%, rgba(214,130,90,0.28), transparent 45%), linear-gradient(180deg, #0e0f22 0%, #17163a 45%, #2b2242 80%, #3a2c46 100%); }
 .app-background { background-position: center top; opacity: 0; }
 .app-background-morning { opacity: 0.6; }
 .app-shell.is-evening .app-background-morning { opacity: 0; }
-.app-shell.is-evening .app-background-evening { opacity: 0.6; }
+.app-shell.is-evening .app-background-evening { opacity: 0.7; mix-blend-mode: multiply; }
 .app-shell::after { background: transparent; }
 
 .adhkar-header {
-  min-height: 190px;
+  min-height: 200px;
   padding-inline: 20px;
   overflow: visible;
 }
 
 .adhkar-header-content {
   max-width: 390px;
-  padding: calc(env(safe-area-inset-top) + 78px) 52px 0;
+  padding: calc(env(safe-area-inset-top) + 88px) 52px 0;
 }
 
 .adhkar-header .label-caps {
@@ -448,13 +456,10 @@ html[data-section="evening"] .app-shell { background: linear-gradient(180deg, #1
 }
 
 .adhkar-progress-row {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
+  display: flex;
   align-items: center;
-  gap: 14px;
-  grid-template-columns: 210px auto;
-  width: max-content;
-  margin: 30px 0 0 18px;
+  width: 220px;
+  margin: 30px auto 0;
 }
 
 .adhkar-progress-track {
@@ -467,7 +472,6 @@ html[data-section="evening"] .app-shell { background: linear-gradient(180deg, #1
 html[data-section="evening"] .adhkar-progress-track { background: rgba(200, 190, 230, 0.3); }
 .adhkar-progress-value { height: 100%; border-radius: inherit; background: #3f5a3c; transition: width 500ms ease; }
 html[data-section="evening"] .adhkar-progress-value { background: #2c2a54; }
-.adhkar-progress-count { color: var(--eyebrow); font-size: 13px; font-weight: 500; font-variant-numeric: tabular-nums; white-space: nowrap; }
 
 .daily-adhkar-page.scroll-area {
   margin-bottom: calc(74px + env(safe-area-inset-bottom));
@@ -493,14 +497,14 @@ html[data-section="evening"] .adhkar-progress-value { background: #2c2a54; }
 }
 .daily-swipe-stack .adhkar-index-row > button { position: absolute; right: 20px; }
 
-.daily-swipe-stack .adhkar-card-stage { display: flex; min-height: 0; flex: 1; overflow: hidden; padding: 0 28px; }
+.daily-swipe-stack .adhkar-card-stage { display: flex; min-height: 0; flex: 1; overflow: hidden; padding: 0 28px 16px; }
 .adhkar-card-motion { display: flex; width: 100%; height: 100%; max-height: 100%; min-height: 0; align-self: flex-start; }
 .adhkar-reference-card {
   display: flex;
   flex-direction: column;
   box-sizing: border-box;
   width: 100%;
-  height: fit-content;
+  height: 100%;
   max-height: 100%;
   min-height: 0;
   overflow: hidden;
@@ -522,6 +526,7 @@ html[data-section="evening"] .adhkar-progress-value { background: #2c2a54; }
 .adhkar-card-heading h3 { color: var(--title) !important; font-family: var(--font-sans); font-size: 12px; font-weight: 500; line-height: 1.35; letter-spacing: 0.14em !important; }
 .adhkar-card-ornament { color: var(--accent); }
 html[data-section="evening"] .adhkar-card-heading h3 { color: #cfc8e8 !important; }
+html[data-section="evening"] .adhkar-card-heading button { background: rgba(170,160,220,0.3) !important; color: #efeafe !important; }
 
 .adhkar-reference-body { width: 100%; min-width: 0; min-height: 0; overflow: hidden; }
 .adhkar-reference-content,
@@ -578,20 +583,14 @@ html[data-section="evening"] .adhkar-card-heading h3 { color: #cfc8e8 !important
 .adhkar-counter-value { color: var(--count-fg); font-size: 40px; font-weight: 600; line-height: 1; }
 .adhkar-counter-target { margin-top: 2px; color: var(--text-muted); font-size: 12px; font-weight: 400; line-height: 1; }
 
-.adhkar-pagination-row { display: flex; min-height: 40px; align-items: flex-start; justify-content: center; gap: 12px; padding: 16px 20px 0; }
-.adhkar-pagination { display: flex; min-width: 0; align-items: center; justify-content: center; gap: 5px; color: var(--text-muted); }
+.adhkar-pagination-row { display: flex; height: 40px; min-height: 40px; align-items: flex-start; justify-content: center; gap: 12px; padding: 0 20px 16px; }
+.adhkar-pagination { display: flex; height: 24px; min-width: 0; align-items: center; justify-content: center; gap: 5px; color: var(--text-muted); touch-action: none; }
 .adhkar-pagination button { width: 7px; height: 7px; flex: 0 0 auto; border-radius: 999px; background: var(--dot-inactive); transition: width 250ms ease, background-color 250ms ease; }
 .adhkar-pagination button.is-active { width: 7px; background: var(--dot-active); }
-.adhkar-pagination svg { margin-left: 5px; }
 .adhkar-pagination-arrow { display: inline-flex; width: 24px; height: 24px; flex: 0 0 24px; align-items: center; justify-content: center; border: 1px solid var(--card-border, var(--border)); border-radius: 999px; background: var(--pill-bg, var(--source-bg)); color: var(--text-muted); }
 .adhkar-pagination-arrow:disabled { opacity: 0.35; }
 
-html[data-section="morning"] .bottom-nav,
-html[data-section="evening"] .bottom-nav { inset-inline: 28px; bottom: calc(14px + env(safe-area-inset-bottom)); height: 60px; min-height: 60px; }
-html[data-section="morning"] .bottom-nav-row,
-html[data-section="evening"] .bottom-nav-row { height: 60px; border-color: var(--border); border-radius: 18px; background: var(--nav-bg); box-shadow: 0 6px 24px rgba(0, 0, 0, 0.12); backdrop-filter: blur(20px); }
-.nav-item { gap: 4px; font-family: var(--font-sans); }
-.nav-active-mark { bottom: 2px; width: 16px; height: 2px; }
+.bottom-nav-row { border-color: var(--nav-border, var(--border)); background: var(--nav-bg); box-shadow: 0 6px 24px rgba(0,0,0,0.12); backdrop-filter: blur(20px); }
 
 /* Compact prayer hub */
 .salah-page {
@@ -657,6 +656,57 @@ html[data-section="salah"] .nav-active-mark { bottom: 2px; width: 16px; height: 
   .salah-page { overflow-y: auto; -webkit-overflow-scrolling: touch; padding-bottom: 88px; }
   .salah-content { flex: none; overflow: visible; }
 }
+
+/* Tasbih, matched to the morning reference */
+html[data-section="tasbih"] {
+  --background: #f5efe3;
+  --foreground: #2f4f34;
+  --title: #2f4f34;
+  --eyebrow: #5f7a5a;
+  --accent: #5a7346;
+  --accent-foreground: #ffffff;
+  --card: rgba(250,247,240,0.95);
+  --card-foreground: #2f4f34;
+  --border: rgba(255,255,255,0.85);
+  --card-border: rgba(255,255,255,0.85);
+  --pill-bg: rgba(240,236,226,0.9);
+  --nav-bg: rgba(255,255,255,0.9);
+  --nav-border: rgba(255,255,255,0.85);
+  --nav-active: #2f5a3c;
+  --nav-inactive: #9aa094;
+}
+html[data-preset][data-section="tasbih"] {
+  --background: #f5efe3 !important; --foreground: #2f4f34 !important; --title: #2f4f34 !important; --eyebrow: #5f7a5a !important; --accent: #5a7346 !important; --accent-foreground: #ffffff !important; --card: rgba(250,247,240,0.95) !important; --card-foreground: #2f4f34 !important; --border: rgba(255,255,255,0.85) !important; --card-border: rgba(255,255,255,0.85) !important; --pill-bg: rgba(240,236,226,0.9) !important; --nav-bg: rgba(255,255,255,0.9) !important; --nav-border: rgba(255,255,255,0.85) !important; --nav-active: #2f5a3c !important; --nav-inactive: #9aa094 !important;
+}
+.tasbih-header { position: relative; z-index: 1; height: 238px; flex: 0 0 238px; padding-top: env(safe-area-inset-top); text-align: center; }
+.tasbih-header-inner { width: 100%; max-width: 390px; margin: 0 auto; padding-top: 78px; }
+.tasbih-eyebrow { color: #5f7a5a; font-family: var(--font-sans); font-size: 12px; font-weight: 500; line-height: 1; letter-spacing: 0.2em; text-transform: uppercase; }
+.tasbih-title { margin-top: 8px; color: #2f4f34; font-family: var(--font-display); font-size: 32px; font-weight: 500; line-height: 1.1; }
+.tasbih-targets { display: flex; gap: 10px; margin: 22px 28px 0; }
+.tasbih-target { display: flex; height: 34px; min-width: 0; flex: 1; align-items: center; justify-content: center; border: 1px solid rgba(255,255,255,0.8); border-radius: 999px; background: rgba(240,236,226,0.9); color: #3d5a3c; font-family: var(--font-sans); font-size: 16px; font-weight: 500; line-height: 1; backdrop-filter: blur(20px); }
+.tasbih-target.is-active { border-color: transparent; background: #5a7346; color: #ffffff; }
+.tasbih-main { min-height: 0; flex: 1; padding: 0 28px calc(90px + env(safe-area-inset-bottom)); }
+.tasbih-card-wrap { width: 100%; max-width: 334px; height: 100%; margin: 0 auto; }
+.tasbih-card { position: relative; display: flex; width: 100%; height: 100%; flex-direction: column; align-items: center; overflow: hidden; box-sizing: border-box; padding: 18px; border: 1px solid rgba(255,255,255,0.85); border-radius: 18px; outline: none; background: rgba(250,247,240,0.95); color: #2f4f34; box-shadow: 0 12px 32px rgba(0,0,0,0.08); cursor: pointer; touch-action: manipulation; user-select: none; transition: transform 80ms ease; }
+.tasbih-card.is-pressed { transform: scale(0.985); }
+.tasbih-corner-control { position: absolute; top: 18px; z-index: 2; }
+.tasbih-corner-control.left { left: 18px; }
+.tasbih-corner-control.right { right: 18px; }
+.tasbih-control { display: flex; width: 36px; height: 36px; align-items: center; justify-content: center; border: 1px solid rgba(0,0,0,0.05); border-radius: 999px; background: #ffffff; color: #2f5a3c; box-shadow: 0 4px 12px rgba(0,0,0,0.06); }
+.tasbih-disc { position: absolute; top: 90px; left: 50%; display: flex; width: 280px; height: 280px; align-items: center; justify-content: center; transform: translateX(-50%); border: 8px solid #f4efe4; border-radius: 50%; background: radial-gradient(circle at 50% 35%, #fbf8f1 0%, #f1ece0 70%, #e6dfd0 100%); box-shadow: 0 18px 40px rgba(0,0,0,0.10), inset 0 2px 6px rgba(255,255,255,0.9), inset 0 -6px 14px rgba(0,0,0,0.06); transition: transform 80ms ease; }
+.tasbih-disc-tapped { transform: translateX(-50%) scale(0.985); }
+.tasbih-disc-content { display: flex; flex-direction: column; align-items: center; justify-content: center; }
+.tasbih-count { color: #2f4f34; font-family: var(--font-sans); font-size: 92px; font-weight: 400; line-height: 1; font-variant-numeric: tabular-nums; }
+.tasbih-cycle { margin-top: 6px; color: #2f4f34; font-family: var(--font-sans); font-size: 15px; font-weight: 400; line-height: 1; }
+.tasbih-helper { position: absolute; top: 406px; inset-inline: 18px; text-align: center; }
+.tasbih-helper-primary { color: #2f4f34; font-family: var(--font-sans); font-size: 12px; font-weight: 500; line-height: 1; letter-spacing: 0.2em; text-transform: uppercase; }
+.tasbih-helper-secondary { margin-top: 10px; color: #9aa094; font-family: var(--font-sans); font-size: 13px; font-weight: 400; line-height: 1; }
+
+@keyframes adhkar-complete-scale { 0% { transform: scale(1); } 52% { transform: scale(1.06); } 100% { transform: scale(1); } }
+@keyframes adhkar-complete-glow { 0%, 100% { box-shadow: 0 0 0 0 color-mix(in oklab, var(--accent) 0%, transparent); } 50% { box-shadow: 0 0 24px 5px color-mix(in oklab, var(--accent) 42%, transparent); } }
+@keyframes adhkar-check-fade { 0% { opacity: 0; } 30%, 70% { opacity: 1; } 100% { opacity: 0; } }
+.adhkar-repeat-counter.is-completing { animation: adhkar-complete-scale 300ms cubic-bezier(.2,.9,.3,1), adhkar-complete-glow 400ms ease-in-out; }
+.adhkar-complete-check { color: var(--accent); animation: adhkar-check-fade 500ms ease-in-out; }
 
 .glass-card {
   border-radius: 24px;

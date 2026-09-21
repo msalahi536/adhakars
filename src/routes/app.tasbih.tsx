@@ -37,11 +37,7 @@ function Tasbih() {
   }, [total, milestone]);
 
   const hasMilestone = milestone > 0;
-  const cycleCount = hasMilestone ? total % milestone : 0;
   const cycleNum = hasMilestone ? Math.floor(total / milestone) + 1 : 1;
-  const ringMax = hasMilestone ? milestone : 100;
-  const ringValue = hasMilestone ? cycleCount : total % 100;
-  const complete = hasMilestone && cycleCount === 0 && total > 0;
 
   const showToast = (msg: string) => {
     setToast(msg);

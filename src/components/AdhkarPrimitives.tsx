@@ -101,6 +101,7 @@ export function Pagination({
 }) {
   const holdTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const scrubbing = useRef(false);
+  const suppressClick = useRef(false);
   const lastIndex = useRef(active);
 
   const indexFromPointer = (clientX: number, element: HTMLElement) => {
@@ -137,6 +138,7 @@ export function Pagination({
           const element = event.currentTarget;
           holdTimer.current = setTimeout(() => {
             scrubbing.current = true;
+            suppressClick.current = true;
             element.setPointerCapture(event.pointerId);
             updateScrub(x, element);
           }, 250);
@@ -160,7 +162,13 @@ export function Pagination({
           <button
             key={index}
             type="button"
-            onClick={() => onSelect(index)}
+            onClick={() => {
+              if (suppressClick.current) {
+                suppressClick.current = false;
+                return;
+              }
+              onSelect(index);
+            }}
             className={index === active ? "is-active" : ""}
             aria-label={`go to ${index + 1}`}
           />
