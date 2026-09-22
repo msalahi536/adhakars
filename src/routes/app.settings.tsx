@@ -465,7 +465,7 @@ function Settings() {
             {showAdvanced && (
               <div
                 className="mb-3 space-y-2 rounded-2xl p-3"
-                style={{ background: "var(--surface)", border: "1px solid var(--border)" }}
+                data-settings-card=""
               >
                 {sectionList.map(({ key, label }) => {
                   const current = overrides[key] ?? sectionSeedFor(presetId, seed, key);
@@ -541,7 +541,7 @@ function Settings() {
             <div className="space-y-3">
               <div
                 className="rounded-2xl px-4 py-3"
-                style={{ background: "var(--surface)", border: "1px solid var(--border)" }}
+                data-settings-card=""
               >
                 <div className="mb-2 text-sm font-semibold">Calculation method</div>
                 <select
@@ -573,7 +573,7 @@ function Settings() {
               {!nativeAvailable ? (
                 <div
                   className="rounded-2xl px-4 py-3"
-                  style={{ background: "var(--surface)", border: "1px solid var(--border)" }}
+                  data-settings-card=""
                 >
                   <div className="text-sm font-semibold">Adhan notifications</div>
                   <div className="mt-1 text-xs opacity-70">
@@ -626,7 +626,7 @@ function Settings() {
 
               <div
                 className="rounded-2xl px-4 py-3"
-                style={{ background: "var(--surface)", border: "1px solid var(--border)" }}
+                data-settings-card=""
               >
                 <div className="mb-2 text-sm font-semibold">Notification sound</div>
                 <div className="grid grid-cols-3 gap-1 rounded-full p-1" style={{ background: "var(--muted)" }}>
@@ -658,7 +658,7 @@ function Settings() {
 
               <div
                 className="rounded-2xl px-4 py-3"
-                style={{ background: "var(--surface)", border: "1px solid var(--border)" }}
+                data-settings-card=""
               >
                 <div className="flex items-center justify-between gap-3">
                   <div className="min-w-0">
@@ -756,7 +756,7 @@ function Settings() {
             <h2 className="label-caps mb-3">Reminders</h2>
             <div
               className="rounded-[24px] p-4"
-              style={{ background: "var(--surface)", border: "1px solid var(--border)" }}
+              data-settings-card=""
             >
               {!nativeAvailable ? (
                 <>
@@ -918,7 +918,7 @@ function Settings() {
             {confirmReset ? (
               <div
                 className="rounded-2xl p-4"
-                style={{ background: "var(--surface)", border: "1px solid var(--border)" }}
+                data-settings-card=""
               >
                 <p className="mb-3 text-sm">Reset all counts for today?</p>
                 <div className="flex gap-2">
@@ -947,7 +947,7 @@ function Settings() {
               <button
                 onClick={() => setConfirmReset(true)}
                 className="w-full rounded-full py-3 text-sm font-semibold"
-                style={{ background: "var(--surface)", border: "1px solid var(--border)" }}
+                data-settings-card=""
               >
                 Reset today's progress
               </button>
@@ -1005,7 +1005,7 @@ function Settings() {
             <h2 className="label-caps mb-1">About</h2>
             <div
               className="flex items-center justify-between rounded-2xl px-4 py-3 text-sm"
-              style={{ background: "var(--surface)", border: "1px solid var(--border)" }}
+              data-settings-card=""
             >
               <span className="font-semibold">Version</span>
               <span className="opacity-70">{APP_VERSION}</span>
@@ -1013,7 +1013,7 @@ function Settings() {
             <Link
               to="/app/privacy"
               className="flex w-full items-center justify-between rounded-2xl px-4 py-3 text-sm font-semibold"
-              style={{ background: "var(--surface)", border: "1px solid var(--border)" }}
+              data-settings-card=""
             >
               <span>Privacy Policy</span>
               <span className="opacity-40">›</span>
@@ -1021,7 +1021,7 @@ function Settings() {
             <Link
               to="/app/terms"
               className="flex w-full items-center justify-between rounded-2xl px-4 py-3 text-sm font-semibold"
-              style={{ background: "var(--surface)", border: "1px solid var(--border)" }}
+              data-settings-card=""
             >
               <span>Terms of Service</span>
               <span className="opacity-40">›</span>
@@ -1049,7 +1049,7 @@ function Toggle({
     <button
       onClick={() => onChange(!value)}
       className="flex w-full items-center justify-between gap-3 rounded-2xl px-4 py-3 text-left text-sm font-semibold"
-      style={{ background: "var(--surface)", border: "1px solid var(--border)" }}
+      data-settings-card=""
     >
       <span className="flex min-w-0 flex-col">
         <span>{label}</span>
