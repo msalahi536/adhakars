@@ -785,7 +785,7 @@ html[data-section="evening"] .adhkar-progress-track { background: rgba(200, 190,
 .adhkar-progress-value { height: 100%; border-radius: inherit; background: color-mix(in oklab, var(--accent) 88%, transparent); box-shadow: 0 1px 3px color-mix(in oklab, var(--accent) 22%, transparent); transition: width 650ms cubic-bezier(.22, 1, .36, 1); }
 html[data-section="evening"] .adhkar-progress-value { background: #2c2a54; }
 .daily-adhkar-page.scroll-area {
-  margin-bottom: calc(98px + env(safe-area-inset-bottom));
+  margin-bottom: calc(106px + env(safe-area-inset-bottom));
   padding: 0;
   overflow: hidden;
 }
