@@ -37,8 +37,8 @@ export function SuggestColorSheet({ open, onClose }: { open: boolean; onClose: (
 
   return (
     <div
-      className="fixed inset-0 z-[80] flex items-end justify-center"
-      style={{ background: "rgba(28,32,24,0.38)", backdropFilter: "blur(8px)" }}
+      className="fixed inset-0 flex items-end justify-center"
+      style={{ zIndex: 200, background: "rgba(28,32,24,0.38)", backdropFilter: "blur(8px)" }}
       onClick={close}
     >
       <div
@@ -46,7 +46,7 @@ export function SuggestColorSheet({ open, onClose }: { open: boolean; onClose: (
         style={{
           background: "var(--surface-card)",
           color: "var(--foreground)",
-          paddingBottom: "calc(20px + env(safe-area-inset-bottom))",
+          paddingBottom: "calc(28px + env(safe-area-inset-bottom))",
         }}
         onClick={(e) => e.stopPropagation()}
       >
