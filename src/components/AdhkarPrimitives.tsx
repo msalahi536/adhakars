@@ -151,7 +151,9 @@ export function Pagination({
       </button>
       <div
         className={`adhkar-pagination ${isScrubbing ? "is-scrubbing" : ""}`}
+        onContextMenu={(event) => event.preventDefault()}
         onPointerDown={(event) => {
+          event.preventDefault();
           lastIndex.current = active;
           const element = event.currentTarget;
           scrubbing.current = true;
