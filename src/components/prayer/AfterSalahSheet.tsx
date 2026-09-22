@@ -87,7 +87,12 @@ export function AfterSalahSheet({ open, prayer, onPrayer, onClose }: Props) {
               <div className="label-caps" style={{ color: "var(--muted-foreground)" }}>
                 After Salah Adhkar
               </div>
-              <h2 className="text-xl font-bold">After {label}</h2>
+              <h2
+                className="after-salah-title"
+                style={{ fontFamily: "'Cormorant Garamond', serif", fontWeight: 600, fontSize: 26, lineHeight: 1.15 }}
+              >
+                After {label}
+              </h2>
             </div>
             <div className="flex items-center gap-2">
               <span className="text-xs font-semibold" style={{ color: "var(--muted-foreground)" }}>
