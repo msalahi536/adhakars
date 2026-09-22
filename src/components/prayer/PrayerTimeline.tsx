@@ -122,7 +122,7 @@ function DayList({
     if (showNowDivider && !dividerPlaced && s.at.getTime() > now.getTime()) {
       dividerPlaced = true;
       rows.push(
-        <div key="now" className="flex items-center gap-2 py-1.5 pl-1">
+        <div key="now" className="flex items-center gap-2 py-3 pl-1">
           <span
             className="text-[10px] font-bold tracking-widest"
             style={{ color: "var(--accent)" }}
@@ -327,12 +327,13 @@ export function PrayerTimeline({ days, now, todayKey, tone = "light", onPickPray
               style={{
                 maxHeight: "72vh",
                 position: "relative",
+                paddingRight: "10px",
                 paddingBottom: "calc(var(--bottom-nav-row) + env(safe-area-inset-bottom))",
               }}
             >
               {days.map((d) => (
-                <div key={d.key} className="mb-3">
-                  <div className="mb-1">
+                <div key={d.key} className="mb-5">
+                  <div className="mb-2.5">
                     <DayPill label={d.label} />
                   </div>
                   <DayList
