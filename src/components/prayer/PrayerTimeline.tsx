@@ -21,26 +21,21 @@ const isSunrise = (s: Slot) => s.id === "sunrise";
 function Row({
   slot,
   state,
-  onPick,
   rowRef,
 }: {
   slot: Slot;
   state: "past" | "next" | "future";
-  onPick?: () => void;
   rowRef?: (el: HTMLDivElement | null) => void;
 }) {
   const sunrise = isSunrise(slot);
   const color = state === "next" ? "var(--accent)" : "var(--foreground)";
   const opacity = state === "past" ? 0.72 : sunrise ? 0.85 : 1;
-  const clickable = !!onPick && !sunrise;
   return (
     <div
       ref={rowRef}
       data-state={state}
-      onClick={clickable ? onPick : undefined}
-      role={clickable ? "button" : undefined}
-      className={`prayer-timeline-row relative flex items-center ${clickable ? "active:scale-[0.99]" : ""}`}
-      style={{ opacity, cursor: clickable ? "pointer" : undefined }}
+      className="prayer-timeline-row relative flex items-center"
+      style={{ opacity }}
     >
 
       <div className="prayer-timeline-marker relative flex shrink-0 justify-center">
@@ -105,7 +100,6 @@ function DayList({
   nextAt,
   showNowDivider,
   dim,
-  onPickPrayer,
   nextRef,
 }: {
   slots: Slot[];
@@ -113,7 +107,6 @@ function DayList({
   nextAt: number | null;
   showNowDivider?: boolean;
   dim?: boolean;
-  onPickPrayer?: (id: Exclude<PrayerId, "sunrise">) => void;
   nextRef?: (el: HTMLDivElement | null) => void;
 }) {
   const rows: React.ReactNode[] = [];
@@ -145,11 +138,6 @@ function DayList({
         slot={s}
         state={state}
         rowRef={state === "next" ? nextRef : undefined}
-        onPick={
-          onPickPrayer && s.id !== "sunrise"
-            ? () => onPickPrayer(s.id as Exclude<PrayerId, "sunrise">)
-            : undefined
-        }
       />,
     );
   });
