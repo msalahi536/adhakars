@@ -257,14 +257,14 @@
   }
   .daily-adhkar-page.scroll-area {
     overflow: hidden;
-  margin-bottom: calc(98px + env(safe-area-inset-bottom));
+  margin-bottom: calc(114px + env(safe-area-inset-bottom));
   padding-bottom: 0;
   }
   .scroll-area::-webkit-scrollbar { display: none; }
   .bottom-nav {
     position: fixed;
     inset-inline: 28px;
-    bottom: calc(22px + env(safe-area-inset-bottom));
+    bottom: calc(34px + env(safe-area-inset-bottom));
     width: auto;
     height: var(--bottom-nav-row);
     min-height: var(--bottom-nav-row);
@@ -286,7 +286,7 @@
     justify-content: space-around;
     overflow: hidden;
     border: 1px solid;
-    border-radius: 30px;
+    border-radius: 14px;
     background: color-mix(in oklab, var(--nav-bg) 84%, transparent);
     box-shadow: 0 12px 34px color-mix(in oklab, var(--foreground) 10%, transparent);
     backdrop-filter: blur(24px);
@@ -785,7 +785,7 @@ html[data-section="evening"] .adhkar-progress-track { background: rgba(200, 190,
 .adhkar-progress-value { height: 100%; border-radius: inherit; background: color-mix(in oklab, var(--accent) 88%, transparent); box-shadow: 0 1px 3px color-mix(in oklab, var(--accent) 22%, transparent); transition: width 650ms cubic-bezier(.22, 1, .36, 1); }
 html[data-section="evening"] .adhkar-progress-value { background: #2c2a54; }
 .daily-adhkar-page.scroll-area {
-  margin-bottom: calc(98px + env(safe-area-inset-bottom));
+  margin-bottom: calc(114px + env(safe-area-inset-bottom));
   padding: 0;
   overflow: hidden;
 }
@@ -925,6 +925,8 @@ html[data-section="evening"] .adhkar-card-heading button { background: rgba(170,
   --card-border: rgba(255, 255, 255, 0.8);
   --eyebrow: #3f5a3c;
   position: relative;
+  display: flex;
+  flex-direction: column;
   flex: 1;
   min-height: 0;
   overflow: hidden;
@@ -938,8 +940,8 @@ html[data-section="evening"] .adhkar-card-heading button { background: rgba(170,
 .salah-dismiss:active { transform: translateX(-50%) scale(0.95); }
 .salah-dismiss:disabled { opacity: 0.45; }
 .salah-location { position: absolute; top: 192px; inset-inline: 24px; display: flex; align-items: center; justify-content: center; gap: 6px; color: #5f7a5a; font-size: 13px; font-weight: 400; line-height: 16px; }
-.salah-content { flex: 1; min-height: 0; overflow: hidden; }
-.salah-content-inner { display: grid; grid-template-rows: 170px 242px 62px; gap: 12px; width: 100%; max-width: 390px; height: 498px; margin: 30px auto 0; padding: 0 28px; box-sizing: border-box; }
+.salah-content { flex: 1; min-height: 0; overflow: hidden; padding-bottom: 24px; }
+.salah-content-inner { display: grid; grid-template-rows: 170px 242px 62px; gap: 12px; width: 100%; max-width: 390px; height: 498px; margin: 16px auto 0; padding: 0 28px; box-sizing: border-box; }
 .salah-content-inner.no-location { display: flex; flex-direction: column; height: auto; max-height: 100%; overflow-y: auto; -webkit-overflow-scrolling: touch; padding-bottom: 110px; }
 .salah-location-card { position: relative; z-index: 5; width: 100%; box-sizing: border-box; border-radius: 18px; }
 .salah-recommended-card { box-sizing: border-box; height: 170px; padding: 18px 20px; border: 1px solid rgba(255, 255, 255, 0.8); border-radius: 18px; background: rgba(250, 247, 240, 0.92); box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06); backdrop-filter: blur(20px); }
@@ -983,15 +985,15 @@ html[data-section="evening"] .adhkar-card-heading button { background: rgba(170,
 .salah-adhan-title { color: #2f4f34; font-size: 16px; font-weight: 500; line-height: 18px; }
 .salah-adhan-subtitle { margin-top: 2px; overflow: hidden; color: #6b6f64; font-size: 13px; font-weight: 400; line-height: 15px; text-overflow: ellipsis; white-space: nowrap; }
 .salah-adhan-chevron { flex: 0 0 auto; color: #9aa094; }
-html[data-section="salah"] .bottom-nav { inset-inline: 28px; bottom: calc(22px + env(safe-area-inset-bottom)); height: var(--bottom-nav-row); min-height: var(--bottom-nav-row); }
-html[data-section="salah"] .bottom-nav-row { height: var(--bottom-nav-row); border-color: rgba(255,255,255,0.9); border-radius: 30px; background: rgba(255,255,255,0.9); box-shadow: 0 6px 24px rgba(0,0,0,0.12); backdrop-filter: blur(20px); }
+html[data-section="salah"] .bottom-nav { inset-inline: 28px; bottom: calc(34px + env(safe-area-inset-bottom)); height: var(--bottom-nav-row); min-height: var(--bottom-nav-row); }
+html[data-section="salah"] .bottom-nav-row { height: var(--bottom-nav-row); border-color: rgba(255,255,255,0.9); border-radius: 14px; background: rgba(255,255,255,0.9); box-shadow: 0 6px 24px rgba(0,0,0,0.12); backdrop-filter: blur(20px); }
 html[data-section="salah"] .nav-item { gap: 4px; font-family: var(--font-sans); }
 html[data-section="salah"] .nav-active-mark { bottom: 2px; width: 16px; height: 2px; }
 html[data-section="salah"] .app-shell { background: linear-gradient(180deg, #f5efe3 0%, #efe8da 45%, #e7e2d2 100%); }
 html[data-section="salah"] .app-shell::after { background: transparent; }
 
 @media (max-height: 779px) {
-  .salah-page { overflow-y: auto; -webkit-overflow-scrolling: touch; padding-bottom: 106px; }
+  .salah-page { overflow-y: auto; -webkit-overflow-scrolling: touch; padding-bottom: 122px; }
   .salah-content { flex: none; overflow: visible; }
 }
 
@@ -1023,7 +1025,7 @@ html[data-preset][data-section="tasbih"] {
 .tasbih-targets { display: flex; gap: 10px; margin: 22px 28px 0; }
 .tasbih-target { display: flex; height: 34px; min-width: 0; flex: 1; align-items: center; justify-content: center; border: 1px solid rgba(255,255,255,0.8); border-radius: 999px; background: rgba(240,236,226,0.9); color: #3d5a3c; font-family: var(--font-sans); font-size: 16px; font-weight: 500; line-height: 1; backdrop-filter: blur(20px); }
 .tasbih-target.is-active { border-color: transparent; background: #5a7346; color: #ffffff; }
-.tasbih-main { min-height: 0; flex: 1; padding: 0 28px calc(106px + env(safe-area-inset-bottom)); }
+.tasbih-main { min-height: 0; flex: 1; padding: 0 28px calc(122px + env(safe-area-inset-bottom)); }
 .tasbih-card-wrap { width: 100%; max-width: 334px; height: 100%; margin: 0 auto; }
 .tasbih-card { position: relative; display: flex; width: 100%; height: 100%; flex-direction: column; align-items: center; overflow: hidden; box-sizing: border-box; padding: 18px; border: 1px solid rgba(255,255,255,0.85); border-radius: 18px; outline: none; background: rgba(250,247,240,0.95); color: #2f4f34; box-shadow: 0 12px 32px rgba(0,0,0,0.08); cursor: pointer; touch-action: manipulation; user-select: none; transition: transform 80ms ease; }
 .tasbih-card.is-pressed { transform: scale(0.985); }
@@ -1206,7 +1208,7 @@ html[data-preset][data-section="tasbih"] {
 }
 
 .page-content {
-  padding-bottom: calc(var(--bottom-nav-row) + env(safe-area-inset-bottom) + 12px);
+  padding-bottom: calc(var(--bottom-nav-row) + env(safe-area-inset-bottom) + 28px);
 }
 
 
