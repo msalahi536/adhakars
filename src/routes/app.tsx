@@ -14,6 +14,7 @@ function AppLayout() {
   const [showOnboarding, setShowOnboarding] = useState(false);
   const pathname = useRouterState({ select: (state) => state.location.pathname });
   const isEvening = pathname === "/app/evening";
+  const isAdhkar = ["/app", "/app/", "/app/evening"].includes(pathname);
   const showSettings = ["/app", "/app/", "/app/evening", "/app/salah", "/app/tasbih", "/app/more"].includes(pathname);
   useEffect(() => {
     if (!hasOnboarded()) setShowOnboarding(true);
@@ -32,7 +33,7 @@ function AppLayout() {
   }, []);
 
   return (
-    <div className={`app-shell ${isEvening ? "is-evening" : ""}`}>
+    <div className={`app-shell ${isEvening ? "is-evening" : ""} ${isAdhkar ? "is-adhkar" : ""}`}>
       <div
         className="app-background app-background-morning"
         style={{ "--screen-background": `url(${morningBackground.url})` } as React.CSSProperties}
