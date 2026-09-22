@@ -12,7 +12,7 @@ export function ProgressRing({ value, max, size = 88, stroke = 7, complete }: Pr
   const pct = Math.min(1, value / max);
   const offset = c * (1 - pct);
   return (
-    <svg width={size} height={size} className="block">
+    <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} className="block">
       <circle
         cx={size / 2}
         cy={size / 2}

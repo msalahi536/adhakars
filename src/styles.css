@@ -1134,6 +1134,7 @@ html[data-preset][data-section="tasbih"] {
 .tasbih-helper { position: relative; width: 100%; flex: 0 0 auto; margin-top: auto; padding-top: 18px; text-align: center; }
 .tasbih-helper-primary { color: #2f4f34; font-family: var(--font-sans); font-size: 12px; font-weight: 500; line-height: 1; letter-spacing: 0.2em; text-transform: uppercase; }
 .tasbih-ring { position: absolute; top: -8px; left: -8px; z-index: 1; pointer-events: none; }
+.tasbih-ring svg { width: calc(100% + 16px); height: calc(100% + 16px); }
 .tasbih-disc-content { position: relative; z-index: 2; }
 .tasbih-confirm-overlay { position: fixed; inset: 0; z-index: 70; display: flex; align-items: center; justify-content: center; padding: 32px; background: rgba(28,32,24,0.38); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); }
 .tasbih-confirm { width: 100%; max-width: 300px; padding: 22px 20px 18px; border: 1px solid rgba(255,255,255,0.85); border-radius: 18px; background: rgba(250,247,240,0.97); box-shadow: 0 20px 48px rgba(0,0,0,0.18); text-align: center; }
