@@ -482,7 +482,7 @@ html[data-preset="rose"][data-section="evening"] {
 }
 /* Rose evening: slight warm rose tint over the background image */
 html[data-preset="rose"][data-section="evening"] .app-shell::after {
-  background: linear-gradient(180deg, rgba(150, 70, 95, 0.16), rgba(90, 40, 60, 0.20)) !important;
+  background: linear-gradient(180deg, rgba(150, 70, 95, 0.08), rgba(90, 40, 60, 0.10)) !important;
 }
 html[data-preset="rose"][data-section="evening"] .dhikr-card {
   backdrop-filter: blur(16px);
