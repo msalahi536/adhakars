@@ -21,7 +21,7 @@ import {
   type ModeSetting,
 } from "@/lib/theme-store";
 import { deriveSectionSeed, sectionSeedFor, type SectionKey, type CustomOverrides } from "@/lib/theming";
-import { backgroundsForPreset } from "@/lib/backgrounds";
+import { backgroundsForPreset, PRESET_BACKGROUNDS } from "@/lib/backgrounds";
 import { ThemePicker } from "@/components/theme/ThemePicker";
 import { CustomThemeSheet } from "@/components/theme/CustomThemeSheet";
 import {
