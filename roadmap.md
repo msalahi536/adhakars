@@ -22,4 +22,4 @@
 - [x] Replace every existing Evening Adhkar entry with the 23 supplied entries.
 - [x] Show weak or disputed narration markers only on the eight identified entries.
 - [x] Open the full supplied Arabic, transliteration, translation, reward, narration, grading, and notes from each reference pill.
-- [ ] Verify list counts, weak-reference treatment, scrolling, and popup presentation across target phone and tablet sizes.
+- [x] Verify list counts, weak-reference treatment, scrolling, and popup presentation across target phone and tablet sizes.
