@@ -320,10 +320,10 @@ function Salah() {
       </header>
 
       <main className="salah-content">
-        <div className="salah-content-inner">
+        <div className={`salah-content-inner ${settings.location ? "" : "no-location"}`}>
           {!settings.location && (
             <div
-               className="dhikr-card salah-location-card w-full overflow-hidden p-5"
+               className="salah-location-card w-full overflow-hidden p-5"
               style={{
                 background: "var(--surface-card)",
                 border: "1px solid var(--border)",
