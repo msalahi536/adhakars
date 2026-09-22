@@ -506,13 +506,6 @@ html[data-preset="sand"] {
   --eve-ink: #e3bd86; --eve-ink-rgb: 227, 189, 134; --eve-title: #faeedd; --eve-eyebrow: #cfae86;
   --eve-nav-active: #f2d4a8; --eve-nav-inactive: #c2a887; --eve-muted: #a48f72; --eve-source-fg: #ecd4b2;
 }
-html[data-preset="midnight"] {
-  --preset-ink: #4f629b; --preset-ink-strong: #33416c; --preset-ink-rgb: 79, 98, 155;
-  --preset-muted: #626a82;
-  --eve-ink: #96a8e0; --eve-ink-rgb: 150, 168, 224; --eve-title: #e7ecfb; --eve-eyebrow: #a2acd0;
-  --eve-nav-active: #c2cdf7; --eve-nav-inactive: #99a2c4; --eve-muted: #838bab; --eve-source-fg: #cbd4ef;
-}
-
 html[data-preset]:is([data-section="morning"], [data-visual-phase="morning"]),
 html[data-preset][data-section="salah"],
 html[data-preset][data-section="tasbih"],
