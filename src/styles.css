@@ -500,12 +500,12 @@ html[data-preset="rose"][data-section="evening"] .adhkar-pagination-arrow {
 }
 /* Rose evening: light pink progress fill on a soft translucent track */
 html[data-preset="rose"][data-section="evening"] .adhkar-progress-track {
-  background: rgba(255, 236, 240, 0.22);
+  background: rgba(255, 236, 240, 0.18);
   box-shadow: none;
 }
 html[data-preset="rose"][data-section="evening"] .adhkar-progress-value {
-  background: #f2c4cf;
-  box-shadow: 0 1px 4px rgba(242, 196, 207, 0.35);
+  background: #d98aa0;
+  box-shadow: 0 1px 4px rgba(217, 138, 160, 0.4);
 }
 /* Rose evening: pink glass audio button + warm heading */
 html[data-preset="rose"][data-section="evening"] .adhkar-card-heading h3 { color: #f0c6d1 !important; }
