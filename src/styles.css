@@ -481,7 +481,11 @@ html[data-preset][data-section="default"] {
 }
 
 /* Rose morning: blush card/nav/arrows, deeper pink source pill */
-html[data-preset="rose"][data-section="morning"] {
+html[data-preset="rose"][data-section="morning"],
+html[data-preset="rose"][data-section="salah"],
+html[data-preset="rose"][data-section="tasbih"],
+html[data-preset="rose"][data-section="custom"],
+html[data-preset="rose"][data-section="default"] {
   --card: #f9e8e6 !important;
   --surface-card: #f9e8e6 !important;
   --nav-bg: #f9e8e6 !important;
