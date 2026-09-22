@@ -23,3 +23,10 @@
 - [x] Show weak or disputed narration markers only on the eight identified entries.
 - [x] Open the full supplied Arabic, transliteration, translation, reward, narration, grading, and notes from each reference pill.
 - [x] Verify list counts, weak-reference treatment, scrolling, and popup presentation across target phone and tablet sizes.
+
+- [x] Remove emoji characters from all app-facing text.
+- [x] Move the weak-narration icon beside the Commentary label.
+- [x] Add guidance that the reference pill opens the complete breakdown.
+- [x] Fit all Morning and Evening pagination dots within the card width.
+- [x] Replace both Three Quls cards with the complete supplied Arabic, transliteration, translation, narration, grading, and reward.
+- [x] Verify the corrected cards and controls at 393×852.
