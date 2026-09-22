@@ -461,12 +461,12 @@ html[data-preset][data-section="evening"] {
 }
 /* Rose evening: translucent mauve glass card/nav, sky shows through, calm pink glow */
 html[data-preset="rose"][data-section="evening"] {
-  --card: rgba(124, 73, 86, 0.55) !important;
-  --surface-card: rgba(124, 73, 86, 0.55) !important;
+  --card: rgba(124, 73, 86, 0.86) !important;
+  --surface-card: rgba(124, 73, 86, 0.86) !important;
   --card-foreground: #fdf0ee !important;
   --card-border: rgba(246, 200, 210, 0.2) !important;
   --border: rgba(246, 200, 210, 0.2) !important;
-  --nav-bg: rgba(123, 74, 88, 0.72) !important;
+  --nav-bg: rgba(123, 74, 88, 0.9) !important;
   --nav-border: rgba(246, 200, 210, 0.3) !important;
   --nav-active: #f7dde3 !important;
   --nav-inactive: rgba(247, 221, 227, 0.55) !important;
@@ -479,6 +479,10 @@ html[data-preset="rose"][data-section="evening"] {
   --source-fg: #f4ccd5 !important;
   --count-fg: #f2c4cf !important;
   --ring-track: rgba(244, 204, 213, 0.22) !important;
+}
+/* Rose evening: slight warm rose tint over the background image */
+html[data-preset="rose"][data-section="evening"] .app-shell::after {
+  background: linear-gradient(180deg, rgba(150, 70, 95, 0.16), rgba(90, 40, 60, 0.20)) !important;
 }
 html[data-preset="rose"][data-section="evening"] .dhikr-card {
   backdrop-filter: blur(16px);
