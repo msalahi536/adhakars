@@ -445,7 +445,7 @@ html[data-section="evening"] .app-shell { background: radial-gradient(circle at 
 }
 
 .adhkar-header .label-caps {
-  color: var(--title);
+  color: #3c5438;
   font-family: var(--font-sans);
   font-size: 9px;
   font-weight: 600;
@@ -457,10 +457,10 @@ html[data-section="evening"] .app-shell { background: radial-gradient(circle at 
 
 .adhkar-header .app-page-title {
   margin-top: 9px;
-  color: var(--title);
+  color: #3c5438;
   font-family: var(--font-display);
-  font-size: 32px;
-  font-weight: 500;
+  font-size: 28px;
+  font-weight: 600;
   line-height: 1;
   letter-spacing: 0;
   white-space: nowrap;
