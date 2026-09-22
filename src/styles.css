@@ -910,7 +910,7 @@ html[data-visual-phase="evening"] .adhkar-card-heading button { background: rgba
 .adhkar-reference-content:not(:has(.adhkar-arabic-scroll)) {
   display: block;
   width: 100%;
-  height: auto;
+  height: 0;
   flex: 1 1 0%;
   min-width: 0;
   min-height: 0;
@@ -1112,7 +1112,7 @@ html[data-preset][data-section="tasbih"] {
 .tasbih-corner-control.left { left: 18px; }
 .tasbih-corner-control.right { right: 18px; }
 .tasbih-control { display: flex; width: 36px; height: 36px; align-items: center; justify-content: center; border: 1px solid var(--card-border, var(--border)); border-radius: 999px; background: color-mix(in oklab, var(--card) 88%, transparent); color: var(--btn-fg, var(--title)); box-shadow: 0 4px 12px color-mix(in oklab, var(--title) 8%, transparent); backdrop-filter: blur(16px); }
-.tasbih-disc { position: relative; display: flex; width: 280px; height: 280px; flex: 0 0 auto; align-items: center; justify-content: center; border: 8px solid #f4efe4; border-radius: 50%; background: radial-gradient(circle at 50% 35%, #fbf8f1 0%, #f1ece0 70%, #e6dfd0 100%); box-shadow: 0 18px 40px rgba(0,0,0,0.10), inset 0 2px 6px rgba(255,255,255,0.9), inset 0 -6px 14px rgba(0,0,0,0.06); transition: transform 80ms ease; }
+.tasbih-disc { position: relative; top: auto; left: auto; display: flex; width: 280px; height: 280px; flex: 0 0 auto; align-items: center; justify-content: center; transform: none; border: 8px solid #f4efe4; border-radius: 50%; background: radial-gradient(circle at 50% 35%, #fbf8f1 0%, #f1ece0 70%, #e6dfd0 100%); box-shadow: 0 18px 40px rgba(0,0,0,0.10), inset 0 2px 6px rgba(255,255,255,0.9), inset 0 -6px 14px rgba(0,0,0,0.06); transition: transform 80ms ease; }
 .tasbih-disc-tapped { transform: scale(0.985); }
 .tasbih-disc-content { display: flex; flex-direction: column; align-items: center; justify-content: center; }
 .tasbih-count { color: #2f4f34; font-family: var(--font-sans); font-size: 92px; font-weight: 400; line-height: 1; font-variant-numeric: tabular-nums; }
@@ -1208,10 +1208,10 @@ html[data-preset][data-section="tasbih"] {
   .qibla-compass { width: min(76vw, 318px); }
 
   .salah-hero { height: calc(232px + env(safe-area-inset-top)); flex-basis: auto; }
-  .salah-next-label { top: 55px; font-size: 19px; }
-  .salah-countdown { top: 82px; font-size: 56px; line-height: 56px; }
-  .salah-dismiss { top: 153px; height: 36px; font-size: 16px; }
-  .salah-location { top: 202px; font-size: 14px; }
+  .salah-next-label { top: calc(env(safe-area-inset-top) + 55px); font-size: 19px; }
+  .salah-countdown { top: calc(env(safe-area-inset-top) + 82px); font-size: 56px; line-height: 56px; }
+  .salah-dismiss { top: calc(env(safe-area-inset-top) + 153px); height: 36px; font-size: 16px; }
+  .salah-location { top: calc(env(safe-area-inset-top) + 202px); font-size: 14px; }
   .salah-content-inner {
     max-width: 430px;
     grid-template-rows: 178px 250px 66px;
@@ -1233,11 +1233,11 @@ html[data-preset][data-section="tasbih"] {
   .tasbih-target { height: 38px; font-size: 17px; }
   .tasbih-main { padding-inline: 20px; }
   .tasbih-card-wrap { max-width: 390px; }
-  .tasbih-disc { top: 92px; width: 296px; height: 296px; }
+  .tasbih-disc { top: auto; width: 296px; height: 296px; }
   .tasbih-ring svg { width: 296px; height: 296px; }
   .tasbih-count { font-size: 98px; }
   .tasbih-cycle { font-size: 16px; }
-  .tasbih-helper { top: 424px; }
+  .tasbih-helper { top: auto; }
   .tasbih-helper-primary { font-size: 13px; }
 }
 
@@ -1252,10 +1252,10 @@ html[data-preset][data-section="tasbih"] {
   .adhkar-counter-value { font-size: 32px !important; }
 
   .salah-hero { height: calc(198px + env(safe-area-inset-top)) !important; flex-basis: auto !important; }
-  .salah-next-label { top: 44px !important; font-size: 18px !important; }
-  .salah-countdown { top: 68px !important; font-size: 46px !important; line-height: 46px !important; }
-  .salah-dismiss { top: 128px !important; height: 34px !important; font-size: 15px !important; }
-  .salah-location { top: 170px !important; font-size: 13px !important; }
+  .salah-next-label { top: calc(env(safe-area-inset-top) + 44px) !important; font-size: 18px !important; }
+  .salah-countdown { top: calc(env(safe-area-inset-top) + 68px) !important; font-size: 46px !important; line-height: 46px !important; }
+  .salah-dismiss { top: calc(env(safe-area-inset-top) + 128px) !important; height: 34px !important; font-size: 15px !important; }
+  .salah-location { top: calc(env(safe-area-inset-top) + 170px) !important; font-size: 13px !important; }
   .salah-content-inner:not(.no-location) {
     height: 100% !important;
     min-height: 0 !important;
@@ -1271,10 +1271,10 @@ html[data-preset][data-section="tasbih"] {
   .tasbih-header { height: calc(206px + env(safe-area-inset-top)) !important; flex-basis: auto !important; }
   .tasbih-header-inner { padding-top: 48px !important; }
   .tasbih-title { font-size: 31px !important; }
-  .tasbih-disc { top: 70px !important; width: 252px !important; height: 252px !important; }
+  .tasbih-disc { top: auto !important; width: 252px !important; height: 252px !important; }
   .tasbih-ring svg { width: 252px !important; height: 252px !important; }
   .tasbih-count { font-size: 80px !important; }
-  .tasbih-helper { top: 348px !important; }
+  .tasbih-helper { top: auto !important; }
 
   .qibla-header { min-height: 138px !important; }
   .qibla-header-content { padding-top: calc(env(safe-area-inset-top) + 50px) !important; }
