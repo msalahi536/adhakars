@@ -13,7 +13,6 @@ export type SuggestionRow = {
   kind: string;
   body: string;
   contact: string | null;
-  meta: Record<string, unknown>;
   created_at: string;
 };
 
@@ -41,7 +40,7 @@ export const listSuggestions = createServerFn({ method: "POST" })
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { data: rows, error } = await supabaseAdmin
       .from("suggestions")
-      .select("id, kind, body, contact, meta, created_at")
+      .select("id, kind, body, contact, created_at")
       .order("created_at", { ascending: false })
       .limit(500);
     if (error) return { ok: true as const, items: [] as SuggestionRow[] };
