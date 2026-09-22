@@ -1,5 +1,5 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { useEffect } from "react";
+import { useEffect, useLayoutEffect } from "react";
 import {
   Outlet,
   Link,
@@ -122,7 +122,9 @@ function RootComponent() {
   const router = useRouter();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
 
-  useEffect(() => {
+  // Apply before paint so a new route never shows the previous page's colors.
+  const useThemeEffect = typeof window === "undefined" ? useEffect : useLayoutEffect;
+  useThemeEffect(() => {
     applyThemeForRoute(pathname);
   }, [pathname]);
 
