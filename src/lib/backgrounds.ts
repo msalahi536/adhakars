@@ -7,6 +7,8 @@ import roseMorning from "@/assets/rose-morning.webp.asset.json";
 import roseEvening from "@/assets/rose-evening.webp.asset.json";
 import twilightMorning from "@/assets/twilight-morning.webp.asset.json";
 import twilightEvening from "@/assets/twilight-evening.webp.asset.json";
+import oceanMorning from "@/assets/ocean-morning.webp.asset.json";
+import oceanEvening from "@/assets/ocean-evening.webp.asset.json";
 
 export type BackgroundPair = { morning: string; evening: string };
 
