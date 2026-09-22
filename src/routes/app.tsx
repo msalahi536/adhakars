@@ -15,7 +15,7 @@ function AppLayout() {
   const pathname = useRouterState({ select: (state) => state.location.pathname });
   const isEvening = pathname === "/app/evening";
   const isAdhkar = ["/app", "/app/", "/app/evening"].includes(pathname);
-  const showBackground = isAdhkar || pathname === "/app/salah";
+  const showBackground = isAdhkar || ["/app/salah", "/app/tasbih", "/app/more"].includes(pathname);
   const showSettings = !pathname.startsWith("/app/settings");
   useEffect(() => {
     if (!hasOnboarded()) setShowOnboarding(true);
