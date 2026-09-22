@@ -57,7 +57,7 @@ export const setSeed = (hex: string) => writeLS(K_SEED, clampSeed(hex));
 export const getPresetId = (): string => {
   const v = readLS(K_PRESET) ?? DEFAULT_PRESET_ID;
   // Removed presets fold back into the default preset.
-  return v === "classic" || v === "sakura" ? DEFAULT_PRESET_ID : v;
+  return v === "classic" || v === "sakura" || v === "custom" ? DEFAULT_PRESET_ID : v;
 };
 export const setPresetId = (id: string) => writeLS(K_PRESET, id);
 
