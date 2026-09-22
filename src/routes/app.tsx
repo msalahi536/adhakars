@@ -70,8 +70,10 @@ function AppLayout() {
           />
         </>
       )}
-      {showSettings && <SettingsButton />}
-      <Outlet />
+      <div className="app-content-frame">
+        {showSettings && <SettingsButton />}
+        <Outlet />
+      </div>
       <BottomNav />
       {showOnboarding && <Onboarding onDone={() => setShowOnboarding(false)} />}
     </div>
