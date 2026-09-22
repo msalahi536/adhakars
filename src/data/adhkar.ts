@@ -2,6 +2,7 @@ export type DhikrDetails = {
   grading?: string;
   reward?: string;
   narration?: string;
+  narrationArabic?: string;
   notes?: string[];
   weak?: boolean;
 };
@@ -20,6 +21,49 @@ export type Dhikr = {
   details?: DhikrDetails;
 };
 
+const threeQuls = (id: string): Dhikr => ({
+  id,
+  title: "The Three Quls",
+  arabic: "بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ\n\nقُلْ هُوَ اللَّهُ أَحَدٌ ۝\nاللَّهُ الصَّمَدُ ۝\nلَمْ يَلِدْ وَلَمْ يُولَدْ ۝\nوَلَمْ يَكُن لَّهُ كُفُوًا أَحَدٌ ۝\n\nقُلْ أَعُوذُ بِرَبِّ الْفَلَقِ ۝\nمِن شَرِّ مَا خَلَقَ ۝\nوَمِن شَرِّ غَاسِقٍ إِذَا وَقَبَ ۝\nوَمِن شَرِّ النَّفَّاثَاتِ فِي الْعُقَدِ ۝\nوَمِن شَرِّ حَاسِدٍ إِذَا حَسَدَ ۝\n\nقُلْ أَعُوذُ بِرَبِّ النَّاسِ ۝\nمَلِكِ النَّاسِ ۝\nإِلَٰهِ النَّاسِ ۝\nمِن شَرِّ الْوَسْوَاسِ الْخَنَّاسِ ۝\nالَّذِي يُوَسْوِسُ فِي صُدُورِ النَّاسِ ۝\nمِنَ الْجِنَّةِ وَالنَّاسِ ۝",
+  transliteration: "Bismillāhi ʾr-Raḥmāni ʾr-Raḥīm\n\nQul huwa ʾllāhu aḥad.\nAllāhu ʾṣ-ṣamad.\nLam yalid wa lam yūlad.\nWa lam yakun lahu kufuwan aḥad.\n\nQul aʿūdhu bi-rabbi ʾl-falaq.\nMin sharri mā khalaq.\nWa min sharri ghāsiqin idhā waqab.\nWa min sharri ʾn-naffāthāti fi ʾl-ʿuqad.\nWa min sharri ḥāsidin idhā ḥasad.\n\nQul aʿūdhu bi-rabbi ʾn-nās.\nMaliki ʾn-nās.\nIlāhi ʾn-nās.\nMin sharri ʾl-waswāsi ʾl-khannās.\nAlladhī yuwaswisu fī ṣudūri ʾn-nās.\nMina ʾl-jinnati wa ʾn-nās.",
+  translation: "In the name of Allah, the Entirely Merciful, the Especially Merciful.\n\nSay, “He is Allah, [who is] One,\nAllah, the Eternal Refuge.\nHe neither begets nor is born,\nNor is there to Him any equivalent.”\n\nSay, “I seek refuge in the Lord of daybreak\nFrom the evil of that which He created\nAnd from the evil of darkness when it settles\nAnd from the evil of the blowers in knots\nAnd from the evil of an envier when he envies.”\n\nSay, “I seek refuge in the Lord of mankind,\nThe Sovereign of mankind,\nThe God of mankind,\nFrom the evil of the retreating whisperer —\nWho whispers [evil] into the breasts of mankind —\nFrom among the jinn and mankind.”",
+  source: "Sunan Abi Dawud 5082 · Hasan (al-Albani)",
+  commentary: "Recite Sūrat al-Ikhlāṣ, Sūrat al-Falaq, and Sūrat an-Nās three times each in the morning and evening. They will suffice you against everything.",
+  target: 3,
+  arabicMulti: [
+    {
+      label: "The Basmalah · Quran 1:1",
+      arabic: "بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ",
+      transliteration: "Bismillāhi ʾr-Raḥmāni ʾr-Raḥīm",
+      translation: "In the name of Allah, the Entirely Merciful, the Especially Merciful.",
+    },
+    {
+      label: "1 · Sūrat al-Ikhlāṣ · Quran 112",
+      arabic: "قُلْ هُوَ اللَّهُ أَحَدٌ ۝\nاللَّهُ الصَّمَدُ ۝\nلَمْ يَلِدْ وَلَمْ يُولَدْ ۝\nوَلَمْ يَكُن لَّهُ كُفُوًا أَحَدٌ ۝",
+      transliteration: "Qul huwa ʾllāhu aḥad.\nAllāhu ʾṣ-ṣamad.\nLam yalid wa lam yūlad.\nWa lam yakun lahu kufuwan aḥad.",
+      translation: "Say, “He is Allah, [who is] One,\nAllah, the Eternal Refuge.\nHe neither begets nor is born,\nNor is there to Him any equivalent.”",
+    },
+    {
+      label: "2 · Sūrat al-Falaq · Quran 113",
+      arabic: "قُلْ أَعُوذُ بِرَبِّ الْفَلَقِ ۝\nمِن شَرِّ مَا خَلَقَ ۝\nوَمِن شَرِّ غَاسِقٍ إِذَا وَقَبَ ۝\nوَمِن شَرِّ النَّفَّاثَاتِ فِي الْعُقَدِ ۝\nوَمِن شَرِّ حَاسِدٍ إِذَا حَسَدَ ۝",
+      transliteration: "Qul aʿūdhu bi-rabbi ʾl-falaq.\nMin sharri mā khalaq.\nWa min sharri ghāsiqin idhā waqab.\nWa min sharri ʾn-naffāthāti fi ʾl-ʿuqad.\nWa min sharri ḥāsidin idhā ḥasad.",
+      translation: "Say, “I seek refuge in the Lord of daybreak\nFrom the evil of that which He created\nAnd from the evil of darkness when it settles\nAnd from the evil of the blowers in knots\nAnd from the evil of an envier when he envies.”",
+    },
+    {
+      label: "3 · Sūrat an-Nās · Quran 114",
+      arabic: "قُلْ أَعُوذُ بِرَبِّ النَّاسِ ۝\nمَلِكِ النَّاسِ ۝\nإِلَٰهِ النَّاسِ ۝\nمِن شَرِّ الْوَسْوَاسِ الْخَنَّاسِ ۝\nالَّذِي يُوَسْوِسُ فِي صُدُورِ النَّاسِ ۝\nمِنَ الْجِنَّةِ وَالنَّاسِ ۝",
+      transliteration: "Qul aʿūdhu bi-rabbi ʾn-nās.\nMaliki ʾn-nās.\nIlāhi ʾn-nās.\nMin sharri ʾl-waswāsi ʾl-khannās.\nAlladhī yuwaswisu fī ṣudūri ʾn-nās.\nMina ʾl-jinnati wa ʾn-nās.",
+      translation: "Say, “I seek refuge in the Lord of mankind,\nThe Sovereign of mankind,\nThe God of mankind,\nFrom the evil of the retreating whisperer —\nWho whispers [evil] into the breasts of mankind —\nFrom among the jinn and mankind.”",
+    },
+  ],
+  details: {
+    grading: "Hasan (al-Albani)",
+    reward: "Reciting the three surahs three times each in the morning and evening will suffice you against everything.",
+    narration: "Narrated ‘Abdullah ibn Khubayb: We went out one rainy and intensely dark night to look for the Messenger of Allah (ﷺ) to lead us in prayer, and when we found him, he asked: “Have you prayed?”, but I did not say anything. So he said: “Say,” but I did not say anything. He again said: “Say,” but I did not say anything. He then said: “Say.” So I said: What am I to say? He said: “Say: ‘Say, He is Allah, One,’ and al-Mu‘awwidhatan three times in the morning and evening; they will serve you for every purpose.”",
+    narrationArabic: "حَدَّثَنَا مُحَمَّدُ بْنُ الْمُصَفَّى، حَدَّثَنَا ابْنُ أَبِي فُدَيْكٍ، قَالَ أَخْبَرَنِي ابْنُ أَبِي ذِئْبٍ، عَنْ أَبِي أَسِيدٍ الْبَرَّادِ، عَنْ مُعَاذِ بْنِ عَبْدِ اللَّهِ بْنِ خُبَيْبٍ، عَنْ أَبِيهِ، أَنَّهُ قَالَ خَرَجْنَا فِي لَيْلَةِ مَطَرٍ وَظُلْمَةٍ شَدِيدَةٍ نَطْلُبُ رَسُولَ اللَّهِ صلى الله عليه وسلم لِيُصَلِّيَ لَنَا فَأَدْرَكْنَاهُ فَقَالَ «أَصَلَّيْتُمْ». فَلَمْ أَقُلْ شَيْئًا فَقَالَ «قُلْ». فَلَمْ أَقُلْ شَيْئًا ثُمَّ قَالَ «قُلْ». فَلَمْ أَقُلْ شَيْئًا ثُمَّ قَالَ «قُلْ». فَقُلْتُ يَا رَسُولَ اللَّهِ مَا أَقُولُ قَالَ «قُلْ هُوَ اللَّهُ أَحَدٌ وَالْمُعَوِّذَتَيْنِ حِينَ تُمْسِي وَحِينَ تُصْبِحُ ثَلاَثَ مَرَّاتٍ تَكْفِيكَ مِنْ كُلِّ شَىْءٍ»",
+  },
+});
+
 export const morningAdhkar: Dhikr[] = [
   {
     id: "morning-1-ayat-al-kursi",
@@ -35,21 +79,7 @@ export const morningAdhkar: Dhikr[] = [
       narration: "Hisn al-Muslim cites the virtue as follows: “Whoever says this when he rises in the morning will be protected from jinn until he retires in the evening, and whoever says it when retiring in the evening will be protected from them until he rises in the morning.” Reported by al-Hakim 1/562. Al-Albani graded it authentic in Sahih at-Targhib wa’t-Tarhib 1/273 and traced it to an-Nasa’i and at-Tabarani, noting that at-Tabarani’s chain of transmission is reliable (jayyid).",
     },
   },
-  {
-    id: "morning-2-surat-al-ikhla-al-falaq-and-an-nas",
-    title: "Sūrat al-Ikhlāṣ, al-Falaq and an-Nās",
-    arabic: "Al-Ikhlāṣ (112)\nقُلْ هُوَ اللَّهُ أَحَدٌ\nاللَّهُ الصَّمَدُ\nلَمْ يَلِدْ وَلَمْ يُولَدْ\nوَلَمْ يَكُن لَّهُ كُفُوًا أَحَدٌ\nAl-Falaq (113)\nقُلْ أَعُوذُ بِرَبِّ الْفَلَقِ\nمِن شَرِّ مَا خَلَقَ\nوَمِن شَرِّ غَاسِقٍ إِذَا وَقَبَ\nوَمِن شَرِّ النَّفَّاثَاتِ فِي الْعُقَدِ\nوَمِن شَرِّ حَاسِدٍ إِذَا حَسَدَ\nAn-Nās (114)\nقُلْ أَعُوذُ بِرَبِّ النَّاسِ\nمَلِكِ النَّاسِ\nإِلَٰهِ النَّاسِ\nمِن شَرِّ الْوَسْوَاسِ الْخَنَّاسِ\nالَّذِي يُوَسْوِسُ فِي صُدُورِ النَّاسِ\nمِنَ الْجِنَّةِ وَالنَّاسِ",
-    transliteration: "Qul huwa ʾllāhu aḥad… · Qul aʿūdhu bi-rabbi ʾl-falaq… · Qul aʿūdhu bi-rabbi ʾn-nās…",
-    translation: "Say: He is Allah, [who is] One… · Say: I seek refuge in the Lord of daybreak… · Say: I seek refuge in the Lord of mankind…",
-    source: "Abu Dawud 5082  ·  quran.com 112, 113, 114  ·  Hasan (al-Albani)",
-    commentary: "Reciting these three surahs three times each, morning and evening, suffices a person against everything.",
-    target: 3,
-    details: {
-      grading: "Hasan (al-Albani)",
-      reward: "Reciting these three surahs three times each, morning and evening, suffices a person against everything.",
-      narration: "Narrated ‘Abdullah ibn Khubayb: We went out one rainy and intensely dark night to look for the Messenger of Allah (ﷺ) to lead us in prayer, and when we found him, he asked: “Have you prayed?”, but I did not say anything. So he said: “Say,” but I did not say anything. He again said: “Say,” but I did not say anything. He then said: “Say.” So I said: What am I to say? He said: “Say: ‘Say, He is Allah, One,’ and al-Mu‘awwidhatan three times in the morning and evening; they will serve you for every purpose.”",
-    },
-  },
+  threeQuls("morning-2-three-quls"),
   {
     id: "morning-3-a-bahna-wa-a-baha-l-mulku-lillah",
     title: "Aṣbaḥnā wa aṣbaḥa ʾl-mulku lillāh",
@@ -394,21 +424,7 @@ export const eveningAdhkar: Dhikr[] = [
       narration: "Hisn al-Muslim cites the virtue as follows: “Whoever says this when he rises in the morning will be protected from jinn until he retires in the evening, and whoever says it when retiring in the evening will be protected from them until he rises in the morning.” Reported by al-Hakim 1/562. Al-Albani graded it authentic in Sahih at-Targhib wa’t-Tarhib 1/273 and traced it to an-Nasa’i and at-Tabarani, noting that at-Tabarani’s chain of transmission is reliable (jayyid).",
     },
   },
-  {
-    id: "evening-2-surat-al-ikhla-al-falaq-and-an-nas",
-    title: "Sūrat al-Ikhlāṣ, al-Falaq and an-Nās",
-    arabic: "Al-Ikhlāṣ (112)\nقُلْ هُوَ اللَّهُ أَحَدٌ\nاللَّهُ الصَّمَدُ\nلَمْ يَلِدْ وَلَمْ يُولَدْ\nوَلَمْ يَكُن لَّهُ كُفُوًا أَحَدٌ\nAl-Falaq (113)\nقُلْ أَعُوذُ بِرَبِّ الْفَلَقِ\nمِن شَرِّ مَا خَلَقَ\nوَمِن شَرِّ غَاسِقٍ إِذَا وَقَبَ\nوَمِن شَرِّ النَّفَّاثَاتِ فِي الْعُقَدِ\nوَمِن شَرِّ حَاسِدٍ إِذَا حَسَدَ\nAn-Nās (114)\nقُلْ أَعُوذُ بِرَبِّ النَّاسِ\nمَلِكِ النَّاسِ\nإِلَٰهِ النَّاسِ\nمِن شَرِّ الْوَسْوَاسِ الْخَنَّاسِ\nالَّذِي يُوَسْوِسُ فِي صُدُورِ النَّاسِ\nمِنَ الْجِنَّةِ وَالنَّاسِ",
-    transliteration: "Qul huwa ʾllāhu aḥad… · Qul aʿūdhu bi-rabbi ʾl-falaq… · Qul aʿūdhu bi-rabbi ʾn-nās…",
-    translation: "Say: He is Allah, [who is] One… · Say: I seek refuge in the Lord of daybreak… · Say: I seek refuge in the Lord of mankind…",
-    source: "Abu Dawud 5082  ·  quran.com 112, 113, 114  ·  Hasan (al-Albani)",
-    commentary: "Reciting these three surahs three times each, morning and evening, suffices a person against everything.",
-    target: 3,
-    details: {
-      grading: "Hasan (al-Albani)",
-      reward: "Reciting these three surahs three times each, morning and evening, suffices a person against everything.",
-      narration: "Narrated ‘Abdullah ibn Khubayb: We went out one rainy and intensely dark night to look for the Messenger of Allah (ﷺ) to lead us in prayer, and when we found him, he asked: “Have you prayed?”, but I did not say anything. So he said: “Say,” but I did not say anything. He again said: “Say,” but I did not say anything. He then said: “Say.” So I said: What am I to say? He said: “Say: ‘Say, He is Allah, One,’ and al-Mu‘awwidhatan three times in the morning and evening; they will serve you for every purpose.”",
-    },
-  },
+  threeQuls("evening-2-three-quls"),
   {
     id: "evening-3-amsayna-wa-amsa-l-mulku-lillah",
     title: "Amsaynā wa amsā ʾl-mulku lillāh",

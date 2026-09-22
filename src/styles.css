@@ -943,10 +943,10 @@ html[data-visual-phase="evening"] .adhkar-card-heading button { background: rgba
 .adhkar-counter-target { margin-top: 2px; color: var(--text-muted); font-size: 12px; font-weight: 400; line-height: 1; }
 
 .adhkar-pagination-row { display: flex; height: 40px; min-height: 40px; align-items: flex-start; justify-content: center; gap: 12px; padding: 0 20px 16px; }
-.adhkar-pagination { display: flex; height: 30px; min-width: 0; align-items: center; justify-content: center; gap: 5px; padding: 0 6px; border: 1px solid transparent; border-radius: 999px; color: var(--text-muted); cursor: ew-resize; touch-action: none; }
+.adhkar-pagination { display: flex; width: min(260px, calc(100vw - 112px)); height: 30px; min-width: 0; align-items: center; justify-content: center; gap: 0; padding: 0 4px; border: 1px solid transparent; border-radius: 999px; color: var(--text-muted); cursor: ew-resize; touch-action: none; }
 .adhkar-pagination.is-scrubbing { padding: 0 9px; border-color: color-mix(in oklab, var(--card-border, var(--border)) 75%, transparent); background: color-mix(in oklab, var(--pill-bg, var(--source-bg)) 72%, transparent); backdrop-filter: blur(12px); }
-.adhkar-pagination button { position: relative; width: 12px; height: 30px; flex: 0 0 12px; background: transparent; }
-.adhkar-pagination button::after { position: absolute; top: 50%; left: 50%; width: 7px; height: 7px; border-radius: 50%; background: var(--dot-inactive); content: ""; transform: translate(-50%, -50%); }
+.adhkar-pagination button { position: relative; width: auto; height: 30px; min-width: 0; flex: 1 1 0; background: transparent; }
+.adhkar-pagination button::after { position: absolute; top: 50%; left: 50%; width: 5px; height: 5px; border-radius: 50%; background: var(--dot-inactive); content: ""; transform: translate(-50%, -50%); }
 .adhkar-pagination button.is-active::after { background: var(--dot-active); }
 .adhkar-pagination-arrow { display: inline-flex; width: 24px; height: 24px; flex: 0 0 24px; align-items: center; justify-content: center; border: 1px solid var(--card-border, var(--border)); border-radius: 999px; background: var(--pill-bg, var(--source-bg)); color: var(--text-muted); }
 .adhkar-pagination-arrow:disabled { opacity: 0.35; }
@@ -2225,10 +2225,12 @@ html[data-visual-phase="evening"] .tasbih-disc {
 .after-salah-stack .adhkar-card-heading h3 { color: var(--accent) !important; }
 .after-salah-stack .adhkar-card-heading button { background: color-mix(in oklab, var(--accent) 16%, transparent) !important; color: var(--accent) !important; }
 .adhkar-commentary { margin-top: 18px; border-top: 1px solid color-mix(in oklab, var(--card-foreground) 9%, transparent); }
-.adhkar-commentary summary { padding: 14px 2px 6px; color: var(--accent); font-size: 12px; font-weight: 600; cursor: pointer; list-style: none; }
+.adhkar-commentary summary { display: flex; align-items: center; padding: 14px 2px 6px; color: var(--accent); font-size: 12px; font-weight: 600; cursor: pointer; list-style: none; }
 .adhkar-commentary summary::before { content: "+"; display: inline-flex; width: 20px; height: 20px; margin-right: 8px; align-items: center; justify-content: center; border: 1px solid color-mix(in oklab, var(--accent) 34%, transparent); border-radius: 50%; }
 .adhkar-commentary[open] summary::before { content: "−"; }
+.adhkar-commentary summary svg { margin-left: 6px; }
 .adhkar-commentary p { margin: 3px 0 0; color: var(--text-muted); font-size: 13px; line-height: 1.55; }
+.adhkar-commentary .adhkar-commentary-hint { margin-top: 10px; color: var(--accent); font-size: 11px; font-weight: 600; }
 
 @media (max-height: 760px) {
   .after-salah-panel { height: 94dvh !important; }

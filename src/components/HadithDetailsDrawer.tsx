@@ -1,4 +1,4 @@
-import { AlertTriangle, BookOpen, X } from "lucide-react";
+import { BookOpen, X } from "lucide-react";
 import type { Dhikr } from "@/data/adhkar";
 import {
   Drawer,
@@ -64,16 +64,6 @@ export function HadithDetailsDrawer({ dhikr, open, onOpenChange }: Props) {
           style={{ WebkitOverflowScrolling: "touch" }}
           data-no-swipe
         >
-          {details?.weak && (
-            <div
-              className="flex items-start gap-2.5 rounded-md border px-3.5 py-3 text-xs leading-5"
-              style={{ borderColor: "var(--border)", background: "color-mix(in oklab, var(--accent) 8%, var(--card))" }}
-            >
-              <AlertTriangle className="mt-0.5 shrink-0" size={15} strokeWidth={1.7} />
-              <span>This narration has a weak or disputed grading. See the notes below.</span>
-            </div>
-          )}
-
           <section className="space-y-3">
             <h3 className="label-caps" style={{ color: "var(--accent)" }}>Arabic</h3>
             <p className="arabic whitespace-pre-line text-right text-[24px] leading-[2.05]" lang="ar" dir="rtl">{dhikr.arabic}</p>
@@ -84,6 +74,12 @@ export function HadithDetailsDrawer({ dhikr, open, onOpenChange }: Props) {
           <DetailSection title="Grading" children={details?.grading} />
           <DetailSection title="Reward · In short" children={details?.reward} />
           <DetailSection title="Full narration" children={details?.narration} />
+          {details?.narrationArabic && (
+            <section className="space-y-3">
+              <h3 className="label-caps" style={{ color: "var(--accent)" }}>Full narration · Arabic</h3>
+              <p className="arabic whitespace-pre-line text-right text-[22px] leading-[2]" lang="ar" dir="rtl">{details.narrationArabic}</p>
+            </section>
+          )}
 
           {details?.notes?.map((note, index) => (
             <DetailSection key={`${dhikr.id}-note-${index}`} title={index === 0 ? "Notes" : `Note ${index + 1}`} children={note} />
