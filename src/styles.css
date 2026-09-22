@@ -332,7 +332,7 @@
 }
 
 .settings-button {
-  top: calc(env(safe-area-inset-top) + 14px);
+  top: calc(env(safe-area-inset-top) + 84px);
   right: 24px;
   width: 36px;
   height: 36px;
@@ -343,8 +343,7 @@
   backdrop-filter: blur(20px);
 }
 
-.app-shell.is-adhkar .settings-button {
-  top: calc(env(safe-area-inset-top) + 84px);
+.app-shell .settings-button {
   border-color: rgba(255, 255, 255, 0.86);
   background: rgba(250, 248, 241, 0.72);
   color: var(--title);
@@ -514,7 +513,7 @@ html[data-section="evening"] .adhkar-progress-value { background: #2c2a54; }
   font-size: 12px;
   font-weight: 600;
 }
-html[data-section="evening"] .app-shell.is-adhkar .settings-button,
+html[data-section="evening"] .app-shell .settings-button,
 html[data-section="evening"] .daily-swipe-stack .adhkar-index-row > span {
   border-color: rgba(255, 255, 255, 0.14) !important;
   background: rgba(235, 231, 247, 0.9) !important;
@@ -898,5 +897,40 @@ html[data-preset][data-section="tasbih"] {
   to {
     transform: translateY(0);
     opacity: 1;
+  }
+}
+
+/* Smooth cross-phase color transition (morning <-> evening) */
+.app-shell,
+.app-shell::after,
+.settings-button,
+.dhikr-card,
+.adhkar-reference-card,
+.adhkar-header,
+.adhkar-header *,
+.daily-swipe-stack .adhkar-index-row > span,
+.bottom-nav,
+.bottom-nav *,
+.adhkar-progress,
+.adhkar-progress *,
+.adhkar-pagination *,
+.app-page-title,
+.label-caps {
+  transition-property: background-color, background, border-color, color, fill, stroke, box-shadow, opacity;
+  transition-duration: 750ms;
+  transition-timing-function: ease-in-out;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .app-shell,
+  .app-shell::after,
+  .settings-button,
+  .dhikr-card,
+  .adhkar-reference-card,
+  .adhkar-header,
+  .adhkar-header *,
+  .bottom-nav,
+  .bottom-nav * {
+    transition-duration: 0ms;
   }
 }

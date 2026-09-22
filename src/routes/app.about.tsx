@@ -1,6 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { HeaderBackButton } from "@/components/HeaderBackButton";
-import { SettingsButton } from "@/components/SettingsButton";
 import { Mail } from "lucide-react";
 import { BenefitsList } from "@/components/BenefitsList";
 
@@ -26,7 +25,6 @@ function About() {
         style={{ background: "var(--grad-header)", color: "var(--header-fg)" }}
       >
         <HeaderBackButton />
-        <SettingsButton />
         <div
           className="relative mx-auto max-w-md px-16 pb-6 pt-9 text-center"
           style={{ paddingLeft: 60, paddingRight: 60 }}
