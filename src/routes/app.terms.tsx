@@ -12,6 +12,8 @@ export const Route = createFileRoute("/app/terms")({
       },
       { property: "og:title", content: "Terms of Service, Sahih Al-Adhkar" },
       { property: "og:description", content: "Terms of service for Sahih Al-Adhkar." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
     ],
   }),
   component: () => (

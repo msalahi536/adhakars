@@ -22,6 +22,10 @@ export const Route = createFileRoute("/app/qibla")({
     meta: [
       { title: "Qibla Finder, Sahih Al-Adhkar" },
       { name: "description", content: "Find the direction of the Qibla from your location." },
+      { property: "og:title", content: "Qibla Finder, Sahih Al-Adhkar" },
+      { property: "og:description", content: "Find the direction of the Qibla from your location." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
     ],
   }),
   component: Qibla,

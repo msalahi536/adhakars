@@ -32,6 +32,8 @@ export const Route = createFileRoute("/")({
         property: "og:description",
         content: "Authentic daily remembrance of Allah, sourced from the Sunnah.",
       },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
     ],
   }),
   component: HomePage,

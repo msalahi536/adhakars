@@ -48,7 +48,16 @@ import { rescheduleAdhanNotifications } from "@/lib/adhan-notifications";
 const APP_VERSION = "1.0.3";
 
 export const Route = createFileRoute("/app/settings")({
-  head: () => ({ meta: [{ title: "Settings, Sahih Al-Adhkar" }] }),
+  head: () => ({
+    meta: [
+      { title: "Settings, Sahih Al-Adhkar" },
+      { name: "description", content: "Choose your color, reminders, and reading preferences." },
+      { property: "og:title", content: "Settings, Sahih Al-Adhkar" },
+      { property: "og:description", content: "Choose your color, reminders, and reading preferences." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
+    ],
+  }),
   component: Settings,
 });
 

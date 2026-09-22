@@ -56,6 +56,8 @@ export const Route = createFileRoute("/download")({
       },
       { property: "og:title", content: "Get Sahih Al-Adhkar" },
       { property: "og:description", content: "Free, offline friendly, no accounts." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
     ],
   }),
   component: DownloadPage,

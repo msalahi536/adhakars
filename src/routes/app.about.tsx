@@ -12,6 +12,10 @@ export const Route = createFileRoute("/app/about")({
         content:
           "About the Sahih Al-Adhkar project, how to support it, and how to get in touch.",
       },
+      { property: "og:title", content: "About & Support, Sahih Al-Adhkar" },
+      { property: "og:description", content: "Learn about and support the Sahih Al-Adhkar project." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
     ],
   }),
   component: About,

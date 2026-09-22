@@ -12,6 +12,10 @@ export const Route = createFileRoute("/app/sleep")({
     meta: [
       { title: "Sleep & Wake Adhkar, Sahih Al-Adhkar" },
       { name: "description", content: "Authenticated adhkar before sleep and upon waking." },
+      { property: "og:title", content: "Sleep & Wake Adhkar, Sahih Al-Adhkar" },
+      { property: "og:description", content: "Authenticated adhkar before sleep and upon waking." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
     ],
   }),
   component: Sleep,

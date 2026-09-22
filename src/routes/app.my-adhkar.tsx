@@ -13,6 +13,10 @@ export const Route = createFileRoute("/app/my-adhkar")({
     meta: [
       { title: "My Adhkar, Sahih Al-Adhkar" },
       { name: "description", content: "Your own custom adhkar cards, saved on this device." },
+      { property: "og:title", content: "My Adhkar, Sahih Al-Adhkar" },
+      { property: "og:description", content: "Create personal adhkar cards saved on your device." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
     ],
   }),
   component: MyAdhkar,
