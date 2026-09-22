@@ -27,14 +27,18 @@ function AppLayout() {
       setBackgrounds(backgroundsForPreset(getPresetId()));
       setVisualPhase(resolveVisualPhase(pathname));
     };
+    const syncVisualPhase = (event: Event) => {
+      const detail = (event as CustomEvent<{ phase?: VisualPhase }>).detail;
+      setVisualPhase(detail?.phase ?? resolveVisualPhase(pathname));
+    };
     sync();
     window.addEventListener("adhkar:theme-change", sync);
     window.addEventListener("storage", sync);
-    window.addEventListener("adhkar:visual-phase-change", sync);
+    window.addEventListener("adhkar:visual-phase-change", syncVisualPhase);
     return () => {
       window.removeEventListener("adhkar:theme-change", sync);
       window.removeEventListener("storage", sync);
-      window.removeEventListener("adhkar:visual-phase-change", sync);
+      window.removeEventListener("adhkar:visual-phase-change", syncVisualPhase);
     };
   }, [pathname]);
 

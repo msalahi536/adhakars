@@ -33,7 +33,9 @@ function Sleep() {
   const setMode = (m: SleepMode) => {
     if (typeof window !== "undefined") window.localStorage.setItem(MODE_KEY, m);
     setModeState(m);
-    window.dispatchEvent(new CustomEvent("adhkar:visual-phase-change"));
+    window.dispatchEvent(new CustomEvent("adhkar:visual-phase-change", {
+      detail: { phase: m === "sleep" ? "evening" : "morning" },
+    }));
   };
 
   const items = mode === "sleep" ? sleepItems : wakeItems;
