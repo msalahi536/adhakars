@@ -303,7 +303,7 @@ function Settings() {
 
             {/* Preset grid */}
             <div className="mb-2 text-xs font-semibold opacity-70">THEME</div>
-            <div className="mb-3 grid grid-cols-4 gap-2">
+            <div className="settings-theme-grid mb-3 grid grid-cols-4 gap-2">
               {PRESETS.map((p) => {
                 const active = presetId === p.id;
                 const morningSeed = sectionSeedFor(p.id, p.seed, "morning");
@@ -313,7 +313,7 @@ function Settings() {
                   <button
                     key={p.id}
                     onClick={() => choosePreset(p)}
-                    className="flex flex-col items-center gap-1 rounded-2xl p-2 transition"
+                    className="settings-theme-option flex flex-col items-center gap-1 rounded-2xl p-2 transition"
                     style={{
                       background: "var(--surface)",
                       border: active ? "2px solid var(--accent)" : "1px solid var(--border)",
@@ -357,7 +357,7 @@ function Settings() {
               })}
               <button
                 onClick={() => setSuggestOpen(true)}
-                className="flex flex-col items-center justify-center gap-1 rounded-2xl p-2 transition"
+                className="settings-theme-option flex flex-col items-center justify-center gap-1 rounded-2xl p-2 transition"
                 style={{
                   background: "var(--surface)",
                   border: "1px dashed var(--border)",
@@ -382,7 +382,7 @@ function Settings() {
 
             <button
               onClick={doReset}
-              className="mb-4 w-full rounded-full py-2 text-xs font-semibold"
+              className="settings-reset-theme mb-4 w-full rounded-full py-2 text-xs font-semibold"
               style={{
                 background: "var(--muted)",
                 color: "var(--foreground)",
