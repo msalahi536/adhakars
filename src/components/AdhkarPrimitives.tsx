@@ -112,6 +112,8 @@ export function Pagination({
   const scrubbing = useRef(false);
   const suppressClick = useRef(false);
   const lastIndex = useRef(active);
+  const pointerStartX = useRef(0);
+  const didDrag = useRef(false);
   const [isScrubbing, setIsScrubbing] = useState(false);
 
   const indexFromPointer = (clientX: number, element: HTMLElement) => {
@@ -129,6 +131,11 @@ export function Pagination({
   };
 
   const stopScrub = (event: React.PointerEvent<HTMLDivElement>) => {
+    if (scrubbing.current && !didDrag.current) {
+      const selected = indexFromPointer(event.clientX, event.currentTarget);
+      if (selected !== active) onSelect(selected);
+      suppressClick.current = true;
+    }
     if (scrubbing.current && event.currentTarget.hasPointerCapture(event.pointerId)) {
       event.currentTarget.releasePointerCapture(event.pointerId);
     }
@@ -153,17 +160,20 @@ export function Pagination({
         className={`adhkar-pagination ${isScrubbing ? "is-scrubbing" : ""}`}
         onContextMenu={(event) => event.preventDefault()}
         onPointerDown={(event) => {
-          event.preventDefault();
           lastIndex.current = active;
+          pointerStartX.current = event.clientX;
+          didDrag.current = false;
+          suppressClick.current = false;
           const element = event.currentTarget;
           scrubbing.current = true;
           setIsScrubbing(true);
-          suppressClick.current = event.target === element;
           element.setPointerCapture(event.pointerId);
-          updateScrub(event.clientX, element);
         }}
         onPointerMove={(event) => {
           if (!scrubbing.current) return;
+          if (Math.abs(event.clientX - pointerStartX.current) < 4) return;
+          didDrag.current = true;
+          suppressClick.current = true;
           event.preventDefault();
           updateScrub(event.clientX, event.currentTarget);
         }}
@@ -180,6 +190,7 @@ export function Pagination({
             onClick={() => {
               if (suppressClick.current) {
                 suppressClick.current = false;
+                didDrag.current = false;
                 return;
               }
               onSelect(index);
