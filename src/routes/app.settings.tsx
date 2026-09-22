@@ -3,8 +3,6 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { HeaderBackButton } from "@/components/HeaderBackButton";
 import { getDisplay, setDisplay } from "@/lib/theme";
 import {
-  getModeSetting,
-  setModeSetting,
   setSeed,
   getPresetId,
   setPresetId,
@@ -12,7 +10,6 @@ import {
   resetTheme,
   PRESETS,
   DEFAULT_PRESET_ID,
-  type ModeSetting,
 } from "@/lib/theme-store";
 import { sectionSeedFor } from "@/lib/theming";
 import { backgroundsForPreset, PRESET_BACKGROUNDS } from "@/lib/backgrounds";
@@ -56,7 +53,6 @@ export const Route = createFileRoute("/app/settings")({
 });
 
 function Settings() {
-  const [mode, setModeState] = useState<ModeSetting>("light");
   const [presetId, setPresetIdState] = useState<string>(DEFAULT_PRESET_ID);
   const [suggestOpen, setSuggestOpen] = useState(false);
   const [display, setDisplayState] = useState(getDisplay());
@@ -94,7 +90,6 @@ function Settings() {
   };
 
   useEffect(() => {
-    setModeState(getModeSetting());
     setPresetIdState(getPresetId());
     setDisplayState(getDisplay());
     setPrayerSettingsState(getPrayerSettings());
@@ -219,12 +214,6 @@ function Settings() {
   const formatTime = (hour: number, minute: number) =>
     `${String(hour).padStart(2, "0")}:${String(minute).padStart(2, "0")}`;
 
-  const chooseMode = (m: ModeSetting) => {
-    setModeState(m);
-    setModeSetting(m);
-    window.dispatchEvent(new Event("adhkar:theme-change"));
-  };
-
   const choosePreset = (p: { id: string; seed: string }) => {
     setPresetIdState(p.id);
     setPresetId(p.id);
@@ -236,7 +225,6 @@ function Settings() {
 
   const doReset = () => {
     resetTheme();
-    setModeState("light");
     setPresetIdState(DEFAULT_PRESET_ID);
     window.dispatchEvent(new Event("adhkar:theme-change"));
   };
@@ -269,31 +257,6 @@ function Settings() {
           {/* APPEARANCE */}
           <section className="mb-6">
             <h2 className="label-caps mb-3">Appearance</h2>
-
-            {/* Mode segmented control */}
-            <div className="mb-3 text-xs font-semibold opacity-70">MODE</div>
-            <div
-              className="mb-4 grid grid-cols-3 gap-1 rounded-full p-1"
-              style={{ background: "var(--muted)" }}
-            >
-              {(["light", "dark", "auto"] as ModeSetting[]).map((m) => {
-                const active = mode === m;
-                return (
-                  <button
-                    key={m}
-                    onClick={() => chooseMode(m)}
-                    className="rounded-full py-2 text-xs font-semibold transition"
-                    style={{
-                      background: active ? "var(--surface-card)" : "transparent",
-                      color: "var(--foreground)",
-                      boxShadow: active ? "0 1px 4px rgba(0,0,0,0.08)" : "none",
-                    }}
-                  >
-                    {m === "light" ? "Light" : m === "dark" ? "Dark" : "Auto"}
-                  </button>
-                );
-              })}
-            </div>
 
             {/* Preview */}
             <div className="mb-4 flex justify-center">

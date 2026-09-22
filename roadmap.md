@@ -3,3 +3,7 @@
 - [x] Theme and improve the prayer timeline sheet
 - [x] Rebuild After-Salah adhkar to match the supplied reference and keep nav visible
 - [x] Verify all themes, modes, pages, and prayer interactions
+- [ ] Restore page-based Morning and Evening artwork and colors
+- [ ] Remove Light, Dark, and Auto from Settings
+- [ ] Keep Settings image-free and slightly round the navigation
+- [ ] Verify every main page and preset at 393×852

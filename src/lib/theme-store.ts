@@ -9,13 +9,13 @@ import {
   clampSeed,
 } from "./theming";
 
-const K_MODE = "adhkar:mode";
+const K_LEGACY_MODE = "adhkar:mode";
 const K_SEED = "adhkar:seed";
 const K_PRESET = "adhkar:preset";
 const K_LEGACY_OVERRIDES = "adhkar:section-overrides";
 const K_CUSTOM = "adhkar:custom-triplet";
 
-export type ModeSetting = "light" | "dark" | "auto";
+export type ModeSetting = "light";
 export type VisualPhase = "morning" | "evening";
 
 export const DEFAULT_SEED = "#70815d";
@@ -47,36 +47,15 @@ const removeLS = (k: string) => {
 };
 
 export const getModeSetting = (): ModeSetting => {
-  const v = readLS(K_MODE);
-  return v === "light" || v === "dark" || v === "auto" ? v : "light";
+  return "light";
 };
-export const setModeSetting = (m: ModeSetting) => writeLS(K_MODE, m);
-
-const localDateKey = (date: Date): string =>
-  `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
-
-const cachedBoundary = (key: "fajr" | "asr", now: Date): number | null => {
-  const raw = readLS(`adhkar:prayer-cache:v3:${localDateKey(now)}`);
-  if (!raw) return null;
-  try {
-    const value = (JSON.parse(raw) as { times?: Record<string, unknown> }).times?.[key];
-    return typeof value === "number" ? value : null;
-  } catch {
-    return null;
-  }
-};
+export const setModeSetting = (_m: ModeSetting) => removeLS(K_LEGACY_MODE);
 
 /** Resolve the artwork and palette phase for the whole app. */
 export const resolveVisualPhase = (
-  setting: ModeSetting = getModeSetting(),
-  now = new Date(),
+  pathname = typeof window !== "undefined" ? window.location.pathname : "/app",
 ): VisualPhase => {
-  if (setting === "light") return "morning";
-  if (setting === "dark") return "evening";
-  const minutes = now.getHours() * 60 + now.getMinutes();
-  const fajr = cachedBoundary("fajr", now) ?? 5 * 60;
-  const asr = cachedBoundary("asr", now) ?? 15 * 60 + 30;
-  return minutes >= asr || minutes < fajr ? "evening" : "morning";
+  return pathname.startsWith("/app/evening") ? "evening" : "morning";
 };
 
 export const getSeed = (): string => clampSeed(readLS(K_SEED) ?? DEFAULT_SEED);
@@ -99,8 +78,8 @@ export const setCustomTriplet = (t: CustomOverrides) => {
 };
 export const clearCustomTriplet = () => removeLS(K_CUSTOM);
 
-export const resolveMode = (setting: ModeSetting = getModeSetting()): Mode => {
-  return resolveVisualPhase(setting) === "evening" ? "dark" : "light";
+export const resolveMode = (): Mode => {
+  return resolveVisualPhase() === "evening" ? "dark" : "light";
 };
 
 export const sectionForRoute = (pathname: string): SectionKey => {
@@ -115,7 +94,7 @@ export const sectionForRoute = (pathname: string): SectionKey => {
 };
 
 export const applyThemeForRoute = (pathname: string, sectionKey?: SectionKey) => {
-  const visualPhase = resolveVisualPhase();
+  const visualPhase = resolveVisualPhase(pathname);
   const mode: Mode = visualPhase === "evening" ? "dark" : "light";
   const base = getSeed();
   const section = sectionKey ?? sectionForRoute(pathname);
@@ -151,7 +130,7 @@ export const applyThemeForRoute = (pathname: string, sectionKey?: SectionKey) =>
 };
 
 export const resetTheme = () => {
-  removeLS(K_MODE);
+  removeLS(K_LEGACY_MODE);
   removeLS(K_SEED);
   removeLS(K_PRESET);
   removeLS(K_LEGACY_OVERRIDES);
@@ -159,12 +138,10 @@ export const resetTheme = () => {
 };
 
 export const PRE_PAINT_SCRIPT = `(function(){try{
-var m=localStorage.getItem('${K_MODE}')||'light';
-var now=new Date(), mins=now.getHours()*60+now.getMinutes(), pad=function(n){return String(n).padStart(2,'0')}, day=now.getFullYear()+'-'+pad(now.getMonth()+1)+'-'+pad(now.getDate()), fajr=300, asr=930;
-try{var cache=JSON.parse(localStorage.getItem('adhkar:prayer-cache:v3:'+day)||'{}');if(cache.times&&typeof cache.times.fajr==='number')fajr=cache.times.fajr;if(cache.times&&typeof cache.times.asr==='number')asr=cache.times.asr;}catch(_){}
-var phase=m==='dark'?'evening':(m==='light'?'morning':((mins>=asr||mins<fajr)?'evening':'morning'));
 var mode=phase==='evening'?'dark':'light';
 var p=location.pathname;
+var phase=p.indexOf('/app/evening')===0?'evening':'morning';
+var mode=phase==='evening'?'dark':'light';
 var section=(p==='/app'||p==='/app/')?'morning':(p.indexOf('/app/evening')===0?'evening':(p.indexOf('/app/salah')===0?'salah':(p.indexOf('/app/tasbih')===0?'tasbih':'default')));
 document.documentElement.setAttribute('data-theme-mode',mode);
 document.documentElement.setAttribute('data-theme', mode==='dark'?'dark':'dawn');
