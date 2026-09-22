@@ -343,8 +343,7 @@
   backdrop-filter: blur(20px);
 }
 
-.app-shell.is-adhkar .settings-button {
-  top: calc(env(safe-area-inset-top) + 84px);
+.app-shell .settings-button {
   border-color: rgba(255, 255, 255, 0.86);
   background: rgba(250, 248, 241, 0.72);
   color: var(--title);
