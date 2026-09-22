@@ -39,6 +39,8 @@ function Tasbih() {
 
   const hasMilestone = milestone > 0;
   const cycleNum = hasMilestone ? Math.floor(total / milestone) + 1 : 1;
+  const ringMax = hasMilestone ? milestone : 1;
+  const ringValue = hasMilestone ? total % milestone : 0;
 
   const showToast = (msg: string) => {
     setToast(msg);
@@ -67,17 +69,16 @@ function Tasbih() {
     setTotal((n) => Math.max(0, n - 1));
   };
 
-  const onResetStart = (e: React.PointerEvent | React.TouchEvent | React.MouseEvent) => {
+  const onResetPress = (e: React.MouseEvent) => {
     e.stopPropagation();
-    resetTimer.current = setTimeout(() => {
-      triggerHaptic("heavy");
-      setTotal(0);
-      showToast("Count reset ✓");
-    }, 2500);
+    triggerHaptic("light");
+    setConfirmReset(true);
   };
-  const onResetEnd = (e?: React.SyntheticEvent) => {
-    e?.stopPropagation();
-    if (resetTimer.current) clearTimeout(resetTimer.current);
+  const doReset = () => {
+    triggerHaptic("heavy");
+    setTotal(0);
+    setConfirmReset(false);
+    showToast("Count reset ✓");
   };
 
   return (
@@ -143,13 +144,9 @@ function Tasbih() {
               onPointerDown={(e) => e.stopPropagation()}
             >
               <button
-                onMouseDown={onResetStart}
-                onMouseUp={onResetEnd}
-                onMouseLeave={onResetEnd}
-                onTouchStart={onResetStart}
-                onTouchEnd={onResetEnd}
+                onClick={onResetPress}
                 className="tasbih-control"
-                aria-label="hold to reset"
+                aria-label="reset counter"
               >
                 <RotateCcw size={16} />
               </button>
@@ -157,6 +154,12 @@ function Tasbih() {
 
             {/* Big progress ring with count */}
             <div className={`tasbih-disc ${tapped ? "tasbih-disc-tapped" : ""}`}>
+              <span
+                className="tasbih-ring"
+                style={{ ["--ring-track" as string]: "transparent" }}
+              >
+                <ProgressRing value={ringValue} max={ringMax} size={280} stroke={8} />
+              </span>
               <div className="tasbih-disc-content">
                 <span className="tasbih-count">
                   {total}
@@ -175,9 +178,6 @@ function Tasbih() {
             <div className="tasbih-helper">
               <div className="tasbih-helper-primary">
                 Tap anywhere to count
-              </div>
-              <div className="tasbih-helper-secondary">
-                Hold to reset
               </div>
             </div>
           </div>
