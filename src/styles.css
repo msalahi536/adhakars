@@ -459,11 +459,16 @@ html[data-section="evening"] .app-shell { background: radial-gradient(circle at 
   margin-top: 9px;
   color: var(--title);
   font-family: var(--font-display);
-  font-size: 32px;
-  font-weight: 500;
+  font-size: 28px;
+  font-weight: 600;
   line-height: 1;
   letter-spacing: 0;
   white-space: nowrap;
+}
+
+html[data-section="morning"] .adhkar-header .label-caps,
+html[data-section="morning"] .adhkar-header .app-page-title {
+  color: #3c5438;
 }
 
 .adhkar-progress-row {
