@@ -494,7 +494,7 @@ html[data-section="evening"] .app-shell { background: radial-gradient(circle at 
 
 html[data-section="morning"] .adhkar-header .label-caps,
 html[data-section="morning"] .adhkar-header .app-page-title {
-  color: #3c5438;
+  color: var(--preset-ink-strong);
 }
 
 .adhkar-progress-row {
@@ -683,11 +683,11 @@ html[data-section="evening"] .adhkar-card-heading button { background: rgba(170,
 .salah-recommended-title { margin-top: 6px; color: #2f4f34; font-size: 26px; font-weight: 500; line-height: 28px; }
 .salah-recommended-progress { margin-top: 2px; color: #5f7a5a; font-size: 15px; font-weight: 400; line-height: 18px; }
 .salah-recommended-action { gap: 16px; margin-top: 14px; }
-.salah-play { width: 48px; height: 48px; background: #70815d; color: #ffffff; box-shadow: 0 6px 16px rgba(112, 129, 93, 0.35); }
+.salah-play { width: 48px; height: 48px; background: var(--preset-ink); color: #ffffff; box-shadow: 0 6px 16px rgba(var(--preset-ink-rgb), 0.35); }
 .salah-play svg { margin-left: 2px; }
 .salah-action-label { color: #2f4f34; font-size: 16px; font-weight: 500; line-height: 19px; }
 .salah-action-track { height: 4px; margin-top: 8px; overflow: hidden; border-radius: 999px; background: rgba(0, 0, 0, 0.08); }
-.salah-action-track span { display: block; height: 100%; border-radius: inherit; background: #70815d; transition: width 300ms ease; }
+.salah-action-track span { display: block; height: 100%; border-radius: inherit; background: var(--preset-ink); transition: width 300ms ease; }
 .salah-upcoming-wrap { height: 242px; }
 .prayer-timeline-card { box-sizing: border-box; height: 242px !important; padding: 16px 20px 14px; border-radius: 18px !important; background: linear-gradient(135deg, #3e512a 0%, #344323 100%) !important; color: #ffffff !important; box-shadow: 0 8px 24px rgba(52, 67, 35, 0.28) !important; }
 .prayer-timeline-card .prayer-timeline-heading { margin-bottom: 12px; }
@@ -713,7 +713,7 @@ html[data-section="evening"] .adhkar-card-heading button { background: rgba(170,
 [data-overlay="prayer-timeline"] .prayer-timeline-list > span { left: 8.5px; }
 .salah-upcoming-placeholder { height: 242px; margin: 0; border-radius: 18px; }
 .salah-adhan-card { box-sizing: border-box; height: 62px; gap: 14px; padding: 14px 18px; border: 1px solid rgba(255, 255, 255, 0.8); border-radius: 18px; background: rgba(250, 247, 240, 0.92); color: #2f4f34; backdrop-filter: blur(20px); }
-.salah-adhan-icon { width: 34px; height: 34px; background: #dfe9dc; color: #70815d; }
+.salah-adhan-icon { width: 34px; height: 34px; background: #dfe9dc; color: var(--preset-ink); }
 .salah-adhan-title { color: #2f4f34; font-size: 16px; font-weight: 500; line-height: 18px; }
 .salah-adhan-subtitle { margin-top: 2px; overflow: hidden; color: #6b6f64; font-size: 13px; font-weight: 400; line-height: 15px; text-overflow: ellipsis; white-space: nowrap; }
 .salah-adhan-chevron { flex: 0 0 auto; color: #9aa094; }
@@ -958,28 +958,28 @@ html[data-preset][data-section="tasbih"] {
 /* After-Salah sheet — calm cream + olive, matching the adhkar cards */
 .after-salah-panel {
   --background: #f9f5f0;
-  --foreground: #3c5438;
+  --foreground: var(--preset-ink-strong);
   --muted-foreground: #8a8f80;
-  --accent: #70815d;
+  --accent: var(--preset-ink);
   --accent-foreground: #f9f5f0;
   --card: #ffffff;
-  --card-foreground: #3c5438;
+  --card-foreground: var(--preset-ink-strong);
   --translit: #7d8474;
   --border: rgba(60, 84, 56, 0.1);
-  --source-bg: rgba(112, 129, 93, 0.14);
+  --source-bg: rgba(var(--preset-ink-rgb), 0.14);
   --source-fg: #68775a;
   --combo-card: #f2ede2;
-  --count-fg: #70815d;
-  --index-badge-bg: #70815d;
+  --count-fg: var(--preset-ink);
+  --index-badge-bg: var(--preset-ink);
   --index-badge-fg: #f9f5f0;
-  --dot-active: #70815d;
+  --dot-active: var(--preset-ink);
   background: #f9f5f0;
-  color: #3c5438;
+  color: var(--preset-ink-strong);
   box-shadow: 0 -12px 40px rgba(28, 32, 24, 0.18);
 }
 
 .after-salah-panel .after-salah-title {
-  color: #3c5438;
+  color: var(--preset-ink-strong);
 }
 
 .after-salah-panel .dhikr-card,
@@ -1028,7 +1028,7 @@ html[data-section="salah"],
 html[data-section="tasbih"] {
   --nav-bg: #fdfcf4 !important;
   --nav-border: rgba(45, 31, 0, 0.08) !important;
-  --nav-active: #70815d !important;
+  --nav-active: var(--preset-ink) !important;
   --nav-inactive: #6b6f64 !important;
 }
 html[data-section="salah"] .bottom-nav-row,
