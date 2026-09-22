@@ -1,3 +1,3 @@
-- [ ] Restore reliable dot selector tap-and-drag behavior on real iPhone touch input.
-- [ ] Eliminate blank background flashes when switching app tabs.
-- [ ] Correct app identity shown where platform permission prompts allow it.
+- [x] Restore reliable dot selector tap-and-drag behavior on real iPhone touch input.
+- [x] Eliminate blank background flashes when switching app tabs.
+- [x] Correct app identity shown where platform permission prompts allow it.
