@@ -257,7 +257,7 @@
   }
   .daily-adhkar-page.scroll-area {
     overflow: hidden;
-  margin-bottom: calc(106px + env(safe-area-inset-bottom));
+  margin-bottom: calc(114px + env(safe-area-inset-bottom));
   padding-bottom: 0;
   }
   .scroll-area::-webkit-scrollbar { display: none; }
