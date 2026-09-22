@@ -992,8 +992,12 @@ function Settings() {
             ) : (
               <button
                 onClick={() => setConfirmResetAll(true)}
-                className="w-full rounded-full py-3 text-sm font-semibold text-white"
-                style={{ background: "#dc2626" }}
+                className="w-full rounded-full py-3 text-sm font-semibold transition-transform active:scale-[0.98]"
+                style={{
+                  background: "color-mix(in oklab, #dc2626 10%, var(--surface))",
+                  border: "1px solid color-mix(in oklab, #dc2626 30%, transparent)",
+                  color: "#b91c1c",
+                }}
               >
                 Reset all progress
               </button>

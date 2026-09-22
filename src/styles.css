@@ -1286,3 +1286,17 @@ html[data-section="tasbih"] .tasbih-confirm-btn.solid {
   background: var(--preset-ink);
   color: #ffffff;
 }
+
+/* ---------- Settings page polish ---------- */
+[data-settings-card] {
+  background: color-mix(in oklab, var(--surface) 92%, transparent);
+  border: 1px solid color-mix(in oklab, var(--foreground) 7%, transparent);
+  box-shadow: 0 14px 34px -22px rgba(0, 0, 0, 0.28);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  transition: transform 150ms ease, box-shadow 150ms ease;
+}
+button[data-settings-card]:active,
+a[data-settings-card]:active {
+  transform: scale(0.985);
+}
