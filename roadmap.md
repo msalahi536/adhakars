@@ -30,3 +30,9 @@
 - [x] Fit all Morning and Evening pagination dots within the card width.
 - [x] Replace both Three Quls cards with the complete supplied Arabic, transliteration, translation, narration, grading, and reward.
 - [x] Verify the corrected cards and controls at 393×852.
+
+- [x] Replace Qibla calibration steering with a clear guided figure-eight motion.
+- [x] Repair the Midnight palette across app surfaces and controls.
+- [x] Add a one-time update welcome for returning users.
+- [x] Reset only appearance to Original for this update.
+- [x] Verify progress and custom adhkar remain untouched.
