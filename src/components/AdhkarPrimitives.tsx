@@ -73,7 +73,7 @@ export function RepeatCounter({ count, target, complete, tapped, bursts, justCom
         ) : (
           <>
             <span className="adhkar-counter-value">{count}</span>
-            {target > 1 && <span className="adhkar-counter-target">of {target}</span>}
+            <span className="adhkar-counter-target">of {target}</span>
           </>
         )}
       </span>
