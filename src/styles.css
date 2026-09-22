@@ -2160,56 +2160,56 @@ html[data-preset="midnight"][data-visual-phase="evening"] .daily-swipe-stack .ad
   backdrop-filter: blur(8px);
 }
 
-/* ---------- Dark Red: warm parchment by day, oxblood glass by night ---------- */
+/* ---------- Dark Red: translucent oxblood glass from the supplied references ---------- */
 html[data-preset="dark-red"]:is([data-section="morning"], [data-visual-phase="morning"]),
 html[data-preset="dark-red"][data-section="salah"],
 html[data-preset="dark-red"][data-section="tasbih"],
 html[data-preset="dark-red"][data-section="custom"],
 html[data-preset="dark-red"][data-section="wake"],
 html[data-preset="dark-red"][data-section="default"] {
-  --background: #f1dfd8 !important;
-  --foreground: #57181f !important;
-  --title: #57181f !important;
-  --eyebrow: #713038 !important;
-  --accent: #8b3038 !important;
-  --primary: #8b3038 !important;
-  --primary-foreground: #fff7f3 !important;
-  --accent-foreground: #fff7f3 !important;
-  --card: rgba(247, 230, 222, 0.94) !important;
-  --surface-card: rgba(247, 230, 222, 0.94) !important;
-  --surface: #ead2ca !important;
-  --card-foreground: #3e2525 !important;
-  --muted: #e4cac2 !important;
-  --muted-foreground: #76585a !important;
-  --border: rgba(91, 28, 34, 0.13) !important;
-  --card-border: rgba(255, 247, 242, 0.7) !important;
-  --translit: #8b3038 !important;
-  --text-muted: #76585a !important;
-  --pill-bg: rgba(237, 207, 198, 0.92) !important;
-  --source-bg: #e8c8bf !important;
-  --source-fg: #6b2028 !important;
-  --ring-track: rgba(139, 48, 56, 0.2) !important;
-  --nav-bg: rgba(239, 217, 208, 0.95) !important;
-  --nav-border: rgba(91, 28, 34, 0.13) !important;
-  --nav-active: #721f28 !important;
-  --nav-inactive: #806365 !important;
-  --dot-active: #8b3038 !important;
-  --dot-inactive: rgba(139, 48, 56, 0.32) !important;
-  --index-badge-bg: #8b3038 !important;
-  --index-badge-fg: #fff7f3 !important;
-  --count-fg: #76252d !important;
-  --btn-surface: rgba(139, 48, 56, 0.12) !important;
-  --btn-fg: #6b2028 !important;
-  --arrow-bg: rgba(247, 230, 222, 0.9) !important;
-  --arrow-fg: #6b2028 !important;
+  --background: #351416 !important;
+  --foreground: #f7dfd8 !important;
+  --title: #fff1e9 !important;
+  --eyebrow: #dca9a5 !important;
+  --accent: #ef8589 !important;
+  --primary: #ef8589 !important;
+  --primary-foreground: #3b1518 !important;
+  --accent-foreground: #3b1518 !important;
+  --card: rgba(74, 35, 35, 0.78) !important;
+  --surface-card: rgba(74, 35, 35, 0.78) !important;
+  --surface: rgba(96, 45, 46, 0.72) !important;
+  --card-foreground: #fff2e9 !important;
+  --muted: rgba(95, 48, 48, 0.82) !important;
+  --muted-foreground: #d9aaa5 !important;
+  --border: rgba(243, 164, 164, 0.28) !important;
+  --card-border: rgba(247, 177, 176, 0.36) !important;
+  --translit: #efb4ad !important;
+  --text-muted: #d8aaa5 !important;
+  --pill-bg: rgba(213, 111, 114, 0.18) !important;
+  --source-bg: rgba(190, 79, 84, 0.25) !important;
+  --source-fg: #f4c4bd !important;
+  --ring-track: rgba(239, 133, 137, 0.34) !important;
+  --nav-bg: rgba(79, 37, 37, 0.84) !important;
+  --nav-border: rgba(247, 177, 176, 0.32) !important;
+  --nav-active: #ff9699 !important;
+  --nav-inactive: #d5aaa5 !important;
+  --dot-active: #f18b8f !important;
+  --dot-inactive: rgba(231, 151, 151, 0.34) !important;
+  --index-badge-bg: rgba(113, 55, 55, 0.72) !important;
+  --index-badge-fg: #fff0e9 !important;
+  --count-fg: #ffd5cf !important;
+  --btn-surface: rgba(213, 111, 114, 0.18) !important;
+  --btn-fg: #ffd1ca !important;
+  --arrow-bg: rgba(114, 56, 57, 0.74) !important;
+  --arrow-fg: #ffd5cf !important;
   --surface-deep: #651f27 !important;
   --surface-deep-gradient: linear-gradient(135deg, #8b3038 0%, #51161c 100%) !important;
   --surface-deep-fg: #fff5f0 !important;
   --surface-deep-muted: rgba(255, 235, 229, 0.72) !important;
   --surface-deep-border: rgba(255, 220, 211, 0.18) !important;
   --surface-deep-accent-fg: #fff5f0 !important;
-  --header-fg: #57181f !important;
-  --header-sub: #76585a !important;
+  --header-fg: #fff1e9 !important;
+  --header-sub: #dca9a5 !important;
 }
 
 html[data-preset="dark-red"]:is([data-section="morning"], [data-visual-phase="morning"]) .dhikr-card,
@@ -2218,23 +2218,23 @@ html[data-preset="dark-red"][data-section="salah"] .salah-recommended-card,
 html[data-preset="dark-red"][data-section="salah"] .salah-adhan-card,
 html[data-preset="dark-red"][data-section="salah"] .salah-upcoming-placeholder,
 html[data-preset="dark-red"][data-section="tasbih"] .tasbih-card {
-  background: rgba(247, 230, 222, 0.94) !important;
-  border-color: rgba(255, 247, 242, 0.72) !important;
-  box-shadow: 0 12px 32px rgba(78, 20, 26, 0.14) !important;
-  backdrop-filter: blur(22px) saturate(112%);
+  background: rgba(74, 35, 35, 0.78) !important;
+  border-color: rgba(247, 177, 176, 0.36) !important;
+  box-shadow: 0 14px 34px rgba(38, 8, 10, 0.28) !important;
+  backdrop-filter: blur(20px) saturate(112%);
 }
 
 html[data-preset="dark-red"][data-visual-phase="morning"] .bottom-nav-row {
-  background: rgba(239, 217, 208, 0.95) !important;
-  border-color: rgba(255, 247, 242, 0.68) !important;
-  box-shadow: 0 9px 28px rgba(78, 20, 26, 0.13) !important;
+  background: rgba(79, 37, 37, 0.84) !important;
+  border-color: rgba(247, 177, 176, 0.32) !important;
+  box-shadow: 0 9px 28px rgba(38, 8, 10, 0.24) !important;
   backdrop-filter: blur(20px);
 }
 
 html[data-preset="dark-red"][data-visual-phase="morning"] .adhkar-pagination-arrow {
-  border-color: rgba(139, 48, 56, 0.18);
-  background: rgba(247, 230, 222, 0.9);
-  color: #6b2028;
+  border-color: rgba(247, 177, 176, 0.38);
+  background: rgba(114, 56, 57, 0.74);
+  color: #ffd5cf;
 }
 
 html[data-preset="dark-red"][data-section="tasbih"] .tasbih-disc {
