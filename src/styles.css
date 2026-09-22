@@ -919,6 +919,36 @@ html[data-preset][data-section="tasbih"] {
   }
 }
 
+/* After-Salah sheet — calm cream + olive, matching the adhkar cards */
+.after-salah-panel {
+  --background: #f9f5f0;
+  --foreground: #3c5438;
+  --muted-foreground: #8a8f80;
+  --accent: #70815d;
+  --accent-foreground: #f9f5f0;
+  --card: #ffffff;
+  --card-foreground: #3c5438;
+  --translit: #7d8474;
+  --border: rgba(60, 84, 56, 0.1);
+  --source-bg: rgba(112, 129, 93, 0.14);
+  --source-fg: #68775a;
+  --combo-card: #f2ede2;
+  --count-fg: #70815d;
+  background: #f9f5f0;
+  color: #3c5438;
+  box-shadow: 0 -12px 40px rgba(28, 32, 24, 0.18);
+}
+
+.after-salah-panel .after-salah-title {
+  color: #3c5438;
+}
+
+.after-salah-panel .dhikr-card,
+.after-salah-panel .adhkar-reference-card {
+  box-shadow: 0 2px 10px rgba(60, 84, 56, 0.06);
+  border: 1px solid rgba(60, 84, 56, 0.08);
+}
+
 /* Smooth cross-phase color transition (morning <-> evening) */
 .app-shell,
 .app-shell::after,
