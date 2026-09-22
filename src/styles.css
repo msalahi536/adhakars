@@ -1147,3 +1147,65 @@ html[data-section="tasbih"] .bottom-nav-row {
   border-color: rgba(45, 31, 0, 0.08);
 }
 html[data-section="salah"] .app-shell { background: transparent; }
+
+/* ===== Salah / Tasbih / More: follow the active preset palette ===== */
+html[data-section="salah"],
+html[data-section="tasbih"],
+html[data-section="default"],
+html[data-section="custom"] {
+  --nav-bg: #fdfcf4 !important;
+  --nav-border: rgba(45, 31, 0, 0.08) !important;
+  --nav-active: var(--preset-ink) !important;
+  --nav-inactive: var(--preset-muted) !important;
+}
+
+html[data-section="salah"] .salah-next-label,
+html[data-section="salah"] .salah-countdown,
+html[data-section="salah"] .salah-dismiss,
+html[data-section="salah"] .salah-recommended-title,
+html[data-section="salah"] .salah-action-label,
+html[data-section="salah"] .salah-change,
+html[data-section="salah"] .salah-adhan-card,
+html[data-section="salah"] .salah-adhan-title {
+  color: var(--preset-ink-strong);
+}
+html[data-section="salah"] .salah-location,
+html[data-section="salah"] .salah-recommended-progress,
+html[data-section="salah"] .salah-kicker,
+html[data-section="salah"] .salah-adhan-subtitle,
+html[data-section="salah"] .salah-adhan-chevron {
+  color: var(--preset-muted);
+}
+html[data-section="salah"] .salah-change {
+  background: rgba(var(--preset-ink-rgb), 0.12);
+}
+html[data-section="salah"] .salah-adhan-icon {
+  background: rgba(var(--preset-ink-rgb), 0.14);
+  color: var(--preset-ink);
+}
+
+html[data-section="tasbih"] .tasbih-title,
+html[data-section="tasbih"] .tasbih-card,
+html[data-section="tasbih"] .tasbih-count,
+html[data-section="tasbih"] .tasbih-cycle,
+html[data-section="tasbih"] .tasbih-helper-primary,
+html[data-section="tasbih"] .tasbih-control,
+html[data-section="tasbih"] .tasbih-confirm-title,
+html[data-section="tasbih"] .tasbih-confirm-btn.ghost {
+  color: var(--preset-ink-strong);
+}
+html[data-section="tasbih"] .tasbih-eyebrow,
+html[data-section="tasbih"] .tasbih-confirm-sub {
+  color: var(--preset-muted);
+}
+html[data-section="tasbih"] .tasbih-target {
+  color: var(--preset-ink-strong);
+}
+html[data-section="tasbih"] .tasbih-target.is-active {
+  background: var(--preset-ink);
+  color: #ffffff;
+}
+html[data-section="tasbih"] .tasbih-confirm-btn.solid {
+  background: var(--preset-ink);
+  color: #ffffff;
+}
