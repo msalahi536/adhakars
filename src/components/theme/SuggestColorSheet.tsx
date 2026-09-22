@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { submitSuggestion } from "@/lib/suggestions.functions";
+import { Portal } from "@/components/Portal";
 
 export function SuggestColorSheet({ open, onClose }: { open: boolean; onClose: () => void }) {
   const send = useServerFn(submitSuggestion);
@@ -36,6 +37,7 @@ export function SuggestColorSheet({ open, onClose }: { open: boolean; onClose: (
   };
 
   return (
+    <Portal>
     <div
       className="fixed inset-0 flex items-end justify-center"
       style={{ zIndex: 200, background: "rgba(28,32,24,0.38)", backdropFilter: "blur(8px)" }}
@@ -116,5 +118,6 @@ export function SuggestColorSheet({ open, onClose }: { open: boolean; onClose: (
         )}
       </div>
     </div>
+    </Portal>
   );
 }
