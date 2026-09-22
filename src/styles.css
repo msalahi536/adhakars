@@ -1239,7 +1239,7 @@ html[data-preset][data-section="tasbih"] {
   .salah-countdown { top: 68px !important; font-size: 46px !important; line-height: 46px !important; }
   .salah-dismiss { top: 128px !important; height: 34px !important; font-size: 15px !important; }
   .salah-location { top: 170px !important; font-size: 13px !important; }
-  .salah-content-inner {
+  .salah-content-inner:not(.no-location) {
     height: 100% !important;
     min-height: 0 !important;
     grid-template-rows: 154px minmax(0, 1fr) 62px !important;
