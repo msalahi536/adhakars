@@ -1,5 +1,5 @@
 import { useRef, useState } from "react";
-import { BookOpen, Check } from "lucide-react";
+import { BookOpen, Check, ChevronLeft, ChevronRight } from "lucide-react";
 import { ProgressRing } from "./ProgressRing";
 import { triggerHaptic } from "@/lib/theme";
 
@@ -71,10 +71,7 @@ export function RepeatCounter({ count, target, complete, tapped, bursts, justCom
         {complete ? (
           <Check className="adhkar-complete-check" size={30} strokeWidth={1.8} />
         ) : (
-          <>
-            <span className="adhkar-counter-value">{count}</span>
-            <span className="adhkar-counter-target">/ {target}</span>
-          </>
+          <span className="adhkar-counter-value">{count}</span>
         )}
       </span>
       {bursts.map((burst) => (
@@ -129,10 +126,19 @@ export function Pagination({
     setIsScrubbing(false);
   };
 
-  void onPrevious;
-  void onNext;
   return (
     <div className="adhkar-pagination-row">
+      <button
+        type="button"
+        className="adhkar-pagination-arrow"
+        onClick={() => {
+          onPrevious();
+          void triggerHaptic("light");
+        }}
+        aria-label="previous"
+      >
+        <ChevronLeft size={14} strokeWidth={1.8} />
+      </button>
       <div
         className={`adhkar-pagination ${isScrubbing ? "is-scrubbing" : ""}`}
         onPointerDown={(event) => {
@@ -178,6 +184,17 @@ export function Pagination({
           />
         ))}
       </div>
+      <button
+        type="button"
+        className="adhkar-pagination-arrow"
+        onClick={() => {
+          onNext();
+          void triggerHaptic("light");
+        }}
+        aria-label="next"
+      >
+        <ChevronRight size={14} strokeWidth={1.8} />
+      </button>
     </div>
   );
 }

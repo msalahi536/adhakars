@@ -171,12 +171,9 @@ export function DhikrCard({ dhikr, count, onIncrement, isSpecial, specialLabel, 
 
       {/* Sticky footer */}
        <div className="adhkar-card-footer flex items-end justify-between gap-3">
-         <div className="adhkar-source-column flex min-w-0 flex-col">
-          <SourceBadge source={dhikr.source} />
-           <div className="adhkar-target-label">
-             Target: {dhikr.target}x
-          </div>
-        </div>
+          <div className="adhkar-source-column flex min-w-0 flex-col">
+           <SourceBadge source={dhikr.source} />
+         </div>
 
         {isPersonalDua ? (
           <button
