@@ -12,8 +12,6 @@ type Props = {
   todayKey: string;
   /** card styling: light surface or the deep tinted surface */
   tone?: "light" | "deep";
-  /** open the after salah adhkar for a tapped prayer */
-  onPickPrayer?: (id: Exclude<PrayerId, "sunrise">) => void;
 };
 
 const isSunrise = (s: Slot) => s.id === "sunrise";
@@ -172,7 +170,7 @@ function DayPill({ label }: { label: string }) {
   );
 }
 
-export function PrayerTimeline({ days, now, todayKey, tone = "light", onPickPrayer }: Props) {
+export function PrayerTimeline({ days, now, todayKey, tone = "light" }: Props) {
   const [expanded, setExpanded] = useState(false);
   const [dragY, setDragY] = useState(0);
   const [startY, setStartY] = useState<number | null>(null);
@@ -333,14 +331,6 @@ export function PrayerTimeline({ days, now, todayKey, tone = "light", onPickPray
                     }}
                     showNowDivider={d.key === todayKey}
                     dim={d.key < todayKey}
-                    onPickPrayer={
-                      onPickPrayer
-                        ? (id) => {
-                            setExpanded(false);
-                            onPickPrayer(id);
-                          }
-                        : undefined
-                    }
                   />
                 </div>
 
