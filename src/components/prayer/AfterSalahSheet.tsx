@@ -146,7 +146,7 @@ export function AfterSalahSheet({ open, prayer, onPrayer, onClose }: Props) {
         </div>
 
         <div
-          className="flex min-h-0 flex-1 flex-col"
+          className="flex min-h-0 flex-1 flex-col px-5"
           style={{
             paddingBottom:
               "calc(var(--bottom-nav-row, 56px) + env(safe-area-inset-bottom) + 12px)",
