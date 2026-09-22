@@ -192,7 +192,7 @@ const sleepLordHeavens: Dhikr = {
     "O Allah, Lord of the Heavens and the Earth and the Magnificent Throne, our Lord and Lord of everything, Splitter of the seed and date-stone, Revealer of the Torah, the Injeel and the Furqan (Quran) — I seek refuge in You from the evil of everything You hold by the forelock. O Allah, You are the First, nothing is before You; the Last, nothing is after You; the Most High, nothing is above You; the Most Near, nothing is beyond You — settle our debts and free us from poverty.",
   source: "Sahih Muslim 2713a",
   commentary:
-    "The Prophet ﷺ commanded that when intending to sleep, one should lie on the right side and say this. ⚠️ Lie on your RIGHT side before reciting.",
+    "The Prophet ﷺ commanded that when intending to sleep, one should lie on the right side and say this. Lie on your RIGHT side before reciting.",
   target: 1,
 };
 
@@ -291,7 +291,7 @@ const sleepLastWords: Dhikr = {
     "O Allah, I have submitted my face to You, entrusted my affair to You, and laid my back against You — out of hope and fear of You. There is no refuge and no escape from You except to You. I believe in Your Book which You revealed and in Your Prophet whom You sent.",
   source: "Sahih al-Bukhari 6311 · Sahih Muslim 2710a",
   commentary:
-    "⚠️ SAY THIS LAST — do not speak after it. The Prophet ﷺ said: \"If you die that night, you will die upon the Fitrah (upon Islam). Let these words be THE LAST THING YOU SAY.\" When al-Bara' repeated it saying \"wa birasulika\", the Prophet ﷺ corrected: \"No — say wa binabiyyika.\" Lie on right side, and go to sleep immediately after.",
+    "SAY THIS LAST — do not speak after it. The Prophet ﷺ said: \"If you die that night, you will die upon the Fitrah (upon Islam). Let these words be THE LAST THING YOU SAY.\" When al-Bara' repeated it saying \"wa birasulika\", the Prophet ﷺ corrected: \"No — say wa binabiyyika.\" Lie on right side, and go to sleep immediately after.",
   target: 1,
 };
 
@@ -325,7 +325,7 @@ const wakeMain: Dhikr = {
     "Praise is to Allah Who gave us life after having taken it from us, and unto Him is the resurrection.",
   source: "Sahih al-Bukhari 6312 · Sahih Muslim 2711",
   commentary:
-    "⚠️ Say this the INSTANT you wake — before sitting up, before speaking, before your phone. Hudhayfah narrated: When the Prophet ﷺ went to bed he would say 'Bismika amootu wa ahyaa', and when he got up he would say this.",
+    "Say this the INSTANT you wake — before sitting up, before speaking, before your phone. Hudhayfah narrated: When the Prophet ﷺ went to bed he would say 'Bismika amootu wa ahyaa', and when he got up he would say this.",
   target: 1,
 };
 
@@ -335,7 +335,7 @@ const wakeAlImran: Dhikr = {
   arabic: "",
   transliteration: "",
   translation:
-    "✋ WIPE THE SLEEP FROM YOUR FACE WITH YOUR HAND → THEN RECITE Surah Aal 'Imran verses 190-200 in full. Imam an-Nawawi: it is mustahabb to recite these verses when getting up from sleep.",
+    "WIPE THE SLEEP FROM YOUR FACE WITH YOUR HAND → THEN RECITE Surah Aal 'Imran verses 190-200 in full. Imam an-Nawawi: it is mustahabb to recite these verses when getting up from sleep.",
   source: "Sahih Muslim 763b",
   commentary:
     "Ibn 'Abbas narrated that he spent a night in the house of Maimuna: \"The Messenger of Allah ﷺ slept till midnight or a little before or after, then got up and began to cast off the effects of sleep from his face by rubbing with his hand, and then recited the ten concluding verses of Surah Aal-'Imran. He then stood up near a hanging water-skin, performed ablution well, and then stood up and prayed.\"",
@@ -368,7 +368,7 @@ const wakeFrightened: Dhikr = {
     "I seek refuge in Allah's Perfect Words from His anger, His punishment, the evil of His creatures, from the whisperings of the devils, and from their coming near me.",
   source: "Jami' at-Tirmidhi 3528 — authenticated by al-Albani (Sahih at-Tirmidhi 3/171)",
   commentary:
-    "The Prophet ﷺ said: \"When one of you becomes frightened during sleep, then let him say this.\" ⚖️ Grading note: sunnah.com's Darussalam edition grades this Da'if, but al-Albani authenticated it and it is in Hisn al-Muslim. If cautious, use \"a'udhu billahi minash-shaytanir-rajim\" (from the Quran).",
+    "The Prophet ﷺ said: \"When one of you becomes frightened during sleep, then let him say this.\" Grading note: sunnah.com's Darussalam edition grades this Da'if, but al-Albani authenticated it and it is in Hisn al-Muslim. If cautious, use \"a'udhu billahi minash-shaytanir-rajim\" (from the Quran).",
   target: 1,
 };
 
@@ -402,7 +402,7 @@ const wakeGoodDream: Dhikr = {
 export type SleepMode = "sleep" | "wake";
 
 export const sleepItems: SalahItem[] = [
-  { dhikr: sleepDisclaimer, isSpecial: true, specialLabel: "⚠️ Read the physical adab first" },
+  { dhikr: sleepDisclaimer, isSpecial: true, specialLabel: "Read the physical adab first" },
   { dhikr: sleepKafirun },
   { dhikr: sleepAyatKursi },
   { dhikr: sleepBaqarahEnd },
@@ -418,11 +418,11 @@ export const sleepItems: SalahItem[] = [
   { dhikr: sleepIbnUmar },
   { dhikr: sleepMain, isSpecial: true, specialLabel: "Shake bed → lie on right side" },
   { dhikr: sleepBismika },
-  { dhikr: sleepLastWords, isSpecial: true, specialLabel: "⚠️ LAST words — do not speak after" },
+  { dhikr: sleepLastWords, isSpecial: true, specialLabel: "LAST words — do not speak after" },
 ];
 
 export const wakeItems: SalahItem[] = [
-  { dhikr: wakeDisclaimer, isSpecial: true, specialLabel: "⚠️ Read the physical adab first" },
+  { dhikr: wakeDisclaimer, isSpecial: true, specialLabel: "Read the physical adab first" },
   { dhikr: wakeMain, isSpecial: true, specialLabel: "Say this the INSTANT you wake — before your phone" },
   { dhikr: wakeAlImran },
   { dhikr: wakeNightWaking },

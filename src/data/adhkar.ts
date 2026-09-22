@@ -2,6 +2,7 @@ export type DhikrDetails = {
   grading?: string;
   reward?: string;
   narration?: string;
+  narrationArabic?: string;
   notes?: string[];
   weak?: boolean;
 };
@@ -20,6 +21,49 @@ export type Dhikr = {
   details?: DhikrDetails;
 };
 
+const threeQuls = (id: string): Dhikr => ({
+  id,
+  title: "The Three Quls",
+  arabic: "بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ\n\nقُلْ هُوَ اللَّهُ أَحَدٌ ۝\nاللَّهُ الصَّمَدُ ۝\nلَمْ يَلِدْ وَلَمْ يُولَدْ ۝\nوَلَمْ يَكُن لَّهُ كُفُوًا أَحَدٌ ۝\n\nقُلْ أَعُوذُ بِرَبِّ الْفَلَقِ ۝\nمِن شَرِّ مَا خَلَقَ ۝\nوَمِن شَرِّ غَاسِقٍ إِذَا وَقَبَ ۝\nوَمِن شَرِّ النَّفَّاثَاتِ فِي الْعُقَدِ ۝\nوَمِن شَرِّ حَاسِدٍ إِذَا حَسَدَ ۝\n\nقُلْ أَعُوذُ بِرَبِّ النَّاسِ ۝\nمَلِكِ النَّاسِ ۝\nإِلَٰهِ النَّاسِ ۝\nمِن شَرِّ الْوَسْوَاسِ الْخَنَّاسِ ۝\nالَّذِي يُوَسْوِسُ فِي صُدُورِ النَّاسِ ۝\nمِنَ الْجِنَّةِ وَالنَّاسِ ۝",
+  transliteration: "Bismillāhi ʾr-Raḥmāni ʾr-Raḥīm\n\nQul huwa ʾllāhu aḥad.\nAllāhu ʾṣ-ṣamad.\nLam yalid wa lam yūlad.\nWa lam yakun lahu kufuwan aḥad.\n\nQul aʿūdhu bi-rabbi ʾl-falaq.\nMin sharri mā khalaq.\nWa min sharri ghāsiqin idhā waqab.\nWa min sharri ʾn-naffāthāti fi ʾl-ʿuqad.\nWa min sharri ḥāsidin idhā ḥasad.\n\nQul aʿūdhu bi-rabbi ʾn-nās.\nMaliki ʾn-nās.\nIlāhi ʾn-nās.\nMin sharri ʾl-waswāsi ʾl-khannās.\nAlladhī yuwaswisu fī ṣudūri ʾn-nās.\nMina ʾl-jinnati wa ʾn-nās.",
+  translation: "In the name of Allah, the Entirely Merciful, the Especially Merciful.\n\nSay, “He is Allah, [who is] One,\nAllah, the Eternal Refuge.\nHe neither begets nor is born,\nNor is there to Him any equivalent.”\n\nSay, “I seek refuge in the Lord of daybreak\nFrom the evil of that which He created\nAnd from the evil of darkness when it settles\nAnd from the evil of the blowers in knots\nAnd from the evil of an envier when he envies.”\n\nSay, “I seek refuge in the Lord of mankind,\nThe Sovereign of mankind,\nThe God of mankind,\nFrom the evil of the retreating whisperer —\nWho whispers [evil] into the breasts of mankind —\nFrom among the jinn and mankind.”",
+  source: "Sunan Abi Dawud 5082 · Hasan (al-Albani)",
+  commentary: "Recite Sūrat al-Ikhlāṣ, Sūrat al-Falaq, and Sūrat an-Nās three times each in the morning and evening. They will suffice you against everything.",
+  target: 3,
+  arabicMulti: [
+    {
+      label: "The Basmalah · Quran 1:1",
+      arabic: "بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ",
+      transliteration: "Bismillāhi ʾr-Raḥmāni ʾr-Raḥīm",
+      translation: "In the name of Allah, the Entirely Merciful, the Especially Merciful.",
+    },
+    {
+      label: "1 · Sūrat al-Ikhlāṣ · Quran 112",
+      arabic: "قُلْ هُوَ اللَّهُ أَحَدٌ ۝\nاللَّهُ الصَّمَدُ ۝\nلَمْ يَلِدْ وَلَمْ يُولَدْ ۝\nوَلَمْ يَكُن لَّهُ كُفُوًا أَحَدٌ ۝",
+      transliteration: "Qul huwa ʾllāhu aḥad.\nAllāhu ʾṣ-ṣamad.\nLam yalid wa lam yūlad.\nWa lam yakun lahu kufuwan aḥad.",
+      translation: "Say, “He is Allah, [who is] One,\nAllah, the Eternal Refuge.\nHe neither begets nor is born,\nNor is there to Him any equivalent.”",
+    },
+    {
+      label: "2 · Sūrat al-Falaq · Quran 113",
+      arabic: "قُلْ أَعُوذُ بِرَبِّ الْفَلَقِ ۝\nمِن شَرِّ مَا خَلَقَ ۝\nوَمِن شَرِّ غَاسِقٍ إِذَا وَقَبَ ۝\nوَمِن شَرِّ النَّفَّاثَاتِ فِي الْعُقَدِ ۝\nوَمِن شَرِّ حَاسِدٍ إِذَا حَسَدَ ۝",
+      transliteration: "Qul aʿūdhu bi-rabbi ʾl-falaq.\nMin sharri mā khalaq.\nWa min sharri ghāsiqin idhā waqab.\nWa min sharri ʾn-naffāthāti fi ʾl-ʿuqad.\nWa min sharri ḥāsidin idhā ḥasad.",
+      translation: "Say, “I seek refuge in the Lord of daybreak\nFrom the evil of that which He created\nAnd from the evil of darkness when it settles\nAnd from the evil of the blowers in knots\nAnd from the evil of an envier when he envies.”",
+    },
+    {
+      label: "3 · Sūrat an-Nās · Quran 114",
+      arabic: "قُلْ أَعُوذُ بِرَبِّ النَّاسِ ۝\nمَلِكِ النَّاسِ ۝\nإِلَٰهِ النَّاسِ ۝\nمِن شَرِّ الْوَسْوَاسِ الْخَنَّاسِ ۝\nالَّذِي يُوَسْوِسُ فِي صُدُورِ النَّاسِ ۝\nمِنَ الْجِنَّةِ وَالنَّاسِ ۝",
+      transliteration: "Qul aʿūdhu bi-rabbi ʾn-nās.\nMaliki ʾn-nās.\nIlāhi ʾn-nās.\nMin sharri ʾl-waswāsi ʾl-khannās.\nAlladhī yuwaswisu fī ṣudūri ʾn-nās.\nMina ʾl-jinnati wa ʾn-nās.",
+      translation: "Say, “I seek refuge in the Lord of mankind,\nThe Sovereign of mankind,\nThe God of mankind,\nFrom the evil of the retreating whisperer —\nWho whispers [evil] into the breasts of mankind —\nFrom among the jinn and mankind.”",
+    },
+  ],
+  details: {
+    grading: "Hasan (al-Albani)",
+    reward: "Reciting the three surahs three times each in the morning and evening will suffice you against everything.",
+    narration: "Narrated ‘Abdullah ibn Khubayb: We went out one rainy and intensely dark night to look for the Messenger of Allah (ﷺ) to lead us in prayer, and when we found him, he asked: “Have you prayed?”, but I did not say anything. So he said: “Say,” but I did not say anything. He again said: “Say,” but I did not say anything. He then said: “Say.” So I said: What am I to say? He said: “Say: ‘Say, He is Allah, One,’ and al-Mu‘awwidhatan three times in the morning and evening; they will serve you for every purpose.”",
+    narrationArabic: "حَدَّثَنَا مُحَمَّدُ بْنُ الْمُصَفَّى، حَدَّثَنَا ابْنُ أَبِي فُدَيْكٍ، قَالَ أَخْبَرَنِي ابْنُ أَبِي ذِئْبٍ، عَنْ أَبِي أَسِيدٍ الْبَرَّادِ، عَنْ مُعَاذِ بْنِ عَبْدِ اللَّهِ بْنِ خُبَيْبٍ، عَنْ أَبِيهِ، أَنَّهُ قَالَ خَرَجْنَا فِي لَيْلَةِ مَطَرٍ وَظُلْمَةٍ شَدِيدَةٍ نَطْلُبُ رَسُولَ اللَّهِ صلى الله عليه وسلم لِيُصَلِّيَ لَنَا فَأَدْرَكْنَاهُ فَقَالَ «أَصَلَّيْتُمْ». فَلَمْ أَقُلْ شَيْئًا فَقَالَ «قُلْ». فَلَمْ أَقُلْ شَيْئًا ثُمَّ قَالَ «قُلْ». فَلَمْ أَقُلْ شَيْئًا ثُمَّ قَالَ «قُلْ». فَقُلْتُ يَا رَسُولَ اللَّهِ مَا أَقُولُ قَالَ «قُلْ هُوَ اللَّهُ أَحَدٌ وَالْمُعَوِّذَتَيْنِ حِينَ تُمْسِي وَحِينَ تُصْبِحُ ثَلاَثَ مَرَّاتٍ تَكْفِيكَ مِنْ كُلِّ شَىْءٍ»",
+  },
+});
+
 export const morningAdhkar: Dhikr[] = [
   {
     id: "morning-1-ayat-al-kursi",
@@ -35,21 +79,7 @@ export const morningAdhkar: Dhikr[] = [
       narration: "Hisn al-Muslim cites the virtue as follows: “Whoever says this when he rises in the morning will be protected from jinn until he retires in the evening, and whoever says it when retiring in the evening will be protected from them until he rises in the morning.” Reported by al-Hakim 1/562. Al-Albani graded it authentic in Sahih at-Targhib wa’t-Tarhib 1/273 and traced it to an-Nasa’i and at-Tabarani, noting that at-Tabarani’s chain of transmission is reliable (jayyid).",
     },
   },
-  {
-    id: "morning-2-surat-al-ikhla-al-falaq-and-an-nas",
-    title: "Sūrat al-Ikhlāṣ, al-Falaq and an-Nās",
-    arabic: "Al-Ikhlāṣ (112)\nقُلْ هُوَ اللَّهُ أَحَدٌ\nاللَّهُ الصَّمَدُ\nلَمْ يَلِدْ وَلَمْ يُولَدْ\nوَلَمْ يَكُن لَّهُ كُفُوًا أَحَدٌ\nAl-Falaq (113)\nقُلْ أَعُوذُ بِرَبِّ الْفَلَقِ\nمِن شَرِّ مَا خَلَقَ\nوَمِن شَرِّ غَاسِقٍ إِذَا وَقَبَ\nوَمِن شَرِّ النَّفَّاثَاتِ فِي الْعُقَدِ\nوَمِن شَرِّ حَاسِدٍ إِذَا حَسَدَ\nAn-Nās (114)\nقُلْ أَعُوذُ بِرَبِّ النَّاسِ\nمَلِكِ النَّاسِ\nإِلَٰهِ النَّاسِ\nمِن شَرِّ الْوَسْوَاسِ الْخَنَّاسِ\nالَّذِي يُوَسْوِسُ فِي صُدُورِ النَّاسِ\nمِنَ الْجِنَّةِ وَالنَّاسِ",
-    transliteration: "Qul huwa ʾllāhu aḥad… · Qul aʿūdhu bi-rabbi ʾl-falaq… · Qul aʿūdhu bi-rabbi ʾn-nās…",
-    translation: "Say: He is Allah, [who is] One… · Say: I seek refuge in the Lord of daybreak… · Say: I seek refuge in the Lord of mankind…",
-    source: "Abu Dawud 5082  ·  quran.com 112, 113, 114  ·  Hasan (al-Albani)",
-    commentary: "Reciting these three surahs three times each, morning and evening, suffices a person against everything.",
-    target: 3,
-    details: {
-      grading: "Hasan (al-Albani)",
-      reward: "Reciting these three surahs three times each, morning and evening, suffices a person against everything.",
-      narration: "Narrated ‘Abdullah ibn Khubayb: We went out one rainy and intensely dark night to look for the Messenger of Allah (ﷺ) to lead us in prayer, and when we found him, he asked: “Have you prayed?”, but I did not say anything. So he said: “Say,” but I did not say anything. He again said: “Say,” but I did not say anything. He then said: “Say.” So I said: What am I to say? He said: “Say: ‘Say, He is Allah, One,’ and al-Mu‘awwidhatan three times in the morning and evening; they will serve you for every purpose.”",
-    },
-  },
+  threeQuls("morning-2-three-quls"),
   {
     id: "morning-3-a-bahna-wa-a-baha-l-mulku-lillah",
     title: "Aṣbaḥnā wa aṣbaḥa ʾl-mulku lillāh",
@@ -218,12 +248,12 @@ export const morningAdhkar: Dhikr[] = [
     transliteration: "Allāhumma innī aʿūdhu bika mina ʾl-hammi wa ʾl-ḥazan, wa ʾl-ʿajzi wa ʾl-kasal, wa ʾl-jubni wa ʾl-bukhl, wa ḍalaʿi ʾd-dayn, wa ghalabati ʾr-rijāl.",
     translation: "O Allah, I seek refuge in You from worry and grief, from incapacity and laziness, from cowardice and miserliness, from being overwhelmed by debt and from being overpowered by men.",
     source: "Bukhari 6369  ·  Sahih (al-Bukhari)",
-    commentary: "Note A — authentic du‘a, weak timing — ✅ Authentic du‘a. The Prophet ﷺ frequently said it (Bukhari 6369). The narration instructing it specifically for morning and evening, and promising relief from debt (Abu Dawud 1555), is graded weak by Shaykh al-Albani. It is therefore included as a general du‘a, not as a dedicated morning/evening dhikr. There is no disagreement about saying it; only the specific timing and virtue are unproven.",
+    commentary: "Note A — authentic du‘a, weak timing — Authentic du‘a. The Prophet ﷺ frequently said it (Bukhari 6369). The narration instructing it specifically for morning and evening, and promising relief from debt (Abu Dawud 1555), is graded weak by Shaykh al-Albani. It is therefore included as a general du‘a, not as a dedicated morning/evening dhikr. There is no disagreement about saying it; only the specific timing and virtue are unproven.",
     target: 1,
     details: {
       grading: "Sahih (al-Bukhari)",
       narration: "Narrated Anas bin Malik: The Prophet (ﷺ) used to say, “O Allah! I seek refuge with You from worry and grief, from incapacity and laziness, from cowardice and miserliness, from being heavily in debt and from being overpowered by (other) men.”",
-      notes: ["Note A — authentic du‘a, weak timing — ✅ Authentic du‘a. The Prophet ﷺ frequently said it (Bukhari 6369). The narration instructing it specifically for morning and evening, and promising relief from debt (Abu Dawud 1555), is graded weak by Shaykh al-Albani. It is therefore included as a general du‘a, not as a dedicated morning/evening dhikr. There is no disagreement about saying it; only the specific timing and virtue are unproven."],
+      notes: ["Note A — authentic du‘a, weak timing — Authentic du‘a. The Prophet ﷺ frequently said it (Bukhari 6369). The narration instructing it specifically for morning and evening, and promising relief from debt (Abu Dawud 1555), is graded weak by Shaykh al-Albani. It is therefore included as a general du‘a, not as a dedicated morning/evening dhikr. There is no disagreement about saying it; only the specific timing and virtue are unproven."],
     },
   },
   {
@@ -321,12 +351,12 @@ export const morningAdhkar: Dhikr[] = [
     transliteration: "Ḥasbiya ʾllāhu lā ilāha illā huw, ʿalayhi tawakkaltu wa huwa rabbu ʾl-ʿarshi ʾl-ʿaẓīm.",
     translation: "Allah is sufficient for me; there is no god but Him. Upon Him I rely, and He is the Lord of the Mighty Throne.",
     source: "Abu Dawud 5081  ·  Mawdu' (al-Albani) · isnad jayyid (Ibn Baz)",
-    commentary: "Warning 4 — scholars differ — ⚠️ Salafi scholars are split on this one. Al-Albani graded the narration mawdu‘ (fabricated) on the Abu Dawud page. Shaykh Ibn Baz, however, classed its isnad as jayyid (good), noting that although it is mawquf — the words are Abu ad-Darda’s, not the Prophet’s ﷺ — it takes the ruling of a marfu‘ report, since such a virtue could not be said from opinion. IslamQA includes it in its compilation of authentic morning and evening adhkar on that basis. Included here so you can judge: if you follow al-Albani, leave it out; if you follow Ibn Baz, keep it. Either way the words themselves are Qur’an (at-Tawbah 9:129).",
+    commentary: "Warning 4 — scholars differ — Salafi scholars are split on this one. Al-Albani graded the narration mawdu‘ (fabricated) on the Abu Dawud page. Shaykh Ibn Baz, however, classed its isnad as jayyid (good), noting that although it is mawquf — the words are Abu ad-Darda’s, not the Prophet’s ﷺ — it takes the ruling of a marfu‘ report, since such a virtue could not be said from opinion. IslamQA includes it in its compilation of authentic morning and evening adhkar on that basis. Included here so you can judge: if you follow al-Albani, leave it out; if you follow Ibn Baz, keep it. Either way the words themselves are Qur’an (at-Tawbah 9:129).",
     target: 7,
     details: {
       grading: "Mawdu' (al-Albani) · isnad jayyid (Ibn Baz)",
       narration: "Abu ad-Darda’ said: “If anyone says seven times morning and evening: ‘Allah sufficeth me: there is no god but He; on Him is my trust — He, the Lord of the Throne Supreme’, Allah will be sufficient for him against anything which grieves him, whether he is true or false in repeating them.” Note that these are the words of Abu ad-Darda’ (mawquf), not a direct statement of the Prophet (ﷺ). The wording itself is Qur’an, at-Tawbah 9:129.",
-      notes: ["Warning 4 — scholars differ — ⚠️ Salafi scholars are split on this one. Al-Albani graded the narration mawdu‘ (fabricated) on the Abu Dawud page. Shaykh Ibn Baz, however, classed its isnad as jayyid (good), noting that although it is mawquf — the words are Abu ad-Darda’s, not the Prophet’s ﷺ — it takes the ruling of a marfu‘ report, since such a virtue could not be said from opinion. IslamQA includes it in its compilation of authentic morning and evening adhkar on that basis. Included here so you can judge: if you follow al-Albani, leave it out; if you follow Ibn Baz, keep it. Either way the words themselves are Qur’an (at-Tawbah 9:129)."],
+      notes: ["Warning 4 — scholars differ — Salafi scholars are split on this one. Al-Albani graded the narration mawdu‘ (fabricated) on the Abu Dawud page. Shaykh Ibn Baz, however, classed its isnad as jayyid (good), noting that although it is mawquf — the words are Abu ad-Darda’s, not the Prophet’s ﷺ — it takes the ruling of a marfu‘ report, since such a virtue could not be said from opinion. IslamQA includes it in its compilation of authentic morning and evening adhkar on that basis. Included here so you can judge: if you follow al-Albani, leave it out; if you follow Ibn Baz, keep it. Either way the words themselves are Qur’an (at-Tawbah 9:129)."],
       weak: true,
     },
   },
@@ -337,12 +367,12 @@ export const morningAdhkar: Dhikr[] = [
     transliteration: "Allāhumma mā aṣbaḥa bī min niʿmatin fa-minka waḥdaka lā sharīka lak, fa-laka ʾl-ḥamdu wa laka ʾsh-shukr.",
     translation: "O Allah, whatever blessing has come to me this morning is from You alone, who has no partner. So to You belongs all praise and to You belongs all thanks.",
     source: "Abu Dawud 5073  ·  Da'if (al-Albani)",
-    commentary: "Warning 1 — da‘if (al-Albani) — ⚠️ Graded weak (da‘if) by Shaykh al-Albani. The promised reward, that whoever says it has fulfilled the gratitude of his day, is not established from the Prophet ﷺ. Scholars who are strict on grading, like al-Albani, do not include it in the adhkar. Others allow reciting it without believing in the specific reward. Its meaning is sound: every blessing is from Allah alone, and He alone is thanked for it.",
+    commentary: "Warning 1 — da‘if (al-Albani) — Graded weak (da‘if) by Shaykh al-Albani. The promised reward, that whoever says it has fulfilled the gratitude of his day, is not established from the Prophet ﷺ. Scholars who are strict on grading, like al-Albani, do not include it in the adhkar. Others allow reciting it without believing in the specific reward. Its meaning is sound: every blessing is from Allah alone, and He alone is thanked for it.",
     target: 1,
     details: {
       grading: "Da'if (al-Albani)",
       narration: "Narrated ‘Abdullah ibn Ghannam: The Prophet (ﷺ) said: “If anyone says in the morning: ‘O Allah! whatever favour has come to me, it comes from Thee alone Who has no partner; to Thee praise is due and thanksgiving’ — he will have expressed full thanksgiving for the day; and if anyone says the same in the evening, he will have expressed full thanksgiving for the night.”",
-      notes: ["Warning 1 — da‘if (al-Albani) — ⚠️ Graded weak (da‘if) by Shaykh al-Albani. The promised reward, that whoever says it has fulfilled the gratitude of his day, is not established from the Prophet ﷺ. Scholars who are strict on grading, like al-Albani, do not include it in the adhkar. Others allow reciting it without believing in the specific reward. Its meaning is sound: every blessing is from Allah alone, and He alone is thanked for it."],
+      notes: ["Warning 1 — da‘if (al-Albani) — Graded weak (da‘if) by Shaykh al-Albani. The promised reward, that whoever says it has fulfilled the gratitude of his day, is not established from the Prophet ﷺ. Scholars who are strict on grading, like al-Albani, do not include it in the adhkar. Others allow reciting it without believing in the specific reward. Its meaning is sound: every blessing is from Allah alone, and He alone is thanked for it."],
       weak: true,
     },
   },
@@ -353,12 +383,12 @@ export const morningAdhkar: Dhikr[] = [
     transliteration: "Allāhumma innī aṣbaḥtu ushhiduka wa ushhidu ḥamalata ʿarshika wa malāʾikataka wa jamīʿa khalqik, annaka anta ʾllāhu lā ilāha illā ant, wa anna Muḥammadan ʿabduka wa rasūluk.",
     translation: "O Allah, I have entered the morning calling You to witness, and calling to witness the bearers of Your Throne, Your angels and all Your creation, that You are Allah — there is no god but You — and that Muhammad is Your servant and Your Messenger.",
     source: "Abu Dawud 5069  ·  Da'if (al-Albani)",
-    commentary: "Warning 2 — da‘if (al-Albani) — ⚠️ Graded weak (da‘if) by Shaykh al-Albani. The virtue that saying it four times frees one from the Fire is not established from the Prophet ﷺ, and the count of four comes only from this narration. Scholars who are strict on grading leave it out. Others allow it as a general affirmation of tawhid, without believing in the specific count or reward. The words themselves are a testimony of faith and are good to say.",
+    commentary: "Warning 2 — da‘if (al-Albani) — Graded weak (da‘if) by Shaykh al-Albani. The virtue that saying it four times frees one from the Fire is not established from the Prophet ﷺ, and the count of four comes only from this narration. Scholars who are strict on grading leave it out. Others allow it as a general affirmation of tawhid, without believing in the specific count or reward. The words themselves are a testimony of faith and are good to say.",
     target: 4,
     details: {
       grading: "Da'if (al-Albani)",
       narration: "Narrated Anas ibn Malik: The Prophet (ﷺ) said: “If anyone says in the morning or in the evening: ‘O Allah! in the morning we call Thee, the bearers of Thy Throne, Thy angels and all Thy creatures to witness that thou art Allah than Whom alone there is no god, and that Muhammad is Thy Servant and Apostle’ — Allah will emancipate his fourth from Hell; if anyone says it twice, Allah will emancipate his half; if anyone says it thrice, Allah will emancipate three-fourths; and if he says it four times, Allah will emancipate him from Hell.”",
-      notes: ["Warning 2 — da‘if (al-Albani) — ⚠️ Graded weak (da‘if) by Shaykh al-Albani. The virtue that saying it four times frees one from the Fire is not established from the Prophet ﷺ, and the count of four comes only from this narration. Scholars who are strict on grading leave it out. Others allow it as a general affirmation of tawhid, without believing in the specific count or reward. The words themselves are a testimony of faith and are good to say."],
+      notes: ["Warning 2 — da‘if (al-Albani) — Graded weak (da‘if) by Shaykh al-Albani. The virtue that saying it four times frees one from the Fire is not established from the Prophet ﷺ, and the count of four comes only from this narration. Scholars who are strict on grading leave it out. Others allow it as a general affirmation of tawhid, without believing in the specific count or reward. The words themselves are a testimony of faith and are good to say."],
       weak: true,
     },
   },
@@ -369,12 +399,12 @@ export const morningAdhkar: Dhikr[] = [
     transliteration: "Aṣbaḥnā wa aṣbaḥa ʾl-mulku lillāhi rabbi ʾl-ʿālamīn. Allāhumma innī asʾaluka khayra hādhā ʾl-yawm: fatḥahu wa naṣrahu wa nūrahu wa barakatahu wa hudāh, wa aʿūdhu bika min sharri mā fīhi wa sharri mā baʿdah.",
     translation: "We have entered the morning and the dominion belongs to Allah, Lord of all the worlds. O Allah, I ask You for the good of this day: its victory, its help, its light, its blessing and its guidance; and I seek refuge in You from the evil in it and the evil that comes after it.",
     source: "Abu Dawud 5084  ·  Da'if (al-Albani)",
-    commentary: "Warning 3 — da‘if (al-Albani) — ⚠️ Graded weak (da‘if) by Shaykh al-Albani. This particular wording and the command to say it are not established from the Prophet ﷺ. Asking Allah for the good of the day is authentically established in a different wording (entry 3 above, Muslim 2723a). Scholars who are strict on grading suffice with the authentic version. Others allow this one as a general du‘a.\n\n🌇 Evening Adhkar",
+    commentary: "Warning 3 — da‘if (al-Albani) — Graded weak (da‘if) by Shaykh al-Albani. This particular wording and the command to say it are not established from the Prophet ﷺ. Asking Allah for the good of the day is authentically established in a different wording (entry 3 above, Muslim 2723a). Scholars who are strict on grading suffice with the authentic version. Others allow this one as a general du‘a.",
     target: 1,
     details: {
       grading: "Da'if (al-Albani)",
       narration: "Abu Dawud said: And through the same chain of transmitters the Messenger of Allah (ﷺ) said: “When one rises in the morning, one should say: ‘We have reached the morning, and in the morning the dominion belongs to Allah, the Lord of the universe. O Allah! I ask Thee for the good this day contains, for conquest, victory, light, blessing and guidance during it; and I seek refuge in Thee from the evil it contains and the evil contained in what comes after it.’ In the evening he should say the equivalent.”",
-      notes: ["Warning 3 — da‘if (al-Albani) — ⚠️ Graded weak (da‘if) by Shaykh al-Albani. This particular wording and the command to say it are not established from the Prophet ﷺ. Asking Allah for the good of the day is authentically established in a different wording (entry 3 above, Muslim 2723a). Scholars who are strict on grading suffice with the authentic version. Others allow this one as a general du‘a.", "🌇 Evening Adhkar"],
+      notes: ["Warning 3 — da‘if (al-Albani) — Graded weak (da‘if) by Shaykh al-Albani. This particular wording and the command to say it are not established from the Prophet ﷺ. Asking Allah for the good of the day is authentically established in a different wording (entry 3 above, Muslim 2723a). Scholars who are strict on grading suffice with the authentic version. Others allow this one as a general du‘a."],
       weak: true,
     },
   },]
@@ -394,21 +424,7 @@ export const eveningAdhkar: Dhikr[] = [
       narration: "Hisn al-Muslim cites the virtue as follows: “Whoever says this when he rises in the morning will be protected from jinn until he retires in the evening, and whoever says it when retiring in the evening will be protected from them until he rises in the morning.” Reported by al-Hakim 1/562. Al-Albani graded it authentic in Sahih at-Targhib wa’t-Tarhib 1/273 and traced it to an-Nasa’i and at-Tabarani, noting that at-Tabarani’s chain of transmission is reliable (jayyid).",
     },
   },
-  {
-    id: "evening-2-surat-al-ikhla-al-falaq-and-an-nas",
-    title: "Sūrat al-Ikhlāṣ, al-Falaq and an-Nās",
-    arabic: "Al-Ikhlāṣ (112)\nقُلْ هُوَ اللَّهُ أَحَدٌ\nاللَّهُ الصَّمَدُ\nلَمْ يَلِدْ وَلَمْ يُولَدْ\nوَلَمْ يَكُن لَّهُ كُفُوًا أَحَدٌ\nAl-Falaq (113)\nقُلْ أَعُوذُ بِرَبِّ الْفَلَقِ\nمِن شَرِّ مَا خَلَقَ\nوَمِن شَرِّ غَاسِقٍ إِذَا وَقَبَ\nوَمِن شَرِّ النَّفَّاثَاتِ فِي الْعُقَدِ\nوَمِن شَرِّ حَاسِدٍ إِذَا حَسَدَ\nAn-Nās (114)\nقُلْ أَعُوذُ بِرَبِّ النَّاسِ\nمَلِكِ النَّاسِ\nإِلَٰهِ النَّاسِ\nمِن شَرِّ الْوَسْوَاسِ الْخَنَّاسِ\nالَّذِي يُوَسْوِسُ فِي صُدُورِ النَّاسِ\nمِنَ الْجِنَّةِ وَالنَّاسِ",
-    transliteration: "Qul huwa ʾllāhu aḥad… · Qul aʿūdhu bi-rabbi ʾl-falaq… · Qul aʿūdhu bi-rabbi ʾn-nās…",
-    translation: "Say: He is Allah, [who is] One… · Say: I seek refuge in the Lord of daybreak… · Say: I seek refuge in the Lord of mankind…",
-    source: "Abu Dawud 5082  ·  quran.com 112, 113, 114  ·  Hasan (al-Albani)",
-    commentary: "Reciting these three surahs three times each, morning and evening, suffices a person against everything.",
-    target: 3,
-    details: {
-      grading: "Hasan (al-Albani)",
-      reward: "Reciting these three surahs three times each, morning and evening, suffices a person against everything.",
-      narration: "Narrated ‘Abdullah ibn Khubayb: We went out one rainy and intensely dark night to look for the Messenger of Allah (ﷺ) to lead us in prayer, and when we found him, he asked: “Have you prayed?”, but I did not say anything. So he said: “Say,” but I did not say anything. He again said: “Say,” but I did not say anything. He then said: “Say.” So I said: What am I to say? He said: “Say: ‘Say, He is Allah, One,’ and al-Mu‘awwidhatan three times in the morning and evening; they will serve you for every purpose.”",
-    },
-  },
+  threeQuls("evening-2-three-quls"),
   {
     id: "evening-3-amsayna-wa-amsa-l-mulku-lillah",
     title: "Amsaynā wa amsā ʾl-mulku lillāh",
@@ -577,12 +593,12 @@ export const eveningAdhkar: Dhikr[] = [
     transliteration: "Allāhumma innī aʿūdhu bika mina ʾl-hammi wa ʾl-ḥazan, wa ʾl-ʿajzi wa ʾl-kasal, wa ʾl-jubni wa ʾl-bukhl, wa ḍalaʿi ʾd-dayn, wa ghalabati ʾr-rijāl.",
     translation: "O Allah, I seek refuge in You from worry and grief, from incapacity and laziness, from cowardice and miserliness, from being overwhelmed by debt and from being overpowered by men.",
     source: "Bukhari 6369  ·  Sahih (al-Bukhari)",
-    commentary: "Note A — authentic du‘a, weak timing — ✅ Authentic du‘a. The Prophet ﷺ frequently said it (Bukhari 6369). The narration instructing it specifically for morning and evening, and promising relief from debt (Abu Dawud 1555), is graded weak by Shaykh al-Albani. It is therefore included as a general du‘a, not as a dedicated morning/evening dhikr. There is no disagreement about saying it; only the specific timing and virtue are unproven.",
+    commentary: "Note A — authentic du‘a, weak timing — Authentic du‘a. The Prophet ﷺ frequently said it (Bukhari 6369). The narration instructing it specifically for morning and evening, and promising relief from debt (Abu Dawud 1555), is graded weak by Shaykh al-Albani. It is therefore included as a general du‘a, not as a dedicated morning/evening dhikr. There is no disagreement about saying it; only the specific timing and virtue are unproven.",
     target: 1,
     details: {
       grading: "Sahih (al-Bukhari)",
       narration: "Narrated Anas bin Malik: The Prophet (ﷺ) used to say, “O Allah! I seek refuge with You from worry and grief, from incapacity and laziness, from cowardice and miserliness, from being heavily in debt and from being overpowered by (other) men.”",
-      notes: ["Note A — authentic du‘a, weak timing — ✅ Authentic du‘a. The Prophet ﷺ frequently said it (Bukhari 6369). The narration instructing it specifically for morning and evening, and promising relief from debt (Abu Dawud 1555), is graded weak by Shaykh al-Albani. It is therefore included as a general du‘a, not as a dedicated morning/evening dhikr. There is no disagreement about saying it; only the specific timing and virtue are unproven."],
+      notes: ["Note A — authentic du‘a, weak timing — Authentic du‘a. The Prophet ﷺ frequently said it (Bukhari 6369). The narration instructing it specifically for morning and evening, and promising relief from debt (Abu Dawud 1555), is graded weak by Shaykh al-Albani. It is therefore included as a general du‘a, not as a dedicated morning/evening dhikr. There is no disagreement about saying it; only the specific timing and virtue are unproven."],
     },
   },
   {
@@ -666,12 +682,12 @@ export const eveningAdhkar: Dhikr[] = [
     transliteration: "Ḥasbiya ʾllāhu lā ilāha illā huw, ʿalayhi tawakkaltu wa huwa rabbu ʾl-ʿarshi ʾl-ʿaẓīm.",
     translation: "Allah is sufficient for me; there is no god but Him. Upon Him I rely, and He is the Lord of the Mighty Throne.",
     source: "Abu Dawud 5081  ·  Mawdu' (al-Albani) · isnad jayyid (Ibn Baz)",
-    commentary: "Warning 4 — scholars differ — ⚠️ Salafi scholars are split on this one. Al-Albani graded the narration mawdu‘ (fabricated) on the Abu Dawud page. Shaykh Ibn Baz, however, classed its isnad as jayyid (good), noting that although it is mawquf — the words are Abu ad-Darda’s, not the Prophet’s ﷺ — it takes the ruling of a marfu‘ report, since such a virtue could not be said from opinion. IslamQA includes it in its compilation of authentic morning and evening adhkar on that basis. Included here so you can judge: if you follow al-Albani, leave it out; if you follow Ibn Baz, keep it. Either way the words themselves are Qur’an (at-Tawbah 9:129).",
+    commentary: "Warning 4 — scholars differ — Salafi scholars are split on this one. Al-Albani graded the narration mawdu‘ (fabricated) on the Abu Dawud page. Shaykh Ibn Baz, however, classed its isnad as jayyid (good), noting that although it is mawquf — the words are Abu ad-Darda’s, not the Prophet’s ﷺ — it takes the ruling of a marfu‘ report, since such a virtue could not be said from opinion. IslamQA includes it in its compilation of authentic morning and evening adhkar on that basis. Included here so you can judge: if you follow al-Albani, leave it out; if you follow Ibn Baz, keep it. Either way the words themselves are Qur’an (at-Tawbah 9:129).",
     target: 7,
     details: {
       grading: "Mawdu' (al-Albani) · isnad jayyid (Ibn Baz)",
       narration: "Abu ad-Darda’ said: “If anyone says seven times morning and evening: ‘Allah sufficeth me: there is no god but He; on Him is my trust — He, the Lord of the Throne Supreme’, Allah will be sufficient for him against anything which grieves him, whether he is true or false in repeating them.” Note that these are the words of Abu ad-Darda’ (mawquf), not a direct statement of the Prophet (ﷺ). The wording itself is Qur’an, at-Tawbah 9:129.",
-      notes: ["Warning 4 — scholars differ — ⚠️ Salafi scholars are split on this one. Al-Albani graded the narration mawdu‘ (fabricated) on the Abu Dawud page. Shaykh Ibn Baz, however, classed its isnad as jayyid (good), noting that although it is mawquf — the words are Abu ad-Darda’s, not the Prophet’s ﷺ — it takes the ruling of a marfu‘ report, since such a virtue could not be said from opinion. IslamQA includes it in its compilation of authentic morning and evening adhkar on that basis. Included here so you can judge: if you follow al-Albani, leave it out; if you follow Ibn Baz, keep it. Either way the words themselves are Qur’an (at-Tawbah 9:129)."],
+      notes: ["Warning 4 — scholars differ — Salafi scholars are split on this one. Al-Albani graded the narration mawdu‘ (fabricated) on the Abu Dawud page. Shaykh Ibn Baz, however, classed its isnad as jayyid (good), noting that although it is mawquf — the words are Abu ad-Darda’s, not the Prophet’s ﷺ — it takes the ruling of a marfu‘ report, since such a virtue could not be said from opinion. IslamQA includes it in its compilation of authentic morning and evening adhkar on that basis. Included here so you can judge: if you follow al-Albani, leave it out; if you follow Ibn Baz, keep it. Either way the words themselves are Qur’an (at-Tawbah 9:129)."],
       weak: true,
     },
   },
@@ -682,12 +698,12 @@ export const eveningAdhkar: Dhikr[] = [
     transliteration: "Allāhumma mā amsā bī min niʿmatin fa-minka waḥdaka lā sharīka lak, fa-laka ʾl-ḥamdu wa laka ʾsh-shukr.",
     translation: "O Allah, whatever blessing has come to me this evening is from You alone, who has no partner. So to You belongs all praise and to You belongs all thanks.",
     source: "Abu Dawud 5073  ·  Da'if (al-Albani)",
-    commentary: "Wording note — adapted for the evening — The page gives only the morning wording and instructs that the equivalent be said in the evening (“thumma idha amsa fal-yaqul mithla dhalik”). The evening Arabic below is that adaptation, not a direct quotation.\n\nWarning 1 — da‘if (al-Albani) — ⚠️ Graded weak (da‘if) by Shaykh al-Albani. The promised reward, that whoever says it has fulfilled the gratitude of his night, is not established from the Prophet ﷺ. Scholars who are strict on grading, like al-Albani, do not include it in the adhkar. Others allow reciting it without believing in the specific reward. Its meaning is sound: every blessing is from Allah alone, and He alone is thanked for it.",
+    commentary: "Wording note — adapted for the evening — The page gives only the morning wording and instructs that the equivalent be said in the evening (“thumma idha amsa fal-yaqul mithla dhalik”). The evening Arabic below is that adaptation, not a direct quotation.\n\nWarning 1 — da‘if (al-Albani) — Graded weak (da‘if) by Shaykh al-Albani. The promised reward, that whoever says it has fulfilled the gratitude of his night, is not established from the Prophet ﷺ. Scholars who are strict on grading, like al-Albani, do not include it in the adhkar. Others allow reciting it without believing in the specific reward. Its meaning is sound: every blessing is from Allah alone, and He alone is thanked for it.",
     target: 1,
     details: {
       grading: "Da'if (al-Albani)",
       narration: "Narrated ‘Abdullah ibn Ghannam: The Prophet (ﷺ) said: “If anyone says in the morning: ‘O Allah! whatever favour has come to me, it comes from Thee alone Who has no partner; to Thee praise is due and thanksgiving’ — he will have expressed full thanksgiving for the day; and if anyone says the same in the evening, he will have expressed full thanksgiving for the night.”",
-      notes: ["Wording note — adapted for the evening — The page gives only the morning wording and instructs that the equivalent be said in the evening (“thumma idha amsa fal-yaqul mithla dhalik”). The evening Arabic below is that adaptation, not a direct quotation.", "Warning 1 — da‘if (al-Albani) — ⚠️ Graded weak (da‘if) by Shaykh al-Albani. The promised reward, that whoever says it has fulfilled the gratitude of his night, is not established from the Prophet ﷺ. Scholars who are strict on grading, like al-Albani, do not include it in the adhkar. Others allow reciting it without believing in the specific reward. Its meaning is sound: every blessing is from Allah alone, and He alone is thanked for it."],
+      notes: ["Wording note — adapted for the evening — The page gives only the morning wording and instructs that the equivalent be said in the evening (“thumma idha amsa fal-yaqul mithla dhalik”). The evening Arabic below is that adaptation, not a direct quotation.", "Warning 1 — da‘if (al-Albani) — Graded weak (da‘if) by Shaykh al-Albani. The promised reward, that whoever says it has fulfilled the gratitude of his night, is not established from the Prophet ﷺ. Scholars who are strict on grading, like al-Albani, do not include it in the adhkar. Others allow reciting it without believing in the specific reward. Its meaning is sound: every blessing is from Allah alone, and He alone is thanked for it."],
       weak: true,
     },
   },
@@ -698,12 +714,12 @@ export const eveningAdhkar: Dhikr[] = [
     transliteration: "Allāhumma innī amsaytu ushhiduka wa ushhidu ḥamalata ʿarshika wa malāʾikataka wa jamīʿa khalqik, annaka anta ʾllāhu lā ilāha illā ant, wa anna Muḥammadan ʿabduka wa rasūluk.",
     translation: "O Allah, I have entered the evening calling You to witness, and calling to witness the bearers of Your Throne, Your angels and all Your creation, that You are Allah — there is no god but You — and that Muhammad is Your servant and Your Messenger.",
     source: "Abu Dawud 5069  ·  Da'if (al-Albani)",
-    commentary: "Wording note — adapted for the evening — The page gives only the morning wording and instructs that the equivalent be said in the evening (“thumma idha amsa fal-yaqul mithla dhalik”). The evening Arabic below is that adaptation, not a direct quotation.\n\nWarning 2 — da‘if (al-Albani) — ⚠️ Graded weak (da‘if) by Shaykh al-Albani. The virtue that saying it four times frees one from the Fire is not established from the Prophet ﷺ, and the count of four comes only from this narration. Scholars who are strict on grading leave it out. Others allow it as a general affirmation of tawhid, without believing in the specific count or reward. The words themselves are a testimony of faith and are good to say.",
+    commentary: "Wording note — adapted for the evening — The page gives only the morning wording and instructs that the equivalent be said in the evening (“thumma idha amsa fal-yaqul mithla dhalik”). The evening Arabic below is that adaptation, not a direct quotation.\n\nWarning 2 — da‘if (al-Albani) — Graded weak (da‘if) by Shaykh al-Albani. The virtue that saying it four times frees one from the Fire is not established from the Prophet ﷺ, and the count of four comes only from this narration. Scholars who are strict on grading leave it out. Others allow it as a general affirmation of tawhid, without believing in the specific count or reward. The words themselves are a testimony of faith and are good to say.",
     target: 4,
     details: {
       grading: "Da'if (al-Albani)",
       narration: "Narrated Anas ibn Malik: The Prophet (ﷺ) said: “If anyone says in the morning or in the evening: ‘O Allah! in the morning we call Thee, the bearers of Thy Throne, Thy angels and all Thy creatures to witness that thou art Allah than Whom alone there is no god, and that Muhammad is Thy Servant and Apostle’ — Allah will emancipate his fourth from Hell; if anyone says it twice, Allah will emancipate his half; if anyone says it thrice, Allah will emancipate three-fourths; and if he says it four times, Allah will emancipate him from Hell.”",
-      notes: ["Wording note — adapted for the evening — The page gives only the morning wording and instructs that the equivalent be said in the evening (“thumma idha amsa fal-yaqul mithla dhalik”). The evening Arabic below is that adaptation, not a direct quotation.", "Warning 2 — da‘if (al-Albani) — ⚠️ Graded weak (da‘if) by Shaykh al-Albani. The virtue that saying it four times frees one from the Fire is not established from the Prophet ﷺ, and the count of four comes only from this narration. Scholars who are strict on grading leave it out. Others allow it as a general affirmation of tawhid, without believing in the specific count or reward. The words themselves are a testimony of faith and are good to say."],
+      notes: ["Wording note — adapted for the evening — The page gives only the morning wording and instructs that the equivalent be said in the evening (“thumma idha amsa fal-yaqul mithla dhalik”). The evening Arabic below is that adaptation, not a direct quotation.", "Warning 2 — da‘if (al-Albani) — Graded weak (da‘if) by Shaykh al-Albani. The virtue that saying it four times frees one from the Fire is not established from the Prophet ﷺ, and the count of four comes only from this narration. Scholars who are strict on grading leave it out. Others allow it as a general affirmation of tawhid, without believing in the specific count or reward. The words themselves are a testimony of faith and are good to say."],
       weak: true,
     },
   },
@@ -714,12 +730,12 @@ export const eveningAdhkar: Dhikr[] = [
     transliteration: "Amsaynā wa amsā ʾl-mulku lillāhi rabbi ʾl-ʿālamīn. Allāhumma innī asʾaluka khayra hādhihi ʾl-laylah: fatḥahā wa naṣrahā wa nūrahā wa barakatahā wa hudāhā, wa aʿūdhu bika min sharri mā fīhā wa sharri mā baʿdahā.",
     translation: "We have entered the evening and the dominion belongs to Allah, Lord of all the worlds. O Allah, I ask You for the good of this night: its victory, its help, its light, its blessing and its guidance; and I seek refuge in You from the evil in it and the evil that comes after it.",
     source: "Abu Dawud 5084  ·  Da'if (al-Albani)",
-    commentary: "Wording note — adapted for the evening — The page gives only the morning wording and instructs that the equivalent be said in the evening (“thumma idha amsa fal-yaqul mithla dhalik”). The evening Arabic below is that adaptation, not a direct quotation.\n\nWarning 3 — da‘if (al-Albani) — ⚠️ Graded weak (da‘if) by Shaykh al-Albani. This particular wording and the command to say it are not established from the Prophet ﷺ. Asking Allah for the good of the night is authentically established in a different wording (entry 3 above, Muslim 2723a). Scholars who are strict on grading suffice with the authentic version. Others allow this one as a general du‘a.",
+    commentary: "Wording note — adapted for the evening — The page gives only the morning wording and instructs that the equivalent be said in the evening (“thumma idha amsa fal-yaqul mithla dhalik”). The evening Arabic below is that adaptation, not a direct quotation.\n\nWarning 3 — da‘if (al-Albani) — Graded weak (da‘if) by Shaykh al-Albani. This particular wording and the command to say it are not established from the Prophet ﷺ. Asking Allah for the good of the night is authentically established in a different wording (entry 3 above, Muslim 2723a). Scholars who are strict on grading suffice with the authentic version. Others allow this one as a general du‘a.",
     target: 1,
     details: {
       grading: "Da'if (al-Albani)",
       narration: "Abu Dawud said: And through the same chain of transmitters the Messenger of Allah (ﷺ) said: “When one rises in the morning, one should say: ‘We have reached the morning, and in the morning the dominion belongs to Allah, the Lord of the universe. O Allah! I ask Thee for the good this day contains, for conquest, victory, light, blessing and guidance during it; and I seek refuge in Thee from the evil it contains and the evil contained in what comes after it.’ In the evening he should say the equivalent.”",
-      notes: ["Wording note — adapted for the evening — The page gives only the morning wording and instructs that the equivalent be said in the evening (“thumma idha amsa fal-yaqul mithla dhalik”). The evening Arabic below is that adaptation, not a direct quotation.", "Warning 3 — da‘if (al-Albani) — ⚠️ Graded weak (da‘if) by Shaykh al-Albani. This particular wording and the command to say it are not established from the Prophet ﷺ. Asking Allah for the good of the night is authentically established in a different wording (entry 3 above, Muslim 2723a). Scholars who are strict on grading suffice with the authentic version. Others allow this one as a general du‘a."],
+      notes: ["Wording note — adapted for the evening — The page gives only the morning wording and instructs that the equivalent be said in the evening (“thumma idha amsa fal-yaqul mithla dhalik”). The evening Arabic below is that adaptation, not a direct quotation.", "Warning 3 — da‘if (al-Albani) — Graded weak (da‘if) by Shaykh al-Albani. This particular wording and the command to say it are not established from the Prophet ﷺ. Asking Allah for the good of the night is authentically established in a different wording (entry 3 above, Muslim 2723a). Scholars who are strict on grading suffice with the authentic version. Others allow this one as a general du‘a."],
       weak: true,
     },
   },]

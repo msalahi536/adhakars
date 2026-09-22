@@ -1,5 +1,5 @@
 import { useRef, useState } from "react";
-import { AlertTriangle, BookOpen, Check, ChevronLeft, ChevronRight } from "lucide-react";
+import { BookOpen, Check, ChevronLeft, ChevronRight } from "lucide-react";
 import { ProgressRing } from "./ProgressRing";
 import { triggerHaptic } from "@/lib/theme";
 
@@ -38,13 +38,13 @@ export function OrnamentalDivider() {
   );
 }
 
-export function SourceBadge({ source, weak = false, onClick }: { source: string; weak?: boolean; onClick?: () => void }) {
+export function SourceBadge({ source, onClick }: { source: string; onClick?: () => void }) {
   return (
     <button
       type="button"
       className="adhkar-source-badge"
       title={source}
-      aria-label={`${source}${weak ? ", weak or disputed narration" : ""}. Open full details`}
+      aria-label={`${source}. Open full details`}
       onClick={() => {
         void triggerHaptic("light");
         onClick?.();
@@ -53,7 +53,6 @@ export function SourceBadge({ source, weak = false, onClick }: { source: string;
     >
       <BookOpen size={13} strokeWidth={1.5} />
       <span>{source}</span>
-      {weak && <AlertTriangle aria-hidden className="shrink-0" size={12} strokeWidth={1.8} />}
     </button>
   );
 }

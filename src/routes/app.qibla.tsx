@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
+import { Check } from "lucide-react";
 import { HeaderBackButton } from "@/components/HeaderBackButton";
 import { CompassCalibrationCard } from "@/components/CompassCalibrationCard";
 import {
@@ -400,8 +401,9 @@ function Qibla() {
                   </div>
                 )}
                 {aligned && (
-                  <div className="pt-2 text-sm font-bold" style={{ color: "#3d8f5c" }}>
-                    ✓ You are facing the Qibla
+                  <div className="flex items-center justify-center gap-1.5 pt-2 text-sm font-bold" style={{ color: "#3d8f5c" }}>
+                    <Check aria-hidden size={16} strokeWidth={2} />
+                    <span>You are facing the Qibla</span>
                   </div>
                 )}
               </div>

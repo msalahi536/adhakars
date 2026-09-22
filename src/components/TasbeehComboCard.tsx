@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { Check, Plus } from "lucide-react";
 import type { ComboDhikr } from "@/data/salah";
 import { getDisplay, triggerHaptic } from "@/lib/theme";
 
@@ -130,7 +131,7 @@ export function TasbeehComboCard({ combo, counts, onIncrement, index, total }: P
                         fontSize: 20,
                       }}
                     >
-                      {done ? "✓" : "+"}
+                      {done ? <Check size={18} strokeWidth={2} /> : <Plus size={18} strokeWidth={2} />}
                     </button>
                   </div>
                 </div>

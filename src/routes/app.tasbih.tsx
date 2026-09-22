@@ -87,7 +87,7 @@ function Tasbih() {
     triggerHaptic("heavy");
     setTotal(0);
     setConfirmReset(false);
-    showToast("Count reset ✓");
+    showToast("Count reset");
   };
 
   return (

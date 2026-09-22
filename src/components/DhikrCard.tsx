@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { AlertTriangle } from "lucide-react";
 import type { Dhikr } from "@/data/adhkar";
 import { ListenButton } from "./ListenButton";
 import { ArabicText, OrnamentalDivider, RepeatCounter, SourceBadge, Transliteration } from "./AdhkarPrimitives";
@@ -159,8 +160,12 @@ export function DhikrCard({ dhikr, count, onIncrement, isSpecial, specialLabel, 
           )}
           {referenceLayout && hasCommentary && (
             <details className="adhkar-commentary" data-no-swipe>
-              <summary>Commentary</summary>
+              <summary>
+                <span>Commentary</span>
+                {dhikr.details?.weak && <AlertTriangle aria-label="Weak or disputed narration" size={13} strokeWidth={1.8} />}
+              </summary>
               <p>{dhikr.commentary}</p>
+              <p className="adhkar-commentary-hint">Press the reference pill below to open the full hadith, grading, reward, and notes.</p>
             </details>
           )}
         </div>
@@ -183,7 +188,6 @@ export function DhikrCard({ dhikr, count, onIncrement, isSpecial, specialLabel, 
             {dhikr.source && (
               <SourceBadge
                 source={dhikr.source}
-                weak={dhikr.details?.weak}
                 onClick={() => setShowHadithDetails(true)}
               />
             )}
@@ -201,7 +205,7 @@ export function DhikrCard({ dhikr, count, onIncrement, isSpecial, specialLabel, 
             }}
             aria-label="mark done"
           >
-            {complete ? "✓ Done" : "Done"}
+            Done
           </button>
         ) : (
            <RepeatCounter count={count} target={dhikr.target} complete={complete} tapped={tapped && !justCompleted} bursts={bursts} justCompleted={justCompleted} onClick={handleTap} size={referenceLayout ? 84 : 88} />

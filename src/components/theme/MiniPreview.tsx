@@ -193,7 +193,7 @@ export function MiniPreview({
                   fontWeight: 800,
                 }}
               >
-                ♪
+                Audio
               </div>
               <div
                 style={{
