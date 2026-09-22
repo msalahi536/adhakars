@@ -991,7 +991,7 @@ html[data-section="salah"] .app-shell { background: linear-gradient(180deg, #f5e
 html[data-section="salah"] .app-shell::after { background: transparent; }
 
 @media (max-height: 779px) {
-  .salah-page { overflow-y: auto; -webkit-overflow-scrolling: touch; padding-bottom: 106px; }
+  .salah-page { overflow-y: auto; -webkit-overflow-scrolling: touch; padding-bottom: 114px; }
   .salah-content { flex: none; overflow: visible; }
 }
 
