@@ -425,7 +425,6 @@ function Salah() {
                 now={now}
                 todayKey={todayKey}
                 tone="deep"
-                onPickPrayer={(id) => openAdhkar(id as SalahPrayer)}
               />
             </div>
           ) : (
