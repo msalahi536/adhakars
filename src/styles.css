@@ -808,11 +808,11 @@ html[data-section="evening"] .adhkar-card-heading button { background: rgba(170,
 .prayer-timeline-card .prayer-timeline-row { height: 30px; gap: 18px !important; padding: 0 !important; border-radius: 0 !important; opacity: 1 !important; }
 .prayer-timeline-card .prayer-timeline-marker { width: 7px !important; }
 .prayer-timeline-card .prayer-timeline-marker span { z-index: 1; width: 6px !important; height: 6px !important; border: 0 !important; background: rgba(255, 255, 255, 0.5) !important; box-shadow: none !important; }
-.prayer-timeline-card .prayer-timeline-row[data-state="next"] .prayer-timeline-marker span { width: 10px !important; height: 10px !important; background: #c4d4af !important; box-shadow: 0 0 0 4px rgba(196, 212, 175, 0.3) !important; }
+.prayer-timeline-card .prayer-timeline-row[data-state="next"] .prayer-timeline-marker span { width: 10px !important; height: 10px !important; background: color-mix(in oklab, var(--preset-ink) 40%, #ffffff) !important; box-shadow: 0 0 0 4px rgba(var(--preset-ink-rgb), 0.3) !important; }
 .prayer-timeline-card .prayer-timeline-name,
 .prayer-timeline-card .prayer-timeline-time { color: #ffffff !important; font-family: var(--font-display); font-size: 16px !important; font-weight: 500 !important; line-height: 30px; }
 .prayer-timeline-card .prayer-timeline-row[data-state="next"] .prayer-timeline-name,
-.prayer-timeline-card .prayer-timeline-row[data-state="next"] .prayer-timeline-time { color: #c4d4af !important; }
+.prayer-timeline-card .prayer-timeline-row[data-state="next"] .prayer-timeline-time { color: color-mix(in oklab, var(--preset-ink) 40%, #ffffff) !important; }
 
 /* Expanded timeline sheet — comfortable spacing (compact card rules above win via !important) */
 [data-overlay="prayer-timeline"] .prayer-timeline-row { height: 44px; gap: 16px; padding: 0 6px; border-radius: 10px; }
