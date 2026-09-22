@@ -934,6 +934,9 @@ html[data-preset][data-section="tasbih"] {
   --source-fg: #68775a;
   --combo-card: #f2ede2;
   --count-fg: #70815d;
+  --index-badge-bg: #70815d;
+  --index-badge-fg: #f9f5f0;
+  --dot-active: #70815d;
   background: #f9f5f0;
   color: #3c5438;
   box-shadow: 0 -12px 40px rgba(28, 32, 24, 0.18);
