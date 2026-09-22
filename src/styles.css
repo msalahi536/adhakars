@@ -417,11 +417,38 @@ html[data-section="evening"] {
   --count-fg: #cfc8e8;
 }
 
+/* Per-preset ink colors. Morning/evening artwork changes with the preset, so
+   the UI ink follows the same hue family. */
+html[data-preset] {
+  --preset-ink: #70815d; --preset-ink-strong: #3c5438; --preset-ink-rgb: 112, 129, 93;
+  --preset-muted: #6b6f64;
+  --eve-ink: #a99bd8; --eve-ink-rgb: 169, 155, 216; --eve-title: #ebe7f7; --eve-eyebrow: #a9a0cc;
+  --eve-nav-active: #cdbff5; --eve-nav-inactive: #a39dc4; --eve-muted: #8a83ac; --eve-source-fg: #cfc8e8;
+}
+html[data-preset="rose"] {
+  --preset-ink: #b05f72; --preset-ink-strong: #7e3f51; --preset-ink-rgb: 176, 95, 114;
+  --preset-muted: #7c6067;
+  --eve-ink: #d596ab; --eve-ink-rgb: 213, 150, 171; --eve-title: #f7e7ee; --eve-eyebrow: #cc9db0;
+  --eve-nav-active: #f2bfd0; --eve-nav-inactive: #c49dab; --eve-muted: #ac8592; --eve-source-fg: #e8c8d4;
+}
+html[data-preset="lavender"] {
+  --preset-ink: #7a63b8; --preset-ink-strong: #4e3d80; --preset-ink-rgb: 122, 99, 184;
+  --preset-muted: #6d6480;
+  --eve-ink: #a99bd8; --eve-ink-rgb: 169, 155, 216; --eve-title: #ebe7f7; --eve-eyebrow: #a9a0cc;
+  --eve-nav-active: #cdbff5; --eve-nav-inactive: #a39dc4; --eve-muted: #8a83ac; --eve-source-fg: #cfc8e8;
+}
+html[data-preset="ocean"] {
+  --preset-ink: #3a7f9b; --preset-ink-strong: #26586e; --preset-ink-rgb: 58, 127, 155;
+  --preset-muted: #5f7078;
+  --eve-ink: #8ec2e6; --eve-ink-rgb: 142, 194, 230; --eve-title: #e4f1fb; --eve-eyebrow: #9dbcd4;
+  --eve-nav-active: #bcdcf5; --eve-nav-inactive: #98b2c6; --eve-muted: #7e94a6; --eve-source-fg: #c6dced;
+}
+
 html[data-preset][data-section="morning"] {
-  --background: #f5efe3 !important; --foreground: #70815d !important; --title: #70815d !important; --eyebrow: #70815d !important; --accent: #70815d !important; --primary: #70815d !important; --card: #f9f5f0 !important; --card-foreground: #2a2a2a !important; --surface-card: #f9f5f0 !important; --border: rgba(255, 255, 255, 0.8) !important; --translit: #70815d !important; --text-muted: #6b6f64 !important; --source-bg: rgba(233, 233, 222, 0.9) !important; --source-fg: #70815d !important; --ring-track: rgba(112, 129, 93, 0.18) !important; --nav-bg: #fdfcf4 !important; --nav-active: #70815d !important; --nav-inactive: #6b6f64 !important; --dot-active: #70815d !important; --dot-inactive: rgba(112, 129, 93, 0.4) !important; --index-badge-bg: #70815d !important; --index-badge-fg: #fff !important; --count-fg: #70815d !important; --btn-fg: #70815d !important; --arrow-fg: #70815d !important;
+  --background: #f5efe3 !important; --foreground: var(--preset-ink) !important; --title: var(--preset-ink) !important; --eyebrow: var(--preset-ink) !important; --accent: var(--preset-ink) !important; --primary: var(--preset-ink) !important; --card: #f9f5f0 !important; --card-foreground: #2a2a2a !important; --surface-card: #f9f5f0 !important; --border: rgba(255, 255, 255, 0.8) !important; --translit: var(--preset-ink) !important; --text-muted: var(--preset-muted) !important; --source-bg: rgba(233, 233, 222, 0.9) !important; --source-fg: var(--preset-ink) !important; --ring-track: rgba(var(--preset-ink-rgb), 0.18) !important; --nav-bg: #fdfcf4 !important; --nav-active: var(--preset-ink) !important; --nav-inactive: var(--preset-muted) !important; --dot-active: var(--preset-ink) !important; --dot-inactive: rgba(var(--preset-ink-rgb), 0.4) !important; --index-badge-bg: var(--preset-ink) !important; --index-badge-fg: #fff !important; --count-fg: var(--preset-ink) !important; --btn-fg: var(--preset-ink) !important; --arrow-fg: var(--preset-ink) !important;
 }
 html[data-preset][data-section="evening"] {
-  --background: #0e0f22 !important; --foreground: #ebe7f7 !important; --title: #ebe7f7 !important; --eyebrow: #a9a0cc !important; --accent: #a99bd8 !important; --card: #222539 !important; --card-foreground: #efeafe !important; --surface-card: #222539 !important; --border: rgba(255,255,255,0.09) !important; --card-border: rgba(255,255,255,0.09) !important; --translit: #a99bd8 !important; --text-muted: #8a83ac !important; --pill-bg: rgba(255,255,255,0.08) !important; --source-bg: rgba(255,255,255,0.08) !important; --source-fg: #cfc8e8 !important; --ring-track: rgba(169,155,216,0.22) !important; --nav-bg: #292d43 !important; --nav-border: rgba(255,255,255,0.14) !important; --nav-active: #cdbff5 !important; --nav-inactive: #a39dc4 !important; --dot-active: #a99bd8 !important; --dot-inactive: rgba(169,155,216,0.3) !important; --index-badge-bg: rgba(255,255,255,0.08) !important; --index-badge-fg: #ebe7f7 !important; --count-fg: #cfc8e8 !important;
+  --background: #0e0f22 !important; --foreground: var(--eve-title) !important; --title: var(--eve-title) !important; --eyebrow: var(--eve-eyebrow) !important; --accent: var(--eve-ink) !important; --card: #222539 !important; --card-foreground: #efeafe !important; --surface-card: #222539 !important; --border: rgba(255,255,255,0.09) !important; --card-border: rgba(255,255,255,0.09) !important; --translit: var(--eve-ink) !important; --text-muted: var(--eve-muted) !important; --pill-bg: rgba(255,255,255,0.08) !important; --source-bg: rgba(255,255,255,0.08) !important; --source-fg: var(--eve-source-fg) !important; --ring-track: rgba(var(--eve-ink-rgb),0.22) !important; --nav-bg: #292d43 !important; --nav-border: rgba(255,255,255,0.14) !important; --nav-active: var(--eve-nav-active) !important; --nav-inactive: var(--eve-nav-inactive) !important; --dot-active: var(--eve-ink) !important; --dot-inactive: rgba(var(--eve-ink-rgb),0.3) !important; --index-badge-bg: rgba(255,255,255,0.08) !important; --index-badge-fg: var(--eve-title) !important; --count-fg: var(--eve-source-fg) !important;
 }
 
 html[data-section="morning"] .app-shell { background: linear-gradient(180deg, #f5efe3 0%, #efe4d1 45%, #e6dccb 100%); }
@@ -467,7 +494,7 @@ html[data-section="evening"] .app-shell { background: radial-gradient(circle at 
 
 html[data-section="morning"] .adhkar-header .label-caps,
 html[data-section="morning"] .adhkar-header .app-page-title {
-  color: #3c5438;
+  color: var(--preset-ink-strong);
 }
 
 .adhkar-progress-row {
@@ -656,11 +683,11 @@ html[data-section="evening"] .adhkar-card-heading button { background: rgba(170,
 .salah-recommended-title { margin-top: 6px; color: #2f4f34; font-size: 26px; font-weight: 500; line-height: 28px; }
 .salah-recommended-progress { margin-top: 2px; color: #5f7a5a; font-size: 15px; font-weight: 400; line-height: 18px; }
 .salah-recommended-action { gap: 16px; margin-top: 14px; }
-.salah-play { width: 48px; height: 48px; background: #70815d; color: #ffffff; box-shadow: 0 6px 16px rgba(112, 129, 93, 0.35); }
+.salah-play { width: 48px; height: 48px; background: var(--preset-ink); color: #ffffff; box-shadow: 0 6px 16px rgba(var(--preset-ink-rgb), 0.35); }
 .salah-play svg { margin-left: 2px; }
 .salah-action-label { color: #2f4f34; font-size: 16px; font-weight: 500; line-height: 19px; }
 .salah-action-track { height: 4px; margin-top: 8px; overflow: hidden; border-radius: 999px; background: rgba(0, 0, 0, 0.08); }
-.salah-action-track span { display: block; height: 100%; border-radius: inherit; background: #70815d; transition: width 300ms ease; }
+.salah-action-track span { display: block; height: 100%; border-radius: inherit; background: var(--preset-ink); transition: width 300ms ease; }
 .salah-upcoming-wrap { height: 242px; }
 .prayer-timeline-card { box-sizing: border-box; height: 242px !important; padding: 16px 20px 14px; border-radius: 18px !important; background: linear-gradient(135deg, #3e512a 0%, #344323 100%) !important; color: #ffffff !important; box-shadow: 0 8px 24px rgba(52, 67, 35, 0.28) !important; }
 .prayer-timeline-card .prayer-timeline-heading { margin-bottom: 12px; }
@@ -686,7 +713,7 @@ html[data-section="evening"] .adhkar-card-heading button { background: rgba(170,
 [data-overlay="prayer-timeline"] .prayer-timeline-list > span { left: 8.5px; }
 .salah-upcoming-placeholder { height: 242px; margin: 0; border-radius: 18px; }
 .salah-adhan-card { box-sizing: border-box; height: 62px; gap: 14px; padding: 14px 18px; border: 1px solid rgba(255, 255, 255, 0.8); border-radius: 18px; background: rgba(250, 247, 240, 0.92); color: #2f4f34; backdrop-filter: blur(20px); }
-.salah-adhan-icon { width: 34px; height: 34px; background: #dfe9dc; color: #70815d; }
+.salah-adhan-icon { width: 34px; height: 34px; background: #dfe9dc; color: var(--preset-ink); }
 .salah-adhan-title { color: #2f4f34; font-size: 16px; font-weight: 500; line-height: 18px; }
 .salah-adhan-subtitle { margin-top: 2px; overflow: hidden; color: #6b6f64; font-size: 13px; font-weight: 400; line-height: 15px; text-overflow: ellipsis; white-space: nowrap; }
 .salah-adhan-chevron { flex: 0 0 auto; color: #9aa094; }
@@ -931,28 +958,28 @@ html[data-preset][data-section="tasbih"] {
 /* After-Salah sheet — calm cream + olive, matching the adhkar cards */
 .after-salah-panel {
   --background: #f9f5f0;
-  --foreground: #3c5438;
+  --foreground: var(--preset-ink-strong);
   --muted-foreground: #8a8f80;
-  --accent: #70815d;
+  --accent: var(--preset-ink);
   --accent-foreground: #f9f5f0;
   --card: #ffffff;
-  --card-foreground: #3c5438;
+  --card-foreground: var(--preset-ink-strong);
   --translit: #7d8474;
   --border: rgba(60, 84, 56, 0.1);
-  --source-bg: rgba(112, 129, 93, 0.14);
+  --source-bg: rgba(var(--preset-ink-rgb), 0.14);
   --source-fg: #68775a;
   --combo-card: #f2ede2;
-  --count-fg: #70815d;
-  --index-badge-bg: #70815d;
+  --count-fg: var(--preset-ink);
+  --index-badge-bg: var(--preset-ink);
   --index-badge-fg: #f9f5f0;
-  --dot-active: #70815d;
+  --dot-active: var(--preset-ink);
   background: #f9f5f0;
-  color: #3c5438;
+  color: var(--preset-ink-strong);
   box-shadow: 0 -12px 40px rgba(28, 32, 24, 0.18);
 }
 
 .after-salah-panel .after-salah-title {
-  color: #3c5438;
+  color: var(--preset-ink-strong);
 }
 
 .after-salah-panel .dhikr-card,
@@ -1001,7 +1028,7 @@ html[data-section="salah"],
 html[data-section="tasbih"] {
   --nav-bg: #fdfcf4 !important;
   --nav-border: rgba(45, 31, 0, 0.08) !important;
-  --nav-active: #70815d !important;
+  --nav-active: var(--preset-ink) !important;
   --nav-inactive: #6b6f64 !important;
 }
 html[data-section="salah"] .bottom-nav-row,
