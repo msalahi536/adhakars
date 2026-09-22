@@ -1014,7 +1014,7 @@ html[data-section="tasbih"] {
   --nav-inactive: #9aa094;
 }
 html[data-preset][data-section="tasbih"] {
-  --background: #f5efe3 !important; --foreground: #2f4f34 !important; --title: #2f4f34 !important; --eyebrow: #5f7a5a !important; --accent: #5a7346 !important; --accent-foreground: #ffffff !important; --card: rgba(250,247,240,0.95) !important; --card-foreground: #2f4f34 !important; --border: rgba(255,255,255,0.85) !important; --card-border: rgba(255,255,255,0.85) !important; --pill-bg: rgba(240,236,226,0.9) !important; --nav-bg: rgba(255,255,255,0.9) !important; --nav-border: rgba(255,255,255,0.85) !important; --nav-active: #2f5a3c !important; --nav-inactive: #9aa094 !important;
+  --accent-foreground: #ffffff !important;
 }
 .tasbih-header { position: relative; z-index: 1; height: 238px; flex: 0 0 238px; padding-top: env(safe-area-inset-top); text-align: center; }
 .tasbih-header-inner { width: 100%; max-width: 390px; margin: 0 auto; padding-top: 78px; }
