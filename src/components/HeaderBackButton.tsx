@@ -24,7 +24,7 @@ export function HeaderBackButton({ fallbackTo = "/app/more" }: { fallbackTo?: st
       aria-label="Back"
       className="header-icon-button absolute z-10 flex items-center justify-center transition-transform active:scale-90"
       style={{
-        top: "calc(env(safe-area-inset-top) + 18px)",
+        top: 18,
         left: 20,
         width: 36,
         height: 36,
