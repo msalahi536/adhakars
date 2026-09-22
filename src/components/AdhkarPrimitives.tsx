@@ -22,8 +22,8 @@ export function ProgressBar({ value, total }: { value: number; total: number }) 
   );
 }
 
-export function ArabicText({ children, size }: { children: React.ReactNode; size: number }) {
-  return <p className="arabic adhkar-arabic" lang="ar" dir="rtl" style={{ fontSize: size }}>{children}</p>;
+export function ArabicText({ children, size, large = false }: { children: React.ReactNode; size: number; large?: boolean }) {
+  return <p className={`arabic adhkar-arabic ${large ? "is-large" : ""}`} lang="ar" dir="rtl" style={{ fontSize: size }}>{children}</p>;
 }
 
 export function Transliteration({ children }: { children: React.ReactNode }) {

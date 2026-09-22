@@ -265,21 +265,21 @@ export function SwipeStack({ items, counts, onIncrement, onReset, persistKey, fi
         {current?.dhikr && onEditItem && (
           <button
             onClick={() => onEditItem(current.dhikr!.id)}
-            className="flex items-center gap-1 rounded-[12px] px-2.5 py-1 text-[11px] font-semibold transition active:scale-95"
+            className={`adhkar-card-action flex items-center justify-center gap-1 rounded-full text-[11px] font-semibold transition active:scale-95 ${dailyLayout ? "is-icon-only" : "px-2.5 py-1"}`}
             style={{ background: "var(--surface)", color: "var(--foreground)" }}
             aria-label="edit"
           >
-            <Pencil size={12} /> Edit
+            <Pencil size={12} /> {!dailyLayout && "Edit"}
           </button>
         )}
         {current?.dhikr && onDeleteItem && (
           <button
             onClick={() => onDeleteItem(current.dhikr!.id)}
-            className="flex items-center gap-1 rounded-[12px] px-2.5 py-1 text-[11px] font-semibold transition active:scale-95"
-            style={{ background: "var(--surface)", color: "#c0392b" }}
+            className={`adhkar-card-action is-delete flex items-center justify-center gap-1 rounded-full text-[11px] font-semibold transition active:scale-95 ${dailyLayout ? "is-icon-only" : "px-2.5 py-1"}`}
+            style={{ background: "var(--surface)", color: "var(--destructive)" }}
             aria-label="delete"
           >
-            <Trash2 size={12} /> Delete
+            <Trash2 size={12} /> {!dailyLayout && "Delete"}
           </button>
         )}
       </div>

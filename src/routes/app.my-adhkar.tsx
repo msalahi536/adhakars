@@ -43,7 +43,23 @@ function loadRows(): CustomRow[] {
     if (!raw) return [];
     const parsed = JSON.parse(raw);
     if (!Array.isArray(parsed)) return [];
-    return parsed as CustomRow[];
+    return parsed.flatMap((value, index): CustomRow[] => {
+      if (!value || typeof value !== "object") return [];
+      const row = value as Partial<CustomRow>;
+      const target = Number(row.target_count);
+      const createdAt = typeof row.created_at === "string" ? row.created_at : new Date(index).toISOString();
+      return [{
+        id: typeof row.id === "string" && row.id ? row.id : `legacy_${index}_${createdAt}`,
+        title: typeof row.title === "string" ? row.title : "Adhkar",
+        arabic_text: typeof row.arabic_text === "string" ? row.arabic_text : "",
+        transliteration: typeof row.transliteration === "string" ? row.transliteration : null,
+        translation: typeof row.translation === "string" ? row.translation : null,
+        source_reference: typeof row.source_reference === "string" ? row.source_reference : null,
+        target_count: Number.isFinite(target) ? Math.max(1, Math.round(target)) : 1,
+        sort_order: Number.isFinite(Number(row.sort_order)) ? Number(row.sort_order) : index,
+        created_at: createdAt,
+      }];
+    });
   } catch {
     return [];
   }
@@ -216,6 +232,7 @@ function MyAdhkar() {
         emptyState={emptyState}
         onEditItem={openEdit}
         onDeleteItem={handleDelete}
+        dailyLayout
       />
       <CustomAdhkarForm
         open={formOpen}
