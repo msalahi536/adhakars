@@ -399,12 +399,12 @@ export const morningAdhkar: Dhikr[] = [
     transliteration: "Aṣbaḥnā wa aṣbaḥa ʾl-mulku lillāhi rabbi ʾl-ʿālamīn. Allāhumma innī asʾaluka khayra hādhā ʾl-yawm: fatḥahu wa naṣrahu wa nūrahu wa barakatahu wa hudāh, wa aʿūdhu bika min sharri mā fīhi wa sharri mā baʿdah.",
     translation: "We have entered the morning and the dominion belongs to Allah, Lord of all the worlds. O Allah, I ask You for the good of this day: its victory, its help, its light, its blessing and its guidance; and I seek refuge in You from the evil in it and the evil that comes after it.",
     source: "Abu Dawud 5084  ·  Da'if (al-Albani)",
-    commentary: "Warning 3 — da‘if (al-Albani) — Graded weak (da‘if) by Shaykh al-Albani. This particular wording and the command to say it are not established from the Prophet ﷺ. Asking Allah for the good of the day is authentically established in a different wording (entry 3 above, Muslim 2723a). Scholars who are strict on grading suffice with the authentic version. Others allow this one as a general du‘a.\n\n🌇 Evening Adhkar",
+    commentary: "Warning 3 — da‘if (al-Albani) — Graded weak (da‘if) by Shaykh al-Albani. This particular wording and the command to say it are not established from the Prophet ﷺ. Asking Allah for the good of the day is authentically established in a different wording (entry 3 above, Muslim 2723a). Scholars who are strict on grading suffice with the authentic version. Others allow this one as a general du‘a.",
     target: 1,
     details: {
       grading: "Da'if (al-Albani)",
       narration: "Abu Dawud said: And through the same chain of transmitters the Messenger of Allah (ﷺ) said: “When one rises in the morning, one should say: ‘We have reached the morning, and in the morning the dominion belongs to Allah, the Lord of the universe. O Allah! I ask Thee for the good this day contains, for conquest, victory, light, blessing and guidance during it; and I seek refuge in Thee from the evil it contains and the evil contained in what comes after it.’ In the evening he should say the equivalent.”",
-      notes: ["Warning 3 — da‘if (al-Albani) — Graded weak (da‘if) by Shaykh al-Albani. This particular wording and the command to say it are not established from the Prophet ﷺ. Asking Allah for the good of the day is authentically established in a different wording (entry 3 above, Muslim 2723a). Scholars who are strict on grading suffice with the authentic version. Others allow this one as a general du‘a.", "🌇 Evening Adhkar"],
+      notes: ["Warning 3 — da‘if (al-Albani) — Graded weak (da‘if) by Shaykh al-Albani. This particular wording and the command to say it are not established from the Prophet ﷺ. Asking Allah for the good of the day is authentically established in a different wording (entry 3 above, Muslim 2723a). Scholars who are strict on grading suffice with the authentic version. Others allow this one as a general du‘a."],
       weak: true,
     },
   },]

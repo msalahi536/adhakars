@@ -335,7 +335,7 @@ const wakeAlImran: Dhikr = {
   arabic: "",
   transliteration: "",
   translation:
-    "✋ WIPE THE SLEEP FROM YOUR FACE WITH YOUR HAND → THEN RECITE Surah Aal 'Imran verses 190-200 in full. Imam an-Nawawi: it is mustahabb to recite these verses when getting up from sleep.",
+    "WIPE THE SLEEP FROM YOUR FACE WITH YOUR HAND → THEN RECITE Surah Aal 'Imran verses 190-200 in full. Imam an-Nawawi: it is mustahabb to recite these verses when getting up from sleep.",
   source: "Sahih Muslim 763b",
   commentary:
     "Ibn 'Abbas narrated that he spent a night in the house of Maimuna: \"The Messenger of Allah ﷺ slept till midnight or a little before or after, then got up and began to cast off the effects of sleep from his face by rubbing with his hand, and then recited the ten concluding verses of Surah Aal-'Imran. He then stood up near a hanging water-skin, performed ablution well, and then stood up and prayed.\"",
