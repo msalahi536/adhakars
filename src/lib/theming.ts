@@ -165,12 +165,12 @@ export const ORIGINAL_SECTION_SEEDS: Record<SectionKey, string> = {
   morning: "#70815d",
   evening: "#555b7e",
   salah:   "#1e4a30",
-  tasbih:  "#c9a84c",
+  tasbih:  "#70815d",
 
   sleep:   "#2c3e63",
-  wake:    "#d8b45a",
-  custom:  "#c9a84c",
-  default: "#c9a84c",
+  wake:    "#70815d",
+  custom:  "#70815d",
+  default: "#70815d",
 };
 
 export const ORIGINAL_PRESET_ID = "original";
