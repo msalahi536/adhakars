@@ -561,6 +561,83 @@ html[data-preset="rose"][data-section="evening"] .daily-swipe-stack .adhkar-inde
   backdrop-filter: blur(8px);
 }
 
+/* Twilight morning: lilac card/nav, deeper violet ink for readability */
+html[data-preset="lavender"][data-section="morning"],
+html[data-preset="lavender"][data-section="salah"],
+html[data-preset="lavender"][data-section="tasbih"],
+html[data-preset="lavender"][data-section="custom"],
+html[data-preset="lavender"][data-section="wake"],
+html[data-preset="lavender"][data-section="default"] {
+  --card: #e4dce8 !important;
+  --surface-card: #e4dce8 !important;
+  --nav-bg: #d5c9df !important;
+  --pill-bg: #e4dce8 !important;
+  --source-bg: #d7cbe2 !important;
+  --source-fg: #4a3580 !important;
+  --card-foreground: #35304a !important;
+  --text-muted: #5f5675 !important;
+}
+/* Twilight evening: deep indigo glass card/nav with a calm violet glow */
+html[data-preset="lavender"][data-section="evening"] {
+  --card: rgba(32, 37, 70, 0.9) !important;
+  --surface-card: rgba(32, 37, 70, 0.9) !important;
+  --card-foreground: #ece8fb !important;
+  --card-border: rgba(196, 186, 240, 0.18) !important;
+  --border: rgba(196, 186, 240, 0.18) !important;
+  --nav-bg: rgba(38, 37, 70, 0.9) !important;
+  --nav-border: rgba(196, 186, 240, 0.26) !important;
+  --nav-active: #d9cffb !important;
+  --nav-inactive: rgba(217, 207, 251, 0.55) !important;
+  --dot-active: #c3b4f2 !important;
+  --dot-inactive: rgba(195, 180, 242, 0.35) !important;
+  --pill-bg: rgba(236, 232, 251, 0.07) !important;
+  --text-muted: #b6aed6 !important;
+  --translit: #cfc4f2 !important;
+  --source-bg: rgba(236, 232, 251, 0.1) !important;
+  --source-fg: #d4caf5 !important;
+  --count-fg: #cfc4f2 !important;
+  --ring-track: rgba(195, 180, 242, 0.22) !important;
+}
+html[data-preset="lavender"][data-section="evening"] .app-shell::after {
+  background: linear-gradient(180deg, rgba(60, 55, 120, 0.08), rgba(25, 22, 60, 0.12)) !important;
+}
+html[data-preset="lavender"][data-section="evening"] .dhikr-card {
+  background: rgba(32, 37, 70, 0.9) !important;
+  backdrop-filter: blur(26px) saturate(130%);
+  box-shadow: none !important;
+}
+html[data-preset="lavender"][data-section="evening"] .bottom-nav-row {
+  backdrop-filter: blur(20px);
+  box-shadow: 0 0 0 1px rgba(196, 186, 240, 0.14), 0 8px 28px rgba(170, 150, 255, 0.08) !important;
+}
+html[data-preset="lavender"][data-section="evening"] .adhkar-pagination-arrow {
+  border-color: rgba(196, 186, 240, 0.42);
+  background: rgba(236, 232, 251, 0.06);
+  color: #d4caf5;
+  backdrop-filter: blur(8px);
+}
+html[data-preset="lavender"][data-section="evening"] .adhkar-progress-track {
+  background: rgba(236, 232, 251, 0.18);
+  box-shadow: none;
+}
+html[data-preset="lavender"][data-section="evening"] .adhkar-progress-value {
+  background: #9a86e0;
+  box-shadow: 0 1px 4px rgba(154, 134, 224, 0.4);
+}
+html[data-preset="lavender"][data-section="evening"] .adhkar-card-heading h3 { color: #cfc4f2 !important; }
+html[data-preset="lavender"][data-section="evening"] .adhkar-card-heading button {
+  background: rgba(196, 186, 240, 0.2) !important;
+  color: #ece8fb !important;
+  backdrop-filter: blur(8px);
+}
+html[data-preset="lavender"][data-section="evening"] .daily-swipe-stack .adhkar-index-row > span {
+  border: none !important;
+  background: rgba(30, 30, 62, 0.4) !important;
+  color: #d4caf5 !important;
+  box-shadow: none !important;
+  backdrop-filter: blur(8px);
+}
+
 html[data-section="morning"] .app-shell { background: linear-gradient(180deg, #f5efe3 0%, #efe4d1 45%, #e6dccb 100%); }
 html[data-section="evening"] .app-shell { background: radial-gradient(circle at 85% 95%, rgba(214,130,90,0.28), transparent 45%), linear-gradient(180deg, #0e0f22 0%, #17163a 45%, #2b2242 80%, #3a2c46 100%); }
 .app-background { background-position: center top; opacity: 0; }
