@@ -56,6 +56,33 @@ export type Database = {
         }
         Relationships: []
       }
+      suggestions: {
+        Row: {
+          body: string
+          contact: string | null
+          created_at: string
+          id: string
+          kind: string
+          meta: Json
+        }
+        Insert: {
+          body: string
+          contact?: string | null
+          created_at?: string
+          id?: string
+          kind?: string
+          meta?: Json
+        }
+        Update: {
+          body?: string
+          contact?: string | null
+          created_at?: string
+          id?: string
+          kind?: string
+          meta?: Json
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
