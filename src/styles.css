@@ -1570,3 +1570,156 @@ html[data-preset="emerald"][data-section="evening"] .daily-swipe-stack .adhkar-i
   box-shadow: none !important;
   backdrop-filter: blur(8px);
 }
+
+/* ---------- Sand: warm parchment by day, amber glass by night ---------- */
+html[data-preset="sand"] {
+  --preset-ink: #98703d;
+  --preset-ink-strong: #62451f;
+  --preset-ink-rgb: 152, 112, 61;
+  --preset-muted: #75664f;
+  --eve-ink: #e5b971;
+  --eve-ink-rgb: 229, 185, 113;
+  --eve-title: #fff2dc;
+  --eve-eyebrow: #e5c79a;
+  --eve-nav-active: #ffd595;
+  --eve-nav-inactive: #bfa17a;
+  --eve-muted: #c4a780;
+  --eve-source-fg: #f1d2a3;
+}
+
+html[data-preset="sand"][data-section="morning"],
+html[data-preset="sand"][data-section="salah"],
+html[data-preset="sand"][data-section="tasbih"],
+html[data-preset="sand"][data-section="custom"],
+html[data-preset="sand"][data-section="wake"],
+html[data-preset="sand"][data-section="default"] {
+  --card: #f2e5cf !important;
+  --surface-card: #f2e5cf !important;
+  --surface: #f2e5cf !important;
+  --card-foreground: #4f402e !important;
+  --nav-bg: #ead9ba !important;
+  --nav-border: rgba(98, 69, 31, 0.1) !important;
+  --pill-bg: #f2e5cf !important;
+  --source-bg: #e5cfaa !important;
+  --source-fg: #694a24 !important;
+  --border: rgba(255, 255, 255, 0.68) !important;
+  --card-border: rgba(255, 255, 255, 0.68) !important;
+}
+
+html[data-preset="sand"][data-section="morning"] .dhikr-card,
+html[data-preset="sand"][data-section="salah"] .salah-location-card,
+html[data-preset="sand"][data-section="salah"] .salah-recommended-card,
+html[data-preset="sand"][data-section="salah"] .salah-adhan-card,
+html[data-preset="sand"][data-section="salah"] .salah-upcoming-placeholder,
+html[data-preset="sand"][data-section="tasbih"] .tasbih-card {
+  background: rgba(242, 229, 207, 0.94) !important;
+  border-color: rgba(255, 255, 255, 0.7) !important;
+  box-shadow: 0 12px 30px rgba(98, 69, 31, 0.1) !important;
+}
+
+html[data-preset="sand"][data-section="morning"] .bottom-nav-row,
+html[data-preset="sand"][data-section="salah"] .bottom-nav-row,
+html[data-preset="sand"][data-section="tasbih"] .bottom-nav-row,
+html[data-preset="sand"][data-section="default"] .bottom-nav-row {
+  background: rgba(234, 217, 186, 0.94) !important;
+  border-color: rgba(255, 255, 255, 0.62) !important;
+  box-shadow: 0 8px 24px rgba(98, 69, 31, 0.1) !important;
+  backdrop-filter: blur(20px);
+}
+
+html[data-preset="sand"][data-section="morning"] .adhkar-pagination-arrow {
+  border-color: rgba(255, 255, 255, 0.72);
+  background: rgba(242, 229, 207, 0.88);
+  color: #694a24;
+}
+
+html[data-preset="sand"][data-section="tasbih"] .tasbih-disc {
+  border-color: #f5ead7;
+  background: radial-gradient(circle at 50% 35%, #fffaf0 0%, #f4e8d2 70%, #e9d7b8 100%);
+  box-shadow: 0 18px 40px rgba(98, 69, 31, 0.1), inset 0 2px 6px rgba(255, 255, 255, 0.82), inset 0 -6px 14px rgba(98, 69, 31, 0.05);
+}
+
+html[data-preset="sand"][data-section="tasbih"] .tasbih-target {
+  background: rgba(242, 229, 207, 0.9);
+  border-color: rgba(255, 255, 255, 0.68);
+}
+
+html[data-preset="sand"][data-section="tasbih"] .tasbih-target.is-active {
+  background: #98703d;
+  border-color: transparent;
+  color: #ffffff;
+}
+
+html[data-preset="sand"][data-section="evening"] {
+  --card: rgba(67, 42, 25, 0.88) !important;
+  --surface-card: rgba(67, 42, 25, 0.88) !important;
+  --card-foreground: #fff0d8 !important;
+  --card-border: rgba(244, 199, 132, 0.2) !important;
+  --border: rgba(244, 199, 132, 0.2) !important;
+  --nav-bg: rgba(73, 47, 29, 0.9) !important;
+  --nav-border: rgba(244, 199, 132, 0.24) !important;
+  --nav-active: #ffd595 !important;
+  --nav-inactive: rgba(241, 210, 163, 0.58) !important;
+  --dot-active: #f5bd67 !important;
+  --dot-inactive: rgba(229, 185, 113, 0.34) !important;
+  --pill-bg: rgba(255, 235, 204, 0.08) !important;
+  --text-muted: #d2b58d !important;
+  --translit: #edbd78 !important;
+  --source-bg: rgba(255, 235, 204, 0.11) !important;
+  --source-fg: #f4d2a0 !important;
+  --count-fg: #f4d2a0 !important;
+  --ring-track: rgba(229, 185, 113, 0.25) !important;
+}
+
+html[data-preset="sand"][data-section="evening"] .app-shell::after {
+  background: linear-gradient(180deg, rgba(107, 61, 24, 0.03), rgba(48, 25, 12, 0.08)) !important;
+}
+
+html[data-preset="sand"][data-section="evening"] .dhikr-card {
+  background: rgba(67, 42, 25, 0.88) !important;
+  border-color: rgba(244, 199, 132, 0.2) !important;
+  box-shadow: 0 0 0 1px rgba(244, 199, 132, 0.05), 0 14px 34px rgba(30, 15, 6, 0.2) !important;
+  backdrop-filter: blur(24px) saturate(120%);
+}
+
+html[data-preset="sand"][data-section="evening"] .bottom-nav-row {
+  background: rgba(73, 47, 29, 0.9) !important;
+  border-color: rgba(244, 199, 132, 0.24) !important;
+  box-shadow: 0 0 0 1px rgba(244, 199, 132, 0.07), 0 8px 28px rgba(210, 137, 54, 0.1) !important;
+  backdrop-filter: blur(20px);
+}
+
+html[data-preset="sand"][data-section="evening"] .adhkar-pagination-arrow {
+  border-color: rgba(244, 199, 132, 0.38);
+  background: rgba(255, 235, 204, 0.08);
+  color: #f4d2a0;
+  backdrop-filter: blur(8px);
+}
+
+html[data-preset="sand"][data-section="evening"] .adhkar-progress-track {
+  background: rgba(255, 235, 204, 0.22);
+  box-shadow: none;
+}
+
+html[data-preset="sand"][data-section="evening"] .adhkar-progress-value {
+  background: #e7aa55;
+  box-shadow: 0 1px 4px rgba(231, 170, 85, 0.34);
+}
+
+html[data-preset="sand"][data-section="evening"] .adhkar-card-heading h3 {
+  color: #efc78f !important;
+}
+
+html[data-preset="sand"][data-section="evening"] .adhkar-card-heading button {
+  background: rgba(244, 199, 132, 0.16) !important;
+  color: #fff0d8 !important;
+  backdrop-filter: blur(8px);
+}
+
+html[data-preset="sand"][data-section="evening"] .daily-swipe-stack .adhkar-index-row > span {
+  border: none !important;
+  background: rgba(43, 24, 12, 0.38) !important;
+  color: #f4d2a0 !important;
+  box-shadow: none !important;
+  backdrop-filter: blur(8px);
+}
