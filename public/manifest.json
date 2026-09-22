@@ -2,10 +2,11 @@
   "name": "Sahih Al-Adhkar",
   "short_name": "Sahih Al-Adhkar",
   "description": "Personal daily Islamic adhkar and tasbih",
-  "start_url": "/",
+  "start_url": "/app",
+  "scope": "/",
   "display": "standalone",
-  "background_color": "#faf3e3",
-  "theme_color": "#1f3d2b",
+  "background_color": "#f5efe3",
+  "theme_color": "#70815d",
   "orientation": "portrait",
   "icons": [
     {
