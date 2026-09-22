@@ -1760,6 +1760,7 @@ html[data-preset="midnight"][data-section="default"] {
   --card-border: rgba(169, 193, 247, 0.24) !important;
   --translit: #b7ccff !important;
   --text-muted: #b2c2e5 !important;
+  --muted-foreground: #b2c2e5 !important;
   --pill-bg: rgba(205, 220, 255, 0.11) !important;
   --source-bg: rgba(205, 220, 255, 0.12) !important;
   --source-fg: #d2dfff !important;
@@ -1783,6 +1784,16 @@ html[data-preset="midnight"][data-section="default"] {
   --surface-deep-accent-fg: #dce7ff !important;
   --header-fg: #edf3ff !important;
   --header-sub: #c8d7f7 !important;
+}
+
+html[data-preset="midnight"][data-section="salah"] .salah-location-card .label-caps,
+html[data-preset="midnight"][data-section="salah"] .salah-location-card p,
+html[data-preset="midnight"][data-section="salah"] .salah-location,
+html[data-preset="midnight"][data-section="salah"] .salah-kicker,
+html[data-preset="midnight"][data-section="salah"] .salah-recommended-progress,
+html[data-preset="midnight"][data-section="salah"] .salah-adhan-subtitle,
+html[data-preset="midnight"][data-section="salah"] .salah-adhan-chevron {
+  color: #b2c2e5 !important;
 }
 
 html[data-preset="midnight"][data-section="morning"] .dhikr-card,
