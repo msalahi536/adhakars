@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { AdhkarPage } from "@/components/AdhkarPage";
-import { eveningAdhkar, baqarahLastTwo } from "@/data/adhkar";
+import { eveningAdhkar } from "@/data/adhkar";
 
 export const Route = createFileRoute("/app/evening")({
   head: () => ({
@@ -25,9 +25,6 @@ function Evening() {
       subtitle="Between 'Asr & Maghrib"
       list={eveningAdhkar}
       headerPattern={null}
-      extras={[
-        { dhikr: baqarahLastTwo, isSpecial: true, specialLabel: "After Sunset. Recite after the sun has set" },
-      ]}
     />
   );
 }

@@ -3,6 +3,7 @@ import type { Dhikr } from "@/data/adhkar";
 import { ListenButton } from "./ListenButton";
 import { ArabicText, OrnamentalDivider, RepeatCounter, SourceBadge, Transliteration } from "./AdhkarPrimitives";
 import { getDisplay, triggerHaptic } from "@/lib/theme";
+import { HadithDetailsDrawer } from "./HadithDetailsDrawer";
 
 type Props = {
   dhikr: Dhikr;
@@ -22,6 +23,7 @@ export function DhikrCard({ dhikr, count, onIncrement, isSpecial, specialLabel, 
   const [justCompleted, setJustCompleted] = useState(false);
   const [display, setDisplay] = useState(getDisplay());
   const [showBottomFade, setShowBottomFade] = useState(true);
+  const [showHadithDetails, setShowHadithDetails] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
   const complete = count >= dhikr.target;
 
@@ -178,7 +180,13 @@ export function DhikrCard({ dhikr, count, onIncrement, isSpecial, specialLabel, 
       {/* Sticky footer */}
        <div className="adhkar-card-footer flex items-end justify-between gap-3">
            <div className="adhkar-source-column flex min-w-0 flex-col">
-            {dhikr.source && <SourceBadge source={dhikr.source} />}
+            {dhikr.source && (
+              <SourceBadge
+                source={dhikr.source}
+                weak={dhikr.details?.weak}
+                onClick={() => setShowHadithDetails(true)}
+              />
+            )}
          </div>
 
         {isPersonalDua ? (
@@ -199,6 +207,13 @@ export function DhikrCard({ dhikr, count, onIncrement, isSpecial, specialLabel, 
            <RepeatCounter count={count} target={dhikr.target} complete={complete} tapped={tapped && !justCompleted} bursts={bursts} justCompleted={justCompleted} onClick={handleTap} size={referenceLayout ? 84 : 88} />
         )}
       </div>
+      {dhikr.source && (
+        <HadithDetailsDrawer
+          dhikr={dhikr}
+          open={showHadithDetails}
+          onOpenChange={setShowHadithDetails}
+        />
+      )}
     </div>
   );
 }

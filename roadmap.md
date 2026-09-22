@@ -17,3 +17,9 @@
 - [x] Remove page-level safe-area offsets and hardcoded viewport compensation.
 - [x] Restore small, uniform pagination dots.
 - [x] Verify Morning, Evening, Salah, Tasbih, and More at iPhone and browser sizes.
+
+- [x] Replace every existing Morning Adhkar entry with the 24 supplied entries.
+- [x] Replace every existing Evening Adhkar entry with the 23 supplied entries.
+- [x] Show weak or disputed narration markers only on the eight identified entries.
+- [x] Open the full supplied Arabic, transliteration, translation, reward, narration, grading, and notes from each reference pill.
+- [x] Verify list counts, weak-reference treatment, scrolling, and popup presentation across target phone and tablet sizes.
