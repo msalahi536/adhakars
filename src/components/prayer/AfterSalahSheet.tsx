@@ -48,18 +48,17 @@ export function AfterSalahSheet({ open, prayer, onPrayer, onClose }: Props) {
     <Portal>
     <div
       className="fixed inset-0 flex flex-col justify-end"
-      style={{ background: "rgba(0,0,0,0.5)", backdropFilter: "blur(6px)", zIndex: 200 }}
+      style={{ background: "rgba(28,32,24,0.38)", backdropFilter: "blur(8px)", WebkitBackdropFilter: "blur(8px)", zIndex: 200 }}
       onClick={onClose}
     >
       <div
         onClick={(e) => e.stopPropagation()}
-        className="flex flex-col rounded-t-[28px] pt-3"
+        className="after-salah-panel flex flex-col rounded-t-[28px] pt-3"
         style={{
-          background: "var(--background)",
-          color: "var(--foreground)",
           height: "92vh",
           transform: `translateY(${dragY}px)`,
           transition: startY === null ? "transform 220ms ease" : "none",
+          animation: startY === null && dragY === 0 ? "sheet-up 260ms ease" : undefined,
         }}
       >
         <div
