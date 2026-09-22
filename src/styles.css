@@ -799,7 +799,7 @@ html[data-section="evening"] .adhkar-card-heading button { background: rgba(170,
 .salah-action-track { height: 4px; margin-top: 8px; overflow: hidden; border-radius: 999px; background: rgba(0, 0, 0, 0.08); }
 .salah-action-track span { display: block; height: 100%; border-radius: inherit; background: var(--preset-ink); transition: width 300ms ease; }
 .salah-upcoming-wrap { height: 242px; }
-.prayer-timeline-card { box-sizing: border-box; height: 242px !important; padding: 16px 20px 14px; border-radius: 18px !important; background: linear-gradient(135deg, #3e512a 0%, #344323 100%) !important; color: #ffffff !important; box-shadow: 0 8px 24px rgba(52, 67, 35, 0.28) !important; }
+.prayer-timeline-card { box-sizing: border-box; height: 242px !important; padding: 16px 20px 14px; border-radius: 18px !important; background: var(--surface-deep-gradient) !important; color: #ffffff !important; box-shadow: 0 8px 24px rgba(var(--preset-ink-rgb), 0.28) !important; }
 .prayer-timeline-card .prayer-timeline-heading { margin-bottom: 12px; }
 .prayer-timeline-card .prayer-timeline-heading .label-caps { color: rgba(255, 255, 255, 0.85); font-family: var(--font-sans); font-size: 11px; font-weight: 500; letter-spacing: 0.18em; opacity: 1; }
 .prayer-timeline-card .prayer-timeline-heading > span:last-child { color: rgba(255, 255, 255, 0.85) !important; font-family: var(--font-display); font-size: 13px !important; font-weight: 400; }
