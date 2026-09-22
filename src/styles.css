@@ -485,7 +485,7 @@ html[data-preset="rose"][data-section="evening"] .app-shell::after {
   background: linear-gradient(180deg, rgba(150, 70, 95, 0.08), rgba(90, 40, 60, 0.10)) !important;
 }
 html[data-preset="rose"][data-section="evening"] .dhikr-card {
-  background: linear-gradient(180deg, rgba(168, 116, 124, 0.84) 0%, rgba(126, 78, 88, 0.88) 100%) !important;
+  background: rgba(128, 80, 90, 0.86) !important;
   backdrop-filter: blur(26px) saturate(130%);
   box-shadow: none !important;
 }
