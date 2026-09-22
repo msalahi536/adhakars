@@ -1,14 +1,9 @@
-- [x] Remove section-by-section appearance customization
-- [x] Apply Light/Dark/Auto as a whole-app morning/evening phase
-- [x] Theme and improve the prayer timeline sheet
-- [x] Rebuild After-Salah adhkar to match the supplied reference and keep nav visible
-- [x] Verify all themes, modes, pages, and prayer interactions
-- [x] Restore page-based Morning and Evening artwork and colors
-- [x] Remove Light, Dark, and Auto from Settings
-- [x] Keep Settings image-free and slightly round the navigation
-- [x] Verify every main page and preset at 390×844
-- [x] Repair My Adhkar creation, editing, deletion, persistence, and counters
-- [x] Rebuild My Adhkar, Sleep, and Wake with the Morning/Evening card experience
-- [x] Make all three experiences follow every selected color preset
-- [x] Repair transliteration and large Arabic text settings across all adhkar cards
-- [x] Validate CRUD, swiping, counters, preferences, themes, and phone layouts
+# Roadmap
+
+- [ ] Slightly increase bottom navigation corner radius.
+- [ ] Center and polish the Qibla page.
+- [ ] Make figure-eight calibration easier to follow and complete.
+- [ ] Correct the My Adhkar add-button placement.
+- [ ] Fix add/edit sheet content and footer separation.
+- [ ] Add an in-app delete confirmation dialog.
+- [ ] Verify mobile interactions and diagnostics.
