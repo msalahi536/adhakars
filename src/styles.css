@@ -419,7 +419,7 @@ html[data-section="evening"] .app-shell { background: radial-gradient(circle at 
 .app-background { background-position: center top; opacity: 0; }
 .app-background-morning { opacity: 0.6; }
 .app-shell.is-evening .app-background-morning { opacity: 0; }
-.app-shell.is-evening .app-background-evening { opacity: 0.7; mix-blend-mode: multiply; }
+.app-shell.is-evening .app-background-evening { opacity: 1; mix-blend-mode: normal; }
 .app-shell::after { background: transparent; }
 
 .adhkar-header {
