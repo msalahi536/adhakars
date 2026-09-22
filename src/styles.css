@@ -1379,3 +1379,23 @@ button[data-settings-card]:active,
 a[data-settings-card]:active {
   transform: scale(0.985);
 }
+
+/* ---------- Ocean: keep Salah / Tasbih / More on the pale blue palette ---------- */
+html[data-preset="ocean"][data-section="salah"],
+html[data-preset="ocean"][data-section="tasbih"],
+html[data-preset="ocean"][data-section="default"],
+html[data-preset="ocean"][data-section="custom"] {
+  --nav-bg: #d6ebf0 !important;
+  --nav-border: rgba(29, 88, 113, 0.1) !important;
+  --card: #def0f4 !important;
+  --surface-card: #def0f4 !important;
+}
+html[data-preset="ocean"][data-section="salah"] .bottom-nav-row,
+html[data-preset="ocean"][data-section="tasbih"] .bottom-nav-row,
+html[data-preset="ocean"][data-section="default"] .bottom-nav-row {
+  background: #d6ebf0;
+  border-color: rgba(29, 88, 113, 0.1);
+}
+html[data-preset="ocean"][data-section="tasbih"] .tasbih-card {
+  background: #def0f4;
+}
