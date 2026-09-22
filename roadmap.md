@@ -7,8 +7,8 @@
 - [x] Remove Light, Dark, and Auto from Settings
 - [x] Keep Settings image-free and slightly round the navigation
 - [x] Verify every main page and preset at 390×844
-- [ ] Repair My Adhkar creation, editing, deletion, persistence, and counters
-- [ ] Rebuild My Adhkar, Sleep, and Wake with the Morning/Evening card experience
-- [ ] Make all three experiences follow every selected color preset
-- [ ] Repair transliteration and large Arabic text settings across all adhkar cards
-- [ ] Validate CRUD, swiping, counters, preferences, themes, and phone layouts
+- [x] Repair My Adhkar creation, editing, deletion, persistence, and counters
+- [x] Rebuild My Adhkar, Sleep, and Wake with the Morning/Evening card experience
+- [x] Make all three experiences follow every selected color preset
+- [x] Repair transliteration and large Arabic text settings across all adhkar cards
+- [x] Validate CRUD, swiping, counters, preferences, themes, and phone layouts
