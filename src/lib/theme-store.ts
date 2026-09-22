@@ -12,10 +12,11 @@ import {
 const K_MODE = "adhkar:mode";
 const K_SEED = "adhkar:seed";
 const K_PRESET = "adhkar:preset";
-const K_OVERRIDES = "adhkar:section-overrides";
+const K_LEGACY_OVERRIDES = "adhkar:section-overrides";
 const K_CUSTOM = "adhkar:custom-triplet";
 
 export type ModeSetting = "light" | "dark" | "auto";
+export type VisualPhase = "morning" | "evening";
 
 export const DEFAULT_SEED = "#70815d";
 export const DEFAULT_PRESET_ID = "original";
@@ -51,6 +52,33 @@ export const getModeSetting = (): ModeSetting => {
 };
 export const setModeSetting = (m: ModeSetting) => writeLS(K_MODE, m);
 
+const localDateKey = (date: Date): string =>
+  `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
+
+const cachedBoundary = (key: "fajr" | "asr", now: Date): number | null => {
+  const raw = readLS(`adhkar:prayer-cache:v3:${localDateKey(now)}`);
+  if (!raw) return null;
+  try {
+    const value = (JSON.parse(raw) as { times?: Record<string, unknown> }).times?.[key];
+    return typeof value === "number" ? value : null;
+  } catch {
+    return null;
+  }
+};
+
+/** Resolve the artwork and palette phase for the whole app. */
+export const resolveVisualPhase = (
+  setting: ModeSetting = getModeSetting(),
+  now = new Date(),
+): VisualPhase => {
+  if (setting === "light") return "morning";
+  if (setting === "dark") return "evening";
+  const minutes = now.getHours() * 60 + now.getMinutes();
+  const fajr = cachedBoundary("fajr", now) ?? 5 * 60;
+  const asr = cachedBoundary("asr", now) ?? 15 * 60 + 30;
+  return minutes >= asr || minutes < fajr ? "evening" : "morning";
+};
+
 export const getSeed = (): string => clampSeed(readLS(K_SEED) ?? DEFAULT_SEED);
 export const setSeed = (hex: string) => writeLS(K_SEED, clampSeed(hex));
 
@@ -60,21 +88,6 @@ export const getPresetId = (): string => {
   return v === "classic" || v === "sakura" || v === "custom" ? DEFAULT_PRESET_ID : v;
 };
 export const setPresetId = (id: string) => writeLS(K_PRESET, id);
-
-export const getOverrides = (): Partial<Record<SectionKey, string>> => {
-  const raw = readLS(K_OVERRIDES);
-  if (!raw) return {};
-  try { return JSON.parse(raw); } catch { return {}; }
-};
-export const setOverrides = (o: Partial<Record<SectionKey, string>>) =>
-  writeLS(K_OVERRIDES, JSON.stringify(o));
-
-export const setSectionOverride = (section: SectionKey, hex: string | null) => {
-  const cur = getOverrides();
-  if (hex === null) delete cur[section];
-  else cur[section] = clampSeed(hex);
-  setOverrides(cur);
-};
 
 export const getCustomTriplet = (): CustomOverrides => {
   const raw = readLS(K_CUSTOM);
@@ -87,12 +100,7 @@ export const setCustomTriplet = (t: CustomOverrides) => {
 export const clearCustomTriplet = () => removeLS(K_CUSTOM);
 
 export const resolveMode = (setting: ModeSetting = getModeSetting()): Mode => {
-  if (setting === "light") return "light";
-  if (setting === "dark") return "dark";
-  if (typeof window !== "undefined" && window.matchMedia) {
-    return window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
-  }
-  return "light";
+  return resolveVisualPhase(setting) === "evening" ? "dark" : "light";
 };
 
 export const sectionForRoute = (pathname: string): SectionKey => {
@@ -107,22 +115,24 @@ export const sectionForRoute = (pathname: string): SectionKey => {
 };
 
 export const applyThemeForRoute = (pathname: string, sectionKey?: SectionKey) => {
-  const mode = resolveMode();
+  const visualPhase = resolveVisualPhase();
+  const mode: Mode = visualPhase === "evening" ? "dark" : "light";
   const base = getSeed();
-  const overrides = getOverrides();
   const section = sectionKey ?? sectionForRoute(pathname);
   const isCustom = getPresetId() === "custom";
   const triplet = isCustom ? getCustomTriplet() : {};
 
-  // Per-section override always wins for the header hue.
-  const sectionOverride = overrides[section];
   const presetId = getPresetId();
   if (typeof document !== "undefined") {
     document.documentElement.dataset.section = section;
     document.documentElement.dataset.preset = presetId;
+    document.documentElement.dataset.visualPhase = visualPhase;
   }
-  const seed =
-    sectionOverride ?? sectionSeedFor(presetId, triplet.accent ?? base, section);
+  const seed = sectionSeedFor(
+    presetId,
+    triplet.accent ?? base,
+    visualPhase === "evening" ? "evening" : section,
+  );
 
   // Custom overrides for background / accent are global; header is
   // per-section-derived unless overridden.
@@ -130,7 +140,7 @@ export const applyThemeForRoute = (pathname: string, sectionKey?: SectionKey) =>
   const custom: CustomOverrides = {
     background: triplet.background,
     accent: presetId === DEFAULT_PRESET_ID ? seed : triplet.accent,
-    header: sectionOverride ? undefined : triplet.header
+    header: triplet.header
       ? deriveSectionSeed(triplet.header, section)
       : undefined,
   };
@@ -144,17 +154,21 @@ export const resetTheme = () => {
   removeLS(K_MODE);
   removeLS(K_SEED);
   removeLS(K_PRESET);
-  removeLS(K_OVERRIDES);
+  removeLS(K_LEGACY_OVERRIDES);
   removeLS(K_CUSTOM);
 };
 
 export const PRE_PAINT_SCRIPT = `(function(){try{
 var m=localStorage.getItem('${K_MODE}')||'light';
-var mode = m==='light'?'light':(m==='dark'?'dark':(window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'));
+var now=new Date(), mins=now.getHours()*60+now.getMinutes(), pad=function(n){return String(n).padStart(2,'0')}, day=now.getFullYear()+'-'+pad(now.getMonth()+1)+'-'+pad(now.getDate()), fajr=300, asr=930;
+try{var cache=JSON.parse(localStorage.getItem('adhkar:prayer-cache:v3:'+day)||'{}');if(cache.times&&typeof cache.times.fajr==='number')fajr=cache.times.fajr;if(cache.times&&typeof cache.times.asr==='number')asr=cache.times.asr;}catch(_){}
+var phase=m==='dark'?'evening':(m==='light'?'morning':((mins>=asr||mins<fajr)?'evening':'morning'));
+var mode=phase==='evening'?'dark':'light';
 var p=location.pathname;
 var section=(p==='/app'||p==='/app/')?'morning':(p.indexOf('/app/evening')===0?'evening':(p.indexOf('/app/salah')===0?'salah':(p.indexOf('/app/tasbih')===0?'tasbih':'default')));
 document.documentElement.setAttribute('data-theme-mode',mode);
 document.documentElement.setAttribute('data-theme', mode==='dark'?'dark':'dawn');
+document.documentElement.setAttribute('data-visual-phase',phase);
 document.documentElement.setAttribute('data-section',section);
 document.documentElement.setAttribute('data-preset',localStorage.getItem('${K_PRESET}')||'original');
 }catch(e){}})();`;

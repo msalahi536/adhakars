@@ -173,6 +173,9 @@ const readCache = (key: string, s: PrayerSettings): DayTimes | null => {
 
 const writeCache = (day: DayTimes, s: PrayerSettings) => {
   writeLS(`${CACHE_PREFIX}${day.key}`, JSON.stringify({ sig: sig(s), times: day.times }));
+  if (typeof window !== "undefined" && day.key === dateKey(new Date())) {
+    window.dispatchEvent(new Event("adhkar:theme-change"));
+  }
 };
 
 /** Removes cached days older than three days so storage never grows. */

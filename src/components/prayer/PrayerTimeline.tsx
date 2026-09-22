@@ -2,7 +2,6 @@
 
 import { useEffect, useRef, useState } from "react";
 import { X } from "lucide-react";
-import { Portal } from "@/components/Portal";
 import { formatMinutes, type Slot } from "@/lib/prayer-times";
 
 type Props = {
@@ -248,12 +247,11 @@ export function PrayerTimeline({ days, now, todayKey, tone = "light" }: Props) {
       </button>
 
       {expanded && (
-        <Portal>
         <div
           className="fixed inset-0 flex flex-col justify-end"
           // eslint-disable-next-line
           data-overlay="prayer-timeline"
-          style={{ background: "rgba(0,0,0,0.5)", backdropFilter: "blur(6px)", zIndex: 200 }}
+          style={{ background: "color-mix(in oklab, var(--foreground) 36%, transparent)", backdropFilter: "blur(8px)", zIndex: 90 }}
           onClick={() => setExpanded(false)}
         >
           <div
@@ -268,19 +266,11 @@ export function PrayerTimeline({ days, now, todayKey, tone = "light" }: Props) {
               setDragY(0);
               setStartY(null);
             }}
-            className="rounded-t-[28px] px-5 pb-8 pt-3"
+            className="prayer-timeline-sheet rounded-t-[28px] px-5 pt-3"
             style={{
-              background: "#f9f5f0",
-              color: "#3c5438",
-              maxHeight: "88vh",
+              maxHeight: "88dvh",
               transform: `translateY(${dragY}px)`,
               transition: startY === null ? "transform 220ms ease" : "none",
-              ["--foreground" as string]: "#3c5438",
-              ["--muted-foreground" as string]: "#8a8f80",
-              ["--accent" as string]: "#70815d",
-              ["--surface-card" as string]: "#ffffff",
-              ["--border" as string]: "rgba(60, 84, 56, 0.12)",
-              ["--card-shadow" as string]: "0 2px 10px rgba(60, 84, 56, 0.08)",
             } as React.CSSProperties}
           >
             <div
@@ -314,7 +304,7 @@ export function PrayerTimeline({ days, now, todayKey, tone = "light" }: Props) {
                 maxHeight: "72vh",
                 position: "relative",
                 paddingRight: "10px",
-                paddingBottom: "calc(var(--bottom-nav-row) + env(safe-area-inset-bottom))",
+                paddingBottom: "calc(var(--bottom-nav-row) + env(safe-area-inset-bottom) + 46px)",
               }}
             >
               {days.map((d) => (
@@ -338,7 +328,6 @@ export function PrayerTimeline({ days, now, todayKey, tone = "light" }: Props) {
             </div>
           </div>
         </div>
-        </Portal>
       )}
     </>
   );

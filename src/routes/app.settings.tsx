@@ -5,24 +5,17 @@ import { getDisplay, setDisplay } from "@/lib/theme";
 import {
   getModeSetting,
   setModeSetting,
-  getSeed,
   setSeed,
   getPresetId,
   setPresetId,
-  getOverrides,
-  setSectionOverride,
-  getCustomTriplet,
   setCustomTriplet,
-  resolveMode,
   resetTheme,
   PRESETS,
-  DEFAULT_SEED,
   DEFAULT_PRESET_ID,
   type ModeSetting,
 } from "@/lib/theme-store";
-import { deriveSectionSeed, sectionSeedFor, type SectionKey, type CustomOverrides } from "@/lib/theming";
+import { sectionSeedFor } from "@/lib/theming";
 import { backgroundsForPreset, PRESET_BACKGROUNDS } from "@/lib/backgrounds";
-import { ThemePicker } from "@/components/theme/ThemePicker";
 import { SuggestColorSheet } from "@/components/theme/SuggestColorSheet";
 import {
   resetToday,
@@ -64,13 +57,8 @@ export const Route = createFileRoute("/app/settings")({
 
 function Settings() {
   const [mode, setModeState] = useState<ModeSetting>("light");
-  const [seed, setSeedState] = useState<string>(DEFAULT_SEED);
   const [presetId, setPresetIdState] = useState<string>(DEFAULT_PRESET_ID);
-  const [overrides, setOverridesState] = useState<Partial<Record<SectionKey, string>>>({});
-  const [showAdvanced, setShowAdvanced] = useState(false);
-  const [pickerOpen, setPickerOpen] = useState<null | { target: SectionKey; seed: string }>(null);
   const [suggestOpen, setSuggestOpen] = useState(false);
-  const [triplet, setTripletState] = useState<CustomOverrides>({});
   const [display, setDisplayState] = useState(getDisplay());
   const [confirmReset, setConfirmReset] = useState(false);
   const [confirmResetAll, setConfirmResetAll] = useState(false);
@@ -107,10 +95,7 @@ function Settings() {
 
   useEffect(() => {
     setModeState(getModeSetting());
-    setSeedState(getSeed());
     setPresetIdState(getPresetId());
-    setOverridesState(getOverrides());
-    setTripletState(getCustomTriplet());
     setDisplayState(getDisplay());
     setPrayerSettingsState(getPrayerSettings());
     setNotifPrefsState(getNotificationPrefs());
@@ -243,41 +228,18 @@ function Settings() {
   const choosePreset = (p: { id: string; seed: string }) => {
     setPresetIdState(p.id);
     setPresetId(p.id);
-    setSeedState(p.seed);
     setSeed(p.seed);
-    setTripletState({});
     setCustomTriplet({});
     window.dispatchEvent(new Event("adhkar:theme-change"));
   };
 
 
-  const applySectionOverride = (section: SectionKey, hex: string) => {
-    const next = { ...overrides, [section]: hex };
-    setOverridesState(next);
-    setSectionOverride(section, hex);
-    setPickerOpen(null);
-    window.dispatchEvent(new Event("adhkar:theme-change"));
-  };
-
-  const clearSectionOverride = (section: SectionKey) => {
-    const next = { ...overrides };
-    delete next[section];
-    setOverridesState(next);
-    setSectionOverride(section, null);
-    window.dispatchEvent(new Event("adhkar:theme-change"));
-  };
-
   const doReset = () => {
     resetTheme();
     setModeState("light");
-    setSeedState(DEFAULT_SEED);
     setPresetIdState(DEFAULT_PRESET_ID);
-    setOverridesState({});
-    setTripletState({});
     window.dispatchEvent(new Event("adhkar:theme-change"));
   };
-
-  const previewMode = resolveMode(mode);
 
   const updateDisplay = (patch: Partial<typeof display>) => {
     const d = { ...display, ...patch };
@@ -285,14 +247,6 @@ function Settings() {
     setDisplay(d);
     window.dispatchEvent(new Event("adhkar:display-update"));
   };
-
-  const sectionList: { key: SectionKey; label: string }[] = [
-    { key: "morning", label: "Morning" },
-    { key: "evening", label: "Evening" },
-    { key: "salah", label: "After Salah" },
-    { key: "tasbih", label: "Tasbih" },
-    { key: "sleep", label: "Sleep & Wake" },
-  ];
 
   return (
     <>
@@ -454,45 +408,6 @@ function Settings() {
               </button>
             </div>
 
-            {/* Advanced */}
-            <button
-              onClick={() => setShowAdvanced((v) => !v)}
-              className="mb-2 text-xs font-semibold opacity-70"
-              style={{ color: "var(--foreground)" }}
-            >
-              {showAdvanced ? "▾" : "▸"} Customize each section
-            </button>
-            {showAdvanced && (
-              <div
-                className="mb-3 space-y-2 rounded-2xl p-3"
-                data-settings-card=""
-              >
-                {sectionList.map(({ key, label }) => {
-                  const current = overrides[key] ?? sectionSeedFor(presetId, seed, key);
-                  const isOverride = !!overrides[key];
-                  return (
-                    <div key={key} className="flex items-center gap-3">
-                      <button
-                        onClick={() => setPickerOpen({ target: key, seed: current })}
-                        className="h-8 w-8 shrink-0 rounded-full"
-                        style={{ background: current, border: "2px solid var(--surface-card)" }}
-                        aria-label={`${label} color`}
-                      />
-                      <div className="flex-1 text-sm font-semibold">{label}</div>
-                      {isOverride && (
-                        <button
-                          onClick={() => clearSectionOverride(key)}
-                          className="text-xs opacity-60"
-                        >
-                          Reset
-                        </button>
-                      )}
-                    </div>
-                  );
-                })}
-              </div>
-            )}
-
             <button
               onClick={doReset}
               className="mb-4 w-full rounded-full py-2 text-xs font-semibold"
@@ -517,17 +432,6 @@ function Settings() {
               />
             </div>
           </section>
-
-          <ThemePicker
-            open={!!pickerOpen}
-            initialSeed={pickerOpen?.seed ?? seed}
-            mode={previewMode}
-            onClose={() => setPickerOpen(null)}
-            onApply={(hex) => {
-              if (!pickerOpen) return;
-              applySectionOverride(pickerOpen.target, hex);
-            }}
-          />
 
           <SuggestColorSheet open={suggestOpen} onClose={() => setSuggestOpen(false)} />
 
