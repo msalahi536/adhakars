@@ -162,7 +162,7 @@ export const deriveSectionSeed = (baseSeed: string, section: SectionKey): string
 // The original hand-picked palette: quiet sage mornings, deep blue evenings,
 // green after salah. Used by the "Original" preset.
 export const ORIGINAL_SECTION_SEEDS: Record<SectionKey, string> = {
-  morning: "#49683e",
+  morning: "#70815d",
   evening: "#555b7e",
   salah:   "#1e4a30",
   tasbih:  "#c9a84c",

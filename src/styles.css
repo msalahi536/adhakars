@@ -29,7 +29,7 @@
   --font-display: "Cormorant Garamond", Georgia, serif;
 }
 
-/* ===== Dawn (morning) — warm cream + gold accent, light cards ===== */
+/* ===== Dawn base — warm cream + olive accent, light cards ===== */
 :root,
 [data-theme="dawn"] {
   --radius: 1.5rem;
@@ -41,9 +41,9 @@
   --card-foreground: #2d1f00;
   --muted: #f3ecd9;
   --muted-foreground: #6b5a2d;
-  --primary: #c9a84c;
+  --primary: #70815d;
   --primary-foreground: #2d1f00;
-  --accent: #c9a84c;
+  --accent: #70815d;
   --accent-foreground: #ffffff;
   --border: rgba(184, 146, 58, 0.15);
   --translit: #b8923a;
@@ -53,14 +53,14 @@
   --nav-bg: rgba(250, 246, 236, 0.97);
   --nav-safe-area-bg: #faf6ec;
   --nav-border: rgba(45, 31, 0, 0.08);
-  --nav-active: #c9a84c;
+  --nav-active: #70815d;
   --nav-inactive: #8a7a4c;
-  --index-badge-bg: #c9a84c;
+  --index-badge-bg: #70815d;
   --index-badge-fg: #ffffff;
   --ring-track: rgba(45, 31, 0, 0.08);
   --btn-surface: rgba(184, 146, 58, 0.12);
   --btn-fg: #6b5a2d;
-  --dot-active: #c9a84c;
+  --dot-active: #70815d;
   --dot-inactive: rgba(45, 31, 0, 0.15);
   --arrow-bg: rgba(184, 146, 58, 0.12);
   --arrow-fg: #6b5a2d;

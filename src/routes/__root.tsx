@@ -142,15 +142,24 @@ function RootComponent() {
     reconcileStreak();
     const reapply = async () => {
       try {
+        const scheduleKey = "adhkar:reminders-checked";
+        const today = new Date().toISOString().slice(0, 10);
+        if (window.localStorage.getItem(scheduleKey) === today) return;
         const granted = await checkNotificationPermission();
-        if (granted) await applyReminders(getNotificationPrefs());
+        if (granted) {
+          await applyReminders(getNotificationPrefs());
+          window.localStorage.setItem(scheduleKey, today);
+        }
       } catch {
         // ignore
       }
     };
-    void reapply();
+    const timer = window.setTimeout(() => void reapply(), 1200);
     window.addEventListener("adhkar:day-complete", reapply);
-    return () => window.removeEventListener("adhkar:day-complete", reapply);
+    return () => {
+      window.clearTimeout(timer);
+      window.removeEventListener("adhkar:day-complete", reapply);
+    };
   }, []);
 
   useEffect(() => {

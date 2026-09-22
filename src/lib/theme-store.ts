@@ -17,14 +17,14 @@ const K_CUSTOM = "adhkar:custom-triplet";
 
 export type ModeSetting = "light" | "dark" | "auto";
 
-export const DEFAULT_SEED = "#c9a84c";
+export const DEFAULT_SEED = "#70815d";
 export const DEFAULT_PRESET_ID = "original";
 
 export type Preset = { id: string; name: string; seed: string };
 
 export const PRESETS: Preset[] = [
-  { id: "original",  name: "Original",  seed: "#c9a84c" },
-  { id: "classic",   name: "Classic",   seed: "#c9a84c" },
+  { id: "original",  name: "Original",  seed: "#70815d" },
+  { id: "classic",   name: "Classic",   seed: "#70815d" },
   { id: "rose",      name: "Rose",      seed: "#d47a8b" },
   { id: "lavender",  name: "Twilight",  seed: "#8a7bd0" },
   { id: "sakura",    name: "Sakura",    seed: "#e69ba5" },
@@ -124,9 +124,7 @@ export const applyThemeForRoute = (pathname: string, sectionKey?: SectionKey) =>
 
   // Custom overrides for background / accent are global; header is
   // per-section-derived unless overridden.
-  // The Original preset gives each section its own hue, so cards, buttons and
-  // progress bars match that section's header (gold mornings, blue evenings,
-  // green after salah).
+  // The Original preset gives each section its own established palette.
   const custom: CustomOverrides = {
     background: triplet.background,
     accent: presetId === DEFAULT_PRESET_ID ? seed : triplet.accent,
@@ -151,6 +149,10 @@ export const resetTheme = () => {
 export const PRE_PAINT_SCRIPT = `(function(){try{
 var m=localStorage.getItem('${K_MODE}')||'light';
 var mode = m==='light'?'light':(m==='dark'?'dark':(window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'));
+var p=location.pathname;
+var section=(p==='/app'||p==='/app/')?'morning':(p.indexOf('/app/evening')===0?'evening':(p.indexOf('/app/salah')===0?'salah':(p.indexOf('/app/tasbih')===0?'tasbih':'default')));
 document.documentElement.setAttribute('data-theme-mode',mode);
 document.documentElement.setAttribute('data-theme', mode==='dark'?'dark':'dawn');
+document.documentElement.setAttribute('data-section',section);
+document.documentElement.setAttribute('data-preset',localStorage.getItem('${K_PRESET}')||'original');
 }catch(e){}})();`;
