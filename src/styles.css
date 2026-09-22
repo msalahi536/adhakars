@@ -432,8 +432,8 @@ html[data-preset="rose"] {
   --eve-nav-active: #f2bfd0; --eve-nav-inactive: #c49dab; --eve-muted: #ac8592; --eve-source-fg: #e8c8d4;
 }
 html[data-preset="lavender"] {
-  --preset-ink: #7a63b8; --preset-ink-strong: #4e3d80; --preset-ink-rgb: 122, 99, 184;
-  --preset-muted: #6d6480;
+  --preset-ink: #6a52ab; --preset-ink-strong: #3f2f72; --preset-ink-rgb: 106, 82, 171;
+  --preset-muted: #5f5675;
   --eve-ink: #a99bd8; --eve-ink-rgb: 169, 155, 216; --eve-title: #ebe7f7; --eve-eyebrow: #a9a0cc;
   --eve-nav-active: #cdbff5; --eve-nav-inactive: #a39dc4; --eve-muted: #8a83ac; --eve-source-fg: #cfc8e8;
 }
