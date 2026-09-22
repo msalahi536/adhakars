@@ -48,18 +48,17 @@ export function AfterSalahSheet({ open, prayer, onPrayer, onClose }: Props) {
     <Portal>
     <div
       className="fixed inset-0 flex flex-col justify-end"
-      style={{ background: "rgba(0,0,0,0.5)", backdropFilter: "blur(6px)", zIndex: 200 }}
+      style={{ background: "rgba(28,32,24,0.38)", backdropFilter: "blur(8px)", WebkitBackdropFilter: "blur(8px)", zIndex: 200 }}
       onClick={onClose}
     >
       <div
         onClick={(e) => e.stopPropagation()}
-        className="flex flex-col rounded-t-[28px] pt-3"
+        className="after-salah-panel flex flex-col rounded-t-[28px] pt-3"
         style={{
-          background: "var(--background)",
-          color: "var(--foreground)",
           height: "92vh",
           transform: `translateY(${dragY}px)`,
           transition: startY === null ? "transform 220ms ease" : "none",
+          animation: startY === null && dragY === 0 ? "sheet-up 260ms ease" : undefined,
         }}
       >
         <div
@@ -88,7 +87,12 @@ export function AfterSalahSheet({ open, prayer, onPrayer, onClose }: Props) {
               <div className="label-caps" style={{ color: "var(--muted-foreground)" }}>
                 After Salah Adhkar
               </div>
-              <h2 className="text-xl font-bold">After {label}</h2>
+              <h2
+                className="after-salah-title"
+                style={{ fontFamily: "'Cormorant Garamond', serif", fontWeight: 600, fontSize: 26, lineHeight: 1.15 }}
+              >
+                After {label}
+              </h2>
             </div>
             <div className="flex items-center gap-2">
               <span className="text-xs font-semibold" style={{ color: "var(--muted-foreground)" }}>
@@ -142,21 +146,11 @@ export function AfterSalahSheet({ open, prayer, onPrayer, onClose }: Props) {
         </div>
 
         <div
-          className="flex min-h-0 flex-1 flex-col"
-          style={
-            {
-              paddingBottom:
-                "calc(var(--bottom-nav-row, 56px) + env(safe-area-inset-bottom) + 12px)",
-              ["--card" as string]: "var(--surface-deep)",
-              ["--card-foreground" as string]: "var(--surface-deep-fg)",
-              ["--translit" as string]: "var(--surface-deep-muted)",
-              ["--border" as string]: "var(--surface-deep-border)",
-              ["--source-bg" as string]: "rgba(0,0,0,0.28)",
-              ["--source-fg" as string]: "var(--surface-deep-muted)",
-              ["--combo-card" as string]: "color-mix(in oklab, var(--surface-deep) 82%, #000)",
-              ["--count-fg" as string]: "var(--surface-deep-fg)",
-            } as React.CSSProperties
-          }
+          className="flex min-h-0 flex-1 flex-col px-5"
+          style={{
+            paddingBottom:
+              "calc(var(--bottom-nav-row, 56px) + env(safe-area-inset-bottom) + 12px)",
+          }}
         >
           <SwipeStack
             items={items}
