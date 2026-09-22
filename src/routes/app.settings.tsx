@@ -21,7 +21,7 @@ import {
   type ModeSetting,
 } from "@/lib/theme-store";
 import { deriveSectionSeed, sectionSeedFor, type SectionKey, type CustomOverrides } from "@/lib/theming";
-import { MiniPreview } from "@/components/theme/MiniPreview";
+import { backgroundsForPreset, PRESET_BACKGROUNDS } from "@/lib/backgrounds";
 import { ThemePicker } from "@/components/theme/ThemePicker";
 import { CustomThemeSheet } from "@/components/theme/CustomThemeSheet";
 import {
@@ -352,7 +352,36 @@ function Settings() {
 
             {/* Preview */}
             <div className="mb-4 flex justify-center">
-              <MiniPreview seed={seed} mode={previewMode} presetId={presetId} width={200} height={340} />
+              <div className="flex items-end gap-3">
+                {(["morning", "evening"] as const).map((k) => (
+                  <div key={k} className="flex flex-col items-center gap-1.5">
+                    <div
+                      style={{
+                        width: 116,
+                        height: 236,
+                        borderRadius: 22,
+                        padding: 4,
+                        background: "linear-gradient(180deg,#2a2a2c 0%,#141416 100%)",
+                        boxShadow: "0 14px 30px -18px rgba(0,0,0,0.5)",
+                      }}
+                    >
+                      <div
+                        style={{
+                          width: "100%",
+                          height: "100%",
+                          borderRadius: 18,
+                          backgroundImage: `url(${backgroundsForPreset(presetId)[k]})`,
+                          backgroundSize: "cover",
+                          backgroundPosition: "center top",
+                        }}
+                      />
+                    </div>
+                    <span className="text-[10px] font-semibold opacity-70">
+                      {k === "morning" ? "Morning" : "Evening"}
+                    </span>
+                  </div>
+                ))}
+              </div>
             </div>
 
             {/* Preset grid */}
@@ -362,6 +391,7 @@ function Settings() {
                 const active = presetId === p.id;
                 const morningSeed = sectionSeedFor(p.id, p.seed, "morning");
                 const eveningSeed = sectionSeedFor(p.id, p.seed, "evening");
+                const art = PRESET_BACKGROUNDS[p.id];
                 return (
                   <button
                     key={p.id}
@@ -378,9 +408,32 @@ function Settings() {
                         width: "100%",
                         height: 40,
                         borderRadius: 10,
+                        overflow: "hidden",
+                        display: "flex",
                         background: `linear-gradient(135deg, ${morningSeed} 0%, ${eveningSeed} 100%)`,
                       }}
-                    />
+                    >
+                      {art && (
+                        <>
+                          <div
+                            style={{
+                              flex: 1,
+                              backgroundImage: `url(${art.morning})`,
+                              backgroundSize: "cover",
+                              backgroundPosition: "center top",
+                            }}
+                          />
+                          <div
+                            style={{
+                              flex: 1,
+                              backgroundImage: `url(${art.evening})`,
+                              backgroundSize: "cover",
+                              backgroundPosition: "center top",
+                            }}
+                          />
+                        </>
+                      )}
+                    </div>
                     <span className="text-[10px] font-semibold">{p.name}</span>
                   </button>
                 );

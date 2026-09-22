@@ -3,8 +3,8 @@ import { createFileRoute, Outlet, useRouterState } from "@tanstack/react-router"
 import { BottomNav } from "@/components/BottomNav";
 import { SettingsButton } from "@/components/SettingsButton";
 import { Onboarding, hasOnboarded } from "@/components/Onboarding";
-import morningBackground from "@/assets/morning-landscape.webp.asset.json";
-import eveningBackground from "@/assets/evening-landscape.webp.asset.json";
+import { backgroundsForPreset, DEFAULT_BACKGROUNDS } from "@/lib/backgrounds";
+import { getPresetId } from "@/lib/theme-store";
 
 export const Route = createFileRoute("/app")({
   component: AppLayout,
@@ -17,8 +17,20 @@ function AppLayout() {
   const isAdhkar = ["/app", "/app/", "/app/evening"].includes(pathname);
   const showBackground = isAdhkar || ["/app/salah", "/app/tasbih", "/app/more"].includes(pathname);
   const showSettings = !pathname.startsWith("/app/settings");
+  const [backgrounds, setBackgrounds] = useState(DEFAULT_BACKGROUNDS);
   useEffect(() => {
     if (!hasOnboarded()) setShowOnboarding(true);
+  }, []);
+
+  useEffect(() => {
+    const sync = () => setBackgrounds(backgroundsForPreset(getPresetId()));
+    sync();
+    window.addEventListener("adhkar:theme-change", sync);
+    window.addEventListener("storage", sync);
+    return () => {
+      window.removeEventListener("adhkar:theme-change", sync);
+      window.removeEventListener("storage", sync);
+    };
   }, []);
 
   // Lock the viewport while inside /app so .scroll-area handles scrolling.
@@ -39,12 +51,12 @@ function AppLayout() {
         <>
           <div
             className="app-background app-background-morning"
-            style={{ "--screen-background": `url(${morningBackground.url})` } as React.CSSProperties}
+            style={{ "--screen-background": `url(${backgrounds.morning})` } as React.CSSProperties}
             aria-hidden="true"
           />
           <div
             className="app-background app-background-evening"
-            style={{ "--screen-background": `url(${eveningBackground.url})` } as React.CSSProperties}
+            style={{ "--screen-background": `url(${backgrounds.evening})` } as React.CSSProperties}
             aria-hidden="true"
           />
         </>

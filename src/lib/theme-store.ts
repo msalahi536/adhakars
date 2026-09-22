@@ -24,7 +24,6 @@ export type Preset = { id: string; name: string; seed: string };
 
 export const PRESETS: Preset[] = [
   { id: "original",  name: "Original",  seed: "#70815d" },
-  { id: "classic",   name: "Classic",   seed: "#70815d" },
   { id: "rose",      name: "Rose",      seed: "#d47a8b" },
   { id: "lavender",  name: "Twilight",  seed: "#8a7bd0" },
   { id: "sakura",    name: "Sakura",    seed: "#e69ba5" },
@@ -56,7 +55,11 @@ export const setModeSetting = (m: ModeSetting) => writeLS(K_MODE, m);
 export const getSeed = (): string => clampSeed(readLS(K_SEED) ?? DEFAULT_SEED);
 export const setSeed = (hex: string) => writeLS(K_SEED, clampSeed(hex));
 
-export const getPresetId = (): string => readLS(K_PRESET) ?? DEFAULT_PRESET_ID;
+export const getPresetId = (): string => {
+  const v = readLS(K_PRESET) ?? DEFAULT_PRESET_ID;
+  // "classic" was removed; fold it back into the default preset.
+  return v === "classic" ? DEFAULT_PRESET_ID : v;
+};
 export const setPresetId = (id: string) => writeLS(K_PRESET, id);
 
 export const getOverrides = (): Partial<Record<SectionKey, string>> => {
