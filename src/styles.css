@@ -264,7 +264,7 @@
   .bottom-nav {
     position: fixed;
     inset-inline: 28px;
-    bottom: calc(22px + env(safe-area-inset-bottom));
+    bottom: calc(30px + env(safe-area-inset-bottom));
     width: auto;
     height: var(--bottom-nav-row);
     min-height: var(--bottom-nav-row);
@@ -286,7 +286,7 @@
     justify-content: space-around;
     overflow: hidden;
     border: 1px solid;
-    border-radius: 30px;
+    border-radius: 22px;
     background: color-mix(in oklab, var(--nav-bg) 84%, transparent);
     box-shadow: 0 12px 34px color-mix(in oklab, var(--foreground) 10%, transparent);
     backdrop-filter: blur(24px);
