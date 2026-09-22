@@ -1159,18 +1159,19 @@ html[data-preset][data-section="tasbih"] {
   }
   .settings-button svg { width: 20px; height: 20px; }
 
-  .adhkar-header { min-height: 194px; }
+  .adhkar-header { min-height: 172px; }
   .adhkar-header-content {
     max-width: 430px;
-    padding-top: calc(env(safe-area-inset-top) + 88px);
+    padding-top: calc(env(safe-area-inset-top) + 70px);
   }
   .adhkar-header .label-caps { font-size: 10px; }
-  .adhkar-header .app-page-title { margin-top: 10px; font-size: 31px; }
+  .adhkar-header .app-page-title { margin-top: 8px; font-size: 31px; }
   .adhkar-progress-row,
   .adhkar-progress-track { width: 236px; }
   .adhkar-progress-track { flex-basis: 236px; height: 8px; }
-  .daily-adhkar-page.scroll-area { margin-bottom: calc(118px + env(safe-area-inset-bottom)); }
-  .daily-swipe-stack .adhkar-card-stage { padding-inline: 20px; }
+  .daily-adhkar-page.scroll-area { margin-bottom: calc(112px + env(safe-area-inset-bottom)); }
+  .daily-swipe-stack .adhkar-card-stage { padding: 0 20px 10px; }
+  .adhkar-index-row { margin-bottom: 2px; }
   .adhkar-reference-card { padding: 20px 22px 18px; }
   .adhkar-card-heading h3 { font-size: 13px; }
   .adhkar-arabic { font-size: 26px !important; }
