@@ -237,7 +237,7 @@ function More() {
                 >
                   Days of remembrance
                 </div>
-                <div style={{ fontSize: 40, fontWeight: 800, color: "var(--accent)", lineHeight: 1.1 }}>
+                <div style={{ fontSize: 40, fontWeight: 800, color: "var(--surface-deep-fg)", lineHeight: 1.1 }}>
                   {daysOfRem.toLocaleString()} days of remembrance
                 </div>
                 <div className="mt-1 text-sm" style={{ color: "var(--surface-deep-muted)" }}>
@@ -252,7 +252,7 @@ function More() {
                 >
                   Total Remembrances
                 </div>
-                <div style={{ fontSize: 48, fontWeight: 800, color: "var(--accent)", lineHeight: 1.1 }}>
+                <div style={{ fontSize: 48, fontWeight: 800, color: "var(--surface-deep-fg)", lineHeight: 1.1 }}>
                   {lifetime.total.toLocaleString()}
                 </div>
                 <div
