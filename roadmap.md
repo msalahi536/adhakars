@@ -8,3 +8,5 @@
 - [x] Add an in-app delete confirmation dialog.
 - [x] Verify mobile interactions and diagnostics.
 - [x] Correct app sizing across modern iPhones, compact phones, tablets, and desktop.
+- [x] Move My Adhkar add beside edit and delete.
+- [x] Repair the My Adhkar card selector and drag interaction.

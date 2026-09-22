@@ -99,7 +99,6 @@ export function Pagination({
   onNext: () => void;
   onScrub: (index: number) => void;
 }) {
-  const holdTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const scrubbing = useRef(false);
   const suppressClick = useRef(false);
   const lastIndex = useRef(active);
@@ -120,8 +119,6 @@ export function Pagination({
   };
 
   const stopScrub = (event: React.PointerEvent<HTMLDivElement>) => {
-    if (holdTimer.current) clearTimeout(holdTimer.current);
-    holdTimer.current = null;
     if (scrubbing.current && event.currentTarget.hasPointerCapture(event.pointerId)) {
       event.currentTarget.releasePointerCapture(event.pointerId);
     }
@@ -146,16 +143,12 @@ export function Pagination({
         className={`adhkar-pagination ${isScrubbing ? "is-scrubbing" : ""}`}
         onPointerDown={(event) => {
           lastIndex.current = active;
-          const x = event.clientX;
           const element = event.currentTarget;
-          holdTimer.current = setTimeout(() => {
-            scrubbing.current = true;
-            setIsScrubbing(true);
-            suppressClick.current = true;
-            element.setPointerCapture(event.pointerId);
-            void triggerHaptic("light");
-            updateScrub(x, element);
-          }, 250);
+          scrubbing.current = true;
+          setIsScrubbing(true);
+          suppressClick.current = event.target === element;
+          element.setPointerCapture(event.pointerId);
+          updateScrub(event.clientX, element);
         }}
         onPointerMove={(event) => {
           if (!scrubbing.current) return;
@@ -165,10 +158,7 @@ export function Pagination({
         onPointerUp={stopScrub}
         onPointerCancel={stopScrub}
         onPointerLeave={(event) => {
-          if (!scrubbing.current && holdTimer.current) {
-            clearTimeout(holdTimer.current);
-            holdTimer.current = null;
-          }
+          if (scrubbing.current && event.buttons === 0) stopScrub(event);
         }}
       >
         {Array.from({ length: total }, (_, index) => (

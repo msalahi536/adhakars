@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "@tanstack/react-router";
 import { DhikrCard } from "./DhikrCard";
 import { TasbeehComboCard } from "./TasbeehComboCard";
-import { ChevronLeft, ChevronRight, RotateCcw, ArrowRight, Pencil, Trash2 } from "lucide-react";
+import { ChevronLeft, ChevronRight, RotateCcw, ArrowRight, Pencil, Plus, Trash2 } from "lucide-react";
 import type { SalahItem } from "@/data/salah";
 import { isItemComplete, itemId } from "@/data/salah";
 import { Pagination } from "./AdhkarPrimitives";
@@ -15,6 +15,7 @@ type Props = {
   persistKey?: string;
   finishCta?: { label: string; to: string };
   onFinishNav?: () => void;
+  onAddItem?: () => void;
   onEditItem?: (id: string) => void;
   onDeleteItem?: (id: string) => void;
   dailyLayout?: boolean;
@@ -32,7 +33,7 @@ const readPersistedIdx = (key?: string): number => {
   return Number.isFinite(n) && n >= 0 ? n : 0;
 };
 
-export function SwipeStack({ items, counts, onIncrement, onReset, persistKey, finishCta, onFinishNav, onEditItem, onDeleteItem, dailyLayout = false }: Props) {
+export function SwipeStack({ items, counts, onIncrement, onReset, persistKey, finishCta, onFinishNav, onAddItem, onEditItem, onDeleteItem, dailyLayout = false }: Props) {
   const navigate = useNavigate();
   const [idx, setIdxState] = useState(0);
   const setIdx = (updater: number | ((i: number) => number)) => {
@@ -262,9 +263,21 @@ export function SwipeStack({ items, counts, onIncrement, onReset, persistKey, fi
             <RotateCcw size={12} /> Restart
           </button>
         )}
+        {current?.dhikr && onAddItem && (
+          <button
+            type="button"
+            onClick={onAddItem}
+            className={`adhkar-card-action flex items-center justify-center gap-1 rounded-full text-[11px] font-semibold transition active:scale-95 ${dailyLayout ? "is-icon-only" : "px-2.5 py-1"}`}
+            style={{ background: "var(--surface)", color: "var(--foreground)" }}
+            aria-label="add adhkar"
+          >
+            <Plus size={13} /> {!dailyLayout && "Add"}
+          </button>
+        )}
         {current?.dhikr && onEditItem && (
           <button
-            onClick={() => onEditItem(current.dhikr!.id)}
+            type="button"
+            onClick={() => onEditItem(current.dhikr.id)}
             className={`adhkar-card-action flex items-center justify-center gap-1 rounded-full text-[11px] font-semibold transition active:scale-95 ${dailyLayout ? "is-icon-only" : "px-2.5 py-1"}`}
             style={{ background: "var(--surface)", color: "var(--foreground)" }}
             aria-label="edit"
@@ -274,7 +287,8 @@ export function SwipeStack({ items, counts, onIncrement, onReset, persistKey, fi
         )}
         {current?.dhikr && onDeleteItem && (
           <button
-            onClick={() => onDeleteItem(current.dhikr!.id)}
+            type="button"
+            onClick={() => onDeleteItem(current.dhikr.id)}
             className={`adhkar-card-action is-delete flex items-center justify-center gap-1 rounded-full text-[11px] font-semibold transition active:scale-95 ${dailyLayout ? "is-icon-only" : "px-2.5 py-1"}`}
             style={{ background: "var(--surface)", color: "var(--destructive)" }}
             aria-label="delete"
@@ -300,7 +314,7 @@ export function SwipeStack({ items, counts, onIncrement, onReset, persistKey, fi
                 key={current.dhikr.id}
                 dhikr={current.dhikr}
                 count={counts[current.dhikr.id] ?? 0}
-                onIncrement={() => onIncrement(current.dhikr!.id, current.dhikr!.target)}
+                onIncrement={() => onIncrement(current.dhikr.id, current.dhikr.target)}
                 index={idx + 1}
                 total={items.length}
                 isSpecial={current.isSpecial}
