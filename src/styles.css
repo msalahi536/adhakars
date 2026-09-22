@@ -344,9 +344,9 @@
 }
 
 .app-shell .settings-button {
-  border-color: rgba(255, 255, 255, 0.86);
-  background: rgba(250, 248, 241, 0.72);
-  color: var(--title);
+  border-color: var(--card-border, var(--border));
+  background: color-mix(in oklab, var(--card) 88%, transparent);
+  color: var(--btn-fg, var(--title));
   box-shadow: 0 2px 8px color-mix(in oklab, var(--title) 6%, transparent);
 }
 
@@ -1014,7 +1014,7 @@ html[data-section="tasbih"] {
   --nav-inactive: #9aa094;
 }
 html[data-preset][data-section="tasbih"] {
-  --background: #f5efe3 !important; --foreground: #2f4f34 !important; --title: #2f4f34 !important; --eyebrow: #5f7a5a !important; --accent: #5a7346 !important; --accent-foreground: #ffffff !important; --card: rgba(250,247,240,0.95) !important; --card-foreground: #2f4f34 !important; --border: rgba(255,255,255,0.85) !important; --card-border: rgba(255,255,255,0.85) !important; --pill-bg: rgba(240,236,226,0.9) !important; --nav-bg: rgba(255,255,255,0.9) !important; --nav-border: rgba(255,255,255,0.85) !important; --nav-active: #2f5a3c !important; --nav-inactive: #9aa094 !important;
+  --accent-foreground: #ffffff !important;
 }
 .tasbih-header { position: relative; z-index: 1; height: 238px; flex: 0 0 238px; padding-top: env(safe-area-inset-top); text-align: center; }
 .tasbih-header-inner { width: 100%; max-width: 390px; margin: 0 auto; padding-top: 78px; }
@@ -1030,7 +1030,7 @@ html[data-preset][data-section="tasbih"] {
 .tasbih-corner-control { position: absolute; top: 18px; z-index: 2; }
 .tasbih-corner-control.left { left: 18px; }
 .tasbih-corner-control.right { right: 18px; }
-.tasbih-control { display: flex; width: 36px; height: 36px; align-items: center; justify-content: center; border: 1px solid rgba(0,0,0,0.05); border-radius: 999px; background: #ffffff; color: #2f5a3c; box-shadow: 0 4px 12px rgba(0,0,0,0.06); }
+.tasbih-control { display: flex; width: 36px; height: 36px; align-items: center; justify-content: center; border: 1px solid var(--card-border, var(--border)); border-radius: 999px; background: color-mix(in oklab, var(--card) 88%, transparent); color: var(--btn-fg, var(--title)); box-shadow: 0 4px 12px color-mix(in oklab, var(--title) 8%, transparent); backdrop-filter: blur(16px); }
 .tasbih-disc { position: absolute; top: 90px; left: 50%; display: flex; width: 280px; height: 280px; align-items: center; justify-content: center; transform: translateX(-50%); border: 8px solid #f4efe4; border-radius: 50%; background: radial-gradient(circle at 50% 35%, #fbf8f1 0%, #f1ece0 70%, #e6dfd0 100%); box-shadow: 0 18px 40px rgba(0,0,0,0.10), inset 0 2px 6px rgba(255,255,255,0.9), inset 0 -6px 14px rgba(0,0,0,0.06); transition: transform 80ms ease; }
 .tasbih-disc-tapped { transform: translateX(-50%) scale(0.985); }
 .tasbih-disc-content { display: flex; flex-direction: column; align-items: center; justify-content: center; }
