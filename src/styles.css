@@ -514,10 +514,11 @@ html[data-section="evening"] .adhkar-progress-value { background: #2c2a54; }
   font-weight: 600;
 }
 html[data-section="evening"] .app-shell .settings-button {
-  border-color: rgba(255, 255, 255, 0.6) !important;
-  background: rgba(20, 18, 40, 0.4) !important;
-  color: #ffffff !important;
+  border-color: rgba(255, 255, 255, 0.3) !important;
+  background: rgba(255, 255, 255, 0.06) !important;
+  color: rgba(255, 255, 255, 0.92) !important;
   box-shadow: none !important;
+  backdrop-filter: blur(16px) !important;
 }
 html[data-section="evening"] .daily-swipe-stack .adhkar-index-row > span {
   border-color: rgba(255, 255, 255, 0.14) !important;
