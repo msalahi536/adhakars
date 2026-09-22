@@ -969,7 +969,7 @@ html[data-visual-phase="evening"] .adhkar-card-heading button { background: rgba
 .custom-adhkar-form { display: flex; min-height: 0; flex: 1; flex-direction: column; overflow: hidden; }
 .custom-adhkar-fields { min-height: 0; flex: 1; overflow-y: auto; overscroll-behavior: contain; padding: 2px 20px 24px; scrollbar-width: none; }
 .custom-adhkar-fields::-webkit-scrollbar { display: none; }
-.custom-adhkar-footer { position: relative; z-index: 2; flex-shrink: 0; padding: 14px 20px calc(16px + env(safe-area-inset-bottom)); background: var(--surface, var(--card)); border-top: 1px solid var(--border); box-shadow: 0 -10px 24px color-mix(in oklab, var(--foreground) 6%, transparent); }
+.custom-adhkar-footer { position: relative; z-index: 2; flex-shrink: 0; padding: 14px 20px 16px; background: var(--surface, var(--card)); border-top: 1px solid var(--border); box-shadow: 0 -10px 24px color-mix(in oklab, var(--foreground) 6%, transparent); }
 
 /* Compact prayer hub */
 .salah-page {
@@ -1177,7 +1177,7 @@ html[data-preset][data-section="tasbih"] {
   .adhkar-repeat-counter { width: 88px; height: 88px; }
   .adhkar-counter-value { font-size: 37px; }
 
-  .adhkar-header-action { top: calc(env(safe-area-inset-top) + 88px); right: 68px; }
+  .adhkar-header-action { top: 88px; right: 68px; }
   .my-adhkar-add { width: 40px; height: 40px; }
 
   .qibla-header { min-height: 166px; }
@@ -1399,12 +1399,8 @@ html[data-preset][data-section="tasbih"] {
   animation: num-pulse 150ms ease-out;
 }
 
-:root {
-  --safe-bottom: env(safe-area-inset-bottom, 20px);
-}
-
 .page-content {
-  padding-bottom: calc(var(--bottom-nav-row) + env(safe-area-inset-bottom) + 28px);
+  padding-bottom: 28px;
 }
 
 
