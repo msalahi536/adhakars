@@ -1,8 +1,9 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { RotateCcw, Undo2 } from "lucide-react";
 import { triggerHaptic } from "@/lib/theme";
 import { bumpLifetime } from "@/lib/storage";
+import { ProgressRing } from "@/components/ProgressRing";
 
 export const Route = createFileRoute("/app/tasbih")({
   head: () => ({ meta: [{ title: "Tasbih, Sahih Al-Adhkar" }] }),
@@ -20,7 +21,7 @@ function Tasbih() {
   const [toast, setToast] = useState<string | null>(null);
   const [pressed, setPressed] = useState(false);
   const [tapped, setTapped] = useState(false);
-  const resetTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const [confirmReset, setConfirmReset] = useState(false);
 
   useEffect(() => {
     try {
@@ -38,6 +39,8 @@ function Tasbih() {
 
   const hasMilestone = milestone > 0;
   const cycleNum = hasMilestone ? Math.floor(total / milestone) + 1 : 1;
+  const ringMax = hasMilestone ? milestone : 1;
+  const ringValue = hasMilestone ? total % milestone : 0;
 
   const showToast = (msg: string) => {
     setToast(msg);
@@ -66,17 +69,16 @@ function Tasbih() {
     setTotal((n) => Math.max(0, n - 1));
   };
 
-  const onResetStart = (e: React.PointerEvent | React.TouchEvent | React.MouseEvent) => {
+  const onResetPress = (e: React.MouseEvent) => {
     e.stopPropagation();
-    resetTimer.current = setTimeout(() => {
-      triggerHaptic("heavy");
-      setTotal(0);
-      showToast("Count reset ✓");
-    }, 2500);
+    triggerHaptic("light");
+    setConfirmReset(true);
   };
-  const onResetEnd = (e?: React.SyntheticEvent) => {
-    e?.stopPropagation();
-    if (resetTimer.current) clearTimeout(resetTimer.current);
+  const doReset = () => {
+    triggerHaptic("heavy");
+    setTotal(0);
+    setConfirmReset(false);
+    showToast("Count reset ✓");
   };
 
   return (
@@ -142,13 +144,9 @@ function Tasbih() {
               onPointerDown={(e) => e.stopPropagation()}
             >
               <button
-                onMouseDown={onResetStart}
-                onMouseUp={onResetEnd}
-                onMouseLeave={onResetEnd}
-                onTouchStart={onResetStart}
-                onTouchEnd={onResetEnd}
+                onClick={onResetPress}
                 className="tasbih-control"
-                aria-label="hold to reset"
+                aria-label="reset counter"
               >
                 <RotateCcw size={16} />
               </button>
@@ -156,6 +154,12 @@ function Tasbih() {
 
             {/* Big progress ring with count */}
             <div className={`tasbih-disc ${tapped ? "tasbih-disc-tapped" : ""}`}>
+              <span
+                className="tasbih-ring"
+                style={{ ["--ring-track" as string]: "transparent" }}
+              >
+                <ProgressRing value={ringValue} max={ringMax} size={280} stroke={8} />
+              </span>
               <div className="tasbih-disc-content">
                 <span className="tasbih-count">
                   {total}
@@ -175,9 +179,6 @@ function Tasbih() {
               <div className="tasbih-helper-primary">
                 Tap anywhere to count
               </div>
-              <div className="tasbih-helper-secondary">
-                Hold to reset
-              </div>
             </div>
           </div>
         </div>
@@ -188,6 +189,36 @@ function Tasbih() {
             style={{ background: "var(--accent)", color: "var(--accent-foreground)" }}
           >
             {toast}
+          </div>
+        )}
+
+        {confirmReset && (
+          <div
+            className="tasbih-confirm-overlay"
+            onClick={() => setConfirmReset(false)}
+          >
+            <div
+              className="tasbih-confirm pop-in"
+              role="alertdialog"
+              aria-label="reset counter confirmation"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <p className="tasbih-confirm-title">Reset counter?</p>
+              <p className="tasbih-confirm-sub">
+                Are you sure you want to reset? Your current count will be cleared.
+              </p>
+              <div className="tasbih-confirm-actions">
+                <button
+                  className="tasbih-confirm-btn ghost"
+                  onClick={() => setConfirmReset(false)}
+                >
+                  Cancel
+                </button>
+                <button className="tasbih-confirm-btn solid" onClick={doReset}>
+                  Reset
+                </button>
+              </div>
+            </div>
           </div>
         )}
       </main>

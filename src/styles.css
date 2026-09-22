@@ -726,7 +726,16 @@ html[data-preset][data-section="tasbih"] {
 .tasbih-cycle { margin-top: 6px; color: #2f4f34; font-family: var(--font-sans); font-size: 15px; font-weight: 400; line-height: 1; }
 .tasbih-helper { position: absolute; top: 406px; inset-inline: 18px; text-align: center; }
 .tasbih-helper-primary { color: #2f4f34; font-family: var(--font-sans); font-size: 12px; font-weight: 500; line-height: 1; letter-spacing: 0.2em; text-transform: uppercase; }
-.tasbih-helper-secondary { margin-top: 10px; color: #9aa094; font-family: var(--font-sans); font-size: 13px; font-weight: 400; line-height: 1; }
+.tasbih-ring { position: absolute; top: -8px; left: -8px; z-index: 1; pointer-events: none; }
+.tasbih-disc-content { position: relative; z-index: 2; }
+.tasbih-confirm-overlay { position: fixed; inset: 0; z-index: 70; display: flex; align-items: center; justify-content: center; padding: 32px; background: rgba(28,32,24,0.38); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); }
+.tasbih-confirm { width: 100%; max-width: 300px; padding: 22px 20px 18px; border: 1px solid rgba(255,255,255,0.85); border-radius: 18px; background: rgba(250,247,240,0.97); box-shadow: 0 20px 48px rgba(0,0,0,0.18); text-align: center; }
+.tasbih-confirm-title { color: #2f4f34; font-family: var(--font-display); font-size: 21px; font-weight: 600; line-height: 1.2; }
+.tasbih-confirm-sub { margin-top: 6px; color: #5f7a5a; font-family: var(--font-sans); font-size: 13.5px; font-weight: 400; line-height: 1.45; }
+.tasbih-confirm-actions { display: flex; gap: 10px; margin-top: 18px; }
+.tasbih-confirm-btn { display: flex; height: 42px; flex: 1; align-items: center; justify-content: center; border-radius: 999px; font-family: var(--font-sans); font-size: 15px; font-weight: 600; line-height: 1; }
+.tasbih-confirm-btn.ghost { border: 1px solid rgba(0,0,0,0.08); background: #ffffff; color: #2f4f34; }
+.tasbih-confirm-btn.solid { border: 1px solid transparent; background: #5a7346; color: #ffffff; }
 
 @keyframes adhkar-complete-scale { 0% { transform: scale(1); } 52% { transform: scale(1.06); } 100% { transform: scale(1); } }
 @keyframes adhkar-complete-glow { 0%, 100% { box-shadow: 0 0 0 0 color-mix(in oklab, var(--accent) 0%, transparent); } 50% { box-shadow: 0 0 24px 5px color-mix(in oklab, var(--accent) 42%, transparent); } }
