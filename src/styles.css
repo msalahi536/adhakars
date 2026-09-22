@@ -24,6 +24,8 @@
   --color-border: var(--border);
   --color-surface: var(--surface);
   --color-translit: var(--translit);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
   --font-arabic: "Amiri", serif;
   --font-sans: "Jost", system-ui, sans-serif;
   --font-display: "Cormorant Garamond", Georgia, serif;
@@ -68,6 +70,8 @@
   --source-fg: #6b5a2d;
   --count-fg: #2d1f00;
   --card-shadow: 0 4px 16px rgba(45, 31, 0, 0.06);
+  --destructive: oklch(0.52 0.18 25);
+  --destructive-foreground: oklch(0.98 0.01 25);
 }
 
 /* ===== Dusk (evening) — cool blue-grey + blue accent, light cards ===== */
@@ -286,7 +290,7 @@
     justify-content: space-around;
     overflow: hidden;
     border: 1px solid;
-    border-radius: 16px;
+    border-radius: 18px;
     background: color-mix(in oklab, var(--nav-bg) 84%, transparent);
     box-shadow: 0 12px 34px color-mix(in oklab, var(--foreground) 10%, transparent);
     backdrop-filter: blur(24px);
@@ -937,6 +941,26 @@ html[data-visual-phase="evening"] .adhkar-card-heading button { background: rgba
 .adhkar-pagination-arrow:disabled { opacity: 0.35; }
 
 .bottom-nav-row { border-color: var(--nav-border, var(--border)); background: var(--nav-bg); box-shadow: 0 6px 24px rgba(0,0,0,0.12); backdrop-filter: blur(20px); }
+
+/* Qibla finder — centered, calm and readable on the usable screen. */
+.qibla-header { min-height: 154px; }
+.qibla-header-content { padding-top: calc(env(safe-area-inset-top) + 58px); padding-bottom: 20px; }
+.qibla-page { padding: 8px 20px 22px; }
+.qibla-ready { display: flex; width: 100%; flex: 1; min-height: 0; flex-direction: column; align-items: center; justify-content: center; padding-bottom: 18px; }
+.qibla-compass {
+  width: min(72vw, 292px);
+  aspect-ratio: 1;
+  filter: drop-shadow(0 18px 30px color-mix(in oklab, var(--foreground) 10%, transparent));
+}
+.qibla-details { margin-top: 22px; }
+
+/* My Adhkar controls and sheets. */
+.adhkar-header-action { top: calc(env(safe-area-inset-top) + 84px); right: 68px; }
+.my-adhkar-add { width: 36px; height: 36px; border-radius: 50%; }
+.custom-adhkar-form { display: flex; min-height: 0; flex: 1; flex-direction: column; overflow: hidden; }
+.custom-adhkar-fields { min-height: 0; flex: 1; overflow-y: auto; overscroll-behavior: contain; padding: 2px 20px 24px; scrollbar-width: none; }
+.custom-adhkar-fields::-webkit-scrollbar { display: none; }
+.custom-adhkar-footer { position: relative; z-index: 2; flex-shrink: 0; padding: 14px 20px calc(16px + env(safe-area-inset-bottom)); background: var(--surface, var(--card)); border-top: 1px solid var(--border); box-shadow: 0 -10px 24px color-mix(in oklab, var(--foreground) 6%, transparent); }
 
 /* Compact prayer hub */
 .salah-page {

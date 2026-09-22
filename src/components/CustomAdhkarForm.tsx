@@ -141,9 +141,9 @@ export function CustomAdhkarForm({ open, mode, initial, onCancel, onSubmit }: Pr
 
         <form
           onSubmit={submit}
-          className="min-h-0 flex-1 space-y-4 overflow-y-auto overscroll-contain px-5 pb-5"
-          style={{ WebkitOverflowScrolling: "touch" }}
+          className="custom-adhkar-form"
         >
+          <div className="custom-adhkar-fields space-y-4" style={{ WebkitOverflowScrolling: "touch" }}>
           <Field label="Title (optional)" error={errors.title}>
             <Input
               value={values.title}
@@ -232,13 +232,10 @@ export function CustomAdhkarForm({ open, mode, initial, onCancel, onSubmit }: Pr
               />
             </div>
           </div>
+          </div>
 
           <DialogFooter
-            className="sticky bottom-0 -mx-5 flex-row gap-2 px-5 pb-1 pt-3 sm:gap-2"
-            style={{
-              background: "var(--surface, var(--card))",
-              borderTop: "1px solid var(--border)",
-            }}
+            className="custom-adhkar-footer flex-row gap-2 sm:gap-2"
           >
             <button
               type="button"
