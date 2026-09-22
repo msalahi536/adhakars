@@ -32,7 +32,7 @@ export function ListenButton({ size = 32 }: Props) {
   const iconSize = Math.round(size * 0.5);
 
   return (
-    <div ref={wrapRef} className="relative shrink-0" data-no-swipe>
+    <div ref={wrapRef} className="listen-button-wrap relative shrink-0" data-no-swipe style={{ width: size, height: size }}>
       <button
         type="button"
         onClick={handleClick}
@@ -51,12 +51,12 @@ export function ListenButton({ size = 32 }: Props) {
       {open && (
         <div
           role="status"
-          className="absolute left-[calc(100%+8px)] top-1/2 z-20 -translate-y-1/2 whitespace-nowrap rounded-full px-3 py-1.5 text-[11px] font-medium shadow-md"
+          className="listen-status absolute z-20 whitespace-nowrap rounded-full px-3 text-[11px] font-medium shadow-md"
           style={{
             background: "var(--popover, var(--card))",
             color: "var(--popover-foreground, var(--card-foreground))",
             border: "1px solid var(--border)",
-            animation: "listen-pop 160ms ease-out",
+            animation: "listen-fade 160ms ease-out",
           }}
         >
           <span
@@ -74,7 +74,7 @@ export function ListenButton({ size = 32 }: Props) {
         </div>
       )}
 
-      <style>{`@keyframes listen-pop { from { opacity: 0; transform: translate(-4px, -50%);} to { opacity: 1; transform: translate(0, -50%);} }`}</style>
+      <style>{`@keyframes listen-fade { from { opacity: 0; } to { opacity: 1; } }`}</style>
     </div>
   );
 }
