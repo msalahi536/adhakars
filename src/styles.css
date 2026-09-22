@@ -362,27 +362,27 @@
 /* Shared Morning and Evening recitation layout */
 html[data-section="morning"] {
   --background: #f5efe3;
-  --foreground: #3d5a3c;
-  --title: #3d5a3c;
-  --eyebrow: #5f7a5a;
-  --accent: #4f6d4a;
+  --foreground: #70815d;
+  --title: #70815d;
+  --eyebrow: #70815d;
+  --accent: #70815d;
   --card: rgba(250, 247, 240, 0.92);
   --card-foreground: #2a2a2a;
   --surface-card: #f7f3e9;
   --border: rgba(255, 255, 255, 0.8);
-  --translit: #5f7a5a;
+  --translit: #70815d;
   --text-muted: #6b6f64;
   --source-bg: rgba(233, 233, 222, 0.9);
-  --source-fg: #3d5a3c;
+  --source-fg: #70815d;
   --ring-track: rgba(90, 110, 85, 0.18);
   --nav-bg: rgba(255, 255, 255, 0.9);
-  --nav-active: #4f6d4a;
+  --nav-active: #70815d;
   --nav-inactive: #6b6f64;
-  --dot-active: #4f6d4a;
+  --dot-active: #70815d;
   --dot-inactive: rgba(107, 111, 100, 0.4);
-  --index-badge-bg: #4f6d4a;
+  --index-badge-bg: #70815d;
   --index-badge-fg: #fff;
-  --count-fg: #4f6d4a;
+  --count-fg: #70815d;
   --pill-bg: rgba(240, 236, 226, 0.9);
   --card-border: rgba(255, 255, 255, 0.8);
 }
@@ -416,7 +416,7 @@ html[data-section="evening"] {
 }
 
 html[data-preset][data-section="morning"] {
-  --background: #f5efe3 !important; --foreground: #3d5a3c !important; --title: #3d5a3c !important; --eyebrow: #5f7a5a !important; --accent: #4f6d4a !important; --card: rgba(250, 247, 240, 0.92) !important; --card-foreground: #2a2a2a !important; --surface-card: #f7f3e9 !important; --border: rgba(255, 255, 255, 0.8) !important; --translit: #5f7a5a !important; --text-muted: #6b6f64 !important; --source-bg: rgba(233, 233, 222, 0.9) !important; --source-fg: #3d5a3c !important; --ring-track: rgba(90, 110, 85, 0.18) !important; --nav-bg: rgba(255, 255, 255, 0.9) !important; --nav-active: #4f6d4a !important; --nav-inactive: #6b6f64 !important; --dot-active: #4f6d4a !important; --dot-inactive: rgba(107, 111, 100, 0.4) !important; --index-badge-bg: #4f6d4a !important; --index-badge-fg: #fff !important; --count-fg: #4f6d4a !important;
+  --background: #f5efe3 !important; --foreground: #70815d !important; --title: #70815d !important; --eyebrow: #70815d !important; --accent: #70815d !important; --card: rgba(250, 247, 240, 0.92) !important; --card-foreground: #2a2a2a !important; --surface-card: #f7f3e9 !important; --border: rgba(255, 255, 255, 0.8) !important; --translit: #70815d !important; --text-muted: #6b6f64 !important; --source-bg: rgba(233, 233, 222, 0.9) !important; --source-fg: #70815d !important; --ring-track: rgba(112, 129, 93, 0.18) !important; --nav-bg: rgba(255, 255, 255, 0.9) !important; --nav-active: #70815d !important; --nav-inactive: #6b6f64 !important; --dot-active: #70815d !important; --dot-inactive: rgba(112, 129, 93, 0.4) !important; --index-badge-bg: #70815d !important; --index-badge-fg: #fff !important; --count-fg: #70815d !important;
 }
 html[data-preset][data-section="evening"] {
   --background: #0e0f22 !important; --foreground: #ebe7f7 !important; --title: #ebe7f7 !important; --eyebrow: #a9a0cc !important; --accent: #a99bd8 !important; --card: rgba(22, 20, 50, 0.92) !important; --card-foreground: #efeafe !important; --surface-card: #161432 !important; --border: rgba(255,255,255,0.09) !important; --card-border: rgba(255,255,255,0.09) !important; --translit: #a99bd8 !important; --text-muted: #8a83ac !important; --pill-bg: rgba(255,255,255,0.08) !important; --source-bg: rgba(255,255,255,0.08) !important; --source-fg: #cfc8e8 !important; --ring-track: rgba(169,155,216,0.22) !important; --nav-bg: rgba(24,22,54,0.92) !important; --nav-border: rgba(255,255,255,0.14) !important; --nav-active: #cdbff5 !important; --nav-inactive: #a39dc4 !important; --dot-active: #a99bd8 !important; --dot-inactive: rgba(169,155,216,0.3) !important; --index-badge-bg: rgba(255,255,255,0.08) !important; --index-badge-fg: #ebe7f7 !important; --count-fg: #cfc8e8 !important;
@@ -444,7 +444,7 @@ html[data-section="evening"] .app-shell { background: radial-gradient(circle at 
 .adhkar-header .label-caps {
   color: var(--title);
   font-family: var(--font-sans);
-  font-size: 10px;
+  font-size: 9px;
   font-weight: 600;
   letter-spacing: 0.12em;
   line-height: 1;
@@ -454,9 +454,9 @@ html[data-section="evening"] .app-shell { background: radial-gradient(circle at 
 
 .adhkar-header .app-page-title {
   margin-top: 9px;
-  color: color-mix(in oklab, var(--title) 94%, black);
+  color: var(--title);
   font-family: var(--font-display);
-  font-size: 30px;
+  font-size: 32px;
   font-weight: 600;
   line-height: 1;
   letter-spacing: 0;
