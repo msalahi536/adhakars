@@ -32,7 +32,7 @@ export function HadithDetailsDrawer({ dhikr, open, onOpenChange }: Props) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent
-        className="hadith-details-drawer grid max-h-[78dvh] w-[calc(100%-32px)] max-w-[420px] grid-rows-[auto_minmax(0,1fr)] gap-0 overflow-hidden rounded-2xl border-border bg-card p-0 text-card-foreground shadow-2xl [&>button:last-child]:hidden"
+        className="hadith-details-drawer grid max-h-[78dvh] w-[calc(100%_-_32px)] max-w-[420px] grid-rows-[auto_minmax(0,1fr)] gap-0 overflow-hidden rounded-2xl border-border bg-card p-0 text-card-foreground shadow-2xl [&>button:last-child]:hidden"
       >
         <DialogHeader className="relative border-b border-border px-5 pb-4 pt-5 text-left">
           <div className="flex items-start gap-3 pr-10">
