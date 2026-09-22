@@ -286,7 +286,7 @@
     justify-content: space-around;
     overflow: hidden;
     border: 1px solid;
-    border-radius: 18px;
+    border-radius: 14px;
     background: color-mix(in oklab, var(--nav-bg) 84%, transparent);
     box-shadow: 0 12px 34px color-mix(in oklab, var(--foreground) 10%, transparent);
     backdrop-filter: blur(24px);
