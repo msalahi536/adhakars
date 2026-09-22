@@ -2265,6 +2265,80 @@ html[data-preset="dark-red"][data-visual-phase="morning"] .adhkar-card-heading b
   color: #fff1e9 !important;
 }
 
+html[data-preset="dark-red"] .app-shell.is-settings {
+  background: linear-gradient(180deg, #321012 0%, #47191c 48%, #2b0d0f 100%) !important;
+}
+
+html[data-preset="dark-red"] .app-shell.is-settings::before {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: linear-gradient(180deg, rgba(237, 124, 127, 0.05), transparent 30%);
+  content: "";
+  pointer-events: none;
+}
+
+html[data-preset="dark-red"] .app-shell.is-settings .page-header {
+  background: transparent !important;
+  color: var(--foreground) !important;
+}
+
+html[data-preset="dark-red"] .app-shell.is-settings .page-header .label-caps {
+  color: #dca9a5 !important;
+  opacity: 0.82;
+}
+
+html[data-preset="dark-red"] .app-shell.is-settings .page-header .app-page-title {
+  color: #fff1e9 !important;
+}
+
+html[data-preset="dark-red"] .app-shell.is-settings .scroll-area {
+  color: #f7dfd8;
+}
+
+html[data-preset="dark-red"] .app-shell.is-settings .scroll-area > div > section > .label-caps,
+html[data-preset="dark-red"] .app-shell.is-settings .settings-theme-grid + * {
+  color: #e6aaa8;
+}
+
+html[data-preset="dark-red"] .app-shell.is-settings [data-settings-card] {
+  border-color: rgba(242, 157, 158, 0.2);
+  background: rgba(79, 31, 34, 0.82);
+  box-shadow: 0 14px 34px -22px rgba(10, 1, 2, 0.72);
+  backdrop-filter: blur(18px);
+}
+
+html[data-preset="dark-red"] .app-shell.is-settings .settings-theme-option {
+  border-color: rgba(242, 157, 158, 0.18) !important;
+  background: rgba(85, 37, 39, 0.78) !important;
+  color: #edcac4;
+}
+
+html[data-preset="dark-red"] .app-shell.is-settings .settings-theme-option[style*="2px"] {
+  border-color: #ef8589 !important;
+  background: rgba(110, 45, 49, 0.9) !important;
+  box-shadow: 0 0 0 1px rgba(239, 133, 137, 0.15), 0 8px 20px rgba(13, 2, 3, 0.22);
+}
+
+html[data-preset="dark-red"] .app-shell.is-settings .settings-reset-theme {
+  border: 1px solid rgba(242, 157, 158, 0.18);
+  background: rgba(91, 37, 40, 0.82) !important;
+  color: #f5d8d1 !important;
+}
+
+html[data-preset="dark-red"] .app-shell.is-settings select,
+html[data-preset="dark-red"] .app-shell.is-settings input {
+  border-color: rgba(242, 157, 158, 0.2) !important;
+  background: rgba(42, 13, 15, 0.64) !important;
+  color: #fff1e9 !important;
+}
+
+html[data-preset="dark-red"] .app-shell.is-settings .bottom-nav-row {
+  border-color: rgba(242, 157, 158, 0.25) !important;
+  background: rgba(68, 25, 28, 0.94) !important;
+  box-shadow: 0 8px 28px rgba(10, 1, 2, 0.34) !important;
+}
+
 html[data-preset="dark-red"][data-visual-phase="morning"] .adhkar-pagination-arrow {
   border-color: rgba(247, 177, 176, 0.38);
   background: rgba(114, 56, 57, 0.74);
