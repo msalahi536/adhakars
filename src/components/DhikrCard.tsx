@@ -155,6 +155,12 @@ export function DhikrCard({ dhikr, count, onIncrement, isSpecial, specialLabel, 
               </p>
             </div>
           )}
+          {referenceLayout && hasCommentary && (
+            <details className="adhkar-commentary" data-no-swipe>
+              <summary>Commentary</summary>
+              <p>{dhikr.commentary}</p>
+            </details>
+          )}
         </div>
 
         {/* Bottom fade hint */}

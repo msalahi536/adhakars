@@ -1,6 +1,5 @@
 // Full screen sheet holding the after salah adhkar for one prayer.
 
-import { Portal } from "@/components/Portal";
 import { useEffect, useState } from "react";
 import { X } from "lucide-react";
 import { SwipeStack } from "@/components/SwipeStack";
@@ -45,17 +44,17 @@ export function AfterSalahSheet({ open, prayer, onPrayer, onClose }: Props) {
   const label = SALAH_PRAYERS.find((p) => p.id === prayer)?.label ?? "";
 
   return (
-    <Portal>
     <div
       className="fixed inset-0 flex flex-col justify-end"
-      style={{ background: "rgba(28,32,24,0.38)", backdropFilter: "blur(8px)", WebkitBackdropFilter: "blur(8px)", zIndex: 200 }}
+      data-overlay="after-salah"
+      style={{ background: "color-mix(in oklab, var(--foreground) 34%, transparent)", backdropFilter: "blur(9px)", WebkitBackdropFilter: "blur(9px)", zIndex: 90 }}
       onClick={onClose}
     >
       <div
         onClick={(e) => e.stopPropagation()}
         className="after-salah-panel flex flex-col rounded-t-[28px] pt-3"
         style={{
-          height: "92vh",
+          height: "92dvh",
           transform: `translateY(${dragY}px)`,
           transition: startY === null ? "transform 220ms ease" : "none",
           animation: startY === null && dragY === 0 ? "sheet-up 260ms ease" : undefined,
@@ -72,7 +71,7 @@ export function AfterSalahSheet({ open, prayer, onPrayer, onClose }: Props) {
             setDragY(0);
             setStartY(null);
           }}
-          className="shrink-0 px-5 pb-2"
+          className="after-salah-header shrink-0 px-6 pb-2"
         >
           <div
             className="mx-auto mb-3 rounded-full"
@@ -85,7 +84,7 @@ export function AfterSalahSheet({ open, prayer, onPrayer, onClose }: Props) {
           <div className="flex items-start justify-between gap-3">
             <div>
               <div className="label-caps" style={{ color: "var(--muted-foreground)" }}>
-                After Salah Adhkar
+                After Salah
               </div>
               <h2
                 className="after-salah-title"
@@ -95,9 +94,6 @@ export function AfterSalahSheet({ open, prayer, onPrayer, onClose }: Props) {
               </h2>
             </div>
             <div className="flex items-center gap-2">
-              <span className="text-xs font-semibold" style={{ color: "var(--muted-foreground)" }}>
-                {completed} / {items.length}
-              </span>
               <button
                 onClick={onClose}
                 aria-label="Close"
@@ -115,7 +111,7 @@ export function AfterSalahSheet({ open, prayer, onPrayer, onClose }: Props) {
           </div>
 
           <div
-            className="hide-scrollbar -mx-5 mt-3 flex gap-2 overflow-x-auto px-5 pb-1"
+            className="after-salah-prayers hide-scrollbar -mx-6 mt-3 flex gap-1.5 overflow-x-auto px-6 pb-1"
             style={{ scrollbarWidth: "none" }}
           >
             {SALAH_PRAYERS.map((p) => {
@@ -126,10 +122,11 @@ export function AfterSalahSheet({ open, prayer, onPrayer, onClose }: Props) {
                   onClick={() => onPrayer(p.id)}
                   className="flex shrink-0 items-center justify-center font-bold active:scale-95"
                   style={{
-                    minWidth: 70,
-                    height: 36,
-                    borderRadius: 18,
-                    padding: "0 16px",
+                    minWidth: 0,
+                    flex: "1 0 auto",
+                    height: 34,
+                    borderRadius: 17,
+                    padding: "0 13px",
                     fontSize: 13,
                     background: active
                       ? "var(--accent)"
@@ -146,10 +143,10 @@ export function AfterSalahSheet({ open, prayer, onPrayer, onClose }: Props) {
         </div>
 
         <div
-          className="flex min-h-0 flex-1 flex-col px-5"
+          className="after-salah-stack flex min-h-0 flex-1 flex-col px-4"
           style={{
             paddingBottom:
-              "calc(var(--bottom-nav-row, 56px) + env(safe-area-inset-bottom) + 12px)",
+              "calc(var(--bottom-nav-row) + env(safe-area-inset-bottom) + 42px)",
           }}
         >
           <SwipeStack
@@ -161,10 +158,10 @@ export function AfterSalahSheet({ open, prayer, onPrayer, onClose }: Props) {
               setCounts({});
             }}
             persistKey={storageKey}
+            dailyLayout
           />
         </div>
       </div>
     </div>
-  </Portal>
   );
 }

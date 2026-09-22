@@ -128,15 +128,16 @@ function RootComponent() {
     applyThemeForRoute(pathname);
   }, [pathname]);
 
-  // Re-apply theme when user changes it in Settings, or system dark mode flips.
+  // Re-apply when preferences or prayer-time boundaries change.
   useEffect(() => {
     const reapply = () => applyThemeForRoute(window.location.pathname);
     window.addEventListener("adhkar:theme-change", reapply);
-    const mm = window.matchMedia?.("(prefers-color-scheme: dark)");
-    mm?.addEventListener?.("change", reapply);
+    window.addEventListener("adhkar:prayer-settings", reapply);
+    const timer = window.setInterval(reapply, 30_000);
     return () => {
       window.removeEventListener("adhkar:theme-change", reapply);
-      mm?.removeEventListener?.("change", reapply);
+      window.removeEventListener("adhkar:prayer-settings", reapply);
+      window.clearInterval(timer);
     };
   }, []);
 

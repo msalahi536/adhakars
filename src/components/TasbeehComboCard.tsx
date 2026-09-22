@@ -153,6 +153,12 @@ export function TasbeehComboCard({ combo, counts, onIncrement, index, total }: P
         >
           {combo.source}
         </span>
+        {combo.commentary && (
+          <details className="adhkar-commentary mt-3" data-no-swipe>
+            <summary>Commentary</summary>
+            <p>{combo.commentary}</p>
+          </details>
+        )}
       </div>
     </div>
   );

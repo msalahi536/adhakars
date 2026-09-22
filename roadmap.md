@@ -1,0 +1,5 @@
+- [x] Remove section-by-section appearance customization
+- [x] Apply Light/Dark/Auto as a whole-app morning/evening phase
+- [x] Theme and improve the prayer timeline sheet
+- [x] Rebuild After-Salah adhkar to match the supplied reference and keep nav visible
+- [ ] Verify all themes, modes, pages, and prayer interactions

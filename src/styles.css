@@ -359,7 +359,7 @@
 }
 
 /* Shared Morning and Evening recitation layout */
-html[data-section="morning"] {
+html:is([data-section="morning"], [data-visual-phase="morning"]) {
   --background: #f5efe3;
   --foreground: #70815d;
   --title: #70815d;
@@ -389,7 +389,7 @@ html[data-section="morning"] {
   --card-border: rgba(255, 255, 255, 0.8);
 }
 
-html[data-section="evening"] {
+html[data-visual-phase="evening"] {
   --background: #0e0f22;
   --foreground: #ebe7f7;
   --title: #ebe7f7;
@@ -462,7 +462,7 @@ html[data-preset="midnight"] {
   --eve-nav-active: #c2cdf7; --eve-nav-inactive: #99a2c4; --eve-muted: #838bab; --eve-source-fg: #cbd4ef;
 }
 
-html[data-preset][data-section="morning"],
+html[data-preset]:is([data-section="morning"], [data-visual-phase="morning"]),
 html[data-preset][data-section="salah"],
 html[data-preset][data-section="tasbih"],
 html[data-preset][data-section="custom"],
@@ -481,7 +481,7 @@ html[data-preset][data-section="default"] {
 }
 
 /* Rose morning: blush card/nav/arrows, deeper pink source pill */
-html[data-preset="rose"][data-section="morning"],
+html[data-preset="rose"]:is([data-section="morning"], [data-visual-phase="morning"]),
 html[data-preset="rose"][data-section="salah"],
 html[data-preset="rose"][data-section="tasbih"],
 html[data-preset="rose"][data-section="custom"],
@@ -493,11 +493,11 @@ html[data-preset="rose"][data-section="default"] {
   --source-bg: #efd6d3 !important;
   --source-fg: #8a4356 !important;
 }
-html[data-preset][data-section="evening"] {
+html[data-preset][data-visual-phase="evening"] {
   --background: #0e0f22 !important; --foreground: var(--eve-title) !important; --title: var(--eve-title) !important; --eyebrow: var(--eve-eyebrow) !important; --accent: var(--eve-ink) !important; --card: #222539 !important; --card-foreground: #efeafe !important; --surface-card: #222539 !important; --border: rgba(255,255,255,0.09) !important; --card-border: rgba(255,255,255,0.09) !important; --translit: var(--eve-ink) !important; --text-muted: var(--eve-muted) !important; --pill-bg: rgba(255,255,255,0.08) !important; --source-bg: rgba(255,255,255,0.08) !important; --source-fg: var(--eve-source-fg) !important; --ring-track: rgba(var(--eve-ink-rgb),0.22) !important; --nav-bg: #292d43 !important; --nav-border: rgba(255,255,255,0.14) !important; --nav-active: var(--eve-nav-active) !important; --nav-inactive: var(--eve-nav-inactive) !important; --dot-active: var(--eve-ink) !important; --dot-inactive: rgba(var(--eve-ink-rgb),0.3) !important; --index-badge-bg: rgba(255,255,255,0.08) !important; --index-badge-fg: var(--eve-title) !important; --count-fg: var(--eve-source-fg) !important;
 }
 /* Rose evening: translucent mauve glass card/nav, sky shows through, calm pink glow */
-html[data-preset="rose"][data-section="evening"] {
+html[data-preset="rose"][data-visual-phase="evening"] {
   --card: rgba(124, 73, 86, 0.86) !important;
   --surface-card: rgba(124, 73, 86, 0.86) !important;
   --card-foreground: #fdf0ee !important;
@@ -518,42 +518,42 @@ html[data-preset="rose"][data-section="evening"] {
   --ring-track: rgba(244, 204, 213, 0.22) !important;
 }
 /* Rose evening: slight warm rose tint over the background image */
-html[data-preset="rose"][data-section="evening"] .app-shell::after {
+html[data-preset="rose"][data-visual-phase="evening"] .app-shell::after {
   background: linear-gradient(180deg, rgba(150, 70, 95, 0.08), rgba(90, 40, 60, 0.10)) !important;
 }
-html[data-preset="rose"][data-section="evening"] .dhikr-card {
+html[data-preset="rose"][data-visual-phase="evening"] .dhikr-card {
   background: rgba(128, 80, 90, 0.86) !important;
   backdrop-filter: blur(26px) saturate(130%);
   box-shadow: none !important;
 }
-html[data-preset="rose"][data-section="evening"] .bottom-nav-row {
+html[data-preset="rose"][data-visual-phase="evening"] .bottom-nav-row {
   backdrop-filter: blur(20px);
   box-shadow: 0 0 0 1px rgba(246, 200, 210, 0.14), 0 8px 28px rgba(255, 180, 200, 0.08) !important;
 }
-html[data-preset="rose"][data-section="evening"] .adhkar-pagination-arrow {
+html[data-preset="rose"][data-visual-phase="evening"] .adhkar-pagination-arrow {
   border-color: rgba(246, 200, 210, 0.42);
   background: rgba(255, 236, 240, 0.06);
   color: #f4d3db;
   backdrop-filter: blur(8px);
 }
 /* Rose evening: light pink progress fill on a soft translucent track */
-html[data-preset="rose"][data-section="evening"] .adhkar-progress-track {
+html[data-preset="rose"][data-visual-phase="evening"] .adhkar-progress-track {
   background: rgba(255, 236, 240, 0.18);
   box-shadow: none;
 }
-html[data-preset="rose"][data-section="evening"] .adhkar-progress-value {
+html[data-preset="rose"][data-visual-phase="evening"] .adhkar-progress-value {
   background: #d98aa0;
   box-shadow: 0 1px 4px rgba(217, 138, 160, 0.4);
 }
 /* Rose evening: pink glass audio button + warm heading */
-html[data-preset="rose"][data-section="evening"] .adhkar-card-heading h3 { color: #f0c6d1 !important; }
-html[data-preset="rose"][data-section="evening"] .adhkar-card-heading button {
+html[data-preset="rose"][data-visual-phase="evening"] .adhkar-card-heading h3 { color: #f0c6d1 !important; }
+html[data-preset="rose"][data-visual-phase="evening"] .adhkar-card-heading button {
   background: rgba(246, 200, 210, 0.2) !important;
   color: #f9e4ea !important;
   backdrop-filter: blur(8px);
 }
 /* Rose evening: 10/14 pill matches the mauve glass */
-html[data-preset="rose"][data-section="evening"] .daily-swipe-stack .adhkar-index-row > span {
+html[data-preset="rose"][data-visual-phase="evening"] .daily-swipe-stack .adhkar-index-row > span {
   border: none !important;
   background: rgba(74, 38, 50, 0.35) !important;
   color: #f4ccd5 !important;
@@ -562,7 +562,7 @@ html[data-preset="rose"][data-section="evening"] .daily-swipe-stack .adhkar-inde
 }
 
 /* Twilight morning: lilac card/nav, deeper violet ink for readability */
-html[data-preset="lavender"][data-section="morning"],
+html[data-preset="lavender"]:is([data-section="morning"], [data-visual-phase="morning"]),
 html[data-preset="lavender"][data-section="salah"],
 html[data-preset="lavender"][data-section="tasbih"],
 html[data-preset="lavender"][data-section="custom"],
@@ -578,7 +578,7 @@ html[data-preset="lavender"][data-section="default"] {
   --text-muted: #5f5675 !important;
 }
 /* Twilight evening: deep indigo glass card/nav with a calm violet glow */
-html[data-preset="lavender"][data-section="evening"] {
+html[data-preset="lavender"][data-visual-phase="evening"] {
   --card: rgba(32, 37, 70, 0.9) !important;
   --surface-card: rgba(32, 37, 70, 0.9) !important;
   --card-foreground: #ece8fb !important;
@@ -598,39 +598,39 @@ html[data-preset="lavender"][data-section="evening"] {
   --count-fg: #cfc4f2 !important;
   --ring-track: rgba(195, 180, 242, 0.22) !important;
 }
-html[data-preset="lavender"][data-section="evening"] .app-shell::after {
+html[data-preset="lavender"][data-visual-phase="evening"] .app-shell::after {
   background: linear-gradient(180deg, rgba(60, 55, 120, 0.08), rgba(25, 22, 60, 0.12)) !important;
 }
-html[data-preset="lavender"][data-section="evening"] .dhikr-card {
+html[data-preset="lavender"][data-visual-phase="evening"] .dhikr-card {
   background: rgba(32, 37, 70, 0.9) !important;
   backdrop-filter: blur(26px) saturate(130%);
   box-shadow: none !important;
 }
-html[data-preset="lavender"][data-section="evening"] .bottom-nav-row {
+html[data-preset="lavender"][data-visual-phase="evening"] .bottom-nav-row {
   backdrop-filter: blur(20px);
   box-shadow: 0 0 0 1px rgba(196, 186, 240, 0.14), 0 8px 28px rgba(170, 150, 255, 0.08) !important;
 }
-html[data-preset="lavender"][data-section="evening"] .adhkar-pagination-arrow {
+html[data-preset="lavender"][data-visual-phase="evening"] .adhkar-pagination-arrow {
   border-color: rgba(196, 186, 240, 0.42);
   background: rgba(236, 232, 251, 0.06);
   color: #d4caf5;
   backdrop-filter: blur(8px);
 }
-html[data-preset="lavender"][data-section="evening"] .adhkar-progress-track {
+html[data-preset="lavender"][data-visual-phase="evening"] .adhkar-progress-track {
   background: rgba(236, 232, 251, 0.18);
   box-shadow: none;
 }
-html[data-preset="lavender"][data-section="evening"] .adhkar-progress-value {
+html[data-preset="lavender"][data-visual-phase="evening"] .adhkar-progress-value {
   background: #9a86e0;
   box-shadow: 0 1px 4px rgba(154, 134, 224, 0.4);
 }
-html[data-preset="lavender"][data-section="evening"] .adhkar-card-heading h3 { color: #cfc4f2 !important; }
-html[data-preset="lavender"][data-section="evening"] .adhkar-card-heading button {
+html[data-preset="lavender"][data-visual-phase="evening"] .adhkar-card-heading h3 { color: #cfc4f2 !important; }
+html[data-preset="lavender"][data-visual-phase="evening"] .adhkar-card-heading button {
   background: rgba(196, 186, 240, 0.2) !important;
   color: #ece8fb !important;
   backdrop-filter: blur(8px);
 }
-html[data-preset="lavender"][data-section="evening"] .daily-swipe-stack .adhkar-index-row > span {
+html[data-preset="lavender"][data-visual-phase="evening"] .daily-swipe-stack .adhkar-index-row > span {
   border: none !important;
   background: rgba(30, 30, 62, 0.4) !important;
   color: #d4caf5 !important;
@@ -639,7 +639,7 @@ html[data-preset="lavender"][data-section="evening"] .daily-swipe-stack .adhkar-
 }
 
 /* Ocean morning: pale sky-blue card, softer blue nav */
-html[data-preset="ocean"][data-section="morning"],
+html[data-preset="ocean"]:is([data-section="morning"], [data-visual-phase="morning"]),
 html[data-preset="ocean"][data-section="salah"],
 html[data-preset="ocean"][data-section="tasbih"],
 html[data-preset="ocean"][data-section="custom"],
@@ -655,7 +655,7 @@ html[data-preset="ocean"][data-section="default"] {
   --text-muted: #5f7884 !important;
 }
 /* Ocean evening: deep teal-navy glass card/nav with a calm cyan glow */
-html[data-preset="ocean"][data-section="evening"] {
+html[data-preset="ocean"][data-visual-phase="evening"] {
   --card: rgba(21, 47, 70, 0.88) !important;
   --surface-card: rgba(21, 47, 70, 0.88) !important;
   --card-foreground: #e6f3fb !important;
@@ -675,39 +675,39 @@ html[data-preset="ocean"][data-section="evening"] {
   --count-fg: #bfdff2 !important;
   --ring-track: rgba(168, 212, 239, 0.22) !important;
 }
-html[data-preset="ocean"][data-section="evening"] .app-shell::after {
+html[data-preset="ocean"][data-visual-phase="evening"] .app-shell::after {
   background: linear-gradient(180deg, rgba(20, 60, 90, 0.08), rgba(8, 25, 45, 0.12)) !important;
 }
-html[data-preset="ocean"][data-section="evening"] .dhikr-card {
+html[data-preset="ocean"][data-visual-phase="evening"] .dhikr-card {
   background: rgba(21, 47, 70, 0.88) !important;
   backdrop-filter: blur(26px) saturate(130%);
   box-shadow: none !important;
 }
-html[data-preset="ocean"][data-section="evening"] .bottom-nav-row {
+html[data-preset="ocean"][data-visual-phase="evening"] .bottom-nav-row {
   backdrop-filter: blur(20px);
   box-shadow: 0 0 0 1px rgba(170, 214, 240, 0.14), 0 8px 28px rgba(120, 190, 240, 0.09) !important;
 }
-html[data-preset="ocean"][data-section="evening"] .adhkar-pagination-arrow {
+html[data-preset="ocean"][data-visual-phase="evening"] .adhkar-pagination-arrow {
   border-color: rgba(170, 214, 240, 0.42);
   background: rgba(230, 243, 251, 0.06);
   color: #bfdff2;
   backdrop-filter: blur(8px);
 }
-html[data-preset="ocean"][data-section="evening"] .adhkar-progress-track {
+html[data-preset="ocean"][data-visual-phase="evening"] .adhkar-progress-track {
   background: rgba(230, 243, 251, 0.18);
   box-shadow: none;
 }
-html[data-preset="ocean"][data-section="evening"] .adhkar-progress-value {
+html[data-preset="ocean"][data-visual-phase="evening"] .adhkar-progress-value {
   background: #6fb0d8;
   box-shadow: 0 1px 4px rgba(111, 176, 216, 0.4);
 }
-html[data-preset="ocean"][data-section="evening"] .adhkar-card-heading h3 { color: #a8d4ef !important; }
-html[data-preset="ocean"][data-section="evening"] .adhkar-card-heading button {
+html[data-preset="ocean"][data-visual-phase="evening"] .adhkar-card-heading h3 { color: #a8d4ef !important; }
+html[data-preset="ocean"][data-visual-phase="evening"] .adhkar-card-heading button {
   background: rgba(170, 214, 240, 0.2) !important;
   color: #e6f3fb !important;
   backdrop-filter: blur(8px);
 }
-html[data-preset="ocean"][data-section="evening"] .daily-swipe-stack .adhkar-index-row > span {
+html[data-preset="ocean"][data-visual-phase="evening"] .daily-swipe-stack .adhkar-index-row > span {
   border: none !important;
   background: rgba(14, 35, 55, 0.4) !important;
   color: #bfdff2 !important;
@@ -717,8 +717,8 @@ html[data-preset="ocean"][data-section="evening"] .daily-swipe-stack .adhkar-ind
 
 
 
-html[data-section="morning"] .app-shell { background: linear-gradient(180deg, #f5efe3 0%, #efe4d1 45%, #e6dccb 100%); }
-html[data-section="evening"] .app-shell { background: radial-gradient(circle at 85% 95%, rgba(214,130,90,0.28), transparent 45%), linear-gradient(180deg, #0e0f22 0%, #17163a 45%, #2b2242 80%, #3a2c46 100%); }
+html:is([data-section="morning"], [data-visual-phase="morning"]) .app-shell { background: linear-gradient(180deg, #f5efe3 0%, #efe4d1 45%, #e6dccb 100%); }
+html[data-visual-phase="evening"] .app-shell { background: radial-gradient(circle at 85% 95%, rgba(214,130,90,0.28), transparent 45%), linear-gradient(180deg, #0e0f22 0%, #17163a 45%, #2b2242 80%, #3a2c46 100%); }
 .app-background { background-position: center top; opacity: 0; }
 .app-background-morning { opacity: 1; }
 .app-shell.is-evening .app-background-morning { opacity: 0; }
@@ -758,8 +758,8 @@ html[data-section="evening"] .app-shell { background: radial-gradient(circle at 
   white-space: nowrap;
 }
 
-html[data-section="morning"] .adhkar-header .label-caps,
-html[data-section="morning"] .adhkar-header .app-page-title {
+html:is([data-section="morning"], [data-visual-phase="morning"]) .adhkar-header .label-caps,
+html:is([data-section="morning"], [data-visual-phase="morning"]) .adhkar-header .app-page-title {
   color: var(--preset-ink-strong);
 }
 
@@ -781,9 +781,9 @@ html[data-section="morning"] .adhkar-header .app-page-title {
   backdrop-filter: blur(8px);
 }
 
-html[data-section="evening"] .adhkar-progress-track { background: rgba(200, 190, 230, 0.3); }
+html[data-visual-phase="evening"] .adhkar-progress-track { background: rgba(200, 190, 230, 0.3); }
 .adhkar-progress-value { height: 100%; border-radius: inherit; background: color-mix(in oklab, var(--accent) 88%, transparent); box-shadow: 0 1px 3px color-mix(in oklab, var(--accent) 22%, transparent); transition: width 650ms cubic-bezier(.22, 1, .36, 1); }
-html[data-section="evening"] .adhkar-progress-value { background: #2c2a54; }
+html[data-visual-phase="evening"] .adhkar-progress-value { background: #2c2a54; }
 .daily-adhkar-page.scroll-area {
   margin-bottom: calc(114px + env(safe-area-inset-bottom));
   padding: 0;
@@ -806,14 +806,14 @@ html[data-section="evening"] .adhkar-progress-value { background: #2c2a54; }
   font-size: 12px;
   font-weight: 600;
 }
-html[data-section="evening"] .app-shell .settings-button {
+html[data-visual-phase="evening"] .app-shell .settings-button {
   border-color: rgba(255, 255, 255, 0.3) !important;
   background: rgba(255, 255, 255, 0.06) !important;
   color: rgba(255, 255, 255, 0.92) !important;
   box-shadow: none !important;
   backdrop-filter: blur(16px) !important;
 }
-html[data-section="evening"] .daily-swipe-stack .adhkar-index-row > span {
+html[data-visual-phase="evening"] .daily-swipe-stack .adhkar-index-row > span {
   border: none !important;
   background: rgba(82, 81, 96, 0.5) !important;
   color: rgba(224, 224, 224, 1) !important;
@@ -848,8 +848,8 @@ html[data-section="evening"] .daily-swipe-stack .adhkar-index-row > span {
   padding: 0;
 }
 .adhkar-card-heading h3 { color: var(--title) !important; font-family: var(--font-sans); font-size: 12px; font-weight: 500; line-height: 1.35; letter-spacing: 0.14em !important; }
-html[data-section="evening"] .adhkar-card-heading h3 { color: #cfc8e8 !important; }
-html[data-section="evening"] .adhkar-card-heading button { background: rgba(170,160,220,0.3) !important; color: #efeafe !important; }
+html[data-visual-phase="evening"] .adhkar-card-heading h3 { color: #cfc8e8 !important; }
+html[data-visual-phase="evening"] .adhkar-card-heading button { background: rgba(170,160,220,0.3) !important; color: #efeafe !important; }
 .listen-button-wrap { contain: layout; }
 .listen-status { left: calc(100% + 8px); top: 3px; height: 28px; display: inline-flex; align-items: center; }
 
@@ -1223,37 +1223,18 @@ html[data-preset][data-section="tasbih"] {
   }
 }
 
-/* After-Salah sheet — calm cream + olive, matching the adhkar cards */
+/* After-Salah sheet base; active preset and visual phase provide its palette. */
 .after-salah-panel {
-  --background: #f9f5f0;
-  --foreground: var(--preset-ink-strong);
-  --muted-foreground: #8a8f80;
-  --accent: var(--preset-ink);
-  --accent-foreground: #f9f5f0;
-  --card: #ffffff;
-  --card-foreground: var(--preset-ink-strong);
-  --translit: #7d8474;
-  --border: rgba(60, 84, 56, 0.1);
-  --source-bg: rgba(var(--preset-ink-rgb), 0.14);
-  --source-fg: #68775a;
-  --combo-card: #f2ede2;
-  --count-fg: var(--preset-ink);
-  --index-badge-bg: var(--preset-ink);
-  --index-badge-fg: #f9f5f0;
-  --dot-active: var(--preset-ink);
-  background: #f9f5f0;
-  color: var(--preset-ink-strong);
-  box-shadow: 0 -12px 40px rgba(28, 32, 24, 0.18);
+  color: var(--card-foreground);
 }
 
 .after-salah-panel .after-salah-title {
-  color: var(--preset-ink-strong);
+  color: var(--card-foreground);
 }
 
 .after-salah-panel .dhikr-card,
 .after-salah-panel .adhkar-reference-card {
-  box-shadow: 0 2px 10px rgba(60, 84, 56, 0.06);
-  border: 1px solid rgba(60, 84, 56, 0.08);
+  border: 1px solid var(--card-border, var(--border));
 }
 
 /* Smooth cross-phase color transition (morning <-> evening) */
@@ -1425,7 +1406,7 @@ html[data-preset="emerald"] {
   --eve-source-fg: #c7e8da;
 }
 
-html[data-preset="emerald"][data-section="morning"],
+html[data-preset="emerald"]:is([data-section="morning"], [data-visual-phase="morning"]),
 html[data-preset="emerald"][data-section="salah"],
 html[data-preset="emerald"][data-section="tasbih"],
 html[data-preset="emerald"][data-section="custom"],
@@ -1444,14 +1425,14 @@ html[data-preset="emerald"][data-section="default"] {
   --card-border: rgba(255, 255, 255, 0.72) !important;
 }
 
-html[data-preset="emerald"][data-section="morning"] .dhikr-card {
+html[data-preset="emerald"]:is([data-section="morning"], [data-visual-phase="morning"]) .dhikr-card {
   background: rgba(222, 235, 226, 0.94) !important;
   border-color: rgba(255, 255, 255, 0.76) !important;
   box-shadow: 0 12px 30px rgba(24, 79, 61, 0.1) !important;
   backdrop-filter: blur(20px) saturate(110%);
 }
 
-html[data-preset="emerald"][data-section="morning"] .bottom-nav-row,
+html[data-preset="emerald"]:is([data-section="morning"], [data-visual-phase="morning"]) .bottom-nav-row,
 html[data-preset="emerald"][data-section="salah"] .bottom-nav-row,
 html[data-preset="emerald"][data-section="tasbih"] .bottom-nav-row,
 html[data-preset="emerald"][data-section="default"] .bottom-nav-row {
@@ -1461,7 +1442,7 @@ html[data-preset="emerald"][data-section="default"] .bottom-nav-row {
   backdrop-filter: blur(20px);
 }
 
-html[data-preset="emerald"][data-section="morning"] .adhkar-pagination-arrow {
+html[data-preset="emerald"]:is([data-section="morning"], [data-visual-phase="morning"]) .adhkar-pagination-arrow {
   border-color: rgba(255, 255, 255, 0.8);
   background: rgba(222, 235, 226, 0.86);
   color: #245f49;
@@ -1499,7 +1480,7 @@ html[data-preset="emerald"][data-section="tasbih"] .tasbih-target.is-active {
   color: #ffffff;
 }
 
-html[data-preset="emerald"][data-section="evening"] {
+html[data-preset="emerald"][data-visual-phase="evening"] {
   --card: rgba(16, 55, 50, 0.9) !important;
   --surface-card: rgba(16, 55, 50, 0.9) !important;
   --card-foreground: #e9f7f1 !important;
@@ -1520,52 +1501,52 @@ html[data-preset="emerald"][data-section="evening"] {
   --ring-track: rgba(143, 209, 180, 0.22) !important;
 }
 
-html[data-preset="emerald"][data-section="evening"] .app-shell::after {
+html[data-preset="emerald"][data-visual-phase="evening"] .app-shell::after {
   background: linear-gradient(180deg, rgba(15, 80, 65, 0.05), rgba(3, 35, 31, 0.1)) !important;
 }
 
-html[data-preset="emerald"][data-section="evening"] .dhikr-card {
+html[data-preset="emerald"][data-visual-phase="evening"] .dhikr-card {
   background: rgba(16, 55, 50, 0.9) !important;
   border-color: rgba(155, 218, 190, 0.18) !important;
   box-shadow: 0 0 0 1px rgba(155, 218, 190, 0.06), 0 14px 34px rgba(0, 24, 21, 0.2) !important;
   backdrop-filter: blur(24px) saturate(125%);
 }
 
-html[data-preset="emerald"][data-section="evening"] .bottom-nav-row {
+html[data-preset="emerald"][data-visual-phase="evening"] .bottom-nav-row {
   background: rgba(18, 61, 56, 0.92) !important;
   border-color: rgba(155, 218, 190, 0.24) !important;
   box-shadow: 0 0 0 1px rgba(155, 218, 190, 0.08), 0 8px 28px rgba(58, 166, 125, 0.1) !important;
   backdrop-filter: blur(20px);
 }
 
-html[data-preset="emerald"][data-section="evening"] .adhkar-pagination-arrow {
+html[data-preset="emerald"][data-visual-phase="evening"] .adhkar-pagination-arrow {
   border-color: rgba(155, 218, 190, 0.38);
   background: rgba(224, 247, 237, 0.07);
   color: #c8eadb;
   backdrop-filter: blur(8px);
 }
 
-html[data-preset="emerald"][data-section="evening"] .adhkar-progress-track {
+html[data-preset="emerald"][data-visual-phase="evening"] .adhkar-progress-track {
   background: rgba(224, 247, 237, 0.16);
   box-shadow: none;
 }
 
-html[data-preset="emerald"][data-section="evening"] .adhkar-progress-value {
+html[data-preset="emerald"][data-visual-phase="evening"] .adhkar-progress-value {
   background: #62ac8b;
   box-shadow: 0 1px 4px rgba(98, 172, 139, 0.35);
 }
 
-html[data-preset="emerald"][data-section="evening"] .adhkar-card-heading h3 {
+html[data-preset="emerald"][data-visual-phase="evening"] .adhkar-card-heading h3 {
   color: #a9ddc6 !important;
 }
 
-html[data-preset="emerald"][data-section="evening"] .adhkar-card-heading button {
+html[data-preset="emerald"][data-visual-phase="evening"] .adhkar-card-heading button {
   background: rgba(155, 218, 190, 0.16) !important;
   color: #e9f7f1 !important;
   backdrop-filter: blur(8px);
 }
 
-html[data-preset="emerald"][data-section="evening"] .daily-swipe-stack .adhkar-index-row > span {
+html[data-preset="emerald"][data-visual-phase="evening"] .daily-swipe-stack .adhkar-index-row > span {
   border: none !important;
   background: rgba(4, 35, 31, 0.38) !important;
   color: #c8eadb !important;
@@ -1589,7 +1570,7 @@ html[data-preset="sand"] {
   --eve-source-fg: #f1d2a3;
 }
 
-html[data-preset="sand"][data-section="morning"],
+html[data-preset="sand"]:is([data-section="morning"], [data-visual-phase="morning"]),
 html[data-preset="sand"][data-section="salah"],
 html[data-preset="sand"][data-section="tasbih"],
 html[data-preset="sand"][data-section="custom"],
@@ -1608,7 +1589,7 @@ html[data-preset="sand"][data-section="default"] {
   --card-border: rgba(255, 255, 255, 0.68) !important;
 }
 
-html[data-preset="sand"][data-section="morning"] .dhikr-card,
+html[data-preset="sand"]:is([data-section="morning"], [data-visual-phase="morning"]) .dhikr-card,
 html[data-preset="sand"][data-section="salah"] .salah-location-card,
 html[data-preset="sand"][data-section="salah"] .salah-recommended-card,
 html[data-preset="sand"][data-section="salah"] .salah-adhan-card,
@@ -1619,7 +1600,7 @@ html[data-preset="sand"][data-section="tasbih"] .tasbih-card {
   box-shadow: 0 12px 30px rgba(98, 69, 31, 0.1) !important;
 }
 
-html[data-preset="sand"][data-section="morning"] .bottom-nav-row,
+html[data-preset="sand"]:is([data-section="morning"], [data-visual-phase="morning"]) .bottom-nav-row,
 html[data-preset="sand"][data-section="salah"] .bottom-nav-row,
 html[data-preset="sand"][data-section="tasbih"] .bottom-nav-row,
 html[data-preset="sand"][data-section="default"] .bottom-nav-row {
@@ -1629,7 +1610,7 @@ html[data-preset="sand"][data-section="default"] .bottom-nav-row {
   backdrop-filter: blur(20px);
 }
 
-html[data-preset="sand"][data-section="morning"] .adhkar-pagination-arrow {
+html[data-preset="sand"]:is([data-section="morning"], [data-visual-phase="morning"]) .adhkar-pagination-arrow {
   border-color: rgba(255, 255, 255, 0.72);
   background: rgba(242, 229, 207, 0.88);
   color: #694a24;
@@ -1652,7 +1633,7 @@ html[data-preset="sand"][data-section="tasbih"] .tasbih-target.is-active {
   color: #ffffff;
 }
 
-html[data-preset="sand"][data-section="evening"] {
+html[data-preset="sand"][data-visual-phase="evening"] {
   --card: rgba(67, 42, 25, 0.88) !important;
   --surface-card: rgba(67, 42, 25, 0.88) !important;
   --card-foreground: #fff0d8 !important;
@@ -1673,52 +1654,52 @@ html[data-preset="sand"][data-section="evening"] {
   --ring-track: rgba(229, 185, 113, 0.25) !important;
 }
 
-html[data-preset="sand"][data-section="evening"] .app-shell::after {
+html[data-preset="sand"][data-visual-phase="evening"] .app-shell::after {
   background: linear-gradient(180deg, rgba(107, 61, 24, 0.03), rgba(48, 25, 12, 0.08)) !important;
 }
 
-html[data-preset="sand"][data-section="evening"] .dhikr-card {
+html[data-preset="sand"][data-visual-phase="evening"] .dhikr-card {
   background: rgba(67, 42, 25, 0.88) !important;
   border-color: rgba(244, 199, 132, 0.2) !important;
   box-shadow: 0 0 0 1px rgba(244, 199, 132, 0.05), 0 14px 34px rgba(30, 15, 6, 0.2) !important;
   backdrop-filter: blur(24px) saturate(120%);
 }
 
-html[data-preset="sand"][data-section="evening"] .bottom-nav-row {
+html[data-preset="sand"][data-visual-phase="evening"] .bottom-nav-row {
   background: rgba(73, 47, 29, 0.9) !important;
   border-color: rgba(244, 199, 132, 0.24) !important;
   box-shadow: 0 0 0 1px rgba(244, 199, 132, 0.07), 0 8px 28px rgba(210, 137, 54, 0.1) !important;
   backdrop-filter: blur(20px);
 }
 
-html[data-preset="sand"][data-section="evening"] .adhkar-pagination-arrow {
+html[data-preset="sand"][data-visual-phase="evening"] .adhkar-pagination-arrow {
   border-color: rgba(244, 199, 132, 0.38);
   background: rgba(255, 235, 204, 0.08);
   color: #f4d2a0;
   backdrop-filter: blur(8px);
 }
 
-html[data-preset="sand"][data-section="evening"] .adhkar-progress-track {
+html[data-preset="sand"][data-visual-phase="evening"] .adhkar-progress-track {
   background: rgba(255, 235, 204, 0.22);
   box-shadow: none;
 }
 
-html[data-preset="sand"][data-section="evening"] .adhkar-progress-value {
+html[data-preset="sand"][data-visual-phase="evening"] .adhkar-progress-value {
   background: #e7aa55;
   box-shadow: 0 1px 4px rgba(231, 170, 85, 0.34);
 }
 
-html[data-preset="sand"][data-section="evening"] .adhkar-card-heading h3 {
+html[data-preset="sand"][data-visual-phase="evening"] .adhkar-card-heading h3 {
   color: #efc78f !important;
 }
 
-html[data-preset="sand"][data-section="evening"] .adhkar-card-heading button {
+html[data-preset="sand"][data-visual-phase="evening"] .adhkar-card-heading button {
   background: rgba(244, 199, 132, 0.16) !important;
   color: #fff0d8 !important;
   backdrop-filter: blur(8px);
 }
 
-html[data-preset="sand"][data-section="evening"] .daily-swipe-stack .adhkar-index-row > span {
+html[data-preset="sand"][data-visual-phase="evening"] .daily-swipe-stack .adhkar-index-row > span {
   border: none !important;
   background: rgba(43, 24, 12, 0.38) !important;
   color: #f4d2a0 !important;
@@ -1742,7 +1723,7 @@ html[data-preset="midnight"] {
   --eve-source-fg: #c5d6fa;
 }
 
-html[data-preset="midnight"][data-section="morning"],
+html[data-preset="midnight"]:is([data-section="morning"], [data-visual-phase="morning"]),
 html[data-preset="midnight"][data-section="salah"],
 html[data-preset="midnight"][data-section="tasbih"],
 html[data-preset="midnight"][data-section="custom"],
@@ -1798,7 +1779,7 @@ html[data-preset="midnight"][data-section="salah"] .salah-adhan-chevron {
   color: #b2c2e5 !important;
 }
 
-html[data-preset="midnight"][data-section="morning"] .dhikr-card,
+html[data-preset="midnight"]:is([data-section="morning"], [data-visual-phase="morning"]) .dhikr-card,
 html[data-preset="midnight"][data-section="salah"] .salah-location-card,
 html[data-preset="midnight"][data-section="salah"] .salah-recommended-card,
 html[data-preset="midnight"][data-section="salah"] .salah-adhan-card,
@@ -1810,7 +1791,7 @@ html[data-preset="midnight"][data-section="tasbih"] .tasbih-card {
   backdrop-filter: blur(24px) saturate(120%);
 }
 
-html[data-preset="midnight"][data-section="morning"] .bottom-nav-row,
+html[data-preset="midnight"]:is([data-section="morning"], [data-visual-phase="morning"]) .bottom-nav-row,
 html[data-preset="midnight"][data-section="salah"] .bottom-nav-row,
 html[data-preset="midnight"][data-section="tasbih"] .bottom-nav-row,
 html[data-preset="midnight"][data-section="default"] .bottom-nav-row {
@@ -1820,7 +1801,7 @@ html[data-preset="midnight"][data-section="default"] .bottom-nav-row {
   backdrop-filter: blur(22px);
 }
 
-html[data-preset="midnight"][data-section="morning"] .adhkar-pagination-arrow {
+html[data-preset="midnight"]:is([data-section="morning"], [data-visual-phase="morning"]) .adhkar-pagination-arrow {
   border-color: rgba(190, 208, 250, 0.4);
   background: rgba(205, 220, 255, 0.14);
   color: #e7eeff;
@@ -1843,7 +1824,7 @@ html[data-preset="midnight"][data-section="tasbih"] .tasbih-target.is-active {
   color: #ffffff;
 }
 
-html[data-preset="midnight"][data-section="evening"] {
+html[data-preset="midnight"][data-visual-phase="evening"] {
   --card: rgba(12, 35, 68, 0.9) !important;
   --surface-card: rgba(12, 35, 68, 0.9) !important;
   --card-foreground: #e8f0ff !important;
@@ -1864,52 +1845,52 @@ html[data-preset="midnight"][data-section="evening"] {
   --ring-track: rgba(126, 166, 239, 0.3) !important;
 }
 
-html[data-preset="midnight"][data-section="evening"] .app-shell::after {
+html[data-preset="midnight"][data-visual-phase="evening"] .app-shell::after {
   background: linear-gradient(180deg, rgba(16, 43, 86, 0.04), rgba(4, 19, 43, 0.1)) !important;
 }
 
-html[data-preset="midnight"][data-section="evening"] .dhikr-card {
+html[data-preset="midnight"][data-visual-phase="evening"] .dhikr-card {
   background: rgba(12, 35, 68, 0.9) !important;
   border-color: rgba(126, 166, 239, 0.28) !important;
   box-shadow: 0 0 0 1px rgba(126, 166, 239, 0.07), 0 14px 36px rgba(2, 13, 32, 0.25) !important;
   backdrop-filter: blur(25px) saturate(125%);
 }
 
-html[data-preset="midnight"][data-section="evening"] .bottom-nav-row {
+html[data-preset="midnight"][data-visual-phase="evening"] .bottom-nav-row {
   background: rgba(18, 43, 80, 0.92) !important;
   border-color: rgba(126, 166, 239, 0.36) !important;
   box-shadow: 0 0 0 1px rgba(126, 166, 239, 0.08), 0 8px 30px rgba(68, 113, 210, 0.12) !important;
   backdrop-filter: blur(22px);
 }
 
-html[data-preset="midnight"][data-section="evening"] .adhkar-pagination-arrow {
+html[data-preset="midnight"][data-visual-phase="evening"] .adhkar-pagination-arrow {
   border-color: rgba(126, 166, 239, 0.42);
   background: rgba(202, 219, 255, 0.1);
   color: #d5e1ff;
   backdrop-filter: blur(8px);
 }
 
-html[data-preset="midnight"][data-section="evening"] .adhkar-progress-track {
+html[data-preset="midnight"][data-visual-phase="evening"] .adhkar-progress-track {
   background: rgba(202, 219, 255, 0.2);
   box-shadow: none;
 }
 
-html[data-preset="midnight"][data-section="evening"] .adhkar-progress-value {
+html[data-preset="midnight"][data-visual-phase="evening"] .adhkar-progress-value {
   background: #668be2;
   box-shadow: 0 1px 4px rgba(102, 139, 226, 0.38);
 }
 
-html[data-preset="midnight"][data-section="evening"] .adhkar-card-heading h3 {
+html[data-preset="midnight"][data-visual-phase="evening"] .adhkar-card-heading h3 {
   color: #b5caff !important;
 }
 
-html[data-preset="midnight"][data-section="evening"] .adhkar-card-heading button {
+html[data-preset="midnight"][data-visual-phase="evening"] .adhkar-card-heading button {
   background: rgba(126, 166, 239, 0.2) !important;
   color: #ecf2ff !important;
   backdrop-filter: blur(8px);
 }
 
-html[data-preset="midnight"][data-section="evening"] .daily-swipe-stack .adhkar-index-row > span {
+html[data-preset="midnight"][data-visual-phase="evening"] .daily-swipe-stack .adhkar-index-row > span {
   border: none !important;
   background: rgba(5, 20, 47, 0.42) !important;
   color: #c9d9fb !important;
@@ -1918,14 +1899,142 @@ html[data-preset="midnight"][data-section="evening"] .daily-swipe-stack .adhkar-
 }
 
 /* The selected tab always follows its preset, never a section fallback color. */
-html[data-preset]:not([data-section="evening"]) {
+html[data-preset][data-visual-phase="morning"] {
   --nav-active: var(--preset-ink) !important;
 }
 
-html[data-preset="midnight"]:not([data-section="evening"]) {
+html[data-preset="midnight"][data-visual-phase="morning"] {
   --nav-active: #edf3ff !important;
 }
 
-html[data-preset][data-section="evening"] {
+html[data-preset][data-visual-phase="evening"] {
   --nav-active: var(--eve-nav-active) !important;
+}
+
+/* Whole-app visual phase: all screens share the chosen preset's day or night atmosphere. */
+html[data-visual-phase="evening"] {
+  --background: #0e0f22 !important;
+  --foreground: var(--eve-title) !important;
+  --title: var(--eve-title) !important;
+  --eyebrow: var(--eve-eyebrow) !important;
+  --accent: var(--eve-ink) !important;
+  --primary: var(--eve-ink) !important;
+  --card-foreground: var(--eve-title) !important;
+  --muted-foreground: var(--eve-muted) !important;
+  --nav-active: var(--eve-nav-active) !important;
+  --nav-inactive: var(--eve-nav-inactive) !important;
+  --btn-fg: var(--eve-title) !important;
+}
+html[data-visual-phase="evening"] .salah-page,
+html[data-visual-phase="evening"] .salah-next-label,
+html[data-visual-phase="evening"] .salah-countdown,
+html[data-visual-phase="evening"] .salah-dismiss,
+html[data-visual-phase="evening"] .salah-recommended-title,
+html[data-visual-phase="evening"] .salah-action-label,
+html[data-visual-phase="evening"] .salah-change,
+html[data-visual-phase="evening"] .salah-adhan-card,
+html[data-visual-phase="evening"] .salah-adhan-title,
+html[data-visual-phase="evening"] .tasbih-title,
+html[data-visual-phase="evening"] .tasbih-card,
+html[data-visual-phase="evening"] .tasbih-count,
+html[data-visual-phase="evening"] .tasbih-cycle,
+html[data-visual-phase="evening"] .tasbih-helper-primary,
+html[data-visual-phase="evening"] .tasbih-control {
+  color: var(--eve-title) !important;
+}
+html[data-visual-phase="evening"] .salah-location,
+html[data-visual-phase="evening"] .salah-recommended-progress,
+html[data-visual-phase="evening"] .salah-kicker,
+html[data-visual-phase="evening"] .salah-adhan-subtitle,
+html[data-visual-phase="evening"] .salah-adhan-chevron,
+html[data-visual-phase="evening"] .tasbih-eyebrow {
+  color: var(--eve-muted) !important;
+}
+html[data-visual-phase="evening"] .salah-recommended-card,
+html[data-visual-phase="evening"] .salah-adhan-card,
+html[data-visual-phase="evening"] .salah-location-card,
+html[data-visual-phase="evening"] .salah-upcoming-placeholder,
+html[data-visual-phase="evening"] .tasbih-card {
+  background: var(--card) !important;
+  border-color: var(--card-border) !important;
+  box-shadow: 0 12px 32px color-mix(in oklab, var(--background) 55%, transparent) !important;
+  backdrop-filter: blur(24px) saturate(120%);
+}
+html[data-visual-phase="evening"] .salah-change,
+html[data-visual-phase="evening"] .salah-dismiss,
+html[data-visual-phase="evening"] .salah-adhan-icon,
+html[data-visual-phase="evening"] .tasbih-target,
+html[data-visual-phase="evening"] .tasbih-control {
+  background: var(--pill-bg) !important;
+  border-color: var(--card-border) !important;
+}
+html[data-visual-phase="evening"] .bottom-nav-row {
+  background: var(--nav-bg) !important;
+  border-color: var(--nav-border) !important;
+}
+html[data-visual-phase="evening"] .tasbih-disc {
+  border-color: var(--card-border) !important;
+  background: radial-gradient(circle at 50% 34%, color-mix(in oklab, var(--card) 82%, var(--eve-ink)) 0%, var(--card) 72%, color-mix(in oklab, var(--card) 88%, var(--background)) 100%) !important;
+  box-shadow: 0 18px 40px color-mix(in oklab, var(--background) 55%, transparent), inset 0 2px 6px color-mix(in oklab, var(--eve-title) 12%, transparent) !important;
+}
+
+/* Prayer overlays inherit the active preset and phase instead of forcing olive. */
+.prayer-timeline-sheet,
+.after-salah-panel {
+  background: color-mix(in oklab, var(--card) 96%, var(--background)) !important;
+  color: var(--card-foreground) !important;
+  border: 1px solid var(--card-border, var(--border));
+  border-bottom: 0;
+  box-shadow: 0 -18px 46px color-mix(in oklab, var(--foreground) 16%, transparent);
+  --foreground: var(--card-foreground);
+  --muted-foreground: var(--text-muted);
+  --surface-card: color-mix(in oklab, var(--card) 90%, var(--background));
+}
+.prayer-timeline-sheet h2,
+.after-salah-panel .after-salah-title { color: var(--card-foreground) !important; }
+.prayer-timeline-sheet .prayer-timeline-row[data-state="next"] {
+  background: color-mix(in oklab, var(--accent) 10%, transparent);
+}
+.prayer-timeline-sheet .prayer-timeline-row[data-state="next"] .prayer-timeline-name,
+.prayer-timeline-sheet .prayer-timeline-row[data-state="next"] .prayer-timeline-time { color: var(--accent) !important; }
+.prayer-timeline-sheet .prayer-timeline-name { color: var(--card-foreground) !important; }
+.prayer-timeline-sheet .prayer-timeline-time { color: color-mix(in oklab, var(--card-foreground) 76%, transparent) !important; }
+.prayer-timeline-sheet .prayer-timeline-marker span { background: color-mix(in oklab, var(--card-foreground) 36%, transparent) !important; }
+.prayer-timeline-sheet .prayer-timeline-row[data-state="next"] .prayer-timeline-marker span { background: var(--accent) !important; }
+.prayer-timeline-sheet .prayer-timeline-list > span { background: color-mix(in oklab, var(--card-foreground) 18%, transparent) !important; }
+.prayer-timeline-sheet .inline-flex { background: color-mix(in oklab, var(--card-foreground) 7%, transparent) !important; color: var(--card-foreground) !important; box-shadow: none !important; }
+
+.after-salah-panel { overflow: hidden; }
+.after-salah-header { padding-top: 0; }
+.after-salah-prayers button { border: 1px solid color-mix(in oklab, var(--card-foreground) 5%, transparent); }
+.after-salah-stack .adhkar-index-row { min-height: 48px; align-items: center; padding-top: 3px; }
+.after-salah-stack .adhkar-index-row > span {
+  height: 30px;
+  padding: 0 17px;
+  border: 0 !important;
+  background: color-mix(in oklab, var(--accent) 10%, transparent) !important;
+  color: var(--accent) !important;
+  box-shadow: none !important;
+}
+.after-salah-stack .adhkar-card-stage { padding: 0 14px 12px; }
+.after-salah-stack .adhkar-reference-card {
+  border-radius: 22px;
+  border-color: color-mix(in oklab, var(--card-foreground) 7%, transparent) !important;
+  background: color-mix(in oklab, var(--card) 95%, var(--background)) !important;
+  box-shadow: 0 12px 34px color-mix(in oklab, var(--foreground) 10%, transparent) !important;
+}
+.after-salah-stack .adhkar-pagination-row { padding-bottom: 4px; }
+.after-salah-stack .adhkar-card-heading h3 { color: var(--accent) !important; }
+.after-salah-stack .adhkar-card-heading button { background: color-mix(in oklab, var(--accent) 16%, transparent) !important; color: var(--accent) !important; }
+.adhkar-commentary { margin-top: 18px; border-top: 1px solid color-mix(in oklab, var(--card-foreground) 9%, transparent); }
+.adhkar-commentary summary { padding: 14px 2px 6px; color: var(--accent); font-size: 12px; font-weight: 600; cursor: pointer; list-style: none; }
+.adhkar-commentary summary::before { content: "+"; display: inline-flex; width: 20px; height: 20px; margin-right: 8px; align-items: center; justify-content: center; border: 1px solid color-mix(in oklab, var(--accent) 34%, transparent); border-radius: 50%; }
+.adhkar-commentary[open] summary::before { content: "−"; }
+.adhkar-commentary p { margin: 3px 0 0; color: var(--text-muted); font-size: 13px; line-height: 1.55; }
+
+@media (max-height: 760px) {
+  .after-salah-panel { height: 94dvh !important; }
+  .after-salah-header { padding-inline: 20px; }
+  .after-salah-panel .after-salah-title { font-size: 23px !important; }
+  .after-salah-stack .adhkar-index-row { min-height: 40px; }
 }
