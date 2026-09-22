@@ -3,8 +3,8 @@ import { createFileRoute, Outlet, useRouterState } from "@tanstack/react-router"
 import { BottomNav } from "@/components/BottomNav";
 import { SettingsButton } from "@/components/SettingsButton";
 import { Onboarding, hasOnboarded } from "@/components/Onboarding";
-import morningBackground from "@/assets/morning-landscape.webp.asset.json";
-import eveningBackground from "@/assets/evening-landscape.webp.asset.json";
+import { backgroundsForPreset, DEFAULT_BACKGROUNDS } from "@/lib/backgrounds";
+import { getPresetId } from "@/lib/theme-store";
 
 export const Route = createFileRoute("/app")({
   component: AppLayout,
