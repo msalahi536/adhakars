@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { X } from "lucide-react";
 import { Portal } from "@/components/Portal";
-import { formatMinutes, type PrayerId, type Slot } from "@/lib/prayer-times";
+import { formatMinutes, type Slot } from "@/lib/prayer-times";
 
 type Props = {
   /** yesterday, today, tomorrow, day after, in order */
