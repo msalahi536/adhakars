@@ -4,7 +4,7 @@ import { BottomNav } from "@/components/BottomNav";
 import { SettingsButton } from "@/components/SettingsButton";
 import { Onboarding, hasOnboarded } from "@/components/Onboarding";
 import { WhatsNewDialog } from "@/components/WhatsNewDialog";
-import { backgroundsForPreset, DEFAULT_BACKGROUNDS } from "@/lib/backgrounds";
+import { backgroundsForPreset } from "@/lib/backgrounds";
 import { getPresetId, resetTheme, resolveVisualPhase, type VisualPhase } from "@/lib/theme-store";
 
 const UPDATE_WELCOME_KEY = "adhkar:update-welcome:2026-09";
@@ -16,12 +16,17 @@ export const Route = createFileRoute("/app")({
 function AppLayout() {
   const [showOnboarding, setShowOnboarding] = useState(false);
   const [showWhatsNew, setShowWhatsNew] = useState(false);
+  const [themeRevision, setThemeRevision] = useState(0);
   const pathname = useRouterState({ select: (state) => state.location.pathname });
+  
   const isAdhkar = ["/app", "/app/", "/app/evening"].includes(pathname);
   const isSettings = pathname.startsWith("/app/settings");
   const showSettings = !pathname.startsWith("/app/settings");
-  const [backgrounds, setBackgrounds] = useState(DEFAULT_BACKGROUNDS);
-  const [visualPhase, setVisualPhase] = useState<VisualPhase>(() => resolveVisualPhase(pathname));
+
+  // Derive phase and backgrounds directly during render to prevent transition flashes
+  const backgrounds = backgroundsForPreset(getPresetId());
+  const visualPhase = resolveVisualPhase(pathname);
+
   useEffect(() => {
     if (!hasOnboarded()) {
       setShowOnboarding(true);
@@ -37,24 +42,16 @@ function AppLayout() {
   }, []);
 
   useLayoutEffect(() => {
-    const sync = () => {
-      setBackgrounds(backgroundsForPreset(getPresetId()));
-      setVisualPhase(resolveVisualPhase(pathname));
-    };
-    const syncVisualPhase = (event: Event) => {
-      const detail = (event as CustomEvent<{ phase?: VisualPhase }>).detail;
-      setVisualPhase(detail?.phase ?? resolveVisualPhase(pathname));
-    };
-    sync();
+    const sync = () => setThemeRevision(r => r + 1);
     window.addEventListener("adhkar:theme-change", sync);
     window.addEventListener("storage", sync);
-    window.addEventListener("adhkar:visual-phase-change", syncVisualPhase);
+    window.addEventListener("adhkar:visual-phase-change", sync);
     return () => {
       window.removeEventListener("adhkar:theme-change", sync);
       window.removeEventListener("storage", sync);
-      window.removeEventListener("adhkar:visual-phase-change", syncVisualPhase);
+      window.removeEventListener("adhkar:visual-phase-change", sync);
     };
-  }, [pathname]);
+  }, []);
 
   // Lock the viewport while inside /app so .scroll-area handles scrolling.
   useEffect(() => {
@@ -70,20 +67,16 @@ function AppLayout() {
 
   return (
     <div className={`app-shell ${visualPhase === "evening" ? "is-evening" : ""} ${isAdhkar ? "is-adhkar" : ""} ${isSettings ? "is-settings" : ""}`}>
-      {!isSettings && (
-        <>
-          <div
-            className="app-background app-background-morning"
-            style={{ "--screen-background": `url(${backgrounds.morning})` } as React.CSSProperties}
-            aria-hidden="true"
-          />
-          <div
-            className="app-background app-background-evening"
-            style={{ "--screen-background": `url(${backgrounds.evening})` } as React.CSSProperties}
-            aria-hidden="true"
-          />
-        </>
-      )}
+      <div
+        className="app-background app-background-morning"
+        style={{ "--screen-background": `url(${backgrounds.morning})` } as React.CSSProperties}
+        aria-hidden="true"
+      />
+      <div
+        className="app-background app-background-evening"
+        style={{ "--screen-background": `url(${backgrounds.evening})` } as React.CSSProperties}
+        aria-hidden="true"
+      />
       <div className="app-content-frame">
         {showSettings && <SettingsButton />}
         <Outlet />
@@ -94,4 +87,3 @@ function AppLayout() {
     </div>
   );
 }
-
