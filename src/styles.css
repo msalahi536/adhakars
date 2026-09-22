@@ -496,6 +496,10 @@ html[data-preset="rose"][data-section="default"] {
 html[data-preset][data-visual-phase="evening"] {
   --background: #0e0f22 !important; --foreground: var(--eve-title) !important; --title: var(--eve-title) !important; --eyebrow: var(--eve-eyebrow) !important; --accent: var(--eve-ink) !important; --card: #222539 !important; --card-foreground: #efeafe !important; --surface-card: #222539 !important; --border: rgba(255,255,255,0.09) !important; --card-border: rgba(255,255,255,0.09) !important; --translit: var(--eve-ink) !important; --text-muted: var(--eve-muted) !important; --pill-bg: rgba(255,255,255,0.08) !important; --source-bg: rgba(255,255,255,0.08) !important; --source-fg: var(--eve-source-fg) !important; --ring-track: rgba(var(--eve-ink-rgb),0.22) !important; --nav-bg: #292d43 !important; --nav-border: rgba(255,255,255,0.14) !important; --nav-active: var(--eve-nav-active) !important; --nav-inactive: var(--eve-nav-inactive) !important; --dot-active: var(--eve-ink) !important; --dot-inactive: rgba(var(--eve-ink-rgb),0.3) !important; --index-badge-bg: rgba(255,255,255,0.08) !important; --index-badge-fg: var(--eve-title) !important; --count-fg: var(--eve-source-fg) !important;
 }
+html[data-preset="ocean"][data-visual-phase="evening"] {
+  --nav-bg: rgba(25, 55, 80, 0.9) !important;
+  --nav-border: rgba(170, 214, 240, 0.26) !important;
+}
 /* Rose evening: translucent mauve glass card/nav, sky shows through, calm pink glow */
 html[data-preset="rose"][data-visual-phase="evening"] {
   --card: rgba(124, 73, 86, 0.86) !important;
@@ -1972,6 +1976,11 @@ html[data-visual-phase="evening"] .bottom-nav-row {
   background: var(--nav-bg) !important;
   border-color: var(--nav-border) !important;
 }
+
+/* Prayer sheets sit below the floating navigation in the app stacking context. */
+.app-shell > [data-overlay="after-salah"],
+.app-shell > [data-overlay="prayer-timeline"] { z-index: 90 !important; }
+.app-shell > .bottom-nav { z-index: 100 !important; }
 html[data-visual-phase="evening"] .tasbih-disc {
   border-color: var(--card-border) !important;
   background: radial-gradient(circle at 50% 34%, color-mix(in oklab, var(--card) 82%, var(--eve-ink)) 0%, var(--card) 72%, color-mix(in oklab, var(--card) 88%, var(--background)) 100%) !important;
