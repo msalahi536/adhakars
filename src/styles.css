@@ -212,6 +212,7 @@
     padding-top: env(safe-area-inset-top);
     padding-bottom: env(safe-area-inset-bottom);
     background-color: var(--background);
+    transition: background-color 400ms ease;
   }
   .app-content-frame {
     position: relative;
@@ -229,7 +230,7 @@
     background-position: center top;
     background-size: cover;
     opacity: 0;
-    transition: opacity 750ms ease-in-out;
+    transition: opacity 400ms ease-in-out;
     pointer-events: none;
   }
   .app-background-morning {
