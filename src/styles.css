@@ -264,7 +264,7 @@
   .bottom-nav {
     position: fixed;
     inset-inline: 28px;
-    bottom: calc(30px + env(safe-area-inset-bottom));
+    bottom: calc(34px + env(safe-area-inset-bottom));
     width: auto;
     height: var(--bottom-nav-row);
     min-height: var(--bottom-nav-row);
