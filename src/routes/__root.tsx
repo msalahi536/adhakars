@@ -71,6 +71,8 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "description", content: "Personal daily Islamic adhkar and tasbih." },
       { name: "theme-color", content: "#1f3d2b" },
       { name: "apple-mobile-web-app-capable", content: "yes" },
+      { name: "apple-mobile-web-app-title", content: "Sahih Al-Adhkar" },
+      { name: "application-name", content: "Sahih Al-Adhkar" },
       { name: "apple-mobile-web-app-status-bar-style", content: "black-translucent" },
       { property: "og:title", content: "Sahih Al-Adhkar" },
       { name: "twitter:title", content: "Sahih Al-Adhkar" },

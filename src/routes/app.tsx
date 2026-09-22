@@ -70,20 +70,16 @@ function AppLayout() {
 
   return (
     <div className={`app-shell ${visualPhase === "evening" ? "is-evening" : ""} ${isAdhkar ? "is-adhkar" : ""} ${isSettings ? "is-settings" : ""}`}>
-      {!isSettings && (
-        <>
-          <div
-            className="app-background app-background-morning"
-            style={{ "--screen-background": `url(${backgrounds.morning})` } as React.CSSProperties}
-            aria-hidden="true"
-          />
-          <div
-            className="app-background app-background-evening"
-            style={{ "--screen-background": `url(${backgrounds.evening})` } as React.CSSProperties}
-            aria-hidden="true"
-          />
-        </>
-      )}
+      <div
+        className="app-background app-background-morning"
+        style={{ "--screen-background": `url(${backgrounds.morning})` } as React.CSSProperties}
+        aria-hidden="true"
+      />
+      <div
+        className="app-background app-background-evening"
+        style={{ "--screen-background": `url(${backgrounds.evening})` } as React.CSSProperties}
+        aria-hidden="true"
+      />
       <div className="app-content-frame">
         {showSettings && <SettingsButton />}
         <Outlet />

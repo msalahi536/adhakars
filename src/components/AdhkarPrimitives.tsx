@@ -1,4 +1,3 @@
-import { useRef, useState } from "react";
 import { BookOpen, Check, ChevronLeft, ChevronRight } from "lucide-react";
 import { ProgressRing } from "./ProgressRing";
 import { triggerHaptic } from "@/lib/theme";
@@ -109,32 +108,6 @@ export function Pagination({
   onNext: () => void;
   onScrub: (index: number) => void;
 }) {
-  const scrubbing = useRef(false);
-  const lastIndex = useRef(active);
-  const [isScrubbing, setIsScrubbing] = useState(false);
-
-  const indexFromPointer = (clientX: number, element: HTMLElement) => {
-    const rect = element.getBoundingClientRect();
-    const ratio = Math.max(0, Math.min(0.999, (clientX - rect.left) / rect.width));
-    return Math.min(total - 1, Math.floor(ratio * total));
-  };
-
-  const updateScrub = (clientX: number, element: HTMLElement) => {
-    const next = indexFromPointer(clientX, element);
-    if (next === lastIndex.current) return;
-    lastIndex.current = next;
-    onScrub(next);
-    void triggerHaptic("light");
-  };
-
-  const stopScrub = (event: React.PointerEvent<HTMLDivElement>) => {
-    if (scrubbing.current && event.currentTarget.hasPointerCapture(event.pointerId)) {
-      event.currentTarget.releasePointerCapture(event.pointerId);
-    }
-    scrubbing.current = false;
-    setIsScrubbing(false);
-  };
-
   return (
     <div className="adhkar-pagination-row">
       <button
@@ -150,38 +123,33 @@ export function Pagination({
         <ChevronLeft size={14} strokeWidth={1.8} />
       </button>
       <div
-        className={`adhkar-pagination ${isScrubbing ? "is-scrubbing" : ""}`}
+        className="adhkar-pagination"
         data-no-swipe
         onContextMenu={(event) => event.preventDefault()}
-        onPointerDown={(event) => {
-          lastIndex.current = active;
-          const element = event.currentTarget;
-          scrubbing.current = true;
-          setIsScrubbing(true);
-          element.setPointerCapture(event.pointerId);
-          updateScrub(event.clientX, element);
-        }}
-        onPointerMove={(event) => {
-          if (!scrubbing.current) return;
-          updateScrub(event.clientX, event.currentTarget);
-        }}
-        onPointerUp={stopScrub}
-        onPointerCancel={stopScrub}
-        onPointerLeave={(event) => {
-          if (scrubbing.current && event.buttons === 0) stopScrub(event);
-        }}
       >
-        {Array.from({ length: total }, (_, index) => (
-          <button
-            key={index}
-            type="button"
-            onClick={(event) => {
-              if (event.detail === 0) onSelect(index);
-            }}
-            className={index === active ? "is-active" : ""}
-            aria-label={`go to ${index + 1}`}
-          />
-        ))}
+        <div className="adhkar-pagination-dots" aria-hidden="true">
+          {Array.from({ length: total }, (_, index) => (
+            <span key={index} className={index === active ? "is-active" : ""} />
+          ))}
+        </div>
+        <input
+          className="adhkar-pagination-slider"
+          type="range"
+          min={0}
+          max={Math.max(0, total - 1)}
+          step={1}
+          value={active}
+          aria-label={`Adhkar ${active + 1} of ${total}`}
+          onChange={(event) => {
+            const next = Number(event.currentTarget.value);
+            onScrub(next);
+            void triggerHaptic("light");
+          }}
+          onClick={(event) => {
+            const next = Number(event.currentTarget.value);
+            if (next !== active) onSelect(next);
+          }}
+        />
       </div>
       <button
         type="button"
