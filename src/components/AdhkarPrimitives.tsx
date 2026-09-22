@@ -71,10 +71,7 @@ export function RepeatCounter({ count, target, complete, tapped, bursts, justCom
         {complete ? (
           <Check className="adhkar-complete-check" size={30} strokeWidth={1.8} />
         ) : (
-          <>
-            <span className="adhkar-counter-value">{count}</span>
-            <span className="adhkar-counter-target">/ {target}</span>
-          </>
+          <span className="adhkar-counter-value">{count}</span>
         )}
       </span>
       {bursts.map((burst) => (
