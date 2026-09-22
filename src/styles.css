@@ -1399,3 +1399,10 @@ html[data-preset="ocean"][data-section="default"] .bottom-nav-row {
 html[data-preset="ocean"][data-section="tasbih"] .tasbih-card {
   background: #def0f4;
 }
+html[data-preset="ocean"][data-section="tasbih"] .tasbih-disc {
+  border-color: #eaf5f8;
+  background: radial-gradient(circle at 50% 35%, #f7fcfd 0%, #e9f4f7 70%, #dcecf1 100%);
+}
+html[data-preset="ocean"][data-section="tasbih"] .tasbih-target {
+  background: rgba(222, 240, 244, 0.9);
+}
