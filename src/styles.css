@@ -1431,6 +1431,7 @@ html[data-preset="emerald"][data-section="wake"],
 html[data-preset="emerald"][data-section="default"] {
   --card: #deebe2 !important;
   --surface-card: #deebe2 !important;
+  --surface: #deebe2 !important;
   --card-foreground: #23483b !important;
   --nav-bg: #d4e6da !important;
   --nav-border: rgba(23, 79, 61, 0.1) !important;
@@ -1488,6 +1489,12 @@ html[data-preset="emerald"][data-section="tasbih"] .tasbih-disc {
 html[data-preset="emerald"][data-section="tasbih"] .tasbih-target {
   background: rgba(222, 235, 226, 0.9);
   border-color: rgba(255, 255, 255, 0.72);
+}
+
+html[data-preset="emerald"][data-section="tasbih"] .tasbih-target.is-active {
+  background: #357c62;
+  border-color: transparent;
+  color: #ffffff;
 }
 
 html[data-preset="emerald"][data-section="evening"] {
