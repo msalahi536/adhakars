@@ -235,6 +235,43 @@
   .app-background-morning {
     opacity: 1;
   }
+
+  .calibration-phone {
+    position: absolute;
+    left: 0;
+    top: 0;
+    display: flex;
+    width: 38px;
+    height: 38px;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid var(--accent-foreground);
+    border-radius: 11px;
+    background: var(--accent);
+    color: var(--accent-foreground);
+    box-shadow: 0 6px 16px color-mix(in oklab, var(--foreground) 18%, transparent);
+    offset-path: path("M143 87 C88 16 31 31 31 87 C31 143 88 158 143 87 C198 16 255 31 255 87 C255 143 198 158 143 87");
+    offset-rotate: 0deg;
+    animation: calibration-figure-eight 4.8s linear infinite;
+  }
+  .calibration-phone.is-complete {
+    left: calc(50% - 19px);
+    top: calc(50% - 19px);
+    animation: none;
+  }
+
+  @keyframes calibration-figure-eight {
+    from { offset-distance: 0%; }
+    to { offset-distance: 100%; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .calibration-phone {
+      left: calc(50% - 19px);
+      top: calc(50% - 19px);
+      animation: none;
+    }
+  }
   .app-shell.is-evening .app-background-morning {
     opacity: 0;
   }
@@ -1914,6 +1951,32 @@ html[data-preset="midnight"] {
   --eve-nav-inactive: #8da1ca;
   --eve-muted: #91a6cf;
   --eve-source-fg: #c5d6fa;
+  --background: #17294f;
+  --foreground: #dce7ff;
+  --surface: #243b6b;
+  --card: #2b406f;
+  --card-2: #2b406f;
+  --card-foreground: #e8efff;
+  --muted: #263d69;
+  --muted-foreground: #b2c2e5;
+  --primary: #91aff5;
+  --primary-foreground: #102044;
+  --accent: #91aff5;
+  --accent-foreground: #102044;
+  --border: rgba(169, 193, 247, 0.24);
+  --nav-safe-area-bg: #17294f;
+  --btn-surface: rgba(205, 220, 255, 0.13);
+  --btn-fg: #dce7ff;
+  --arrow-bg: rgba(205, 220, 255, 0.13);
+  --arrow-fg: #dce7ff;
+  --source-bg: rgba(205, 220, 255, 0.12);
+  --source-fg: #d2dfff;
+  --index-badge-bg: rgba(205, 220, 255, 0.14);
+  --index-badge-fg: #eaf1ff;
+  --ring-track: rgba(145, 175, 245, 0.3);
+  --dot-active: #b9cdff;
+  --dot-inactive: rgba(145, 175, 245, 0.38);
+  --count-fg: #d6e2ff;
 }
 
 html[data-preset="midnight"]:is([data-section="morning"], [data-visual-phase="morning"]),
@@ -1927,7 +1990,9 @@ html[data-preset="midnight"][data-section="default"] {
   --title: #edf3ff !important;
   --eyebrow: #c8d7f7 !important;
   --accent: #91aff5 !important;
+  --accent-foreground: #102044 !important;
   --primary: #91aff5 !important;
+  --primary-foreground: #102044 !important;
   --card: rgba(43, 64, 111, 0.88) !important;
   --surface-card: rgba(43, 64, 111, 0.88) !important;
   --surface: rgba(43, 64, 111, 0.88) !important;
@@ -1936,6 +2001,7 @@ html[data-preset="midnight"][data-section="default"] {
   --card-border: rgba(169, 193, 247, 0.24) !important;
   --translit: #b7ccff !important;
   --text-muted: #b2c2e5 !important;
+  --muted: #263d69 !important;
   --muted-foreground: #b2c2e5 !important;
   --pill-bg: rgba(205, 220, 255, 0.11) !important;
   --source-bg: rgba(205, 220, 255, 0.12) !important;

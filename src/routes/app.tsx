@@ -3,8 +3,11 @@ import { createFileRoute, Outlet, useRouterState } from "@tanstack/react-router"
 import { BottomNav } from "@/components/BottomNav";
 import { SettingsButton } from "@/components/SettingsButton";
 import { Onboarding, hasOnboarded } from "@/components/Onboarding";
+import { WhatsNewDialog } from "@/components/WhatsNewDialog";
 import { backgroundsForPreset, DEFAULT_BACKGROUNDS } from "@/lib/backgrounds";
-import { getPresetId, resolveVisualPhase, type VisualPhase } from "@/lib/theme-store";
+import { getPresetId, resetTheme, resolveVisualPhase, type VisualPhase } from "@/lib/theme-store";
+
+const UPDATE_WELCOME_KEY = "adhkar:update-welcome:2026-09";
 
 export const Route = createFileRoute("/app")({
   component: AppLayout,
@@ -12,6 +15,7 @@ export const Route = createFileRoute("/app")({
 
 function AppLayout() {
   const [showOnboarding, setShowOnboarding] = useState(false);
+  const [showWhatsNew, setShowWhatsNew] = useState(false);
   const pathname = useRouterState({ select: (state) => state.location.pathname });
   const isAdhkar = ["/app", "/app/", "/app/evening"].includes(pathname);
   const isSettings = pathname.startsWith("/app/settings");
@@ -19,7 +23,17 @@ function AppLayout() {
   const [backgrounds, setBackgrounds] = useState(DEFAULT_BACKGROUNDS);
   const [visualPhase, setVisualPhase] = useState<VisualPhase>(() => resolveVisualPhase(pathname));
   useEffect(() => {
-    if (!hasOnboarded()) setShowOnboarding(true);
+    if (!hasOnboarded()) {
+      setShowOnboarding(true);
+      window.localStorage.setItem(UPDATE_WELCOME_KEY, "seen");
+      return;
+    }
+    if (window.localStorage.getItem(UPDATE_WELCOME_KEY) !== "seen") {
+      resetTheme();
+      window.localStorage.setItem(UPDATE_WELCOME_KEY, "seen");
+      window.dispatchEvent(new Event("adhkar:theme-change"));
+      setShowWhatsNew(true);
+    }
   }, []);
 
   useLayoutEffect(() => {
@@ -76,6 +90,7 @@ function AppLayout() {
       </div>
       <BottomNav />
       {showOnboarding && <Onboarding onDone={() => setShowOnboarding(false)} />}
+      <WhatsNewDialog open={showWhatsNew} onClose={() => setShowWhatsNew(false)} />
     </div>
   );
 }
