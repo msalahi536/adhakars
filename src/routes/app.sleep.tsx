@@ -25,11 +25,7 @@ export const Route = createFileRoute("/app/sleep")({
 const MODE_KEY = "sleepMode";
 
 function Sleep() {
-  const [mode, setModeState] = useState<SleepMode>(() => {
-    if (typeof window === "undefined") return "sleep";
-    const v = window.localStorage.getItem(MODE_KEY);
-    return v === "wake" ? "wake" : "sleep";
-  });
+  const [mode, setModeState] = useState<SleepMode>("sleep");
   const setMode = (m: SleepMode) => {
     if (typeof window !== "undefined") window.localStorage.setItem(MODE_KEY, m);
     setModeState(m);
@@ -42,6 +38,11 @@ function Sleep() {
   const storageKey = mode === "sleep" ? "sleep" : "wake";
   const [counts, setCounts] = useState<Record<string, number>>({});
   const completed = items.filter((i) => isItemComplete(i, counts)).length;
+
+  useEffect(() => {
+    const savedMode = window.localStorage.getItem(MODE_KEY);
+    if (savedMode === "wake") setModeState("wake");
+  }, []);
 
   useEffect(() => {
     setCounts(getCounts(storageKey));
