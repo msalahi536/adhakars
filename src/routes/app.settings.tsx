@@ -23,7 +23,7 @@ import {
 import { deriveSectionSeed, sectionSeedFor, type SectionKey, type CustomOverrides } from "@/lib/theming";
 import { backgroundsForPreset, PRESET_BACKGROUNDS } from "@/lib/backgrounds";
 import { ThemePicker } from "@/components/theme/ThemePicker";
-import { CustomThemeSheet } from "@/components/theme/CustomThemeSheet";
+import { SuggestColorSheet } from "@/components/theme/SuggestColorSheet";
 import {
   resetToday,
   resetAllProgress,
@@ -69,7 +69,7 @@ function Settings() {
   const [overrides, setOverridesState] = useState<Partial<Record<SectionKey, string>>>({});
   const [showAdvanced, setShowAdvanced] = useState(false);
   const [pickerOpen, setPickerOpen] = useState<null | { target: SectionKey; seed: string }>(null);
-  const [customSheetOpen, setCustomSheetOpen] = useState(false);
+  const [suggestOpen, setSuggestOpen] = useState(false);
   const [triplet, setTripletState] = useState<CustomOverrides>({});
   const [display, setDisplayState] = useState(getDisplay());
   const [confirmReset, setConfirmReset] = useState(false);
@@ -250,15 +250,6 @@ function Settings() {
     window.dispatchEvent(new Event("adhkar:theme-change"));
   };
 
-  const applyCustomTriplet = (t: CustomOverrides, nextSeed: string) => {
-    setPresetIdState("custom");
-    setPresetId("custom");
-    setSeedState(nextSeed);
-    setSeed(nextSeed);
-    setTripletState(t);
-    setCustomTriplet(t);
-    window.dispatchEvent(new Event("adhkar:theme-change"));
-  };
 
   const applySectionOverride = (section: SectionKey, hex: string) => {
     const next = { ...overrides, [section]: hex };
@@ -439,25 +430,27 @@ function Settings() {
                 );
               })}
               <button
-                onClick={() => setCustomSheetOpen(true)}
+                onClick={() => setSuggestOpen(true)}
                 className="flex flex-col items-center justify-center gap-1 rounded-2xl p-2 transition"
                 style={{
                   background: "var(--surface)",
-                  border: presetId === "custom" ? "2px solid var(--accent)" : "1px dashed var(--border)",
+                  border: "1px dashed var(--border)",
                 }}
               >
                 <div
+                  className="flex items-center justify-center text-lg font-semibold"
                   style={{
                     width: "100%",
                     height: 40,
                     borderRadius: 10,
-                    background:
-                      presetId === "custom" && (triplet.header || triplet.background || triplet.accent)
-                        ? `linear-gradient(135deg, ${triplet.header ?? seed} 0%, ${triplet.accent ?? seed} 100%)`
-                        : "conic-gradient(from 0deg, #ff3b3b, #ffb03b, #f8ff3b, #7dff3b, #3bffcf, #3ba7ff, #7d3bff, #ff3bd0, #ff3b3b)",
+                    background: "var(--muted)",
+                    color: "var(--foreground)",
+                    opacity: 0.8,
                   }}
-                />
-                <span className="text-[10px] font-semibold">Custom</span>
+                >
+                  +
+                </div>
+                <span className="text-[10px] font-semibold">Suggest</span>
               </button>
             </div>
 
@@ -536,16 +529,7 @@ function Settings() {
             }}
           />
 
-          <CustomThemeSheet
-            open={customSheetOpen}
-            initial={{ seed, triplet }}
-            mode={previewMode}
-            onClose={() => setCustomSheetOpen(false)}
-            onApply={({ header, background, accent, seed: nextSeed }) => {
-              applyCustomTriplet({ header, background, accent }, nextSeed);
-              setCustomSheetOpen(false);
-            }}
-          />
+          <SuggestColorSheet open={suggestOpen} onClose={() => setSuggestOpen(false)} />
 
 
 

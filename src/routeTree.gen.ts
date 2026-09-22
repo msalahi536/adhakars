@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as TermsRouteImport } from './routes/terms'
+import { Route as SuggestionsRouteImport } from './routes/suggestions'
 import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as DownloadRouteImport } from './routes/download'
 import { Route as AppRouteImport } from './routes/app'
@@ -31,6 +32,11 @@ import { Route as AppAboutRouteImport } from './routes/app.about'
 const TermsRoute = TermsRouteImport.update({
   id: '/terms',
   path: '/terms',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SuggestionsRoute = SuggestionsRouteImport.update({
+  id: '/suggestions',
+  path: '/suggestions',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PrivacyRoute = PrivacyRouteImport.update({
@@ -125,6 +131,7 @@ export interface FileRoutesByFullPath {
   '/app': typeof AppRouteWithChildren
   '/download': typeof DownloadRoute
   '/privacy': typeof PrivacyRoute
+  '/suggestions': typeof SuggestionsRoute
   '/terms': typeof TermsRoute
   '/app/about': typeof AppAboutRoute
   '/app/evening': typeof AppEveningRoute
@@ -144,6 +151,7 @@ export interface FileRoutesByTo {
   '/about': typeof AboutRoute
   '/download': typeof DownloadRoute
   '/privacy': typeof PrivacyRoute
+  '/suggestions': typeof SuggestionsRoute
   '/terms': typeof TermsRoute
   '/app/about': typeof AppAboutRoute
   '/app/evening': typeof AppEveningRoute
@@ -165,6 +173,7 @@ export interface FileRoutesById {
   '/app': typeof AppRouteWithChildren
   '/download': typeof DownloadRoute
   '/privacy': typeof PrivacyRoute
+  '/suggestions': typeof SuggestionsRoute
   '/terms': typeof TermsRoute
   '/app/about': typeof AppAboutRoute
   '/app/evening': typeof AppEveningRoute
@@ -187,6 +196,7 @@ export interface FileRouteTypes {
     | '/app'
     | '/download'
     | '/privacy'
+    | '/suggestions'
     | '/terms'
     | '/app/about'
     | '/app/evening'
@@ -206,6 +216,7 @@ export interface FileRouteTypes {
     | '/about'
     | '/download'
     | '/privacy'
+    | '/suggestions'
     | '/terms'
     | '/app/about'
     | '/app/evening'
@@ -226,6 +237,7 @@ export interface FileRouteTypes {
     | '/app'
     | '/download'
     | '/privacy'
+    | '/suggestions'
     | '/terms'
     | '/app/about'
     | '/app/evening'
@@ -247,6 +259,7 @@ export interface RootRouteChildren {
   AppRoute: typeof AppRouteWithChildren
   DownloadRoute: typeof DownloadRoute
   PrivacyRoute: typeof PrivacyRoute
+  SuggestionsRoute: typeof SuggestionsRoute
   TermsRoute: typeof TermsRoute
 }
 
@@ -257,6 +270,13 @@ declare module '@tanstack/react-router' {
       path: '/terms'
       fullPath: '/terms'
       preLoaderRoute: typeof TermsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/suggestions': {
+      id: '/suggestions'
+      path: '/suggestions'
+      fullPath: '/suggestions'
+      preLoaderRoute: typeof SuggestionsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/privacy': {
@@ -419,6 +439,7 @@ const rootRouteChildren: RootRouteChildren = {
   AppRoute: AppRouteWithChildren,
   DownloadRoute: DownloadRoute,
   PrivacyRoute: PrivacyRoute,
+  SuggestionsRoute: SuggestionsRoute,
   TermsRoute: TermsRoute,
 }
 export const routeTree = rootRouteImport
