@@ -34,16 +34,20 @@ function AppLayout() {
 
   return (
     <div className={`app-shell ${isEvening ? "is-evening" : ""} ${isAdhkar ? "is-adhkar" : ""}`}>
-      <div
-        className="app-background app-background-morning"
-        style={{ "--screen-background": `url(${morningBackground.url})` } as React.CSSProperties}
-        aria-hidden="true"
-      />
-      <div
-        className="app-background app-background-evening"
-        style={{ "--screen-background": `url(${eveningBackground.url})` } as React.CSSProperties}
-        aria-hidden="true"
-      />
+      {isAdhkar && (
+        <>
+          <div
+            className="app-background app-background-morning"
+            style={{ "--screen-background": `url(${morningBackground.url})` } as React.CSSProperties}
+            aria-hidden="true"
+          />
+          <div
+            className="app-background app-background-evening"
+            style={{ "--screen-background": `url(${eveningBackground.url})` } as React.CSSProperties}
+            aria-hidden="true"
+          />
+        </>
+      )}
       {showSettings && <SettingsButton />}
       <Outlet />
       <BottomNav />
