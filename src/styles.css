@@ -521,9 +521,10 @@ html[data-section="evening"] .app-shell .settings-button {
   backdrop-filter: blur(16px) !important;
 }
 html[data-section="evening"] .daily-swipe-stack .adhkar-index-row > span {
-  border-color: rgba(255, 255, 255, 0.14) !important;
-  background: rgba(235, 231, 247, 0.9) !important;
-  color: #2c2a54;
+  border: none !important;
+  background: rgba(82, 81, 96, 0.5) !important;
+  color: rgba(224, 224, 224, 1) !important;
+  box-shadow: none !important;
 }
 .daily-swipe-stack .adhkar-index-row > button { position: absolute; right: 20px; }
 
