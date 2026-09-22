@@ -1,8 +1,9 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { RotateCcw, Undo2 } from "lucide-react";
 import { triggerHaptic } from "@/lib/theme";
 import { bumpLifetime } from "@/lib/storage";
+import { ProgressRing } from "@/components/ProgressRing";
 
 export const Route = createFileRoute("/app/tasbih")({
   head: () => ({ meta: [{ title: "Tasbih, Sahih Al-Adhkar" }] }),
@@ -20,7 +21,7 @@ function Tasbih() {
   const [toast, setToast] = useState<string | null>(null);
   const [pressed, setPressed] = useState(false);
   const [tapped, setTapped] = useState(false);
-  const resetTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const [confirmReset, setConfirmReset] = useState(false);
 
   useEffect(() => {
     try {
