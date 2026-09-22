@@ -447,6 +447,15 @@ html[data-preset="ocean"] {
 html[data-preset][data-section="morning"] {
   --background: #f5efe3 !important; --foreground: var(--preset-ink) !important; --title: var(--preset-ink) !important; --eyebrow: var(--preset-ink) !important; --accent: var(--preset-ink) !important; --primary: var(--preset-ink) !important; --card: #f9f5f0 !important; --card-foreground: #2a2a2a !important; --surface-card: #f9f5f0 !important; --border: rgba(255, 255, 255, 0.8) !important; --translit: var(--preset-ink) !important; --text-muted: var(--preset-muted) !important; --source-bg: rgba(233, 233, 222, 0.9) !important; --source-fg: var(--preset-ink) !important; --ring-track: rgba(var(--preset-ink-rgb), 0.18) !important; --nav-bg: #fdfcf4 !important; --nav-active: var(--preset-ink) !important; --nav-inactive: var(--preset-muted) !important; --dot-active: var(--preset-ink) !important; --dot-inactive: rgba(var(--preset-ink-rgb), 0.4) !important; --index-badge-bg: var(--preset-ink) !important; --index-badge-fg: #fff !important; --count-fg: var(--preset-ink) !important; --btn-fg: var(--preset-ink) !important; --arrow-fg: var(--preset-ink) !important;
 }
+/* Rose morning: blush card/nav/arrows, deeper pink source pill */
+html[data-preset="rose"][data-section="morning"] {
+  --card: #f9e8e6 !important;
+  --surface-card: #f9e8e6 !important;
+  --nav-bg: #f9e8e6 !important;
+  --pill-bg: #f9e8e6 !important;
+  --source-bg: #efd6d3 !important;
+  --source-fg: #8a4356 !important;
+}
 html[data-preset][data-section="evening"] {
   --background: #0e0f22 !important; --foreground: var(--eve-title) !important; --title: var(--eve-title) !important; --eyebrow: var(--eve-eyebrow) !important; --accent: var(--eve-ink) !important; --card: #222539 !important; --card-foreground: #efeafe !important; --surface-card: #222539 !important; --border: rgba(255,255,255,0.09) !important; --card-border: rgba(255,255,255,0.09) !important; --translit: var(--eve-ink) !important; --text-muted: var(--eve-muted) !important; --pill-bg: rgba(255,255,255,0.08) !important; --source-bg: rgba(255,255,255,0.08) !important; --source-fg: var(--eve-source-fg) !important; --ring-track: rgba(var(--eve-ink-rgb),0.22) !important; --nav-bg: #292d43 !important; --nav-border: rgba(255,255,255,0.14) !important; --nav-active: var(--eve-nav-active) !important; --nav-inactive: var(--eve-nav-inactive) !important; --dot-active: var(--eve-ink) !important; --dot-inactive: rgba(var(--eve-ink-rgb),0.3) !important; --index-badge-bg: rgba(255,255,255,0.08) !important; --index-badge-fg: var(--eve-title) !important; --count-fg: var(--eve-source-fg) !important;
 }
