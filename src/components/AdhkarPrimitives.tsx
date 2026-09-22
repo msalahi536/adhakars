@@ -184,6 +184,17 @@ export function Pagination({
           />
         ))}
       </div>
+      <button
+        type="button"
+        className="adhkar-pagination-arrow"
+        onClick={() => {
+          onNext();
+          void triggerHaptic("light");
+        }}
+        aria-label="next"
+      >
+        <ChevronRight size={14} strokeWidth={1.8} />
+      </button>
     </div>
   );
 }
