@@ -140,6 +140,7 @@ export function Pagination({
       <button
         type="button"
         className="adhkar-pagination-arrow"
+        data-no-swipe
         onClick={() => {
           onPrevious();
           void triggerHaptic("light");
@@ -150,6 +151,7 @@ export function Pagination({
       </button>
       <div
         className={`adhkar-pagination ${isScrubbing ? "is-scrubbing" : ""}`}
+        data-no-swipe
         onContextMenu={(event) => event.preventDefault()}
         onPointerDown={(event) => {
           lastIndex.current = active;
@@ -184,6 +186,7 @@ export function Pagination({
       <button
         type="button"
         className="adhkar-pagination-arrow"
+        data-no-swipe
         onClick={() => {
           onNext();
           void triggerHaptic("light");
