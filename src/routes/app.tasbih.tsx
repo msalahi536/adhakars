@@ -6,7 +6,16 @@ import { bumpLifetime } from "@/lib/storage";
 import { ProgressRing } from "@/components/ProgressRing";
 
 export const Route = createFileRoute("/app/tasbih")({
-  head: () => ({ meta: [{ title: "Tasbih, Sahih Al-Adhkar" }] }),
+  head: () => ({
+    meta: [
+      { title: "Tasbih, Sahih Al-Adhkar" },
+      { name: "description", content: "A calm digital tasbih with selectable remembrance goals." },
+      { property: "og:title", content: "Tasbih, Sahih Al-Adhkar" },
+      { property: "og:description", content: "A calm digital tasbih with selectable remembrance goals." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
+    ],
+  }),
   component: Tasbih,
 });
 

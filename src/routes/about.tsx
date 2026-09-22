@@ -56,6 +56,8 @@ export const Route = createFileRoute("/about")({
         property: "og:description",
         content: "The intention, the sources, and the promise behind the project.",
       },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
     ],
   }),
   component: AboutPage,

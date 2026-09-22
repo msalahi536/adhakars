@@ -15,6 +15,8 @@ export const Route = createFileRoute("/privacy")({
         property: "og:description",
         content: "No data collection. No tracking. Everything stays on your device.",
       },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
     ],
   }),
   component: PrivacyPage,

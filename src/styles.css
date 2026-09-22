@@ -286,7 +286,7 @@
     justify-content: space-around;
     overflow: hidden;
     border: 1px solid;
-    border-radius: 14px;
+    border-radius: 16px;
     background: color-mix(in oklab, var(--nav-bg) 84%, transparent);
     box-shadow: 0 12px 34px color-mix(in oklab, var(--foreground) 10%, transparent);
     backdrop-filter: blur(24px);
@@ -990,7 +990,14 @@ html[data-visual-phase="evening"] .adhkar-card-heading button { background: rgba
 .salah-adhan-subtitle { margin-top: 2px; overflow: hidden; color: #6b6f64; font-size: 13px; font-weight: 400; line-height: 15px; text-overflow: ellipsis; white-space: nowrap; }
 .salah-adhan-chevron { flex: 0 0 auto; color: #9aa094; }
 html[data-section="salah"] .bottom-nav { inset-inline: 28px; bottom: calc(34px + env(safe-area-inset-bottom)); height: var(--bottom-nav-row); min-height: var(--bottom-nav-row); }
-html[data-section="salah"] .bottom-nav-row { height: var(--bottom-nav-row); border-color: rgba(255,255,255,0.9); border-radius: 14px; background: rgba(255,255,255,0.9); box-shadow: 0 6px 24px rgba(0,0,0,0.12); backdrop-filter: blur(20px); }
+html[data-section="salah"] .bottom-nav-row { height: var(--bottom-nav-row); border-color: rgba(255,255,255,0.9); border-radius: 16px; background: rgba(255,255,255,0.9); box-shadow: 0 6px 24px rgba(0,0,0,0.12); backdrop-filter: blur(20px); }
+
+.app-shell.is-settings {
+  background: var(--background);
+}
+.app-shell.is-settings::after {
+  background: transparent;
+}
 html[data-section="salah"] .nav-item { gap: 4px; font-family: var(--font-sans); }
 html[data-section="salah"] .nav-active-mark { bottom: 2px; width: 16px; height: 2px; }
 html[data-section="salah"] .app-shell { background: linear-gradient(180deg, #f5efe3 0%, #efe8da 45%, #e7e2d2 100%); }

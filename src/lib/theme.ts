@@ -8,15 +8,12 @@ import {
   type ModeSetting,
 } from "./theme-store";
 
-// Legacy type re-export. The old "auto" | "classic" is remapped:
-// classic -> light. Existing callers keep working.
+// Legacy type re-export retained for compatibility.
 export type ThemeMode = ModeSetting;
 export type ThemeId = "light" | "dark";
 
 export const themes: { id: ThemeMode; name: string; description: string }[] = [
-  { id: "light", name: "Light", description: "Bright surfaces" },
-  { id: "dark",  name: "Dark",  description: "Deep, easy on the eyes" },
-  { id: "auto",  name: "Auto",  description: "Follows device appearance" },
+  { id: "light", name: "Page-based", description: "Morning and evening follow their pages" },
 ];
 
 export const getMode = (): ThemeMode => {

@@ -18,6 +18,10 @@ export const Route = createFileRoute("/app/more")({
     meta: [
       { title: "More, Sahih Al-Adhkar" },
       { name: "description", content: "Sleep & Wake adhkar, Qibla finder and more tools." },
+      { property: "og:title", content: "More, Sahih Al-Adhkar" },
+      { property: "og:description", content: "Sleep and wake adhkar, Qibla finder, and more tools." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
     ],
   }),
   component: More,

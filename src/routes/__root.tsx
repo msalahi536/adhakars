@@ -128,16 +128,12 @@ function RootComponent() {
     applyThemeForRoute(pathname);
   }, [pathname]);
 
-  // Re-apply when preferences or prayer-time boundaries change.
+  // Re-apply when the selected color preset changes.
   useEffect(() => {
     const reapply = () => applyThemeForRoute(window.location.pathname);
     window.addEventListener("adhkar:theme-change", reapply);
-    window.addEventListener("adhkar:prayer-settings", reapply);
-    const timer = window.setInterval(reapply, 30_000);
     return () => {
       window.removeEventListener("adhkar:theme-change", reapply);
-      window.removeEventListener("adhkar:prayer-settings", reapply);
-      window.clearInterval(timer);
     };
   }, []);
 
