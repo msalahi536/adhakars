@@ -279,7 +279,7 @@
   .bottom-nav {
     position: fixed;
     inset-inline: 28px;
-    bottom: calc(34px + env(safe-area-inset-bottom));
+    bottom: calc(16px + env(safe-area-inset-bottom));
     width: auto;
     height: var(--bottom-nav-row);
     min-height: var(--bottom-nav-row);
@@ -347,7 +347,7 @@
 }
 
 .settings-button {
-  top: calc(env(safe-area-inset-top) + 84px);
+  top: calc(env(safe-area-inset-top) + 50px);
   right: 24px;
   width: 36px;
   height: 36px;
@@ -749,14 +749,14 @@ html[data-visual-phase="evening"] .app-shell .app-background-evening { opacity: 
 .app-shell::after { background: transparent; }
 
 .adhkar-header {
-  min-height: 182px;
+  min-height: 152px;
   padding-inline: 20px;
   overflow: visible;
 }
 
 .adhkar-header-content {
   max-width: 390px;
-  padding: calc(env(safe-area-inset-top) + 82px) 52px 0;
+  padding: calc(env(safe-area-inset-top) + 48px) 52px 0;
 }
 
 .adhkar-header .label-caps {
@@ -988,7 +988,7 @@ html[data-visual-phase="evening"] .adhkar-card-heading button { background: rgba
   color: #2f4f34;
   font-family: var(--font-display);
 }
-.salah-hero { position: relative; height: 220px; flex: 0 0 220px; text-align: center; }
+.salah-hero { position: relative; height: calc(220px + env(safe-area-inset-top)); flex: 0 0 auto; padding-top: env(safe-area-inset-top); box-sizing: border-box; text-align: center; }
 .salah-next-label { position: absolute; top: 53px; inset-inline: 70px; color: #3f5a3c; font-size: 18px; font-weight: 500; line-height: 22px; }
 .salah-countdown { position: absolute; top: 79px; inset-inline: 24px; color: #2f4f34; font-size: 52px; font-weight: 500; line-height: 52px; letter-spacing: 0; font-variant-numeric: tabular-nums; transition: color 400ms ease; }
 .salah-dismiss { position: absolute; top: 147px; left: 50%; display: inline-flex; height: 32px; align-items: center; justify-content: center; padding: 0 22px; transform: translateX(-50%); border: 1px solid rgba(255, 255, 255, 0.8); border-radius: 999px; background: rgba(233, 233, 222, 0.9); color: #2f4f34; font-size: 15px; font-weight: 500; line-height: 1; white-space: nowrap; backdrop-filter: blur(20px); }
@@ -1040,7 +1040,7 @@ html[data-visual-phase="evening"] .adhkar-card-heading button { background: rgba
 .salah-adhan-title { color: #2f4f34; font-size: 16px; font-weight: 500; line-height: 18px; }
 .salah-adhan-subtitle { margin-top: 2px; overflow: hidden; color: #6b6f64; font-size: 13px; font-weight: 400; line-height: 15px; text-overflow: ellipsis; white-space: nowrap; }
 .salah-adhan-chevron { flex: 0 0 auto; color: #9aa094; }
-html[data-section="salah"] .bottom-nav { inset-inline: 28px; bottom: calc(34px + env(safe-area-inset-bottom)); height: var(--bottom-nav-row); min-height: var(--bottom-nav-row); }
+html[data-section="salah"] .bottom-nav { inset-inline: 28px; bottom: calc(16px + env(safe-area-inset-bottom)); height: var(--bottom-nav-row); min-height: var(--bottom-nav-row); }
 html[data-section="salah"] .bottom-nav-row { height: var(--bottom-nav-row); border-color: rgba(255,255,255,0.9); border-radius: 16px; background: rgba(255,255,255,0.9); box-shadow: 0 6px 24px rgba(0,0,0,0.12); backdrop-filter: blur(20px); }
 
 .app-shell.is-settings {
@@ -1080,8 +1080,8 @@ html[data-section="tasbih"] {
 html[data-preset][data-section="tasbih"] {
   --accent-foreground: #ffffff !important;
 }
-.tasbih-header { position: relative; z-index: 1; height: 238px; flex: 0 0 238px; padding-top: env(safe-area-inset-top); text-align: center; }
-.tasbih-header-inner { width: 100%; max-width: 390px; margin: 0 auto; padding-top: 78px; }
+.tasbih-header { position: relative; z-index: 1; height: calc(238px + env(safe-area-inset-top)); flex: 0 0 auto; box-sizing: border-box; padding-top: env(safe-area-inset-top); text-align: center; }
+.tasbih-header-inner { width: 100%; max-width: 390px; margin: 0 auto; padding-top: 62px; }
 .tasbih-eyebrow { color: #5f7a5a; font-family: var(--font-sans); font-size: 12px; font-weight: 500; line-height: 1; letter-spacing: 0.2em; text-transform: uppercase; }
 .tasbih-title { margin-top: 8px; color: #2f4f34; font-family: var(--font-display); font-size: 32px; font-weight: 500; line-height: 1.1; }
 .tasbih-targets { display: flex; gap: 10px; margin: 22px 28px 0; }
@@ -1159,10 +1159,10 @@ html[data-preset][data-section="tasbih"] {
   }
   .settings-button svg { width: 20px; height: 20px; }
 
-  .adhkar-header { min-height: 172px; }
+  .adhkar-header { min-height: 150px; }
   .adhkar-header-content {
     max-width: 430px;
-    padding-top: calc(env(safe-area-inset-top) + 70px);
+    padding-top: calc(env(safe-area-inset-top) + 52px);
   }
   .adhkar-header .label-caps { font-size: 10px; }
   .adhkar-header .app-page-title { margin-top: 8px; font-size: 31px; }
@@ -1190,7 +1190,7 @@ html[data-preset][data-section="tasbih"] {
   .qibla-page { padding-inline: 24px; }
   .qibla-compass { width: min(76vw, 318px); }
 
-  .salah-hero { height: 232px; flex-basis: 232px; }
+  .salah-hero { height: calc(232px + env(safe-area-inset-top)); flex-basis: auto; }
   .salah-next-label { top: 55px; font-size: 19px; }
   .salah-countdown { top: 82px; font-size: 56px; line-height: 56px; }
   .salah-dismiss { top: 153px; height: 36px; font-size: 16px; }
@@ -1208,8 +1208,8 @@ html[data-preset][data-section="tasbih"] {
   .salah-upcoming-placeholder { height: 250px !important; }
   .salah-adhan-card { height: 66px; }
 
-  .tasbih-header { height: 246px; flex-basis: 246px; }
-  .tasbih-header-inner { max-width: 430px; padding-top: 82px; }
+  .tasbih-header { height: calc(246px + env(safe-area-inset-top)); flex-basis: auto; }
+  .tasbih-header-inner { max-width: 430px; padding-top: 66px; }
   .tasbih-eyebrow { font-size: 13px; }
   .tasbih-title { font-size: 35px; }
   .tasbih-targets { margin-inline: 20px; }
@@ -1226,15 +1226,15 @@ html[data-preset][data-section="tasbih"] {
 
 /* Shorter visible areas (browser chrome, compact phones) trade header height for content. */
 @media (max-height: 800px) {
-  .adhkar-header { min-height: 150px !important; }
-  .adhkar-header-content { padding-top: calc(env(safe-area-inset-top) + 54px) !important; }
+  .adhkar-header { min-height: 132px !important; }
+  .adhkar-header-content { padding-top: calc(env(safe-area-inset-top) + 40px) !important; }
   .adhkar-header .app-page-title { margin-top: 6px !important; font-size: 28px !important; }
   .adhkar-arabic { font-size: 23px !important; }
   .adhkar-arabic.is-large { font-size: 28px !important; }
   .adhkar-repeat-counter { width: 78px !important; height: 78px !important; }
   .adhkar-counter-value { font-size: 32px !important; }
 
-  .salah-hero { height: 198px !important; flex-basis: 198px !important; }
+  .salah-hero { height: calc(198px + env(safe-area-inset-top)) !important; flex-basis: auto !important; }
   .salah-next-label { top: 44px !important; font-size: 18px !important; }
   .salah-countdown { top: 68px !important; font-size: 46px !important; line-height: 46px !important; }
   .salah-dismiss { top: 128px !important; height: 34px !important; font-size: 15px !important; }
@@ -1251,8 +1251,8 @@ html[data-preset][data-section="tasbih"] {
   .salah-upcoming-placeholder { height: 100% !important; min-height: 0 !important; }
   .salah-adhan-card { height: 62px !important; }
 
-  .tasbih-header { height: 206px !important; flex-basis: 206px !important; }
-  .tasbih-header-inner { padding-top: 62px !important; }
+  .tasbih-header { height: calc(206px + env(safe-area-inset-top)) !important; flex-basis: auto !important; }
+  .tasbih-header-inner { padding-top: 48px !important; }
   .tasbih-title { font-size: 31px !important; }
   .tasbih-disc { top: 70px !important; width: 252px !important; height: 252px !important; }
   .tasbih-ring svg { width: 252px !important; height: 252px !important; }
