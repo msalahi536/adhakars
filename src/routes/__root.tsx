@@ -132,8 +132,10 @@ function RootComponent() {
   useEffect(() => {
     const reapply = () => applyThemeForRoute(window.location.pathname);
     window.addEventListener("adhkar:theme-change", reapply);
+    window.addEventListener("adhkar:visual-phase-change", reapply);
     return () => {
       window.removeEventListener("adhkar:theme-change", reapply);
+      window.removeEventListener("adhkar:visual-phase-change", reapply);
     };
   }, []);
 

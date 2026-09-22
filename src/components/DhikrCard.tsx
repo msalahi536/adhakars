@@ -57,7 +57,7 @@ export function DhikrCard({ dhikr, count, onIncrement, isSpecial, specialLabel, 
     onIncrement();
   };
 
-  const arabicSize = 24;
+  const arabicSize = display.arabicLarge ? 30 : 24;
 
   const hasTranslation = !!(dhikr.translation || dhikr.arabicMulti);
   const hasCommentary = !!dhikr.commentary;
@@ -100,8 +100,8 @@ export function DhikrCard({ dhikr, count, onIncrement, isSpecial, specialLabel, 
               {dhikr.arabicMulti.map((part) => (
                 <div key={part.label}>
                   <div className="label-caps mb-1.5 text-center">{part.label}</div>
-                    <ArabicText size={arabicSize}>{part.arabic}</ArabicText>
-                   {part.transliteration && (
+                    <ArabicText size={arabicSize} large={display.arabicLarge}>{part.arabic}</ArabicText>
+                   {display.showTransliteration && part.transliteration && (
                      <p className="adhkar-transliteration">
                       {part.transliteration}
                     </p>
@@ -117,10 +117,10 @@ export function DhikrCard({ dhikr, count, onIncrement, isSpecial, specialLabel, 
           ) : (
             <>
               {dhikr.arabic && (
-                <ArabicText size={arabicSize}>{dhikr.arabic}</ArabicText>
+                <ArabicText size={arabicSize} large={display.arabicLarge}>{dhikr.arabic}</ArabicText>
               )}
-              {dhikr.arabic && dhikr.transliteration && <OrnamentalDivider />}
-               {dhikr.transliteration && (
+              {dhikr.arabic && (dhikr.translation || (display.showTransliteration && dhikr.transliteration)) && <OrnamentalDivider />}
+               {display.showTransliteration && dhikr.transliteration && (
                 <Transliteration>{dhikr.transliteration}</Transliteration>
               )}
                {dhikr.translation && <p className="adhkar-translation">{dhikr.translation}</p>}

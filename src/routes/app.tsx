@@ -17,7 +17,7 @@ function AppLayout() {
   const isSettings = pathname.startsWith("/app/settings");
   const showSettings = !pathname.startsWith("/app/settings");
   const [backgrounds, setBackgrounds] = useState(DEFAULT_BACKGROUNDS);
-  const visualPhase: VisualPhase = resolveVisualPhase(pathname);
+  const [visualPhase, setVisualPhase] = useState<VisualPhase>(() => resolveVisualPhase(pathname));
   useEffect(() => {
     if (!hasOnboarded()) setShowOnboarding(true);
   }, []);
@@ -25,15 +25,18 @@ function AppLayout() {
   useLayoutEffect(() => {
     const sync = () => {
       setBackgrounds(backgroundsForPreset(getPresetId()));
+      setVisualPhase(resolveVisualPhase(pathname));
     };
     sync();
     window.addEventListener("adhkar:theme-change", sync);
     window.addEventListener("storage", sync);
+    window.addEventListener("adhkar:visual-phase-change", sync);
     return () => {
       window.removeEventListener("adhkar:theme-change", sync);
       window.removeEventListener("storage", sync);
+      window.removeEventListener("adhkar:visual-phase-change", sync);
     };
-  }, []);
+  }, [pathname]);
 
   // Lock the viewport while inside /app so .scroll-area handles scrolling.
   useEffect(() => {

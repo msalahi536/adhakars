@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import type { ComboDhikr } from "@/data/salah";
-import { triggerHaptic } from "@/lib/theme";
+import { getDisplay, triggerHaptic } from "@/lib/theme";
 
 type Props = {
   combo: ComboDhikr;
@@ -12,12 +12,19 @@ type Props = {
 
 export function TasbeehComboCard({ combo, counts, onIncrement, index, total }: Props) {
   const [showBottomFade, setShowBottomFade] = useState(true);
+  const [display, setDisplay] = useState(getDisplay());
   const scrollRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (scrollRef.current) scrollRef.current.scrollTop = 0;
     setShowBottomFade(true);
   }, [combo.id]);
+
+  useEffect(() => {
+    const syncDisplay = () => setDisplay(getDisplay());
+    window.addEventListener("adhkar:display-update", syncDisplay);
+    return () => window.removeEventListener("adhkar:display-update", syncDisplay);
+  }, []);
 
   const handleScroll = () => {
     const el = scrollRef.current;
@@ -77,16 +84,16 @@ export function TasbeehComboCard({ combo, counts, onIncrement, index, total }: P
                 <div className="px-1">
                   <p
                     className="arabic font-bold"
-                    style={{ fontSize: 24, lineHeight: 1.7, color: "var(--card-foreground)" }}
+                    style={{ fontSize: display.arabicLarge ? 30 : 24, lineHeight: 1.7, color: "var(--card-foreground)" }}
                   >
                     {part.arabic}
                   </p>
-                  <p
+                  {display.showTransliteration && <p
                     className="mt-1 text-center italic"
                     style={{ fontSize: 12, color: "var(--translit)" }}
                   >
                     {part.transliteration}
-                  </p>
+                  </p>}
                   <div className="mt-3 flex items-center gap-3">
                     <div
                       className="h-2 flex-1 overflow-hidden rounded-full"

@@ -20,6 +20,7 @@ type Props = {
   emptyState?: React.ReactNode;
   onEditItem?: (id: string) => void;
   onDeleteItem?: (id: string) => void;
+  dailyLayout?: boolean;
 };
 
 export function AdhkarPage({
@@ -36,6 +37,7 @@ export function AdhkarPage({
   emptyState,
   onEditItem,
   onDeleteItem,
+  dailyLayout: dailyLayoutProp,
 }: Props) {
   const [counts, setCounts] = useState<Record<string, number>>({});
 
@@ -57,7 +59,7 @@ export function AdhkarPage({
     bumpLifetime(lifetimeCategory, next - prev);
   };
 
-  const dailyLayout = storageKey === "morning" || storageKey === "evening";
+  const dailyLayout = dailyLayoutProp ?? ["morning", "evening", "sleep", "wake", "custom_adhkar"].includes(storageKey);
 
   return (
     <>

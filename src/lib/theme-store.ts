@@ -55,6 +55,9 @@ export const setModeSetting = (_m: ModeSetting) => removeLS(K_LEGACY_MODE);
 export const resolveVisualPhase = (
   pathname = typeof window !== "undefined" ? window.location.pathname : "/app",
 ): VisualPhase => {
+  if (pathname.startsWith("/app/sleep")) {
+    return readLS("sleepMode") === "wake" ? "morning" : "evening";
+  }
   return pathname.startsWith("/app/evening") ? "evening" : "morning";
 };
 
@@ -139,7 +142,7 @@ export const resetTheme = () => {
 
 export const PRE_PAINT_SCRIPT = `(function(){try{
 var p=location.pathname;
-var phase=p.indexOf('/app/evening')===0?'evening':'morning';
+var phase=p.indexOf('/app/evening')===0||(p.indexOf('/app/sleep')===0&&localStorage.getItem('sleepMode')!=='wake')?'evening':'morning';
 var mode=phase==='evening'?'dark':'light';
 var section=(p==='/app'||p==='/app/')?'morning':(p.indexOf('/app/evening')===0?'evening':(p.indexOf('/app/salah')===0?'salah':(p.indexOf('/app/tasbih')===0?'tasbih':'default')));
 document.documentElement.setAttribute('data-theme-mode',mode);
