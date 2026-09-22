@@ -953,3 +953,18 @@ html[data-preset][data-section="tasbih"] {
     transition-duration: 0ms;
   }
 }
+
+/* Unify nav bar on salah/tasbih with the light morning style */
+html[data-section="salah"],
+html[data-section="tasbih"] {
+  --nav-bg: #fdfcf4 !important;
+  --nav-border: rgba(45, 31, 0, 0.08) !important;
+  --nav-active: #70815d !important;
+  --nav-inactive: #6b6f64 !important;
+}
+html[data-section="salah"] .bottom-nav-row,
+html[data-section="tasbih"] .bottom-nav-row {
+  background: #fdfcf4;
+  border-color: rgba(45, 31, 0, 0.08);
+}
+html[data-section="salah"] .app-shell { background: transparent; }
