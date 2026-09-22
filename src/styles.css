@@ -443,10 +443,43 @@ html[data-preset="ocean"] {
   --eve-ink: #8ec2e6; --eve-ink-rgb: 142, 194, 230; --eve-title: #e4f1fb; --eve-eyebrow: #9dbcd4;
   --eve-nav-active: #bcdcf5; --eve-nav-inactive: #98b2c6; --eve-muted: #7e94a6; --eve-source-fg: #c6dced;
 }
-
-html[data-preset][data-section="morning"] {
-  --background: #f5efe3 !important; --foreground: var(--preset-ink) !important; --title: var(--preset-ink) !important; --eyebrow: var(--preset-ink) !important; --accent: var(--preset-ink) !important; --primary: var(--preset-ink) !important; --card: #f9f5f0 !important; --card-foreground: #2a2a2a !important; --surface-card: #f9f5f0 !important; --border: rgba(255, 255, 255, 0.8) !important; --translit: var(--preset-ink) !important; --text-muted: var(--preset-muted) !important; --source-bg: rgba(233, 233, 222, 0.9) !important; --source-fg: var(--preset-ink) !important; --ring-track: rgba(var(--preset-ink-rgb), 0.18) !important; --nav-bg: #fdfcf4 !important; --nav-active: var(--preset-ink) !important; --nav-inactive: var(--preset-muted) !important; --dot-active: var(--preset-ink) !important; --dot-inactive: rgba(var(--preset-ink-rgb), 0.4) !important; --index-badge-bg: var(--preset-ink) !important; --index-badge-fg: #fff !important; --count-fg: var(--preset-ink) !important; --btn-fg: var(--preset-ink) !important; --arrow-fg: var(--preset-ink) !important;
+html[data-preset="emerald"] {
+  --preset-ink: #3f8a6c; --preset-ink-strong: #275c47; --preset-ink-rgb: 63, 138, 108;
+  --preset-muted: #5f7469;
+  --eve-ink: #8fd6b6; --eve-ink-rgb: 143, 214, 182; --eve-title: #e4f7ee; --eve-eyebrow: #9cc7b4;
+  --eve-nav-active: #bdeed8; --eve-nav-inactive: #97b8aa; --eve-muted: #7e9c8e; --eve-source-fg: #c8e8da;
 }
+html[data-preset="sand"] {
+  --preset-ink: #a17a44; --preset-ink-strong: #6f5128; --preset-ink-rgb: 161, 122, 68;
+  --preset-muted: #7a6c56;
+  --eve-ink: #e3bd86; --eve-ink-rgb: 227, 189, 134; --eve-title: #faeedd; --eve-eyebrow: #cfae86;
+  --eve-nav-active: #f2d4a8; --eve-nav-inactive: #c2a887; --eve-muted: #a48f72; --eve-source-fg: #ecd4b2;
+}
+html[data-preset="midnight"] {
+  --preset-ink: #4f629b; --preset-ink-strong: #33416c; --preset-ink-rgb: 79, 98, 155;
+  --preset-muted: #626a82;
+  --eve-ink: #96a8e0; --eve-ink-rgb: 150, 168, 224; --eve-title: #e7ecfb; --eve-eyebrow: #a2acd0;
+  --eve-nav-active: #c2cdf7; --eve-nav-inactive: #99a2c4; --eve-muted: #838bab; --eve-source-fg: #cbd4ef;
+}
+
+html[data-preset][data-section="morning"],
+html[data-preset][data-section="salah"],
+html[data-preset][data-section="tasbih"],
+html[data-preset][data-section="custom"],
+html[data-preset][data-section="wake"],
+html[data-preset][data-section="default"] {
+  --background: #f5efe3 !important; --foreground: var(--preset-ink) !important; --title: var(--preset-ink) !important; --eyebrow: var(--preset-ink) !important; --accent: var(--preset-ink) !important; --primary: var(--preset-ink) !important; --card: #f9f5f0 !important; --card-foreground: #2a2a2a !important; --surface-card: #f9f5f0 !important; --border: rgba(255, 255, 255, 0.8) !important; --translit: var(--preset-ink) !important; --text-muted: var(--preset-muted) !important; --source-bg: rgba(233, 233, 222, 0.9) !important; --source-fg: var(--preset-ink) !important; --ring-track: rgba(var(--preset-ink-rgb), 0.18) !important; --nav-bg: #fdfcf4 !important; --nav-active: var(--preset-ink) !important; --nav-inactive: var(--preset-muted) !important; --dot-active: var(--preset-ink) !important; --dot-inactive: rgba(var(--preset-ink-rgb), 0.4) !important; --index-badge-bg: var(--preset-ink) !important; --index-badge-fg: #fff !important; --count-fg: var(--preset-ink) !important; --btn-fg: var(--preset-ink) !important; --arrow-fg: var(--preset-ink) !important;
+  --surface-deep: var(--preset-ink-strong) !important;
+  --surface-deep-gradient: linear-gradient(135deg, var(--preset-ink) 0%, var(--preset-ink-strong) 100%) !important;
+  --surface-deep-fg: #f7f4ec !important;
+  --surface-deep-muted: rgba(247, 244, 236, 0.66) !important;
+  --surface-deep-border: rgba(255, 255, 255, 0.16) !important;
+  --surface-deep-accent-fg: var(--preset-ink-strong) !important;
+  --header-fg: var(--preset-ink-strong) !important;
+  --header-sub: var(--preset-muted) !important;
+  --grad-header: transparent !important;
+}
+
 /* Rose morning: blush card/nav/arrows, deeper pink source pill */
 html[data-preset="rose"][data-section="morning"] {
   --card: #f9e8e6 !important;
