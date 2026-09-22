@@ -391,6 +391,7 @@ function Settings() {
                 const active = presetId === p.id;
                 const morningSeed = sectionSeedFor(p.id, p.seed, "morning");
                 const eveningSeed = sectionSeedFor(p.id, p.seed, "evening");
+                const art = PRESET_BACKGROUNDS[p.id];
                 return (
                   <button
                     key={p.id}
@@ -407,9 +408,32 @@ function Settings() {
                         width: "100%",
                         height: 40,
                         borderRadius: 10,
+                        overflow: "hidden",
+                        display: "flex",
                         background: `linear-gradient(135deg, ${morningSeed} 0%, ${eveningSeed} 100%)`,
                       }}
-                    />
+                    >
+                      {art && (
+                        <>
+                          <div
+                            style={{
+                              flex: 1,
+                              backgroundImage: `url(${art.morning})`,
+                              backgroundSize: "cover",
+                              backgroundPosition: "center top",
+                            }}
+                          />
+                          <div
+                            style={{
+                              flex: 1,
+                              backgroundImage: `url(${art.evening})`,
+                              backgroundSize: "cover",
+                              backgroundPosition: "center top",
+                            }}
+                          />
+                        </>
+                      )}
+                    </div>
                     <span className="text-[10px] font-semibold">{p.name}</span>
                   </button>
                 );
