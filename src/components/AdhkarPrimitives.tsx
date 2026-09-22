@@ -1,5 +1,5 @@
 import { useRef, useState } from "react";
-import { BookOpen, Check } from "lucide-react";
+import { BookOpen, Check, ChevronLeft, ChevronRight } from "lucide-react";
 import { ProgressRing } from "./ProgressRing";
 import { triggerHaptic } from "@/lib/theme";
 
@@ -126,10 +126,19 @@ export function Pagination({
     setIsScrubbing(false);
   };
 
-  void onPrevious;
-  void onNext;
   return (
     <div className="adhkar-pagination-row">
+      <button
+        type="button"
+        className="adhkar-pagination-arrow"
+        onClick={() => {
+          onPrevious();
+          void triggerHaptic("light");
+        }}
+        aria-label="previous"
+      >
+        <ChevronLeft size={14} strokeWidth={1.8} />
+      </button>
       <div
         className={`adhkar-pagination ${isScrubbing ? "is-scrubbing" : ""}`}
         onPointerDown={(event) => {
