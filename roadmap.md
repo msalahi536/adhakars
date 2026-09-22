@@ -1,2 +1,2 @@
-- [ ] Restore the card selector's smooth tap-and-drag behavior without blocking iPhone interactions.
-- [ ] Finish and verify Dark Red Settings colors.
+- [x] Restore the card selector's smooth tap-and-drag behavior without blocking iPhone interactions.
+- [x] Finish and verify Dark Red Settings colors.
