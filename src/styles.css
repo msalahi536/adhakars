@@ -655,13 +655,13 @@ html[data-section="evening"] .adhkar-card-heading button { background: rgba(170,
 .salah-recommended-title { margin-top: 6px; color: #2f4f34; font-size: 26px; font-weight: 500; line-height: 28px; }
 .salah-recommended-progress { margin-top: 2px; color: #5f7a5a; font-size: 15px; font-weight: 400; line-height: 18px; }
 .salah-recommended-action { gap: 16px; margin-top: 14px; }
-.salah-play { width: 48px; height: 48px; background: #2f5a3c; color: #ffffff; box-shadow: 0 6px 16px rgba(47, 90, 60, 0.35); }
+.salah-play { width: 48px; height: 48px; background: #70815d; color: #ffffff; box-shadow: 0 6px 16px rgba(112, 129, 93, 0.35); }
 .salah-play svg { margin-left: 2px; }
 .salah-action-label { color: #2f4f34; font-size: 16px; font-weight: 500; line-height: 19px; }
 .salah-action-track { height: 4px; margin-top: 8px; overflow: hidden; border-radius: 999px; background: rgba(0, 0, 0, 0.08); }
-.salah-action-track span { display: block; height: 100%; border-radius: inherit; background: #2f5a3c; transition: width 300ms ease; }
+.salah-action-track span { display: block; height: 100%; border-radius: inherit; background: #70815d; transition: width 300ms ease; }
 .salah-upcoming-wrap { height: 242px; }
-.prayer-timeline-card { box-sizing: border-box; height: 242px !important; padding: 16px 20px 14px; border-radius: 18px !important; background: #2f5a3c !important; color: #ffffff !important; box-shadow: 0 8px 24px rgba(47, 90, 60, 0.25) !important; }
+.prayer-timeline-card { box-sizing: border-box; height: 242px !important; padding: 16px 20px 14px; border-radius: 18px !important; background: #70815d !important; color: #ffffff !important; box-shadow: 0 8px 24px rgba(112, 129, 93, 0.25) !important; }
 .prayer-timeline-heading { margin-bottom: 12px; }
 .prayer-timeline-heading .label-caps { color: rgba(255, 255, 255, 0.85); font-family: var(--font-sans); font-size: 11px; font-weight: 500; letter-spacing: 0.18em; opacity: 1; }
 .prayer-timeline-heading > span:last-child { color: rgba(255, 255, 255, 0.85) !important; font-family: var(--font-display); font-size: 13px !important; font-weight: 400; }
@@ -670,14 +670,14 @@ html[data-section="evening"] .adhkar-card-heading button { background: rgba(170,
 .prayer-timeline-row { height: 30px; gap: 18px !important; padding: 0 !important; border-radius: 0 !important; opacity: 1 !important; }
 .prayer-timeline-marker { width: 7px !important; }
 .prayer-timeline-marker span { z-index: 1; width: 6px !important; height: 6px !important; border: 0 !important; background: rgba(255, 255, 255, 0.5) !important; box-shadow: none !important; }
-.prayer-timeline-row[data-state="next"] .prayer-timeline-marker span { width: 10px !important; height: 10px !important; background: #8fd39a !important; box-shadow: 0 0 0 4px rgba(143, 211, 154, 0.3) !important; }
+.prayer-timeline-row[data-state="next"] .prayer-timeline-marker span { width: 10px !important; height: 10px !important; background: #c4d4af !important; box-shadow: 0 0 0 4px rgba(196, 212, 175, 0.3) !important; }
 .prayer-timeline-name,
 .prayer-timeline-time { color: #ffffff !important; font-family: var(--font-display); font-size: 16px !important; font-weight: 500 !important; line-height: 30px; }
 .prayer-timeline-row[data-state="next"] .prayer-timeline-name,
-.prayer-timeline-row[data-state="next"] .prayer-timeline-time { color: #8fd39a !important; }
+.prayer-timeline-row[data-state="next"] .prayer-timeline-time { color: #c4d4af !important; }
 .salah-upcoming-placeholder { height: 242px; margin: 0; border-radius: 18px; }
 .salah-adhan-card { box-sizing: border-box; height: 62px; gap: 14px; padding: 14px 18px; border: 1px solid rgba(255, 255, 255, 0.8); border-radius: 18px; background: rgba(250, 247, 240, 0.92); color: #2f4f34; backdrop-filter: blur(20px); }
-.salah-adhan-icon { width: 34px; height: 34px; background: #dfe9dc; color: #2f5a3c; }
+.salah-adhan-icon { width: 34px; height: 34px; background: #dfe9dc; color: #70815d; }
 .salah-adhan-title { color: #2f4f34; font-size: 16px; font-weight: 500; line-height: 18px; }
 .salah-adhan-subtitle { margin-top: 2px; overflow: hidden; color: #6b6f64; font-size: 13px; font-weight: 400; line-height: 15px; text-overflow: ellipsis; white-space: nowrap; }
 .salah-adhan-chevron { flex: 0 0 auto; color: #9aa094; }
