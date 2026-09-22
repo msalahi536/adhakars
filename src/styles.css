@@ -646,7 +646,8 @@ html[data-section="evening"] .adhkar-card-heading button { background: rgba(170,
 .salah-location { position: absolute; top: 192px; inset-inline: 24px; display: flex; align-items: center; justify-content: center; gap: 6px; color: #5f7a5a; font-size: 13px; font-weight: 400; line-height: 16px; }
 .salah-content { flex: 1; min-height: 0; overflow: hidden; }
 .salah-content-inner { display: grid; grid-template-rows: 170px 242px 62px; gap: 12px; width: 100%; max-width: 390px; height: 498px; margin: 30px auto 0; padding: 0 28px; box-sizing: border-box; }
-.salah-location-card { position: absolute; z-index: 5; inset-inline: 28px; top: 220px; }
+.salah-content-inner.no-location { display: flex; flex-direction: column; height: auto; max-height: 100%; overflow-y: auto; -webkit-overflow-scrolling: touch; padding-bottom: 110px; }
+.salah-location-card { position: relative; z-index: 5; width: 100%; box-sizing: border-box; border-radius: 18px; }
 .salah-recommended-card { box-sizing: border-box; height: 170px; padding: 18px 20px; border: 1px solid rgba(255, 255, 255, 0.8); border-radius: 18px; background: rgba(250, 247, 240, 0.92); box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06); backdrop-filter: blur(20px); }
 .salah-recommended-top { height: 26px; }
 .salah-kicker { color: #8a9a80; font-family: var(--font-sans); font-size: 11px; font-weight: 500; line-height: 1; letter-spacing: 0.18em; text-transform: uppercase; }
@@ -684,6 +685,8 @@ html[data-section="salah"] .bottom-nav { inset-inline: 28px; bottom: calc(14px +
 html[data-section="salah"] .bottom-nav-row { height: 60px; border-color: rgba(255,255,255,0.9); border-radius: 18px; background: rgba(255,255,255,0.9); box-shadow: 0 6px 24px rgba(0,0,0,0.12); backdrop-filter: blur(20px); }
 html[data-section="salah"] .nav-item { gap: 4px; font-family: var(--font-sans); }
 html[data-section="salah"] .nav-active-mark { bottom: 2px; width: 16px; height: 2px; }
+html[data-section="salah"] .app-shell { background: linear-gradient(180deg, #f5efe3 0%, #efe8da 45%, #e7e2d2 100%); }
+html[data-section="salah"] .app-shell::after { background: transparent; }
 
 @media (max-height: 779px) {
   .salah-page { overflow-y: auto; -webkit-overflow-scrolling: touch; padding-bottom: 88px; }
