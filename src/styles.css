@@ -925,6 +925,8 @@ html[data-section="evening"] .adhkar-card-heading button { background: rgba(170,
   --card-border: rgba(255, 255, 255, 0.8);
   --eyebrow: #3f5a3c;
   position: relative;
+  display: flex;
+  flex-direction: column;
   flex: 1;
   min-height: 0;
   overflow: hidden;
