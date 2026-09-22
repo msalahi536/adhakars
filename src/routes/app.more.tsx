@@ -238,7 +238,7 @@ function More() {
                   Days of remembrance
                 </div>
                 <div style={{ fontSize: 40, fontWeight: 800, color: "var(--surface-deep-fg)", lineHeight: 1.1 }}>
-                  {daysOfRem.toLocaleString()} days of remembrance
+                  {daysOfRem.toLocaleString()}
                 </div>
                 <div className="mt-1 text-sm" style={{ color: "var(--surface-deep-muted)" }}>
                   {weeksConsistent} weeks consistent
