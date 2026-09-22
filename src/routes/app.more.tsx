@@ -9,9 +9,9 @@ import {
   type LifetimeCounts,
 } from "@/lib/storage";
 
-// Days of remembrance are always gold, independent of the active theme.
-const GOLD = "#e8b84a";
-const GOLD_SOFT = "#f0d08a";
+// Completed days follow the active palette accent.
+const DONE = "color-mix(in oklab, var(--surface-deep-fg) 88%, transparent)";
+const DONE_SOFT = "color-mix(in oklab, var(--surface-deep-fg) 45%, transparent)";
 
 export const Route = createFileRoute("/app/more")({
   head: () => ({
@@ -142,13 +142,13 @@ function More() {
                       let border = "1px solid var(--surface-deep-border)";
                       let color = "color-mix(in oklab, var(--surface-deep-fg) 70%, transparent)";
                       if (status === "complete") {
-                        bg = GOLD;
-                        border = `1px solid ${GOLD}`;
-                        color = "#1c1608";
+                        bg = DONE;
+                        border = `1px solid ${DONE}`;
+                        color = "var(--surface-deep)";
                       } else if (status === "grace") {
-                        bg = GOLD_SOFT;
-                        border = `1px solid ${GOLD_SOFT}`;
-                        color = "#1c1608";
+                        bg = DONE_SOFT;
+                        border = `1px solid ${DONE_SOFT}`;
+                        color = "var(--surface-deep)";
                       } else if (isFuture) {
                         border = "1px dashed color-mix(in oklab, var(--surface-deep-fg) 20%, transparent)";
                         color = "color-mix(in oklab, var(--surface-deep-fg) 35%, transparent)";
