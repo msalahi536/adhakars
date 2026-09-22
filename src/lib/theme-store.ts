@@ -138,7 +138,6 @@ export const resetTheme = () => {
 };
 
 export const PRE_PAINT_SCRIPT = `(function(){try{
-var mode=phase==='evening'?'dark':'light';
 var p=location.pathname;
 var phase=p.indexOf('/app/evening')===0?'evening':'morning';
 var mode=phase==='evening'?'dark':'light';
