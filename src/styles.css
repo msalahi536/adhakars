@@ -638,6 +638,85 @@ html[data-preset="lavender"][data-section="evening"] .daily-swipe-stack .adhkar-
   backdrop-filter: blur(8px);
 }
 
+/* Ocean morning: pale sky-blue card, softer blue nav */
+html[data-preset="ocean"][data-section="morning"],
+html[data-preset="ocean"][data-section="salah"],
+html[data-preset="ocean"][data-section="tasbih"],
+html[data-preset="ocean"][data-section="custom"],
+html[data-preset="ocean"][data-section="wake"],
+html[data-preset="ocean"][data-section="default"] {
+  --card: #def0f4 !important;
+  --surface-card: #def0f4 !important;
+  --nav-bg: #d6ebf0 !important;
+  --pill-bg: #def0f4 !important;
+  --source-bg: #cbe5ec !important;
+  --source-fg: #1d5871 !important;
+  --card-foreground: #2b4450 !important;
+  --text-muted: #5f7884 !important;
+}
+/* Ocean evening: deep teal-navy glass card/nav with a calm cyan glow */
+html[data-preset="ocean"][data-section="evening"] {
+  --card: rgba(21, 47, 70, 0.88) !important;
+  --surface-card: rgba(21, 47, 70, 0.88) !important;
+  --card-foreground: #e6f3fb !important;
+  --card-border: rgba(170, 214, 240, 0.18) !important;
+  --border: rgba(170, 214, 240, 0.18) !important;
+  --nav-bg: rgba(25, 55, 80, 0.9) !important;
+  --nav-border: rgba(170, 214, 240, 0.26) !important;
+  --nav-active: #cfe8f8 !important;
+  --nav-inactive: rgba(207, 232, 248, 0.55) !important;
+  --dot-active: #a8d4ef !important;
+  --dot-inactive: rgba(168, 212, 239, 0.35) !important;
+  --pill-bg: rgba(230, 243, 251, 0.07) !important;
+  --text-muted: #a3bfd0 !important;
+  --translit: #a8d4ef !important;
+  --source-bg: rgba(230, 243, 251, 0.1) !important;
+  --source-fg: #bfdff2 !important;
+  --count-fg: #bfdff2 !important;
+  --ring-track: rgba(168, 212, 239, 0.22) !important;
+}
+html[data-preset="ocean"][data-section="evening"] .app-shell::after {
+  background: linear-gradient(180deg, rgba(20, 60, 90, 0.08), rgba(8, 25, 45, 0.12)) !important;
+}
+html[data-preset="ocean"][data-section="evening"] .dhikr-card {
+  background: rgba(21, 47, 70, 0.88) !important;
+  backdrop-filter: blur(26px) saturate(130%);
+  box-shadow: none !important;
+}
+html[data-preset="ocean"][data-section="evening"] .bottom-nav-row {
+  backdrop-filter: blur(20px);
+  box-shadow: 0 0 0 1px rgba(170, 214, 240, 0.14), 0 8px 28px rgba(120, 190, 240, 0.09) !important;
+}
+html[data-preset="ocean"][data-section="evening"] .adhkar-pagination-arrow {
+  border-color: rgba(170, 214, 240, 0.42);
+  background: rgba(230, 243, 251, 0.06);
+  color: #bfdff2;
+  backdrop-filter: blur(8px);
+}
+html[data-preset="ocean"][data-section="evening"] .adhkar-progress-track {
+  background: rgba(230, 243, 251, 0.18);
+  box-shadow: none;
+}
+html[data-preset="ocean"][data-section="evening"] .adhkar-progress-value {
+  background: #6fb0d8;
+  box-shadow: 0 1px 4px rgba(111, 176, 216, 0.4);
+}
+html[data-preset="ocean"][data-section="evening"] .adhkar-card-heading h3 { color: #a8d4ef !important; }
+html[data-preset="ocean"][data-section="evening"] .adhkar-card-heading button {
+  background: rgba(170, 214, 240, 0.2) !important;
+  color: #e6f3fb !important;
+  backdrop-filter: blur(8px);
+}
+html[data-preset="ocean"][data-section="evening"] .daily-swipe-stack .adhkar-index-row > span {
+  border: none !important;
+  background: rgba(14, 35, 55, 0.4) !important;
+  color: #bfdff2 !important;
+  box-shadow: none !important;
+  backdrop-filter: blur(8px);
+}
+
+
+
 html[data-section="morning"] .app-shell { background: linear-gradient(180deg, #f5efe3 0%, #efe4d1 45%, #e6dccb 100%); }
 html[data-section="evening"] .app-shell { background: radial-gradient(circle at 85% 95%, rgba(214,130,90,0.28), transparent 45%), linear-gradient(180deg, #0e0f22 0%, #17163a 45%, #2b2242 80%, #3a2c46 100%); }
 .app-background { background-position: center top; opacity: 0; }
