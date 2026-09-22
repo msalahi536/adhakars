@@ -18,6 +18,7 @@ export function ProgressBar({ value, total }: { value: number; total: number }) 
       <div className="adhkar-progress-track">
         <div className="adhkar-progress-value" style={{ width: `${total ? (value / total) * 100 : 0}%` }} />
       </div>
+      <span className="adhkar-progress-count">{value} / {total}</span>
     </div>
   );
 }

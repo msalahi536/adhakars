@@ -345,6 +345,10 @@
 
 .app-shell.is-adhkar .settings-button {
   top: calc(env(safe-area-inset-top) + 84px);
+  border-color: rgba(255, 255, 255, 0.86);
+  background: rgba(250, 248, 241, 0.72);
+  color: var(--title);
+  box-shadow: 0 2px 8px color-mix(in oklab, var(--title) 6%, transparent);
 }
 
 .dhikr-card {
@@ -438,10 +442,10 @@ html[data-section="evening"] .app-shell { background: radial-gradient(circle at 
 }
 
 .adhkar-header .label-caps {
-  color: color-mix(in oklab, var(--eyebrow) 92%, var(--title));
+  color: var(--title);
   font-family: var(--font-sans);
-  font-size: 9px;
-  font-weight: 500;
+  font-size: 10px;
+  font-weight: 600;
   letter-spacing: 0.12em;
   line-height: 1;
   opacity: 1;
@@ -452,7 +456,7 @@ html[data-section="evening"] .app-shell { background: radial-gradient(circle at 
   margin-top: 9px;
   color: color-mix(in oklab, var(--title) 94%, black);
   font-family: var(--font-display);
-  font-size: 27px;
+  font-size: 30px;
   font-weight: 600;
   line-height: 1;
   letter-spacing: 0;
@@ -462,23 +466,26 @@ html[data-section="evening"] .app-shell { background: radial-gradient(circle at 
 .adhkar-progress-row {
   display: flex;
   align-items: center;
-  width: 220px;
+  width: 270px;
   margin: 18px auto 0;
+  gap: 18px;
 }
 
 .adhkar-progress-track {
-  width: 100%;
+  width: 210px;
+  flex: 0 0 210px;
   height: 7px;
   overflow: hidden;
   border-radius: 999px;
-  background: color-mix(in oklab, var(--card) 42%, transparent);
-  box-shadow: inset 0 1px 2px color-mix(in oklab, var(--title) 5%, transparent);
+  background: rgba(250, 248, 241, 0.46);
+  box-shadow: inset 0 1px 2px color-mix(in oklab, var(--title) 4%, transparent);
   backdrop-filter: blur(8px);
 }
 
 html[data-section="evening"] .adhkar-progress-track { background: rgba(200, 190, 230, 0.3); }
-.adhkar-progress-value { height: 100%; border-radius: inherit; background: color-mix(in oklab, var(--accent) 82%, transparent); box-shadow: 0 1px 3px color-mix(in oklab, var(--accent) 22%, transparent); transition: width 650ms cubic-bezier(.22, 1, .36, 1); }
+.adhkar-progress-value { height: 100%; border-radius: inherit; background: color-mix(in oklab, var(--accent) 88%, transparent); box-shadow: 0 1px 3px color-mix(in oklab, var(--accent) 22%, transparent); transition: width 650ms cubic-bezier(.22, 1, .36, 1); }
 html[data-section="evening"] .adhkar-progress-value { background: #2c2a54; }
+.adhkar-progress-count { flex: 0 0 42px; color: var(--title); font-family: var(--font-sans); font-size: 12px; font-weight: 600; line-height: 1; white-space: nowrap; }
 
 .daily-adhkar-page.scroll-area {
   margin-bottom: calc(74px + env(safe-area-inset-bottom));
@@ -494,13 +501,19 @@ html[data-section="evening"] .adhkar-progress-value { background: #2c2a54; }
   padding: 0 16px;
   display: inline-flex;
   align-items: center;
-  border: 1px solid var(--border) !important;
+  border: 1px solid rgba(255, 255, 255, 0.92) !important;
   border-radius: 999px;
-  background: var(--source-bg) !important;
+  background: rgba(250, 248, 241, 0.86) !important;
   color: var(--title);
-  box-shadow: none !important;
+  box-shadow: 0 2px 8px color-mix(in oklab, var(--title) 5%, transparent) !important;
   font-size: 13px;
   font-weight: 500;
+}
+html[data-section="evening"] .app-shell.is-adhkar .settings-button,
+html[data-section="evening"] .daily-swipe-stack .adhkar-index-row > span {
+  border-color: rgba(255, 255, 255, 0.14) !important;
+  background: rgba(235, 231, 247, 0.9) !important;
+  color: #2c2a54;
 }
 .daily-swipe-stack .adhkar-index-row > button { position: absolute; right: 20px; }
 
