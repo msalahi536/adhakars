@@ -1,5 +1,5 @@
 import { useRef, useState } from "react";
-import { BookOpen, Check, ChevronLeft, ChevronRight } from "lucide-react";
+import { BookOpen, Check } from "lucide-react";
 import { ProgressRing } from "./ProgressRing";
 import { triggerHaptic } from "@/lib/theme";
 
