@@ -24,7 +24,6 @@ export type Preset = { id: string; name: string; seed: string };
 
 export const PRESETS: Preset[] = [
   { id: "original",  name: "Original",  seed: "#70815d" },
-  { id: "classic",   name: "Classic",   seed: "#70815d" },
   { id: "rose",      name: "Rose",      seed: "#d47a8b" },
   { id: "lavender",  name: "Twilight",  seed: "#8a7bd0" },
   { id: "sakura",    name: "Sakura",    seed: "#e69ba5" },
