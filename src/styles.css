@@ -168,7 +168,10 @@
     margin: 0;
     padding: 0;
     width: 100%;
+    min-width: 320px;
     background-color: var(--nav-safe-area-bg);
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
     -webkit-tap-highlight-color: transparent;
   }
   body {
@@ -183,8 +186,11 @@
   /* App-mode: lock the viewport so .scroll-area handles scrolling internally. */
   html.app-mode,
   body.app-mode {
+    height: 100svh;
     height: 100dvh;
+    min-height: 100svh;
     min-height: 100dvh;
+    max-height: 100svh;
     max-height: 100dvh;
     overflow: hidden;
     -webkit-user-select: none;
@@ -201,7 +207,12 @@
     isolation: isolate;
     position: relative;
     display: flex;
+    height: 100svh;
+    height: 100dvh;
+    min-height: 100svh;
     min-height: 100dvh;
+    max-height: 100svh;
+    max-height: 100dvh;
     width: 100%;
     flex: 1;
     flex-direction: column;
@@ -1117,6 +1128,107 @@ html[data-preset][data-section="tasbih"] {
 
 @media (max-width: 360px) {
   .adhkar-header-content { padding-inline: 50px; }
+}
+
+/* Modern 6.1–6.3 inch phones need a roomier canvas than the original 390px spec.
+   Widths remain capped above phone size, so tablet and desktop stay composed. */
+@media (min-width: 400px) and (max-width: 599px) {
+  :root {
+    --bottom-nav-row: 72px;
+    --bottom-nav-height: 94px;
+  }
+
+  .bottom-nav,
+  html[data-section="salah"] .bottom-nav {
+    inset-inline: 20px;
+  }
+  .bottom-nav-row,
+  html[data-section="salah"] .bottom-nav-row {
+    max-width: 390px;
+    height: 72px;
+  }
+  .nav-item { gap: 5px; }
+  .nav-item > svg { width: 24px; height: 24px; flex-basis: 24px; }
+  .nav-item > span:not(.nav-active-mark) { font-size: 13px !important; }
+
+  .settings-button {
+    right: 20px;
+    width: 40px;
+    height: 40px;
+  }
+  .settings-button svg { width: 20px; height: 20px; }
+
+  .adhkar-header { min-height: 194px; }
+  .adhkar-header-content {
+    max-width: 430px;
+    padding-top: calc(env(safe-area-inset-top) + 88px);
+  }
+  .adhkar-header .label-caps { font-size: 10px; }
+  .adhkar-header .app-page-title { margin-top: 10px; font-size: 31px; }
+  .adhkar-progress-row,
+  .adhkar-progress-track { width: 236px; }
+  .adhkar-progress-track { flex-basis: 236px; height: 8px; }
+  .daily-adhkar-page.scroll-area { margin-bottom: calc(118px + env(safe-area-inset-bottom)); }
+  .daily-swipe-stack .adhkar-card-stage { padding-inline: 20px; }
+  .adhkar-reference-card { padding: 20px 22px 18px; }
+  .adhkar-card-heading h3 { font-size: 13px; }
+  .adhkar-arabic { font-size: 26px !important; }
+  .adhkar-arabic.is-large { font-size: 32px !important; }
+  .adhkar-transliteration,
+  .adhkar-translation { font-size: 14px; }
+  .adhkar-source-badge { height: 30px; min-height: 30px; font-size: 13px; }
+  .adhkar-repeat-counter { width: 88px; height: 88px; }
+  .adhkar-counter-value { font-size: 37px; }
+
+  .adhkar-header-action { top: calc(env(safe-area-inset-top) + 88px); right: 68px; }
+  .my-adhkar-add { width: 40px; height: 40px; }
+
+  .qibla-header { min-height: 166px; }
+  .qibla-header-content { padding-top: calc(env(safe-area-inset-top) + 64px); }
+  .qibla-page { padding-inline: 24px; }
+  .qibla-compass { width: min(76vw, 318px); }
+
+  .salah-hero { height: 232px; flex-basis: 232px; }
+  .salah-next-label { top: 55px; font-size: 19px; }
+  .salah-countdown { top: 82px; font-size: 56px; line-height: 56px; }
+  .salah-dismiss { top: 153px; height: 36px; font-size: 16px; }
+  .salah-location { top: 202px; font-size: 14px; }
+  .salah-content-inner {
+    max-width: 430px;
+    grid-template-rows: 178px 250px 66px;
+    height: 518px;
+    padding-inline: 20px;
+  }
+  .salah-recommended-card { height: 178px; padding: 19px 21px; }
+  .salah-recommended-title { font-size: 28px; line-height: 30px; }
+  .salah-upcoming-wrap,
+  .prayer-timeline-card,
+  .salah-upcoming-placeholder { height: 250px !important; }
+  .salah-adhan-card { height: 66px; }
+
+  .tasbih-header { height: 246px; flex-basis: 246px; }
+  .tasbih-header-inner { max-width: 430px; padding-top: 82px; }
+  .tasbih-eyebrow { font-size: 13px; }
+  .tasbih-title { font-size: 35px; }
+  .tasbih-targets { margin-inline: 20px; }
+  .tasbih-target { height: 38px; font-size: 17px; }
+  .tasbih-main { padding-inline: 20px; }
+  .tasbih-card-wrap { max-width: 390px; }
+  .tasbih-disc { top: 92px; width: 296px; height: 296px; }
+  .tasbih-ring svg { width: 296px; height: 296px; }
+  .tasbih-count { font-size: 98px; }
+  .tasbih-cycle { font-size: 16px; }
+  .tasbih-helper { top: 424px; }
+  .tasbih-helper-primary { font-size: 13px; }
+}
+
+/* Tablets and desktops use a centered reading column with comfortable controls. */
+@media (min-width: 600px) {
+  .settings-button { right: max(24px, calc(50% - 244px)); }
+  .adhkar-header-content,
+  .tasbih-header-inner,
+  .salah-content-inner { max-width: 448px; }
+  .daily-swipe-stack .adhkar-card-stage { padding-inline: 0; }
 }
 
 @media (prefers-reduced-motion: reduce) {
