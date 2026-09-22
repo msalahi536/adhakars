@@ -31,6 +31,7 @@ export const PRESETS: Preset[] = [
   { id: "emerald",   name: "Emerald",   seed: "#3f9d7a" },
   { id: "sand",      name: "Sand",      seed: "#b8925a" },
   { id: "midnight",  name: "Midnight",  seed: "#5b6ea8" },
+  { id: "dark-red",  name: "Dark Red",  seed: "#8f3038" },
 ];
 
 const readLS = (k: string): string | null => {
