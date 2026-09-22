@@ -11,9 +11,9 @@
 - [x] Move My Adhkar add beside edit and delete.
 - [x] Repair the My Adhkar card selector and drag interaction.
 
-- [ ] Replace accumulated iOS sizing patches with one shared safe-area flex frame.
-- [ ] Make the dhikr card body the only vertically scrollable card region.
-- [ ] Put the bottom navigation in layout flow with a fixed row height.
-- [ ] Remove page-level safe-area offsets and hardcoded viewport compensation.
-- [ ] Restore small, uniform pagination dots.
-- [ ] Verify Morning, Evening, Salah, Tasbih, and More at iPhone and browser sizes.
+- [x] Replace accumulated iOS sizing patches with one shared safe-area flex frame.
+- [x] Make the dhikr card body the only vertically scrollable card region.
+- [x] Put the bottom navigation in layout flow with a fixed row height.
+- [x] Remove page-level safe-area offsets and hardcoded viewport compensation.
+- [x] Restore small, uniform pagination dots.
+- [x] Verify Morning, Evening, Salah, Tasbih, and More at iPhone and browser sizes.
