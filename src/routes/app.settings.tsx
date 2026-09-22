@@ -23,7 +23,7 @@ import {
 import { deriveSectionSeed, sectionSeedFor, type SectionKey, type CustomOverrides } from "@/lib/theming";
 import { backgroundsForPreset, PRESET_BACKGROUNDS } from "@/lib/backgrounds";
 import { ThemePicker } from "@/components/theme/ThemePicker";
-import { CustomThemeSheet } from "@/components/theme/CustomThemeSheet";
+import { SuggestColorSheet } from "@/components/theme/SuggestColorSheet";
 import {
   resetToday,
   resetAllProgress,
@@ -69,7 +69,7 @@ function Settings() {
   const [overrides, setOverridesState] = useState<Partial<Record<SectionKey, string>>>({});
   const [showAdvanced, setShowAdvanced] = useState(false);
   const [pickerOpen, setPickerOpen] = useState<null | { target: SectionKey; seed: string }>(null);
-  const [customSheetOpen, setCustomSheetOpen] = useState(false);
+  const [suggestOpen, setSuggestOpen] = useState(false);
   const [triplet, setTripletState] = useState<CustomOverrides>({});
   const [display, setDisplayState] = useState(getDisplay());
   const [confirmReset, setConfirmReset] = useState(false);
@@ -250,15 +250,6 @@ function Settings() {
     window.dispatchEvent(new Event("adhkar:theme-change"));
   };
 
-  const applyCustomTriplet = (t: CustomOverrides, nextSeed: string) => {
-    setPresetIdState("custom");
-    setPresetId("custom");
-    setSeedState(nextSeed);
-    setSeed(nextSeed);
-    setTripletState(t);
-    setCustomTriplet(t);
-    window.dispatchEvent(new Event("adhkar:theme-change"));
-  };
 
   const applySectionOverride = (section: SectionKey, hex: string) => {
     const next = { ...overrides, [section]: hex };
@@ -538,16 +529,7 @@ function Settings() {
             }}
           />
 
-          <CustomThemeSheet
-            open={customSheetOpen}
-            initial={{ seed, triplet }}
-            mode={previewMode}
-            onClose={() => setCustomSheetOpen(false)}
-            onApply={({ header, background, accent, seed: nextSeed }) => {
-              applyCustomTriplet({ header, background, accent }, nextSeed);
-              setCustomSheetOpen(false);
-            }}
-          />
+          <SuggestColorSheet open={suggestOpen} onClose={() => setSuggestOpen(false)} />
 
 
 
