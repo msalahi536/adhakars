@@ -612,7 +612,8 @@ html[data-section="evening"] .adhkar-card-heading button { background: rgba(170,
 .adhkar-source-badge span { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .adhkar-target-label { margin-top: 12px; color: var(--text-muted); font-size: 13px; font-weight: 400; }
 .adhkar-repeat-counter { width: 84px; height: 84px; color: var(--count-fg); touch-action: manipulation; }
-.adhkar-counter-value { color: var(--count-fg); font-size: 40px; font-weight: 600; line-height: 1; }
+.adhkar-counter-value { color: var(--count-fg); font-size: 34px; font-weight: 600; line-height: 1; }
+.adhkar-counter-target { color: var(--count-fg); opacity: 0.55; font-size: 12px; font-weight: 500; line-height: 1; margin-top: 4px; letter-spacing: 0.02em; }
 .adhkar-counter-target { margin-top: 2px; color: var(--text-muted); font-size: 12px; font-weight: 400; line-height: 1; }
 
 .adhkar-pagination-row { display: flex; height: 40px; min-height: 40px; align-items: flex-start; justify-content: center; gap: 12px; padding: 0 20px 16px; }
