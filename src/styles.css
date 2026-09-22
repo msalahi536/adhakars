@@ -842,8 +842,11 @@ html[data-visual-phase="evening"] .daily-swipe-stack .adhkar-index-row > span {
   color: rgba(224, 224, 224, 1) !important;
   box-shadow: none !important;
 }
-.daily-swipe-stack .adhkar-index-row > button { position: absolute; right: 20px; }
-.daily-swipe-stack .adhkar-index-row > button + button { right: 58px; }
+.daily-swipe-stack .adhkar-index-row > button { position: static; flex: 0 0 auto; }
+.daily-swipe-stack .adhkar-index-row { position: relative; }
+.daily-swipe-stack .adhkar-index-row > span { margin-right: auto; margin-left: auto; }
+.daily-swipe-stack .adhkar-index-row:has(.adhkar-card-action) { justify-content: flex-end; padding-inline: 20px; }
+.daily-swipe-stack .adhkar-index-row:has(.adhkar-card-action) > span { position: absolute; left: 50%; transform: translateX(-50%); }
 .adhkar-card-action.is-icon-only { width: 30px; height: 30px; padding: 0; border: 1px solid var(--card-border, var(--border)); background: var(--pill-bg, var(--source-bg)) !important; color: var(--source-fg, var(--title)) !important; backdrop-filter: blur(12px); }
 .adhkar-card-action.is-delete { color: var(--destructive) !important; }
 
@@ -944,10 +947,10 @@ html[data-visual-phase="evening"] .adhkar-card-heading button { background: rgba
 .adhkar-counter-target { margin-top: 2px; color: var(--text-muted); font-size: 12px; font-weight: 400; line-height: 1; }
 
 .adhkar-pagination-row { display: flex; height: 40px; min-height: 40px; align-items: flex-start; justify-content: center; gap: 12px; padding: 0 20px 16px; }
-.adhkar-pagination { display: flex; height: 24px; min-width: 0; align-items: center; justify-content: center; gap: 5px; padding: 0 0; border: 1px solid transparent; border-radius: 999px; color: var(--text-muted); touch-action: none; transition: padding 120ms ease, background-color 120ms ease, border-color 120ms ease; }
+.adhkar-pagination { display: flex; height: 30px; min-width: 0; align-items: center; justify-content: center; gap: 5px; padding: 0 6px; border: 1px solid transparent; border-radius: 999px; color: var(--text-muted); cursor: ew-resize; touch-action: none; transition: padding 120ms ease, background-color 120ms ease, border-color 120ms ease; }
 .adhkar-pagination.is-scrubbing { padding: 0 9px; border-color: color-mix(in oklab, var(--card-border, var(--border)) 75%, transparent); background: color-mix(in oklab, var(--pill-bg, var(--source-bg)) 72%, transparent); backdrop-filter: blur(12px); }
-.adhkar-pagination button { width: 7px; height: 7px; flex: 0 0 auto; border-radius: 999px; background: var(--dot-inactive); transition: width 250ms ease, background-color 250ms ease; }
-.adhkar-pagination button.is-active { width: 7px; background: var(--dot-active); }
+.adhkar-pagination button { width: 12px; height: 30px; flex: 0 0 12px; border-radius: 999px; background: radial-gradient(circle, var(--dot-inactive) 0 3.5px, transparent 4px); transition: width 250ms ease, background-color 250ms ease; }
+.adhkar-pagination button.is-active { width: 12px; background: radial-gradient(circle, var(--dot-active) 0 3.5px, transparent 4px); }
 .adhkar-pagination-arrow { display: inline-flex; width: 24px; height: 24px; flex: 0 0 24px; align-items: center; justify-content: center; border: 1px solid var(--card-border, var(--border)); border-radius: 999px; background: var(--pill-bg, var(--source-bg)); color: var(--text-muted); }
 .adhkar-pagination-arrow:disabled { opacity: 0.35; }
 
@@ -966,8 +969,6 @@ html[data-visual-phase="evening"] .adhkar-card-heading button { background: rgba
 .qibla-details { margin-top: 22px; }
 
 /* My Adhkar controls and sheets. */
-.adhkar-header-action { top: calc(env(safe-area-inset-top) + 84px); right: 68px; }
-.my-adhkar-add { width: 36px; height: 36px; border-radius: 50%; }
 .custom-adhkar-form { display: flex; min-height: 0; flex: 1; flex-direction: column; overflow: hidden; }
 .custom-adhkar-fields { min-height: 0; flex: 1; overflow-y: auto; overscroll-behavior: contain; padding: 2px 20px 24px; scrollbar-width: none; }
 .custom-adhkar-fields::-webkit-scrollbar { display: none; }

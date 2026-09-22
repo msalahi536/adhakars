@@ -175,22 +175,6 @@ function MyAdhkar() {
     setEditing(null);
   };
 
-  const headerAction = (
-    <button
-      type="button"
-      onClick={openAdd}
-      aria-label="Add adhkar"
-        className="header-icon-button my-adhkar-add flex items-center justify-center transition-transform active:scale-90"
-      style={{
-        color: "currentColor",
-        background: "color-mix(in oklab, var(--surface-card) 72%, transparent)",
-        border: "1px solid color-mix(in oklab, currentColor 12%, transparent)",
-      }}
-    >
-      <Plus size={20} />
-    </button>
-  );
-
   const emptyState = (
     <div className="mx-auto flex w-full max-w-md flex-col items-center px-6 py-10 text-center">
       <div
@@ -231,8 +215,8 @@ function MyAdhkar() {
         subtitle="Your personal collection"
         items={items}
         headerPattern={null}
-        headerAction={headerAction}
         emptyState={emptyState}
+        onAddItem={openAdd}
         onEditItem={openEdit}
         onDeleteItem={handleDelete}
         dailyLayout

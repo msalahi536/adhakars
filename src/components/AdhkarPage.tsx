@@ -18,6 +18,7 @@ type Props = {
   headerPattern?: React.ReactNode;
   headerAction?: React.ReactNode;
   emptyState?: React.ReactNode;
+  onAddItem?: () => void;
   onEditItem?: (id: string) => void;
   onDeleteItem?: (id: string) => void;
   dailyLayout?: boolean;
@@ -35,6 +36,7 @@ export function AdhkarPage({
   headerPattern,
   headerAction,
   emptyState,
+  onAddItem,
   onEditItem,
   onDeleteItem,
   dailyLayout: dailyLayoutProp,
@@ -87,6 +89,7 @@ export function AdhkarPage({
                 setCounts({});
               }}
               persistKey={storageKey}
+              onAddItem={onAddItem}
               onEditItem={onEditItem}
               onDeleteItem={onDeleteItem}
               dailyLayout={dailyLayout}
