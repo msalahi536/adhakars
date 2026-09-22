@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import type { Dhikr } from "@/data/adhkar";
 import { ListenButton } from "./ListenButton";
-import { ArabicText, IslamicOrnament, OrnamentalDivider, RepeatCounter, SourceBadge, Transliteration } from "./AdhkarPrimitives";
+import { ArabicText, OrnamentalDivider, RepeatCounter, SourceBadge, Transliteration } from "./AdhkarPrimitives";
 import { getDisplay, triggerHaptic } from "@/lib/theme";
 
 type Props = {
@@ -75,7 +75,6 @@ export function DhikrCard({ dhikr, count, onIncrement, isSpecial, specialLabel, 
         >
           {dhikr.title}
         </h3>
-        <IslamicOrnament size={18} className="adhkar-card-ornament shrink-0" />
       </div>
 
       {isSpecial && specialLabel && (

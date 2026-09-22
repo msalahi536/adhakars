@@ -1,4 +1,4 @@
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import { BookOpen, Check, ChevronLeft, ChevronRight } from "lucide-react";
 import { ProgressRing } from "./ProgressRing";
 import { triggerHaptic } from "@/lib/theme";
@@ -18,7 +18,6 @@ export function ProgressBar({ value, total }: { value: number; total: number }) 
       <div className="adhkar-progress-track">
         <div className="adhkar-progress-value" style={{ width: `${total ? (value / total) * 100 : 0}%` }} />
       </div>
-      <span className="adhkar-progress-count">{value} / {total}</span>
     </div>
   );
 }
@@ -104,6 +103,7 @@ export function Pagination({
   const scrubbing = useRef(false);
   const suppressClick = useRef(false);
   const lastIndex = useRef(active);
+  const [isScrubbing, setIsScrubbing] = useState(false);
 
   const indexFromPointer = (clientX: number, element: HTMLElement) => {
     const rect = element.getBoundingClientRect();
@@ -122,8 +122,11 @@ export function Pagination({
   const stopScrub = (event: React.PointerEvent<HTMLDivElement>) => {
     if (holdTimer.current) clearTimeout(holdTimer.current);
     holdTimer.current = null;
-    if (scrubbing.current) event.currentTarget.releasePointerCapture(event.pointerId);
+    if (scrubbing.current && event.currentTarget.hasPointerCapture(event.pointerId)) {
+      event.currentTarget.releasePointerCapture(event.pointerId);
+    }
     scrubbing.current = false;
+    setIsScrubbing(false);
   };
 
   return (
@@ -132,15 +135,17 @@ export function Pagination({
         <ChevronLeft size={12} strokeWidth={2} />
       </button>
       <div
-        className="adhkar-pagination"
+        className={`adhkar-pagination ${isScrubbing ? "is-scrubbing" : ""}`}
         onPointerDown={(event) => {
           lastIndex.current = active;
           const x = event.clientX;
           const element = event.currentTarget;
           holdTimer.current = setTimeout(() => {
             scrubbing.current = true;
+            setIsScrubbing(true);
             suppressClick.current = true;
             element.setPointerCapture(event.pointerId);
+            void triggerHaptic("light");
             updateScrub(x, element);
           }, 250);
         }}
@@ -156,7 +161,6 @@ export function Pagination({
             clearTimeout(holdTimer.current);
             holdTimer.current = null;
           }
-          if (scrubbing.current && event.buttons === 0) stopScrub(event);
         }}
       >
         {Array.from({ length: total }, (_, index) => (

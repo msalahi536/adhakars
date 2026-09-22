@@ -466,14 +466,13 @@ html[data-section="evening"] .app-shell { background: radial-gradient(circle at 
 .adhkar-progress-row {
   display: flex;
   align-items: center;
-  width: 270px;
+  width: 220px;
   margin: 18px auto 0;
-  gap: 18px;
 }
 
 .adhkar-progress-track {
-  width: 210px;
-  flex: 0 0 210px;
+  width: 220px;
+  flex: 0 0 220px;
   height: 7px;
   overflow: hidden;
   border-radius: 999px;
@@ -485,8 +484,6 @@ html[data-section="evening"] .app-shell { background: radial-gradient(circle at 
 html[data-section="evening"] .adhkar-progress-track { background: rgba(200, 190, 230, 0.3); }
 .adhkar-progress-value { height: 100%; border-radius: inherit; background: color-mix(in oklab, var(--accent) 88%, transparent); box-shadow: 0 1px 3px color-mix(in oklab, var(--accent) 22%, transparent); transition: width 650ms cubic-bezier(.22, 1, .36, 1); }
 html[data-section="evening"] .adhkar-progress-value { background: #2c2a54; }
-.adhkar-progress-count { flex: 0 0 42px; color: var(--title); font-family: var(--font-sans); font-size: 12px; font-weight: 600; line-height: 1; white-space: nowrap; }
-
 .daily-adhkar-page.scroll-area {
   margin-bottom: calc(74px + env(safe-area-inset-bottom));
   padding: 0;
@@ -496,9 +493,9 @@ html[data-section="evening"] .adhkar-progress-value { background: #2c2a54; }
 .daily-swipe-stack { min-height: 0; overflow: hidden; }
 .daily-swipe-stack .adhkar-index-row { min-height: 58px; margin: 0; align-items: flex-start; padding-top: 8px; }
 .daily-swipe-stack .adhkar-index-row > span {
-  height: 26px;
+  height: 24px;
   min-width: 0;
-  padding: 0 16px;
+  padding: 0 12px;
   display: inline-flex;
   align-items: center;
   border: 1px solid rgba(255, 255, 255, 0.92) !important;
@@ -506,8 +503,8 @@ html[data-section="evening"] .adhkar-progress-value { background: #2c2a54; }
   background: rgba(250, 248, 241, 0.86) !important;
   color: var(--title);
   box-shadow: 0 2px 8px color-mix(in oklab, var(--title) 5%, transparent) !important;
-  font-size: 13px;
-  font-weight: 500;
+  font-size: 12px;
+  font-weight: 600;
 }
 html[data-section="evening"] .app-shell.is-adhkar .settings-button,
 html[data-section="evening"] .daily-swipe-stack .adhkar-index-row > span {
@@ -538,15 +535,16 @@ html[data-section="evening"] .daily-swipe-stack .adhkar-index-row > span {
 
 .adhkar-card-heading {
   display: grid;
-  grid-template-columns: 34px minmax(0, 1fr) 18px;
+  grid-template-columns: 34px minmax(0, 1fr);
   gap: 14px;
   margin-bottom: 18px;
   padding: 0;
 }
 .adhkar-card-heading h3 { color: var(--title) !important; font-family: var(--font-sans); font-size: 12px; font-weight: 500; line-height: 1.35; letter-spacing: 0.14em !important; }
-.adhkar-card-ornament { color: var(--accent); }
 html[data-section="evening"] .adhkar-card-heading h3 { color: #cfc8e8 !important; }
 html[data-section="evening"] .adhkar-card-heading button { background: rgba(170,160,220,0.3) !important; color: #efeafe !important; }
+.listen-button-wrap { contain: layout; }
+.listen-status { left: calc(100% + 8px); top: 3px; height: 28px; display: inline-flex; align-items: center; }
 
 .adhkar-reference-body { width: 100%; min-width: 0; min-height: 0; overflow: hidden; }
 .adhkar-reference-content,
@@ -604,7 +602,8 @@ html[data-section="evening"] .adhkar-card-heading button { background: rgba(170,
 .adhkar-counter-target { margin-top: 2px; color: var(--text-muted); font-size: 12px; font-weight: 400; line-height: 1; }
 
 .adhkar-pagination-row { display: flex; height: 40px; min-height: 40px; align-items: flex-start; justify-content: center; gap: 12px; padding: 0 20px 16px; }
-.adhkar-pagination { display: flex; height: 24px; min-width: 0; align-items: center; justify-content: center; gap: 5px; color: var(--text-muted); touch-action: none; }
+.adhkar-pagination { display: flex; height: 24px; min-width: 0; align-items: center; justify-content: center; gap: 5px; padding: 0 0; border: 1px solid transparent; border-radius: 999px; color: var(--text-muted); touch-action: none; transition: padding 120ms ease, background-color 120ms ease, border-color 120ms ease; }
+.adhkar-pagination.is-scrubbing { padding: 0 9px; border-color: color-mix(in oklab, var(--card-border, var(--border)) 75%, transparent); background: color-mix(in oklab, var(--pill-bg, var(--source-bg)) 72%, transparent); backdrop-filter: blur(12px); }
 .adhkar-pagination button { width: 7px; height: 7px; flex: 0 0 auto; border-radius: 999px; background: var(--dot-inactive); transition: width 250ms ease, background-color 250ms ease; }
 .adhkar-pagination button.is-active { width: 7px; background: var(--dot-active); }
 .adhkar-pagination-arrow { display: inline-flex; width: 24px; height: 24px; flex: 0 0 24px; align-items: center; justify-content: center; border: 1px solid var(--card-border, var(--border)); border-radius: 999px; background: var(--pill-bg, var(--source-bg)); color: var(--text-muted); }
