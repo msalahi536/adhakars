@@ -110,6 +110,7 @@ export function SwipeStack({ items, counts, onIncrement, onReset, persistKey, fi
   };
 
   const current = items[idx];
+  const currentDhikr = current?.dhikr;
 
   // Auto-advance ONLY when the current card transitions from incomplete → complete
   // due to a user tap in this session. Ignore already-complete cards on mount and
@@ -152,7 +153,8 @@ export function SwipeStack({ items, counts, onIncrement, onReset, persistKey, fi
 
     const onTouchStart = (e: TouchEvent) => {
       if (animating.current) return;
-      // ignore swipes that start inside a scrollable card body
+      // Keep controls interactive, but allow horizontal swipes to begin over
+      // the card's scrollable reading area. Axis locking preserves vertical reading.
       const target = e.target as HTMLElement | null;
       if (target && target.closest("[data-no-swipe]")) return;
       startX.current = e.touches[0].clientX;
@@ -263,7 +265,7 @@ export function SwipeStack({ items, counts, onIncrement, onReset, persistKey, fi
             <RotateCcw size={12} /> Restart
           </button>
         )}
-        {current?.dhikr && onAddItem && (
+        {currentDhikr && onAddItem && (
           <button
             type="button"
             onClick={onAddItem}
@@ -274,10 +276,10 @@ export function SwipeStack({ items, counts, onIncrement, onReset, persistKey, fi
             <Plus size={13} /> {!dailyLayout && "Add"}
           </button>
         )}
-        {current?.dhikr && onEditItem && (
+        {currentDhikr && onEditItem && (
           <button
             type="button"
-            onClick={() => onEditItem(current.dhikr!.id)}
+            onClick={() => onEditItem(currentDhikr.id)}
             className={`adhkar-card-action flex items-center justify-center gap-1 rounded-full text-[11px] font-semibold transition active:scale-95 ${dailyLayout ? "is-icon-only" : "px-2.5 py-1"}`}
             style={{ background: "var(--surface)", color: "var(--foreground)" }}
             aria-label="edit"
@@ -285,10 +287,10 @@ export function SwipeStack({ items, counts, onIncrement, onReset, persistKey, fi
             <Pencil size={12} /> {!dailyLayout && "Edit"}
           </button>
         )}
-        {current?.dhikr && onDeleteItem && (
+        {currentDhikr && onDeleteItem && (
           <button
             type="button"
-            onClick={() => onDeleteItem(current.dhikr!.id)}
+            onClick={() => onDeleteItem(currentDhikr.id)}
             className={`adhkar-card-action is-delete flex items-center justify-center gap-1 rounded-full text-[11px] font-semibold transition active:scale-95 ${dailyLayout ? "is-icon-only" : "px-2.5 py-1"}`}
             style={{ background: "var(--surface)", color: "var(--destructive)" }}
             aria-label="delete"
@@ -309,12 +311,12 @@ export function SwipeStack({ items, counts, onIncrement, onReset, persistKey, fi
             className={dailyLayout ? "adhkar-card-motion w-full" : "h-full w-full"}
             style={{ transform, opacity, transition, willChange: "transform, opacity" }}
           >
-            {current.dhikr ? (
+            {currentDhikr ? (
               <DhikrCard
-                key={current.dhikr.id}
-                dhikr={current.dhikr}
-                count={counts[current.dhikr.id] ?? 0}
-                onIncrement={() => onIncrement(current.dhikr!.id, current.dhikr!.target)}
+                key={currentDhikr.id}
+                dhikr={currentDhikr}
+                count={counts[currentDhikr.id] ?? 0}
+                onIncrement={() => onIncrement(currentDhikr.id, currentDhikr.target)}
                 index={idx + 1}
                 total={items.length}
                 isSpecial={current.isSpecial}

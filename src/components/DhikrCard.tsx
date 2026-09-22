@@ -94,7 +94,6 @@ export function DhikrCard({ dhikr, count, onIncrement, isSpecial, specialLabel, 
         <div
           ref={scrollRef}
           onScroll={handleScroll}
-          data-no-swipe
           className={`hide-scrollbar px-7 pb-4 pt-5 ${referenceLayout ? "adhkar-reference-content" : "h-full overflow-y-auto"}`}
           style={{ scrollbarWidth: "none", WebkitOverflowScrolling: "touch" }}
         >
@@ -159,7 +158,7 @@ export function DhikrCard({ dhikr, count, onIncrement, isSpecial, specialLabel, 
             </div>
           )}
           {referenceLayout && hasCommentary && (
-            <details className="adhkar-commentary" data-no-swipe>
+            <details className="adhkar-commentary">
               <summary>
                 <span>Commentary</span>
                 {dhikr.details?.weak && <AlertTriangle aria-label="Weak or disputed narration" size={13} strokeWidth={1.8} />}

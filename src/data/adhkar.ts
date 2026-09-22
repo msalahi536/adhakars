@@ -29,7 +29,7 @@ const threeQuls = (id: string): Dhikr => ({
   translation: "In the name of Allah, the Entirely Merciful, the Especially Merciful.\n\nSay, “He is Allah, [who is] One,\nAllah, the Eternal Refuge.\nHe neither begets nor is born,\nNor is there to Him any equivalent.”\n\nSay, “I seek refuge in the Lord of daybreak\nFrom the evil of that which He created\nAnd from the evil of darkness when it settles\nAnd from the evil of the blowers in knots\nAnd from the evil of an envier when he envies.”\n\nSay, “I seek refuge in the Lord of mankind,\nThe Sovereign of mankind,\nThe God of mankind,\nFrom the evil of the retreating whisperer —\nWho whispers [evil] into the breasts of mankind —\nFrom among the jinn and mankind.”",
   source: "Sunan Abi Dawud 5082 · Hasan (al-Albani)",
   commentary: "Recite Sūrat al-Ikhlāṣ, Sūrat al-Falaq, and Sūrat an-Nās three times each in the morning and evening. They will suffice you against everything.",
-  target: 3,
+  target: 9,
   arabicMulti: [
     {
       label: "The Basmalah · Quran 1:1",
