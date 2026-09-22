@@ -131,6 +131,11 @@ export function Pagination({
   };
 
   const stopScrub = (event: React.PointerEvent<HTMLDivElement>) => {
+    if (scrubbing.current && !didDrag.current) {
+      const selected = indexFromPointer(event.clientX, event.currentTarget);
+      if (selected !== active) onSelect(selected);
+      suppressClick.current = true;
+    }
     if (scrubbing.current && event.currentTarget.hasPointerCapture(event.pointerId)) {
       event.currentTarget.releasePointerCapture(event.pointerId);
     }
@@ -183,7 +188,7 @@ export function Pagination({
             key={index}
             type="button"
             onClick={() => {
-              if (suppressClick.current || didDrag.current) {
+              if (suppressClick.current) {
                 suppressClick.current = false;
                 didDrag.current = false;
                 return;

@@ -2225,10 +2225,44 @@ html[data-preset="dark-red"][data-section="tasbih"] .tasbih-card {
 }
 
 html[data-preset="dark-red"][data-visual-phase="morning"] .bottom-nav-row {
-  background: rgba(79, 37, 37, 0.84) !important;
+  background: rgba(83, 42, 41, 0.82) !important;
   border-color: rgba(247, 177, 176, 0.32) !important;
   box-shadow: 0 9px 28px rgba(38, 8, 10, 0.24) !important;
   backdrop-filter: blur(20px);
+}
+
+html[data-preset="dark-red"][data-visual-phase="morning"] .adhkar-header-title {
+  color: #fff1e9 !important;
+  text-shadow: 0 2px 12px rgba(40, 7, 9, 0.18);
+}
+
+html[data-preset="dark-red"][data-visual-phase="morning"] .adhkar-header-eyebrow {
+  color: #dca9a5 !important;
+}
+
+html[data-preset="dark-red"][data-visual-phase="morning"] .daily-swipe-stack .adhkar-index-row > span {
+  border-color: rgba(247, 177, 176, 0.28) !important;
+  background: rgba(108, 54, 54, 0.68) !important;
+  color: #fff0e9 !important;
+  box-shadow: none !important;
+  backdrop-filter: blur(10px);
+}
+
+html[data-preset="dark-red"][data-visual-phase="morning"] .adhkar-progress-track {
+  background: rgba(255, 232, 226, 0.34);
+}
+
+html[data-preset="dark-red"][data-visual-phase="morning"] .adhkar-progress-value {
+  background: #f18b8f;
+}
+
+html[data-preset="dark-red"][data-visual-phase="morning"] .adhkar-card-heading h3 {
+  color: #f3c4bd !important;
+}
+
+html[data-preset="dark-red"][data-visual-phase="morning"] .adhkar-card-heading button {
+  background: rgba(213, 111, 114, 0.24) !important;
+  color: #fff1e9 !important;
 }
 
 html[data-preset="dark-red"][data-visual-phase="morning"] .adhkar-pagination-arrow {
