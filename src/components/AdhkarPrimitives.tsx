@@ -161,7 +161,6 @@ export function Pagination({
             clearTimeout(holdTimer.current);
             holdTimer.current = null;
           }
-          if (scrubbing.current && event.buttons === 0) stopScrub(event);
         }}
       >
         {Array.from({ length: total }, (_, index) => (
