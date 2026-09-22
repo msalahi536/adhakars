@@ -456,6 +456,39 @@ html[data-preset="rose"][data-section="morning"] {
   --source-bg: #efd6d3 !important;
   --source-fg: #8a4356 !important;
 }
+/* Rose evening: mauve glass card/nav with a calm pink edge glow */
+html[data-preset="rose"][data-section="evening"] {
+  --card: rgba(124, 73, 86, 0.88) !important;
+  --surface-card: rgba(124, 73, 86, 0.88) !important;
+  --card-border: rgba(246, 200, 210, 0.22) !important;
+  --border: rgba(246, 200, 210, 0.22) !important;
+  --nav-bg: rgba(123, 74, 88, 0.9) !important;
+  --nav-border: rgba(246, 200, 210, 0.3) !important;
+  --nav-active: #f7dde3 !important;
+  --nav-inactive: rgba(247, 221, 227, 0.55) !important;
+  --dot-active: #f4ccd5 !important;
+  --dot-inactive: rgba(244, 204, 213, 0.35) !important;
+  --pill-bg: rgba(255, 236, 240, 0.07) !important;
+  --text-muted: #d9a7b5 !important;
+  --translit: #f0c6d1 !important;
+  --source-bg: rgba(255, 236, 240, 0.1) !important;
+  --source-fg: #f4ccd5 !important;
+  --count-fg: #f2c4cf !important;
+  --ring-track: rgba(244, 204, 213, 0.22) !important;
+}
+html[data-preset="rose"][data-section="evening"] .dhikr-card {
+  backdrop-filter: blur(14px);
+  box-shadow: 0 0 0 1px rgba(246, 200, 210, 0.14), 0 8px 32px rgba(255, 180, 200, 0.1), 0 24px 60px rgba(30, 10, 18, 0.35) !important;
+}
+html[data-preset="rose"][data-section="evening"] .bottom-nav-row {
+  box-shadow: 0 0 0 1px rgba(246, 200, 210, 0.16), 0 8px 32px rgba(255, 180, 200, 0.1), 0 18px 44px rgba(30, 10, 18, 0.4) !important;
+}
+html[data-preset="rose"][data-section="evening"] .adhkar-pagination-arrow {
+  border-color: rgba(246, 200, 210, 0.42);
+  background: rgba(255, 236, 240, 0.06);
+  color: #f4d3db;
+  backdrop-filter: blur(8px);
+}
 html[data-preset][data-section="evening"] {
   --background: #0e0f22 !important; --foreground: var(--eve-title) !important; --title: var(--eve-title) !important; --eyebrow: var(--eve-eyebrow) !important; --accent: var(--eve-ink) !important; --card: #222539 !important; --card-foreground: #efeafe !important; --surface-card: #222539 !important; --border: rgba(255,255,255,0.09) !important; --card-border: rgba(255,255,255,0.09) !important; --translit: var(--eve-ink) !important; --text-muted: var(--eve-muted) !important; --pill-bg: rgba(255,255,255,0.08) !important; --source-bg: rgba(255,255,255,0.08) !important; --source-fg: var(--eve-source-fg) !important; --ring-track: rgba(var(--eve-ink-rgb),0.22) !important; --nav-bg: #292d43 !important; --nav-border: rgba(255,255,255,0.14) !important; --nav-active: var(--eve-nav-active) !important; --nav-inactive: var(--eve-nav-inactive) !important; --dot-active: var(--eve-ink) !important; --dot-inactive: rgba(var(--eve-ink-rgb),0.3) !important; --index-badge-bg: rgba(255,255,255,0.08) !important; --index-badge-fg: var(--eve-title) !important; --count-fg: var(--eve-source-fg) !important;
 }
