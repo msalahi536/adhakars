@@ -197,24 +197,21 @@ function Qibla() {
   return (
     <>
       <header
-        className="page-header relative overflow-hidden"
+        className="page-header qibla-header relative overflow-hidden"
         style={{ background: "var(--grad-header)", color: "var(--header-fg)" }}
       >
         <HeaderBackButton />
-        <div className="mx-auto max-w-md px-16 pb-6 pt-9 text-center">
+        <div className="qibla-header-content mx-auto max-w-md px-16 text-center">
           <div className="label-caps" style={{ color: "var(--header-sub)", opacity: 1 }}>
             Direction of Prayer
           </div>
           <h1 className="app-page-title mt-2">Qibla Finder</h1>
-          <p className="mt-2 text-xs" style={{ color: "var(--header-sub)" }}>
-            Point your phone flat. The arrow will point toward the Kaaba.
-          </p>
         </div>
       </header>
 
       <main className="scroll-area">
         <div
-          className="mx-auto flex w-full max-w-md flex-col items-center px-5 py-6"
+          className="qibla-page mx-auto flex min-h-full w-full max-w-md flex-col items-center"
           style={{ color: "var(--foreground)" }}
         >
           {showCalibration && (
@@ -222,7 +219,7 @@ function Qibla() {
           )}
 
           {permState !== "ready" && (
-            <div className="mt-6 flex w-full flex-col items-center gap-4">
+            <div className="flex w-full flex-1 flex-col items-center justify-center gap-4 pb-10">
               <p
                 className="text-center text-sm"
                 style={{ color: "var(--muted-foreground)" }}
@@ -254,10 +251,12 @@ function Qibla() {
 
 
           {permState === "ready" && (
-            <>
+            <div className="qibla-ready">
+              <p className="mb-5 max-w-[280px] text-center text-xs" style={{ color: "var(--muted-foreground)" }}>
+                Hold your phone flat and turn slowly until the arrow points up.
+              </p>
               <div
-                className="relative mt-4 flex items-center justify-center"
-                style={{ width: 280, height: 280 }}
+                className="qibla-compass relative flex items-center justify-center"
               >
                 {/* Compass ring */}
                 <div
@@ -370,7 +369,7 @@ function Qibla() {
 
 
               <div
-                className="mt-6 w-full space-y-1.5 text-center text-xs"
+                className="qibla-details w-full space-y-1.5 text-center text-xs"
                 style={{ color: "var(--muted-foreground)" }}
               >
                 {qiblaBearing !== null && (
@@ -405,12 +404,12 @@ function Qibla() {
               </div>
 
               <p
-                className="mt-6 text-center text-[10px]"
+                className="mt-4 text-center text-[10px]"
                 style={{ color: "var(--muted-foreground)", opacity: 0.8 }}
               >
                 Tip: Keep phone flat and away from metal or magnets for best accuracy.
               </p>
-            </>
+            </div>
           )}
         </div>
       </main>

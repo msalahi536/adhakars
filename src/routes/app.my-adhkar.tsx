@@ -7,6 +7,16 @@ import {
   type CustomAdhkarFormValues,
 } from "@/components/CustomAdhkarForm";
 import type { Dhikr } from "@/data/adhkar";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 export const Route = createFileRoute("/app/my-adhkar")({
   head: () => ({
@@ -104,6 +114,7 @@ function MyAdhkar() {
   const [rows, setRows] = useState<CustomRow[]>([]);
   const [formOpen, setFormOpen] = useState(false);
   const [editing, setEditing] = useState<CustomRow | null>(null);
+  const [deleting, setDeleting] = useState<CustomRow | null>(null);
 
   useEffect(() => {
     setRows(sortRows(loadRows()));
@@ -130,13 +141,7 @@ function MyAdhkar() {
   };
 
   const handleDelete = (id: string) => {
-    if (typeof window !== "undefined") {
-      const row = rows.find((r) => r.id === id);
-      const label = row?.title || "this adhkar";
-      const confirmed = window.confirm(`Delete "${label}"? This cannot be undone.`);
-      if (!confirmed) return;
-    }
-    persist(rows.filter((r) => r.id !== id));
+    setDeleting(rows.find((r) => r.id === id) ?? null);
   };
 
   const handleSubmit = (values: CustomAdhkarFormValues) => {
@@ -175,10 +180,8 @@ function MyAdhkar() {
       type="button"
       onClick={openAdd}
       aria-label="Add adhkar"
-        className="header-icon-button flex items-center justify-center transition-transform active:scale-90"
+        className="header-icon-button my-adhkar-add flex items-center justify-center transition-transform active:scale-90"
       style={{
-        width: 44,
-        height: 44,
         color: "currentColor",
         background: "color-mix(in oklab, var(--surface-card) 72%, transparent)",
         border: "1px solid color-mix(in oklab, currentColor 12%, transparent)",
@@ -255,6 +258,34 @@ function MyAdhkar() {
         }}
         onSubmit={handleSubmit}
       />
+      <AlertDialog open={deleting !== null} onOpenChange={(open) => { if (!open) setDeleting(null); }}>
+        <AlertDialogContent
+          className="w-[calc(100%-40px)] max-w-sm rounded-[22px] border p-5"
+          style={{ background: "var(--surface, var(--card))", borderColor: "var(--border)", color: "var(--foreground)" }}
+        >
+          <AlertDialogHeader className="text-left">
+            <AlertDialogTitle>Delete this adhkar?</AlertDialogTitle>
+            <AlertDialogDescription style={{ color: "var(--muted-foreground)" }}>
+              {deleting?.title ? `“${deleting.title}” will be removed from your collection.` : "This adhkar will be removed from your collection."} This cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter className="mt-2 grid grid-cols-2 gap-2">
+            <AlertDialogCancel className="m-0 rounded-full" style={{ background: "var(--muted)", color: "var(--foreground)", borderColor: "var(--border)" }}>
+              Cancel
+            </AlertDialogCancel>
+            <AlertDialogAction
+              className="rounded-full"
+              style={{ background: "var(--destructive)", color: "var(--destructive-foreground)" }}
+              onClick={() => {
+                if (deleting) persist(rows.filter((row) => row.id !== deleting.id));
+                setDeleting(null);
+              }}
+            >
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </>
   );
 }
