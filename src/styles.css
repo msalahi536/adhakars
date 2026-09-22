@@ -332,7 +332,7 @@
 }
 
 .settings-button {
-  top: calc(env(safe-area-inset-top) + 14px);
+  top: calc(env(safe-area-inset-top) + 84px);
   right: 24px;
   width: 36px;
   height: 36px;
