@@ -1,13 +1,13 @@
 import { BookOpen, X } from "lucide-react";
 import type { Dhikr } from "@/data/adhkar";
 import {
-  Drawer,
-  DrawerClose,
-  DrawerContent,
-  DrawerDescription,
-  DrawerHeader,
-  DrawerTitle,
-} from "@/components/ui/drawer";
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 
 type Props = {
   dhikr: Dhikr;
@@ -30,37 +30,34 @@ export function HadithDetailsDrawer({ dhikr, open, onOpenChange }: Props) {
   const details = dhikr.details;
 
   return (
-    <Drawer open={open} onOpenChange={onOpenChange} shouldScaleBackground={false}>
-      <DrawerContent
-        className="hadith-details-drawer mx-auto max-h-[92dvh] max-w-lg overflow-hidden rounded-t-[24px]"
-        style={{ background: "var(--card)", color: "var(--card-foreground)", borderColor: "var(--border)" }}
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent
+        className="hadith-details-drawer grid max-h-[78dvh] w-[calc(100%-32px)] max-w-[420px] grid-rows-[auto_minmax(0,1fr)] gap-0 overflow-hidden rounded-2xl border-border bg-card p-0 text-card-foreground shadow-2xl [&>button:last-child]:hidden"
       >
-        <DrawerHeader className="relative border-b px-6 pb-4 pt-5 text-left" style={{ borderColor: "var(--border)" }}>
+        <DialogHeader className="relative border-b border-border px-5 pb-4 pt-5 text-left">
           <div className="flex items-start gap-3 pr-10">
             <span
-              className="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-full"
-              style={{ background: "var(--index-badge-bg, var(--accent))", color: "var(--index-badge-fg, var(--accent-foreground))" }}
+              className="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-accent text-accent-foreground"
             >
               <BookOpen size={17} strokeWidth={1.6} />
             </span>
             <div className="min-w-0">
-              <DrawerTitle className="font-serif text-xl leading-6">{dhikr.title}</DrawerTitle>
-              <DrawerDescription className="mt-1.5 text-xs leading-5" style={{ color: "var(--muted-foreground)" }}>
+              <DialogTitle className="font-serif text-xl leading-6">{dhikr.title}</DialogTitle>
+              <DialogDescription className="mt-1.5 text-xs leading-5 text-muted-foreground">
                 {dhikr.source}
-              </DrawerDescription>
+              </DialogDescription>
             </div>
           </div>
-          <DrawerClose
+          <DialogClose
             aria-label="Close hadith details"
-            className="absolute right-5 top-5 flex h-9 w-9 items-center justify-center rounded-full"
-            style={{ background: "color-mix(in oklab, var(--foreground) 8%, transparent)" }}
+            className="absolute right-4 top-4 flex h-9 w-9 items-center justify-center rounded-full bg-muted text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
           >
             <X size={17} />
-          </DrawerClose>
-        </DrawerHeader>
+          </DialogClose>
+        </DialogHeader>
 
         <div
-          className="hide-scrollbar min-h-0 flex-1 space-y-6 overflow-y-auto overscroll-contain px-6 pb-[calc(env(safe-area-inset-bottom)+28px)] pt-5"
+          className="hide-scrollbar min-h-0 space-y-6 overflow-y-auto overscroll-contain px-5 pb-6 pt-5"
           style={{ WebkitOverflowScrolling: "touch" }}
           data-no-swipe
         >
@@ -85,7 +82,7 @@ export function HadithDetailsDrawer({ dhikr, open, onOpenChange }: Props) {
             <DetailSection key={`${dhikr.id}-note-${index}`} title={index === 0 ? "Notes" : `Note ${index + 1}`} children={note} />
           ))}
         </div>
-      </DrawerContent>
-    </Drawer>
+      </DialogContent>
+    </Dialog>
   );
 }
