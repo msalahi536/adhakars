@@ -11,6 +11,8 @@ import oceanMorning from "@/assets/ocean-morning.webp.asset.json";
 import oceanEvening from "@/assets/ocean-evening.webp.asset.json";
 import emeraldMorning from "@/assets/emerald-morning.webp.asset.json";
 import emeraldEvening from "@/assets/emerald-evening.webp.asset.json";
+import sandMorning from "@/assets/sand-morning.webp.asset.json";
+import sandEvening from "@/assets/sand-evening.webp.asset.json";
 
 export type BackgroundPair = { morning: string; evening: string };
 
