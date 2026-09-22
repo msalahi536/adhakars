@@ -284,12 +284,18 @@ export function PrayerTimeline({ days, now, todayKey, tone = "light", onPickPray
             }}
             className="rounded-t-[28px] px-5 pb-8 pt-3"
             style={{
-              background: "var(--background)",
-              color: "var(--foreground)",
+              background: "#f9f5f0",
+              color: "#3c5438",
               maxHeight: "88vh",
               transform: `translateY(${dragY}px)`,
               transition: startY === null ? "transform 220ms ease" : "none",
-            }}
+              ["--foreground" as string]: "#3c5438",
+              ["--muted-foreground" as string]: "#8a8f80",
+              ["--accent" as string]: "#70815d",
+              ["--surface-card" as string]: "#ffffff",
+              ["--border" as string]: "rgba(60, 84, 56, 0.12)",
+              ["--card-shadow" as string]: "0 2px 10px rgba(60, 84, 56, 0.08)",
+            } as React.CSSProperties}
           >
             <div
               className="mx-auto mb-3 rounded-full"
