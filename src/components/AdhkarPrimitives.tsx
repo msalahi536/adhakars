@@ -129,11 +129,10 @@ export function Pagination({
     setIsScrubbing(false);
   };
 
+  void onPrevious;
+  void onNext;
   return (
     <div className="adhkar-pagination-row">
-      <button type="button" className="adhkar-pagination-arrow" onClick={onPrevious} disabled={active === 0} aria-label="previous">
-        <ChevronLeft size={12} strokeWidth={2} />
-      </button>
       <div
         className={`adhkar-pagination ${isScrubbing ? "is-scrubbing" : ""}`}
         onPointerDown={(event) => {
@@ -179,9 +178,6 @@ export function Pagination({
           />
         ))}
       </div>
-      <button type="button" className="adhkar-pagination-arrow" onClick={onNext} disabled={active === total - 1} aria-label="next">
-        <ChevronRight size={12} strokeWidth={2} />
-      </button>
     </div>
   );
 }
