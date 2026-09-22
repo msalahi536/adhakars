@@ -277,7 +277,7 @@ export function SwipeStack({ items, counts, onIncrement, onReset, persistKey, fi
         {current?.dhikr && onEditItem && (
           <button
             type="button"
-            onClick={() => onEditItem(current.dhikr.id)}
+            onClick={() => onEditItem(current.dhikr!.id)}
             className={`adhkar-card-action flex items-center justify-center gap-1 rounded-full text-[11px] font-semibold transition active:scale-95 ${dailyLayout ? "is-icon-only" : "px-2.5 py-1"}`}
             style={{ background: "var(--surface)", color: "var(--foreground)" }}
             aria-label="edit"
@@ -288,7 +288,7 @@ export function SwipeStack({ items, counts, onIncrement, onReset, persistKey, fi
         {current?.dhikr && onDeleteItem && (
           <button
             type="button"
-            onClick={() => onDeleteItem(current.dhikr.id)}
+            onClick={() => onDeleteItem(current.dhikr!.id)}
             className={`adhkar-card-action is-delete flex items-center justify-center gap-1 rounded-full text-[11px] font-semibold transition active:scale-95 ${dailyLayout ? "is-icon-only" : "px-2.5 py-1"}`}
             style={{ background: "var(--surface)", color: "var(--destructive)" }}
             aria-label="delete"
@@ -314,7 +314,7 @@ export function SwipeStack({ items, counts, onIncrement, onReset, persistKey, fi
                 key={current.dhikr.id}
                 dhikr={current.dhikr}
                 count={counts[current.dhikr.id] ?? 0}
-                onIncrement={() => onIncrement(current.dhikr.id, current.dhikr.target)}
+                onIncrement={() => onIncrement(current.dhikr!.id, current.dhikr!.target)}
                 index={idx + 1}
                 total={items.length}
                 isSpecial={current.isSpecial}
