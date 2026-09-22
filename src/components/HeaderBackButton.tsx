@@ -26,17 +26,19 @@ export function HeaderBackButton({ fallbackTo = "/app/more" }: { fallbackTo?: st
       style={{
         top: "calc(env(safe-area-inset-top) + 18px)",
         left: 20,
-        width: 44,
-        height: 44,
-        color: "currentColor",
-        background: "color-mix(in oklab, var(--surface-card) 72%, transparent)",
-        border: "1px solid color-mix(in oklab, currentColor 12%, transparent)",
-        boxShadow: "0 8px 24px color-mix(in oklab, var(--foreground) 9%, transparent)",
-        backdropFilter: "blur(18px) saturate(130%)",
+        width: 36,
+        height: 36,
+        borderRadius: 999,
+        color: "var(--foreground)",
+        background: "color-mix(in oklab, var(--surface-card, var(--background)) 55%, transparent)",
+        border: "1px solid color-mix(in oklab, currentColor 16%, transparent)",
+        boxShadow: "0 4px 14px color-mix(in oklab, var(--foreground) 6%, transparent)",
+        backdropFilter: "blur(14px) saturate(130%)",
+        WebkitBackdropFilter: "blur(14px) saturate(130%)",
         cursor: "pointer",
       }}
     >
-      <ChevronLeft size={20} />
+      <ChevronLeft size={18} strokeWidth={2.2} />
     </button>
   );
 }
