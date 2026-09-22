@@ -9,6 +9,8 @@ import twilightMorning from "@/assets/twilight-morning.webp.asset.json";
 import twilightEvening from "@/assets/twilight-evening.webp.asset.json";
 import oceanMorning from "@/assets/ocean-morning.webp.asset.json";
 import oceanEvening from "@/assets/ocean-evening.webp.asset.json";
+import emeraldMorning from "@/assets/emerald-morning.webp.asset.json";
+import emeraldEvening from "@/assets/emerald-evening.webp.asset.json";
 
 export type BackgroundPair = { morning: string; evening: string };
 
@@ -22,6 +24,7 @@ export const PRESET_BACKGROUNDS: Record<string, BackgroundPair> = {
   rose: { morning: roseMorning.url, evening: roseEvening.url },
   lavender: { morning: twilightMorning.url, evening: twilightEvening.url },
   ocean: { morning: oceanMorning.url, evening: oceanEvening.url },
+  emerald: { morning: emeraldMorning.url, evening: emeraldEvening.url },
 };
 
 export const backgroundsForPreset = (presetId: string | null | undefined): BackgroundPair =>
