@@ -147,20 +147,10 @@ export function AfterSalahSheet({ open, prayer, onPrayer, onClose }: Props) {
 
         <div
           className="flex min-h-0 flex-1 flex-col"
-          style={
-            {
-              paddingBottom:
-                "calc(var(--bottom-nav-row, 56px) + env(safe-area-inset-bottom) + 12px)",
-              ["--card" as string]: "var(--surface-deep)",
-              ["--card-foreground" as string]: "var(--surface-deep-fg)",
-              ["--translit" as string]: "var(--surface-deep-muted)",
-              ["--border" as string]: "var(--surface-deep-border)",
-              ["--source-bg" as string]: "rgba(0,0,0,0.28)",
-              ["--source-fg" as string]: "var(--surface-deep-muted)",
-              ["--combo-card" as string]: "color-mix(in oklab, var(--surface-deep) 82%, #000)",
-              ["--count-fg" as string]: "var(--surface-deep-fg)",
-            } as React.CSSProperties
-          }
+          style={{
+            paddingBottom:
+              "calc(var(--bottom-nav-row, 56px) + env(safe-area-inset-bottom) + 12px)",
+          }}
         >
           <SwipeStack
             items={items}
