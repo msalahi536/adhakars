@@ -2047,3 +2047,9 @@ html[data-visual-phase="evening"] .tasbih-disc {
   .after-salah-panel .after-salah-title { font-size: 23px !important; }
   .after-salah-stack .adhkar-index-row { min-height: 40px; }
 }
+
+/* Phase wins over older route-specific navigation surfaces. */
+html[data-preset="ocean"][data-visual-phase="evening"] .bottom-nav-row {
+  background: rgba(25, 55, 80, 0.9) !important;
+  border-color: rgba(170, 214, 240, 0.26) !important;
+}
