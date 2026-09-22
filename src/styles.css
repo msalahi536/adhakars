@@ -168,6 +168,8 @@
     margin: 0;
     padding: 0;
     width: 100%;
+    height: 100%;
+    height: -webkit-fill-available;
     min-width: 320px;
     background-color: var(--nav-safe-area-bg);
     -webkit-text-size-adjust: 100%;
@@ -825,7 +827,7 @@ html[data-visual-phase="evening"] .adhkar-progress-value { background: #2c2a54; 
   overflow: hidden;
 }
 
-.daily-swipe-stack { min-height: 0; overflow: hidden; }
+.daily-swipe-stack { min-height: 0; flex: 1 1 0%; overflow: hidden; }
 .daily-swipe-stack .adhkar-index-row { min-height: 58px; margin: 0; align-items: flex-start; padding-top: 8px; }
 .daily-swipe-stack .adhkar-index-row > span {
   height: 24px;
@@ -870,13 +872,13 @@ html[data-visual-phase="evening"] .daily-swipe-stack .adhkar-index-row > span {
 .sleep-adhkar-page.daily-adhkar-page { margin-top: 0; }
 
 .daily-swipe-stack .adhkar-card-stage { display: flex; min-height: 0; flex: 1 1 0%; overflow: hidden; padding: 0 28px 16px; }
-.adhkar-card-motion { display: flex; width: 100%; height: auto; max-height: 100%; min-height: 0; flex: 1 1 auto; align-self: stretch; }
+.adhkar-card-motion { display: flex; width: 100%; height: 100%; max-height: 100%; min-height: 0; flex: 1 1 0%; align-self: stretch; overflow: hidden; }
 .adhkar-reference-card {
   display: flex;
   flex-direction: column;
   box-sizing: border-box;
   width: 100%;
-  height: auto;
+  height: 100%;
   max-height: 100%;
   min-height: 0;
   flex: 1 1 auto;
@@ -916,6 +918,7 @@ html[data-visual-phase="evening"] .adhkar-card-heading button { background: rgba
   overflow-x: hidden;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
+  touch-action: pan-y;
   overscroll-behavior: contain;
   scrollbar-width: none;
 }
@@ -1003,12 +1006,12 @@ html[data-visual-phase="evening"] .adhkar-card-heading button { background: rgba
   font-family: var(--font-display);
 }
 .salah-hero { position: relative; height: calc(220px + env(safe-area-inset-top)); flex: 0 0 auto; padding-top: env(safe-area-inset-top); box-sizing: border-box; text-align: center; }
-.salah-next-label { position: absolute; top: 53px; inset-inline: 70px; color: #3f5a3c; font-size: 18px; font-weight: 500; line-height: 22px; }
-.salah-countdown { position: absolute; top: 79px; inset-inline: 24px; color: #2f4f34; font-size: 52px; font-weight: 500; line-height: 52px; letter-spacing: 0; font-variant-numeric: tabular-nums; transition: color 400ms ease; }
-.salah-dismiss { position: absolute; top: 147px; left: 50%; display: inline-flex; height: 32px; align-items: center; justify-content: center; padding: 0 22px; transform: translateX(-50%); border: 1px solid rgba(255, 255, 255, 0.8); border-radius: 999px; background: rgba(233, 233, 222, 0.9); color: #2f4f34; font-size: 15px; font-weight: 500; line-height: 1; white-space: nowrap; backdrop-filter: blur(20px); }
+.salah-next-label { position: absolute; top: calc(env(safe-area-inset-top) + 53px); inset-inline: 70px; color: #3f5a3c; font-size: 18px; font-weight: 500; line-height: 22px; }
+.salah-countdown { position: absolute; top: calc(env(safe-area-inset-top) + 79px); inset-inline: 24px; color: #2f4f34; font-size: 52px; font-weight: 500; line-height: 52px; letter-spacing: 0; font-variant-numeric: tabular-nums; transition: color 400ms ease; }
+.salah-dismiss { position: absolute; top: calc(env(safe-area-inset-top) + 147px); left: 50%; display: inline-flex; height: 32px; align-items: center; justify-content: center; padding: 0 22px; transform: translateX(-50%); border: 1px solid rgba(255, 255, 255, 0.8); border-radius: 999px; background: rgba(233, 233, 222, 0.9); color: #2f4f34; font-size: 15px; font-weight: 500; line-height: 1; white-space: nowrap; backdrop-filter: blur(20px); }
 .salah-dismiss:active { transform: translateX(-50%) scale(0.95); }
 .salah-dismiss:disabled { opacity: 0.45; }
-.salah-location { position: absolute; top: 192px; inset-inline: 24px; display: flex; align-items: center; justify-content: center; gap: 6px; color: #5f7a5a; font-size: 13px; font-weight: 400; line-height: 16px; }
+.salah-location { position: absolute; top: calc(env(safe-area-inset-top) + 192px); inset-inline: 24px; display: flex; align-items: center; justify-content: center; gap: 6px; color: #5f7a5a; font-size: 13px; font-weight: 400; line-height: 16px; }
 .salah-content { flex: 1; min-height: 0; overflow: hidden; padding-bottom: 24px; }
 .salah-content-inner { display: grid; grid-template-rows: 170px 242px 62px; gap: 12px; width: 100%; max-width: 390px; height: 498px; margin: 16px auto 0; padding: 0 28px; box-sizing: border-box; }
 .salah-content-inner.no-location { display: flex; flex-direction: column; height: auto; max-height: 100%; overflow-y: auto; -webkit-overflow-scrolling: touch; padding-bottom: calc(var(--bottom-nav-height, 92px) + 34px + env(safe-area-inset-bottom)); }
@@ -1103,18 +1106,18 @@ html[data-preset][data-section="tasbih"] {
 .tasbih-target.is-active { border-color: transparent; background: #5a7346; color: #ffffff; }
 .tasbih-main { min-height: 0; flex: 1; padding: 0 28px calc(122px + env(safe-area-inset-bottom)); }
 .tasbih-card-wrap { width: 100%; max-width: 334px; height: 100%; margin: 0 auto; }
-.tasbih-card { position: relative; display: flex; width: 100%; height: 100%; flex-direction: column; align-items: center; overflow: hidden; box-sizing: border-box; padding: 18px; border: 1px solid rgba(255,255,255,0.85); border-radius: 18px; outline: none; background: rgba(250,247,240,0.95); color: #2f4f34; box-shadow: 0 12px 32px rgba(0,0,0,0.08); cursor: pointer; touch-action: manipulation; user-select: none; transition: transform 80ms ease; }
+.tasbih-card { position: relative; display: flex; width: 100%; height: 100%; min-height: 0; flex-direction: column; align-items: center; justify-content: center; overflow: hidden; box-sizing: border-box; padding: 58px 18px 22px; border: 1px solid rgba(255,255,255,0.85); border-radius: 18px; outline: none; background: rgba(250,247,240,0.95); color: #2f4f34; box-shadow: 0 12px 32px rgba(0,0,0,0.08); cursor: pointer; touch-action: manipulation; user-select: none; transition: transform 80ms ease; }
 .tasbih-card.is-pressed { transform: scale(0.985); }
 .tasbih-corner-control { position: absolute; top: 18px; z-index: 2; }
 .tasbih-corner-control.left { left: 18px; }
 .tasbih-corner-control.right { right: 18px; }
 .tasbih-control { display: flex; width: 36px; height: 36px; align-items: center; justify-content: center; border: 1px solid var(--card-border, var(--border)); border-radius: 999px; background: color-mix(in oklab, var(--card) 88%, transparent); color: var(--btn-fg, var(--title)); box-shadow: 0 4px 12px color-mix(in oklab, var(--title) 8%, transparent); backdrop-filter: blur(16px); }
-.tasbih-disc { position: absolute; top: 90px; left: 50%; display: flex; width: 280px; height: 280px; align-items: center; justify-content: center; transform: translateX(-50%); border: 8px solid #f4efe4; border-radius: 50%; background: radial-gradient(circle at 50% 35%, #fbf8f1 0%, #f1ece0 70%, #e6dfd0 100%); box-shadow: 0 18px 40px rgba(0,0,0,0.10), inset 0 2px 6px rgba(255,255,255,0.9), inset 0 -6px 14px rgba(0,0,0,0.06); transition: transform 80ms ease; }
-.tasbih-disc-tapped { transform: translateX(-50%) scale(0.985); }
+.tasbih-disc { position: relative; display: flex; width: 280px; height: 280px; flex: 0 0 auto; align-items: center; justify-content: center; border: 8px solid #f4efe4; border-radius: 50%; background: radial-gradient(circle at 50% 35%, #fbf8f1 0%, #f1ece0 70%, #e6dfd0 100%); box-shadow: 0 18px 40px rgba(0,0,0,0.10), inset 0 2px 6px rgba(255,255,255,0.9), inset 0 -6px 14px rgba(0,0,0,0.06); transition: transform 80ms ease; }
+.tasbih-disc-tapped { transform: scale(0.985); }
 .tasbih-disc-content { display: flex; flex-direction: column; align-items: center; justify-content: center; }
 .tasbih-count { color: #2f4f34; font-family: var(--font-sans); font-size: 92px; font-weight: 400; line-height: 1; font-variant-numeric: tabular-nums; }
 .tasbih-cycle { margin-top: 6px; color: #2f4f34; font-family: var(--font-sans); font-size: 15px; font-weight: 400; line-height: 1; }
-.tasbih-helper { position: absolute; top: 406px; inset-inline: 18px; text-align: center; }
+.tasbih-helper { position: relative; width: 100%; flex: 0 0 auto; margin-top: 24px; text-align: center; }
 .tasbih-helper-primary { color: #2f4f34; font-family: var(--font-sans); font-size: 12px; font-weight: 500; line-height: 1; letter-spacing: 0.2em; text-transform: uppercase; }
 .tasbih-ring { position: absolute; top: -8px; left: -8px; z-index: 1; pointer-events: none; }
 .tasbih-disc-content { position: relative; z-index: 2; }
