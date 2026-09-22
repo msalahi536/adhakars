@@ -1206,7 +1206,7 @@ html[data-preset][data-section="tasbih"] {
 }
 
 .page-content {
-  padding-bottom: calc(var(--bottom-nav-row) + env(safe-area-inset-bottom) + 12px);
+  padding-bottom: calc(var(--bottom-nav-row) + env(safe-area-inset-bottom) + 20px);
 }
 
 
