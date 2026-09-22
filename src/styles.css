@@ -366,6 +366,7 @@ html[data-section="morning"] {
   --title: #70815d;
   --eyebrow: #70815d;
   --accent: #70815d;
+  --primary: #70815d;
   --card: rgba(250, 247, 240, 0.92);
   --card-foreground: #2a2a2a;
   --surface-card: #f7f3e9;
@@ -383,6 +384,8 @@ html[data-section="morning"] {
   --index-badge-bg: #70815d;
   --index-badge-fg: #fff;
   --count-fg: #70815d;
+  --btn-fg: #70815d;
+  --arrow-fg: #70815d;
   --pill-bg: rgba(240, 236, 226, 0.9);
   --card-border: rgba(255, 255, 255, 0.8);
 }
@@ -416,7 +419,7 @@ html[data-section="evening"] {
 }
 
 html[data-preset][data-section="morning"] {
-  --background: #f5efe3 !important; --foreground: #70815d !important; --title: #70815d !important; --eyebrow: #70815d !important; --accent: #70815d !important; --card: rgba(250, 247, 240, 0.92) !important; --card-foreground: #2a2a2a !important; --surface-card: #f7f3e9 !important; --border: rgba(255, 255, 255, 0.8) !important; --translit: #70815d !important; --text-muted: #6b6f64 !important; --source-bg: rgba(233, 233, 222, 0.9) !important; --source-fg: #70815d !important; --ring-track: rgba(112, 129, 93, 0.18) !important; --nav-bg: rgba(255, 255, 255, 0.9) !important; --nav-active: #70815d !important; --nav-inactive: #6b6f64 !important; --dot-active: #70815d !important; --dot-inactive: rgba(112, 129, 93, 0.4) !important; --index-badge-bg: #70815d !important; --index-badge-fg: #fff !important; --count-fg: #70815d !important;
+  --background: #f5efe3 !important; --foreground: #70815d !important; --title: #70815d !important; --eyebrow: #70815d !important; --accent: #70815d !important; --primary: #70815d !important; --card: rgba(250, 247, 240, 0.92) !important; --card-foreground: #2a2a2a !important; --surface-card: #f7f3e9 !important; --border: rgba(255, 255, 255, 0.8) !important; --translit: #70815d !important; --text-muted: #6b6f64 !important; --source-bg: rgba(233, 233, 222, 0.9) !important; --source-fg: #70815d !important; --ring-track: rgba(112, 129, 93, 0.18) !important; --nav-bg: rgba(255, 255, 255, 0.9) !important; --nav-active: #70815d !important; --nav-inactive: #6b6f64 !important; --dot-active: #70815d !important; --dot-inactive: rgba(112, 129, 93, 0.4) !important; --index-badge-bg: #70815d !important; --index-badge-fg: #fff !important; --count-fg: #70815d !important; --btn-fg: #70815d !important; --arrow-fg: #70815d !important;
 }
 html[data-preset][data-section="evening"] {
   --background: #0e0f22 !important; --foreground: #ebe7f7 !important; --title: #ebe7f7 !important; --eyebrow: #a9a0cc !important; --accent: #a99bd8 !important; --card: rgba(22, 20, 50, 0.92) !important; --card-foreground: #efeafe !important; --surface-card: #161432 !important; --border: rgba(255,255,255,0.09) !important; --card-border: rgba(255,255,255,0.09) !important; --translit: #a99bd8 !important; --text-muted: #8a83ac !important; --pill-bg: rgba(255,255,255,0.08) !important; --source-bg: rgba(255,255,255,0.08) !important; --source-fg: #cfc8e8 !important; --ring-track: rgba(169,155,216,0.22) !important; --nav-bg: rgba(24,22,54,0.92) !important; --nav-border: rgba(255,255,255,0.14) !important; --nav-active: #cdbff5 !important; --nav-inactive: #a39dc4 !important; --dot-active: #a99bd8 !important; --dot-inactive: rgba(169,155,216,0.3) !important; --index-badge-bg: rgba(255,255,255,0.08) !important; --index-badge-fg: #ebe7f7 !important; --count-fg: #cfc8e8 !important;
@@ -457,7 +460,7 @@ html[data-section="evening"] .app-shell { background: radial-gradient(circle at 
   color: var(--title);
   font-family: var(--font-display);
   font-size: 32px;
-  font-weight: 600;
+  font-weight: 500;
   line-height: 1;
   letter-spacing: 0;
   white-space: nowrap;
