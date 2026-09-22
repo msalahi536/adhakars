@@ -239,7 +239,7 @@
   }
   .page-header {
     --header-fg: var(--foreground);
-    --header-sub: var(--muted-foreground);
+    --header-sub: var(--text-muted, var(--muted-foreground));
     flex-shrink: 0;
     padding-top: env(safe-area-inset-top);
     background: transparent !important;
