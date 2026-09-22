@@ -24,6 +24,8 @@
   --color-border: var(--border);
   --color-surface: var(--surface);
   --color-translit: var(--translit);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
   --font-arabic: "Amiri", serif;
   --font-sans: "Jost", system-ui, sans-serif;
   --font-display: "Cormorant Garamond", Georgia, serif;
@@ -68,6 +70,8 @@
   --source-fg: #6b5a2d;
   --count-fg: #2d1f00;
   --card-shadow: 0 4px 16px rgba(45, 31, 0, 0.06);
+  --destructive: oklch(0.52 0.18 25);
+  --destructive-foreground: oklch(0.98 0.01 25);
 }
 
 /* ===== Dusk (evening) — cool blue-grey + blue accent, light cards ===== */
@@ -951,7 +955,8 @@ html[data-visual-phase="evening"] .adhkar-card-heading button { background: rgba
 .qibla-details { margin-top: 22px; }
 
 /* My Adhkar controls and sheets. */
-.my-adhkar-add { top: calc(env(safe-area-inset-top) + 18px); right: 20px; width: 36px; height: 36px; border-radius: 50%; }
+.adhkar-header-action { top: calc(env(safe-area-inset-top) + 84px); right: 68px; }
+.my-adhkar-add { width: 36px; height: 36px; border-radius: 50%; }
 .custom-adhkar-form { display: flex; min-height: 0; flex: 1; flex-direction: column; overflow: hidden; }
 .custom-adhkar-fields { min-height: 0; flex: 1; overflow-y: auto; overscroll-behavior: contain; padding: 2px 20px 24px; scrollbar-width: none; }
 .custom-adhkar-fields::-webkit-scrollbar { display: none; }

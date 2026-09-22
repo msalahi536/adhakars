@@ -332,8 +332,11 @@ function Qibla() {
                 <div
                   className="absolute rounded-full"
                   style={{
+                    left: "50%",
+                    top: "50%",
                     width: 12,
                     height: 12,
+                    transform: "translate(-50%, -50%)",
                     background: "var(--accent)",
                     boxShadow:
                       "0 0 0 4px color-mix(in oklab, var(--accent) 20%, transparent)",
