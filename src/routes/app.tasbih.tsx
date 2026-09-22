@@ -191,6 +191,36 @@ function Tasbih() {
             {toast}
           </div>
         )}
+
+        {confirmReset && (
+          <div
+            className="tasbih-confirm-overlay"
+            onClick={() => setConfirmReset(false)}
+          >
+            <div
+              className="tasbih-confirm pop-in"
+              role="alertdialog"
+              aria-label="reset counter confirmation"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <p className="tasbih-confirm-title">Reset counter?</p>
+              <p className="tasbih-confirm-sub">
+                Are you sure you want to reset? Your current count will be cleared.
+              </p>
+              <div className="tasbih-confirm-actions">
+                <button
+                  className="tasbih-confirm-btn ghost"
+                  onClick={() => setConfirmReset(false)}
+                >
+                  Cancel
+                </button>
+                <button className="tasbih-confirm-btn solid" onClick={doReset}>
+                  Reset
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </main>
     </>
   );
