@@ -1224,6 +1224,46 @@ html[data-preset][data-section="tasbih"] {
   .tasbih-helper-primary { font-size: 13px; }
 }
 
+/* Shorter visible areas (browser chrome, compact phones) trade header height for content. */
+@media (max-height: 800px) {
+  .adhkar-header { min-height: 150px !important; }
+  .adhkar-header-content { padding-top: calc(env(safe-area-inset-top) + 54px) !important; }
+  .adhkar-header .app-page-title { margin-top: 6px !important; font-size: 28px !important; }
+  .adhkar-arabic { font-size: 23px !important; }
+  .adhkar-arabic.is-large { font-size: 28px !important; }
+  .adhkar-repeat-counter { width: 78px !important; height: 78px !important; }
+  .adhkar-counter-value { font-size: 32px !important; }
+
+  .salah-hero { height: 198px !important; flex-basis: 198px !important; }
+  .salah-next-label { top: 44px !important; font-size: 18px !important; }
+  .salah-countdown { top: 68px !important; font-size: 46px !important; line-height: 46px !important; }
+  .salah-dismiss { top: 128px !important; height: 34px !important; font-size: 15px !important; }
+  .salah-location { top: 170px !important; font-size: 13px !important; }
+  .salah-content-inner {
+    height: 100% !important;
+    min-height: 0 !important;
+    grid-template-rows: 154px minmax(0, 1fr) 62px !important;
+  }
+  .salah-recommended-card { height: 154px !important; padding: 16px 18px !important; }
+  .salah-recommended-title { font-size: 25px !important; line-height: 27px !important; }
+  .salah-upcoming-wrap,
+  .prayer-timeline-card,
+  .salah-upcoming-placeholder { height: 100% !important; min-height: 0 !important; }
+  .salah-adhan-card { height: 62px !important; }
+
+  .tasbih-header { height: 206px !important; flex-basis: 206px !important; }
+  .tasbih-header-inner { padding-top: 62px !important; }
+  .tasbih-title { font-size: 31px !important; }
+  .tasbih-disc { top: 70px !important; width: 252px !important; height: 252px !important; }
+  .tasbih-ring svg { width: 252px !important; height: 252px !important; }
+  .tasbih-count { font-size: 80px !important; }
+  .tasbih-helper { top: 348px !important; }
+
+  .qibla-header { min-height: 138px !important; }
+  .qibla-header-content { padding-top: calc(env(safe-area-inset-top) + 50px) !important; }
+  .qibla-compass { width: min(70vw, 280px) !important; }
+}
+
 /* Tablets and desktops use a centered reading column with comfortable controls. */
 @media (min-width: 600px) {
   .settings-button { right: max(24px, calc(50% - 244px)); }
