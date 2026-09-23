@@ -4,6 +4,7 @@ import { BottomNav } from "@/components/BottomNav";
 import { SettingsButton } from "@/components/SettingsButton";
 import { Onboarding, hasOnboarded } from "@/components/Onboarding";
 import { WhatsNewDialog } from "@/components/WhatsNewDialog";
+import { RatePrompt } from "@/components/RatePrompt";
 import { backgroundsForPreset } from "@/lib/backgrounds";
 import { getPresetId, resetTheme, resolveVisualPhase, type VisualPhase } from "@/lib/theme-store";
 
@@ -84,6 +85,7 @@ function AppLayout() {
       <BottomNav />
       {showOnboarding && <Onboarding onDone={() => setShowOnboarding(false)} />}
       <WhatsNewDialog open={showWhatsNew} onClose={() => setShowWhatsNew(false)} />
+      <RatePrompt />
     </div>
   );
 }

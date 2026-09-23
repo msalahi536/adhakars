@@ -56,6 +56,7 @@ export function DhikrCard({ dhikr, count, onIncrement, isSpecial, specialLabel, 
     if (willComplete) {
       setJustCompleted(true);
       setTimeout(() => setJustCompleted(false), 500);
+      noteDhikrSessionComplete();
     }
     onIncrement();
   };
