@@ -42,6 +42,8 @@ import {
   type AdhanSound,
 } from "@/lib/prayer-times";
 import { rescheduleAdhanNotifications } from "@/lib/adhan-notifications";
+import { requestAppReview } from "@/lib/rate-app";
+import { Star } from "lucide-react";
 
 
 
@@ -883,6 +885,18 @@ function Settings() {
           {/* ABOUT */}
           <section className="mb-6 space-y-3">
             <h2 className="label-caps mb-1">About</h2>
+            <button
+              type="button"
+              onClick={() => void requestAppReview()}
+              className="flex w-full items-center justify-between rounded-2xl px-4 py-3 text-sm font-semibold transition-transform active:scale-[0.99]"
+              data-settings-card=""
+            >
+              <span className="flex items-center gap-2.5">
+                <Star size={16} strokeWidth={1.6} style={{ color: "var(--accent)" }} />
+                <span>Rate This App</span>
+              </span>
+              <span className="opacity-40">›</span>
+            </button>
             <div
               className="flex items-center justify-between rounded-2xl px-4 py-3 text-sm"
               data-settings-card=""

@@ -5,6 +5,7 @@ import { ListenButton } from "./ListenButton";
 import { ArabicText, OrnamentalDivider, RepeatCounter, SourceBadge, Transliteration } from "./AdhkarPrimitives";
 import { getDisplay, triggerHaptic } from "@/lib/theme";
 import { HadithDetailsDrawer } from "./HadithDetailsDrawer";
+import { noteDhikrSessionComplete } from "@/lib/rate-app";
 
 type Props = {
   dhikr: Dhikr;
@@ -56,6 +57,7 @@ export function DhikrCard({ dhikr, count, onIncrement, isSpecial, specialLabel, 
     if (willComplete) {
       setJustCompleted(true);
       setTimeout(() => setJustCompleted(false), 500);
+      noteDhikrSessionComplete();
     }
     onIncrement();
   };
