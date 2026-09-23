@@ -2607,3 +2607,18 @@ html[data-preset="ocean"][data-visual-phase="evening"] .bottom-nav-row {
   background: rgba(25, 55, 80, 0.9) !important;
   border-color: rgba(170, 214, 240, 0.26) !important;
 }
+
+/* ============ Rate prompt sheet ============ */
+.rate-sheet {
+  animation: rate-sheet-in 320ms cubic-bezier(0.22, 1, 0.36, 1);
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  user-select: none;
+}
+@keyframes rate-sheet-in {
+  from { transform: translateY(24px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .rate-sheet { animation: none; }
+}

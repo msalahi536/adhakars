@@ -5,6 +5,7 @@ import { ListenButton } from "./ListenButton";
 import { ArabicText, OrnamentalDivider, RepeatCounter, SourceBadge, Transliteration } from "./AdhkarPrimitives";
 import { getDisplay, triggerHaptic } from "@/lib/theme";
 import { HadithDetailsDrawer } from "./HadithDetailsDrawer";
+import { noteDhikrSessionComplete } from "@/lib/rate-app";
 
 type Props = {
   dhikr: Dhikr;
