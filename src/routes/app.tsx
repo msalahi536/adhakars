@@ -6,7 +6,7 @@ import { Onboarding, hasOnboarded } from "@/components/Onboarding";
 import { WhatsNewDialog } from "@/components/WhatsNewDialog";
 import { RatePrompt } from "@/components/RatePrompt";
 import { backgroundsForPreset } from "@/lib/backgrounds";
-import { getPresetId, resetTheme, resolveVisualPhase, type VisualPhase } from "@/lib/theme-store";
+import { DEFAULT_PRESET_ID, getPresetId, resetTheme, resolveVisualPhase } from "@/lib/theme-store";
 
 const UPDATE_WELCOME_KEY = "adhkar:update-welcome:2026-09";
 
@@ -17,7 +17,10 @@ export const Route = createFileRoute("/app")({
 function AppLayout() {
   const [showOnboarding, setShowOnboarding] = useState(false);
   const [showWhatsNew, setShowWhatsNew] = useState(false);
-  const [themeRevision, setThemeRevision] = useState(0);
+  // Keep the server and first browser render identical, then restore the saved
+  // artwork before paint. Reading localStorage during render causes React to
+  // preserve the server's default background during hydration.
+  const [activePresetId, setActivePresetId] = useState(DEFAULT_PRESET_ID);
   const pathname = useRouterState({ select: (state) => state.location.pathname });
   
   const isAdhkar = ["/app", "/app/", "/app/evening"].includes(pathname);
@@ -25,7 +28,7 @@ function AppLayout() {
   const showSettings = !pathname.startsWith("/app/settings");
 
   // Derive phase and backgrounds directly during render to prevent transition flashes
-  const backgrounds = backgroundsForPreset(getPresetId());
+  const backgrounds = backgroundsForPreset(activePresetId);
   const visualPhase = resolveVisualPhase(pathname);
 
   useEffect(() => {
@@ -43,7 +46,8 @@ function AppLayout() {
   }, []);
 
   useLayoutEffect(() => {
-    const sync = () => setThemeRevision(r => r + 1);
+    const sync = () => setActivePresetId(getPresetId());
+    sync();
     window.addEventListener("adhkar:theme-change", sync);
     window.addEventListener("storage", sync);
     window.addEventListener("adhkar:visual-phase-change", sync);
