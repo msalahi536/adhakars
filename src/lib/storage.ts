@@ -1,6 +1,7 @@
 import { morningAdhkar, eveningAdhkar } from "@/data/adhkar";
 import { getSalahItems, isItemComplete, SALAH_PRAYERS } from "@/data/salah";
 import { sleepItems, wakeItems } from "@/data/sleep";
+import { periodDayCounts } from "@/lib/period";
 
 export const todayKey = () => {
   const d = new Date();
@@ -175,6 +176,8 @@ export const isDayComplete = (date = todayKey()): boolean => {
 // True if any tracked section has a recorded count > 0 for the given date.
 function hasAnyActivity(date: string): boolean {
   if (typeof window === "undefined") return false;
+  // The period is a valid excuse: checklist worship on those days keeps the streak.
+  if (periodDayCounts(date)) return true;
   const tracked = [
     "morning",
     "evening",
