@@ -83,6 +83,80 @@ export type Database = {
         }
         Relationships: []
       }
+      widget_content: {
+        Row: {
+          arabic_text: string
+          category: string
+          created_at: string
+          display_order: number | null
+          id: string
+          is_active: boolean
+          reference: string | null
+          reward_note: string | null
+          translation: string
+          transliteration: string | null
+          updated_at: string
+        }
+        Insert: {
+          arabic_text: string
+          category: string
+          created_at?: string
+          display_order?: number | null
+          id?: string
+          is_active?: boolean
+          reference?: string | null
+          reward_note?: string | null
+          translation: string
+          transliteration?: string | null
+          updated_at?: string
+        }
+        Update: {
+          arabic_text?: string
+          category?: string
+          created_at?: string
+          display_order?: number | null
+          id?: string
+          is_active?: boolean
+          reference?: string | null
+          reward_note?: string | null
+          translation?: string
+          transliteration?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      widget_schedule: {
+        Row: {
+          current_content_id: string | null
+          id: string
+          rotation_mode: string
+          updated_at: string
+          widget_type: string
+        }
+        Insert: {
+          current_content_id?: string | null
+          id?: string
+          rotation_mode?: string
+          updated_at?: string
+          widget_type: string
+        }
+        Update: {
+          current_content_id?: string | null
+          id?: string
+          rotation_mode?: string
+          updated_at?: string
+          widget_type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "widget_schedule_current_content_id_fkey"
+            columns: ["current_content_id"]
+            isOneToOne: false
+            referencedRelation: "widget_content"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
