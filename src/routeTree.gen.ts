@@ -14,6 +14,7 @@ import { Route as SuggestionsRouteImport } from './routes/suggestions'
 import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as DownloadRouteImport } from './routes/download'
 import { Route as AppRouteImport } from './routes/app'
+import { Route as AdminRouteImport } from './routes/admin'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AppIndexRouteImport } from './routes/app.index'
@@ -28,6 +29,7 @@ import { Route as AppMyAdhkarRouteImport } from './routes/app.my-adhkar'
 import { Route as AppMoreRouteImport } from './routes/app.more'
 import { Route as AppEveningRouteImport } from './routes/app.evening'
 import { Route as AppAboutRouteImport } from './routes/app.about'
+import { Route as ApiWidgetsRouteImport } from './routes/api/widgets'
 
 const TermsRoute = TermsRouteImport.update({
   id: '/terms',
@@ -52,6 +54,11 @@ const DownloadRoute = DownloadRouteImport.update({
 const AppRoute = AppRouteImport.update({
   id: '/app',
   path: '/app',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminRoute = AdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AboutRoute = AboutRouteImport.update({
@@ -124,15 +131,22 @@ const AppAboutRoute = AppAboutRouteImport.update({
   path: '/about',
   getParentRoute: () => AppRoute,
 } as any)
+const ApiWidgetsRoute = ApiWidgetsRouteImport.update({
+  id: '/api/widgets',
+  path: '/api/widgets',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/admin': typeof AdminRoute
   '/app': typeof AppRouteWithChildren
   '/download': typeof DownloadRoute
   '/privacy': typeof PrivacyRoute
   '/suggestions': typeof SuggestionsRoute
   '/terms': typeof TermsRoute
+  '/api/widgets': typeof ApiWidgetsRoute
   '/app/about': typeof AppAboutRoute
   '/app/evening': typeof AppEveningRoute
   '/app/more': typeof AppMoreRoute
@@ -149,10 +163,12 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/admin': typeof AdminRoute
   '/download': typeof DownloadRoute
   '/privacy': typeof PrivacyRoute
   '/suggestions': typeof SuggestionsRoute
   '/terms': typeof TermsRoute
+  '/api/widgets': typeof ApiWidgetsRoute
   '/app/about': typeof AppAboutRoute
   '/app/evening': typeof AppEveningRoute
   '/app/more': typeof AppMoreRoute
@@ -170,11 +186,13 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/admin': typeof AdminRoute
   '/app': typeof AppRouteWithChildren
   '/download': typeof DownloadRoute
   '/privacy': typeof PrivacyRoute
   '/suggestions': typeof SuggestionsRoute
   '/terms': typeof TermsRoute
+  '/api/widgets': typeof ApiWidgetsRoute
   '/app/about': typeof AppAboutRoute
   '/app/evening': typeof AppEveningRoute
   '/app/more': typeof AppMoreRoute
@@ -193,11 +211,13 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/about'
+    | '/admin'
     | '/app'
     | '/download'
     | '/privacy'
     | '/suggestions'
     | '/terms'
+    | '/api/widgets'
     | '/app/about'
     | '/app/evening'
     | '/app/more'
@@ -214,10 +234,12 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/about'
+    | '/admin'
     | '/download'
     | '/privacy'
     | '/suggestions'
     | '/terms'
+    | '/api/widgets'
     | '/app/about'
     | '/app/evening'
     | '/app/more'
@@ -234,11 +256,13 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/about'
+    | '/admin'
     | '/app'
     | '/download'
     | '/privacy'
     | '/suggestions'
     | '/terms'
+    | '/api/widgets'
     | '/app/about'
     | '/app/evening'
     | '/app/more'
@@ -256,11 +280,13 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AboutRoute: typeof AboutRoute
+  AdminRoute: typeof AdminRoute
   AppRoute: typeof AppRouteWithChildren
   DownloadRoute: typeof DownloadRoute
   PrivacyRoute: typeof PrivacyRoute
   SuggestionsRoute: typeof SuggestionsRoute
   TermsRoute: typeof TermsRoute
+  ApiWidgetsRoute: typeof ApiWidgetsRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -298,6 +324,13 @@ declare module '@tanstack/react-router' {
       path: '/app'
       fullPath: '/app'
       preLoaderRoute: typeof AppRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin': {
+      id: '/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AdminRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/about': {
@@ -398,6 +431,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppAboutRouteImport
       parentRoute: typeof AppRoute
     }
+    '/api/widgets': {
+      id: '/api/widgets'
+      path: '/api/widgets'
+      fullPath: '/api/widgets'
+      preLoaderRoute: typeof ApiWidgetsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -436,11 +476,13 @@ const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
+  AdminRoute: AdminRoute,
   AppRoute: AppRouteWithChildren,
   DownloadRoute: DownloadRoute,
   PrivacyRoute: PrivacyRoute,
   SuggestionsRoute: SuggestionsRoute,
   TermsRoute: TermsRoute,
+  ApiWidgetsRoute: ApiWidgetsRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
