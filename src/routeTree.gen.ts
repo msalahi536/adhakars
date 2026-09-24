@@ -28,6 +28,7 @@ import { Route as AppMyAdhkarRouteImport } from './routes/app.my-adhkar'
 import { Route as AppMoreRouteImport } from './routes/app.more'
 import { Route as AppEveningRouteImport } from './routes/app.evening'
 import { Route as AppAboutRouteImport } from './routes/app.about'
+import { Route as ApiWidgetsRouteImport } from './routes/api/widgets'
 
 const TermsRoute = TermsRouteImport.update({
   id: '/terms',
@@ -124,6 +125,11 @@ const AppAboutRoute = AppAboutRouteImport.update({
   path: '/about',
   getParentRoute: () => AppRoute,
 } as any)
+const ApiWidgetsRoute = ApiWidgetsRouteImport.update({
+  id: '/api/widgets',
+  path: '/api/widgets',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -133,6 +139,7 @@ export interface FileRoutesByFullPath {
   '/privacy': typeof PrivacyRoute
   '/suggestions': typeof SuggestionsRoute
   '/terms': typeof TermsRoute
+  '/api/widgets': typeof ApiWidgetsRoute
   '/app/about': typeof AppAboutRoute
   '/app/evening': typeof AppEveningRoute
   '/app/more': typeof AppMoreRoute
@@ -153,6 +160,7 @@ export interface FileRoutesByTo {
   '/privacy': typeof PrivacyRoute
   '/suggestions': typeof SuggestionsRoute
   '/terms': typeof TermsRoute
+  '/api/widgets': typeof ApiWidgetsRoute
   '/app/about': typeof AppAboutRoute
   '/app/evening': typeof AppEveningRoute
   '/app/more': typeof AppMoreRoute
@@ -175,6 +183,7 @@ export interface FileRoutesById {
   '/privacy': typeof PrivacyRoute
   '/suggestions': typeof SuggestionsRoute
   '/terms': typeof TermsRoute
+  '/api/widgets': typeof ApiWidgetsRoute
   '/app/about': typeof AppAboutRoute
   '/app/evening': typeof AppEveningRoute
   '/app/more': typeof AppMoreRoute
@@ -198,6 +207,7 @@ export interface FileRouteTypes {
     | '/privacy'
     | '/suggestions'
     | '/terms'
+    | '/api/widgets'
     | '/app/about'
     | '/app/evening'
     | '/app/more'
@@ -218,6 +228,7 @@ export interface FileRouteTypes {
     | '/privacy'
     | '/suggestions'
     | '/terms'
+    | '/api/widgets'
     | '/app/about'
     | '/app/evening'
     | '/app/more'
@@ -239,6 +250,7 @@ export interface FileRouteTypes {
     | '/privacy'
     | '/suggestions'
     | '/terms'
+    | '/api/widgets'
     | '/app/about'
     | '/app/evening'
     | '/app/more'
@@ -261,6 +273,7 @@ export interface RootRouteChildren {
   PrivacyRoute: typeof PrivacyRoute
   SuggestionsRoute: typeof SuggestionsRoute
   TermsRoute: typeof TermsRoute
+  ApiWidgetsRoute: typeof ApiWidgetsRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -398,6 +411,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppAboutRouteImport
       parentRoute: typeof AppRoute
     }
+    '/api/widgets': {
+      id: '/api/widgets'
+      path: '/api/widgets'
+      fullPath: '/api/widgets'
+      preLoaderRoute: typeof ApiWidgetsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -441,6 +461,7 @@ const rootRouteChildren: RootRouteChildren = {
   PrivacyRoute: PrivacyRoute,
   SuggestionsRoute: SuggestionsRoute,
   TermsRoute: TermsRoute,
+  ApiWidgetsRoute: ApiWidgetsRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
