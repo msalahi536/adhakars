@@ -25,6 +25,7 @@ import { Route as AppSettingsRouteImport } from './routes/app.settings'
 import { Route as AppSalahRouteImport } from './routes/app.salah'
 import { Route as AppQiblaRouteImport } from './routes/app.qibla'
 import { Route as AppPrivacyRouteImport } from './routes/app.privacy'
+import { Route as AppPeriodRouteImport } from './routes/app.period'
 import { Route as AppMyAdhkarRouteImport } from './routes/app.my-adhkar'
 import { Route as AppMoreRouteImport } from './routes/app.more'
 import { Route as AppEveningRouteImport } from './routes/app.evening'
@@ -111,6 +112,11 @@ const AppPrivacyRoute = AppPrivacyRouteImport.update({
   path: '/privacy',
   getParentRoute: () => AppRoute,
 } as any)
+const AppPeriodRoute = AppPeriodRouteImport.update({
+  id: '/period',
+  path: '/period',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppMyAdhkarRoute = AppMyAdhkarRouteImport.update({
   id: '/my-adhkar',
   path: '/my-adhkar',
@@ -151,6 +157,7 @@ export interface FileRoutesByFullPath {
   '/app/evening': typeof AppEveningRoute
   '/app/more': typeof AppMoreRoute
   '/app/my-adhkar': typeof AppMyAdhkarRoute
+  '/app/period': typeof AppPeriodRoute
   '/app/privacy': typeof AppPrivacyRoute
   '/app/qibla': typeof AppQiblaRoute
   '/app/salah': typeof AppSalahRoute
@@ -173,6 +180,7 @@ export interface FileRoutesByTo {
   '/app/evening': typeof AppEveningRoute
   '/app/more': typeof AppMoreRoute
   '/app/my-adhkar': typeof AppMyAdhkarRoute
+  '/app/period': typeof AppPeriodRoute
   '/app/privacy': typeof AppPrivacyRoute
   '/app/qibla': typeof AppQiblaRoute
   '/app/salah': typeof AppSalahRoute
@@ -197,6 +205,7 @@ export interface FileRoutesById {
   '/app/evening': typeof AppEveningRoute
   '/app/more': typeof AppMoreRoute
   '/app/my-adhkar': typeof AppMyAdhkarRoute
+  '/app/period': typeof AppPeriodRoute
   '/app/privacy': typeof AppPrivacyRoute
   '/app/qibla': typeof AppQiblaRoute
   '/app/salah': typeof AppSalahRoute
@@ -222,6 +231,7 @@ export interface FileRouteTypes {
     | '/app/evening'
     | '/app/more'
     | '/app/my-adhkar'
+    | '/app/period'
     | '/app/privacy'
     | '/app/qibla'
     | '/app/salah'
@@ -244,6 +254,7 @@ export interface FileRouteTypes {
     | '/app/evening'
     | '/app/more'
     | '/app/my-adhkar'
+    | '/app/period'
     | '/app/privacy'
     | '/app/qibla'
     | '/app/salah'
@@ -267,6 +278,7 @@ export interface FileRouteTypes {
     | '/app/evening'
     | '/app/more'
     | '/app/my-adhkar'
+    | '/app/period'
     | '/app/privacy'
     | '/app/qibla'
     | '/app/salah'
@@ -403,6 +415,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppPrivacyRouteImport
       parentRoute: typeof AppRoute
     }
+    '/app/period': {
+      id: '/app/period'
+      path: '/period'
+      fullPath: '/app/period'
+      preLoaderRoute: typeof AppPeriodRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/app/my-adhkar': {
       id: '/app/my-adhkar'
       path: '/my-adhkar'
@@ -446,6 +465,7 @@ interface AppRouteChildren {
   AppEveningRoute: typeof AppEveningRoute
   AppMoreRoute: typeof AppMoreRoute
   AppMyAdhkarRoute: typeof AppMyAdhkarRoute
+  AppPeriodRoute: typeof AppPeriodRoute
   AppPrivacyRoute: typeof AppPrivacyRoute
   AppQiblaRoute: typeof AppQiblaRoute
   AppSalahRoute: typeof AppSalahRoute
@@ -461,6 +481,7 @@ const AppRouteChildren: AppRouteChildren = {
   AppEveningRoute: AppEveningRoute,
   AppMoreRoute: AppMoreRoute,
   AppMyAdhkarRoute: AppMyAdhkarRoute,
+  AppPeriodRoute: AppPeriodRoute,
   AppPrivacyRoute: AppPrivacyRoute,
   AppQiblaRoute: AppQiblaRoute,
   AppSalahRoute: AppSalahRoute,
