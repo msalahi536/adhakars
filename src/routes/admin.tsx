@@ -221,7 +221,7 @@ function ContentSection({ password, category, label, items, onChange, setContent
   const [dragId, setDragId] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const [msg, setMsg] = useState("");
-  const cat = category as Parameters<typeof save>[0]["data"]["category"];
+  const cat = category as "quran_verse";
 
   const submit = async () => {
     if (!editing) return;
