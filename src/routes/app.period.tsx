@@ -58,6 +58,8 @@ const SYMPTOM_META: Record<Symptom, { label: string; Icon: typeof Zap }> = {
   bloating: { label: "Bloating", Icon: CircleDot },
 };
 
+const saw = (t: string) => t.split("ﷺ").flatMap((part, i) => (i ? [<span key={i} className="period-saw">ﷺ</span>, part] : [part]));
+
 const fmt = (k: string) => parseK(k).toLocaleDateString(undefined, { month: "short", day: "numeric" });
 
 function useTick() {
@@ -453,7 +455,7 @@ function LearnView({ open, setOpen }: { open: string | null; setOpen: (id: strin
           <section key={s.id} id={`sec-${s.id}`} className="period-card !p-0 overflow-hidden scroll-mt-4">
             <button className="period-acc-head" aria-expanded={isOpen} onClick={() => setOpen(isOpen ? null : s.id)}>
               <span className="period-acc-num">{idx + 1}</span>
-              <span className="flex-1 text-left text-[15px] font-semibold">{s.title}</span>
+              <span className="flex-1 text-left text-[15px] font-semibold">{saw(s.title)}</span>
               <ChevronRight size={16} style={{ transform: isOpen ? "rotate(90deg)" : undefined, transition: "transform .2s" }} />
             </button>
             {isOpen && (
@@ -475,8 +477,8 @@ function LearnView({ open, setOpen }: { open: string | null; setOpen: (id: strin
 function SunnahCard({ item, compact = false }: { item: SunnahItem; compact?: boolean }) {
   return (
     <article className={compact ? "mt-2" : "period-item"}>
-      {!compact && <h3 className="text-sm font-bold">{item.title}</h3>}
-      {compact && <h3 className="text-sm font-bold">{item.title}</h3>}
+      {!compact && <h3 className="text-sm font-bold">{saw(item.title)}</h3>}
+      {compact && <h3 className="text-sm font-bold">{saw(item.title)}</h3>}
       <div className="period-source mt-1"><BookOpen size={12} /> {item.source}</div>
       {item.arabic && (
         <p className="arabic mt-3 whitespace-pre-line text-right text-[21px] leading-[1.95]" lang="ar" dir="rtl">{item.arabic}</p>
