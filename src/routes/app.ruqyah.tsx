@@ -44,7 +44,7 @@ function RuqyahCompanion() {
   useEffect(() => setMounted(true), []);
   return (
     <>
-      <header className="page-header period-header relative overflow-hidden" style={{ background: "var(--grad-header)", color: "var(--header-fg)" }}>
+      <header className="page-header period-header rq-header relative overflow-hidden" style={{ background: "var(--grad-header)", color: "var(--header-fg)" }}>
         <HeaderBackButton />
         <div className="relative mx-auto max-w-md px-16 pb-4 pt-7 text-center">
           <div className="label-caps" style={{ color: "var(--header-sub)", opacity: 1 }}>Ruqyah Companion</div>
@@ -59,7 +59,7 @@ function RuqyahCompanion() {
           ))}
         </div>
       </header>
-      <main className="scroll-area period-scroll-area">
+      <main className="scroll-area period-scroll-area rq-scroll-area">
         <div className="mx-auto max-w-md space-y-4 px-5 pb-8 pt-4">
           {mounted && tab === "daily" && <DailyView />}
           {mounted && tab === "ruqyah" && <RuqyahView />}
@@ -123,6 +123,11 @@ function DailyView() {
 
   return (
     <>
+      <div className="rq-intro-note">
+        <span className="rq-intro-icon"><ShieldCheck size={20} /></span>
+        <p>Protection is a daily practice, not a crisis response. Here’s what the Prophet <span className="period-saw">ﷺ</span> did every day.</p>
+      </div>
+
       <div className="period-card rq-hero">
         {complete ? (
           <div className="rq-hero-done">
@@ -138,12 +143,11 @@ function DailyView() {
           <>
             <div className="flex items-start gap-4">
               <div className="flex-1">
-                <div className="rq-icon-circle mb-3"><Flower2 size={20} /></div>
-                <h2 className="rq-hero-title text-left">{started ? "Today’s protection" : "Daily Protection"}</h2>
+                <h2 className="rq-hero-title text-left">Today’s protection</h2>
                 <p className="period-muted mt-1 text-sm leading-relaxed">
                   {started
                     ? "Keep going! May Allah keep you protected always."
-                    : <>Protection is a daily practice, not a crisis response. Here’s what the Prophet <span className="period-saw">ﷺ</span> did every day.</>}
+                    : "Begin with one small act of protection today."}
                 </p>
               </div>
               <Ring done={count} total={total} />
@@ -167,10 +171,12 @@ function DailyView() {
             <div key={g.group} className="period-card rq-group">
               <button className="rq-group-head" aria-expanded={isOpen}
                 onClick={() => { setOpenGroup(isOpen ? null : g.group); void triggerHaptic("light"); }}>
-                <span className={`rq-check-circle ${allDone ? "is-on" : ""}`}>{allDone && <Check size={13} strokeWidth={3} />}</span>
-                <Icon size={17} className="rq-group-icon" />
-                <span className="flex-1 text-left text-[15px] font-semibold">{g.group === "After each obligatory prayer" ? "After each Salah" : g.group}</span>
-                <span className="period-muted text-xs font-semibold">{groupDone}/{g.items.length}</span>
+                <span className={`rq-group-icon-wrap rq-group-icon-${gi}`}><Icon size={20} className="rq-group-icon" /></span>
+                <span className="rq-group-copy">
+                  <span className="rq-group-title">{g.group === "After each obligatory prayer" ? "After each Salah" : g.group}</span>
+                  <span className="rq-group-meta">{groupDone} of {g.items.length} done</span>
+                  <span className="rq-group-progress" aria-hidden="true"><i style={{ width: `${(groupDone / g.items.length) * 100}%` }} /></span>
+                </span>
                 <ChevronRight size={16} className={`rq-group-chevron ${isOpen ? "is-open" : ""}`} />
               </button>
               {isOpen && (
