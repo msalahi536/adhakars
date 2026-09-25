@@ -330,7 +330,7 @@ async function shareSection(s: RuqyahSection) {
     if (it.translation) lines.push(it.translation);
     it.notes?.forEach((n) => lines.push(n));
     if (it.callout) lines.push(`${it.callout.label} — ${it.callout.text}`);
-    if (it.id === "raqi") RAQI_FLAGS.forEach((f) => lines.push(`• ${saw(f)}`));
+    if (it.id === "raqi") RAQI_FLAGS.forEach((f) => lines.push(`• ${f}`));
     lines.push("");
   }
   if (s.myths) MYTHS.forEach((m) => lines.push(`Myth: ${m.myth}`, m.truth, ""));
