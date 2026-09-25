@@ -2,5 +2,5 @@
 - [x] Eliminate blank background flashes when switching app tabs.
 - [x] Correct app identity shown where platform permission prompts allow it.
 - [x] Period Companion: cycle tracker, daily checklist, Sunnah knowledge, post-period + smart features.
-- [ ] Separate aftercare and post-period guidance; remove Learn sharing.
-- [ ] Restore themed relief dua, Three Quls formatting, and the card selector.
+- [x] Separate aftercare and post-period guidance; remove Learn sharing.
+- [x] Restore themed relief dua, Three Quls formatting, and the card selector.

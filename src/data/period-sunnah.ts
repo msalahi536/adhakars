@@ -358,7 +358,7 @@ export const SUNNAH_SECTIONS: SunnahSection[] = [
   {
     id: "post-period",
     title: "Post-Period",
-    intro: `Once the bleeding has stopped and ghusl is complete, worship resumes normally. These are the practical next steps.` ,
+    intro: `Once the bleeding has stopped and ghusl is complete, worship resumes normally. These are the practical next steps.`,
     items: [
       {
         id: "post-period-next",
