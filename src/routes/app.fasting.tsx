@@ -1,9 +1,11 @@
 import { useEffect, useMemo, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import {
-  Ban, BookOpen, Check, ChevronLeft, ChevronRight, CircleAlert, Minus, Moon, Plus, Sparkles, Sunrise, Sunset,
+  Ban, BookOpen, CalendarDays, Check, ChevronLeft, ChevronRight, CircleAlert, Clock3, Lightbulb, Minus, Moon, Plus,
+  Settings2, Sunrise, Sunset,
 } from "lucide-react";
 import { HeaderBackButton } from "@/components/HeaderBackButton";
+import { SettingsButton } from "@/components/SettingsButton";
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from "@/components/ui/dialog";
 import { triggerHaptic } from "@/lib/theme";
 import type { SunnahItem } from "@/data/period-sunnah";
@@ -69,6 +71,7 @@ function FastingCompanion() {
     <>
       <header className="page-header period-header rq-header relative overflow-hidden" style={{ background: "var(--grad-header)", color: "var(--header-fg)" }}>
         <HeaderBackButton />
+        <div className="rq-settings-btn"><SettingsButton /></div>
         <div className="relative mx-auto max-w-md px-16 pb-4 pt-7 text-center">
           <div className="label-caps" style={{ color: "var(--header-sub)", opacity: 1 }}>Fasting Companion</div>
           <h1 className="app-page-title mt-2">Sawm</h1>
@@ -177,7 +180,7 @@ function CalendarView({ s }: { s: FastingState }) {
         </div>
         {next && (
           <button className="fs-next" onClick={() => setOpen(next.key)}>
-            <Sparkles size={15} />
+            <CalendarDays size={15} />
             <span>Next recommended fast: <strong>{niceDate(next.key, { weekday: "long", month: "short", day: "numeric" })}</strong></span>
             <ChevronRight size={15} />
           </button>
@@ -243,8 +246,12 @@ function CalendarView({ s }: { s: FastingState }) {
           <span><i className="is-forbidden" /> Forbidden</span>
           <span><i className="is-done" /> Fasted</span>
         </div>
-        <p className="fs-muted mt-3 text-center text-[11px]">Hijri dates are expected (Umm al-Qura{s.offset ? `, ${s.offset > 0 ? "+" : ""}${s.offset} day` : ""}) until confirmed by your community.</p>
       </section>
+
+      <div className="fs-date-note">
+        <Lightbulb size={17} />
+        <p>These dates are expected and based on the Umm al-Qura calendar until confirmed by your local community.</p>
+      </div>
 
       <CalendarSettings s={s} />
 
@@ -282,8 +289,8 @@ function MoonPrompt({ s }: { s: FastingState }) {
 
 function CalendarSettings({ s }: { s: FastingState }) {
   return (
-    <details className="period-card fs-settings">
-      <summary>Calendar settings <ChevronRight size={15} className="hj-chev" /></summary>
+    <details className="period-card fs-settings fs-settings-group">
+      <summary><Settings2 size={15} /> Calendar settings <ChevronRight size={15} className="hj-chev" /></summary>
       <div className="fs-set-row">
         <div><strong>Local sighting adjustment</strong><span>Shift Hijri dates −2 to +2 days. ‘Arafah always follows the Saudi date.</span></div>
         <div className="fs-offset">
@@ -457,8 +464,11 @@ function RamadanView({ s }: { s: FastingState }) {
         </section>
       ) : (
         <section className="period-card fs-ram-hero">
-          <div className="label-caps">Ramadan</div>
-          <h2>{startsIn ? <>In {startsIn.days} <span>days</span></> : "Ramadan"}</h2>
+          <span className="fs-ram-icon"><Moon size={20} /></span>
+          <div className="fs-ram-copy">
+            <div className="label-caps">Ramadan</div>
+            <h2>{startsIn ? <>In {startsIn.days} <span>days</span></> : "Ramadan"}</h2>
+          </div>
           {startsIn && <p className="fs-muted text-sm">Expected to begin {niceDate(startsIn.key, { weekday: "long", month: "long", day: "numeric" })}, subject to sighting.</p>}
           {owed > 0 && <p className="fs-ram-logged mt-3">{owed} {owed === 1 ? "day" : "days"} to make up</p>}
         </section>
@@ -466,11 +476,11 @@ function RamadanView({ s }: { s: FastingState }) {
 
       {r.active && r.excused > 0 && <div className="period-callout is-grey">{EXCUSED_NOTE}</div>}
 
-      <section className="period-card fs-times">
+      <section className="fs-times">
         {noLoc ? (
-          <p className="text-sm">Set your location on the <Link to="/app/salah" className="font-bold" style={{ color: "var(--accent)" }}>Salah</Link> page to see suhoor and iftar times.</p>
+          <div className="period-card"><p className="text-sm">Set your location on the <Link to="/app/salah" className="font-bold" style={{ color: "var(--accent)" }}>Salah</Link> page to see suhoor and iftar times.</p></div>
         ) : !times ? (
-          <p className="fs-muted text-sm">Loading today’s times…</p>
+          <div className="period-card"><p className="fs-muted text-sm">Loading today’s times…</p></div>
         ) : (
           <>
             {toIftar > 0 && (
@@ -517,33 +527,38 @@ function RamadanView({ s }: { s: FastingState }) {
 
 function ReminderSettings({ s }: { s: FastingState }) {
   return (
-    <details className="period-card fs-settings">
-      <summary>Suhoor & iftar reminders <ChevronRight size={15} className="hj-chev" /></summary>
-      <label className="fs-set-row">
-        <div><strong>Suhoor reminder</strong><span>{s.suhoorMins} minutes before Fajr on fasting days</span></div>
-        <input type="checkbox" className="fs-switch" checked={s.suhoorReminder} onChange={(e) => setFastingState({ suhoorReminder: e.target.checked })} />
-      </label>
-      {s.suhoorReminder && (
+    <div className="fs-reminder-stack">
+      <details className="period-card fs-settings fs-settings-group">
+        <summary><CalendarDays size={15} /> Suhoor & iftar reminders <ChevronRight size={15} className="hj-chev" /></summary>
+        <label className="fs-set-row">
+          <div><strong>Suhoor reminder</strong><span>{s.suhoorMins} minutes before Fajr on fasting days</span></div>
+          <input type="checkbox" className="fs-switch" checked={s.suhoorReminder} onChange={(e) => setFastingState({ suhoorReminder: e.target.checked })} />
+        </label>
+        {s.suhoorReminder && (
+          <div className="fs-set-row">
+            <div><strong>Remind me</strong><span>Minutes before Fajr</span></div>
+            <select className="settings-select" value={s.suhoorMins} onChange={(e) => setFastingState({ suhoorMins: Number(e.target.value) })}>
+              {[15, 30, 45, 60, 90].map((m) => <option key={m} value={m}>{m} min</option>)}
+            </select>
+          </div>
+        )}
+        <label className="fs-set-row">
+          <div><strong>Iftar reminder</strong><span>At Maghrib on fasting days</span></div>
+          <input type="checkbox" className="fs-switch" checked={s.iftarReminder} onChange={(e) => setFastingState({ iftarReminder: e.target.checked })} />
+        </label>
+      </details>
+      <details className="period-card fs-settings fs-settings-group">
+        <summary><Clock3 size={15} /> Personal buffer <span className="fs-summary-note">Add time before Fajr (optional)</span><ChevronRight size={15} className="hj-chev" /></summary>
         <div className="fs-set-row">
-          <div><strong>Remind me</strong><span>Minutes before Fajr</span></div>
-          <select className="settings-select" value={s.suhoorMins} onChange={(e) => setFastingState({ suhoorMins: Number(e.target.value) })}>
-            {[15, 30, 45, 60, 90].map((m) => <option key={m} value={m}>{m} min</option>)}
+          <div><strong>Personal buffer</strong><span>Not from the Sunnah — shown only if you choose it.</span></div>
+          <select className="settings-select" value={s.buffer} onChange={(e) => setFastingState({ buffer: Number(e.target.value) })}>
+            {[0, 5, 10].map((m) => <option key={m} value={m}>{m ? `${m} min` : "None"}</option>)}
           </select>
         </div>
-      )}
-      <label className="fs-set-row">
-        <div><strong>Iftar reminder</strong><span>At Maghrib on fasting days</span></div>
-        <input type="checkbox" className="fs-switch" checked={s.iftarReminder} onChange={(e) => setFastingState({ iftarReminder: e.target.checked })} />
-      </label>
-      <div className="fs-set-row">
-        <div><strong>Personal buffer (optional)</strong><span>Not from the Sunnah — shown only if you choose it.</span></div>
-        <select className="settings-select" value={s.buffer} onChange={(e) => setFastingState({ buffer: Number(e.target.value) })}>
-          {[0, 5, 10].map((m) => <option key={m} value={m}>{m ? `${m} min` : "None"}</option>)}
-        </select>
-      </div>
+      </details>
+      <CalendarSettings s={s} />
       <Amber label="There is no imsak in the Sunnah">{IMSAK_TEXT}</Amber>
-      <p className="fs-muted text-[11px]">Reminders work in the installed app. Notifications must be allowed.</p>
-    </details>
+    </div>
   );
 }
 
@@ -621,26 +636,26 @@ function LogView({ s }: { s: FastingState }) {
 
 // ================= LEARN =================
 
-type LearnSection = { id: string; title: string; body: React.ReactNode };
+type LearnSection = { id: string; title: string; subtitle: string; body: React.ReactNode };
 
 function LearnView() {
   const [open, setOpen] = useState<string | null>(null);
   const sections: LearnSection[] = [
-    { id: "suhoor", title: "Suhoor — delay it", body: <><DuaCard item={SUHOOR} /><Amber label="There is no imsak in the Sunnah">{IMSAK_TEXT}</Amber></> },
-    { id: "iftar", title: "Iftar — hasten it", body: <DuaCard item={IFTAR} /> },
-    { id: "dua", title: "The iftar du‘a", body: <><DuaCard item={IFTAR_DUA} /><Amber label="The popular one is weak">{WEAK_IFTAR_TEXT}</Amber></> },
-    { id: "intention", title: "Intention", body: <DuaCard item={INTENTION} /> },
-    { id: "break", title: "What does not break the fast", body: <><DuaCard item={FORGETFUL} /><ul className="fs-list">{DOES_NOT_BREAK.map((x) => <li key={x}><Check size={13} /> {x}</li>)}</ul></> },
-    { id: "earns", title: "What fasting Ramadan earns", body: <DuaCard item={BUKHARI_2014} /> },
-    { id: "month", title: "Starting and ending the month", body: <DuaCard item={BUKHARI_1909} /> },
-    { id: "voluntary", title: "The voluntary fasts", body: <>{[MON_THU, BEED, THREE_DAYS, ASHURA, ARAFAH, SHAWWAL, MUHARRAM, DAWUD].map((it) => <DuaCard key={it.id} item={it} />)}</> },
-    { id: "forbidden", title: "Days fasting is forbidden or disliked", body: <><div className="fs-block"><Ban size={15} /><span><strong>The two ‘Eids — forbidden.</strong> {EIDS_TEXT}</span></div><DuaCard item={TASHRIQ} /><DuaCard item={FRIDAY} /><Amber label="The day of doubt">{DOUBT_TEXT}</Amber></> },
+    { id: "suhoor", title: "Suhoor — delay it", subtitle: "The blessing and its timing", body: <><DuaCard item={SUHOOR} /><Amber label="There is no imsak in the Sunnah">{IMSAK_TEXT}</Amber></> },
+    { id: "iftar", title: "Iftar — hasten it", subtitle: "The Sunnah and rulings", body: <DuaCard item={IFTAR} /> },
+    { id: "dua", title: "The iftar du‘a", subtitle: "What to say when breaking the fast", body: <><DuaCard item={IFTAR_DUA} /><Amber label="The popular one is weak">{WEAK_IFTAR_TEXT}</Amber></> },
+    { id: "intention", title: "Intention", subtitle: "How to make your intention", body: <DuaCard item={INTENTION} /> },
+    { id: "break", title: "What does not break the fast", subtitle: "Common situations", body: <><DuaCard item={FORGETFUL} /><ul className="fs-list">{DOES_NOT_BREAK.map((x) => <li key={x}><Check size={13} /> {x}</li>)}</ul></> },
+    { id: "earns", title: "What fasting Ramadan earns", subtitle: "The reward and hadith", body: <DuaCard item={BUKHARI_2014} /> },
+    { id: "month", title: "Starting and ending the month", subtitle: "Sighting the moon", body: <DuaCard item={BUKHARI_1909} /> },
+    { id: "voluntary", title: "The voluntary fasts", subtitle: "Six days of Shawwal, Tasua, Ashura, etc.", body: <>{[MON_THU, BEED, THREE_DAYS, ASHURA, ARAFAH, SHAWWAL, MUHARRAM, DAWUD].map((it) => <DuaCard key={it.id} item={it} />)}</> },
+    { id: "forbidden", title: "Days fasting is forbidden or disliked", subtitle: "Important rulings", body: <><div className="fs-block"><Ban size={15} /><span><strong>The two ‘Eids — forbidden.</strong> {EIDS_TEXT}</span></div><DuaCard item={TASHRIQ} /><DuaCard item={FRIDAY} /><Amber label="The day of doubt">{DOUBT_TEXT}</Amber></> },
   ];
   return (
     <>
       <section className="period-card fs-learn-intro">
-        <h2>Fasting in the Sunnah</h2>
-        <p>Suhoor, iftar, intention and the fasts the Prophet ﷺ encouraged — every source verified.</p>
+        <span className="fs-learn-book"><BookOpen size={22} /></span>
+        <span><h2>Fasting in the Sunnah</h2><p>Suhoor, iftar, intention and the fasts the Prophet ﷺ encouraged — every source verified.</p></span>
       </section>
       <div className="fs-learn-list">
         {sections.map((sec, i) => {
@@ -649,7 +664,7 @@ function LearnView() {
             <div key={sec.id} className={`period-card fs-learn-row ${isOpen ? "is-open" : ""}`}>
               <button className="fs-learn-head" aria-expanded={isOpen} onClick={() => { setOpen(isOpen ? null : sec.id); void triggerHaptic("light"); }}>
                 <span className="fs-learn-num">{i + 1}</span>
-                <span className="flex-1 text-left">{sec.title}</span>
+                <span className="fs-learn-copy"><strong>{sec.title}</strong><small>{sec.subtitle}</small></span>
                 <ChevronRight size={16} className="fs-learn-chev" />
               </button>
               <div className="fs-learn-body"><div><div className="space-y-3 pt-3">{isOpen && sec.body}</div></div></div>
