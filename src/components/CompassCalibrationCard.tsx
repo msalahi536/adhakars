@@ -113,13 +113,6 @@ export function CompassCalibrationCard({ onDone, onSkip }: Props) {
               <path key={i} d={arc(i)} fill="none" strokeWidth={9} strokeLinecap="round"
                 stroke={on ? "var(--accent)" : "color-mix(in oklab, var(--muted-foreground) 25%, transparent)"} style={{ transition: "stroke 250ms" }} />
             ))}
-            <defs>
-              <radialGradient id="cal-ball" cx="35%" cy="30%" r="75%">
-                <stop offset="0%" stopColor="var(--card)" stopOpacity="0.95" />
-                <stop offset="35%" stopColor="var(--accent)" />
-                <stop offset="100%" stopColor="color-mix(in oklab, var(--accent) 60%, var(--foreground))" />
-              </radialGradient>
-            </defs>
             <circle cx={c} cy={c} r={76} fill="color-mix(in oklab, var(--muted) 55%, transparent)" />
             <circle cx={c} cy={c} r={24} fill="none" strokeDasharray="3 4" stroke="color-mix(in oklab, var(--muted-foreground) 30%, transparent)" />
             <g transform={`translate(${c + ball.x * 62} ${c + ball.y * 62})`}>
