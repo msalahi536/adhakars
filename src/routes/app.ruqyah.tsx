@@ -6,6 +6,7 @@ import {
   Sunrise, Users, X,
 } from "lucide-react";
 import { HeaderBackButton } from "@/components/HeaderBackButton";
+import { ListenButton } from "@/components/ListenButton";
 import { triggerHaptic } from "@/lib/theme";
 import { getRuqyahChecklist, toggleRuqyahCheck } from "@/lib/ruqyah";
 import type { SunnahItem } from "@/data/period-sunnah";
@@ -255,6 +256,7 @@ function SelfGuide({ onBack }: { onBack: () => void }) {
   const s = SELF_STEPS[step];
   const last = SELF_STEPS.length - 1;
   const go = (n: number) => { setStep(n); void triggerHaptic("light"); };
+  const recitation = step === 1 ? AL_FATIHAH : step === 2 ? STORED_VERSES[1] : step === 3 ? STORED_VERSES[3] : undefined;
   return (
     <>
       <BackLink onBack={onBack} label="Ruqyah" />
@@ -275,6 +277,7 @@ function SelfGuide({ onBack }: { onBack: () => void }) {
             <p className="flex-1 text-[15px] font-semibold leading-snug">{saw(s.title)}</p>
           </div>
           {s.note && <p className="period-callout is-grey mt-3">{saw(s.note)}</p>}
+           {recitation && <GuideRecitation item={recitation} />}
           {s.item && <div className="mt-3"><DuaCard item={s.item} /></div>}
         </div>
         <div className="mt-5 flex gap-2">
