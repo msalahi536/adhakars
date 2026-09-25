@@ -362,11 +362,11 @@ export const SELF_STEPS: RuqyahStep[] = [
 
 // ---------- Verses ----------
 
-export const VERSES: { title: string; source: string; note: string; item?: SunnahItem; to?: "/app" }[] = [
-  { title: "Al-Fatihah", source: "Bukhari 5736", note: "Established as ruqyah by the hadith of the stung chief.", item: BUKHARI_5736 },
-  { title: "Āyat al-Kursi (2:255)", source: "Qur’an 2:255", note: "Established as protection.", to: "/app" },
-  { title: "The last two verses of al-Baqarah (2:285–286)", source: "Qur’an 2:285–286", note: "Nightly protection." },
-  { title: "Al-Ikhlāṣ, al-Falaq and an-Nās", source: "Bukhari 5017", note: "The Prophet’s ﷺ own nightly recitation, three times.", item: BUKHARI_5017 },
-  { title: "The opening verses of al-Baqarah (2:1–5)", source: "Qur’an 2:1–5", note: "Named among the recitations of ruqyah." },
-  { title: "Verses on magic", source: "Al-A‘raf 117–122 · Yunus 79–82 · Ta-Ha 65–69", note: "Where relevant." },
+export const VERSES: { title: string; source: string; tag: string; note: string; item?: SunnahItem; to?: "/app" }[] = [
+  { title: "Al-Fatihah", source: "Bukhari 5736", tag: "For ruqyah and healing", note: "Established as ruqyah by the hadith of the stung chief.", item: BUKHARI_5736 },
+  { title: "Āyat al-Kursi (2:255)", source: "Qur’an 2:255", tag: "Protection", note: "Established as protection.", to: "/app" },
+  { title: "The last two verses of al-Baqarah (2:285–286)", source: "Qur’an 2:285–286", tag: "Nightly protection", note: "Nightly protection." },
+  { title: "Al-Ikhlāṣ, al-Falaq and an-Nās", source: "Bukhari 5017", tag: "Protection from harm", note: "The Prophet’s ﷺ own nightly recitation, three times.", item: BUKHARI_5017 },
+  { title: "The opening verses of al-Baqarah (2:1–5)", source: "Qur’an 2:1–5", tag: "Protection", note: "Named among the recitations of ruqyah." },
+  { title: "Verses on magic", source: "Al-A‘raf 117–122 · Yunus 79–82 · Ta-Ha 65–69", tag: "Against magic", note: "Where relevant." },
 ];
