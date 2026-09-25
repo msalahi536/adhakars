@@ -42,7 +42,7 @@ const TABS: { id: Tab; label: string }[] = [
 
 function RuqyahCompanion() {
   const [mounted, setMounted] = useState(false);
-  const [tab, setTab] = useState<Tab>("daily");
+  const [tab, setTab] = useState<Tab>("ruqyah");
   useEffect(() => setMounted(true), []);
   return (
     <>
