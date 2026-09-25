@@ -94,7 +94,7 @@ export function CompassCalibrationCard({ onDone, onSkip }: Props) {
           <svg width={SIZE} height={SIZE} viewBox={`0 0 ${SIZE} ${SIZE}`} aria-hidden="true">
             {sectors.map((on, i) => (
               <path key={i} d={arc(i)} fill="none" strokeWidth={10} strokeLinecap="round"
-                stroke={on ? "var(--accent)" : "var(--border)"} style={{ transition: "stroke 250ms" }} />
+                stroke={on ? "var(--accent)" : "color-mix(in oklab, var(--muted-foreground) 25%, transparent)"} style={{ transition: "stroke 250ms" }} />
             ))}
             {zones.map((on, i) => {
               const a = ((i * 360) / TILT_ZONES) * (Math.PI / 180);
