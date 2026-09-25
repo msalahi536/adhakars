@@ -66,7 +66,6 @@ function RuqyahCompanion() {
           {mounted && tab === "ruqyah" && <RuqyahView />}
           {mounted && tab === "verses" && <VersesView />}
           {mounted && tab === "learn" && <LearnView />}
-          <p className="period-muted flex items-center justify-center gap-1 pt-1 text-[11px]"><Lock size={11} /> Private — stored only on your device</p>
         </div>
       </main>
     </>
@@ -389,8 +388,6 @@ const SECTION_META: Record<string, { icon: typeof BookOpen; sub: string }> = {
 
 function LearnView() {
   const [openId, setOpenId] = useState<string | null>(null);
-  const section = RUQYAH_SECTIONS.find((s) => s.id === openId);
-  if (section) return <div className="rq-view-transition"><LearnArticle section={section} onBack={() => setOpenId(null)} /></div>;
   return (
     <>
       <div className="period-card rq-landing-card">
@@ -400,20 +397,26 @@ function LearnView() {
           Authentic knowledge to help you understand ruqyah, its rulings, and what the Sunnah teaches.
         </p>
       </div>
-      <div className="period-card p-0">
+      <div className="period-card rq-learn-list p-0">
         {RUQYAH_SECTIONS.map((s, i) => {
           const meta = SECTION_META[s.id] ?? { icon: BookOpen, sub: "" };
           const Icon = meta.icon;
+          const isOpen = openId === s.id;
           return (
-            <button key={s.id} className={`rq-learn-row ${i > 0 ? "rq-learn-row-border" : ""}`}
-              onClick={() => { setOpenId(s.id); void triggerHaptic("light"); }}>
-              <span className="rq-icon-circle rq-icon-circle-sm"><Icon size={17} /></span>
-              <span className="flex-1 text-left">
-                <span className="block text-[15px] font-semibold">{saw(s.title)}</span>
-                {meta.sub && <span className="period-muted block text-xs">{meta.sub}</span>}
-              </span>
-              <ChevronRight size={17} className="rq-group-chevron" />
-            </button>
+            <div key={s.id} className={i > 0 ? "rq-learn-row-border" : ""}>
+              <button className="rq-learn-row" aria-expanded={isOpen}
+                onClick={() => { setOpenId(isOpen ? null : s.id); void triggerHaptic("light"); }}>
+                <span className="rq-icon-circle rq-icon-circle-sm"><Icon size={17} /></span>
+                <span className="flex-1 text-left">
+                  <span className="block text-[15px] font-semibold">{saw(s.title)}</span>
+                  {meta.sub && <span className="period-muted block text-xs">{meta.sub}</span>}
+                </span>
+                <ChevronRight size={17} className={`rq-group-chevron ${isOpen ? "is-open" : ""}`} />
+              </button>
+              <div className="rq-learn-content" aria-hidden={!isOpen}>
+                <div><LearnArticle section={s} embedded /></div>
+              </div>
+            </div>
           );
         })}
       </div>
@@ -421,11 +424,10 @@ function LearnView() {
   );
 }
 
-function LearnArticle({ section: s, onBack }: { section: RuqyahSection; onBack: () => void }) {
+function LearnArticle({ section: s, embedded = false }: { section: RuqyahSection; embedded?: boolean }) {
   return (
-    <div className="space-y-4">
-      <BackLink onBack={onBack} label="Back to Learn" />
-      <div className="period-card">
+    <div className={`space-y-3 ${embedded ? "rq-learn-article-embedded" : ""}`}>
+      <div className={embedded ? "rq-learn-intro" : "period-card"}>
         <h2 className="rq-hero-title text-left">{saw(s.title)}</h2>
         {s.intro && <p className="period-muted mt-2 text-sm leading-relaxed">{saw(s.intro)}</p>}
         {s.id === "what" && (
@@ -448,7 +450,7 @@ function LearnArticle({ section: s, onBack }: { section: RuqyahSection; onBack: 
         )}
       </div>
       {s.items.map((it) => (
-        <div key={it.id} className="period-card">
+        <div key={it.id} className={embedded ? "rq-learn-item" : "period-card"}>
           <DuaCard item={it} bare />
           {it.id === "raqi" && (
             <ul className="mt-2 space-y-1.5">
@@ -459,7 +461,7 @@ function LearnArticle({ section: s, onBack }: { section: RuqyahSection; onBack: 
           )}
         </div>
       ))}
-      {s.myths && <div className="period-card"><Myths /></div>}
+      {s.myths && <div className={embedded ? "rq-learn-item" : "period-card"}><Myths /></div>}
     </div>
   );
 }

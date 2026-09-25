@@ -8,4 +8,4 @@
 - [x] Refine Period Companion aftercare grouping, relief duas, and Today ordering.
 - [x] Reorder More tools and repair More-section navigation behavior.
 - [x] Refine Ruqyah warnings, verse accordions, article navigation, transitions, and remove all section sharing.
-- [ ] Convert Ruqyah Learn articles to in-page dropdowns and remove the private-device note.
+- [x] Convert Ruqyah Learn articles to in-page dropdowns and remove the private-device note.

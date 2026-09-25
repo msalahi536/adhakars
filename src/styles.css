@@ -3112,3 +3112,11 @@ html[data-preset="ocean"][data-visual-phase="evening"] .bottom-nav-row {
 }
 .rq-learn-row-border { border-top: 1px solid color-mix(in oklab, var(--foreground) 7%, transparent); }
 .rq-conditions { background: color-mix(in oklab, var(--accent) 6%, transparent); box-shadow: none; }
+.rq-learn-list { overflow: clip; }
+.rq-learn-content { display: grid; grid-template-rows: 0fr; opacity: 0; transition: grid-template-rows .38s ease, opacity .28s ease; }
+.rq-learn-content > div { min-height: 0; overflow: hidden; }
+.rq-learn-row[aria-expanded="true"] + .rq-learn-content { grid-template-rows: 1fr; opacity: 1; }
+.rq-learn-article-embedded { padding: 2px 14px 16px 53px; }
+.rq-learn-intro { padding: 14px 0; border-top: 1px solid color-mix(in oklab, var(--foreground) 8%, transparent); }
+.rq-learn-item { padding: 15px 0; border-top: 1px solid color-mix(in oklab, var(--foreground) 8%, transparent); }
+@media (max-width: 390px) { .rq-learn-article-embedded { padding-left: 14px; } }
