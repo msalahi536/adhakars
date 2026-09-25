@@ -3060,10 +3060,15 @@ html[data-preset="ocean"][data-visual-phase="evening"] .bottom-nav-row {
 .rq-landing-card { padding: 18px; }
 .rq-back-link {
   display: inline-flex; align-items: center; gap: 4px;
-  background: none; border: none; cursor: pointer;
-  color: var(--muted-foreground); font-size: 13px; font-weight: 700; padding: 2px 0;
+  min-height: 38px; padding: 7px 13px 7px 9px;
+  background: color-mix(in oklab, var(--accent) 10%, var(--card));
+  border: 1px solid color-mix(in oklab, var(--accent) 22%, var(--border));
+  border-radius: 999px; cursor: pointer;
+  color: var(--accent); font-size: 13px; font-weight: 750;
+  box-shadow: 0 4px 12px color-mix(in oklab, var(--foreground) 5%, transparent);
+  transition: transform .2s ease, background-color .2s ease;
 }
-.rq-back-link:active { opacity: .7; }
+.rq-back-link:active { transform: scale(.97); }
 .rq-search {
   display: flex; align-items: center; gap: 8px;
   background: var(--card); border: 1px solid var(--border); border-radius: 999px;
@@ -3074,8 +3079,32 @@ html[data-preset="ocean"][data-visual-phase="evening"] .bottom-nav-row {
   color: var(--foreground); font-size: 14px; font-family: inherit;
 }
 .rq-verse-row {
-  display: flex; align-items: flex-start; gap: 12px; width: 100%;
-  padding: 14px 16px; cursor: pointer; text-align: left; color: inherit;
+  display: block; width: 100%; padding: 14px 16px;
+  background: none; border: none; cursor: pointer; text-align: left; color: inherit;
+}
+.rq-sequence-note {
+  padding: 13px 15px;
+  border: 1px solid color-mix(in oklab, var(--accent) 22%, var(--border));
+  border-left: 3px solid var(--accent);
+  border-radius: 15px;
+  background: color-mix(in oklab, var(--card) 94%, var(--accent));
+  color: color-mix(in oklab, var(--foreground) 82%, var(--accent));
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.55;
+  box-shadow: 0 5px 15px color-mix(in oklab, var(--foreground) 5%, transparent);
+}
+.rq-verse-accordion { overflow: clip; padding: 0; transition: box-shadow .25s ease, border-color .25s ease; }
+.rq-verse-accordion.is-open { border-color: color-mix(in oklab, var(--accent) 24%, var(--border)); box-shadow: 0 10px 28px color-mix(in oklab, var(--foreground) 7%, transparent); }
+.rq-verse-accordion.is-open .rq-group-chevron { transform: rotate(90deg); }
+.rq-verse-content { display: grid; grid-template-rows: 0fr; opacity: 0; transition: grid-template-rows .35s ease, opacity .25s ease; }
+.rq-verse-content > div { min-height: 0; overflow: hidden; padding: 0 16px; border-top: 1px solid transparent; transition: padding .35s ease, border-color .35s ease; }
+.rq-verse-accordion.is-open .rq-verse-content { grid-template-rows: 1fr; opacity: 1; }
+.rq-verse-accordion.is-open .rq-verse-content > div { padding: 15px 16px 18px; border-color: color-mix(in oklab, var(--foreground) 8%, transparent); }
+.rq-view-transition { animation: rq-view-in .32s ease-out both; }
+@keyframes rq-view-in { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+@media (prefers-reduced-motion: reduce) {
+  .rq-verse-content, .rq-verse-content > div, .rq-view-transition { animation: none; transition: none; }
 }
 .rq-learn-row {
   display: flex; align-items: center; gap: 12px; width: 100%;
@@ -3083,3 +3112,11 @@ html[data-preset="ocean"][data-visual-phase="evening"] .bottom-nav-row {
 }
 .rq-learn-row-border { border-top: 1px solid color-mix(in oklab, var(--foreground) 7%, transparent); }
 .rq-conditions { background: color-mix(in oklab, var(--accent) 6%, transparent); box-shadow: none; }
+.rq-learn-list { overflow: clip; }
+.rq-learn-content { display: grid; grid-template-rows: 0fr; opacity: 0; transition: grid-template-rows .38s ease, opacity .28s ease; }
+.rq-learn-content > div { min-height: 0; overflow: hidden; }
+.rq-learn-row[aria-expanded="true"] + .rq-learn-content { grid-template-rows: 1fr; opacity: 1; }
+.rq-learn-article-embedded { padding: 2px 14px 16px 53px; }
+.rq-learn-intro { padding: 14px 0; border-top: 1px solid color-mix(in oklab, var(--foreground) 8%, transparent); }
+.rq-learn-item { padding: 15px 0; border-top: 1px solid color-mix(in oklab, var(--foreground) 8%, transparent); }
+@media (max-width: 390px) { .rq-learn-article-embedded { padding-left: 14px; } }
