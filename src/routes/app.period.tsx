@@ -147,7 +147,7 @@ function TodayView({ goLearn, goCycle }: { goLearn: (id: string) => void; goCycl
         </div>
       )}
 
-      {endedToday && <SalahDue cycle={endedToday} />}
+      {endedToday && <SalahDue cycle={endedToday} onReadAftercare={() => goLearn("ends")} />}
 
       <div className="period-card period-status-card">
         <div className="period-status-title">{onPeriod ? "Your period" : "Your cycle"}</div>
@@ -174,7 +174,7 @@ function TodayView({ goLearn, goCycle }: { goLearn: (id: string) => void; goCycl
         <>
           <button className="period-banner period-daily-reminder" onClick={() => goLearn("continues")}>
             <Sparkles size={18} />
-            <span><strong>Daily reminder</strong><small>You can't pray today, but you are not far from Allah. Here's what you can do.</small></span>
+            <span><strong>Stay Close to Allah</strong><small>See the worship and remembrance that continue during your period.</small></span>
             <ChevronRight size={18} />
           </button>
           <div className="period-card">
@@ -195,7 +195,7 @@ function TodayView({ goLearn, goCycle }: { goLearn: (id: string) => void; goCycl
   );
 }
 
-function SalahDue({ cycle }: { cycle: Cycle }) {
+function SalahDue({ cycle, onReadAftercare }: { cycle: Cycle; onReadAftercare: () => void }) {
   const [prayer, setPrayer] = useState<string | null>(null);
   const ended = new Date(cycle.endedAt!);
   useEffect(() => {
@@ -219,6 +219,7 @@ function SalahDue({ cycle }: { cycle: Cycle }) {
         Your period ended at {time}.{prayer ? ` Your next prayer is ${prayer}.` : " Set your location on the Salah tab to see which prayer is due."}
       </p>
       <p className="period-muted mt-1 text-xs">If your period ends before a prayer's time passes, that prayer is due after ghusl.</p>
+      <button className="period-link mt-3" onClick={onReadAftercare}>Read aftercare and ghusl guidance <ChevronRight size={14} /></button>
     </div>
   );
 }
