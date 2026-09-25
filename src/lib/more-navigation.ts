@@ -1,7 +1,6 @@
 export const MORE_DESTINATIONS = [
   "/app/more",
   "/app/sleep",
-  "/app/wake",
   "/app/qibla",
   "/app/my-adhkar",
   "/app/about",
