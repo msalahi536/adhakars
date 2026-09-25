@@ -356,6 +356,34 @@ const AL_FATIHAH: Dhikr = {
   target: 1,
 };
 
+function GuideRecitation({ item }: { item: Dhikr }) {
+  return (
+    <article className="rq-guide-recitation mt-4">
+      <div className="rq-guide-recitation-head">
+        <div>
+          <h3>{item.title}</h3>
+          <div className="period-source mt-1"><BookOpen size={12} /> {item.source}</div>
+        </div>
+        <ListenButton dhikrId={item.id} size={34} />
+      </div>
+      {item.arabicMulti ? item.arabicMulti.map((part) => (
+        <section key={part.label} className="rq-guide-part">
+          <div className="label-caps text-center">{part.label}</div>
+          <p className="arabic whitespace-pre-line text-right" lang="ar" dir="rtl">{part.arabic}</p>
+          <p className="adhkar-transliteration !text-left">{part.transliteration}</p>
+          <p className="text-sm leading-relaxed">{part.translation}</p>
+        </section>
+      )) : (
+        <div className="rq-guide-part">
+          <p className="arabic whitespace-pre-line text-right" lang="ar" dir="rtl">{item.arabic}</p>
+          <p className="adhkar-transliteration !text-left">{item.transliteration}</p>
+          <p className="text-sm leading-relaxed">{item.translation}</p>
+        </div>
+      )}
+    </article>
+  );
+}
+
 function VerseAccordion({ idx, open, onToggle }: { idx: number; open: boolean; onToggle: () => void }) {
   const v = VERSES[idx];
   const stored = STORED_VERSES[idx];
