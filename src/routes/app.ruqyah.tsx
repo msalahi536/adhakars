@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import {
   BookOpen, Check, ChevronLeft, ChevronRight, CircleAlert, Droplets, FileText, Flower2, Hand, Lock,
-  Moon, MoonStar, Mosque, Play, Search, Settings, Share2, ShieldCheck, Sparkles, Stethoscope, Sun,
+  Moon, MoonStar, Play, Search, Settings, Share2, ShieldCheck, Sparkles, Star, Stethoscope, Sun,
   Sunrise, Users, X,
 } from "lucide-react";
 import { HeaderBackButton } from "@/components/HeaderBackButton";
@@ -99,7 +99,7 @@ function Ring({ done, total, size = 84 }: { done: number; total: number; size?: 
   );
 }
 
-const GROUP_ICONS = [Sun, Sunrise, MoonStar, Mosque, Moon];
+const GROUP_ICONS = [Sun, Sunrise, MoonStar, Star, Moon];
 
 function useChecklist() {
   const [done, setDone] = useState<Set<string>>(() => new Set(getRuqyahChecklist()));
