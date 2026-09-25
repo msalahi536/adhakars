@@ -26,6 +26,8 @@ export const Route = createFileRoute("/app/ruqyah")({
   component: RuqyahCompanion,
 });
 
+const saw = (t: string) => t.split("ﷺ").flatMap((part, i) => (i ? [<span key={i} className="period-saw"><span className="period-saw">ﷺ</span></span>, part] : [part]));
+
 type Tab = "daily" | "ruqyah" | "verses" | "learn";
 const TABS: { id: Tab; label: string }[] = [
   { id: "daily", label: "Daily" },
@@ -63,7 +65,7 @@ function RuqyahCompanion() {
           {mounted && tab === "learn" && <LearnView />}
           <div className="period-callout is-grey flex gap-2">
             <Stethoscope size={16} className="mt-0.5 flex-none" />
-            <span>{RUQYAH_DISCLAIMER}</span>
+            <span>{saw(RUQYAH_DISCLAIMER)}</span>
           </div>
           <p className="period-muted flex items-center justify-center gap-1 pt-1 text-[11px]"><Lock size={11} /> Private — stored only on your device</p>
         </div>
@@ -87,7 +89,7 @@ function DailyView() {
     <>
       <div className="period-banner">
         <ShieldCheck size={18} />
-        <span>Protection is a daily practice, not a crisis response. Here’s what the Prophet ﷺ did every day.</span>
+        <span>Protection is a daily practice, not a crisis response. Here’s what the Prophet <span className="period-saw">ﷺ</span> did every day.</span>
       </div>
       <div className="period-card">
         <div className="flex items-center justify-between">
@@ -108,12 +110,12 @@ function DailyView() {
                 const on = done.has(it.id);
                 return (
                   <li key={it.id} className="period-check-row">
-                    <button className={`period-check ${on ? "is-on" : ""}`} aria-pressed={on} aria-label={it.label}
+                    <button className={`period-check ${on ? "is-on" : ""}`} aria-pressed={on} aria-label={saw(it.label)}
                       onClick={() => { toggleRuqyahCheck(it.id); void triggerHaptic("light"); }}>
                       {on && <Check size={14} strokeWidth={2.6} />}
                     </button>
-                    <span className="flex-1 text-sm leading-snug">{it.label}</span>
-                    {it.to && <Link to={it.to} className="period-icon-btn" aria-label={`Open ${it.label}`}><ChevronRight size={16} /></Link>}
+                    <span className="flex-1 text-sm leading-snug">{saw(it.label)}</span>
+                    {it.to && <Link to={it.to} className="period-icon-btn" aria-label={`Open ${saw(it.label)}`}><ChevronRight size={16} /></Link>}
                   </li>
                 );
               })}
@@ -137,7 +139,7 @@ function RuqyahView() {
     <>
       <div className="period-banner">
         <BookOpen size={18} />
-        <span>Ruqyah as the Prophet ﷺ transmitted it is short, simple, and performed by a person on themselves. It needs no specialist, no fee, no diagnosis and no secret knowledge.</span>
+        <span>Ruqyah as the Prophet <span className="period-saw">ﷺ</span> transmitted it is short, simple, and performed by a person on themselves. It needs no specialist, no fee, no diagnosis and no secret knowledge.</span>
       </div>
       <div className="period-card">
         <div className="flex items-center justify-between">
@@ -153,9 +155,9 @@ function RuqyahView() {
         <div key={step} className="animate-in fade-in slide-in-from-right-2 duration-300">
           <div className="mt-4 flex items-start gap-3">
             <span className="period-acc-num">{step + 1}</span>
-            <p className="flex-1 text-[15px] font-semibold leading-snug">{s.title}</p>
+            <p className="flex-1 text-[15px] font-semibold leading-snug">{saw(s.title)}</p>
           </div>
-          {s.note && <p className="period-callout is-grey mt-3">{s.note}</p>}
+          {s.note && <p className="period-callout is-grey mt-3">{saw(s.note)}</p>}
           {s.item && <div className="mt-3"><DuaCard item={s.item} /></div>}
         </div>
         <div className="mt-5 flex gap-2">
@@ -190,13 +192,13 @@ function VersesView() {
       <p className="period-callout is-grey">No fixed sequence is reported. These are what the Sunnah names, in the order most commonly used.</p>
       <div className="space-y-3">
         {VERSES.map((v, i) => (
-          <div key={v.title} className="period-card">
+          <div key={saw(v.title)} className="period-card">
             <div className="flex items-start gap-3">
               <span className="period-acc-num">{i + 1}</span>
               <div className="flex-1">
-                <h3 className="text-[15px] font-bold">{v.title}</h3>
+                <h3 className="text-[15px] font-bold">{saw(v.title)}</h3>
                 <div className="period-source mt-1"><BookOpen size={12} /> {v.source}</div>
-                <p className="mt-2 text-sm">{v.note}</p>
+                <p className="mt-2 text-sm">{saw(v.note)}</p>
                 {v.to && <Link to={v.to} className="period-link mt-2">Open in Morning Adhkar <ChevronRight size={14} /></Link>}
               </div>
             </div>
@@ -226,12 +228,12 @@ function LearnView() {
             <section key={s.id} className={`period-learn-section ${isOpen ? "is-open" : ""}`}>
               <button className="period-acc-head" aria-expanded={isOpen} onClick={() => setOpen(isOpen ? null : s.id)}>
                 <span className="period-acc-num">{idx + 1}</span>
-                <span className="flex-1 text-left text-[15px] font-semibold">{s.title}</span>
+                <span className="flex-1 text-left text-[15px] font-semibold">{saw(s.title)}</span>
                 <ChevronRight size={17} strokeWidth={1.8} />
               </button>
               {isOpen && (
                 <div className="period-learn-body space-y-4">
-                  {s.intro && <p className="period-muted text-sm">{s.intro}</p>}
+                  {s.intro && <p className="period-muted text-sm">{saw(s.intro)}</p>}
                   {s.id === "what" && (
                     <div className="period-callout is-grey">
                       <strong>The three conditions</strong>
@@ -244,7 +246,7 @@ function LearnView() {
                       {it.id === "raqi" && (
                         <ul className="mt-2 space-y-1.5">
                           {RAQI_FLAGS.map((f) => (
-                            <li key={f} className="flex gap-2 text-sm"><X size={15} className="mt-0.5 flex-none" style={{ color: "var(--destructive)" }} />{f}</li>
+                            <li key={saw(f)} className="flex gap-2 text-sm"><X size={15} className="mt-0.5 flex-none" style={{ color: "var(--destructive)" }} />{saw(f)}</li>
                           ))}
                         </ul>
                       )}
@@ -267,8 +269,8 @@ function Myths() {
     <div className="space-y-2">
       {MYTHS.map((m) => (
         <div key={m.myth} className="period-item">
-          <p className="flex gap-2 text-sm font-semibold"><X size={15} className="mt-0.5 flex-none" style={{ color: "var(--destructive)" }} />“{m.myth}”</p>
-          <p className="mt-1.5 flex gap-2 text-sm"><Check size={15} className="mt-0.5 flex-none" style={{ color: "var(--accent)" }} />{m.truth}</p>
+          <p className="flex gap-2 text-sm font-semibold"><X size={15} className="mt-0.5 flex-none" style={{ color: "var(--destructive)" }} />“{saw(m.myth)}”</p>
+          <p className="mt-1.5 flex gap-2 text-sm"><Check size={15} className="mt-0.5 flex-none" style={{ color: "var(--accent)" }} />{saw(m.truth)}</p>
         </div>
       ))}
     </div>
@@ -328,7 +330,7 @@ async function shareSection(s: RuqyahSection) {
     if (it.translation) lines.push(it.translation);
     it.notes?.forEach((n) => lines.push(n));
     if (it.callout) lines.push(`${it.callout.label} — ${it.callout.text}`);
-    if (it.id === "raqi") RAQI_FLAGS.forEach((f) => lines.push(`• ${f}`));
+    if (it.id === "raqi") RAQI_FLAGS.forEach((f) => lines.push(`• ${saw(f)}`));
     lines.push("");
   }
   if (s.myths) MYTHS.forEach((m) => lines.push(`Myth: ${m.myth}`, m.truth, ""));
@@ -343,18 +345,18 @@ async function shareSection(s: RuqyahSection) {
 function DuaCard({ item, bare = false }: { item: SunnahItem; bare?: boolean }) {
   return (
     <article className={bare ? "" : "period-item"}>
-      <h3 className="text-sm font-bold">{item.title}</h3>
+      <h3 className="text-sm font-bold">{saw(item.title)}</h3>
       <div className="period-source mt-1"><BookOpen size={12} /> {item.source}</div>
       {item.arabic && <p className="arabic mt-3 whitespace-pre-line text-right text-[21px] leading-[1.95]" lang="ar" dir="rtl">{item.arabic}</p>}
       {item.transliteration && <p className="adhkar-transliteration mt-2 !text-left text-[13px]">{item.transliteration}</p>}
-      {item.translation && <p className="mt-2 text-sm">{item.translation}</p>}
+      {item.translation && <p className="mt-2 text-sm">{saw(item.translation)}</p>}
       {item.narration && (
-        <details className="adhkar-commentary"><summary>Full narration</summary><p className="pb-1 text-sm">{item.narration}</p></details>
+        <details className="adhkar-commentary"><summary>Full narration</summary><p className="pb-1 text-sm">{saw(item.narration)}</p></details>
       )}
-      {item.notes?.map((n, i) => <p key={i} className="period-muted mt-2 text-sm leading-relaxed">{n}</p>)}
+      {item.notes?.map((n, i) => <p key={i} className="period-muted mt-2 text-sm leading-relaxed">{saw(n)}</p>)}
       {item.callout && (
         <div className={`period-callout mt-3 ${item.callout.tone === "amber" ? "is-amber" : "is-grey"}`}>
-          <strong>{item.callout.label}</strong> — {item.callout.text}
+          <strong>{item.callout.label}</strong> — {saw(item.callout.text)}
         </div>
       )}
     </article>
