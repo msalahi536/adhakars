@@ -44,7 +44,7 @@ function RuqyahCompanion() {
   useEffect(() => setMounted(true), []);
   return (
     <>
-      <header className="page-header period-header relative overflow-hidden" style={{ background: "var(--grad-header)", color: "var(--header-fg)" }}>
+      <header className="page-header period-header rq-header relative overflow-hidden" style={{ background: "var(--grad-header)", color: "var(--header-fg)" }}>
         <HeaderBackButton />
         <div className="relative mx-auto max-w-md px-16 pb-4 pt-7 text-center">
           <div className="label-caps" style={{ color: "var(--header-sub)", opacity: 1 }}>Ruqyah Companion</div>
@@ -59,7 +59,7 @@ function RuqyahCompanion() {
           ))}
         </div>
       </header>
-      <main className="scroll-area period-scroll-area">
+      <main className="scroll-area period-scroll-area rq-scroll-area">
         <div className="mx-auto max-w-md space-y-4 px-5 pb-8 pt-4">
           {mounted && tab === "daily" && <DailyView />}
           {mounted && tab === "ruqyah" && <RuqyahView />}
