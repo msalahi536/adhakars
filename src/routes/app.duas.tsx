@@ -68,12 +68,7 @@ function DuaLibrary() {
     }
     return list;
   }, [cat, sort, favs]);
-
-  const suggestions = useMemo(() => {
-    if (!now) return null;
-    if (now.getDay() === 5) return { title: "Jumu‘ah Sunnahs", gold: true, ids: ["jum-01", "jum-02", "jum-03", "jum-04"] };
-    return null;
-  }, [now]);
+  const emotional = results.some((d) => EMOTIONAL_CATS.has(d.cat));
 
   const go = (t: Tab) => { setTab(t); setCat(null); void triggerHaptic("light"); document.querySelector(".period-scroll-area")?.scrollTo({ top: 0 }); };
   const card = (d: Dua, extra?: React.ReactNode) => <DuaCard key={d.id} d={d} fav={favIds.has(d.id)} onFav={() => toggleFav(d.id)} extra={extra} />;
