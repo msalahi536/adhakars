@@ -17,3 +17,4 @@
 - [x] Qibla: make bearing/distance verifiable — refresh-location button, cache-age note, recompute on refresh.
 - [x] Qibla: lighter, springier calibration ball rendered as a flat circle.
 - [x] Qibla: move compass/content up so the tip card is not hidden under the nav bar on iPhone.
+- [x] Add Page-based, Always morning, and Always evening appearance modes for the whole app.
