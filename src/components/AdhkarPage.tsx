@@ -61,7 +61,7 @@ export function AdhkarPage({
     bumpLifetime(lifetimeCategory, next - prev);
   };
 
-  const dailyLayout = dailyLayoutProp ?? ["morning", "evening", "sleep", "wake", "custom_adhkar"].includes(storageKey);
+  const dailyLayout = dailyLayoutProp ?? ["morning", "evening", "sleep", "wake"].includes(storageKey);
 
   return (
     <>

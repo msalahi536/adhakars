@@ -97,7 +97,6 @@ export const sectionForRoute = (pathname: string): SectionKey => {
   if (pathname.startsWith("/app/tasbih")) return "tasbih";
   if (pathname.startsWith("/app/sleep")) return "sleep";
   if (pathname.startsWith("/app/wake")) return "wake";
-  if (pathname.startsWith("/app/my-adhkar")) return "custom";
   return "default";
 };
 

@@ -27,7 +27,6 @@ import { Route as AppRuqyahRouteImport } from './routes/app.ruqyah'
 import { Route as AppQiblaRouteImport } from './routes/app.qibla'
 import { Route as AppPrivacyRouteImport } from './routes/app.privacy'
 import { Route as AppPeriodRouteImport } from './routes/app.period'
-import { Route as AppMyAdhkarRouteImport } from './routes/app.my-adhkar'
 import { Route as AppMoreRouteImport } from './routes/app.more'
 import { Route as AppHajjRouteImport } from './routes/app.hajj'
 import { Route as AppFastingRouteImport } from './routes/app.fasting'
@@ -126,11 +125,6 @@ const AppPeriodRoute = AppPeriodRouteImport.update({
   path: '/period',
   getParentRoute: () => AppRoute,
 } as any)
-const AppMyAdhkarRoute = AppMyAdhkarRouteImport.update({
-  id: '/my-adhkar',
-  path: '/my-adhkar',
-  getParentRoute: () => AppRoute,
-} as any)
 const AppMoreRoute = AppMoreRouteImport.update({
   id: '/more',
   path: '/more',
@@ -183,7 +177,6 @@ export interface FileRoutesByFullPath {
   '/app/fasting': typeof AppFastingRoute
   '/app/hajj': typeof AppHajjRoute
   '/app/more': typeof AppMoreRoute
-  '/app/my-adhkar': typeof AppMyAdhkarRoute
   '/app/period': typeof AppPeriodRoute
   '/app/privacy': typeof AppPrivacyRoute
   '/app/qibla': typeof AppQiblaRoute
@@ -210,7 +203,6 @@ export interface FileRoutesByTo {
   '/app/fasting': typeof AppFastingRoute
   '/app/hajj': typeof AppHajjRoute
   '/app/more': typeof AppMoreRoute
-  '/app/my-adhkar': typeof AppMyAdhkarRoute
   '/app/period': typeof AppPeriodRoute
   '/app/privacy': typeof AppPrivacyRoute
   '/app/qibla': typeof AppQiblaRoute
@@ -239,7 +231,6 @@ export interface FileRoutesById {
   '/app/fasting': typeof AppFastingRoute
   '/app/hajj': typeof AppHajjRoute
   '/app/more': typeof AppMoreRoute
-  '/app/my-adhkar': typeof AppMyAdhkarRoute
   '/app/period': typeof AppPeriodRoute
   '/app/privacy': typeof AppPrivacyRoute
   '/app/qibla': typeof AppQiblaRoute
@@ -269,7 +260,6 @@ export interface FileRouteTypes {
     | '/app/fasting'
     | '/app/hajj'
     | '/app/more'
-    | '/app/my-adhkar'
     | '/app/period'
     | '/app/privacy'
     | '/app/qibla'
@@ -296,7 +286,6 @@ export interface FileRouteTypes {
     | '/app/fasting'
     | '/app/hajj'
     | '/app/more'
-    | '/app/my-adhkar'
     | '/app/period'
     | '/app/privacy'
     | '/app/qibla'
@@ -324,7 +313,6 @@ export interface FileRouteTypes {
     | '/app/fasting'
     | '/app/hajj'
     | '/app/more'
-    | '/app/my-adhkar'
     | '/app/period'
     | '/app/privacy'
     | '/app/qibla'
@@ -477,13 +465,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppPeriodRouteImport
       parentRoute: typeof AppRoute
     }
-    '/app/my-adhkar': {
-      id: '/app/my-adhkar'
-      path: '/my-adhkar'
-      fullPath: '/app/my-adhkar'
-      preLoaderRoute: typeof AppMyAdhkarRouteImport
-      parentRoute: typeof AppRoute
-    }
     '/app/more': {
       id: '/app/more'
       path: '/more'
@@ -543,7 +524,6 @@ interface AppRouteChildren {
   AppFastingRoute: typeof AppFastingRoute
   AppHajjRoute: typeof AppHajjRoute
   AppMoreRoute: typeof AppMoreRoute
-  AppMyAdhkarRoute: typeof AppMyAdhkarRoute
   AppPeriodRoute: typeof AppPeriodRoute
   AppPrivacyRoute: typeof AppPrivacyRoute
   AppQiblaRoute: typeof AppQiblaRoute
@@ -563,7 +543,6 @@ const AppRouteChildren: AppRouteChildren = {
   AppFastingRoute: AppFastingRoute,
   AppHajjRoute: AppHajjRoute,
   AppMoreRoute: AppMoreRoute,
-  AppMyAdhkarRoute: AppMyAdhkarRoute,
   AppPeriodRoute: AppPeriodRoute,
   AppPrivacyRoute: AppPrivacyRoute,
   AppQiblaRoute: AppQiblaRoute,

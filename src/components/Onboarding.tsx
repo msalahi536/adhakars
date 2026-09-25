@@ -53,7 +53,7 @@ const SLIDES: Slide[] = [
     Icon: Compass,
     label: "Finding your way",
     title: "Five tabs, one More hub",
-    body: "Morning · Evening · Salah · Tasbih · More. Sleep, Wake, Qibla and My Adhkar live under More.",
+    body: "Morning · Evening · Salah · Tasbih · More. Sleep, Wake, Qibla and the companions live under More.",
   },
   {
     Icon: Bell,
