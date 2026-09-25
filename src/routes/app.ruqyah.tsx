@@ -346,6 +346,16 @@ const STORED_VERSES: Partial<Record<number, Dhikr>> = {
   3: morningAdhkar.find((item) => item.id === "morning-2-three-quls"),
 };
 
+const AL_FATIHAH: Dhikr = {
+  id: "ruqyah-al-fatihah",
+  title: "Surat al-Fatihah",
+  arabic: "بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ ۝١\nالْحَمْدُ لِلَّهِ رَبِّ الْعَالَمِينَ ۝٢\nالرَّحْمَٰنِ الرَّحِيمِ ۝٣\nمَالِكِ يَوْمِ الدِّينِ ۝٤\nإِيَّاكَ نَعْبُدُ وَإِيَّاكَ نَسْتَعِينُ ۝٥\nاهْدِنَا الصِّرَاطَ الْمُسْتَقِيمَ ۝٦\nصِرَاطَ الَّذِينَ أَنْعَمْتَ عَلَيْهِمْ غَيْرِ الْمَغْضُوبِ عَلَيْهِمْ وَلَا الضَّالِّينَ ۝٧",
+  transliteration: "Bismillahi r-Rahmani r-Rahim. Al-hamdu lillahi Rabbi l-alamin. Ar-Rahmani r-Rahim. Maliki yawmi d-din. Iyyaka nabudu wa iyyaka nastain. Ihdina s-sirata l-mustaqim. Sirata lladhina anamta alayhim, ghayri l-maghdubi alayhim wa la d-dallin.",
+  translation: "In the name of Allah, the Entirely Merciful, the Especially Merciful. All praise is for Allah, Lord of all worlds. You alone we worship and You alone we ask for help. Guide us along the Straight Path.",
+  source: "Quran 1:1-7 · Bukhari 5736",
+  target: 1,
+};
+
 function VerseAccordion({ idx, open, onToggle }: { idx: number; open: boolean; onToggle: () => void }) {
   const v = VERSES[idx];
   const stored = STORED_VERSES[idx];
