@@ -3116,7 +3116,16 @@ html[data-preset="ocean"][data-visual-phase="evening"] .bottom-nav-row {
 .rq-learn-content { display: grid; grid-template-rows: 0fr; opacity: 0; transition: grid-template-rows .38s ease, opacity .28s ease; }
 .rq-learn-content > div { min-height: 0; overflow: hidden; }
 .rq-learn-row[aria-expanded="true"] + .rq-learn-content { grid-template-rows: 1fr; opacity: 1; }
-.rq-learn-article-embedded { padding: 2px 14px 16px 53px; }
-.rq-learn-intro { padding: 14px 0; border-top: 1px solid color-mix(in oklab, var(--foreground) 8%, transparent); }
-.rq-learn-item { padding: 15px 0; border-top: 1px solid color-mix(in oklab, var(--foreground) 8%, transparent); }
-@media (max-width: 390px) { .rq-learn-article-embedded { padding-left: 14px; } }
+.rq-learn-article-embedded { width: 100%; padding: 0 16px 18px; }
+.rq-learn-intro { padding: 18px 4px 16px; border-top: 1px solid color-mix(in oklab, var(--foreground) 8%, transparent); text-align: center; }
+.rq-learn-intro .rq-hero-title { text-align: center; }
+.rq-learn-item { width: 100%; padding: 18px 4px; border-top: 1px solid color-mix(in oklab, var(--foreground) 8%, transparent); }
+.rq-learn-item > article > h3, .rq-learn-item > article > .period-source { justify-content: center; text-align: center; }
+.rq-learn-item > article > h3 { font-family: var(--font-display); font-size: 18px; line-height: 1.3; }
+.rq-guide-recitation { overflow: hidden; border: 1px solid color-mix(in oklab, var(--accent) 20%, var(--border)); border-radius: 18px; background: color-mix(in oklab, var(--card) 94%, var(--accent)); }
+.rq-guide-recitation-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 14px 15px; border-bottom: 1px solid color-mix(in oklab, var(--foreground) 8%, transparent); }
+.rq-guide-recitation-head h3 { font-family: var(--font-display); font-size: 17px; font-weight: 700; }
+.rq-guide-part { padding: 17px 16px; }
+.rq-guide-part + .rq-guide-part { border-top: 1px solid color-mix(in oklab, var(--foreground) 8%, transparent); }
+.rq-guide-part .arabic { font-size: 23px; line-height: 2; }
+.rq-guide-part .adhkar-transliteration { margin-top: 12px; font-size: 13px; }

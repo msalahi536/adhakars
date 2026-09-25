@@ -6,6 +6,7 @@ import {
   Sunrise, Users, X,
 } from "lucide-react";
 import { HeaderBackButton } from "@/components/HeaderBackButton";
+import { ListenButton } from "@/components/ListenButton";
 import { triggerHaptic } from "@/lib/theme";
 import { getRuqyahChecklist, toggleRuqyahCheck } from "@/lib/ruqyah";
 import type { SunnahItem } from "@/data/period-sunnah";
@@ -255,6 +256,7 @@ function SelfGuide({ onBack }: { onBack: () => void }) {
   const s = SELF_STEPS[step];
   const last = SELF_STEPS.length - 1;
   const go = (n: number) => { setStep(n); void triggerHaptic("light"); };
+  const recitation = step === 1 ? AL_FATIHAH : step === 2 ? STORED_VERSES[1] : step === 3 ? STORED_VERSES[3] : undefined;
   return (
     <>
       <BackLink onBack={onBack} label="Ruqyah" />
@@ -275,6 +277,7 @@ function SelfGuide({ onBack }: { onBack: () => void }) {
             <p className="flex-1 text-[15px] font-semibold leading-snug">{saw(s.title)}</p>
           </div>
           {s.note && <p className="period-callout is-grey mt-3">{saw(s.note)}</p>}
+           {recitation && <GuideRecitation item={recitation} />}
           {s.item && <div className="mt-3"><DuaCard item={s.item} /></div>}
         </div>
         <div className="mt-5 flex gap-2">
@@ -342,6 +345,44 @@ const STORED_VERSES: Partial<Record<number, Dhikr>> = {
   2: eveningAdhkar.find((item) => item.id === "evening-19-the-last-two-verses-of-surat-al-baqa"),
   3: morningAdhkar.find((item) => item.id === "morning-2-three-quls"),
 };
+
+const AL_FATIHAH: Dhikr = {
+  id: "ruqyah-al-fatihah",
+  title: "Surat al-Fatihah",
+  arabic: "بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ ۝١\nالْحَمْدُ لِلَّهِ رَبِّ الْعَالَمِينَ ۝٢\nالرَّحْمَٰنِ الرَّحِيمِ ۝٣\nمَالِكِ يَوْمِ الدِّينِ ۝٤\nإِيَّاكَ نَعْبُدُ وَإِيَّاكَ نَسْتَعِينُ ۝٥\nاهْدِنَا الصِّرَاطَ الْمُسْتَقِيمَ ۝٦\nصِرَاطَ الَّذِينَ أَنْعَمْتَ عَلَيْهِمْ غَيْرِ الْمَغْضُوبِ عَلَيْهِمْ وَلَا الضَّالِّينَ ۝٧",
+  transliteration: "Bismillahi r-Rahmani r-Rahim. Al-hamdu lillahi Rabbi l-alamin. Ar-Rahmani r-Rahim. Maliki yawmi d-din. Iyyaka nabudu wa iyyaka nastain. Ihdina s-sirata l-mustaqim. Sirata lladhina anamta alayhim, ghayri l-maghdubi alayhim wa la d-dallin.",
+  translation: "In the name of Allah, the Entirely Merciful, the Especially Merciful. All praise is for Allah, Lord of all worlds. You alone we worship and You alone we ask for help. Guide us along the Straight Path.",
+  source: "Quran 1:1-7 · Bukhari 5736",
+  target: 1,
+};
+
+function GuideRecitation({ item }: { item: Dhikr }) {
+  return (
+    <article className="rq-guide-recitation mt-4">
+      <div className="rq-guide-recitation-head">
+        <div>
+          <h3>{item.title}</h3>
+          <div className="period-source mt-1"><BookOpen size={12} /> {item.source}</div>
+        </div>
+        <ListenButton dhikrId={item.id} size={34} />
+      </div>
+      {item.arabicMulti ? item.arabicMulti.map((part) => (
+        <section key={part.label} className="rq-guide-part">
+          <div className="label-caps text-center">{part.label}</div>
+          <p className="arabic whitespace-pre-line text-right" lang="ar" dir="rtl">{part.arabic}</p>
+          <p className="adhkar-transliteration !text-left">{part.transliteration}</p>
+          <p className="text-sm leading-relaxed">{part.translation}</p>
+        </section>
+      )) : (
+        <div className="rq-guide-part">
+          <p className="arabic whitespace-pre-line text-right" lang="ar" dir="rtl">{item.arabic}</p>
+          <p className="adhkar-transliteration !text-left">{item.transliteration}</p>
+          <p className="text-sm leading-relaxed">{item.translation}</p>
+        </div>
+      )}
+    </article>
+  );
+}
 
 function VerseAccordion({ idx, open, onToggle }: { idx: number; open: boolean; onToggle: () => void }) {
   const v = VERSES[idx];
