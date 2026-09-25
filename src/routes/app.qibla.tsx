@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
-import { Check, Crosshair, Lightbulb, Navigation, RotateCw } from "lucide-react";
+import { Check, Crosshair, Lightbulb, Navigation } from "lucide-react";
 import { HeaderBackButton } from "@/components/HeaderBackButton";
 import { CompassCalibrationCard } from "@/components/CompassCalibrationCard";
 import {
@@ -11,6 +11,7 @@ import {
   requestOrientationPermission,
   storePermissionGranted,
   subscribeOrientation,
+  watchPosition,
 } from "@/lib/compass";
 
 
@@ -70,10 +71,7 @@ function Qibla() {
   const [error, setError] = useState<string | null>(null);
   const [absolute, setAbsolute] = useState<boolean | null>(null);
   const [coords, setCoords] = useState<{ lat: number; lng: number } | null>(null);
-  const [posMeta, setPosMeta] = useState<{ source: "fresh" | "cached"; at: number } | null>(null);
   const [lostSensor, setLostSensor] = useState(false);
-  const [locError, setLocError] = useState<string | null>(null);
-  const [, setNowTick] = useState(0);
   const [heading, setHeading] = useState<number | null>(null);
   const [qiblaBearing, setQiblaBearing] = useState<number | null>(null);
   const [showCalibration, setShowCalibration] = useState(false);
@@ -90,11 +88,16 @@ function Qibla() {
     };
   }, []);
 
-  // Keep the "updated X min ago" note current.
+  // Live location: keep the bearing and distance tracking the real position
+  // the whole time the page is open. No cached fixes, no refresh button.
   useEffect(() => {
-    const id = window.setInterval(() => setNowTick((n) => n + 1), 30000);
-    return () => window.clearInterval(id);
-  }, []);
+    if (phase !== "ready") return;
+    const stop = watchPosition((c) => {
+      setCoords(c);
+      setQiblaBearing(bearingToKaaba(c.lat, c.lng));
+    });
+    return stop;
+  }, [phase]);
 
   // Lock the page in place: no pinch zoom, no dragging the layout around.
   useEffect(() => {
@@ -176,16 +179,15 @@ function Qibla() {
     }
     if (sensor === "granted") storePermissionGranted();
 
-
     setStep("Getting your location…");
-    const pos = await getPosition();
+    // Always take a fresh fix here; the watcher keeps it live afterwards.
+    const pos = await getPosition({ force: true });
     if (!pos.ok) {
       setError(pos.error);
       setPhase("error");
       return;
     }
     setCoords(pos.coords);
-    setPosMeta({ source: pos.source, at: pos.at });
     setQiblaBearing(bearingToKaaba(pos.coords.lat, pos.coords.lng));
 
     setStep("");
@@ -195,19 +197,6 @@ function Qibla() {
       attachCompass();
     }
     setPhase("ready");
-  };
-
-  // Pull a fresh GPS fix and recompute the bearing and distance.
-  const refreshLocation = async () => {
-    const p = await getPosition({ force: true });
-    if (p.ok) {
-      setCoords(p.coords);
-      setPosMeta({ source: p.source, at: p.at });
-      setQiblaBearing(bearingToKaaba(p.coords.lat, p.coords.lng));
-      setLocError(null);
-    } else {
-      setLocError(p.error);
-    }
   };
 
   // Auto start when opening the page. iOS only allows the motion prompt from a
@@ -364,14 +353,7 @@ function Qibla() {
                 </p>
               )}
 
-              <div className="qb-stats" style={{ position: "relative" }}>
-                <button
-                  onClick={() => void refreshLocation()}
-                  className="qb-refresh"
-                  aria-label="Update your location"
-                >
-                  <RotateCw size={14} strokeWidth={2} aria-hidden />
-                </button>
+              <div className="qb-stats">
                 <div className="qb-stat">
                   <span className="qb-stat-icon"><Navigation size={16} strokeWidth={1.8} /></span>
                   <div>
@@ -390,18 +372,6 @@ function Qibla() {
                   </div>
                 </div>
               </div>
-              {posMeta?.source === "cached" && (
-                <p className="qb-pos-note">
-                  Last saved location, updated{" "}
-                  {Math.max(1, Math.round((Date.now() - posMeta.at) / 60000))} min ago. Tap ↻ for a
-                  fresh fix.
-                </p>
-              )}
-              {locError && (
-                <p className="qb-pos-note" style={{ color: "var(--destructive)" }}>
-                  {locError}
-                </p>
-              )}
 
               <div className="qb-tip">
                 <Lightbulb size={18} strokeWidth={1.6} aria-hidden />

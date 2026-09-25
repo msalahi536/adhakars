@@ -229,6 +229,67 @@ export async function getPosition(opts?: { force?: boolean }): Promise<PositionR
 }
 
 
+/**
+ * Continuously watch the device position. Every GPS update is pushed to
+ * `onUpdate` so the Qibla bearing and distance always reflect where the user
+ * actually is — no cached fixes, no manual refresh. Returns an unsubscribe.
+ */
+export function watchPosition(
+  onUpdate: (coords: Coords) => void,
+  onError?: (msg: string) => void,
+): () => void {
+  let cancelled = false;
+  let cleanup: (() => void) | null = null;
+
+  const startWeb = () => {
+    if (typeof navigator === "undefined" || !("geolocation" in navigator)) return;
+    const id = navigator.geolocation.watchPosition(
+      (pos) => {
+        const coords = { lat: pos.coords.latitude, lng: pos.coords.longitude };
+        cachePosition(coords);
+        onUpdate(coords);
+      },
+      (err) =>
+        onError?.(
+          err.code === err.PERMISSION_DENIED
+            ? "Location permission denied. Allow location access for this app."
+            : err.message,
+        ),
+      { enableHighAccuracy: true, maximumAge: 5000 },
+    );
+    cleanup = () => navigator.geolocation.clearWatch(id);
+  };
+
+  if (isNative()) {
+    void (async () => {
+      try {
+        const { Geolocation } = await import("@capacitor/geolocation");
+        const id = await Geolocation.watchPosition({ enableHighAccuracy: true }, (pos, err) => {
+          if (pos) {
+            const coords = { lat: pos.coords.latitude, lng: pos.coords.longitude };
+            cachePosition(coords);
+            onUpdate(coords);
+          } else if (err) {
+            onError?.(err.message ?? "Location error");
+          }
+        });
+        if (cancelled) await Geolocation.clearWatch({ id });
+        else cleanup = () => void Geolocation.clearWatch({ id });
+      } catch {
+        // Plugin missing in this build: use the web API.
+        startWeb();
+      }
+    })();
+  } else {
+    startWeb();
+  }
+
+  return () => {
+    cancelled = true;
+    cleanup?.();
+  };
+}
+
 
 export function normalizeHeading(h: number) {
   return ((h % 360) + 360) % 360;
