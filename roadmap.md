@@ -16,3 +16,4 @@
 - [ ] Qibla: stop repeat "Enable Compass" prompts once permission was granted (sensor-wake fallback, keep stored flag).
 - [ ] Qibla: make bearing/distance verifiable — refresh-location button, cache-age note, recompute on refresh.
 - [ ] Qibla: lighter, springier calibration ball rendered as a flat circle.
+- [ ] Qibla: move compass/content up so the tip card is not hidden under the nav bar on iPhone.
