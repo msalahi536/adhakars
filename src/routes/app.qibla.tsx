@@ -65,7 +65,9 @@ function distanceKm(lat: number, lng: number): number {
 const CAL_DONE_KEY = "qibla-calibrated";
 
 function Qibla() {
-  const [phase, setPhase] = useState<"intro" | "requesting" | "ready" | "error">("intro");
+  const [phase, setPhase] = useState<"intro" | "requesting" | "ready" | "error">(() =>
+    typeof window !== "undefined" && (!needsGesturePermission() || hasStoredPermission()) ? "requesting" : "intro",
+  );
   const [step, setStep] = useState<string>("");
   const [error, setError] = useState<string | null>(null);
   const [absolute, setAbsolute] = useState<boolean | null>(null);
@@ -83,6 +85,22 @@ function Qibla() {
   useEffect(() => {
     return () => {
       unsubRef.current?.();
+    };
+  }, []);
+
+  // Lock the page in place: no pinch zoom, no dragging the layout around.
+  useEffect(() => {
+    const stop = (e: Event) => e.preventDefault();
+    document.addEventListener("gesturestart", stop, { passive: false });
+    document.addEventListener("gesturechange", stop, { passive: false });
+    const onTouch = (e: TouchEvent) => {
+      if (e.touches.length > 1) e.preventDefault();
+    };
+    document.addEventListener("touchmove", onTouch, { passive: false });
+    return () => {
+      document.removeEventListener("gesturestart", stop);
+      document.removeEventListener("gesturechange", stop);
+      document.removeEventListener("touchmove", onTouch);
     };
   }, []);
 
@@ -114,6 +132,13 @@ function Qibla() {
       setHeading(next);
     });
     setTimeout(() => {
+      if (!got && needsGesturePermission()) {
+        // Stored permission no longer valid (e.g. iOS reset it): ask again.
+        unsubRef.current?.();
+        try { localStorage.removeItem("qibla-perm-granted"); } catch { /* ignore */ }
+        setPhase("intro");
+        return;
+      }
       if (!got) {
         setError(
           "No compass readings from this device. Try calibrating, or open the app on a phone.",
@@ -123,12 +148,14 @@ function Qibla() {
   };
 
   // Permissions first, then calibration. Runs from a real user gesture.
-  const start = async () => {
+  const start = async (skipPrompt = false) => {
     setPhase("requesting");
     setError(null);
 
     setStep("Requesting motion access…");
-    const sensor = await requestOrientationPermission();
+    // Permission was already granted before: don't re-prompt (iOS would reject
+    // a prompt that isn't triggered by a tap). Just attach to the sensor.
+    const sensor = skipPrompt ? "granted" : await requestOrientationPermission();
     if (sensor === "denied") {
       setError(
         "Motion and orientation access was denied. Allow it for this app in your device settings, then try again.",
@@ -165,7 +192,8 @@ function Qibla() {
   useEffect(() => {
     if (autoRef.current) return;
     autoRef.current = true;
-    if (!needsGesturePermission() || hasStoredPermission()) void start();
+    if (!needsGesturePermission()) void start();
+    else if (hasStoredPermission()) void start(true);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -221,7 +249,7 @@ function Qibla() {
                 leaves your device.
               </p>
               <button
-                onClick={() => void start()}
+                onClick={() => void start(false)}
                 disabled={permState === "requesting"}
                 className="rounded-full px-6 py-3 text-sm font-bold disabled:opacity-70"
                 style={{
