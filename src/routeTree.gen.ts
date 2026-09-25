@@ -32,6 +32,7 @@ import { Route as AppMoreRouteImport } from './routes/app.more'
 import { Route as AppHajjRouteImport } from './routes/app.hajj'
 import { Route as AppFastingRouteImport } from './routes/app.fasting'
 import { Route as AppEveningRouteImport } from './routes/app.evening'
+import { Route as AppDuasRouteImport } from './routes/app.duas'
 import { Route as AppAboutRouteImport } from './routes/app.about'
 import { Route as ApiWidgetsRouteImport } from './routes/api/widgets'
 
@@ -150,6 +151,11 @@ const AppEveningRoute = AppEveningRouteImport.update({
   path: '/evening',
   getParentRoute: () => AppRoute,
 } as any)
+const AppDuasRoute = AppDuasRouteImport.update({
+  id: '/duas',
+  path: '/duas',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppAboutRoute = AppAboutRouteImport.update({
   id: '/about',
   path: '/about',
@@ -172,6 +178,7 @@ export interface FileRoutesByFullPath {
   '/terms': typeof TermsRoute
   '/api/widgets': typeof ApiWidgetsRoute
   '/app/about': typeof AppAboutRoute
+  '/app/duas': typeof AppDuasRoute
   '/app/evening': typeof AppEveningRoute
   '/app/fasting': typeof AppFastingRoute
   '/app/hajj': typeof AppHajjRoute
@@ -198,6 +205,7 @@ export interface FileRoutesByTo {
   '/terms': typeof TermsRoute
   '/api/widgets': typeof ApiWidgetsRoute
   '/app/about': typeof AppAboutRoute
+  '/app/duas': typeof AppDuasRoute
   '/app/evening': typeof AppEveningRoute
   '/app/fasting': typeof AppFastingRoute
   '/app/hajj': typeof AppHajjRoute
@@ -226,6 +234,7 @@ export interface FileRoutesById {
   '/terms': typeof TermsRoute
   '/api/widgets': typeof ApiWidgetsRoute
   '/app/about': typeof AppAboutRoute
+  '/app/duas': typeof AppDuasRoute
   '/app/evening': typeof AppEveningRoute
   '/app/fasting': typeof AppFastingRoute
   '/app/hajj': typeof AppHajjRoute
@@ -255,6 +264,7 @@ export interface FileRouteTypes {
     | '/terms'
     | '/api/widgets'
     | '/app/about'
+    | '/app/duas'
     | '/app/evening'
     | '/app/fasting'
     | '/app/hajj'
@@ -281,6 +291,7 @@ export interface FileRouteTypes {
     | '/terms'
     | '/api/widgets'
     | '/app/about'
+    | '/app/duas'
     | '/app/evening'
     | '/app/fasting'
     | '/app/hajj'
@@ -308,6 +319,7 @@ export interface FileRouteTypes {
     | '/terms'
     | '/api/widgets'
     | '/app/about'
+    | '/app/duas'
     | '/app/evening'
     | '/app/fasting'
     | '/app/hajj'
@@ -500,6 +512,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppEveningRouteImport
       parentRoute: typeof AppRoute
     }
+    '/app/duas': {
+      id: '/app/duas'
+      path: '/duas'
+      fullPath: '/app/duas'
+      preLoaderRoute: typeof AppDuasRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/app/about': {
       id: '/app/about'
       path: '/about'
@@ -519,6 +538,7 @@ declare module '@tanstack/react-router' {
 
 interface AppRouteChildren {
   AppAboutRoute: typeof AppAboutRoute
+  AppDuasRoute: typeof AppDuasRoute
   AppEveningRoute: typeof AppEveningRoute
   AppFastingRoute: typeof AppFastingRoute
   AppHajjRoute: typeof AppHajjRoute
@@ -538,6 +558,7 @@ interface AppRouteChildren {
 
 const AppRouteChildren: AppRouteChildren = {
   AppAboutRoute: AppAboutRoute,
+  AppDuasRoute: AppDuasRoute,
   AppEveningRoute: AppEveningRoute,
   AppFastingRoute: AppFastingRoute,
   AppHajjRoute: AppHajjRoute,

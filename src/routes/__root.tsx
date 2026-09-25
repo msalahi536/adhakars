@@ -10,6 +10,7 @@ import {
   Scripts,
 } from "@tanstack/react-router";
 
+import { Toaster } from "@/components/ui/sonner";
 import appCss from "../styles.css?url";
 
 import { applyThemeForRoute, PRE_PAINT_SCRIPT } from "@/lib/theme-store";
@@ -180,6 +181,7 @@ function RootComponent() {
   return (
     <QueryClientProvider client={queryClient}>
       <Outlet />
+      <Toaster position="top-center" />
     </QueryClientProvider>
   );
 }

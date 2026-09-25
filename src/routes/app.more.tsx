@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { BedDouble, Compass, BookPlus, ChevronRight, HandHeart, Moon, ShieldCheck, Landmark, MoonStar } from "lucide-react";
+import { BedDouble, Compass, BookPlus, ChevronRight, HandHeart, Moon, ShieldCheck, Landmark, MoonStar, BookOpen } from "lucide-react";
 import {
   getConsistency,
   getLifetime,
@@ -28,13 +28,14 @@ export const Route = createFileRoute("/app/more")({
 });
 
 type Tile = {
-  to: "/app/sleep" | "/app/qibla" | "/app/my-adhkar" | "/app/about" | "/app/period" | "/app/ruqyah" | "/app/hajj" | "/app/fasting";
+  to: "/app/sleep" | "/app/qibla" | "/app/my-adhkar" | "/app/about" | "/app/period" | "/app/ruqyah" | "/app/hajj" | "/app/fasting" | "/app/duas";
   title: string;
   subtitle: string;
   Icon: typeof BedDouble;
 };
 
 const tiles: Tile[] = [
+  { to: "/app/duas", title: "Dua Library", subtitle: "50 authentic duas for every feeling", Icon: BookOpen },
   { to: "/app/qibla", title: "Qibla Finder", subtitle: "Find the direction of the Ka'bah", Icon: Compass },
   { to: "/app/period", title: "Period Companion", subtitle: "Private cycle tracker and guidance", Icon: Moon },
   { to: "/app/ruqyah", title: "Ruqyah Companion", subtitle: "Daily protection and authentic ruqyah", Icon: ShieldCheck },
