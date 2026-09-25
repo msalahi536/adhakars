@@ -4,5 +4,5 @@
 - [x] Period Companion: cycle tracker, daily checklist, Sunnah knowledge, post-period + smart features.
 - [x] Separate aftercare and post-period guidance; remove Learn sharing.
 - [x] Restore themed relief dua, Three Quls formatting, and the card selector.
-- [ ] Preserve the last opened More destination when switching main tabs.
-- [ ] Refine Period Companion aftercare grouping, relief duas, and Today ordering.
+- [x] Preserve the last opened More destination when switching main tabs.
+- [x] Refine Period Companion aftercare grouping, relief duas, and Today ordering.

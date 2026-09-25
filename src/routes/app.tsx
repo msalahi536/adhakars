@@ -7,6 +7,7 @@ import { WhatsNewDialog } from "@/components/WhatsNewDialog";
 import { RatePrompt } from "@/components/RatePrompt";
 import { backgroundsForPreset } from "@/lib/backgrounds";
 import { DEFAULT_PRESET_ID, getPresetId, resetTheme, resolveVisualPhase } from "@/lib/theme-store";
+import { rememberMoreDestination } from "@/lib/more-navigation";
 
 const UPDATE_WELCOME_KEY = "adhkar:update-welcome:2026-09";
 
@@ -44,6 +45,10 @@ function AppLayout() {
       setShowWhatsNew(true);
     }
   }, []);
+
+  useEffect(() => {
+    rememberMoreDestination(pathname);
+  }, [pathname]);
 
   useLayoutEffect(() => {
     const sync = () => setActivePresetId(getPresetId());

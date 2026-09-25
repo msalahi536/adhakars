@@ -305,7 +305,7 @@ export const SUNNAH_SECTIONS: SunnahSection[] = [
   },
   {
     id: "ends",
-    title: "Aftercare & Ghusl",
+    title: "Aftercare, Ghusl & Post-Period",
     intro: `The farḍ ghusl is simple: intend purification in the heart, rinse the mouth and nose, and ensure water reaches every part of the body including the roots of the hair. Once this is done, the ghusl is valid and prayer is valid. Everything else below is additional Sunnah and reward, not a condition.`,
     items: [
       {
@@ -353,16 +353,9 @@ export const SUNNAH_SECTIONS: SunnahSection[] = [
           text: `The first three elements — intention, rinsing the mouth and nose, and water reaching the whole body — determine validity. The remaining steps bring additional Sunnah and reward.`,
         },
       },
-    ],
-  },
-  {
-    id: "post-period",
-    title: "Post-Period",
-    intro: `Once the bleeding has stopped and ghusl is complete, worship resumes normally. These are the practical next steps.`,
-    items: [
       {
         id: "post-period-next",
-        title: "What to do next",
+        title: "Post-period — what to do next",
         source: "Bukhari 227  ·  Agreed rulings",
         notes: [
           `Resume prayer at once with the next prayer due.`,
