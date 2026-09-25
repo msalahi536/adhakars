@@ -1093,6 +1093,20 @@ html[data-section="salah"] .bottom-nav-row { height: var(--bottom-nav-row); bord
 .app-shell.is-settings::after {
   background: transparent;
 }
+.app-shell.is-settings .page-header,
+.app-shell.is-settings .settings-scroll-area {
+  background: color-mix(in oklab, var(--background) 82%, transparent) !important;
+  backdrop-filter: blur(10px) saturate(112%);
+}
+.app-shell.is-settings .settings-scroll-area {
+  color: var(--foreground);
+}
+.app-shell.is-settings .settings-scroll-area .label-caps,
+.app-shell.is-settings .settings-scroll-area h2 {
+  color: color-mix(in oklab, var(--foreground) 88%, var(--accent));
+  opacity: 1;
+  text-shadow: 0 1px 8px color-mix(in oklab, var(--background) 70%, transparent);
+}
 html[data-section="salah"] .nav-item { gap: 4px; font-family: var(--font-sans); }
 html[data-section="salah"] .nav-active-mark { bottom: 2px; width: 16px; height: 2px; }
 html[data-section="salah"] .app-shell { background: linear-gradient(180deg, #f5efe3 0%, #efe8da 45%, #e7e2d2 100%); }
@@ -1595,7 +1609,6 @@ html[data-section="tasbih"] .tasbih-confirm-btn.solid {
   border: 1px solid color-mix(in oklab, var(--foreground) 7%, transparent);
   box-shadow: 0 14px 34px -22px rgba(0, 0, 0, 0.28);
   backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
   transition: transform 150ms ease, box-shadow 150ms ease;
 }
 button[data-settings-card]:active,
