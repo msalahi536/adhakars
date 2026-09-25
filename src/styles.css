@@ -2699,7 +2699,7 @@ html[data-preset="ocean"][data-visual-phase="evening"] .bottom-nav-row {
 .period-stat-label { overflow: hidden; color: var(--muted-foreground); font-size: 9px; font-weight: 700; letter-spacing: .06em; text-overflow: ellipsis; text-transform: uppercase; white-space: nowrap; }
 .period-stat-value { margin-top: 3px; overflow-wrap: anywhere; font-family: var(--font-display); font-size: 17px; font-weight: 700; line-height: 1.1; }
 .period-prediction-note { padding: 0 10px; color: var(--muted-foreground); text-align: center; font-size: 11px; line-height: 1.45; }
-.period-dialog { z-index: 140; display: grid; width: calc(100% - 32px); max-width: 410px; max-height: 82dvh; gap: 15px; overflow: hidden; border: 1px solid var(--border); border-radius: 22px; background: var(--card); color: var(--card-foreground); padding: 18px; box-shadow: 0 22px 60px color-mix(in oklab, var(--foreground) 24%, transparent); }
+.period-dialog { z-index: 140; display: grid; width: calc(100% - 32px); max-width: 410px; max-height: 82dvh; gap: 15px; overflow: hidden; border: 1px solid var(--border); border-radius: 22px; background: color-mix(in oklab, var(--card) 96%, var(--background)); color: var(--card-foreground); padding: 18px; box-shadow: 0 22px 60px color-mix(in oklab, var(--foreground) 24%, transparent); backdrop-filter: blur(30px); -webkit-backdrop-filter: blur(30px); }
 .period-dialog-head { display: flex; align-items: center; gap: 11px; }
 .period-dialog-head > span:last-child { display: grid; gap: 3px; }
 .period-dialog-head h2 { font-family: var(--font-display); font-size: 19px; line-height: 1.15; }
