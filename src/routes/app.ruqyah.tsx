@@ -437,8 +437,10 @@ function VerseAccordion({ idx, open, onToggle }: { idx: number; open: boolean; o
           <span className="period-acc-num">{idx + 1}</span>
           <div className="flex-1">
             <h2 className="text-[15px] font-bold">{saw(v.title)}</h2>
-            <div className="period-source mt-1"><BookOpen size={12} /> {v.source}</div>
-            <span className="rq-tag mt-2">{v.tag}</span>
+            <div className="rq-verse-meta">
+              <div className="period-source"><BookOpen size={12} /> {v.source}</div>
+              <span className="rq-tag">{v.tag}</span>
+            </div>
           </div>
           <ChevronRight size={17} className="rq-group-chevron" />
         </div>
