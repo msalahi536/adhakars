@@ -22,27 +22,27 @@ export function CompassCalibrationCard({ onDone, onSkip }: Props) {
   const [sectors, setSectors] = useState<boolean[]>(() => Array(SECTORS).fill(false));
   const gotRef = useRef(false);
   const targetRef = useRef({ x: 0, y: 0 });
-  // Rolling ball: position + velocity driven by tilt, like a marble in a bowl.
-  const [ball, setBall] = useState({ x: 0, y: 0, rot: 0 });
+  // Rolling ball: light, springy marble that follows tilt eagerly.
+  const [ball, setBall] = useState({ x: 0, y: 0 });
   useEffect(() => {
     let raf = 0;
     let last = performance.now();
-    const st = { x: 0, y: 0, vx: 0, vy: 0, rot: 0 };
+    const st = { x: 0, y: 0, vx: 0, vy: 0 };
     const loop = (now: number) => {
       const dt = Math.min((now - last) / 1000, 0.05);
       last = now;
       const t = targetRef.current;
-      st.vx += (t.x - st.x) * 18 * dt;
-      st.vy += (t.y - st.y) * 18 * dt;
-      const damp = Math.exp(-4 * dt);
+      // Strong spring, light damping → responds fast with a bit of overshoot.
+      st.vx += (t.x - st.x) * 120 * dt;
+      st.vy += (t.y - st.y) * 120 * dt;
+      const damp = Math.exp(-6 * dt);
       st.vx *= damp;
       st.vy *= damp;
-      st.x += st.vx * dt * 4;
-      st.y += st.vy * dt * 4;
+      st.x += st.vx * dt;
+      st.y += st.vy * dt;
       const d = Math.hypot(st.x, st.y);
-      if (d > 1) { st.x /= d; st.y /= d; st.vx *= 0.4; st.vy *= 0.4; }
-      st.rot += (st.vx + st.vy) * dt * 400;
-      setBall({ x: st.x, y: st.y, rot: st.rot });
+      if (d > 1) { st.x /= d; st.y /= d; st.vx *= 0.5; st.vy *= 0.5; }
+      setBall({ x: st.x, y: st.y });
       raf = requestAnimationFrame(loop);
     };
     raf = requestAnimationFrame(loop);
@@ -113,21 +113,12 @@ export function CompassCalibrationCard({ onDone, onSkip }: Props) {
               <path key={i} d={arc(i)} fill="none" strokeWidth={9} strokeLinecap="round"
                 stroke={on ? "var(--accent)" : "color-mix(in oklab, var(--muted-foreground) 25%, transparent)"} style={{ transition: "stroke 250ms" }} />
             ))}
-            <defs>
-              <radialGradient id="cal-ball" cx="35%" cy="30%" r="75%">
-                <stop offset="0%" stopColor="var(--card)" stopOpacity="0.95" />
-                <stop offset="35%" stopColor="var(--accent)" />
-                <stop offset="100%" stopColor="color-mix(in oklab, var(--accent) 60%, var(--foreground))" />
-              </radialGradient>
-            </defs>
             <circle cx={c} cy={c} r={76} fill="color-mix(in oklab, var(--muted) 55%, transparent)" />
             <circle cx={c} cy={c} r={24} fill="none" strokeDasharray="3 4" stroke="color-mix(in oklab, var(--muted-foreground) 30%, transparent)" />
-            <ellipse cx={c + ball.x * 62 + 3} cy={c + ball.y * 62 + 12} rx={12} ry={4} fill="var(--foreground)" opacity={0.12} />
             <g transform={`translate(${c + ball.x * 62} ${c + ball.y * 62})`}>
-              <circle r={13} fill="url(#cal-ball)" />
-              <g transform={`rotate(${ball.rot})`}>
-                <path d="M -9 -3 Q 0 3 9 -3" fill="none" stroke="var(--card)" strokeOpacity={0.45} strokeWidth={1.4} strokeLinecap="round" />
-              </g>
+              {/* Flat circle — a simple solid dot, no 3D shading. */}
+              <circle r={11} fill="var(--accent)" />
+              <circle r={11} fill="none" stroke="color-mix(in oklab, var(--accent) 70%, var(--card))" strokeWidth={2} />
             </g>
             {complete && (
               <g transform={`translate(${c - 14} ${c - 14})`}>

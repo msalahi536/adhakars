@@ -113,7 +113,9 @@ export async function requestOrientationPermission(): Promise<PermResult> {
 
 export type Coords = { lat: number; lng: number };
 
-export type PositionResult = { ok: true; coords: Coords } | { ok: false; error: string };
+export type PositionResult =
+  | { ok: true; coords: Coords; source: "fresh" | "cached"; at: number }
+  | { ok: false; error: string };
 
 function webPosition(): Promise<PositionResult> {
   if (typeof navigator === "undefined" || !("geolocation" in navigator)) {
@@ -135,7 +137,7 @@ function webPosition(): Promise<PositionResult> {
         if (settled) return;
         settled = true;
         clearTimeout(timer);
-        resolve({ ok: true, coords: { lat: pos.coords.latitude, lng: pos.coords.longitude } });
+        resolve({ ok: true, coords: { lat: pos.coords.latitude, lng: pos.coords.longitude }, source: "fresh", at: Date.now() });
       },
       (err) => {
         if (settled) return;
@@ -157,14 +159,14 @@ function webPosition(): Promise<PositionResult> {
 const POS_CACHE_KEY = "qibla-pos-cache";
 const POS_CACHE_MAX_AGE = 1000 * 60 * 60 * 24 * 14; // 14 days
 
-export function getCachedPosition(): Coords | null {
+export function getCachedPosition(): (Coords & { at: number }) | null {
   try {
     const raw = localStorage.getItem(POS_CACHE_KEY);
     if (!raw) return null;
     const parsed = JSON.parse(raw) as { lat: number; lng: number; at: number };
     if (typeof parsed.lat !== "number" || typeof parsed.lng !== "number") return null;
     if (Date.now() - parsed.at > POS_CACHE_MAX_AGE) return null;
-    return { lat: parsed.lat, lng: parsed.lng };
+    return { lat: parsed.lat, lng: parsed.lng, at: parsed.at };
   } catch {
     return null;
   }
@@ -186,7 +188,7 @@ function cachePosition(coords: Coords) {
 export async function getPosition(opts?: { force?: boolean }): Promise<PositionResult> {
   if (!opts?.force) {
     const cached = getCachedPosition();
-    if (cached) return { ok: true, coords: cached };
+    if (cached) return { ok: true, coords: cached, source: "cached", at: cached.at };
   }
 
   if (isNative()) {
@@ -210,18 +212,20 @@ export async function getPosition(opts?: { force?: boolean }): Promise<PositionR
       });
       const coords = { lat: pos.coords.latitude, lng: pos.coords.longitude };
       cachePosition(coords);
-      return { ok: true, coords };
+      return { ok: true, coords, source: "fresh", at: Date.now() };
     } catch {
       // Plugin missing or unimplemented in this native build: use the web API.
       const fallback = await webPosition();
       if (fallback.ok) cachePosition(fallback.coords);
-      return fallback;
+      return fallback.ok
+        ? { ok: true, coords: fallback.coords, source: "fresh", at: Date.now() }
+        : fallback;
     }
   }
 
   const web = await webPosition();
   if (web.ok) cachePosition(web.coords);
-  return web;
+  return web.ok ? { ok: true, coords: web.coords, source: "fresh", at: Date.now() } : web;
 }
 
 

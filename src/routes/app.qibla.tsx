@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
-import { Check, Crosshair, Lightbulb, Navigation } from "lucide-react";
+import { Check, Crosshair, Lightbulb, Navigation, RotateCw } from "lucide-react";
 import { HeaderBackButton } from "@/components/HeaderBackButton";
 import { CompassCalibrationCard } from "@/components/CompassCalibrationCard";
 import {
@@ -70,6 +70,10 @@ function Qibla() {
   const [error, setError] = useState<string | null>(null);
   const [absolute, setAbsolute] = useState<boolean | null>(null);
   const [coords, setCoords] = useState<{ lat: number; lng: number } | null>(null);
+  const [posMeta, setPosMeta] = useState<{ source: "fresh" | "cached"; at: number } | null>(null);
+  const [lostSensor, setLostSensor] = useState(false);
+  const [locError, setLocError] = useState<string | null>(null);
+  const [, setNowTick] = useState(0);
   const [heading, setHeading] = useState<number | null>(null);
   const [qiblaBearing, setQiblaBearing] = useState<number | null>(null);
   const [showCalibration, setShowCalibration] = useState(false);
@@ -84,6 +88,12 @@ function Qibla() {
     return () => {
       unsubRef.current?.();
     };
+  }, []);
+
+  // Keep the "updated X min ago" note current.
+  useEffect(() => {
+    const id = window.setInterval(() => setNowTick((n) => n + 1), 30000);
+    return () => window.clearInterval(id);
   }, []);
 
   // Lock the page in place: no pinch zoom, no dragging the layout around.
@@ -131,9 +141,11 @@ function Qibla() {
     });
     setTimeout(() => {
       if (!got && needsGesturePermission()) {
-        // Stored permission no longer valid (e.g. iOS reset it): ask again.
+        // The sensor stayed quiet this session — iOS can reset its motion
+        // permission per launch. Show the button again, but KEEP the stored
+        // flag so the compass reconnects with one tap instead of nagging.
         unsubRef.current?.();
-        try { localStorage.removeItem("qibla-perm-granted"); } catch { /* ignore */ }
+        setLostSensor(true);
         setPhase("intro");
         return;
       }
@@ -142,13 +154,14 @@ function Qibla() {
           "No compass readings from this device. Try calibrating, or open the app on a phone.",
         );
       }
-    }, 3000);
+    }, 4000);
   };
 
   // Permissions first, then calibration. Runs from a real user gesture.
   const start = async (skipPrompt = false) => {
     setPhase("requesting");
     setError(null);
+    setLostSensor(false);
 
     setStep("Requesting motion access…");
     // Permission was already granted before: don't re-prompt (iOS would reject
@@ -172,6 +185,7 @@ function Qibla() {
       return;
     }
     setCoords(pos.coords);
+    setPosMeta({ source: pos.source, at: pos.at });
     setQiblaBearing(bearingToKaaba(pos.coords.lat, pos.coords.lng));
 
     setStep("");
@@ -181,6 +195,19 @@ function Qibla() {
       attachCompass();
     }
     setPhase("ready");
+  };
+
+  // Pull a fresh GPS fix and recompute the bearing and distance.
+  const refreshLocation = async () => {
+    const p = await getPosition({ force: true });
+    if (p.ok) {
+      setCoords(p.coords);
+      setPosMeta({ source: p.source, at: p.at });
+      setQiblaBearing(bearingToKaaba(p.coords.lat, p.coords.lng));
+      setLocError(null);
+    } else {
+      setLocError(p.error);
+    }
   };
 
   // Auto start when opening the page. iOS only allows the motion prompt from a
@@ -264,6 +291,11 @@ function Qibla() {
                   {error}
                 </p>
               )}
+              {lostSensor && !error && (
+                <p className="text-center text-xs" style={{ color: "var(--muted-foreground)" }}>
+                  The compass didn't respond on its own — tap to reconnect it.
+                </p>
+              )}
             </div>
           )}
 
@@ -332,7 +364,14 @@ function Qibla() {
                 </p>
               )}
 
-              <div className="qb-stats">
+              <div className="qb-stats" style={{ position: "relative" }}>
+                <button
+                  onClick={() => void refreshLocation()}
+                  className="qb-refresh"
+                  aria-label="Update your location"
+                >
+                  <RotateCw size={14} strokeWidth={2} aria-hidden />
+                </button>
                 <div className="qb-stat">
                   <span className="qb-stat-icon"><Navigation size={16} strokeWidth={1.8} /></span>
                   <div>
@@ -351,6 +390,18 @@ function Qibla() {
                   </div>
                 </div>
               </div>
+              {posMeta?.source === "cached" && (
+                <p className="qb-pos-note">
+                  Last saved location, updated{" "}
+                  {Math.max(1, Math.round((Date.now() - posMeta.at) / 60000))} min ago. Tap ↻ for a
+                  fresh fix.
+                </p>
+              )}
+              {locError && (
+                <p className="qb-pos-note" style={{ color: "var(--destructive)" }}>
+                  {locError}
+                </p>
+              )}
 
               <div className="qb-tip">
                 <Lightbulb size={18} strokeWidth={1.6} aria-hidden />
