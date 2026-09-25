@@ -368,7 +368,7 @@ function VerseAccordion({ idx, open, onToggle }: { idx: number; open: boolean; o
           {item?.translation && <p className="mt-3 text-sm leading-relaxed">{saw(item.translation)}</p>}
           {!item?.arabic && <p className="period-muted text-sm leading-relaxed">{saw(v.note)}</p>}
           {stored?.commentary && <p className="period-callout is-grey mt-3">{saw(stored.commentary)}</p>}
-          {!stored && item?.notes?.map((n, i) => <p key={i} className="period-muted mt-2 text-sm leading-relaxed">{saw(n)}</p>)}
+          {!stored && v.item?.notes?.map((n, i) => <p key={i} className="period-muted mt-2 text-sm leading-relaxed">{saw(n)}</p>)}
           {v.to && <Link to={v.to} className="period-link mt-3">Open in Morning Adhkar <ChevronRight size={14} /></Link>}
         </div>
       </div>
