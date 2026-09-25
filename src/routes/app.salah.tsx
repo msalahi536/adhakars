@@ -285,9 +285,9 @@ function Salah() {
     msLeft === null || msLeft < 0
       ? null
       : msLeft <= 10 * 60 * 1000
-        ? "#ff9a8a"
+        ? "var(--urgency-critical)"
         : msLeft <= 30 * 60 * 1000
-          ? "#ffd166"
+          ? "var(--urgency-warning)"
           : null;
 
 
