@@ -7,6 +7,7 @@ export const MORE_DESTINATIONS = [
   "/app/period",
   "/app/ruqyah",
   "/app/hajj",
+  "/app/fasting",
 ] as const;
 
 export type MoreDestination = (typeof MORE_DESTINATIONS)[number];
