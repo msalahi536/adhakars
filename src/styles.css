@@ -3051,12 +3051,22 @@ html[data-preset="ocean"][data-visual-phase="evening"] .bottom-nav-row {
   color: var(--accent-foreground, var(--background));
 }
 .rq-group-items {
-  list-style: none; margin: 0; padding: 2px 0 9px 53px;
+  list-style: none; margin: 0; padding: 2px 0 9px;
   border-top: 1px solid color-mix(in oklab, var(--foreground) 7%, transparent);
   display: grid; gap: 2px;
 }
-.rq-group-items .period-check-row { min-height: 47px; }
+.rq-group-items .period-check-row { min-height: 47px; padding-left: 53px; }
 .rq-group-items .period-check { width: 25px; height: 25px; border-radius: 999px; }
+.rq-check-item { min-width: 0; }
+.rq-check-item + .rq-check-item { border-top: 1px solid color-mix(in oklab, var(--foreground) 7%, transparent); }
+.rq-check-item .period-check-row { border-bottom: 0; }
+.rq-check-recitation { display: grid; grid-template-rows: 0fr; opacity: 0; transition: grid-template-rows .38s ease, opacity .25s ease; }
+.rq-check-recitation > div { min-height: 0; overflow: hidden; }
+.rq-check-item.is-open .rq-check-recitation { grid-template-rows: 1fr; opacity: 1; }
+.rq-check-item .rq-guide-recitation { margin: 1px 0 12px; border-radius: 15px; }
+.rq-check-item .rq-guide-recitation-head { padding: 11px 12px; }
+.rq-check-item .rq-guide-part { padding: 14px 12px; }
+.rq-check-item .rq-guide-part .arabic { font-size: 21px; }
 .rq-landing-card { padding: 18px; }
 .rq-back-link {
   display: inline-flex; align-items: center; gap: 4px;
@@ -3104,7 +3114,7 @@ html[data-preset="ocean"][data-visual-phase="evening"] .bottom-nav-row {
 .rq-view-transition { animation: rq-view-in .32s ease-out both; }
 @keyframes rq-view-in { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
 @media (prefers-reduced-motion: reduce) {
-  .rq-verse-content, .rq-verse-content > div, .rq-view-transition { animation: none; transition: none; }
+  .rq-verse-content, .rq-verse-content > div, .rq-check-recitation, .rq-view-transition { animation: none; transition: none; }
 }
 .rq-learn-row {
   display: flex; align-items: center; gap: 12px; width: 100%;
