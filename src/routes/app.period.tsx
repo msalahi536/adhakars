@@ -226,40 +226,45 @@ function SalahDue({ cycle }: { cycle: Cycle }) {
 function SymptomsCard() {
   const s = getSymptoms();
   const [showDua, setShowDua] = useState(false);
-  const selectSymptom = (symptom: Symptom, isOn: boolean) => {
+  const selectSymptom = (symptom: Symptom) => {
     toggleSymptom(symptom);
     void triggerHaptic("light");
-    if (symptom === "cramps" && !isOn) setShowDua(true);
   };
+  const hasPain = s.includes("cramps") || s.includes("headache");
   return (
     <>
       <div className="period-card period-symptoms-card">
         <div className="period-section-title">How are you feeling today?</div>
+        <p className="period-symptom-intro">Choose all that apply. Your selections are saved for today.</p>
         <div className="period-symptom-grid mt-3">
           {(Object.keys(SYMPTOM_META) as Symptom[]).map((k) => {
             const { label, Icon } = SYMPTOM_META[k];
             const on = s.includes(k);
             return (
               <button key={k} className={`period-chip ${on ? "is-on" : ""}`} aria-pressed={on}
-                onClick={() => selectSymptom(k, on)}>
-                <Icon size={21} /> <span>{label}</span>
+                onClick={() => selectSymptom(k)}>
+                <span className="period-chip-icon"><Icon size={19} />{on && <Check size={11} strokeWidth={3} />}</span>
+                <span>{label}</span>
               </button>
             );
           })}
         </div>
-        <button className="period-symptom-help" onClick={() => setShowDua(true)} disabled={!s.includes("cramps")}>
-          {s.includes("cramps") ? "View relief dua" : "Select cramps to see an authentic relief dua"}
-          {s.includes("cramps") && <ChevronRight size={14} />}
-        </button>
+        {hasPain && (
+          <button className="period-relief-row" onClick={() => setShowDua(true)}>
+            <span className="period-relief-icon"><Sparkles size={17} /></span>
+            <span><strong>Relief dua for pain</strong><small>Read the authentic dua for cramps or headache</small></span>
+            <ChevronRight size={17} />
+          </button>
+        )}
       </div>
       <Dialog open={showDua} onOpenChange={setShowDua}>
-        <DialogContent className="period-dialog [&>button:last-child]:hidden">
+        <DialogContent className="period-dialog period-relief-dialog [&>button:last-child]:hidden">
           <div className="period-dialog-head">
             <span className="period-learn-book"><BookOpen size={21} /></span>
-            <span><DialogTitle>Relief dua for pain</DialogTitle><DialogDescription>Authentic guidance for cramps and pain</DialogDescription></span>
+            <span><DialogTitle>Relief dua for pain</DialogTitle><DialogDescription>For cramps, headaches, or pain anywhere in the body</DialogDescription></span>
           </div>
           <div className="period-dialog-scroll"><SunnahCard item={PAIN_DUA} compact /></div>
-          <Button className="period-btn w-full" onClick={() => setShowDua(false)}>Done</Button>
+          <Button className="period-btn w-full" onClick={() => setShowDua(false)}>Close</Button>
         </DialogContent>
       </Dialog>
     </>

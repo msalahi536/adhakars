@@ -2652,13 +2652,22 @@ html[data-preset="ocean"][data-visual-phase="evening"] .bottom-nav-row {
 .period-status-action { display: block; width: 100%; min-height: 46px; margin-top: 17px; font-size: 14px; }
 .period-calendar-link { display: inline-flex; align-items: center; gap: 3px; margin-top: 11px; color: var(--accent); font-size: 12px; font-weight: 700; }
 .period-section-title { font-family: var(--font-display); font-size: 20px; font-weight: 600; line-height: 1.2; }
-.period-symptom-grid { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 8px; }
-.period-chip { grid-column: span 2; display: flex; min-height: 70px; flex-direction: column; align-items: center; justify-content: center; gap: 6px; padding: 8px 5px; border-radius: 15px; font-size: 11px; font-weight: 600; border: 1px solid color-mix(in oklab, var(--border) 75%, transparent); background: color-mix(in oklab, var(--background) 55%, transparent); color: var(--foreground); transition: background .2s, color .2s, transform .2s; }
-.period-chip:nth-child(n+4) { grid-column: span 3; min-height: 60px; flex-direction: row; }
-.period-chip.is-on { background: var(--accent); border-color: var(--accent); color: var(--accent-foreground, var(--background)); }
+.period-symptom-intro { margin-top: 5px; color: var(--muted-foreground); font-size: 11px; line-height: 1.45; }
+.period-symptom-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+.period-chip { position: relative; display: flex; min-height: 52px; align-items: center; justify-content: flex-start; gap: 9px; padding: 9px 11px; border-radius: 15px; font-size: 11px; font-weight: 650; border: 1px solid color-mix(in oklab, var(--border) 75%, transparent); background: color-mix(in oklab, var(--background) 55%, transparent); color: var(--foreground); text-align: left; transition: background .2s, color .2s, border-color .2s, transform .2s; }
+.period-chip:last-child { grid-column: 1 / -1; }
+.period-chip-icon { position: relative; display: grid; width: 30px; height: 30px; flex: none; place-items: center; border-radius: 11px; background: color-mix(in oklab, var(--accent) 11%, transparent); color: var(--accent); }
+.period-chip-icon > svg:last-child:not(:first-child) { position: absolute; right: -4px; bottom: -3px; width: 15px; height: 15px; padding: 2px; border: 2px solid var(--accent); border-radius: 999px; background: var(--surface, var(--card)); color: var(--accent); }
+.period-chip.is-on { background: color-mix(in oklab, var(--accent) 14%, var(--surface, var(--card))); border-color: color-mix(in oklab, var(--accent) 52%, transparent); color: var(--foreground); }
 .period-chip:active { transform: scale(.97); }
-.period-symptom-help { display: flex; width: 100%; min-height: 28px; align-items: center; justify-content: center; gap: 3px; margin-top: 8px; color: var(--accent); font-size: 11px; font-weight: 700; }
-.period-symptom-help:disabled { color: var(--muted-foreground); font-weight: 500; opacity: .75; }
+.period-relief-row { display: flex; width: 100%; min-height: 57px; align-items: center; gap: 10px; margin-top: 11px; padding: 8px 10px; border: 1px solid color-mix(in oklab, var(--accent) 25%, transparent); border-radius: 16px; background: color-mix(in oklab, var(--accent) 9%, transparent); color: var(--foreground); text-align: left; animation: period-relief-in .22s ease-out; }
+.period-relief-row > span:nth-child(2) { display: flex; min-width: 0; flex: 1; flex-direction: column; gap: 1px; }
+.period-relief-row strong { color: var(--accent); font-size: 12px; }
+.period-relief-row small { color: var(--muted-foreground); font-size: 10px; line-height: 1.35; }
+.period-relief-row > svg { flex: none; color: var(--muted-foreground); }
+.period-relief-icon { display: grid; width: 34px; height: 34px; flex: none; place-items: center; border-radius: 12px; background: color-mix(in oklab, var(--accent) 16%, transparent); color: var(--accent); }
+.period-relief-dialog { max-height: min(76dvh, 650px); }
+@keyframes period-relief-in { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: translateY(0); } }
 .period-daily-reminder { width: 100%; align-items: center; text-align: left; }
 .period-daily-reminder > span { display: flex; min-width: 0; flex: 1; flex-direction: column; gap: 2px; }
 .period-daily-reminder strong { color: var(--accent); font-family: var(--font-display); font-size: 17px; line-height: 1.2; }
