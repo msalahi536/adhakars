@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import {
   BookOpen, Check, ChevronLeft, ChevronRight, CircleAlert, Compass, GraduationCap, Landmark,
-  MapPin, RotateCcw, Sparkles, UserRound, WifiOff, X,
+  MapPin, RotateCcw, Sparkles, UserRound, X,
 } from "lucide-react";
 import { HeaderBackButton } from "@/components/HeaderBackButton";
 import { triggerHaptic } from "@/lib/theme";
@@ -80,7 +80,6 @@ function HajjCompanion() {
               {tab === "guide" && <GuideView mode={state.mode} />}
               {tab === "duas" && <DuasView />}
               {tab === "learn" && <LearnView />}
-              <p className="hj-offline"><WifiOff size={14} /> All content in this guide is stored on your device. It works without internet.</p>
             </>
           )}
         </div>
@@ -284,14 +283,6 @@ function GuideView({ mode }: { mode: HajjMode }) {
         )}
       </div>
 
-      <div className="period-card hj-links">
-        <p className="text-sm">The morning and evening adhkar still apply during the journey.</p>
-        <div className="mt-3 flex gap-2">
-          <Link to="/app" className="rq-btn-outline flex-1">Morning</Link>
-          <Link to="/app/evening" className="rq-btn-outline flex-1">Evening</Link>
-          <Link to="/app/tasbih" className="rq-btn-outline flex-1">Tasbih</Link>
-        </div>
-      </div>
     </>
   );
 }
