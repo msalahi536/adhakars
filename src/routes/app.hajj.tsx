@@ -80,7 +80,7 @@ function HajjCompanion() {
               {tab === "guide" && <GuideView mode={state.mode} />}
               {tab === "duas" && <DuasView />}
               {tab === "learn" && <LearnView />}
-              <p className="hj-offline"><WifiOff size={14} /> All content in this guide is stored on your device. It works without internet — you won’t need data at the Haram.</p>
+              <p className="hj-offline"><WifiOff size={14} /> All content in this guide is stored on your device. It works without internet.</p>
             </>
           )}
         </div>
