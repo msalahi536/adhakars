@@ -55,7 +55,9 @@ export function BottomNav() {
         style={{ borderColor }}
       >
         {tabs.map((t) => {
-          const destination = t.to === "/app/more" ? moreDestination : t.to;
+          const destination = t.to === "/app/more"
+            ? (moreNestedActive && pathname !== "/app/more" ? "/app/more" : moreDestination)
+            : t.to;
           return (
           <Link
             key={t.to}

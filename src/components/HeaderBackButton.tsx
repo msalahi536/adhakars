@@ -1,5 +1,6 @@
 import { useRouter } from "@tanstack/react-router";
 import { ChevronLeft } from "lucide-react";
+import { isMoreDestination } from "@/lib/more-navigation";
 
 /**
  * Small back-arrow button shown in the top-left corner of a page's header
@@ -10,6 +11,11 @@ export function HeaderBackButton({ fallbackTo = "/app/more" }: { fallbackTo?: st
   const router = useRouter();
 
   const onClick = () => {
+    const pathname = router.state.location.pathname;
+    if (isMoreDestination(pathname) && pathname !== "/app/more") {
+      router.navigate({ to: "/app/more" });
+      return;
+    }
     if (typeof window !== "undefined" && window.history.length > 1) {
       router.history.back();
     } else {
