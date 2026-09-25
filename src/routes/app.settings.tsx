@@ -284,7 +284,7 @@ function Settings() {
         <div className="mx-auto max-w-md px-5 py-3">
           {/* APPEARANCE */}
           <section className="mb-6">
-            <h2 className="label-caps mb-3">Appearance</h2>
+            <h2 className="label-caps mb-3 text-center">Appearance</h2>
 
             {/* Preview */}
             <div className="mb-4 flex justify-center">
