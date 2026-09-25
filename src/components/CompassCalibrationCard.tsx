@@ -22,27 +22,27 @@ export function CompassCalibrationCard({ onDone, onSkip }: Props) {
   const [sectors, setSectors] = useState<boolean[]>(() => Array(SECTORS).fill(false));
   const gotRef = useRef(false);
   const targetRef = useRef({ x: 0, y: 0 });
-  // Rolling ball: position + velocity driven by tilt, like a marble in a bowl.
-  const [ball, setBall] = useState({ x: 0, y: 0, rot: 0 });
+  // Rolling ball: light, springy marble that follows tilt eagerly.
+  const [ball, setBall] = useState({ x: 0, y: 0 });
   useEffect(() => {
     let raf = 0;
     let last = performance.now();
-    const st = { x: 0, y: 0, vx: 0, vy: 0, rot: 0 };
+    const st = { x: 0, y: 0, vx: 0, vy: 0 };
     const loop = (now: number) => {
       const dt = Math.min((now - last) / 1000, 0.05);
       last = now;
       const t = targetRef.current;
-      st.vx += (t.x - st.x) * 18 * dt;
-      st.vy += (t.y - st.y) * 18 * dt;
-      const damp = Math.exp(-4 * dt);
+      // Strong spring, light damping → responds fast with a bit of overshoot.
+      st.vx += (t.x - st.x) * 120 * dt;
+      st.vy += (t.y - st.y) * 120 * dt;
+      const damp = Math.exp(-6 * dt);
       st.vx *= damp;
       st.vy *= damp;
-      st.x += st.vx * dt * 4;
-      st.y += st.vy * dt * 4;
+      st.x += st.vx * dt;
+      st.y += st.vy * dt;
       const d = Math.hypot(st.x, st.y);
-      if (d > 1) { st.x /= d; st.y /= d; st.vx *= 0.4; st.vy *= 0.4; }
-      st.rot += (st.vx + st.vy) * dt * 400;
-      setBall({ x: st.x, y: st.y, rot: st.rot });
+      if (d > 1) { st.x /= d; st.y /= d; st.vx *= 0.5; st.vy *= 0.5; }
+      setBall({ x: st.x, y: st.y });
       raf = requestAnimationFrame(loop);
     };
     raf = requestAnimationFrame(loop);
