@@ -305,16 +305,16 @@ function More() {
                 >
                   <Icon size={22} strokeWidth={2.2} />
                 </div>
-                <div className="mt-auto pt-4">
-                  <div className="flex items-center gap-1 text-[15px] font-bold">
+                <div className="pt-4">
+                  <div className="flex min-h-10 items-start gap-1 text-[15px] font-bold leading-snug">
                     <span>{title}</span>
                     <ChevronRight
                       size={14}
-                      className="opacity-40 transition-transform group-hover:translate-x-0.5"
+                      className="mt-0.5 shrink-0 opacity-40 transition-transform group-hover:translate-x-0.5"
                     />
                   </div>
                   <div
-                    className="mt-0.5 text-[11px] leading-snug"
+                    className="text-[11px] leading-snug"
                     style={{ color: "var(--muted-foreground)" }}
                   >
                     {subtitle}

@@ -263,7 +263,7 @@ function Settings() {
         </div>
       </header>
 
-      <main className="scroll-area">
+      <main className="scroll-area settings-scroll-area">
         <div className="mx-auto max-w-md px-5 py-3">
           {/* APPEARANCE */}
           <section className="mb-6">
