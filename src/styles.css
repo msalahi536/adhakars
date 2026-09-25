@@ -1022,6 +1022,8 @@ html[data-visual-phase="evening"] .adhkar-card-heading button { background: rgba
   --pill-bg: rgba(233, 233, 222, 0.9);
   --card-border: rgba(255, 255, 255, 0.8);
   --eyebrow: #3f5a3c;
+  --urgency-warning: #9a6815;
+  --urgency-critical: #b1443d;
   position: relative;
   display: flex;
   flex-direction: column;
@@ -3335,6 +3337,8 @@ html[data-preset][data-visual-phase="evening"][data-section="salah"] {
   --surface-deep-muted: var(--eve-muted) !important;
   --nav-active: var(--eve-nav-active) !important;
   --nav-inactive: var(--eve-nav-inactive) !important;
+  --urgency-warning: #ffd166;
+  --urgency-critical: #ff9a8a;
 }
 
 html[data-preset][data-visual-phase="evening"][data-section="salah"] .salah-page {

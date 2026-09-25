@@ -27,7 +27,10 @@ export function PrayerPicker({ open, selected, progress, onPick, onClose }: Prop
         aria-label="Close"
         onClick={onClose}
         className="absolute inset-0"
-        style={{ background: "rgba(0,0,0,0.45)", backdropFilter: "blur(3px)" }}
+        style={{
+          background: "color-mix(in oklab, var(--foreground) 34%, transparent)",
+          backdropFilter: "blur(3px)",
+        }}
       />
       <div
         className="relative w-full rounded-t-[28px] px-5 pt-3"
@@ -35,7 +38,7 @@ export function PrayerPicker({ open, selected, progress, onPick, onClose }: Prop
           background: "var(--surface-card)",
           color: "var(--foreground)",
           paddingBottom: "calc(var(--bottom-nav-row) + env(safe-area-inset-bottom) + 20px)",
-          boxShadow: "0 -20px 50px -20px rgba(0,0,0,0.4)",
+          boxShadow: "var(--card-shadow)",
           animation: "sheet-up 260ms cubic-bezier(0.22,1,0.36,1)",
           maxHeight: "82vh",
           display: "flex",
