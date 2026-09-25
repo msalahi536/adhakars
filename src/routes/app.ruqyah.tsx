@@ -246,7 +246,7 @@ function LearnView() {
                       {it.id === "raqi" && (
                         <ul className="mt-2 space-y-1.5">
                           {RAQI_FLAGS.map((f) => (
-                            <li key={f} className="flex gap-2 text-sm"><X size={15} className="mt-0.5 flex-none" style={{ color: "var(--destructive)" }} />{saw(f)}</li>
+                            <li key={f} className="flex gap-2 text-sm"><X size={15} className="mt-0.5 flex-none" style={{ color: "var(--destructive)" }} /><span>{saw(f)}</span></li>
                           ))}
                         </ul>
                       )}
@@ -269,8 +269,8 @@ function Myths() {
     <div className="space-y-2">
       {MYTHS.map((m) => (
         <div key={m.myth} className="period-item">
-          <p className="flex gap-2 text-sm font-semibold"><X size={15} className="mt-0.5 flex-none" style={{ color: "var(--destructive)" }} />“{saw(m.myth)}”</p>
-          <p className="mt-1.5 flex gap-2 text-sm"><Check size={15} className="mt-0.5 flex-none" style={{ color: "var(--accent)" }} />{saw(m.truth)}</p>
+          <p className="flex gap-2 text-sm font-semibold"><X size={15} className="mt-0.5 flex-none" style={{ color: "var(--destructive)" }} /><span>“{saw(m.myth)}”</span></p>
+          <p className="mt-1.5 flex gap-2 text-sm"><Check size={15} className="mt-0.5 flex-none" style={{ color: "var(--accent)" }} /><span>{saw(m.truth)}</span></p>
         </div>
       ))}
     </div>
