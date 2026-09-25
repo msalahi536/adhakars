@@ -3351,25 +3351,26 @@ html[data-preset="ocean"][data-visual-phase="evening"] .bottom-nav-row {
 .fs-hist-dot { width: 9px; height: 9px; border-radius: 50%; background: var(--accent); flex: none; }
 .fs-hist-dot.is-excused { background: transparent; border: 1.5px dashed var(--muted-foreground); }
 .fs-hist-type { font-size: 11px; font-weight: 700; color: var(--accent); text-align: right; }
-.fs-learn-intro { display: flex; align-items: center; gap: 12px; padding: 14px 16px; text-align: left; }
-.fs-learn-book { display: grid; width: 40px; height: 40px; flex: none; place-items: center; border-radius: 12px; background: color-mix(in oklab, var(--accent) 12%, transparent); color: var(--accent); }
-.fs-learn-intro h2 { font-family: var(--font-display); font-size: 18px; }
-.fs-learn-intro p { margin-top: 2px; font-size: 10px; color: var(--muted-foreground); line-height: 1.4; }
-.fs-learn-list { display: grid; gap: 0; overflow: hidden; border: 1px solid color-mix(in oklab, var(--border) 82%, transparent); border-radius: 18px; background: color-mix(in oklab, var(--surface) 93%, transparent); box-shadow: 0 7px 22px color-mix(in oklab, var(--foreground) 5%, transparent); }
-.fs-learn-row { padding: 0 14px; border: 0; border-radius: 0; background: transparent; box-shadow: none; backdrop-filter: none; }
-.fs-learn-row + .fs-learn-row { border-top: 1px solid color-mix(in oklab, var(--border) 68%, transparent); }
-.fs-learn-head { display: flex; align-items: center; gap: 12px; width: 100%; font-size: 14px; font-weight: 700; }
-.fs-learn-head { min-height: 51px; }
-.fs-learn-num { display: flex; flex: none; align-items: center; justify-content: center; width: 30px; height: 30px; border-radius: 50%; font-size: 12px; background: color-mix(in oklab, var(--accent) 11%, transparent); color: var(--accent); }
-.fs-learn-copy { display: grid; min-width: 0; flex: 1; gap: 1px; text-align: left; }
-.fs-learn-copy strong { font-size: 12px; line-height: 1.25; }
-.fs-learn-copy small { color: var(--muted-foreground); font-size: 9px; font-weight: 500; line-height: 1.25; }
-.fs-learn-chev { flex: none; opacity: .5; transition: transform .25s; }
+.fs-learn-intro { display: flex; align-items: center; gap: 14px; padding: 18px; text-align: left; }
+.fs-learn-book { display: grid; width: 48px; height: 48px; flex: none; place-items: center; border-radius: 14px; background: color-mix(in oklab, var(--accent) 12%, transparent); color: var(--accent); }
+.fs-learn-intro h2 { font-family: var(--font-display); font-size: 20px; }
+.fs-learn-intro p { margin-top: 3px; font-size: 12px; color: var(--muted-foreground); line-height: 1.45; }
+.fs-learn-list { display: grid; gap: 10px; overflow: visible; border: 0; border-radius: 0; background: transparent; box-shadow: none; }
+.fs-learn-row { padding: 4px 18px; border-radius: 18px; }
+.fs-learn-row + .fs-learn-row { border-top: 0; }
+.fs-learn-head { display: flex; align-items: center; gap: 14px; width: 100%; font-size: 14px; font-weight: 700; }
+.fs-learn-head { min-height: 74px; padding: 8px 0; }
+.fs-learn-num { display: flex; flex: none; align-items: center; justify-content: center; width: 38px; height: 38px; border-radius: 50%; font-size: 14px; background: color-mix(in oklab, var(--accent) 11%, transparent); color: var(--accent); }
+.fs-learn-copy { display: grid; min-width: 0; flex: 1; gap: 3px; text-align: left; }
+.fs-learn-copy strong { font-size: 15.5px; line-height: 1.3; }
+.fs-learn-copy small { color: var(--muted-foreground); font-size: 11.5px; font-weight: 500; line-height: 1.35; }
+.fs-learn-chev { flex: none; width: 20px; height: 20px; opacity: .5; transition: transform .25s; }
 .fs-learn-row.is-open .fs-learn-chev { transform: rotate(90deg); }
 .fs-learn-body { display: grid; grid-template-rows: 0fr; transition: grid-template-rows .3s ease; }
 .fs-learn-body > div { overflow: hidden; }
 .fs-learn-row.is-open .fs-learn-body { grid-template-rows: 1fr; }
-.fs-learn-row .fs-dua { padding: 14px; box-shadow: none; backdrop-filter: none; }
+.fs-learn-row .fs-dua { margin-bottom: 6px; padding: 16px; box-shadow: none; backdrop-filter: none; }
+.fs-learn-body .space-y-3 { padding-bottom: 12px; }
 .fs-list { display: grid; gap: 6px; font-size: 13px; }
 .fs-list li { display: flex; align-items: center; gap: 8px; }
 .fs-list svg { color: var(--accent); flex: none; }
