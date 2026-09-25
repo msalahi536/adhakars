@@ -1,15 +1,15 @@
 import { useEffect, useMemo, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import {
-  BatteryLow, BookOpen, Brain, Check, ChevronLeft, ChevronRight, CircleDot, Droplets, Frown,
-  Info, Lock, Share2, Sparkles, Trash2, Zap,
+  BatteryLow, BookOpen, Brain, CalendarIcon, Check, ChevronLeft, ChevronRight, CircleDot, Droplets, Frown,
+  Info, Lock, Pencil, Share2, Sparkles, Trash2, Zap,
 } from "lucide-react";
 import { HeaderBackButton } from "@/components/HeaderBackButton";
 import { triggerHaptic } from "@/lib/theme";
 import {
   EVENT, addK, deleteCycle, diffDays, endPeriod, getChecklist, getCycles, getGratitude, getStats,
   getSymptoms, gratitudeHistory, isPeriodDay, isPredictedPeriodDay, keyOf, openCycle, parseK,
-  setGratitude, startPeriod, todayK, toggleChecklist, toggleSymptom, type Cycle, type Stats, type Symptom,
+  saveCycleRange, setGratitude, startPeriod, todayK, toggleChecklist, toggleSymptom, type Cycle, type Stats, type Symptom,
 } from "@/lib/period";
 import {
   EARNING_HADITH, PAIN_DUA, SUNNAH_SECTIONS, sectionShareText, type SunnahItem,
@@ -18,6 +18,9 @@ import {
   PRAYER_LABELS, fetchDay, getPrayerSettings, slotsForDay,
 } from "@/lib/prayer-times";
 import { Button } from "@/components/ui/button";
+import { Calendar } from "@/components/ui/calendar";
+import { Dialog, DialogContent, DialogDescription, DialogTitle } from "@/components/ui/dialog";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 
 export const Route = createFileRoute("/app/period")({
   head: () => ({
@@ -92,9 +95,6 @@ function PeriodCompanion() {
         <div className="relative mx-auto max-w-md px-16 pb-4 pt-7 text-center">
           <div className="label-caps" style={{ color: "var(--header-sub)", opacity: 1 }}>Period Companion</div>
           <h1 className="app-page-title mt-2">Stay Close</h1>
-          <p className="period-private mt-2 inline-flex items-center gap-1 text-xs opacity-90">
-            <Lock size={11} /> Private — stored only on your device
-          </p>
         </div>
         <div className="period-tabs mx-auto max-w-md" role="tablist">
           {(["today", "cycle", "learn"] as Tab[]).map((t) => (
@@ -110,6 +110,7 @@ function PeriodCompanion() {
           {mounted && tab === "today" && <TodayView goLearn={goLearn} goCycle={() => setTab("cycle")} />}
           {mounted && tab === "cycle" && <CycleView />}
           {mounted && tab === "learn" && <LearnView open={openSection} setOpen={setOpenSection} />}
+          {mounted && <p className="period-muted flex items-center justify-center gap-1 pt-2 text-[11px]"><Lock size={11} /> Private — stored only on your device</p>}
         </div>
       </main>
     </>
@@ -132,13 +133,6 @@ function TodayView({ goLearn, goCycle }: { goLearn: (id: string) => void; goCycl
 
   return (
     <div className="period-today space-y-4">
-      {symptoms.includes("cramps") && (
-        <div className="period-card">
-          <div className="period-eyebrow">For your cramps today</div>
-          <SunnahCard item={PAIN_DUA} compact />
-        </div>
-      )}
-
       {soon && (
         <div className="period-card period-soft">
           <p className="font-semibold">Your period may be starting soon. Here's how to prepare spiritually.</p>
@@ -231,22 +225,44 @@ function SalahDue({ cycle }: { cycle: Cycle }) {
 
 function SymptomsCard() {
   const s = getSymptoms();
+  const [showDua, setShowDua] = useState(false);
+  const selectSymptom = (symptom: Symptom, isOn: boolean) => {
+    toggleSymptom(symptom);
+    void triggerHaptic("light");
+    if (symptom === "cramps" && !isOn) setShowDua(true);
+  };
   return (
-    <div className="period-card period-symptoms-card">
-      <div className="period-section-title">How are you feeling today?</div>
-      <div className="period-symptom-grid mt-3">
-        {(Object.keys(SYMPTOM_META) as Symptom[]).map((k) => {
-          const { label, Icon } = SYMPTOM_META[k];
-          const on = s.includes(k);
-          return (
-            <button key={k} className={`period-chip ${on ? "is-on" : ""}`} aria-pressed={on}
-              onClick={() => { toggleSymptom(k); void triggerHaptic("light"); }}>
-              <Icon size={21} /> <span>{label}</span>
-            </button>
-          );
-        })}
+    <>
+      <div className="period-card period-symptoms-card">
+        <div className="period-section-title">How are you feeling today?</div>
+        <div className="period-symptom-grid mt-3">
+          {(Object.keys(SYMPTOM_META) as Symptom[]).map((k) => {
+            const { label, Icon } = SYMPTOM_META[k];
+            const on = s.includes(k);
+            return (
+              <button key={k} className={`period-chip ${on ? "is-on" : ""}`} aria-pressed={on}
+                onClick={() => selectSymptom(k, on)}>
+                <Icon size={21} /> <span>{label}</span>
+              </button>
+            );
+          })}
+        </div>
+        <button className="period-symptom-help" onClick={() => setShowDua(true)} disabled={!s.includes("cramps")}>
+          {s.includes("cramps") ? "View relief dua" : "Select cramps to see an authentic relief dua"}
+          {s.includes("cramps") && <ChevronRight size={14} />}
+        </button>
       </div>
-    </div>
+      <Dialog open={showDua} onOpenChange={setShowDua}>
+        <DialogContent className="period-dialog [&>button:last-child]:hidden">
+          <div className="period-dialog-head">
+            <span className="period-learn-book"><BookOpen size={21} /></span>
+            <span><DialogTitle>Relief dua for pain</DialogTitle><DialogDescription>Authentic guidance for cramps and pain</DialogDescription></span>
+          </div>
+          <div className="period-dialog-scroll"><SunnahCard item={PAIN_DUA} compact /></div>
+          <Button className="period-btn w-full" onClick={() => setShowDua(false)}>Done</Button>
+        </DialogContent>
+      </Dialog>
+    </>
   );
 }
 
@@ -336,6 +352,7 @@ function CycleView() {
   const [selected, setSelected] = useState(today);
   const stats: Stats = getStats();
   const cycles = getCycles();
+  const [editor, setEditor] = useState<{ cycle?: Cycle; start: string; end: string; ongoing: boolean } | null>(null);
 
   const cells = useMemo(() => {
     const first = new Date(month);
@@ -347,6 +364,11 @@ function CycleView() {
 
   const shift = (n: number) => setMonth((m) => new Date(m.getFullYear(), m.getMonth() + n, 1));
   const future = selected > today;
+  const openEditor = (cycle?: Cycle) => {
+    const start = cycle?.start ?? selected;
+    const isToday = start === today;
+    setEditor({ cycle, start, end: cycle?.end ?? start, ongoing: cycle ? !cycle.end : isToday });
+  };
 
   return (
     <div className="period-cycle-view space-y-3">
@@ -377,13 +399,10 @@ function CycleView() {
           <span><i className="is-ovulation" /> Ovulation</span>
         </div>
         <div className="period-calendar-actions">
-          <Button className="period-btn period-calendar-primary" disabled={future} onClick={() => { startPeriod(selected); void triggerHaptic("medium"); }}>
-            Start Period
+          <Button className="period-btn period-calendar-primary" disabled={future} onClick={() => openEditor()}>
+            <CalendarIcon size={16} /> Log a period
           </Button>
-          <Button variant="outline" className="period-btn is-ghost period-calendar-secondary" disabled={future || !cycles.some((c) => c.start <= selected)}
-            onClick={() => { endPeriod(selected); void triggerHaptic("medium"); }}>
-            Add End Date
-          </Button>
+          <p>Choose any past date to add history and improve predictions.</p>
         </div>
       </div>
 
@@ -392,9 +411,11 @@ function CycleView() {
         <Stat label="Avg cycle" value={`${stats.avgCycle} days`} />
         <Stat label="Next period" value={stats.nextStart ? fmt(stats.nextStart) : "—"} />
       </div>
-      {stats.cyclesLogged < 2 && (
-        <p className="period-muted px-2 text-center text-xs">Predictions use a 28-day cycle until you log two or more cycles.</p>
-      )}
+      <p className="period-prediction-note">
+        {stats.cyclesLogged < 2
+          ? "Add at least two past periods for predictions based on your cycle. Until then, estimates use a 28-day cycle."
+          : `Predictions use your last ${Math.min(stats.cyclesLogged, 6)} logged cycles and update automatically.`}
+      </p>
 
       {cycles.length > 0 && (
         <div className="period-card">
@@ -410,14 +431,81 @@ function CycleView() {
                     {c.end && <span className="period-muted"> · {diffDays(c.start, c.end) + 1} days</span>}
                     {prev && <span className="period-muted"> · cycle {diffDays(prev.start, c.start)}d</span>}
                   </span>
-                  <button className="period-icon-btn" aria-label="Delete cycle" onClick={() => deleteCycle(c.start)}><Trash2 size={15} /></button>
+                  <button className="period-icon-btn" aria-label="Edit period" onClick={() => openEditor(c)}><Pencil size={14} /></button>
+                  <button className="period-icon-btn" aria-label="Delete period" onClick={() => deleteCycle(c.start)}><Trash2 size={15} /></button>
                 </li>
               );
             })}
           </ul>
         </div>
       )}
-      <p className="period-muted flex items-center justify-center gap-1 text-[11px]"><Lock size={11} /> Private — stored only on your device</p>
+      <PeriodEditor editor={editor} setEditor={setEditor} />
+    </div>
+  );
+}
+
+function PeriodEditor({
+  editor,
+  setEditor,
+}: {
+  editor: { cycle?: Cycle; start: string; end: string; ongoing: boolean } | null;
+  setEditor: (value: { cycle?: Cycle; start: string; end: string; ongoing: boolean } | null) => void;
+}) {
+  const [error, setError] = useState("");
+  useEffect(() => setError(""), [editor]);
+  if (!editor) return null;
+  const save = () => {
+    const result = saveCycleRange(editor.start, editor.ongoing ? undefined : editor.end, editor.cycle?.start);
+    if (!result.ok) { setError(result.error); return; }
+    void triggerHaptic("medium");
+    setEditor(null);
+  };
+  return (
+    <Dialog open onOpenChange={(next) => { if (!next) setEditor(null); }}>
+      <DialogContent className="period-dialog period-editor-dialog [&>button:last-child]:hidden">
+        <div className="period-dialog-head">
+          <span className="period-learn-book"><CalendarIcon size={21} /></span>
+          <span>
+            <DialogTitle>{editor.cycle ? "Edit period" : "Log a period"}</DialogTitle>
+            <DialogDescription>Add current or past dates to improve your predictions.</DialogDescription>
+          </span>
+        </div>
+        <div className="period-date-fields">
+          <DateField label="Started" value={editor.start} onChange={(start) => setEditor({ ...editor, start, end: editor.end < start ? start : editor.end })} />
+          <DateField label="Ended" value={editor.end} disabled={editor.ongoing} min={editor.start}
+            onChange={(end) => setEditor({ ...editor, end })} />
+        </div>
+        <label className="period-ongoing-row">
+          <input type="checkbox" checked={editor.ongoing} onChange={(event) => setEditor({ ...editor, ongoing: event.target.checked })} />
+          <span>This period is still ongoing</span>
+        </label>
+        {error && <p className="period-form-error" role="alert">{error}</p>}
+        <div className="period-dialog-actions">
+          <Button variant="outline" className="period-btn is-ghost" onClick={() => setEditor(null)}>Cancel</Button>
+          <Button className="period-btn" onClick={save}>{editor.cycle ? "Save changes" : "Save period"}</Button>
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+function DateField({ label, value, onChange, disabled = false, min }: { label: string; value: string; onChange: (value: string) => void; disabled?: boolean; min?: string }) {
+  const selected = parseK(value);
+  const minDate = min ? parseK(min) : undefined;
+  return (
+    <div className="period-date-field">
+      <label>{label}</label>
+      <Popover>
+        <PopoverTrigger asChild>
+          <Button variant="outline" disabled={disabled} className="period-date-trigger">
+            <CalendarIcon size={15} /> {selected.toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" })}
+          </Button>
+        </PopoverTrigger>
+        <PopoverContent className="pointer-events-auto w-auto p-0" align="center">
+          <Calendar mode="single" selected={selected} defaultMonth={selected} captionLayout="dropdown" startMonth={new Date(new Date().getFullYear() - 10, 0)} endMonth={new Date()}
+            disabled={(date) => date > new Date() || Boolean(minDate && date < minDate)} onSelect={(date) => { if (date) onChange(keyOf(date)); }} className="pointer-events-auto p-3" />
+        </PopoverContent>
+      </Popover>
     </div>
   );
 }

@@ -66,6 +66,32 @@ export const endPeriod = (date: string) => {
   saveCycles(c);
 };
 
+export type SaveCycleResult = { ok: true } | { ok: false; error: string };
+
+export const saveCycleRange = (start: string, end?: string, originalStart?: string): SaveCycleResult => {
+  const today = todayK();
+  if (!start) return { ok: false, error: "Choose a start date." };
+  if (start > today || (end && end > today)) return { ok: false, error: "Period dates cannot be in the future." };
+  if (end && end < start) return { ok: false, error: "The end date must be on or after the start date." };
+  if (end && diffDays(start, end) > 20) return { ok: false, error: "Check these dates — this period is longer than 21 days." };
+
+  const remaining = getCycles().filter((cycle) => cycle.start !== originalStart);
+  const candidateEnd = end ?? today;
+  const overlaps = remaining.some((cycle) => {
+    const existingEnd = cycle.end ?? today;
+    return start <= existingEnd && candidateEnd >= cycle.start;
+  });
+  if (overlaps) return { ok: false, error: "These dates overlap another logged period." };
+
+  remaining.push({
+    start,
+    end,
+    endedAt: end === today ? new Date().toISOString() : undefined,
+  });
+  saveCycles(remaining);
+  return { ok: true };
+};
+
 export const deleteCycle = (start: string) => saveCycles(getCycles().filter((x) => x.start !== start));
 
 export type Stats = {
@@ -90,7 +116,8 @@ export const getStats = (): Stats => {
   const avgPeriod = avg(periods.slice(-6), 5);
   const last = c[c.length - 1];
   if (!last) return { avgCycle, avgPeriod, currentDay: null, nextStart: null, ovulation: null, cyclesLogged: 0 };
-  const nextStart = addK(last.start, avgCycle);
+  let nextStart = addK(last.start, avgCycle);
+  while (nextStart < todayK()) nextStart = addK(nextStart, avgCycle);
   return {
     avgCycle,
     avgPeriod,
