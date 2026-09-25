@@ -13,3 +13,6 @@
 - [x] Add Fasting Companion (calendar, Ramadan mode, log, learn) from the source document.
 - [x] Redesign Fasting Companion to match the supplied calm, compact reference.
 - [x] Keep the monthly Monday fasting summary accurate and synced with logged days.
+- [ ] Qibla: stop repeat "Enable Compass" prompts once permission was granted (sensor-wake fallback, keep stored flag).
+- [ ] Qibla: make bearing/distance verifiable — refresh-location button, cache-age note, recompute on refresh.
+- [ ] Qibla: lighter, springier calibration ball rendered as a flat circle.
