@@ -77,6 +77,7 @@ export function SwipeStack({ items, counts, onIncrement, onReset, persistKey, fi
     if (dir === "next" && idx >= items.length - 1) return;
     if (dir === "prev" && idx <= 0) return;
     animating.current = true;
+    triggerHaptic("light");
     setPhase(dir === "next" ? "out-left" : "out-right");
     setDragOffset(0);
 
@@ -104,6 +105,7 @@ export function SwipeStack({ items, counts, onIncrement, onReset, persistKey, fi
   };
   const scrubTo = (i: number) => {
     if (animating.current || i === idx) return;
+    triggerHaptic("light");
     setDragOffset(0);
     setPhase("idle");
     setEnter(false);
