@@ -21,6 +21,33 @@ export function CompassCalibrationCard({ onDone, onSkip }: Props) {
   const [tilt, setTilt] = useState({ x: 0, y: 0 });
   const [sectors, setSectors] = useState<boolean[]>(() => Array(SECTORS).fill(false));
   const gotRef = useRef(false);
+  const targetRef = useRef({ x: 0, y: 0 });
+  // Rolling ball: position + velocity driven by tilt, like a marble in a bowl.
+  const [ball, setBall] = useState({ x: 0, y: 0, rot: 0 });
+  useEffect(() => {
+    let raf = 0;
+    let last = performance.now();
+    const st = { x: 0, y: 0, vx: 0, vy: 0, rot: 0 };
+    const loop = (now: number) => {
+      const dt = Math.min((now - last) / 1000, 0.05);
+      last = now;
+      const t = targetRef.current;
+      st.vx += (t.x - st.x) * 18 * dt;
+      st.vy += (t.y - st.y) * 18 * dt;
+      const damp = Math.exp(-4 * dt);
+      st.vx *= damp;
+      st.vy *= damp;
+      st.x += st.vx * dt * 4;
+      st.y += st.vy * dt * 4;
+      const d = Math.hypot(st.x, st.y);
+      if (d > 1) { st.x /= d; st.y /= d; st.vx *= 0.4; st.vy *= 0.4; }
+      st.rot += (st.vx + st.vy) * dt * 400;
+      setBall({ x: st.x, y: st.y, rot: st.rot });
+      raf = requestAnimationFrame(loop);
+    };
+    raf = requestAnimationFrame(loop);
+    return () => cancelAnimationFrame(raf);
+  }, []);
 
   const sectorCount = sectors.filter(Boolean).length;
   const progress = Math.round((sectorCount / SECTORS) * 100);
@@ -34,6 +61,7 @@ export function CompassCalibrationCard({ onDone, onSkip }: Props) {
         const x = Math.max(-1, Math.min(1, r.gamma / 40));
         const y = Math.max(-1, Math.min(1, r.beta / 40));
         setTilt({ x, y });
+        targetRef.current = { x, y };
         if (Math.hypot(x, y) > 0.3) {
           const ang = (Math.atan2(y, x) * 180) / Math.PI + 360;
           const s = Math.floor(((ang + 180 / SECTORS) % 360) / (360 / SECTORS)) % SECTORS;
@@ -85,9 +113,21 @@ export function CompassCalibrationCard({ onDone, onSkip }: Props) {
               <path key={i} d={arc(i)} fill="none" strokeWidth={9} strokeLinecap="round"
                 stroke={on ? "var(--accent)" : "color-mix(in oklab, var(--muted-foreground) 25%, transparent)"} style={{ transition: "stroke 250ms" }} />
             ))}
-            <g style={{ transform: `translate(${c + tilt.x * 62}px, ${c + tilt.y * 62}px)`, transition: "transform 90ms linear" }}>
-              <circle r={14} fill="var(--accent)" opacity={0.18} />
-              <circle r={8} fill="var(--accent)" />
+            <defs>
+              <radialGradient id="cal-ball" cx="35%" cy="30%" r="75%">
+                <stop offset="0%" stopColor="var(--card)" stopOpacity="0.95" />
+                <stop offset="35%" stopColor="var(--accent)" />
+                <stop offset="100%" stopColor="color-mix(in oklab, var(--accent) 60%, var(--foreground))" />
+              </radialGradient>
+            </defs>
+            <circle cx={c} cy={c} r={76} fill="color-mix(in oklab, var(--muted) 55%, transparent)" />
+            <circle cx={c} cy={c} r={24} fill="none" strokeDasharray="3 4" stroke="color-mix(in oklab, var(--muted-foreground) 30%, transparent)" />
+            <ellipse cx={c + ball.x * 62 + 3} cy={c + ball.y * 62 + 12} rx={12} ry={4} fill="var(--foreground)" opacity={0.12} />
+            <g transform={`translate(${c + ball.x * 62} ${c + ball.y * 62})`}>
+              <circle r={13} fill="url(#cal-ball)" />
+              <g transform={`rotate(${ball.rot})`}>
+                <path d="M -9 -3 Q 0 3 9 -3" fill="none" stroke="var(--card)" strokeOpacity={0.45} strokeWidth={1.4} strokeLinecap="round" />
+              </g>
             </g>
             {complete && (
               <g transform={`translate(${c - 14} ${c - 14})`}>
