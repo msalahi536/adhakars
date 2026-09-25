@@ -986,10 +986,14 @@ html[data-visual-phase="evening"] .adhkar-card-heading button { background: rgba
 .adhkar-pagination { position: relative; display: flex; width: min(260px, calc(100vw - 112px)); height: 30px; min-width: 0; align-items: center; justify-content: center; padding: 0 4px; border-radius: 999px; color: var(--text-muted); cursor: ew-resize; touch-action: pan-x; -webkit-touch-callout: none; -webkit-user-select: none; user-select: none; }
 .adhkar-pagination-dots { position: absolute; inset: 0 4px; display: flex; align-items: center; pointer-events: none; }
 .adhkar-pagination-dots span { position: relative; height: 30px; min-width: 0; flex: 1 1 0; }
-.adhkar-pagination-dots span::after { position: absolute; top: 50%; left: 50%; width: 5px; height: 5px; border-radius: 50%; background: var(--dot-inactive); content: ""; transform: translate(-50%, -50%); }
-.adhkar-pagination-dots span.is-active::after { background: var(--dot-active); }
-.adhkar-pagination-slider { position: absolute; inset: 0; width: 100%; height: 30px; margin: 0; opacity: 0.001; cursor: ew-resize; touch-action: pan-x; -webkit-appearance: none; appearance: none; }
+.adhkar-pagination-dots span::before { position: absolute; top: 50%; left: 50%; width: 17px; height: 17px; border: 1px solid transparent; border-radius: 999px; background: transparent; content: ""; transform: translate(-50%, -50%) scale(.72); transition: transform .18s ease, border-color .18s ease, background .18s ease; }
+.adhkar-pagination-dots span::after { position: absolute; top: 50%; left: 50%; width: 5px; height: 5px; border-radius: 50%; background: var(--dot-inactive); content: ""; transform: translate(-50%, -50%); transition: width .18s ease, background .18s ease; }
+.adhkar-pagination-dots span.is-active::before { border-color: color-mix(in oklab, var(--dot-active) 44%, transparent); background: color-mix(in oklab, var(--dot-active) 12%, transparent); transform: translate(-50%, -50%) scale(1); }
+.adhkar-pagination-dots span.is-active::after { width: 7px; height: 7px; background: var(--dot-active); }
+.adhkar-pagination-slider { position: absolute; z-index: 2; inset: 0; width: 100%; height: 30px; margin: 0; opacity: .001; pointer-events: none; cursor: ew-resize; touch-action: none; -webkit-appearance: none; appearance: none; }
+.adhkar-pagination-slider::-webkit-slider-runnable-track { height: 30px; background: transparent; }
 .adhkar-pagination-slider::-webkit-slider-thumb { width: 28px; height: 30px; -webkit-appearance: none; appearance: none; }
+.adhkar-pagination-slider::-moz-range-track { height: 30px; background: transparent; }
 .adhkar-pagination-slider::-moz-range-thumb { width: 28px; height: 30px; border: 0; background: transparent; }
 .adhkar-pagination-arrow { display: inline-flex; width: 24px; height: 24px; flex: 0 0 24px; align-items: center; justify-content: center; border: 1px solid var(--card-border, var(--border)); border-radius: 999px; background: var(--pill-bg, var(--source-bg)); color: var(--text-muted); }
 .adhkar-pagination-arrow:disabled { opacity: 0.35; }
@@ -2666,7 +2670,15 @@ html[data-preset="ocean"][data-visual-phase="evening"] .bottom-nav-row {
 .period-relief-row small { color: var(--muted-foreground); font-size: 10px; line-height: 1.35; }
 .period-relief-row > svg { flex: none; color: var(--muted-foreground); }
 .period-relief-icon { display: grid; width: 34px; height: 34px; flex: none; place-items: center; border-radius: 12px; background: color-mix(in oklab, var(--accent) 16%, transparent); color: var(--accent); }
-.period-relief-dialog { max-height: min(76dvh, 650px); }
+.period-relief-dialog { max-height: min(76dvh, 650px); border-color: color-mix(in oklab, var(--accent) 24%, var(--border)); background: color-mix(in oklab, var(--surface, var(--card)) 92%, var(--accent)); }
+.period-relief-dialog .period-dialog-head { margin: -18px -18px 0; padding: 18px; border-bottom: 1px solid color-mix(in oklab, var(--accent) 18%, transparent); background: color-mix(in oklab, var(--accent) 10%, transparent); }
+.period-relief-prayer { position: relative; overflow: hidden; padding: 16px; border: 1px solid color-mix(in oklab, var(--accent) 22%, transparent); border-radius: 18px; background: color-mix(in oklab, var(--accent) 8%, var(--card)); }
+.period-relief-prayer::before { position: absolute; inset: 0 0 auto; height: 3px; background: var(--accent); content: ""; opacity: .72; }
+.period-relief-prayer h3 { color: var(--accent); font-family: var(--font-display); font-size: 16px; }
+.period-relief-prayer .period-source { margin-top: 5px; }
+.period-relief-prayer .arabic { margin-top: 14px; padding: 10px 2px; color: var(--foreground); }
+.period-relief-prayer .adhkar-transliteration { margin: 8px 0 0; color: var(--accent); }
+.period-relief-prayer .adhkar-commentary { border-top-color: color-mix(in oklab, var(--accent) 18%, transparent); }
 @keyframes period-relief-in { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: translateY(0); } }
 .period-daily-reminder { width: 100%; align-items: center; text-align: left; }
 .period-daily-reminder > span { display: flex; min-width: 0; flex: 1; flex-direction: column; gap: 2px; }

@@ -126,6 +126,24 @@ export function Pagination({
         className="adhkar-pagination"
         data-no-swipe
         onContextMenu={(event) => event.preventDefault()}
+        onPointerDown={(event) => {
+          event.currentTarget.setPointerCapture(event.pointerId);
+          const rect = event.currentTarget.getBoundingClientRect();
+          const ratio = Math.max(0, Math.min(1, (event.clientX - rect.left) / rect.width));
+          onScrub(Math.round(ratio * Math.max(0, total - 1)));
+          void triggerHaptic("light");
+        }}
+        onPointerMove={(event) => {
+          if (!event.currentTarget.hasPointerCapture(event.pointerId)) return;
+          const rect = event.currentTarget.getBoundingClientRect();
+          const ratio = Math.max(0, Math.min(1, (event.clientX - rect.left) / rect.width));
+          onScrub(Math.round(ratio * Math.max(0, total - 1)));
+        }}
+        onPointerUp={(event) => {
+          if (event.currentTarget.hasPointerCapture(event.pointerId)) {
+            event.currentTarget.releasePointerCapture(event.pointerId);
+          }
+        }}
       >
         <div className="adhkar-pagination-dots" aria-hidden="true">
           {Array.from({ length: total }, (_, index) => (
@@ -140,15 +158,7 @@ export function Pagination({
           step={1}
           value={active}
           aria-label={`Adhkar ${active + 1} of ${total}`}
-          onChange={(event) => {
-            const next = Number(event.currentTarget.value);
-            onScrub(next);
-            void triggerHaptic("light");
-          }}
-          onClick={(event) => {
-            const next = Number(event.currentTarget.value);
-            if (next !== active) onSelect(next);
-          }}
+          onChange={(event) => onSelect(Number(event.currentTarget.value))}
         />
       </div>
       <button
