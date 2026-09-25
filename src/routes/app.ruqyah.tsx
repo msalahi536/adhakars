@@ -208,7 +208,7 @@ function DailyView() {
                         {recitation && (
                           <div className="rq-check-recitation" aria-hidden={!recitationOpen}>
                             <div>
-                              <GuideRecitation item={recitation} />
+                              <GuideRecitation item={recitation} compact />
                             </div>
                           </div>
                         )}
@@ -390,9 +390,9 @@ const AL_FATIHAH: Dhikr = {
   target: 1,
 };
 
-function GuideRecitation({ item }: { item: Dhikr }) {
+function GuideRecitation({ item, compact = false }: { item: Dhikr; compact?: boolean }) {
   return (
-    <article className="rq-guide-recitation mt-4">
+    <article className={`rq-guide-recitation mt-4 ${compact ? "is-compact" : ""}`}>
       <div className="rq-guide-recitation-head">
         <div>
           <h3>{item.title}</h3>
@@ -400,20 +400,27 @@ function GuideRecitation({ item }: { item: Dhikr }) {
         </div>
         <ListenButton dhikrId={item.id} size={34} />
       </div>
-      {item.arabicMulti ? item.arabicMulti.map((part) => (
-        <section key={part.label} className="rq-guide-part">
-          <div className="label-caps text-center">{part.label}</div>
-          <p className="arabic whitespace-pre-line text-right" lang="ar" dir="rtl">{part.arabic}</p>
-          <p className="adhkar-transliteration !text-left">{part.transliteration}</p>
-          <p className="text-sm leading-relaxed">{part.translation}</p>
-        </section>
-      )) : (
-        <div className="rq-guide-part">
-          <p className="arabic whitespace-pre-line text-right" lang="ar" dir="rtl">{item.arabic}</p>
-          <p className="adhkar-transliteration !text-left">{item.transliteration}</p>
-          <p className="text-sm leading-relaxed">{item.translation}</p>
-        </div>
-      )}
+      <div className={compact ? "rq-guide-scroll" : undefined}>
+        {item.arabicMulti ? item.arabicMulti.map((part) => (
+          <section key={part.label} className="rq-guide-part">
+            <div className="label-caps text-center">{part.label}</div>
+            <p className="arabic whitespace-pre-line text-right" lang="ar" dir="rtl">{part.arabic}</p>
+            {!compact && <p className="adhkar-transliteration !text-left">{part.transliteration}</p>}
+            {!compact && <p className="text-sm leading-relaxed">{part.translation}</p>}
+          </section>
+        )) : (
+          <div className="rq-guide-part">
+            <p className="arabic whitespace-pre-line text-right" lang="ar" dir="rtl">{item.arabic}</p>
+            {!compact && <p className="adhkar-transliteration !text-left">{item.transliteration}</p>}
+            {!compact && <p className="text-sm leading-relaxed">{item.translation}</p>}
+          </div>
+        )}
+        {compact && (
+          <div className="rq-guide-scroll-note">
+            <span>Scroll to continue reading</span>
+          </div>
+        )}
+      </div>
     </article>
   );
 }

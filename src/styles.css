@@ -3067,6 +3067,12 @@ html[data-preset="ocean"][data-visual-phase="evening"] .bottom-nav-row {
 .rq-check-item .rq-guide-recitation-head { padding: 11px 12px; }
 .rq-check-item .rq-guide-part { padding: 14px 12px; }
 .rq-check-item .rq-guide-part .arabic { font-size: 21px; }
+.rq-guide-recitation.is-compact { max-height: 270px; display: flex; flex-direction: column; }
+.rq-guide-recitation.is-compact .rq-guide-recitation-head { flex: none; }
+.rq-guide-scroll { min-height: 0; overflow-y: auto; overscroll-behavior: contain; -webkit-overflow-scrolling: touch; scrollbar-width: thin; }
+.rq-guide-recitation.is-compact .rq-guide-part { border-top: 0; }
+.rq-guide-scroll-note { position: sticky; bottom: 0; display: flex; justify-content: center; padding: 13px 10px 9px; background: linear-gradient(180deg, transparent, var(--card) 58%); pointer-events: none; }
+.rq-guide-scroll-note span { padding: 4px 10px; border-radius: 999px; background: color-mix(in oklab, var(--card) 92%, var(--accent)); color: var(--muted-foreground); font-size: 10px; font-weight: 700; }
 .rq-landing-card { padding: 18px; }
 .rq-back-link {
   display: inline-flex; align-items: center; gap: 4px;
