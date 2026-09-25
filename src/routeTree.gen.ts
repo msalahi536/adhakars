@@ -23,6 +23,7 @@ import { Route as AppTasbihRouteImport } from './routes/app.tasbih'
 import { Route as AppSleepRouteImport } from './routes/app.sleep'
 import { Route as AppSettingsRouteImport } from './routes/app.settings'
 import { Route as AppSalahRouteImport } from './routes/app.salah'
+import { Route as AppRuqyahRouteImport } from './routes/app.ruqyah'
 import { Route as AppQiblaRouteImport } from './routes/app.qibla'
 import { Route as AppPrivacyRouteImport } from './routes/app.privacy'
 import { Route as AppPeriodRouteImport } from './routes/app.period'
@@ -102,6 +103,11 @@ const AppSalahRoute = AppSalahRouteImport.update({
   path: '/salah',
   getParentRoute: () => AppRoute,
 } as any)
+const AppRuqyahRoute = AppRuqyahRouteImport.update({
+  id: '/ruqyah',
+  path: '/ruqyah',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppQiblaRoute = AppQiblaRouteImport.update({
   id: '/qibla',
   path: '/qibla',
@@ -160,6 +166,7 @@ export interface FileRoutesByFullPath {
   '/app/period': typeof AppPeriodRoute
   '/app/privacy': typeof AppPrivacyRoute
   '/app/qibla': typeof AppQiblaRoute
+  '/app/ruqyah': typeof AppRuqyahRoute
   '/app/salah': typeof AppSalahRoute
   '/app/settings': typeof AppSettingsRoute
   '/app/sleep': typeof AppSleepRoute
@@ -183,6 +190,7 @@ export interface FileRoutesByTo {
   '/app/period': typeof AppPeriodRoute
   '/app/privacy': typeof AppPrivacyRoute
   '/app/qibla': typeof AppQiblaRoute
+  '/app/ruqyah': typeof AppRuqyahRoute
   '/app/salah': typeof AppSalahRoute
   '/app/settings': typeof AppSettingsRoute
   '/app/sleep': typeof AppSleepRoute
@@ -208,6 +216,7 @@ export interface FileRoutesById {
   '/app/period': typeof AppPeriodRoute
   '/app/privacy': typeof AppPrivacyRoute
   '/app/qibla': typeof AppQiblaRoute
+  '/app/ruqyah': typeof AppRuqyahRoute
   '/app/salah': typeof AppSalahRoute
   '/app/settings': typeof AppSettingsRoute
   '/app/sleep': typeof AppSleepRoute
@@ -234,6 +243,7 @@ export interface FileRouteTypes {
     | '/app/period'
     | '/app/privacy'
     | '/app/qibla'
+    | '/app/ruqyah'
     | '/app/salah'
     | '/app/settings'
     | '/app/sleep'
@@ -257,6 +267,7 @@ export interface FileRouteTypes {
     | '/app/period'
     | '/app/privacy'
     | '/app/qibla'
+    | '/app/ruqyah'
     | '/app/salah'
     | '/app/settings'
     | '/app/sleep'
@@ -281,6 +292,7 @@ export interface FileRouteTypes {
     | '/app/period'
     | '/app/privacy'
     | '/app/qibla'
+    | '/app/ruqyah'
     | '/app/salah'
     | '/app/settings'
     | '/app/sleep'
@@ -401,6 +413,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppSalahRouteImport
       parentRoute: typeof AppRoute
     }
+    '/app/ruqyah': {
+      id: '/app/ruqyah'
+      path: '/ruqyah'
+      fullPath: '/app/ruqyah'
+      preLoaderRoute: typeof AppRuqyahRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/app/qibla': {
       id: '/app/qibla'
       path: '/qibla'
@@ -468,6 +487,7 @@ interface AppRouteChildren {
   AppPeriodRoute: typeof AppPeriodRoute
   AppPrivacyRoute: typeof AppPrivacyRoute
   AppQiblaRoute: typeof AppQiblaRoute
+  AppRuqyahRoute: typeof AppRuqyahRoute
   AppSalahRoute: typeof AppSalahRoute
   AppSettingsRoute: typeof AppSettingsRoute
   AppSleepRoute: typeof AppSleepRoute
@@ -484,6 +504,7 @@ const AppRouteChildren: AppRouteChildren = {
   AppPeriodRoute: AppPeriodRoute,
   AppPrivacyRoute: AppPrivacyRoute,
   AppQiblaRoute: AppQiblaRoute,
+  AppRuqyahRoute: AppRuqyahRoute,
   AppSalahRoute: AppSalahRoute,
   AppSettingsRoute: AppSettingsRoute,
   AppSleepRoute: AppSleepRoute,
