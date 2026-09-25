@@ -13,7 +13,7 @@
 - [x] Add Fasting Companion (calendar, Ramadan mode, log, learn) from the source document.
 - [x] Redesign Fasting Companion to match the supplied calm, compact reference.
 - [x] Keep the monthly Monday fasting summary accurate and synced with logged days.
-- [ ] Qibla: stop repeat "Enable Compass" prompts once permission was granted (sensor-wake fallback, keep stored flag).
-- [ ] Qibla: make bearing/distance verifiable — refresh-location button, cache-age note, recompute on refresh.
-- [ ] Qibla: lighter, springier calibration ball rendered as a flat circle.
-- [ ] Qibla: move compass/content up so the tip card is not hidden under the nav bar on iPhone.
+- [x] Qibla: stop repeat "Enable Compass" prompts once permission was granted (sensor-wake fallback, keep stored flag).
+- [x] Qibla: make bearing/distance verifiable — refresh-location button, cache-age note, recompute on refresh.
+- [x] Qibla: lighter, springier calibration ball rendered as a flat circle.
+- [x] Qibla: move compass/content up so the tip card is not hidden under the nav bar on iPhone.
