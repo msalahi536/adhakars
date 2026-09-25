@@ -9,13 +9,13 @@ import {
   clampSeed,
 } from "./theming";
 
-const K_LEGACY_MODE = "adhkar:mode";
+const K_MODE = "adhkar:mode";
 const K_SEED = "adhkar:seed";
 const K_PRESET = "adhkar:preset";
 const K_LEGACY_OVERRIDES = "adhkar:section-overrides";
 const K_CUSTOM = "adhkar:custom-triplet";
 
-export type ModeSetting = "light";
+export type ModeSetting = "page" | "morning" | "evening";
 export type VisualPhase = "morning" | "evening";
 
 export const DEFAULT_SEED = "#70815d";
@@ -48,14 +48,18 @@ const removeLS = (k: string) => {
 };
 
 export const getModeSetting = (): ModeSetting => {
-  return "light";
+  const value = readLS(K_MODE);
+  if (value === "morning" || value === "evening") return value;
+  return "page";
 };
-export const setModeSetting = (_m: ModeSetting) => removeLS(K_LEGACY_MODE);
+export const setModeSetting = (mode: ModeSetting) => writeLS(K_MODE, mode);
 
 /** Resolve the artwork and palette phase for the whole app. */
 export const resolveVisualPhase = (
   pathname = typeof window !== "undefined" ? window.location.pathname : "/app",
 ): VisualPhase => {
+  const mode = getModeSetting();
+  if (mode === "morning" || mode === "evening") return mode;
   if (pathname.startsWith("/app/sleep")) {
     return readLS("sleepMode") === "wake" ? "morning" : "evening";
   }
@@ -134,7 +138,7 @@ export const applyThemeForRoute = (pathname: string, sectionKey?: SectionKey) =>
 };
 
 export const resetTheme = () => {
-  removeLS(K_LEGACY_MODE);
+  removeLS(K_MODE);
   removeLS(K_SEED);
   removeLS(K_PRESET);
   removeLS(K_LEGACY_OVERRIDES);
@@ -143,7 +147,8 @@ export const resetTheme = () => {
 
 export const PRE_PAINT_SCRIPT = `(function(){try{
 var p=location.pathname;
-var phase=p.indexOf('/app/evening')===0||(p.indexOf('/app/sleep')===0&&localStorage.getItem('sleepMode')!=='wake')?'evening':'morning';
+ var pref=localStorage.getItem('${K_MODE}');
+ var phase=(pref==='morning'||pref==='evening')?pref:(p.indexOf('/app/evening')===0||(p.indexOf('/app/sleep')===0&&localStorage.getItem('sleepMode')!=='wake')?'evening':'morning');
 var mode=phase==='evening'?'dark':'light';
 var section=(p==='/app'||p==='/app/')?'morning':(p.indexOf('/app/evening')===0?'evening':(p.indexOf('/app/salah')===0?'salah':(p.indexOf('/app/tasbih')===0?'tasbih':'default')));
 document.documentElement.setAttribute('data-theme-mode',mode);

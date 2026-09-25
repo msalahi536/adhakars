@@ -1,7 +1,7 @@
 import { useEffect, useState, type ReactNode } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { HeaderBackButton } from "@/components/HeaderBackButton";
-import { getDisplay, setDisplay } from "@/lib/theme";
+import { getDisplay, setDisplay, themes } from "@/lib/theme";
 import {
   setSeed,
   getPresetId,
@@ -10,6 +10,9 @@ import {
   resetTheme,
   PRESETS,
   DEFAULT_PRESET_ID,
+  getModeSetting,
+  setModeSetting,
+  type ModeSetting,
 } from "@/lib/theme-store";
 import { sectionSeedFor } from "@/lib/theming";
 import { backgroundsForPreset, PRESET_BACKGROUNDS } from "@/lib/backgrounds";
@@ -83,6 +86,7 @@ export const Route = createFileRoute("/app/settings")({
 
 function Settings() {
   const [presetId, setPresetIdState] = useState<string>(DEFAULT_PRESET_ID);
+  const [modeSetting, setModeSettingState] = useState<ModeSetting>("page");
   const [suggestOpen, setSuggestOpen] = useState(false);
   const [display, setDisplayState] = useState(getDisplay());
   const [confirmReset, setConfirmReset] = useState(false);
@@ -120,6 +124,7 @@ function Settings() {
 
   useEffect(() => {
     setPresetIdState(getPresetId());
+    setModeSettingState(getModeSetting());
     setDisplayState(getDisplay());
     setPrayerSettingsState(getPrayerSettings());
     setNotifPrefsState(getNotificationPrefs());
@@ -250,6 +255,12 @@ function Settings() {
     window.dispatchEvent(new Event("adhkar:theme-change"));
   };
 
+  const chooseMode = (mode: ModeSetting) => {
+    setModeSettingState(mode);
+    setModeSetting(mode);
+    window.dispatchEvent(new Event("adhkar:visual-phase-change"));
+  };
+
 
   const doReset = () => {
     resetTheme();
@@ -317,6 +328,32 @@ function Settings() {
                     </span>
                   </div>
                 ))}
+              </div>
+            </div>
+
+            <div className="settings-group mb-3 p-4">
+              <div className="settings-row-title">Display style</div>
+              <div className="settings-row-desc mb-3">
+                Choose which artwork and colors the whole app uses.
+              </div>
+              <div className="settings-phase-options" role="radiogroup" aria-label="Display style">
+                {themes.map((theme) => {
+                  const active = modeSetting === theme.id;
+                  return (
+                    <button
+                      key={theme.id}
+                      type="button"
+                      role="radio"
+                      aria-checked={active}
+                      className="settings-phase-option"
+                      data-active={active ? "true" : "false"}
+                      onClick={() => chooseMode(theme.id)}
+                    >
+                      {theme.id === "morning" ? <Sun size={17} /> : theme.id === "evening" ? <Moon size={17} /> : <Sprout size={17} />}
+                      <span>{theme.name}</span>
+                    </button>
+                  );
+                })}
               </div>
             </div>
 

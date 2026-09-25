@@ -13,7 +13,9 @@ export type ThemeMode = ModeSetting;
 export type ThemeId = "light" | "dark";
 
 export const themes: { id: ThemeMode; name: string; description: string }[] = [
-  { id: "light", name: "Page-based", description: "Morning and evening follow their pages" },
+  { id: "page", name: "Page-based", description: "Morning and evening follow their pages" },
+  { id: "morning", name: "Always morning", description: "Use the morning artwork and colors everywhere" },
+  { id: "evening", name: "Always evening", description: "Use the evening artwork and colors everywhere" },
 ];
 
 export const getMode = (): ThemeMode => {
@@ -32,8 +34,7 @@ export const applyTheme = (_id: ThemeId) => {
 };
 
 export const resolveTheme = (_mode: ThemeMode, _route: string): ThemeId => {
-  // no-op alias; the engine handles resolution.
-  return "light";
+  return _mode === "evening" ? "dark" : "light";
 };
 
 // ============= Display + haptics prefs (unchanged) =============
