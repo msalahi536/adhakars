@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import {
-  BookOpen, Check, ChevronLeft, ChevronRight, CircleAlert, Droplets, FileText, Flower2, Hand, Lock,
+  BookOpen, Check, ChevronLeft, ChevronRight, CircleAlert, Droplets, FileText, Flower2, Hand,
   Moon, MoonStar, ShieldCheck, Sparkles, Star, Stethoscope, Sun,
   Sunrise, Users, X,
 } from "lucide-react";
