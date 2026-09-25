@@ -167,7 +167,19 @@ function Qibla() {
     setLostSensor(false);
 
     setStep("Requesting motion access…");
-...
+    // Permission was already granted before: don't re-prompt (iOS would reject
+    // a prompt that isn't triggered by a tap). Just attach to the sensor.
+    const sensor = skipPrompt ? "granted" : await requestOrientationPermission();
+    if (sensor === "denied") {
+      setError(
+        "Motion and orientation access was denied. Allow it for this app in your device settings, then try again.",
+      );
+      setPhase("error");
+      return;
+    }
+    if (sensor === "granted") storePermissionGranted();
+
+    setStep("Getting your location…");
     // Always take a fresh fix here; the watcher keeps it live afterwards.
     const pos = await getPosition({ force: true });
     if (!pos.ok) {
@@ -341,9 +353,24 @@ function Qibla() {
                 </p>
               )}
 
-              <div className="qb-stats" style={{ position: "relative" }}>
+              <div className="qb-stats">
                 <div className="qb-stat">
-...
+                  <span className="qb-stat-icon"><Navigation size={16} strokeWidth={1.8} /></span>
+                  <div>
+                    <div className="qb-stat-label">Qibla bearing</div>
+                    <div className="qb-stat-value">{qiblaBearing !== null ? `${qiblaBearing.toFixed(1)}°` : "--"}</div>
+                  </div>
+                </div>
+                <div className="qb-stat-divider" />
+                <div className="qb-stat">
+                  <span className="qb-stat-icon">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden><path d="M4 7l8-4 8 4v10l-8 4-8-4z" /><path d="M4 10l8 4 8-4" /></svg>
+                  </span>
+                  <div>
+                    <div className="qb-stat-label">Distance to Kaaba</div>
+                    <div className="qb-stat-value">{coords ? `${Math.round(distanceKm(coords.lat, coords.lng)).toLocaleString()} km` : "--"}</div>
+                  </div>
+                </div>
               </div>
 
               <div className="qb-tip">
