@@ -305,17 +305,64 @@ export const SUNNAH_SECTIONS: SunnahSection[] = [
   },
   {
     id: "ends",
-    title: "When It Ends",
+    title: "Aftercare & Post-Period",
+    intro: `The farḍ ghusl is simple: intend purification in the heart, rinse the mouth and nose, and ensure water reaches every part of the body including the roots of the hair. Once this is done, the ghusl is valid and prayer is valid. Everything else below is additional Sunnah and reward, not a condition.`,
     items: [
       {
+        id: "ghusl-minimum",
+        title: "The minimum valid ghusl",
+        source: "Qur’an 5:6  ·  Scholarly agreement",
+        notes: [
+          `Confirm the bleeding has fully stopped — by the white discharge (al-qaṣṣah al-bayḍāʾ) or complete dryness.`,
+          `Farḍ — Intend purification in the heart. Nothing is said aloud.`,
+          `Farḍ — Rinse the mouth and nose.`,
+          `Farḍ — Ensure water reaches every part of the body, including the roots of the hair.`,
+          `If she does only this, the ghusl is complete and valid. She prays. Nothing is deficient and nothing needs repeating.`,
+        ],
+      },
+      {
+        id: "ghusl-sunnah-sequence",
+        title: "The full Sunnah ghusl — in order",
+        source: "Bukhari 248  ·  Bukhari 257  ·  Sahih (al-Bukhari)",
+        notes: [
+          `1. Intention in the heart. 2. Say Bismillah. 3. Wash the hands two or three times. 4. Wash the private parts and any remaining traces with the left hand. 5. Wash that hand — with soap now, as he wiped it on the ground. 6. Perform a complete wudu as for prayer, optionally leaving the feet to the end. 7. Run wet fingers through the roots of the hair until the scalp is wet. 8. Pour three handfuls of water over the head. 9. Pour water over the whole body, beginning with the right side then the left. 10. Move aside and wash the feet. 11. Apply the musk.`,
+          `Water must reach the roots of the hair, but braids need not be undone.`,
+        ],
+      },
+      {
         id: "ghusl",
-        title: "Ghusl, and the Sunnah of scent afterwards",
-        source: "Muslim 332a  ·  Sahih (Muslim)",
+        title: "The Sunnah of scent afterwards",
+        source: "Muslim 332a  ·  Sahih (Muslim)  ·  Recommended, not obligatory",
         arabic: `قَالَتْ سَأَلَتِ امْرَأَةٌ النَّبِيَّ صلى الله عليه وسلم كَيْفَ تَغْتَسِلُ مِنْ حَيْضَتِهَا قَالَ فَذَكَرَتْ أَنَّهُ عَلَّمَهَا كَيْفَ تَغْتَسِلُ ثُمَّ تَأْخُذُ فِرْصَةً مِنْ مِسْكٍ فَتَطَهَّرُ بِهَا . قَالَتْ كَيْفَ أَتَطَهَّرُ بِهَا قَالَ تَطَهَّرِي بِهَا . سُبْحَانَ اللَّهِ . وَاسْتَتَرَ`,
+        transliteration: `Thumma taʾkhudhu firṣatan min miskin fa-taṭahharu bihā.`,
         translation: `‘Aisha reported: A woman asked the Prophet (ﷺ) how she should perform ghusl after her period. He taught her how to wash, then said: “then take a piece of cotton scented with musk and purify yourself with it.” She said: How do I purify myself with it? He said: “Purify yourself with it — Subhan Allah!” and he covered his face out of modesty. ‘Aisha said: I drew her to me and said: Follow the traces of blood with it.`,
         notes: [
-          `Once the bleeding has stopped she performs ghusl and returns to prayer and fasting immediately. The detail worth keeping is the musk-scented cotton — a recommendation of scent and cleanliness at the end of the period, and a small piece of evidence that the Sunnah treats the end of the period as something to feel good about rather than merely a return to obligation. The narration is also a model of how to teach this subject: the Prophet ﷺ was too modest to say it plainly, so ‘Aisha explained it woman to woman.`,
+          `This is recommended, not required. If musk is unavailable, any perfume may be used. If no perfume is available, something that removes odour such as soap may be used. Water alone is sufficient and the ghusl is complete.`,
         ],
+      },
+      {
+        id: "post-period-next",
+        title: "What to do next",
+        source: "Bukhari 227  ·  Agreed rulings",
+        notes: [
+          `Resume prayer at once with the next prayer due.`,
+          `Note the days missed from Ramadan, to be made up before the next Ramadan. Prayers are not made up.`,
+          `If needed, scrape, rub and rinse any menstrual blood on a garment. Then pray in it. The garment does not need replacing.`,
+          `There is no requirement to wear new or different clothes after ghusl. Clean, fresh clothes are a personal preference, not a Sunnah step.`,
+        ],
+      },
+      {
+        id: "not-required",
+        title: "What is not required",
+        source: "No basis in the Sunnah",
+        notes: [
+          `None of the following is required: wearing new or different clothes; washing all clothes worn during the period; undoing braids or plaits; washing the hair a set number of times; saying a spoken intention; reciting a specific du‘a for ghusl; waiting after the bleeding stops before performing ghusl; or making up missed prayers.`,
+        ],
+        callout: {
+          tone: "grey",
+          label: "Keep it simple",
+          text: `The first three elements — intention, rinsing the mouth and nose, and water reaching the whole body — determine validity. The remaining steps bring additional Sunnah and reward.`,
+        },
       },
     ],
   },
