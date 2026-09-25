@@ -1,8 +1,8 @@
 import { useEffect, useMemo, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import {
-  Bookmark, ChevronDown, ChevronUp, Cloud, Copy, HeartPulse, Home, Info, Compass, Search, Shield,
-  Sparkles, Users, Wallet, X, CloudRain, Frown, RotateCcw, Flower2, HandHeart, Lock, Volume2,
+  Bookmark, ChevronDown, ChevronUp, ChevronRight, Cloud, Copy, HeartPulse, Home, Info, Compass, Search, Shield,
+  Sparkles, Sun, Users, Wallet, X, CloudRain, Frown, RotateCcw, Flower2, HandHeart, Lock, Volume2,
 } from "lucide-react";
 import { toast } from "sonner";
 import { HeaderBackButton } from "@/components/HeaderBackButton";
@@ -26,6 +26,8 @@ export const Route = createFileRoute("/app/duas")({
 const CAT_ICONS = [Flower2, HandHeart, Wallet, Shield, RotateCcw, HeartPulse, Frown, Compass, Home, Sparkles, Users, CloudRain, Cloud];
 const THUNDER_NOTE = "Practice of Abdullah bin az-Zubayr, not a prophetic narration. Graded authentic by al-Albani as his statement.";
 const byId = (id: string) => DUAS.find((d) => d.id === id);
+const JUMUAH_IDS = ["jum-01", "jum-02", "jum-03", "jum-04"];
+const JUMUAH_DUAS = JUMUAH_IDS.map(byId).filter(Boolean) as Dua[];
 const saw = (t: string) => t.split("ﷺ").flatMap((p, i) => (i ? [<span key={i} className="period-saw">ﷺ</span>, p] : [p]));
 
 type Tab = "library" | "saved";
