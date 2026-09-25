@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { BedDouble, Compass, BookPlus, ChevronRight, HandHeart, Moon, ShieldCheck } from "lucide-react";
+import { BedDouble, Compass, BookPlus, ChevronRight, HandHeart, Moon, ShieldCheck, Landmark } from "lucide-react";
 import {
   getConsistency,
   getLifetime,
@@ -28,7 +28,7 @@ export const Route = createFileRoute("/app/more")({
 });
 
 type Tile = {
-  to: "/app/sleep" | "/app/qibla" | "/app/my-adhkar" | "/app/about" | "/app/period" | "/app/ruqyah";
+  to: "/app/sleep" | "/app/qibla" | "/app/my-adhkar" | "/app/about" | "/app/period" | "/app/ruqyah" | "/app/hajj";
   title: string;
   subtitle: string;
   Icon: typeof BedDouble;
@@ -38,6 +38,7 @@ const tiles: Tile[] = [
   { to: "/app/qibla", title: "Qibla Finder", subtitle: "Find the direction of the Ka'bah", Icon: Compass },
   { to: "/app/period", title: "Period Companion", subtitle: "Private cycle tracker and guidance", Icon: Moon },
   { to: "/app/ruqyah", title: "Ruqyah Companion", subtitle: "Daily protection and authentic ruqyah", Icon: ShieldCheck },
+  { to: "/app/hajj", title: "Hajj & Umrah", subtitle: "Station-by-station guide and du‘as", Icon: Landmark },
   { to: "/app/my-adhkar", title: "My Adhkar", subtitle: "Your own custom adhkar", Icon: BookPlus },
   { to: "/app/sleep", title: "Sleep & Wake", subtitle: "17 sleep + 7 wake adhkar", Icon: BedDouble },
   { to: "/app/about", title: "About & Support", subtitle: "The project and contact", Icon: HandHeart },
