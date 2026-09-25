@@ -3213,14 +3213,15 @@ html[data-preset="ocean"][data-visual-phase="evening"] .bottom-nav-row {
 .hj-learn-body .period-card { box-shadow: none; }
 
 /* ================= Fasting Companion ================= */
-:root { --fs-ramadan: oklch(0.6 0.11 245); }
+:root { --fs-ramadan: oklch(0.58 0.11 154); }
+.app-shell:has(.fs-today) .rq-header { background: linear-gradient(180deg, color-mix(in oklab, var(--surface) 72%, transparent), transparent) !important; }
 .fs-muted { color: var(--muted-foreground); }
-.fs-today { display: grid; gap: 12px; text-align: center; }
+.fs-today { display: grid; gap: 12px; padding: 15px 16px 14px; text-align: center; }
 .fs-today-hijri { display: grid; gap: 3px; }
 .fs-today-hijri .label-caps { color: var(--muted-foreground); opacity: 1; }
-.fs-today-hijri strong { font-family: var(--font-display); font-size: 24px; line-height: 1.15; }
+.fs-today-hijri strong { font-family: var(--font-display); font-size: 21px; line-height: 1.15; }
 .fs-today-hijri .fs-muted { font-size: 12px; }
-.fs-next { display: flex; align-items: center; gap: 9px; padding: 11px 13px; border-radius: 16px; text-align: left; font-size: 13px; background: color-mix(in oklab, var(--accent) 11%, transparent); border: 1px solid color-mix(in oklab, var(--accent) 24%, transparent); color: var(--foreground); }
+.fs-next { display: flex; align-items: center; gap: 9px; padding: 10px 12px; border-radius: 13px; text-align: left; font-size: 11px; background: color-mix(in oklab, var(--accent) 8%, transparent); border: 1px solid color-mix(in oklab, var(--accent) 18%, transparent); color: var(--foreground); }
 .fs-next > svg:first-child { color: var(--accent); flex: none; }
 .fs-next span { flex: 1; }
 .fs-special { display: grid; gap: 8px; border-color: color-mix(in oklab, var(--period-amber) 45%, transparent); }
@@ -3232,10 +3233,10 @@ html[data-preset="ocean"][data-visual-phase="evening"] .bottom-nav-row {
 .fs-dots { display: flex; gap: 5px; }
 .fs-dots span { width: 11px; height: 11px; border-radius: 50%; border: 1.5px solid color-mix(in oklab, var(--period-amber) 70%, transparent); }
 .fs-dots span.is-on { background: var(--period-amber); }
-.fs-cal { padding: 17px 14px 15px; }
-.fs-grid { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 5px; margin-top: 14px; }
+.fs-cal { padding: 15px 14px 13px; }
+.fs-grid { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 4px; margin-top: 12px; }
 .fs-wd { text-align: center; font-size: 10px; font-weight: 700; color: var(--muted-foreground); padding-bottom: 2px; }
-.fs-day { --c: transparent; position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center; aspect-ratio: 1; border-radius: 13px; line-height: 1; background: color-mix(in oklab, var(--c) 13%, transparent); border: 1px solid color-mix(in oklab, var(--c) 30%, transparent); color: var(--foreground); transition: transform .15s; }
+.fs-day { --c: transparent; position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center; aspect-ratio: 1; border-radius: 999px; line-height: 1; background: color-mix(in oklab, var(--c) 11%, transparent); border: 1px solid color-mix(in oklab, var(--c) 24%, transparent); color: var(--foreground); transition: transform .15s; }
 .fs-day:active { transform: scale(.94); }
 .fs-day.is-none { border-color: transparent; }
 .fs-day.is-recommended { --c: var(--accent); }
@@ -3245,7 +3246,7 @@ html[data-preset="ocean"][data-visual-phase="evening"] .bottom-nav-row {
 .fs-day.is-forbidden .fs-g { text-decoration: line-through; text-decoration-thickness: 1px; opacity: .8; }
 .fs-day.is-done { background: var(--accent); border-color: var(--accent); color: var(--accent-foreground, var(--background)); }
 .fs-day.is-excused { border-style: dashed; border-color: color-mix(in oklab, var(--muted-foreground) 60%, transparent); }
-.fs-day.is-today { box-shadow: 0 0 0 2px var(--background), 0 0 0 3.5px var(--foreground); }
+.fs-day.is-today { box-shadow: 0 0 0 2px var(--background), 0 0 0 3px color-mix(in oklab, var(--accent) 72%, transparent); }
 .fs-g { font-size: 13px; font-weight: 700; }
 .fs-h { margin-top: 3px; font-size: 8.5px; opacity: .6; }
 .fs-check { position: absolute; top: 3px; right: 3px; }
@@ -3256,6 +3257,8 @@ html[data-preset="ocean"][data-visual-phase="evening"] .bottom-nav-row {
 .fs-legend i.is-ramadan { --c: var(--fs-ramadan); }
 .fs-legend i.is-forbidden { --c: var(--destructive); }
 .fs-legend i.is-recommended { --c: color-mix(in oklab, var(--accent) 45%, transparent); }
+.fs-date-note { display: flex; align-items: flex-start; gap: 11px; padding: 14px 16px; border: 1px solid color-mix(in oklab, var(--period-amber) 26%, transparent); border-radius: 17px; background: color-mix(in oklab, var(--period-amber) 10%, var(--surface)); color: var(--muted-foreground); font-size: 11px; line-height: 1.5; }
+.fs-date-note svg { flex: none; color: var(--period-amber); }
 .fs-moon { border-color: color-mix(in oklab, var(--accent) 35%, transparent); }
 .fs-moon-icon, .fs-dialog-dot { display: flex; flex: none; align-items: center; justify-content: center; width: 38px; height: 38px; border-radius: 50%; background: color-mix(in oklab, var(--accent) 15%, transparent); color: var(--accent); }
 .fs-dialog-dot.is-forbidden { background: color-mix(in oklab, var(--destructive) 15%, transparent); color: var(--destructive); }
@@ -3266,7 +3269,11 @@ html[data-preset="ocean"][data-visual-phase="evening"] .bottom-nav-row {
 .fs-offset button { display: flex; align-items: center; justify-content: center; width: 30px; height: 30px; border-radius: 50%; background: color-mix(in oklab, var(--accent) 12%, transparent); color: var(--accent); }
 .fs-offset button:disabled { opacity: .35; }
 .fs-offset span { min-width: 28px; text-align: center; font-size: 13px; font-weight: 700; }
-.fs-settings > summary, .fs-weak > summary { display: flex; align-items: center; gap: 8px; list-style: none; cursor: pointer; font-size: 14px; font-weight: 700; }
+.fs-settings > summary, .fs-weak > summary { display: flex; align-items: center; gap: 9px; list-style: none; cursor: pointer; font-size: 13px; font-weight: 700; }
+.fs-settings > summary > svg:first-child { width: 30px; height: 30px; padding: 8px; border-radius: 10px; background: color-mix(in oklab, var(--accent) 11%, transparent); color: var(--accent); }
+.fs-settings-group { padding: 12px 14px; border-radius: 17px; box-shadow: 0 5px 18px color-mix(in oklab, var(--foreground) 4%, transparent); }
+.fs-summary-note { min-width: 0; flex: 1; color: var(--muted-foreground); font-size: 10px; font-weight: 500; }
+.fs-reminder-stack { display: grid; gap: 8px; }
 .fs-settings > summary::-webkit-details-marker, .fs-weak > summary::-webkit-details-marker { display: none; }
 .fs-settings > summary .hj-chev, .fs-weak > summary .hj-chev { margin-left: auto; transition: transform .2s; }
 .fs-settings[open] > summary .hj-chev, .fs-weak[open] > summary .hj-chev { transform: rotate(90deg); }
@@ -3300,7 +3307,10 @@ html[data-preset="ocean"][data-visual-phase="evening"] .bottom-nav-row {
 .fs-excuse { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 6px; font-size: 11px; color: var(--muted-foreground); }
 .fs-excuse button { padding: 6px 11px; border-radius: 999px; font-weight: 700; border: 1px solid var(--border); color: var(--foreground); }
 .fs-close { justify-self: center; font-size: 12px; font-weight: 700; color: var(--muted-foreground); padding: 4px 12px; }
-.fs-ram-hero { text-align: center; display: grid; gap: 6px; }
+.fs-ram-hero { position: relative; text-align: center; display: grid; grid-template-columns: 42px 1fr 42px; align-items: center; gap: 6px; }
+.fs-ram-icon { display: grid; width: 38px; height: 38px; place-items: center; border-radius: 50%; background: color-mix(in oklab, var(--accent) 12%, transparent); color: var(--accent); }
+.fs-ram-copy { grid-column: 2; }
+.fs-ram-hero > p { grid-column: 1 / -1; }
 .fs-ram-hero .label-caps { color: var(--muted-foreground); opacity: 1; }
 .fs-ram-hero h2 { font-family: var(--font-display); font-size: 40px; line-height: 1.05; }
 .fs-ram-hero h2 span { font-size: 17px; color: var(--muted-foreground); }
@@ -3311,12 +3321,12 @@ html[data-preset="ocean"][data-visual-phase="evening"] .bottom-nav-row {
 .fs-ram-actions { display: grid; gap: 9px; margin-top: 10px; }
 .fs-ram-actions .period-btn { min-height: 44px; }
 .fs-ram-logged { display: inline-flex; align-items: center; justify-content: center; gap: 6px; margin-top: 8px; font-size: 13px; font-weight: 600; color: var(--accent); }
-.fs-times { display: grid; gap: 12px; }
+.fs-times { display: grid; gap: 8px; }
 .fs-countdown { display: grid; gap: 2px; text-align: center; padding: 16px; border-radius: 20px; background: var(--surface-deep-gradient, var(--surface-deep)); color: var(--surface-deep-fg); }
 .fs-countdown .label-caps { color: var(--surface-deep-muted); opacity: 1; }
 .fs-countdown strong { font-size: 38px; font-weight: 800; font-variant-numeric: tabular-nums; letter-spacing: -.01em; }
 .fs-time-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-.fs-time-row div { display: grid; justify-items: center; gap: 3px; padding: 12px 6px; border-radius: 16px; border: 1px solid var(--border); }
+.fs-time-row div { display: grid; justify-items: center; gap: 3px; padding: 13px 6px; border-radius: 17px; border: 1px solid color-mix(in oklab, var(--border) 78%, transparent); background: color-mix(in oklab, var(--surface) 93%, transparent); box-shadow: 0 5px 18px color-mix(in oklab, var(--foreground) 4%, transparent); }
 .fs-time-row svg { color: var(--accent); }
 .fs-time-row span { font-size: 11px; color: var(--muted-foreground); }
 .fs-time-row strong { font-size: 17px; }
@@ -3341,13 +3351,19 @@ html[data-preset="ocean"][data-visual-phase="evening"] .bottom-nav-row {
 .fs-hist-dot { width: 9px; height: 9px; border-radius: 50%; background: var(--accent); flex: none; }
 .fs-hist-dot.is-excused { background: transparent; border: 1.5px dashed var(--muted-foreground); }
 .fs-hist-type { font-size: 11px; font-weight: 700; color: var(--accent); text-align: right; }
-.fs-learn-intro { text-align: center; }
-.fs-learn-intro h2 { font-family: var(--font-display); font-size: 22px; }
-.fs-learn-intro p { margin-top: 6px; font-size: 13px; color: var(--muted-foreground); line-height: 1.5; }
-.fs-learn-list { display: grid; gap: 9px; }
-.fs-learn-row { padding: 12px 14px; }
+.fs-learn-intro { display: flex; align-items: center; gap: 12px; padding: 14px 16px; text-align: left; }
+.fs-learn-book { display: grid; width: 40px; height: 40px; flex: none; place-items: center; border-radius: 12px; background: color-mix(in oklab, var(--accent) 12%, transparent); color: var(--accent); }
+.fs-learn-intro h2 { font-family: var(--font-display); font-size: 18px; }
+.fs-learn-intro p { margin-top: 2px; font-size: 10px; color: var(--muted-foreground); line-height: 1.4; }
+.fs-learn-list { display: grid; gap: 0; overflow: hidden; border: 1px solid color-mix(in oklab, var(--border) 82%, transparent); border-radius: 18px; background: color-mix(in oklab, var(--surface) 93%, transparent); box-shadow: 0 7px 22px color-mix(in oklab, var(--foreground) 5%, transparent); }
+.fs-learn-row { padding: 0 14px; border: 0; border-radius: 0; background: transparent; box-shadow: none; backdrop-filter: none; }
+.fs-learn-row + .fs-learn-row { border-top: 1px solid color-mix(in oklab, var(--border) 68%, transparent); }
 .fs-learn-head { display: flex; align-items: center; gap: 12px; width: 100%; font-size: 14px; font-weight: 700; }
-.fs-learn-num { display: flex; flex: none; align-items: center; justify-content: center; width: 30px; height: 30px; border-radius: 50%; font-size: 13px; background: color-mix(in oklab, var(--accent) 14%, transparent); color: var(--accent); }
+.fs-learn-head { min-height: 51px; }
+.fs-learn-num { display: flex; flex: none; align-items: center; justify-content: center; width: 30px; height: 30px; border-radius: 50%; font-size: 12px; background: color-mix(in oklab, var(--accent) 11%, transparent); color: var(--accent); }
+.fs-learn-copy { display: grid; min-width: 0; flex: 1; gap: 1px; text-align: left; }
+.fs-learn-copy strong { font-size: 12px; line-height: 1.25; }
+.fs-learn-copy small { color: var(--muted-foreground); font-size: 9px; font-weight: 500; line-height: 1.25; }
 .fs-learn-chev { flex: none; opacity: .5; transition: transform .25s; }
 .fs-learn-row.is-open .fs-learn-chev { transform: rotate(90deg); }
 .fs-learn-body { display: grid; grid-template-rows: 0fr; transition: grid-template-rows .3s ease; }
