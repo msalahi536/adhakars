@@ -301,7 +301,7 @@ function SelfGuide({ onBack }: { onBack: () => void }) {
             <p className="flex-1 text-[15px] font-semibold leading-snug">{saw(s.title)}</p>
           </div>
           {s.note && <p className="period-callout is-grey mt-3">{saw(s.note)}</p>}
-           {recitation && <GuideRecitation item={recitation} />}
+           {recitation && <GuideRecitation item={recitation} scroll />}
           {s.item && <div className="mt-3"><DuaCard item={s.item} /></div>}
         </div>
         <div className="mt-5 flex gap-2">
