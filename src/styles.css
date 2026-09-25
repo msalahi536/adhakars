@@ -3374,3 +3374,38 @@ html[data-preset="ocean"][data-visual-phase="evening"] .bottom-nav-row {
 .fs-list li { display: flex; align-items: center; gap: 8px; }
 .fs-list svg { color: var(--accent); flex: none; }
 @media (prefers-reduced-motion: reduce) { .fs-learn-body, .fs-learn-chev { transition: none; } }
+
+/* ---- Qibla redesign ---- */
+.qb-main { position: relative; }
+.qb-hero { position: absolute; inset: 0 0 auto 0; width: 100%; height: 300px; object-fit: cover; object-position: 70% 30%; pointer-events: none; opacity: .9;
+  -webkit-mask-image: linear-gradient(to bottom, #000 45%, transparent); mask-image: linear-gradient(to bottom, #000 45%, transparent); }
+.qibla-page { position: relative; z-index: 1; }
+.qb-dial { --qb-r: min(39vw, 150px); position: relative; width: calc(var(--qb-r) * 2); height: calc(var(--qb-r) * 2); border-radius: 50%; margin-top: 40px;
+  background: radial-gradient(circle at 50% 40%, color-mix(in oklab, var(--card) 96%, transparent), color-mix(in oklab, var(--muted) 85%, var(--card)));
+  box-shadow: 0 0 0 6px color-mix(in oklab, var(--card) 70%, transparent), 0 18px 40px -18px color-mix(in oklab, var(--foreground) 35%, transparent), inset 0 2px 6px color-mix(in oklab, var(--foreground) 8%, transparent);
+  border: 1px solid color-mix(in oklab, var(--border) 80%, transparent); transition: box-shadow 300ms; }
+.qb-dial[data-aligned] { box-shadow: 0 0 0 6px color-mix(in oklab, var(--primary) 30%, transparent), 0 0 36px color-mix(in oklab, var(--primary) 35%, transparent); }
+.qb-rose { position: absolute; inset: 0; transition: transform 280ms cubic-bezier(.22,1,.36,1); }
+.qb-tick { position: absolute; left: 50%; top: 6px; width: 1px; height: 6px; margin-left: -.5px; transform-origin: 50% calc(var(--qb-r) - 6px); background: color-mix(in oklab, var(--foreground) 22%, transparent); }
+.qb-tick.is-mid { height: 9px; background: color-mix(in oklab, var(--foreground) 35%, transparent); }
+.qb-tick.is-major { height: 12px; width: 2px; background: color-mix(in oklab, var(--foreground) 55%, transparent); }
+.qb-cardinal { position: absolute; left: 50%; top: 50%; font-family: var(--font-display, serif); font-weight: 600; font-size: 15px; color: color-mix(in oklab, var(--foreground) 75%, transparent); }
+.qb-inner { position: absolute; inset: 30%; border-radius: 50%; background: color-mix(in oklab, var(--muted) 60%, transparent); display: grid; place-items: center; }
+.qb-star { width: 90%; height: 90%; }
+.qb-star rect { fill: none; stroke: color-mix(in oklab, var(--foreground) 10%, transparent); stroke-width: .6; }
+.qb-needle { position: absolute; inset: 0; display: flex; justify-content: center; transition: transform 280ms cubic-bezier(.22,1,.36,1); }
+.qb-needle svg { width: 17%; height: 50%; margin-top: 14%; }
+.qb-needle-dark { fill: color-mix(in oklab, var(--primary) 85%, var(--foreground)); }
+.qb-needle-light { fill: var(--primary); }
+.qb-hub { position: absolute; left: 50%; top: 50%; width: 22px; height: 22px; transform: translate(-50%,-50%); border-radius: 50%; background: color-mix(in oklab, var(--primary) 85%, var(--foreground)); box-shadow: 0 0 0 5px var(--card), 0 0 0 6px var(--border); }
+.qb-cal-btn { margin-top: 18px; display: inline-flex; align-items: center; gap: 8px; padding: 10px 26px; border-radius: 999px; font-size: 14px; font-weight: 600; color: var(--foreground);
+  background: var(--card); border: 1px solid var(--border); box-shadow: var(--card-shadow); }
+.qb-cal-btn svg { color: var(--primary); }
+.qb-stats { margin-top: 16px; width: 100%; display: flex; align-items: center; padding: 14px 16px; border-radius: 18px; background: var(--card); border: 1px solid var(--border); box-shadow: var(--card-shadow); }
+.qb-stat { flex: 1; display: flex; align-items: center; gap: 10px; min-width: 0; }
+.qb-stat-icon { flex: none; width: 36px; height: 36px; border-radius: 50%; display: grid; place-items: center; background: var(--muted); color: var(--foreground); }
+.qb-stat-label { font-size: 11px; color: var(--muted-foreground); }
+.qb-stat-value { font-size: 20px; font-weight: 700; color: var(--primary); line-height: 1.2; white-space: nowrap; }
+.qb-stat-divider { width: 1px; align-self: stretch; margin: 0 10px; background: var(--border); }
+.qb-tip { margin-top: 12px; width: 100%; display: flex; gap: 12px; align-items: center; padding: 12px 16px; border-radius: 16px; background: color-mix(in oklab, var(--primary) 10%, var(--card)); color: var(--muted-foreground); font-size: 12.5px; line-height: 1.45; }
+.qb-tip svg { flex: none; color: var(--foreground); }

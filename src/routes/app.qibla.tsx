@@ -203,7 +203,8 @@ function Qibla() {
         </div>
       </header>
 
-      <main className="scroll-area">
+      <main className="scroll-area qb-main">
+        <img src={qiblaHero} alt="" aria-hidden="true" className="qb-hero" width={1024} height={768} />
         <div
           className="qibla-page mx-auto flex min-h-full w-full max-w-md flex-col items-center"
           style={{ color: "var(--foreground)" }}
