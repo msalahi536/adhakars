@@ -8,26 +8,22 @@ type Props = {
   onSkip: () => void;
 };
 
-const SECTORS = 12; // heading directions to sweep through
-const TILT_ZONES = 8; // tilt directions (figure-eight lobes)
+const SECTORS = 12; // ring segments the dot fills in by drifting around
 const SIZE = 220;
-const R = 96;
+const R = 92;
 
 /**
- * Live calibration: the dot follows your phone's tilt, the ring fills in as
- * you rotate through every direction. Both must be covered to finish.
+ * Calm calibration: a dot drifts with your phone's tilt, and the ring fills
+ * in wherever the dot travels. Gently tilt in circles until the ring closes.
  */
 export function CompassCalibrationCard({ onDone, onSkip }: Props) {
   const [mode, setMode] = useState<"waiting" | "live" | "nosensor">("waiting");
   const [tilt, setTilt] = useState({ x: 0, y: 0 });
   const [sectors, setSectors] = useState<boolean[]>(() => Array(SECTORS).fill(false));
-  const [zones, setZones] = useState<boolean[]>(() => Array(TILT_ZONES).fill(false));
-  const [heading, setHeading] = useState<number | null>(null);
   const gotRef = useRef(false);
 
   const sectorCount = sectors.filter(Boolean).length;
-  const zoneCount = zones.filter(Boolean).length;
-  const progress = Math.round(((sectorCount / SECTORS) * 0.6 + (zoneCount / TILT_ZONES) * 0.4) * 100);
+  const progress = Math.round((sectorCount / SECTORS) * 100);
   const complete = progress >= 100;
 
   useEffect(() => {
@@ -35,19 +31,14 @@ export function CompassCalibrationCard({ onDone, onSkip }: Props) {
       gotRef.current = true;
       setMode("live");
       if (r.beta !== null && r.gamma !== null) {
-        const x = Math.max(-1, Math.min(1, r.gamma / 45));
-        const y = Math.max(-1, Math.min(1, r.beta / 45));
+        const x = Math.max(-1, Math.min(1, r.gamma / 40));
+        const y = Math.max(-1, Math.min(1, r.beta / 40));
         setTilt({ x, y });
-        if (Math.hypot(x, y) > 0.45) {
+        if (Math.hypot(x, y) > 0.3) {
           const ang = (Math.atan2(y, x) * 180) / Math.PI + 360;
-          const z = Math.floor(((ang + 180 / TILT_ZONES) % 360) / (360 / TILT_ZONES));
-          setZones((p) => (p[z] ? p : p.map((v, i) => (i === z ? true : v))));
+          const s = Math.floor(((ang + 180 / SECTORS) % 360) / (360 / SECTORS)) % SECTORS;
+          setSectors((p) => (p[s] ? p : p.map((v, i) => (i === s ? true : v))));
         }
-      }
-      if (r.heading !== null) {
-        setHeading(r.heading);
-        const s = Math.floor(r.heading / (360 / SECTORS)) % SECTORS;
-        setSectors((p) => (p[s] ? p : p.map((v, i) => (i === s ? true : v))));
       }
     });
     const t = window.setTimeout(() => {
@@ -75,9 +66,7 @@ export function CompassCalibrationCard({ onDone, onSkip }: Props) {
       ? "Waiting for motion…"
       : complete
         ? "Calibration complete"
-        : sectorCount < SECTORS
-          ? "Slowly turn around in a full circle"
-          : "Now tilt your phone in a figure eight";
+        : "Gently tilt your phone in circles";
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-foreground/45 px-5 backdrop-blur-sm" role="dialog" aria-modal="true" aria-labelledby="calibration-title">
@@ -86,26 +75,16 @@ export function CompassCalibrationCard({ onDone, onSkip }: Props) {
           <p className="label-caps text-accent">Compass calibration</p>
           <h2 id="calibration-title" className="mt-1 font-display text-2xl font-semibold">{status}</h2>
           <p className="mt-1 text-xs leading-5 text-muted-foreground">
-            {complete ? "Your compass is ready." : "Fill the ring by turning, and move the dot to every edge by tilting."}
+            {complete ? "Your compass is ready." : "Let the dot drift around the ring — no turning around needed."}
           </p>
         </div>
 
         <div className="flex justify-center px-6 py-3">
           <svg width={SIZE} height={SIZE} viewBox={`0 0 ${SIZE} ${SIZE}`} aria-hidden="true">
             {sectors.map((on, i) => (
-              <path key={i} d={arc(i)} fill="none" strokeWidth={10} strokeLinecap="round"
+              <path key={i} d={arc(i)} fill="none" strokeWidth={9} strokeLinecap="round"
                 stroke={on ? "var(--accent)" : "color-mix(in oklab, var(--muted-foreground) 25%, transparent)"} style={{ transition: "stroke 250ms" }} />
             ))}
-            {zones.map((on, i) => {
-              const a = ((i * 360) / TILT_ZONES) * (Math.PI / 180);
-              return <circle key={i} cx={c + 62 * Math.cos(a)} cy={c + 62 * Math.sin(a)} r={4}
-                fill={on ? "var(--accent)" : "var(--muted)"} stroke="var(--border)" />;
-            })}
-            <circle cx={c} cy={c} r={70} fill="none" stroke="var(--border)" strokeDasharray="3 5" />
-            {heading !== null && (
-              <line x1={c} y1={c} x2={c + 82 * Math.sin((heading * Math.PI) / 180)} y2={c - 82 * Math.cos((heading * Math.PI) / 180)}
-                stroke="var(--muted-foreground)" strokeWidth={1.5} strokeLinecap="round" opacity={0.5} />
-            )}
             <g style={{ transform: `translate(${c + tilt.x * 62}px, ${c + tilt.y * 62}px)`, transition: "transform 90ms linear" }}>
               <circle r={14} fill="var(--accent)" opacity={0.18} />
               <circle r={8} fill="var(--accent)" />
@@ -127,7 +106,7 @@ export function CompassCalibrationCard({ onDone, onSkip }: Props) {
           ) : (
             <>
               <div className="mb-1.5 flex justify-between text-[11px] font-semibold text-muted-foreground">
-                <span>Directions {sectorCount}/{SECTORS} · Tilt {zoneCount}/{TILT_ZONES}</span>
+                <span>&nbsp;</span>
                 <span>{progress}%</span>
               </div>
               <div className="h-1.5 overflow-hidden rounded-full bg-muted">
