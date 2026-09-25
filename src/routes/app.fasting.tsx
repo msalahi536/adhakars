@@ -5,7 +5,6 @@ import {
   Settings2, Sunrise, Sunset,
 } from "lucide-react";
 import { HeaderBackButton } from "@/components/HeaderBackButton";
-import { SettingsButton } from "@/components/SettingsButton";
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from "@/components/ui/dialog";
 import { triggerHaptic } from "@/lib/theme";
 import type { SunnahItem } from "@/data/period-sunnah";
@@ -71,7 +70,6 @@ function FastingCompanion() {
     <>
       <header className="page-header period-header rq-header relative overflow-hidden" style={{ background: "var(--grad-header)", color: "var(--header-fg)" }}>
         <HeaderBackButton />
-        <div className="rq-settings-btn"><SettingsButton /></div>
         <div className="relative mx-auto max-w-md px-16 pb-4 pt-7 text-center">
           <div className="label-caps" style={{ color: "var(--header-sub)", opacity: 1 }}>Fasting Companion</div>
           <h1 className="app-page-title mt-2">Sawm</h1>
