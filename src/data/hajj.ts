@@ -241,7 +241,7 @@ export const STATIONS: Station[] = [
     checklist: [
       "Trim nails, remove underarm and pubic hair, trim the moustache — done before, since these become prohibited.",
       "Ghusl. The Prophet ﷺ did this at Dhu’l-Hulayfah, and it is recommended even for a menstruating woman, who enters ihram and does everything except tawaf.",
-      "Men: two unstitched white cloths, izar and rida’. Women: ordinary modest clothing, no set colour, face and hands uncovered in ihram.",
+      "Men: two unstitched white cloths, izar and rida’. Women: ordinary modest clothing, no set colour.",
       "Perfume on the body — not the garments — before entering ihram. ‘Aisha said she used to perfume him before he entered ihram.",
       "Pray two rak‘ahs if it is a time of prayer, otherwise make the intention without a dedicated prayer.",
       "Make the intention in the heart and begin the talbiyah.",
