@@ -6,7 +6,7 @@ import { Onboarding, hasOnboarded } from "@/components/Onboarding";
 import { WhatsNewDialog } from "@/components/WhatsNewDialog";
 import { RatePrompt } from "@/components/RatePrompt";
 import { backgroundsForPreset } from "@/lib/backgrounds";
-import { DEFAULT_PRESET_ID, getPresetId, resetTheme, resolveVisualPhase } from "@/lib/theme-store";
+import { DEFAULT_PRESET_ID, getPresetId, resetTheme, resolveVisualPhase, type VisualPhase } from "@/lib/theme-store";
 import { rememberMoreDestination } from "@/lib/more-navigation";
 
 const UPDATE_WELCOME_KEY = "adhkar:update-welcome:2026-09";
@@ -22,6 +22,7 @@ function AppLayout() {
   // artwork before paint. Reading localStorage during render causes React to
   // preserve the server's default background during hydration.
   const [activePresetId, setActivePresetId] = useState(DEFAULT_PRESET_ID);
+  const [activeVisualPhase, setActiveVisualPhase] = useState<VisualPhase>("morning");
   const pathname = useRouterState({ select: (state) => state.location.pathname });
   
   const isAdhkar = ["/app", "/app/", "/app/evening"].includes(pathname);
@@ -30,7 +31,7 @@ function AppLayout() {
 
   // Derive phase and backgrounds directly during render to prevent transition flashes
   const backgrounds = backgroundsForPreset(activePresetId);
-  const visualPhase = resolveVisualPhase(pathname);
+  const visualPhase = activeVisualPhase;
 
   useEffect(() => {
     if (!hasOnboarded()) {
@@ -51,7 +52,10 @@ function AppLayout() {
   }, [pathname]);
 
   useLayoutEffect(() => {
-    const sync = () => setActivePresetId(getPresetId());
+    const sync = () => {
+      setActivePresetId(getPresetId());
+      setActiveVisualPhase(resolveVisualPhase(window.location.pathname));
+    };
     sync();
     window.addEventListener("adhkar:theme-change", sync);
     window.addEventListener("storage", sync);
@@ -61,7 +65,7 @@ function AppLayout() {
       window.removeEventListener("storage", sync);
       window.removeEventListener("adhkar:visual-phase-change", sync);
     };
-  }, []);
+  }, [pathname]);
 
   // Lock the viewport while inside /app so .scroll-area handles scrolling.
   useEffect(() => {
