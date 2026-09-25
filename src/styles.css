@@ -1094,11 +1094,17 @@ html[data-section="salah"] .bottom-nav-row { height: var(--bottom-nav-row); bord
   background: transparent;
 }
 .app-shell.is-settings .page-header {
-  background: transparent !important;
+  background: color-mix(in oklab, var(--background) 90%, transparent) !important;
+  backdrop-filter: blur(3px) saturate(104%);
+  border-bottom: none;
+  box-shadow: none;
+  color: var(--foreground);
 }
 .app-shell.is-settings .settings-scroll-area {
-  background: color-mix(in oklab, var(--background) 92%, transparent) !important;
-  backdrop-filter: blur(4px) saturate(104%);
+  background: color-mix(in oklab, var(--background) 90%, transparent) !important;
+  backdrop-filter: blur(3px) saturate(104%);
+  border-top: none;
+  box-shadow: none;
   color: var(--foreground);
 }
 .app-shell.is-settings .settings-scroll-area .label-caps,
