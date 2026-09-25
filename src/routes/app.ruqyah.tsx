@@ -192,7 +192,7 @@ function VersesView() {
       <p className="period-callout is-grey">No fixed sequence is reported. These are what the Sunnah names, in the order most commonly used.</p>
       <div className="space-y-3">
         {VERSES.map((v, i) => (
-          <div key={saw(v.title)} className="period-card">
+          <div key={v.title} className="period-card">
             <div className="flex items-start gap-3">
               <span className="period-acc-num">{i + 1}</span>
               <div className="flex-1">
@@ -246,7 +246,7 @@ function LearnView() {
                       {it.id === "raqi" && (
                         <ul className="mt-2 space-y-1.5">
                           {RAQI_FLAGS.map((f) => (
-                            <li key={saw(f)} className="flex gap-2 text-sm"><X size={15} className="mt-0.5 flex-none" style={{ color: "var(--destructive)" }} />{saw(f)}</li>
+                            <li key={f} className="flex gap-2 text-sm"><X size={15} className="mt-0.5 flex-none" style={{ color: "var(--destructive)" }} />{saw(f)}</li>
                           ))}
                         </ul>
                       )}
