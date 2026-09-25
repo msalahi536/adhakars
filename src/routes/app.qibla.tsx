@@ -197,6 +197,19 @@ function Qibla() {
     setPhase("ready");
   };
 
+  // Pull a fresh GPS fix and recompute the bearing and distance.
+  const refreshLocation = async () => {
+    const p = await getPosition({ force: true });
+    if (p.ok) {
+      setCoords(p.coords);
+      setPosMeta({ source: p.source, at: p.at });
+      setQiblaBearing(bearingToKaaba(p.coords.lat, p.coords.lng));
+      setLocError(null);
+    } else {
+      setLocError(p.error);
+    }
+  };
+
   // Auto start when opening the page. iOS only allows the motion prompt from a
   // real tap, so the button is kept for that first run; once granted (or on
   // platforms with no prompt) the compass comes up on its own.
@@ -278,6 +291,11 @@ function Qibla() {
                   {error}
                 </p>
               )}
+              {lostSensor && !error && (
+                <p className="text-center text-xs" style={{ color: "var(--muted-foreground)" }}>
+                  The compass didn't respond on its own — tap to reconnect it.
+                </p>
+              )}
             </div>
           )}
 
@@ -346,7 +364,14 @@ function Qibla() {
                 </p>
               )}
 
-              <div className="qb-stats">
+              <div className="qb-stats" style={{ position: "relative" }}>
+                <button
+                  onClick={() => void refreshLocation()}
+                  className="qb-refresh"
+                  aria-label="Update your location"
+                >
+                  <RotateCw size={14} strokeWidth={2} aria-hidden />
+                </button>
                 <div className="qb-stat">
                   <span className="qb-stat-icon"><Navigation size={16} strokeWidth={1.8} /></span>
                   <div>
@@ -365,6 +390,18 @@ function Qibla() {
                   </div>
                 </div>
               </div>
+              {posMeta?.source === "cached" && (
+                <p className="qb-pos-note">
+                  Last saved location, updated{" "}
+                  {Math.max(1, Math.round((Date.now() - posMeta.at) / 60000))} min ago. Tap ↻ for a
+                  fresh fix.
+                </p>
+              )}
+              {locError && (
+                <p className="qb-pos-note" style={{ color: "var(--destructive)" }}>
+                  {locError}
+                </p>
+              )}
 
               <div className="qb-tip">
                 <Lightbulb size={18} strokeWidth={1.6} aria-hidden />
