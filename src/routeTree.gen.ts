@@ -30,6 +30,7 @@ import { Route as AppPeriodRouteImport } from './routes/app.period'
 import { Route as AppMyAdhkarRouteImport } from './routes/app.my-adhkar'
 import { Route as AppMoreRouteImport } from './routes/app.more'
 import { Route as AppHajjRouteImport } from './routes/app.hajj'
+import { Route as AppFastingRouteImport } from './routes/app.fasting'
 import { Route as AppEveningRouteImport } from './routes/app.evening'
 import { Route as AppAboutRouteImport } from './routes/app.about'
 import { Route as ApiWidgetsRouteImport } from './routes/api/widgets'
@@ -139,6 +140,11 @@ const AppHajjRoute = AppHajjRouteImport.update({
   path: '/hajj',
   getParentRoute: () => AppRoute,
 } as any)
+const AppFastingRoute = AppFastingRouteImport.update({
+  id: '/fasting',
+  path: '/fasting',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppEveningRoute = AppEveningRouteImport.update({
   id: '/evening',
   path: '/evening',
@@ -167,6 +173,7 @@ export interface FileRoutesByFullPath {
   '/api/widgets': typeof ApiWidgetsRoute
   '/app/about': typeof AppAboutRoute
   '/app/evening': typeof AppEveningRoute
+  '/app/fasting': typeof AppFastingRoute
   '/app/hajj': typeof AppHajjRoute
   '/app/more': typeof AppMoreRoute
   '/app/my-adhkar': typeof AppMyAdhkarRoute
@@ -192,6 +199,7 @@ export interface FileRoutesByTo {
   '/api/widgets': typeof ApiWidgetsRoute
   '/app/about': typeof AppAboutRoute
   '/app/evening': typeof AppEveningRoute
+  '/app/fasting': typeof AppFastingRoute
   '/app/hajj': typeof AppHajjRoute
   '/app/more': typeof AppMoreRoute
   '/app/my-adhkar': typeof AppMyAdhkarRoute
@@ -219,6 +227,7 @@ export interface FileRoutesById {
   '/api/widgets': typeof ApiWidgetsRoute
   '/app/about': typeof AppAboutRoute
   '/app/evening': typeof AppEveningRoute
+  '/app/fasting': typeof AppFastingRoute
   '/app/hajj': typeof AppHajjRoute
   '/app/more': typeof AppMoreRoute
   '/app/my-adhkar': typeof AppMyAdhkarRoute
@@ -247,6 +256,7 @@ export interface FileRouteTypes {
     | '/api/widgets'
     | '/app/about'
     | '/app/evening'
+    | '/app/fasting'
     | '/app/hajj'
     | '/app/more'
     | '/app/my-adhkar'
@@ -272,6 +282,7 @@ export interface FileRouteTypes {
     | '/api/widgets'
     | '/app/about'
     | '/app/evening'
+    | '/app/fasting'
     | '/app/hajj'
     | '/app/more'
     | '/app/my-adhkar'
@@ -298,6 +309,7 @@ export interface FileRouteTypes {
     | '/api/widgets'
     | '/app/about'
     | '/app/evening'
+    | '/app/fasting'
     | '/app/hajj'
     | '/app/more'
     | '/app/my-adhkar'
@@ -474,6 +486,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppHajjRouteImport
       parentRoute: typeof AppRoute
     }
+    '/app/fasting': {
+      id: '/app/fasting'
+      path: '/fasting'
+      fullPath: '/app/fasting'
+      preLoaderRoute: typeof AppFastingRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/app/evening': {
       id: '/app/evening'
       path: '/evening'
@@ -501,6 +520,7 @@ declare module '@tanstack/react-router' {
 interface AppRouteChildren {
   AppAboutRoute: typeof AppAboutRoute
   AppEveningRoute: typeof AppEveningRoute
+  AppFastingRoute: typeof AppFastingRoute
   AppHajjRoute: typeof AppHajjRoute
   AppMoreRoute: typeof AppMoreRoute
   AppMyAdhkarRoute: typeof AppMyAdhkarRoute
@@ -519,6 +539,7 @@ interface AppRouteChildren {
 const AppRouteChildren: AppRouteChildren = {
   AppAboutRoute: AppAboutRoute,
   AppEveningRoute: AppEveningRoute,
+  AppFastingRoute: AppFastingRoute,
   AppHajjRoute: AppHajjRoute,
   AppMoreRoute: AppMoreRoute,
   AppMyAdhkarRoute: AppMyAdhkarRoute,
