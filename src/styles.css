@@ -3355,6 +3355,7 @@ html[data-preset="ocean"][data-visual-phase="evening"] .bottom-nav-row {
 .fs-learn-book { display: grid; width: 48px; height: 48px; flex: none; place-items: center; border-radius: 14px; background: color-mix(in oklab, var(--accent) 12%, transparent); color: var(--accent); }
 .fs-learn-intro h2 { font-family: var(--font-display); font-size: 20px; }
 .fs-learn-intro p { margin-top: 3px; font-size: 12px; color: var(--muted-foreground); line-height: 1.45; }
+.fs-learn-peace { display: inline-block; font-size: .72em; line-height: 1; vertical-align: -0.08em; }
 .fs-learn-list { display: grid; gap: 10px; overflow: visible; border: 0; border-radius: 0; background: transparent; box-shadow: none; }
 .fs-learn-row { padding: 4px 18px; border-radius: 18px; }
 .fs-learn-row + .fs-learn-row { border-top: 0; }

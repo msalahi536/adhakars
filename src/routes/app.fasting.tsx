@@ -659,7 +659,7 @@ function LearnView() {
     <>
       <section className="period-card fs-learn-intro">
         <span className="fs-learn-book"><BookOpen size={22} /></span>
-        <span><h2>Fasting in the Sunnah</h2><p>Suhoor, iftar, intention and the fasts the Prophet ﷺ encouraged — every source verified.</p></span>
+        <span><h2>Fasting in the Sunnah</h2><p>Suhoor, iftar, intention and the fasts the Prophet <span className="fs-learn-peace">ﷺ</span> encouraged — every source verified.</p></span>
       </section>
       <div className="fs-learn-list">
         {sections.map((sec, i) => {
