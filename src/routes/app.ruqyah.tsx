@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import {
   BookOpen, Check, ChevronLeft, ChevronRight, CircleAlert, Droplets, FileText, Flower2, Hand, Lock,
-  Moon, MoonStar, Play, Search, Settings, Share2, ShieldCheck, Sparkles, Star, Stethoscope, Sun,
+  Moon, MoonStar, Play, Search, Share2, ShieldCheck, Sparkles, Star, Stethoscope, Sun,
   Sunrise, Users, X,
 } from "lucide-react";
 import { HeaderBackButton } from "@/components/HeaderBackButton";
@@ -46,7 +46,6 @@ function RuqyahCompanion() {
     <>
       <header className="page-header period-header relative overflow-hidden" style={{ background: "var(--grad-header)", color: "var(--header-fg)" }}>
         <HeaderBackButton />
-        <Link to="/app/settings" className="period-icon-btn rq-settings-btn" aria-label="Settings"><Settings size={18} /></Link>
         <div className="relative mx-auto max-w-md px-16 pb-4 pt-7 text-center">
           <div className="label-caps" style={{ color: "var(--header-sub)", opacity: 1 }}>Ruqyah Companion</div>
           <h1 className="app-page-title mt-2">Protected</h1>
