@@ -390,9 +390,10 @@ const AL_FATIHAH: Dhikr = {
   target: 1,
 };
 
-function GuideRecitation({ item, compact = false }: { item: Dhikr; compact?: boolean }) {
+function GuideRecitation({ item, compact = false, scroll = false }: { item: Dhikr; compact?: boolean; scroll?: boolean }) {
+  const useScroll = compact || scroll;
   return (
-    <article className={`rq-guide-recitation mt-4 ${compact ? "is-compact" : ""}`}>
+    <article className={`rq-guide-recitation mt-4 ${useScroll ? "is-compact" : ""}`}>
       <div className="rq-guide-recitation-head">
         <div>
           <h3>{item.title}</h3>
@@ -400,24 +401,24 @@ function GuideRecitation({ item, compact = false }: { item: Dhikr; compact?: boo
         </div>
         <ListenButton dhikrId={item.id} size={34} />
       </div>
-      <div className={compact ? "rq-guide-scroll" : undefined}>
+      <div className={useScroll ? "rq-guide-scroll" : undefined}>
         {item.arabicMulti ? item.arabicMulti.map((part) => (
           <section key={part.label} className="rq-guide-part">
             <div className="label-caps text-center">{part.label}</div>
             <p className="arabic whitespace-pre-line text-right" lang="ar" dir="rtl">{part.arabic}</p>
-            {!compact && <p className="adhkar-transliteration !text-left">{part.transliteration}</p>}
-            {!compact && <p className="text-sm leading-relaxed">{part.translation}</p>}
+            {(!compact || scroll) && <p className="adhkar-transliteration !text-left">{part.transliteration}</p>}
+            {(!compact || scroll) && <p className="text-sm leading-relaxed">{part.translation}</p>}
           </section>
         )) : (
           <div className="rq-guide-part">
             <p className="arabic whitespace-pre-line text-right" lang="ar" dir="rtl">{item.arabic}</p>
-            {!compact && <p className="adhkar-transliteration !text-left">{item.transliteration}</p>}
-            {!compact && <p className="text-sm leading-relaxed">{item.translation}</p>}
+            {(!compact || scroll) && <p className="adhkar-transliteration !text-left">{item.transliteration}</p>}
+            {(!compact || scroll) && <p className="text-sm leading-relaxed">{item.translation}</p>}
           </div>
         )}
-        {compact && (
+        {useScroll && (
           <div className="rq-guide-scroll-note">
-            <span>Scroll to continue reading</span>
+            <span>{compact ? "Scroll to continue reading" : "Scroll for translation"}</span>
           </div>
         )}
       </div>
