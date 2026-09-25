@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { Check, Smartphone } from "lucide-react";
+import { Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { subscribeOrientation } from "@/lib/compass";
 
@@ -8,98 +8,138 @@ type Props = {
   onSkip: () => void;
 };
 
-const WIDTH = 286;
-const HEIGHT = 174;
-const PATH = "M143 87 C88 16 31 31 31 87 C31 143 88 158 143 87 C198 16 255 31 255 87 C255 143 198 158 143 87";
+const SECTORS = 12; // heading directions to sweep through
+const TILT_ZONES = 8; // tilt directions (figure-eight lobes)
+const SIZE = 220;
+const R = 96;
 
+/**
+ * Live calibration: the dot follows your phone's tilt, the ring fills in as
+ * you rotate through every direction. Both must be covered to finish.
+ */
 export function CompassCalibrationCard({ onDone, onSkip }: Props) {
   const [mode, setMode] = useState<"waiting" | "live" | "nosensor">("waiting");
-  const [progress, setProgress] = useState(0);
-  const [complete, setComplete] = useState(false);
-  const lastRef = useRef<{ beta: number; gamma: number } | null>(null);
-  const movementRef = useRef(0);
+  const [tilt, setTilt] = useState({ x: 0, y: 0 });
+  const [sectors, setSectors] = useState<boolean[]>(() => Array(SECTORS).fill(false));
+  const [zones, setZones] = useState<boolean[]>(() => Array(TILT_ZONES).fill(false));
+  const [heading, setHeading] = useState<number | null>(null);
   const gotRef = useRef(false);
 
+  const sectorCount = sectors.filter(Boolean).length;
+  const zoneCount = zones.filter(Boolean).length;
+  const progress = Math.round(((sectorCount / SECTORS) * 0.6 + (zoneCount / TILT_ZONES) * 0.4) * 100);
+  const complete = progress >= 100;
+
   useEffect(() => {
-    const unsubscribe = subscribeOrientation((reading) => {
-      if (reading.beta === null || reading.gamma === null) return;
+    const unsubscribe = subscribeOrientation((r) => {
       gotRef.current = true;
       setMode("live");
-
-      const last = lastRef.current;
-      lastRef.current = { beta: reading.beta, gamma: reading.gamma };
-      if (!last || complete) return;
-
-      const betaDelta = Math.min(8, Math.abs(reading.beta - last.beta));
-      const gammaDelta = Math.min(8, Math.abs(reading.gamma - last.gamma));
-      if (betaDelta + gammaDelta < 0.8) return;
-
-      movementRef.current = Math.min(100, movementRef.current + (betaDelta + gammaDelta) * 0.65);
-      const next = Math.round(movementRef.current);
-      setProgress(next);
-      if (next >= 100) setComplete(true);
+      if (r.beta !== null && r.gamma !== null) {
+        const x = Math.max(-1, Math.min(1, r.gamma / 45));
+        const y = Math.max(-1, Math.min(1, r.beta / 45));
+        setTilt({ x, y });
+        if (Math.hypot(x, y) > 0.45) {
+          const ang = (Math.atan2(y, x) * 180) / Math.PI + 360;
+          const z = Math.floor(((ang + 180 / TILT_ZONES) % 360) / (360 / TILT_ZONES));
+          setZones((p) => (p[z] ? p : p.map((v, i) => (i === z ? true : v))));
+        }
+      }
+      if (r.heading !== null) {
+        setHeading(r.heading);
+        const s = Math.floor(r.heading / (360 / SECTORS)) % SECTORS;
+        setSectors((p) => (p[s] ? p : p.map((v, i) => (i === s ? true : v))));
+      }
     });
-    const timeout = window.setTimeout(() => {
+    const t = window.setTimeout(() => {
       if (!gotRef.current) setMode("nosensor");
     }, 4000);
     return () => {
       unsubscribe();
-      window.clearTimeout(timeout);
+      window.clearTimeout(t);
     };
+  }, []);
+
+  useEffect(() => {
+    if (complete && typeof navigator !== "undefined" && "vibrate" in navigator) navigator.vibrate?.(30);
   }, [complete]);
+
+  const c = SIZE / 2;
+  const arc = (i: number) => {
+    const a0 = ((i * 360) / SECTORS - 90 + 2) * (Math.PI / 180);
+    const a1 = (((i + 1) * 360) / SECTORS - 90 - 2) * (Math.PI / 180);
+    return `M ${c + R * Math.cos(a0)} ${c + R * Math.sin(a0)} A ${R} ${R} 0 0 1 ${c + R * Math.cos(a1)} ${c + R * Math.sin(a1)}`;
+  };
+
+  const status =
+    mode === "waiting"
+      ? "Waiting for motion…"
+      : complete
+        ? "Calibration complete"
+        : sectorCount < SECTORS
+          ? "Slowly turn around in a full circle"
+          : "Now tilt your phone in a figure eight";
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-foreground/45 px-5 backdrop-blur-sm" role="dialog" aria-modal="true" aria-labelledby="calibration-title">
-      <div className="w-full max-w-sm overflow-hidden rounded-2xl border border-border bg-card text-card-foreground shadow-2xl">
-        <div className="border-b border-border px-6 pb-4 pt-5">
+      <div className="w-full max-w-sm overflow-hidden rounded-3xl border border-border bg-card text-card-foreground shadow-2xl">
+        <div className="px-6 pb-2 pt-5 text-center">
           <p className="label-caps text-accent">Compass calibration</p>
-          <h2 id="calibration-title" className="mt-1 font-display text-2xl font-semibold">
-            {complete ? "Calibration complete" : "Move your phone in a figure eight"}
-          </h2>
-          <p className="mt-2 text-sm leading-6 text-muted-foreground">
-            {complete
-              ? "Your compass is ready to guide you toward the Qibla."
-              : "Hold your phone securely and draw a slow, wide figure eight in the air. Follow the motion shown below."}
+          <h2 id="calibration-title" className="mt-1 font-display text-2xl font-semibold">{status}</h2>
+          <p className="mt-1 text-xs leading-5 text-muted-foreground">
+            {complete ? "Your compass is ready." : "Fill the ring by turning, and move the dot to every edge by tilting."}
           </p>
         </div>
 
-        <div className="px-6 py-5">
-          <div className="relative mx-auto overflow-hidden rounded-xl border border-border bg-muted/50" style={{ width: WIDTH, height: HEIGHT }}>
-            <svg className="absolute inset-0" width={WIDTH} height={HEIGHT} viewBox={`0 0 ${WIDTH} ${HEIGHT}`} aria-hidden="true">
-              <path d={PATH} fill="none" stroke="var(--border)" strokeWidth="10" strokeLinecap="round" />
-              <path d={PATH} fill="none" stroke="var(--accent)" strokeWidth="3" strokeLinecap="round" strokeDasharray="7 9" />
-            </svg>
-            <div className={`calibration-phone ${complete ? "is-complete" : ""}`} aria-hidden="true">
-              {complete ? <Check size={20} strokeWidth={2} /> : <Smartphone size={20} strokeWidth={1.8} />}
-            </div>
-          </div>
+        <div className="flex justify-center px-6 py-3">
+          <svg width={SIZE} height={SIZE} viewBox={`0 0 ${SIZE} ${SIZE}`} aria-hidden="true">
+            {sectors.map((on, i) => (
+              <path key={i} d={arc(i)} fill="none" strokeWidth={10} strokeLinecap="round"
+                stroke={on ? "var(--accent)" : "var(--border)"} style={{ transition: "stroke 250ms" }} />
+            ))}
+            {zones.map((on, i) => {
+              const a = ((i * 360) / TILT_ZONES) * (Math.PI / 180);
+              return <circle key={i} cx={c + 62 * Math.cos(a)} cy={c + 62 * Math.sin(a)} r={4}
+                fill={on ? "var(--accent)" : "var(--muted)"} stroke="var(--border)" />;
+            })}
+            <circle cx={c} cy={c} r={70} fill="none" stroke="var(--border)" strokeDasharray="3 5" />
+            {heading !== null && (
+              <line x1={c} y1={c} x2={c + 82 * Math.sin((heading * Math.PI) / 180)} y2={c - 82 * Math.cos((heading * Math.PI) / 180)}
+                stroke="var(--muted-foreground)" strokeWidth={1.5} strokeLinecap="round" opacity={0.5} />
+            )}
+            <g style={{ transform: `translate(${c + tilt.x * 62}px, ${c + tilt.y * 62}px)`, transition: "transform 90ms linear" }}>
+              <circle r={14} fill="var(--accent)" opacity={0.18} />
+              <circle r={8} fill="var(--accent)" />
+            </g>
+            {complete && (
+              <g transform={`translate(${c - 14} ${c - 14})`}>
+                <circle cx={14} cy={14} r={18} fill="var(--card)" />
+                <Check x={2} y={2} width={24} height={24} color="var(--accent)" strokeWidth={2.4} />
+              </g>
+            )}
+          </svg>
+        </div>
 
+        <div className="px-6">
           {mode === "nosensor" ? (
-            <p className="mt-4 text-center text-xs leading-5 text-muted-foreground">
-              Motion readings are unavailable. You can continue and calibrate from your phone settings if needed.
+            <p className="text-center text-xs leading-5 text-muted-foreground">
+              Motion readings are unavailable on this device.
             </p>
           ) : (
-            <div className="mt-4">
-              <div className="mb-2 flex items-center justify-between text-[11px] font-semibold text-muted-foreground">
-                <span>{mode === "waiting" ? "Waiting for motion" : complete ? "Ready" : "Keep moving slowly"}</span>
+            <>
+              <div className="mb-1.5 flex justify-between text-[11px] font-semibold text-muted-foreground">
+                <span>Directions {sectorCount}/{SECTORS} · Tilt {zoneCount}/{TILT_ZONES}</span>
                 <span>{progress}%</span>
               </div>
               <div className="h-1.5 overflow-hidden rounded-full bg-muted">
                 <div className="h-full rounded-full bg-accent transition-[width] duration-200" style={{ width: `${progress}%` }} />
               </div>
-            </div>
+            </>
           )}
-
-          <p className="mt-4 text-[11px] leading-5 text-muted-foreground">
-            Keep away from magnets, metal surfaces, and magnetic phone cases while calibrating.
-          </p>
         </div>
 
-        <div className="flex items-center justify-between gap-3 border-t border-border px-5 py-4">
-          <Button variant="ghost" className="rounded-full text-muted-foreground" onClick={onSkip}>Skip for now</Button>
-          <Button className="rounded-full px-6" onClick={complete || mode === "nosensor" ? onDone : onSkip}>
-            {complete ? "Continue" : mode === "nosensor" ? "Continue" : "Use compass"}
-          </Button>
+        <div className="mt-4 flex items-center justify-between gap-3 border-t border-border px-5 py-4">
+          <Button variant="ghost" className="rounded-full text-muted-foreground" onClick={onSkip}>Close</Button>
+          <Button className="rounded-full px-6" onClick={onDone}>{complete ? "Done" : "Finish"}</Button>
         </div>
       </div>
     </div>
