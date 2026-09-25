@@ -14,48 +14,6 @@ export type Database = {
   }
   public: {
     Tables: {
-      custom_adhkar: {
-        Row: {
-          arabic_text: string
-          created_at: string
-          id: string
-          sort_order: number
-          source_reference: string | null
-          target_count: number
-          title: string
-          translation: string | null
-          transliteration: string | null
-          updated_at: string
-          user_id: string
-        }
-        Insert: {
-          arabic_text: string
-          created_at?: string
-          id?: string
-          sort_order?: number
-          source_reference?: string | null
-          target_count?: number
-          title?: string
-          translation?: string | null
-          transliteration?: string | null
-          updated_at?: string
-          user_id: string
-        }
-        Update: {
-          arabic_text?: string
-          created_at?: string
-          id?: string
-          sort_order?: number
-          source_reference?: string | null
-          target_count?: number
-          title?: string
-          translation?: string | null
-          transliteration?: string | null
-          updated_at?: string
-          user_id?: string
-        }
-        Relationships: []
-      }
       suggestions: {
         Row: {
           body: string
