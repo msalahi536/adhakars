@@ -3146,3 +3146,52 @@ html[data-preset="ocean"][data-visual-phase="evening"] .bottom-nav-row {
 .rq-guide-part + .rq-guide-part { border-top: 1px solid color-mix(in oklab, var(--foreground) 8%, transparent); }
 .rq-guide-part .arabic { font-size: 23px; line-height: 2; }
 .rq-guide-part .adhkar-transliteration { margin-top: 12px; font-size: 13px; }
+
+/* ===== Hajj & Umrah Companion ===== */
+.hj-mode-tile { display: flex; width: 100%; align-items: center; gap: 14px; padding: 16px; transition: transform .15s ease; }
+.hj-mode-tile:active { transform: scale(.985); }
+.hj-mode-bar { display: flex; align-items: center; justify-content: space-between; font-size: 13px; padding: 2px 4px; }
+.hj-mode-bar button { font-size: 12px; font-weight: 600; color: var(--accent); padding: 5px 12px; border-radius: 999px; background: color-mix(in oklab, var(--accent) 12%, transparent); }
+.hj-offline { display: flex; gap: 8px; align-items: flex-start; font-size: 12px; line-height: 1.5; opacity: .72; padding: 4px; }
+.hj-offline svg { flex-shrink: 0; margin-top: 2px; }
+.hj-track { display: flex; gap: 4px; overflow-x: auto; padding: 4px 2px 8px; scrollbar-width: none; scroll-snap-type: x proximity; }
+.hj-track::-webkit-scrollbar { display: none; }
+.hj-track-step { flex: 0 0 auto; display: flex; flex-direction: column; align-items: center; gap: 4px; min-width: 58px; scroll-snap-align: center; }
+.hj-track-dot { width: 28px; height: 28px; border-radius: 50%; display: grid; place-items: center; font-size: 12px; font-weight: 700; background: color-mix(in oklab, var(--foreground) 8%, transparent); color: var(--foreground); transition: all .25s ease; }
+.hj-track-step.is-done .hj-track-dot { background: color-mix(in oklab, var(--accent) 22%, transparent); color: var(--accent); }
+.hj-track-step.is-current .hj-track-dot { background: var(--accent); color: var(--accent-foreground); box-shadow: 0 0 0 4px color-mix(in oklab, var(--accent) 20%, transparent); }
+.hj-track-label { font-size: 10px; line-height: 1.2; max-width: 64px; text-align: center; opacity: .7; }
+.hj-track-step.is-current .hj-track-label { opacity: 1; font-weight: 700; }
+.hj-station-num { font-size: 11px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--accent); }
+.hj-station-name { font-size: 26px; font-weight: 700; line-height: 1.15; margin-top: 4px; }
+.hj-location { display: inline-flex; align-items: center; gap: 5px; margin-top: 10px; font-size: 12px; font-weight: 600; padding: 5px 11px; border-radius: 999px; background: color-mix(in oklab, var(--accent) 12%, transparent); color: var(--accent); }
+.hj-not-sunnah { border-radius: 16px; background: color-mix(in oklab, var(--period-amber) 14%, transparent); border: 1px solid color-mix(in oklab, var(--period-amber) 35%, transparent); }
+.hj-not-sunnah summary { list-style: none; display: flex; align-items: center; gap: 8px; padding: 13px 15px; font-size: 14px; font-weight: 700; cursor: pointer; }
+.hj-not-sunnah summary::-webkit-details-marker { display: none; }
+.hj-not-sunnah summary svg:first-child { color: var(--period-amber); }
+.hj-chev { margin-left: auto; transition: transform .25s ease; opacity: .6; }
+.hj-not-sunnah[open] .hj-chev { transform: rotate(90deg); }
+.hj-not-sunnah p { padding: 0 15px 14px; font-size: 13px; line-height: 1.6; }
+.hj-counter { text-align: center; display: flex; flex-direction: column; align-items: center; }
+.hj-counter-ring { position: relative; margin-top: 10px; border-radius: 50%; -webkit-tap-highlight-color: transparent; transition: transform .12s ease; }
+.hj-counter-ring:active { transform: scale(.96); }
+.hj-counter-label { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; color: var(--accent); }
+.hj-counter-label strong { font-size: 44px; line-height: 1; font-weight: 700; }
+.hj-counter-label span { font-size: 12px; opacity: .75; color: var(--foreground); margin-top: 2px; }
+.hj-counter-dir { margin-top: 10px; font-size: 14px; font-weight: 700; }
+.hj-counter-pips { display: flex; gap: 6px; margin-top: 8px; }
+.hj-counter-pips i { width: 8px; height: 8px; border-radius: 50%; background: color-mix(in oklab, var(--foreground) 14%, transparent); transition: background .25s ease; }
+.hj-counter-pips i.is-on { background: var(--accent); }
+.hj-mini-btn { display: inline-flex; align-items: center; gap: 4px; font-size: 12px; font-weight: 600; padding: 6px 14px; border-radius: 999px; border: 1px solid var(--border); }
+.hj-mini-btn:disabled { opacity: .4; }
+.hj-miqat { display: grid; gap: 6px; }
+.hj-miqat li { display: flex; justify-content: space-between; gap: 10px; font-size: 13px; padding: 8px 0; border-bottom: 1px solid color-mix(in oklab, var(--foreground) 7%, transparent); }
+.hj-miqat li:last-child { border-bottom: 0; }
+.hj-miqat span { opacity: .7; text-align: right; }
+.hj-complete { text-align: center; display: flex; flex-direction: column; align-items: center; gap: 6px; border: 1px solid color-mix(in oklab, var(--accent) 35%, transparent); background: color-mix(in oklab, var(--accent) 8%, var(--card)); }
+.hj-bullets { display: grid; gap: 7px; font-size: 13px; line-height: 1.5; }
+.hj-bullets li { position: relative; padding-left: 16px; }
+.hj-bullets li::before { content: ""; position: absolute; left: 2px; top: .6em; width: 6px; height: 6px; border-radius: 50%; background: var(--accent); }
+.hj-learn-body { padding: 0 14px 16px; }
+.hj-learn-body .period-card { box-shadow: none; }
+.hj-links a { display: inline-flex; justify-content: center; align-items: center; }
