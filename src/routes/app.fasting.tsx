@@ -593,6 +593,12 @@ function LogView({ s }: { s: FastingState }) {
         <div><strong>{st.streak}</strong><span>Current streak</span></div>
         <div><strong>{owed}</strong><span>Qada’ remaining</span></div>
       </div>
+      {owed > 0 && (
+        <section className="period-card fs-qada-hint">
+          <p><strong>{owed} {owed === 1 ? "day" : "days"} of qada’ to make up</strong></p>
+          <p className="fs-muted text-xs">Tap any past day on the calendar, choose “Qada’ (making up)” as the fast type, and log it. Each logged day reduces this count.</p>
+        </section>
+      )}
       <p className="fs-muted text-center text-xs">Fasted {st.mondaysFasted} of {st.mondays} Mondays this month{inShawwal ? ` · Shawwal ${shawwal} of 6` : ""}</p>
 
       <div className="fs-chips">
