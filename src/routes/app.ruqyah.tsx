@@ -114,6 +114,7 @@ function useChecklist() {
 function DailyView() {
   const { done, total, count } = useChecklist();
   const [openGroup, setOpenGroup] = useState<string | null>(RUQYAH_CHECKLIST[0].group);
+  const [openRecitation, setOpenRecitation] = useState<string | null>(null);
   const listRef = useRef<HTMLDivElement>(null);
   const complete = count === total;
   const started = count > 0;
@@ -180,14 +181,37 @@ function DailyView() {
                 <ul className="rq-group-items">
                   {g.items.map((it) => {
                     const on = done.has(it.id);
+                    const recitation = CHECKLIST_RECITATIONS[it.id];
+                    const recitationOpen = openRecitation === it.id;
                     return (
-                      <li key={it.id} className="period-check-row">
-                        <button className={`period-check ${on ? "is-on" : ""}`} aria-pressed={on} aria-label={it.label}
-                          onClick={() => { toggleRuqyahCheck(it.id); void triggerHaptic("light"); }}>
-                          {on && <Check size={14} strokeWidth={2.6} />}
-                        </button>
-                        <span className="flex-1 text-sm leading-snug">{saw(it.label)}</span>
-                        {it.to && <Link to={it.to} className="period-icon-btn" aria-label={`Open ${it.label}`}><ChevronRight size={16} /></Link>}
+                      <li key={it.id} className={`rq-check-item ${recitationOpen ? "is-open" : ""}`}>
+                        <div className="period-check-row">
+                          <button className={`period-check ${on ? "is-on" : ""}`} aria-pressed={on} aria-label={it.label}
+                            onClick={() => { toggleRuqyahCheck(it.id); void triggerHaptic("light"); }}>
+                            {on && <Check size={14} strokeWidth={2.6} />}
+                          </button>
+                          <span className="flex-1 text-sm leading-snug">{saw(it.label)}</span>
+                          {recitation && (
+                            <button
+                              className="period-icon-btn"
+                              aria-label={`${recitationOpen ? "Close" : "Read"} ${it.label}`}
+                              aria-expanded={recitationOpen}
+                              onClick={() => {
+                                setOpenRecitation(recitationOpen ? null : it.id);
+                                void triggerHaptic("light");
+                              }}
+                            >
+                              <ChevronRight size={16} className={`rq-group-chevron ${recitationOpen ? "is-open" : ""}`} />
+                            </button>
+                          )}
+                        </div>
+                        {recitation && (
+                          <div className="rq-check-recitation" aria-hidden={!recitationOpen}>
+                            <div>
+                              <GuideRecitation item={recitation} />
+                            </div>
+                          </div>
+                        )}
                       </li>
                     );
                   })}
@@ -344,6 +368,16 @@ const STORED_VERSES: Partial<Record<number, Dhikr>> = {
   1: morningAdhkar.find((item) => item.id === "morning-1-ayat-al-kursi"),
   2: eveningAdhkar.find((item) => item.id === "evening-19-the-last-two-verses-of-surat-al-baqa"),
   3: morningAdhkar.find((item) => item.id === "morning-2-three-quls"),
+};
+
+const CHECKLIST_RECITATIONS: Record<string, Dhikr | undefined> = {
+  "m-kursi": STORED_VERSES[1],
+  "m-quls": STORED_VERSES[3],
+  "m-bismillah": morningAdhkar.find((item) => item.id === "morning-9-bismillahi-lladhi-la-ya-urru-maa-smi"),
+  "m-audhu": eveningAdhkar.find((item) => item.id === "evening-17-audhu-bi-kalimati-llahi-t-tammati-mi"),
+  "e-audhu": eveningAdhkar.find((item) => item.id === "evening-17-audhu-bi-kalimati-llahi-t-tammati-mi"),
+  "s-kursi": STORED_VERSES[1],
+  "n-baqarah": STORED_VERSES[2],
 };
 
 const AL_FATIHAH: Dhikr = {
