@@ -444,32 +444,37 @@ function LearnView({ open, setOpen }: { open: string | null; setOpen: (id: strin
     } catch { /* cancelled */ }
   };
   return (
-    <div className="space-y-3">
-      <div className="period-card period-soft text-sm">
-        <div className="period-eyebrow">The Period in the Sunnah</div>
-        <p className="mt-1">What pauses, what continues, and what was actually taught — every source verified.</p>
+    <div className="period-learn-view">
+      <div className="period-card period-learn-intro">
+        <span className="period-learn-book" aria-hidden="true"><BookOpen size={25} strokeWidth={1.7} /></span>
+        <span>
+          <strong>The Period in the Sunnah</strong>
+          <small>What pauses, what continues, and what was actually taught — every source verified.</small>
+        </span>
       </div>
-      {SUNNAH_SECTIONS.map((s, idx) => {
-        const isOpen = open === s.id;
-        return (
-          <section key={s.id} id={`sec-${s.id}`} className="period-card !p-0 overflow-hidden scroll-mt-4">
-            <button className="period-acc-head" aria-expanded={isOpen} onClick={() => setOpen(isOpen ? null : s.id)}>
-              <span className="period-acc-num">{idx + 1}</span>
-              <span className="flex-1 text-left text-[15px] font-semibold">{saw(s.title)}</span>
-              <ChevronRight size={16} style={{ transform: isOpen ? "rotate(90deg)" : undefined, transition: "transform .2s" }} />
-            </button>
-            {isOpen && (
-              <div className="space-y-4 px-4 pb-4">
-                {s.intro && <p className={s.id === "duas" ? "period-callout is-grey" : "period-muted text-sm"}>{s.intro}</p>}
-                {s.items.map((it) => <SunnahCard key={it.id} item={it} />)}
-                <button className="period-link" onClick={() => void share(s.id)}>
-                  <Share2 size={14} /> {copied === s.id ? "Copied" : "Share this section"}
-                </button>
-              </div>
-            )}
-          </section>
-        );
-      })}
+      <div className="period-card period-learn-list">
+        {SUNNAH_SECTIONS.map((s, idx) => {
+          const isOpen = open === s.id;
+          return (
+            <section key={s.id} id={`sec-${s.id}`} className={`period-learn-section scroll-mt-4 ${isOpen ? "is-open" : ""}`}>
+              <button className="period-acc-head" aria-expanded={isOpen} onClick={() => setOpen(isOpen ? null : s.id)}>
+                <span className="period-acc-num">{idx + 1}</span>
+                <span className="flex-1 text-left text-[15px] font-semibold">{saw(s.title)}</span>
+                <ChevronRight size={17} strokeWidth={1.8} />
+              </button>
+              {isOpen && (
+                <div className="period-learn-body space-y-4">
+                  {s.intro && <p className={s.id === "duas" ? "period-callout is-grey" : "period-muted text-sm"}>{s.intro}</p>}
+                  {s.items.map((it) => <SunnahCard key={it.id} item={it} />)}
+                  <button className="period-link" onClick={() => void share(s.id)}>
+                    <Share2 size={14} /> {copied === s.id ? "Copied" : "Share this section"}
+                  </button>
+                </div>
+              )}
+            </section>
+          );
+        })}
+      </div>
     </div>
   );
 }
