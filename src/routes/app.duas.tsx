@@ -153,15 +153,17 @@ function DuaLibrary() {
             <>
               <div className="dl-cat-head">
                 <button className="dl-back" onClick={() => setCat(null)}>All categories</button>
-                <h2>{cat}</h2>
+                <h2>{cat === "jum" ? "Jumu‘ah Sunnahs" : cat}</h2>
                 <p>{catList.length} authentic {catList.length === 1 ? "dua" : "duas"}</p>
-                <div className="dl-sort" role="radiogroup" aria-label="Sort">
-                  {(["default", "alpha", "recent"] as Sort[]).map((s) => (
-                    <button key={s} role="radio" aria-checked={sort === s} className={sort === s ? "is-active" : ""} onClick={() => setSort(s)}>
-                      {s === "default" ? "Default" : s === "alpha" ? "A–Z" : "Recently saved"}
-                    </button>
-                  ))}
-                </div>
+                {cat !== "jum" && (
+                  <div className="dl-sort" role="radiogroup" aria-label="Sort">
+                    {(["default", "alpha", "recent"] as Sort[]).map((s) => (
+                      <button key={s} role="radio" aria-checked={sort === s} className={sort === s ? "is-active" : ""} onClick={() => setSort(s)}>
+                        {s === "default" ? "Default" : s === "alpha" ? "A–Z" : "Recently saved"}
+                      </button>
+                    ))}
+                  </div>
+                )}
               </div>
               {catList.map((d) => card(d))}
             </>
