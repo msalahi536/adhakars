@@ -17,6 +17,7 @@ import {
 import {
   PRAYER_LABELS, fetchDay, getPrayerSettings, slotsForDay,
 } from "@/lib/prayer-times";
+import { Button } from "@/components/ui/button";
 
 export const Route = createFileRoute("/app/period")({
   head: () => ({
@@ -348,15 +349,15 @@ function CycleView() {
   const future = selected > today;
 
   return (
-    <div className="space-y-4">
-      <div className="period-card">
-        <div className="flex items-center justify-between">
-          <button className="period-icon-btn" aria-label="Previous month" onClick={() => shift(-1)}><ChevronLeft size={18} /></button>
-          <div className="text-sm font-semibold">{month.toLocaleString(undefined, { month: "long", year: "numeric" })}</div>
-          <button className="period-icon-btn" aria-label="Next month" onClick={() => shift(1)}><ChevronRight size={18} /></button>
+    <div className="period-cycle-view space-y-3">
+      <div className="period-card period-calendar-card">
+        <div className="period-calendar-heading">
+          <Button variant="ghost" size="icon" className="period-icon-btn" aria-label="Previous month" onClick={() => shift(-1)}><ChevronLeft size={20} /></Button>
+          <div className="period-calendar-month">{month.toLocaleString(undefined, { month: "long", year: "numeric" })}</div>
+          <Button variant="ghost" size="icon" className="period-icon-btn" aria-label="Next month" onClick={() => shift(1)}><ChevronRight size={20} /></Button>
         </div>
-        <div className="mt-3 grid grid-cols-7 gap-1 text-center">
-          {["S", "M", "T", "W", "T", "F", "S"].map((w, i) => <div key={i} className="period-muted text-[10px]">{w}</div>)}
+        <div className="period-calendar-grid">
+          {["S", "M", "T", "W", "T", "F", "S"].map((w, i) => <div key={i} className="period-weekday">{w}</div>)}
           {cells.map((k, i) => {
             if (!k) return <div key={i} />;
             const cls = [
@@ -370,23 +371,23 @@ function CycleView() {
             return <button key={k} className={cls} onClick={() => setSelected(k)}>{parseK(k).getDate()}</button>;
           })}
         </div>
-        <div className="period-legend mt-3">
+        <div className="period-legend">
           <span><i className="is-period" /> Period</span>
           <span><i className="is-predicted" /> Predicted</span>
           <span><i className="is-ovulation" /> Ovulation</span>
         </div>
-        <div className="mt-3 flex gap-2">
-          <button className="period-btn flex-1" disabled={future} onClick={() => { startPeriod(selected); void triggerHaptic("medium"); }}>
-            Start on {fmt(selected)}
-          </button>
-          <button className="period-btn is-ghost flex-1" disabled={future || !cycles.some((c) => c.start <= selected)}
+        <div className="period-calendar-actions">
+          <Button className="period-btn period-calendar-primary" disabled={future} onClick={() => { startPeriod(selected); void triggerHaptic("medium"); }}>
+            Start Period
+          </Button>
+          <Button variant="outline" className="period-btn is-ghost period-calendar-secondary" disabled={future || !cycles.some((c) => c.start <= selected)}
             onClick={() => { endPeriod(selected); void triggerHaptic("medium"); }}>
-            End on {fmt(selected)}
-          </button>
+            Add End Date
+          </Button>
         </div>
       </div>
 
-      <div className="grid grid-cols-3 gap-2">
+      <div className="period-cycle-stats">
         <Stat label="Current" value={stats.currentDay ? `Day ${stats.currentDay}` : "—"} />
         <Stat label="Avg cycle" value={`${stats.avgCycle} days`} />
         <Stat label="Next period" value={stats.nextStart ? fmt(stats.nextStart) : "—"} />
@@ -423,9 +424,9 @@ function CycleView() {
 
 function Stat({ label, value }: { label: string; value: string }) {
   return (
-    <div className="period-card !p-3 text-center">
-      <div className="period-muted text-[10px] font-semibold uppercase tracking-wider">{label}</div>
-      <div className="mt-1 text-sm font-bold">{value}</div>
+    <div className="period-card period-stat-card">
+      <div className="period-stat-label">{label}</div>
+      <div className="period-stat-value">{value}</div>
     </div>
   );
 }
