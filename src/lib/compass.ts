@@ -137,7 +137,7 @@ function webPosition(): Promise<PositionResult> {
         if (settled) return;
         settled = true;
         clearTimeout(timer);
-        resolve({ ok: true, coords: { lat: pos.coords.latitude, lng: pos.coords.longitude } });
+        resolve({ ok: true, coords: { lat: pos.coords.latitude, lng: pos.coords.longitude }, source: "fresh", at: Date.now() });
       },
       (err) => {
         if (settled) return;
