@@ -1,7 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { Check, Crosshair, Lightbulb, Navigation } from "lucide-react";
-import qiblaHero from "@/assets/qibla-hero.jpg";
 import { HeaderBackButton } from "@/components/HeaderBackButton";
 import { CompassCalibrationCard } from "@/components/CompassCalibrationCard";
 import {
@@ -204,7 +203,6 @@ function Qibla() {
       </header>
 
       <main className="scroll-area qb-main">
-        <img src={qiblaHero} alt="" aria-hidden="true" className="qb-hero" width={1024} height={768} />
         <div
           className="qibla-page mx-auto flex min-h-full w-full max-w-md flex-col items-center"
           style={{ color: "var(--foreground)" }}
