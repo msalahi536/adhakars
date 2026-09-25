@@ -72,7 +72,7 @@ export const resetAllProgress = () => {
 
 // ============ Section completion ============
 
-export type CommitmentSection = "morning" | "evening" | "salah" | "sleep" | "wake" | "custom";
+export type CommitmentSection = "morning" | "evening" | "salah" | "sleep" | "wake";
 
 const isMorningComplete = (date: string) => {
   const c = getCounts("morning", date);
@@ -104,28 +104,6 @@ const isWakeComplete = (date: string): boolean => {
   return wakeItems.every((it) => isItemComplete(it, counts));
 };
 
-type CustomRow = { id: string; target_count: number };
-
-export const getCustomAdhkarRows = (): CustomRow[] => {
-  if (typeof window === "undefined") return [];
-  try {
-    const raw = localStorage.getItem("custom_adhkar");
-    if (!raw) return [];
-    const parsed = JSON.parse(raw);
-    if (!Array.isArray(parsed)) return [];
-    return parsed as CustomRow[];
-  } catch {
-    return [];
-  }
-};
-
-const isCustomComplete = (date: string): boolean => {
-  const rows = getCustomAdhkarRows();
-  if (rows.length === 0) return false;
-  const counts = getCounts("custom_adhkar", date);
-  return rows.every((r) => (counts[r.id] ?? 0) >= (r.target_count ?? 0));
-};
-
 export const isSectionComplete = (section: CommitmentSection, date = todayKey()): boolean => {
   switch (section) {
     case "morning": return isMorningComplete(date);
@@ -133,7 +111,6 @@ export const isSectionComplete = (section: CommitmentSection, date = todayKey())
     case "salah": return isSalahComplete(date);
     case "sleep": return isSleepComplete(date);
     case "wake": return isWakeComplete(date);
-    case "custom": return isCustomComplete(date);
   }
 };
 
@@ -146,7 +123,6 @@ const DEFAULT_COMMITMENT: Record<CommitmentSection, boolean> = {
   salah: false,
   sleep: false,
   wake: false,
-  custom: false,
 };
 
 export const getCommitment = (): Record<CommitmentSection, boolean> => {
@@ -187,7 +163,6 @@ function hasAnyActivity(date: string): boolean {
     "evening",
     "sleep",
     "wake",
-    "custom_adhkar",
     ...SALAH_PRAYERS.map((p) => `salah_${p.id}`),
   ];
   for (const kind of tracked) {
@@ -346,14 +321,13 @@ export const isAnySalahComplete = (date = todayKey()): boolean => {
 };
 
 // ============ Lifetime dhikr counter ============
-export type LifetimeCategory = "morning" | "evening" | "salah" | "tasbih" | "custom";
+export type LifetimeCategory = "morning" | "evening" | "salah" | "tasbih";
 export type LifetimeCounts = {
   total: number;
   morning: number;
   evening: number;
   salah: number;
   tasbih: number;
-  custom: number;
 };
 
 const LIFETIME_KEY = "lifetimeDhikr";
@@ -363,7 +337,6 @@ const defaultLifetime: LifetimeCounts = {
   evening: 0,
   salah: 0,
   tasbih: 0,
-  custom: 0,
 };
 
 export const getLifetime = (): LifetimeCounts => {
@@ -389,7 +362,7 @@ export const bumpLifetime = (category: LifetimeCategory, n = 1) => {
 export const getDaysOfRemembrance = (): number => {
   if (typeof window === "undefined") return 0;
   const seen = new Set<string>();
-  const kinds = ["morning", "evening", "sleep", "wake", "custom_adhkar", ...SALAH_PRAYERS.map((p) => `salah_${p.id}`)];
+  const kinds = ["morning", "evening", "sleep", "wake", ...SALAH_PRAYERS.map((p) => `salah_${p.id}`)];
   for (let i = 0; i < localStorage.length; i++) {
     const key = localStorage.key(i);
     if (!key || !key.startsWith("adhkar:")) continue;

@@ -54,7 +54,7 @@ function More() {
     graceUsedRecently: false,
   });
   const [lifetime, setLifetime] = useState<LifetimeCounts>({
-    total: 0, morning: 0, evening: 0, salah: 0, tasbih: 0, custom: 0,
+    total: 0, morning: 0, evening: 0, salah: 0, tasbih: 0,
   });
   const [daysOfRem, setDaysOfRem] = useState(0);
   const [lifetimeView, setLifetimeView] = useState<"days" | "count">("days");
