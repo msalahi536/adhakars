@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import {
   BookOpen, Check, ChevronLeft, ChevronRight, CircleAlert, Compass, GraduationCap, Landmark,
   MapPin, RotateCcw, Sparkles, UserRound, X,
@@ -51,6 +51,8 @@ function HajjCompanion() {
 
   const go = (t: Tab) => { setTab(t); void triggerHaptic("light"); document.querySelector(".period-scroll-area")?.scrollTo({ top: 0 }); };
 
+  const prepDone = PREP_CHECKLIST.filter((_, i) => state.checks.includes(`prep-${i}`)).length;
+
   return (
     <>
       <header className="page-header period-header rq-header relative overflow-hidden" style={{ background: "var(--grad-header)", color: "var(--header-fg)" }}>
@@ -73,8 +75,16 @@ function HajjCompanion() {
           {mounted && state.mode && (
             <>
               <div className="hj-mode-bar">
-                <span>Preparing for <strong>{state.mode === "hajj" ? "Hajj" : state.mode === "umrah" ? "‘Umrah" : "Just learning"}</strong></span>
-                <button onClick={() => { update({ mode: null }); void triggerHaptic("light"); }}>Change</button>
+                <div className="hj-mode-bar-top">
+                  <span><MapPin size={13} /> Preparing for <strong>{state.mode === "hajj" ? "Hajj" : state.mode === "umrah" ? "‘Umrah" : "Just learning"}</strong></span>
+                  <button onClick={() => { update({ mode: null }); void triggerHaptic("light"); }}>Change</button>
+                </div>
+                {state.mode !== "learn" && (
+                  <div className="hj-mode-bar-progress">
+                    <div className="rq-group-progress"><i style={{ width: `${(prepDone / PREP_CHECKLIST.length) * 100}%` }} /></div>
+                    <span>{prepDone} of {PREP_CHECKLIST.length} done</span>
+                  </div>
+                )}
               </div>
               {tab === "prepare" && <PrepareView checks={state.checks} onToggle={(id) => toggle(id)} />}
               {tab === "guide" && <GuideView mode={state.mode} />}
@@ -172,20 +182,19 @@ function PrepareView({ checks, onToggle }: { checks: string[]; onToggle: (id: st
   const done = PREP_CHECKLIST.filter((_, i) => checks.includes(`prep-${i}`)).length;
   return (
     <>
-      <div className="rq-intro-note">
-        <span className="rq-intro-icon"><Sparkles size={20} /></span>
-        <p>Learn the rites before you arrive. This is the single most useful preparation.</p>
-      </div>
       <section className="period-card">
         <div className="flex items-center justify-between">
-          <h2 className="rq-hero-title text-left">Before departing</h2>
+          <h2 className="hj-section-title">Before you depart</h2>
           <span className="rq-pill">{done} of {PREP_CHECKLIST.length}</span>
         </div>
-        <div className="rq-group-progress mt-3"><i style={{ width: `${(done / PREP_CHECKLIST.length) * 100}%` }} /></div>
         <ul className="mt-2">
           {PREP_CHECKLIST.map((l, i) => <CheckRow key={i} label={l} on={checks.includes(`prep-${i}`)} onToggle={() => onToggle(`prep-${i}`)} />)}
         </ul>
       </section>
+      <div className="rq-intro-note">
+        <span className="rq-intro-icon"><BookOpen size={20} /></span>
+        <p>The single most useful preparation is learning the rites before you arrive.</p>
+      </div>
       <div className="label-caps px-1">What Hajj erases, and what it earns</div>
       <DuaCard item={BUKHARI_1521} />
       <DuaCard item={BUKHARI_1773} />
@@ -233,15 +242,24 @@ function GuideView({ mode }: { mode: HajjMode }) {
       </nav>
 
       <section key={st.id} className="period-card hj-station rq-view-transition">
-        <div className="hj-station-num">Station {idx + 1} of {list.length}</div>
-        <h2 className="hj-station-name">{st.name}</h2>
-        <p className="period-muted text-sm">{st.subtitle}</p>
-        <div className="hj-location"><MapPin size={13} /> {st.location}</div>
+        <div className="hj-station-head">
+          <div className="hj-station-num">Station {idx + 1} of {list.length}</div>
+          <h2 className="hj-station-name">{st.name}</h2>
+          <p className="hj-station-sub">{st.subtitle}</p>
+          <div className="hj-location"><MapPin size={13} /> {st.location}</div>
+        </div>
         {st.intro && <p className="mt-3 text-sm leading-relaxed">{saw(st.intro)}</p>}
         <ul className="mt-3">
           {st.checklist.map((l, i) => <CheckRow key={i} label={l} on={state.checks.includes(`${st.id}-${i}`)} onToggle={() => toggle(`${st.id}-${i}`)} />)}
         </ul>
-        {st.notes?.map((n, i) => <div key={i} className="period-callout is-grey mt-3">{saw(n)}</div>)}
+        {st.notes && st.notes.length > 0 && (
+          <details className="hj-details">
+            <summary><Check size={14} strokeWidth={2.6} /> View all details<ChevronRight size={15} className="hj-chev" /></summary>
+            <div className="hj-details-body">
+              {st.notes.map((n, i) => <p key={i}>{saw(n)}</p>)}
+            </div>
+          </details>
+        )}
       </section>
 
       {st.counter && (
@@ -272,14 +290,14 @@ function GuideView({ mode }: { mode: HajjMode }) {
         </section>
       )}
 
-      <div className="flex gap-3">
-        <button className="rq-btn-outline flex-1" disabled={idx === 0} onClick={() => goTo(idx - 1)}><ChevronLeft size={16} /> Back</button>
+      <div className="hj-nav-row">
+        <button className="hj-back-btn" disabled={idx === 0} onClick={() => goTo(idx - 1)} aria-label="Previous station"><ChevronLeft size={18} /></button>
         {idx < list.length - 1 ? (
-          <button className="rq-btn-primary flex-1" onClick={() => goTo(idx + 1)}>
+          <button className="rq-btn-primary hj-next-btn" onClick={() => goTo(idx + 1)}>
             {umrahEnd ? "Continue to Hajj" : "Next station"} <ChevronRight size={16} />
           </button>
         ) : (
-          <button className="rq-btn-primary flex-1" onClick={() => goTo(0)}><RotateCcw size={15} /> Start over</button>
+          <button className="rq-btn-primary hj-next-btn" onClick={() => goTo(0)}><RotateCcw size={15} /> Start over</button>
         )}
       </div>
 
