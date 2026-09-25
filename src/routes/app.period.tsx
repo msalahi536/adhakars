@@ -427,12 +427,12 @@ function CycleView() {
           <Button className="period-btn period-calendar-primary" disabled={future} onClick={() => openEditor()}>
             <CalendarIcon size={16} /> Log a period
           </Button>
-          <p>Choose any past date to add history and improve predictions.</p>
+          <p>Started a few days ago, or have past periods? Tap a day, then log it — past dates are fine.</p>
         </div>
       </div>
 
       <div className="period-cycle-stats">
-        <Stat label="Current" value={stats.currentDay ? `Day ${stats.currentDay}` : "—"} />
+        <Stat label={openCycle() ? "Period day" : "Cycle day"} value={stats.currentDay ? `Day ${stats.currentDay}` : "—"} />
         <Stat label="Avg cycle" value={`${stats.avgCycle} days`} />
         <Stat label="Next period" value={stats.nextStart ? fmt(stats.nextStart) : "—"} />
       </div>
@@ -452,7 +452,7 @@ function CycleView() {
                 <li key={c.start} className="period-check-row">
                   <Droplets size={15} className="period-accent" />
                   <span className="flex-1 text-sm">
-                    {fmt(c.start)} – {c.end ? fmt(c.end) : "ongoing"}
+                    {fmt(c.start)} – {c.end ? fmt(c.end) : "still going"}
                     {c.end && <span className="period-muted"> · {diffDays(c.start, c.end) + 1} days</span>}
                     {prev && <span className="period-muted"> · cycle {diffDays(prev.start, c.start)}d</span>}
                   </span>
