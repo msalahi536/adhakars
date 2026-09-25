@@ -172,11 +172,7 @@ function TodayView({ goLearn, goCycle }: { goLearn: (id: string) => void; goCycl
 
       {onPeriod ? (
         <>
-          <button className="period-banner period-daily-reminder" onClick={() => goLearn("continues")}>
-            <Sparkles size={18} />
-            <span><strong>Stay Close to Allah</strong><small>See the worship and remembrance that continue during your period.</small></span>
-            <ChevronRight size={18} />
-          </button>
+          <Checklist goLearn={goLearn} />
           <div className="period-card">
             <div className="period-eyebrow">You're Still Earning</div>
             <p className="arabic mt-2 text-right text-[20px] leading-[1.9]" lang="ar" dir="rtl">{EARNING_HADITH.arabic}</p>
@@ -184,7 +180,6 @@ function TodayView({ goLearn, goCycle }: { goLearn: (id: string) => void; goCycl
             <p className="period-muted mt-1 text-[11px]">{EARNING_HADITH.source}</p>
             <p className="mt-3 text-sm font-semibold">Your regular worship is still being recorded. Nothing is missing from your record.</p>
           </div>
-          <Checklist goLearn={goLearn} />
         </>
       ) : (
         <p className="period-muted px-2 text-center text-xs">
@@ -232,6 +227,7 @@ function SymptomsCard() {
     void triggerHaptic("light");
   };
   const hasPain = s.includes("cramps") || s.includes("headache");
+  const reliefDuas = SUNNAH_SECTIONS.find((section) => section.id === "duas")?.items ?? [PAIN_DUA];
   return (
     <>
       <div className="period-card period-symptoms-card">
@@ -253,7 +249,7 @@ function SymptomsCard() {
         {hasPain && (
           <button className="period-relief-row" onClick={() => setShowDua(true)}>
             <span className="period-relief-icon"><Sparkles size={17} /></span>
-            <span><strong>Relief dua for pain</strong><small>Read the authentic dua for cramps or headache</small></span>
+            <span><strong>Relief duas</strong><small>Six authentic duas for pain, illness, and hardship</small></span>
             <ChevronRight size={17} />
           </button>
         )}
@@ -262,9 +258,11 @@ function SymptomsCard() {
         <DialogContent className="period-dialog period-relief-dialog [&>button:last-child]:hidden">
           <div className="period-dialog-head">
             <span className="period-learn-book"><BookOpen size={21} /></span>
-            <span><DialogTitle>Relief dua for pain</DialogTitle><DialogDescription>For cramps, headaches, or pain anywhere in the body</DialogDescription></span>
+             <span><DialogTitle>Relief duas</DialogTitle><DialogDescription>For pain, illness, anxiety, and hardship</DialogDescription></span>
           </div>
-          <div className="period-dialog-scroll"><SunnahCard item={PAIN_DUA} compact /></div>
+           <div className="period-dialog-scroll space-y-3">
+             {reliefDuas.map((item) => <SunnahCard key={item.id} item={item} compact />)}
+           </div>
           <Button className="period-btn w-full" onClick={() => setShowDua(false)}>Close</Button>
         </DialogContent>
       </Dialog>
@@ -528,6 +526,8 @@ function Stat({ label, value }: { label: string; value: string }) {
 // ================= LEARN =================
 
 function LearnView({ open, setOpen }: { open: string | null; setOpen: (id: string | null) => void }) {
+  const aftercare = SUNNAH_SECTIONS.find((section) => section.id === "ends");
+  const mainSections = SUNNAH_SECTIONS.filter((section) => section.id !== "ends");
   return (
     <div className="period-learn-view">
       <div className="period-card period-learn-intro">
@@ -538,7 +538,7 @@ function LearnView({ open, setOpen }: { open: string | null; setOpen: (id: strin
         </span>
       </div>
       <div className="period-card period-learn-list">
-        {SUNNAH_SECTIONS.map((s, idx) => {
+        {mainSections.map((s, idx) => {
           const isOpen = open === s.id;
           return (
             <section key={s.id} id={`sec-${s.id}`} className={`period-learn-section scroll-mt-4 ${isOpen ? "is-open" : ""}`}>
@@ -557,6 +557,24 @@ function LearnView({ open, setOpen }: { open: string | null; setOpen: (id: strin
           );
         })}
       </div>
+      {aftercare && (
+        <div className="period-aftercare-group">
+          <div className="period-aftercare-label">When your period ends</div>
+          <section id={`sec-${aftercare.id}`} className={`period-card period-learn-section period-aftercare-section scroll-mt-4 ${open === aftercare.id ? "is-open" : ""}`}>
+            <button className="period-acc-head" aria-expanded={open === aftercare.id} onClick={() => setOpen(open === aftercare.id ? null : aftercare.id)}>
+              <span className="period-aftercare-icon"><Droplets size={17} /></span>
+              <span className="flex-1 text-left text-[15px] font-semibold">{aftercare.title}</span>
+              <ChevronRight size={17} strokeWidth={1.8} />
+            </button>
+            {open === aftercare.id && (
+              <div className="period-learn-body space-y-4">
+                {aftercare.intro && <p className="period-muted text-sm">{aftercare.intro}</p>}
+                {aftercare.items.map((item) => <SunnahCard key={item.id} item={item} />)}
+              </div>
+            )}
+          </section>
+        </div>
+      )}
     </div>
   );
 }

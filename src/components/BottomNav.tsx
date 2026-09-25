@@ -1,6 +1,9 @@
 import { Link, useRouterState } from "@tanstack/react-router";
 import { Sun, Moon, MoreHorizontal } from "lucide-react";
-import type { CSSProperties } from "react";
+import { useEffect, useState, type CSSProperties } from "react";
+import {
+  getLastMoreDestination, MORE_DESTINATION_EVENT, MORE_DESTINATIONS, type MoreDestination,
+} from "@/lib/more-navigation";
 
 type NavIconProps = { size?: number; strokeWidth?: number; style?: CSSProperties };
 
@@ -21,8 +24,6 @@ function TasbihIcon({ size = 22, strokeWidth = 1.5, style }: NavIconProps) {
   );
 }
 
-const MORE_NESTED = ["/app/sleep", "/app/wake", "/app/qibla", "/app/my-adhkar", "/app/settings", "/app/about"];
-
 const tabs = [
   { to: "/app" as const, label: "Morning", Icon: Sun },
   { to: "/app/evening" as const, label: "Evening", Icon: Moon },
@@ -33,7 +34,15 @@ const tabs = [
 
 export function BottomNav() {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
-  const moreNestedActive = MORE_NESTED.some((p) => pathname === p || pathname.startsWith(p + "/"));
+  const [moreDestination, setMoreDestination] = useState<MoreDestination>("/app/more");
+  const moreNestedActive = MORE_DESTINATIONS.some((p) => pathname === p || pathname.startsWith(p + "/"));
+
+  useEffect(() => {
+    const sync = () => setMoreDestination(getLastMoreDestination());
+    sync();
+    window.addEventListener(MORE_DESTINATION_EVENT, sync);
+    return () => window.removeEventListener(MORE_DESTINATION_EVENT, sync);
+  }, []);
 
   const iconColor = "var(--nav-inactive)";
   const activeColor = "var(--nav-active)";
@@ -45,10 +54,12 @@ export function BottomNav() {
         className="bottom-nav-row mx-auto max-w-md px-2"
         style={{ borderColor }}
       >
-        {tabs.map((t) => (
+        {tabs.map((t) => {
+          const destination = t.to === "/app/more" ? moreDestination : t.to;
+          return (
           <Link
             key={t.to}
-            to={t.to}
+            to={destination}
             activeOptions={{ exact: true }}
             className="nav-item relative flex flex-1 flex-col items-center justify-center px-0 font-medium"
             style={{ transition: "color 0.25s ease", minWidth: 0 }}
@@ -80,7 +91,8 @@ export function BottomNav() {
               );
             }}
           </Link>
-        ))}
+          );
+        })}
       </div>
     </nav>
   );
