@@ -10,3 +10,4 @@
 - [x] Refine Ruqyah warnings, verse accordions, article navigation, transitions, and remove all section sharing.
 - [x] Convert Ruqyah Learn articles to in-page dropdowns and remove the private-device note.
 - [x] Add complete stored recitations with audio to the self-Ruqyah guide and center expanded Learn content.
+- [x] Add Fasting Companion (calendar, Ramadan mode, log, learn) from the source document.

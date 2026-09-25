@@ -3,6 +3,7 @@ import { getSalahItems, isItemComplete, SALAH_PRAYERS } from "@/data/salah";
 import { sleepItems, wakeItems } from "@/data/sleep";
 import { periodDayCounts } from "@/lib/period";
 import { ruqyahDayCounts } from "@/lib/ruqyah";
+import { fastingDayCounts } from "@/lib/fasting";
 
 export const todayKey = () => {
   const d = new Date();
@@ -180,6 +181,7 @@ function hasAnyActivity(date: string): boolean {
   // The period is a valid excuse: checklist worship on those days keeps the streak.
   if (periodDayCounts(date)) return true;
   if (ruqyahDayCounts(date)) return true;
+  if (fastingDayCounts(date)) return true;
   const tracked = [
     "morning",
     "evening",

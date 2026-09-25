@@ -340,7 +340,7 @@ function DayDialog({ k, s, onClose }: { k: string; s: FastingState; onClose: () 
   if (info.tags.includes("monthu")) items.push(MON_THU);
   if (info.tags.includes("dawud")) items.push(DAWUD);
 
-  const save = () => { logFast(k, type); void triggerHaptic("success"); onClose(); };
+  const save = () => { logFast(k, type); void triggerHaptic("medium"); onClose(); };
   const excuse = (r: ExcuseReason) => { excuseDay(k, r); onClose(); };
   const canLog = !info.blocked && !isFuture && (warnings.length === 0 || ackWarn) && (!needsIntent || intended);
   const showArafahDiff = (info.tags.includes("arafah") && !(info.hijri.m === 12 && info.hijri.d === 9)) || info.tags.includes("arafah-local");
@@ -445,7 +445,7 @@ function RamadanView({ s }: { s: FastingState }) {
           </div>
           {!todayLog ? (
             <div className="fs-ram-actions">
-              <button className="period-btn" onClick={() => { logFast(today, "ramadan"); void triggerHaptic("success"); }}>I’m fasting today</button>
+              <button className="period-btn" onClick={() => { logFast(today, "ramadan"); void triggerHaptic("medium"); }}>I’m fasting today</button>
               <div className="fs-excuse">
                 <span>Excused</span>
                 {(["illness", "travel", "menstruation"] as ExcuseReason[]).map((x) => <button key={x} onClick={() => excuseDay(today, x)}>{x[0].toUpperCase() + x.slice(1)}</button>)}
