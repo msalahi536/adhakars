@@ -56,7 +56,9 @@ function DuaLibrary() {
   };
 
   const results = useMemo(() => searchDuas(q), [q]);
+  const isFriday = mounted && now?.getDay() === 5;
   const catList = useMemo(() => {
+    if (cat === "jum") return JUMUAH_DUAS;
     if (!cat) return [];
     const list = DUAS.filter((d) => d.cat === cat);
     if (sort === "alpha") return [...list].sort((a, b) => a.title.localeCompare(b.title));
@@ -66,7 +68,6 @@ function DuaLibrary() {
     }
     return list;
   }, [cat, sort, favs]);
-  const emotional = results.some((d) => EMOTIONAL_CATS.has(d.cat));
 
   const suggestions = useMemo(() => {
     if (!now) return null;
