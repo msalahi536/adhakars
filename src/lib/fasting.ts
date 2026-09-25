@@ -306,14 +306,16 @@ export function stats(s: FastingState) {
     k = addDaysKey(k, -1);
   }
 
-  // Mondays this month
+  // Every Monday in the current calendar month. Use the same effective log
+  // source as the calendar so the summary cannot disagree with a marked day.
   const y = now.getFullYear(), m = now.getMonth();
   const mondays: string[] = [];
-  for (let d = 1; d <= now.getDate(); d++) {
+  const daysInMonth = new Date(y, m + 1, 0).getDate();
+  for (let d = 1; d <= daysInMonth; d++) {
     const dt = new Date(y, m, d, 12);
     if (dt.getDay() === 1) mondays.push(keyOf(dt));
   }
-  const mondaysFasted = mondays.filter((mk) => s.logs[mk]?.status === "fasted").length;
+  const mondaysFasted = mondays.filter((mk) => effectiveLog(mk, s)?.status === "fasted").length;
 
   return { totalYear, voluntaryMonth, streak, mondays: mondays.length, mondaysFasted };
 }

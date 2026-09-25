@@ -12,3 +12,4 @@
 - [x] Add complete stored recitations with audio to the self-Ruqyah guide and center expanded Learn content.
 - [x] Add Fasting Companion (calendar, Ramadan mode, log, learn) from the source document.
 - [x] Redesign Fasting Companion to match the supplied calm, compact reference.
+- [x] Keep the monthly Monday fasting summary accurate and synced with logged days.
