@@ -86,26 +86,26 @@ function PeriodCompanion() {
 
   return (
     <>
-      <header className="page-header relative overflow-hidden" style={{ background: "var(--grad-header)", color: "var(--header-fg)" }}>
+      <header className="page-header period-header relative overflow-hidden" style={{ background: "var(--grad-header)", color: "var(--header-fg)" }}>
         <HeaderBackButton />
-        <div className="relative mx-auto max-w-md px-16 pb-5 pt-9 text-center">
+        <div className="relative mx-auto max-w-md px-16 pb-4 pt-7 text-center">
           <div className="label-caps" style={{ color: "var(--header-sub)", opacity: 1 }}>Period Companion</div>
           <h1 className="app-page-title mt-2">Stay Close</h1>
-          <p className="mt-2 inline-flex items-center gap-1 text-xs opacity-90">
+          <p className="period-private mt-2 inline-flex items-center gap-1 text-xs opacity-90">
             <Lock size={11} /> Private — stored only on your device
           </p>
         </div>
+        <div className="period-tabs mx-auto max-w-md" role="tablist">
+          {(["today", "cycle", "learn"] as Tab[]).map((t) => (
+            <button key={t} role="tab" aria-selected={tab === t} className={tab === t ? "is-active" : ""}
+              onClick={() => { setTab(t); void triggerHaptic("light"); }}>
+              {t === "today" ? "Today" : t === "cycle" ? "Cycle" : "Learn"}
+            </button>
+          ))}
+        </div>
       </header>
-      <main className="scroll-area">
-        <div className="mx-auto max-w-md space-y-4 px-5 pb-8 pt-3">
-          <div className="period-tabs" role="tablist">
-            {(["today", "cycle", "learn"] as Tab[]).map((t) => (
-              <button key={t} role="tab" aria-selected={tab === t} className={tab === t ? "is-active" : ""}
-                onClick={() => { setTab(t); void triggerHaptic("light"); }}>
-                {t === "today" ? "Today" : t === "cycle" ? "Cycle" : "Learn"}
-              </button>
-            ))}
-          </div>
+      <main className="scroll-area period-scroll-area">
+        <div className="mx-auto max-w-md space-y-4 px-5 pb-8 pt-4">
           {mounted && tab === "today" && <TodayView goLearn={goLearn} goCycle={() => setTab("cycle")} />}
           {mounted && tab === "cycle" && <CycleView />}
           {mounted && tab === "learn" && <LearnView open={openSection} setOpen={setOpenSection} />}
@@ -130,7 +130,7 @@ function TodayView({ goLearn, goCycle }: { goLearn: (id: string) => void; goCycl
   const ending = open && diffDays(open.start, today) + 1 >= stats.avgPeriod;
 
   return (
-    <div className="space-y-4">
+    <div className="period-today space-y-4">
       {symptoms.includes("cramps") && (
         <div className="period-card">
           <div className="period-eyebrow">For your cramps today</div>
@@ -154,35 +154,34 @@ function TodayView({ goLearn, goCycle }: { goLearn: (id: string) => void; goCycl
 
       {endedToday && <SalahDue cycle={endedToday} />}
 
-      <div className="period-card">
-        <div className="flex items-center justify-between gap-3">
-          <div>
-            <div className="period-eyebrow">{onPeriod ? "Period" : "Cycle"}</div>
-            <p className="text-sm font-semibold">
-              {open ? `Day ${diffDays(open.start, today) + 1} of your period` :
-                stats.currentDay ? `Cycle day ${stats.currentDay}` : "No cycles logged yet"}
-            </p>
-            {stats.nextStart && !open && (
-              <p className="period-muted text-xs">Next period expected {fmt(stats.nextStart)}</p>
-            )}
-          </div>
-          {open ? (
-            <button className="period-btn" onClick={() => { endPeriod(today); void triggerHaptic("medium"); }}>Period ended today</button>
-          ) : (
-            <button className="period-btn" onClick={() => { startPeriod(today); void triggerHaptic("medium"); }}>Period started today</button>
-          )}
+      <div className="period-card period-status-card">
+        <div className="period-status-title">{onPeriod ? "Your period" : "Your cycle"}</div>
+        <div className="period-status-day">
+          {open ? `Day ${diffDays(open.start, today) + 1}` : stats.currentDay ? `Day ${stats.currentDay}` : "Ready"}
         </div>
-        <button className="period-link mt-3" onClick={goCycle}>Open calendar <ChevronRight size={14} /></button>
+        <div className="period-status-note">
+          <Droplets size={15} />
+          {open
+            ? (open.start === today ? "Started today" : `Started ${fmt(open.start)}`)
+            : stats.nextStart ? `Next period expected ${fmt(stats.nextStart)}` : "No cycles logged yet"}
+        </div>
+        {open ? (
+          <button className="period-btn period-status-action" onClick={() => { endPeriod(today); void triggerHaptic("medium"); }}>Period ended today</button>
+        ) : (
+          <button className="period-btn period-status-action" onClick={() => { startPeriod(today); void triggerHaptic("medium"); }}>Period started today</button>
+        )}
+        <button className="period-calendar-link" onClick={goCycle}>Edit period dates <ChevronRight size={15} /></button>
       </div>
 
       <SymptomsCard />
 
       {onPeriod ? (
         <>
-          <div className="period-banner">
+          <button className="period-banner period-daily-reminder" onClick={() => goLearn("continues")}>
             <Sparkles size={18} />
-            <p>You can't pray today, but you are not far from Allah. Here's what you can do.</p>
-          </div>
+            <span><strong>Daily reminder</strong><small>You can't pray today, but you are not far from Allah. Here's what you can do.</small></span>
+            <ChevronRight size={18} />
+          </button>
           <div className="period-card">
             <div className="period-eyebrow">You're Still Earning</div>
             <p className="arabic mt-2 text-right text-[20px] leading-[1.9]" lang="ar" dir="rtl">{EARNING_HADITH.arabic}</p>
@@ -232,16 +231,16 @@ function SalahDue({ cycle }: { cycle: Cycle }) {
 function SymptomsCard() {
   const s = getSymptoms();
   return (
-    <div className="period-card">
-      <div className="period-eyebrow">How are you feeling?</div>
-      <div className="mt-3 flex flex-wrap gap-2">
+    <div className="period-card period-symptoms-card">
+      <div className="period-section-title">How are you feeling today?</div>
+      <div className="period-symptom-grid mt-3">
         {(Object.keys(SYMPTOM_META) as Symptom[]).map((k) => {
           const { label, Icon } = SYMPTOM_META[k];
           const on = s.includes(k);
           return (
             <button key={k} className={`period-chip ${on ? "is-on" : ""}`} aria-pressed={on}
               onClick={() => { toggleSymptom(k); void triggerHaptic("light"); }}>
-              <Icon size={14} /> {label}
+              <Icon size={21} /> <span>{label}</span>
             </button>
           );
         })}
