@@ -130,6 +130,8 @@ function TodayView({ goLearn, goCycle }: { goLearn: (id: string) => void; goCycl
   const daysToNext = stats.nextStart ? diffDays(today, stats.nextStart) : null;
   const soon = !onPeriod && daysToNext !== null && daysToNext >= 1 && daysToNext <= 2;
   const ending = open && diffDays(open.start, today) + 1 >= stats.avgPeriod;
+  const lastEnded = [...cycles].reverse().find((c) => c.end);
+  const [editor, setEditor] = useState<{ cycle?: Cycle; start: string; end: string; ongoing: boolean } | null>(null);
 
   return (
     <div className="period-today space-y-4">
@@ -150,23 +152,42 @@ function TodayView({ goLearn, goCycle }: { goLearn: (id: string) => void; goCycl
       {endedToday && <SalahDue cycle={endedToday} onReadAftercare={() => goLearn("ends")} />}
 
       <div className="period-card period-status-card">
-        <div className="period-status-title">{onPeriod ? "Your period" : "Your cycle"}</div>
+        <div className="period-status-title">
+          {open ? "Period in progress" : endedToday ? "Period ended today" : "Your cycle"}
+        </div>
         <div className="period-status-day">
-          {open ? `Day ${diffDays(open.start, today) + 1}` : stats.currentDay ? `Day ${stats.currentDay}` : "Ready"}
+          {open
+            ? `Day ${diffDays(open.start, today) + 1}`
+            : stats.currentDay ? `Cycle day ${stats.currentDay}` : "Welcome"}
         </div>
         <div className="period-status-note">
           <Droplets size={15} />
           {open
             ? (open.start === today ? "Started today" : `Started ${fmt(open.start)}`)
-            : stats.nextStart ? `Next period expected ${fmt(stats.nextStart)}` : "No cycles logged yet"}
+            : lastEnded
+              ? `Last period ${fmt(lastEnded.start)} – ${fmt(lastEnded.end!)}${stats.nextStart ? ` · next expected ${fmt(stats.nextStart)}` : ""}`
+              : "No periods logged yet"}
         </div>
         {open ? (
-          <button className="period-btn period-status-action" onClick={() => { endPeriod(today); void triggerHaptic("medium"); }}>Period ended today</button>
+          <>
+            <p className="period-muted mt-2 text-center text-xs">Tap below once your period has finished.</p>
+            <button className="period-btn period-status-action" onClick={() => { endPeriod(today); void triggerHaptic("medium"); }}>Mark as ended today</button>
+            <button className="period-calendar-link" onClick={() => setEditor({ cycle: open, start: open.start, end: today, ongoing: false })}>
+              Ended on an earlier day, or wrong start date? <ChevronRight size={15} />
+            </button>
+          </>
         ) : (
-          <button className="period-btn period-status-action" onClick={() => { startPeriod(today); void triggerHaptic("medium"); }}>Period started today</button>
+          <>
+            <p className="period-muted mt-2 text-center text-xs">Did your period start? Log it here — even if it began a few days ago.</p>
+            <button className="period-btn period-status-action" onClick={() => { startPeriod(today); void triggerHaptic("medium"); }}>It started today</button>
+            <button className="period-calendar-link" onClick={() => setEditor({ start: addK(today, -1), end: today, ongoing: true })}>
+              It started on an earlier day <ChevronRight size={15} />
+            </button>
+          </>
         )}
-        <button className="period-calendar-link" onClick={goCycle}>Edit period dates <ChevronRight size={15} /></button>
+        <button className="period-calendar-link" onClick={goCycle}>Add past periods &amp; history <ChevronRight size={15} /></button>
       </div>
+      <PeriodEditor editor={editor} setEditor={setEditor} />
 
       <SymptomsCard />
 
