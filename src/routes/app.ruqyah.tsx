@@ -2,15 +2,16 @@ import { useEffect, useRef, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import {
   BookOpen, Check, ChevronLeft, ChevronRight, CircleAlert, Droplets, FileText, Flower2, Hand, Lock,
-  Moon, MoonStar, Play, Search, Share2, ShieldCheck, Sparkles, Star, Stethoscope, Sun,
+  Moon, MoonStar, ShieldCheck, Sparkles, Star, Stethoscope, Sun,
   Sunrise, Users, X,
 } from "lucide-react";
 import { HeaderBackButton } from "@/components/HeaderBackButton";
 import { triggerHaptic } from "@/lib/theme";
 import { getRuqyahChecklist, toggleRuqyahCheck } from "@/lib/ruqyah";
 import type { SunnahItem } from "@/data/period-sunnah";
+import { eveningAdhkar, morningAdhkar, type Dhikr } from "@/data/adhkar";
 import {
-  BUKHARI_5675, CONDITION_LIST, MUSLIM_2186, MYTHS, RAQI_FLAGS, RUQYAH_CHECKLIST, RUQYAH_DISCLAIMER,
+  BUKHARI_5675, CONDITION_LIST, MUSLIM_2186, MYTHS, RAQI_FLAGS, RUQYAH_CHECKLIST,
   RUQYAH_SECTIONS, SELF_STEPS, VERSES, type RuqyahSection,
 } from "@/data/ruqyah";
 
@@ -65,10 +66,6 @@ function RuqyahCompanion() {
           {mounted && tab === "ruqyah" && <RuqyahView />}
           {mounted && tab === "verses" && <VersesView />}
           {mounted && tab === "learn" && <LearnView />}
-          <div className="period-callout is-grey flex gap-2">
-            <Stethoscope size={16} className="mt-0.5 flex-none" />
-            <span>{saw(RUQYAH_DISCLAIMER)}</span>
-          </div>
           <p className="period-muted flex items-center justify-center gap-1 pt-1 text-[11px]"><Lock size={11} /> Private — stored only on your device</p>
         </div>
       </main>
@@ -320,34 +317,18 @@ function OthersGuide({ onBack }: { onBack: () => void }) {
 // ================= VERSES =================
 
 function VersesView() {
-  const [query, setQuery] = useState("");
   const [openIdx, setOpenIdx] = useState<number | null>(null);
-  const q = query.trim().toLowerCase();
-  const list = VERSES.map((v, i) => ({ v, i })).filter(({ v }) =>
-    !q || v.title.toLowerCase().includes(q) || v.source.toLowerCase().includes(q) || v.tag.toLowerCase().includes(q));
-
-  if (openIdx !== null) return <VerseDetail idx={openIdx} onBack={() => setOpenIdx(null)} />;
 
   return (
     <>
-      <label className="rq-search">
-        <Search size={16} />
-        <input value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Search verses…" aria-label="Search verses" />
-      </label>
-      <p className="period-callout is-grey">No fixed sequence is reported. These are what the Sunnah names, in the order most commonly used.</p>
+      <p className="rq-sequence-note">No fixed sequence is reported. These are what the Sunnah names, in the order most commonly used.</p>
       <div className="space-y-3">
-        {list.map(({ v, i }) => (
-          <button key={v.title} className="period-card rq-verse-row" onClick={() => { setOpenIdx(i); void triggerHaptic("light"); }}>
-            <span className="period-acc-num">{i + 1}</span>
-            <span className="flex-1 text-left">
-              <span className="block text-[15px] font-bold">{saw(v.title)}</span>
-              <span className="period-source mt-1"><BookOpen size={12} /> {v.source}</span>
-              <span className="rq-tag mt-2">{v.tag}</span>
-            </span>
-            <ChevronRight size={17} className="rq-group-chevron" />
-          </button>
+        {VERSES.map((v, i) => (
+          <VerseAccordion key={v.title} idx={i} open={openIdx === i} onToggle={() => {
+            setOpenIdx(openIdx === i ? null : i);
+            void triggerHaptic("light");
+          }} />
         ))}
-        {list.length === 0 && <p className="period-muted px-1 text-sm">No verses match “{query}”.</p>}
       </div>
       <p className="period-muted px-1 text-sm">Any of the Qur’an, in truth — Allah says of it that it is shifāʾ, a healing.</p>
       <div className="period-callout is-amber">
@@ -357,63 +338,41 @@ function VersesView() {
   );
 }
 
-function VerseDetail({ idx, onBack }: { idx: number; onBack: () => void }) {
+const STORED_VERSES: Partial<Record<number, Dhikr>> = {
+  1: morningAdhkar.find((item) => item.id === "morning-1-ayat-al-kursi"),
+  2: eveningAdhkar.find((item) => item.id === "evening-19-the-last-two-verses-of-surat-al-baqa"),
+  3: morningAdhkar.find((item) => item.id === "morning-2-three-quls"),
+};
+
+function VerseAccordion({ idx, open, onToggle }: { idx: number; open: boolean; onToggle: () => void }) {
   const v = VERSES[idx];
-  const item = v.item;
-  const play = () => {
-    if (!item?.arabic) return;
-    try {
-      const u = new SpeechSynthesisUtterance(item.arabic);
-      u.lang = "ar-SA";
-      u.rate = 0.85;
-      speechSynthesis.cancel();
-      speechSynthesis.speak(u);
-    } catch { /* unsupported */ }
-  };
-  const share = async () => {
-    const lines = [v.title, v.source, ""];
-    if (item?.arabic) lines.push(item.arabic, "");
-    if (item?.transliteration) lines.push(item.transliteration, "");
-    if (item?.translation) lines.push(item.translation, "");
-    lines.push(v.note, "", "— Sahih Al-Adhkar");
-    const text = lines.join("\n");
-    try {
-      if (navigator.share) await navigator.share({ title: v.title, text });
-      else { await navigator.clipboard.writeText(text); alert("Copied to clipboard"); }
-    } catch { /* cancelled */ }
-  };
+  const stored = STORED_VERSES[idx];
+  const item = stored ?? v.item;
   return (
-    <>
-      <BackLink onBack={onBack} label="Verses" />
-      <div className="period-card">
+    <article className={`period-card rq-verse-accordion ${open ? "is-open" : ""}`}>
+      <button className="rq-verse-row" aria-expanded={open} onClick={onToggle}>
         <div className="flex items-start gap-3">
           <span className="period-acc-num">{idx + 1}</span>
           <div className="flex-1">
-            <h2 className="text-[17px] font-bold">{saw(v.title)}</h2>
+            <h2 className="text-[15px] font-bold">{saw(v.title)}</h2>
             <div className="period-source mt-1"><BookOpen size={12} /> {v.source}</div>
+            <span className="rq-tag mt-2">{v.tag}</span>
           </div>
-          <span className="rq-tag">{v.tag}</span>
+          <ChevronRight size={17} className="rq-group-chevron" />
         </div>
-        {item?.arabic && <p className="arabic mt-4 whitespace-pre-line text-right text-[22px] leading-[1.95]" lang="ar" dir="rtl">{item.arabic}</p>}
-        {item?.transliteration && <p className="adhkar-transliteration mt-3 !text-left text-[13px]">{item.transliteration}</p>}
-        <div className="mt-4 flex gap-2">
-          <button className="rq-btn-outline flex-1" onClick={play} disabled={!item?.arabic}><Play size={15} /> Play</button>
-          <button className="rq-btn-outline flex-1" onClick={share}><Share2 size={15} /> Share</button>
+      </button>
+      <div className="rq-verse-content" aria-hidden={!open}>
+        <div>
+          {item?.arabic && <p className="arabic whitespace-pre-line text-right text-[21px] leading-[1.95]" lang="ar" dir="rtl">{item.arabic}</p>}
+          {item?.transliteration && <p className="adhkar-transliteration mt-3 !text-left text-[13px]">{item.transliteration}</p>}
+          {item?.translation && <p className="mt-3 text-sm leading-relaxed">{saw(item.translation)}</p>}
+          {!item?.arabic && <p className="period-muted text-sm leading-relaxed">{saw(v.note)}</p>}
+          {stored?.commentary && <p className="period-callout is-grey mt-3">{saw(stored.commentary)}</p>}
+          {!stored && item?.notes?.map((n, i) => <p key={i} className="period-muted mt-2 text-sm leading-relaxed">{saw(n)}</p>)}
+          {v.to && <Link to={v.to} className="period-link mt-3">Open in Morning Adhkar <ChevronRight size={14} /></Link>}
         </div>
-        {item?.translation && (
-          <details className="adhkar-commentary mt-3" open={false}>
-            <summary>Translation</summary>
-            <p className="pb-1 text-sm">{saw(item.translation)}</p>
-          </details>
-        )}
-        <details className="adhkar-commentary mt-2">
-          <summary>Benefits &amp; Virtues</summary>
-          <p className="pb-1 text-sm">{saw(v.note)}</p>
-          {item?.notes?.map((n, i) => <p key={i} className="period-muted pb-1 text-sm leading-relaxed">{saw(n)}</p>)}
-        </details>
-        {v.to && <Link to={v.to} className="period-link mt-3">Open in Morning Adhkar <ChevronRight size={14} /></Link>}
       </div>
-    </>
+    </article>
   );
 }
 
@@ -431,7 +390,7 @@ const SECTION_META: Record<string, { icon: typeof BookOpen; sub: string }> = {
 function LearnView() {
   const [openId, setOpenId] = useState<string | null>(null);
   const section = RUQYAH_SECTIONS.find((s) => s.id === openId);
-  if (section) return <LearnArticle section={section} onBack={() => setOpenId(null)} />;
+  if (section) return <div className="rq-view-transition"><LearnArticle section={section} onBack={() => setOpenId(null)} /></div>;
   return (
     <>
       <div className="period-card rq-landing-card">
@@ -465,7 +424,7 @@ function LearnView() {
 function LearnArticle({ section: s, onBack }: { section: RuqyahSection; onBack: () => void }) {
   return (
     <div className="space-y-4">
-      <BackLink onBack={onBack} label="Learn" />
+      <BackLink onBack={onBack} label="Back to Learn" />
       <div className="period-card">
         <h2 className="rq-hero-title text-left">{saw(s.title)}</h2>
         {s.intro && <p className="period-muted mt-2 text-sm leading-relaxed">{saw(s.intro)}</p>}
@@ -501,7 +460,6 @@ function LearnArticle({ section: s, onBack }: { section: RuqyahSection; onBack: 
         </div>
       ))}
       {s.myths && <div className="period-card"><Myths /></div>}
-      <button className="period-link" onClick={() => shareSection(s)}><Share2 size={14} /> Share this section</button>
     </div>
   );
 }
@@ -517,26 +475,6 @@ function Myths() {
       ))}
     </div>
   );
-}
-
-async function shareSection(s: RuqyahSection) {
-  const lines = [s.title, ""];
-  if (s.intro) lines.push(s.intro, "");
-  for (const it of s.items) {
-    lines.push(it.title, it.source);
-    if (it.translation) lines.push(it.translation);
-    it.notes?.forEach((n) => lines.push(n));
-    if (it.callout) lines.push(`${it.callout.label} — ${it.callout.text}`);
-    if (it.id === "raqi") RAQI_FLAGS.forEach((f) => lines.push(`• ${f}`));
-    lines.push("");
-  }
-  if (s.myths) MYTHS.forEach((m) => lines.push(`Myth: ${m.myth}`, m.truth, ""));
-  lines.push("— Sahih Al-Adhkar");
-  const text = lines.join("\n");
-  try {
-    if (navigator.share) await navigator.share({ title: s.title, text });
-    else { await navigator.clipboard.writeText(text); alert("Copied to clipboard"); }
-  } catch { /* cancelled */ }
 }
 
 function DuaCard({ item, bare = false }: { item: SunnahItem; bare?: boolean }) {
