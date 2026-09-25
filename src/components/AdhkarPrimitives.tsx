@@ -140,15 +140,12 @@ export function Pagination({
           step={1}
           value={active}
           aria-label={`Adhkar ${active + 1} of ${total}`}
-          onChange={(event) => {
+          onInput={(event) => {
             const next = Number(event.currentTarget.value);
             onScrub(next);
             void triggerHaptic("light");
           }}
-          onClick={(event) => {
-            const next = Number(event.currentTarget.value);
-            if (next !== active) onSelect(next);
-          }}
+          onChange={(event) => onSelect(Number(event.currentTarget.value))}
         />
       </div>
       <button

@@ -305,7 +305,7 @@ export const SUNNAH_SECTIONS: SunnahSection[] = [
   },
   {
     id: "ends",
-    title: "Aftercare & Post-Period",
+    title: "Aftercare & Ghusl",
     intro: `The farḍ ghusl is simple: intend purification in the heart, rinse the mouth and nose, and ensure water reaches every part of the body including the roots of the hair. Once this is done, the ghusl is valid and prayer is valid. Everything else below is additional Sunnah and reward, not a condition.`,
     items: [
       {
@@ -341,17 +341,6 @@ export const SUNNAH_SECTIONS: SunnahSection[] = [
         ],
       },
       {
-        id: "post-period-next",
-        title: "What to do next",
-        source: "Bukhari 227  ·  Agreed rulings",
-        notes: [
-          `Resume prayer at once with the next prayer due.`,
-          `Note the days missed from Ramadan, to be made up before the next Ramadan. Prayers are not made up.`,
-          `If needed, scrape, rub and rinse any menstrual blood on a garment. Then pray in it. The garment does not need replacing.`,
-          `There is no requirement to wear new or different clothes after ghusl. Clean, fresh clothes are a personal preference, not a Sunnah step.`,
-        ],
-      },
-      {
         id: "not-required",
         title: "What is not required",
         source: "No basis in the Sunnah",
@@ -367,6 +356,24 @@ export const SUNNAH_SECTIONS: SunnahSection[] = [
     ],
   },
   {
+    id: "post-period",
+    title: "Post-Period",
+    intro: `Once the bleeding has stopped and ghusl is complete, worship resumes normally. These are the practical next steps.` ,
+    items: [
+      {
+        id: "post-period-next",
+        title: "What to do next",
+        source: "Bukhari 227  ·  Agreed rulings",
+        notes: [
+          `Resume prayer at once with the next prayer due.`,
+          `Note the days missed from Ramadan, to be made up before the next Ramadan. Prayers are not made up.`,
+          `If needed, scrape, rub and rinse any menstrual blood on a garment. Then pray in it. The garment does not need replacing.`,
+          `There is no requirement to wear new or different clothes after ghusl. Clean, fresh clothes are a personal preference, not a Sunnah step.`,
+        ],
+      },
+    ],
+  },
+  {
     id: "myths",
     title: "Myths vs. Sunnah",
     items: [
@@ -377,18 +384,3 @@ export const SUNNAH_SECTIONS: SunnahSection[] = [
     ],
   },
 ];
-
-export const sectionShareText = (s: SunnahSection) => {
-  const parts = [s.title, s.intro ?? ""];
-  for (const it of s.items) {
-    parts.push(`\n${it.title}\n${it.source}`);
-    if (it.arabic) parts.push(it.arabic);
-    if (it.transliteration) parts.push(it.transliteration);
-    if (it.translation) parts.push(it.translation);
-    if (it.narration) parts.push(it.narration);
-    for (const n of it.notes ?? []) parts.push(n);
-    if (it.callout) parts.push(`${it.callout.label}: ${it.callout.text}`);
-  }
-  parts.push("\nFrom Sahih Al-Adhkar");
-  return parts.filter(Boolean).join("\n");
-};

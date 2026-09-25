@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import {
   BatteryLow, BookOpen, Brain, CalendarIcon, Check, ChevronLeft, ChevronRight, CircleDot, Droplets, Frown,
-  Info, Lock, Pencil, Share2, Sparkles, Trash2, Zap,
+  Info, Lock, Pencil, Sparkles, Trash2, Zap,
 } from "lucide-react";
 import { HeaderBackButton } from "@/components/HeaderBackButton";
 import { triggerHaptic } from "@/lib/theme";
@@ -12,7 +12,7 @@ import {
   saveCycleRange, setGratitude, startPeriod, todayK, toggleChecklist, toggleSymptom, type Cycle, type Stats, type Symptom,
 } from "@/lib/period";
 import {
-  EARNING_HADITH, PAIN_DUA, SUNNAH_SECTIONS, sectionShareText, type SunnahItem,
+  EARNING_HADITH, PAIN_DUA, SUNNAH_SECTIONS, type SunnahItem,
 } from "@/data/period-sunnah";
 import {
   PRAYER_LABELS, fetchDay, getPrayerSettings, slotsForDay,
@@ -528,15 +528,6 @@ function Stat({ label, value }: { label: string; value: string }) {
 // ================= LEARN =================
 
 function LearnView({ open, setOpen }: { open: string | null; setOpen: (id: string | null) => void }) {
-  const [copied, setCopied] = useState<string | null>(null);
-  const share = async (id: string) => {
-    const s = SUNNAH_SECTIONS.find((x) => x.id === id)!;
-    const text = sectionShareText(s);
-    try {
-      if (navigator.share) await navigator.share({ title: s.title, text });
-      else { await navigator.clipboard.writeText(text); setCopied(id); setTimeout(() => setCopied(null), 1800); }
-    } catch { /* cancelled */ }
-  };
   return (
     <div className="period-learn-view">
       <div className="period-card period-learn-intro">
@@ -560,9 +551,6 @@ function LearnView({ open, setOpen }: { open: string | null; setOpen: (id: strin
                 <div className="period-learn-body space-y-4">
                   {s.intro && <p className={s.id === "duas" ? "period-callout is-grey" : "period-muted text-sm"}>{s.intro}</p>}
                   {s.items.map((it) => <SunnahCard key={it.id} item={it} />)}
-                  <button className="period-link" onClick={() => void share(s.id)}>
-                    <Share2 size={14} /> {copied === s.id ? "Copied" : "Share this section"}
-                  </button>
                 </div>
               )}
             </section>
@@ -575,7 +563,7 @@ function LearnView({ open, setOpen }: { open: string | null; setOpen: (id: strin
 
 function SunnahCard({ item, compact = false }: { item: SunnahItem; compact?: boolean }) {
   return (
-    <article className={compact ? "mt-2" : "period-item"}>
+    <article className={compact ? "period-relief-prayer" : "period-item"}>
       {!compact && <h3 className="text-sm font-bold">{saw(item.title)}</h3>}
       {compact && <h3 className="text-sm font-bold">{saw(item.title)}</h3>}
       <div className="period-source mt-1"><BookOpen size={12} /> {item.source}</div>
