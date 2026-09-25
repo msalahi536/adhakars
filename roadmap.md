@@ -7,3 +7,4 @@
 - [x] Preserve the last opened More destination when switching main tabs.
 - [x] Refine Period Companion aftercare grouping, relief duas, and Today ordering.
 - [x] Reorder More tools and repair More-section navigation behavior.
+- [ ] Refine Ruqyah warnings, verse accordions, article navigation, transitions, and remove all section sharing.
