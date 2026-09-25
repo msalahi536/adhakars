@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
-import { Check } from "lucide-react";
+import { Check, Crosshair, Lightbulb, Navigation } from "lucide-react";
+import qiblaHero from "@/assets/qibla-hero.jpg";
 import { HeaderBackButton } from "@/components/HeaderBackButton";
 import { CompassCalibrationCard } from "@/components/CompassCalibrationCard";
 import {
@@ -156,14 +157,6 @@ function Qibla() {
       attachCompass();
     }
     setPhase("ready");
-
-    let calibrated = false;
-    try {
-      calibrated = localStorage.getItem(CAL_DONE_KEY) === "1";
-    } catch {
-      // ignore
-    }
-    if (!calibrated && sensor !== "unsupported") setShowCalibration(true);
   };
 
   // Auto start when opening the page. iOS only allows the motion prompt from a
@@ -253,167 +246,90 @@ function Qibla() {
 
           {permState === "ready" && (
             <div className="qibla-ready">
-              <p className="mb-5 max-w-[280px] text-center text-xs" style={{ color: "var(--muted-foreground)" }}>
-                Hold your phone flat and turn slowly until the arrow points up.
-              </p>
-              <div
-                className="qibla-compass relative flex items-center justify-center"
-              >
-                {/* Compass ring */}
+              <div className="qb-dial" data-aligned={aligned || undefined}>
                 <div
-                  className="absolute inset-0 rounded-full"
-                  style={{
-                    background:
-                      "radial-gradient(circle, var(--card) 0%, var(--muted) 75%)",
-                    border: `2px solid ${aligned ? "color-mix(in oklab, #3d8f5c 70%, transparent)" : "color-mix(in oklab, var(--accent) 45%, transparent)"}`,
-                    boxShadow: aligned
-                      ? "0 0 28px color-mix(in oklab, #3d8f5c 35%, transparent), var(--card-shadow)"
-                      : "var(--card-shadow)",
-                    transition: "border-color 300ms ease, box-shadow 300ms ease",
-                  }}
-                />
-
-                {/* Cardinal marks rotate with device so N always points to true North */}
-                <div
-                  className="absolute inset-0"
+                  className="qb-rose"
                   style={{
                     transform: `rotate(${qiblaBearing !== null && heading !== null ? arrowAngle - qiblaBearing : 0}deg)`,
-                    transition: "transform 280ms cubic-bezier(0.22, 1, 0.36, 1)",
                   }}
                 >
+                  {Array.from({ length: 72 }).map((_, i) => (
+                    <span
+                      key={i}
+                      className={`qb-tick ${i % 18 === 0 ? "is-major" : i % 6 === 0 ? "is-mid" : ""}`}
+                      style={{ transform: `rotate(${i * 5}deg)` }}
+                    />
+                  ))}
                   {(["N", "E", "S", "W"] as const).map((label, i) => (
-                    <div
+                    <span
                       key={label}
-                      className="absolute left-1/2 top-1/2 text-xs font-bold"
-                      style={{
-                        color:
-                          label === "N"
-                            ? "var(--accent)"
-                            : "color-mix(in oklab, var(--foreground) 55%, transparent)",
-                        transform: `translate(-50%, -50%) rotate(${i * 90}deg) translateY(-118px) rotate(${-i * 90}deg)`,
-                      }}
+                      className="qb-cardinal"
+                      style={{ transform: `translate(-50%, -50%) rotate(${i * 90}deg) translateY(calc(var(--qb-r) * -0.78)) rotate(${-i * 90}deg)` }}
                     >
                       {label}
-                    </div>
+                    </span>
                   ))}
                 </div>
-                {/* Qibla arrow */}
+                <div className="qb-inner" aria-hidden="true">
+                  <svg viewBox="0 0 100 100" className="qb-star">
+                    {Array.from({ length: 8 }).map((_, i) => (
+                      <rect key={i} x="30" y="30" width="40" height="40" rx="2" transform={`rotate(${i * 11.25} 50 50)`} />
+                    ))}
+                  </svg>
+                </div>
                 {targetRotation !== null && (
-                  <div
-                    className="absolute inset-0 flex items-center justify-center"
-                    style={{
-                      transform: `rotate(${arrowAngle}deg)`,
-                      transition: "transform 280ms cubic-bezier(0.22, 1, 0.36, 1)",
-                    }}
-                  >
-                    <div
-                      className="flex flex-col items-center"
-                      style={{ transform: "translateY(-40px)" }}
-                    >
-                      <svg width={40} height={46} viewBox="0 0 40 46" aria-hidden="true">
-                        <path
-                          d="M20 2 L36 42 L20 33 L4 42 Z"
-                          fill={aligned ? "#3d8f5c" : "var(--accent)"}
-                          stroke={aligned ? "#3d8f5c" : "var(--accent)"}
-                          strokeWidth={1}
-                          strokeLinejoin="round"
-                        />
-                      </svg>
-                      <div
-                        className="mt-1 text-[10px] font-bold tracking-wide"
-                        style={{ color: aligned ? "#3d8f5c" : "var(--accent)" }}
-                      >
-                        KAABA
-                      </div>
-                    </div>
+                  <div className="qb-needle" style={{ transform: `rotate(${arrowAngle}deg)` }}>
+                    <svg viewBox="0 0 40 90" aria-hidden="true">
+                      <path d="M20 2 L34 62 L20 54 Z" className="qb-needle-dark" />
+                      <path d="M20 2 L6 62 L20 54 Z" className="qb-needle-light" />
+                    </svg>
                   </div>
                 )}
-
-                {/* Center dot */}
-                <div
-                  className="absolute rounded-full"
-                  style={{
-                    left: "50%",
-                    top: "50%",
-                    width: 12,
-                    height: 12,
-                    transform: "translate(-50%, -50%)",
-                    background: "var(--accent)",
-                    boxShadow:
-                      "0 0 0 4px color-mix(in oklab, var(--accent) 20%, transparent)",
-                  }}
-                />
+                <span className="qb-hub" />
               </div>
 
-              {!showCalibration && (
-                <button
-                  onClick={() => setShowCalibration(true)}
-                  className="mt-4 rounded-full px-4 py-2 text-xs font-bold"
-                  style={{
-                    background: "var(--btn-surface)",
-                    color: "var(--btn-fg)",
-                    border:
-                      "1px solid color-mix(in oklab, var(--accent) 40%, transparent)",
-                  }}
-                >
-                  Calibrate compass
-                </button>
+              {aligned && (
+                <div className="mt-3 flex items-center gap-1.5 text-sm font-bold text-primary">
+                  <Check aria-hidden size={16} strokeWidth={2} />
+                  <span>You are facing the Qibla</span>
+                </div>
               )}
 
+              <button onClick={() => setShowCalibration(true)} className="qb-cal-btn">
+                <Crosshair size={16} strokeWidth={1.8} aria-hidden />
+                Calibrate compass
+              </button>
+
               {absolute === false && (
-                <p
-                  className="mt-3 text-center text-[11px]"
-                  style={{ color: "#c0392b" }}
-                >
-                  This device reports a relative compass, so the direction may drift. Calibrate,
-                  then hold the phone flat and face North once to reset it.
+                <p className="mt-2 text-center text-[11px] text-destructive">
+                  This device reports a relative compass, so the direction may drift. Calibrate to improve it.
                 </p>
               )}
 
-
-
-              <div
-                className="qibla-details w-full space-y-1.5 text-center text-xs"
-                style={{ color: "var(--muted-foreground)" }}
-              >
-                {qiblaBearing !== null && (
+              <div className="qb-stats">
+                <div className="qb-stat">
+                  <span className="qb-stat-icon"><Navigation size={16} strokeWidth={1.8} /></span>
                   <div>
-                    Qibla bearing:{" "}
-                    <span className="font-bold" style={{ color: "var(--foreground)" }}>
-                      {qiblaBearing.toFixed(1)}°
-                    </span>
+                    <div className="qb-stat-label">Qibla bearing</div>
+                    <div className="qb-stat-value">{qiblaBearing !== null ? `${qiblaBearing.toFixed(1)}°` : "--"}</div>
                   </div>
-                )}
-                {heading !== null && (
+                </div>
+                <div className="qb-stat-divider" />
+                <div className="qb-stat">
+                  <span className="qb-stat-icon">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden><path d="M4 7l8-4 8 4v10l-8 4-8-4z" /><path d="M4 10l8 4 8-4" /></svg>
+                  </span>
                   <div>
-                    Your heading:{" "}
-                    <span className="font-bold" style={{ color: "var(--foreground)" }}>
-                      {heading.toFixed(1)}°
-                    </span>
+                    <div className="qb-stat-label">Distance to Kaaba</div>
+                    <div className="qb-stat-value">{coords ? `${Math.round(distanceKm(coords.lat, coords.lng)).toLocaleString()} km` : "--"}</div>
                   </div>
-                )}
-                {coords && (
-                  <div>
-                    Distance to Kaaba:{" "}
-                    <span className="font-bold" style={{ color: "var(--foreground)" }}>
-                      {distanceKm(coords.lat, coords.lng).toFixed(0)} km
-                    </span>
-                  </div>
-                )}
-                {aligned && (
-                  <div className="flex items-center justify-center gap-1.5 pt-2 text-sm font-bold" style={{ color: "#3d8f5c" }}>
-                    <Check aria-hidden size={16} strokeWidth={2} />
-                    <span>You are facing the Qibla</span>
-                  </div>
-                )}
+                </div>
               </div>
 
-              <p
-                className="mt-4 text-center text-[10px]"
-                style={{ color: "var(--muted-foreground)", opacity: 0.8 }}
-              >
-                Tip: Keep phone flat and away from metal or magnets for best accuracy.
-              </p>
+              <div className="qb-tip">
+                <Lightbulb size={18} strokeWidth={1.6} aria-hidden />
+                <p>Tip: Keep your phone flat and away from metal or magnets for best accuracy.</p>
+              </div>
             </div>
           )}
         </div>
