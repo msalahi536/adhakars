@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import {
-  Bookmark, ChevronDown, ChevronUp, Cloud, Copy, Heart, HeartPulse, Home, Info, Compass, Search, Shield,
+  Bookmark, ChevronDown, ChevronUp, Cloud, Copy, HeartPulse, Home, Info, Compass, Search, Shield,
   Sparkles, Users, Wallet, X, CloudRain, Frown, RotateCcw, Flower2, HandHeart, Lock, Volume2,
 } from "lucide-react";
 import { toast } from "sonner";
@@ -220,4 +220,4 @@ function DuaCard({ d, fav, onFav, extra }: { d: Dua; fav: boolean; onFav: () => 
   );
 }
 
-void Heart;
+
