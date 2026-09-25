@@ -106,12 +106,18 @@ function DuaLibrary() {
                 </>
               ) : (
                 <>
-                  {suggestions && (
-                    <section className={`dl-suggest ${suggestions.gold ? "is-gold" : ""}`}>
-                      <div className="dl-section-title">{suggestions.title}</div>
-                      {suggestions.ids.map(byId).filter(Boolean).map((d) => card(d!))}
-                    </section>
-                  )}
+                  <button
+                    className={`dl-jumuah ${isFriday ? "is-glow" : ""}`}
+                    onClick={() => { setCat("jum"); void triggerHaptic("light"); document.querySelector(".period-scroll-area")?.scrollTo({ top: 0 }); }}
+                  >
+                    <span className="dl-cat-icon"><Sun size={18} /></span>
+                    <span className="dl-jumuah-body">
+                      <span className="dl-jumuah-name">Jumu‘ah Sunnahs</span>
+                      <span className="dl-jumuah-sub">The Prophet’s ﷺ Friday practice</span>
+                    </span>
+                    <span className="dl-jumuah-count">4 duas</span>
+                    <ChevronRight size={18} className="dl-jumuah-chevron" />
+                  </button>
                   <div className="dl-grid">
                     {CATEGORIES.map((c, i) => {
                       const Icon = CAT_ICONS[i];
