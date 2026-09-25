@@ -65,9 +65,7 @@ function distanceKm(lat: number, lng: number): number {
 const CAL_DONE_KEY = "qibla-calibrated";
 
 function Qibla() {
-  const [phase, setPhase] = useState<"intro" | "requesting" | "ready" | "error">(() =>
-    typeof window !== "undefined" && (!needsGesturePermission() || hasStoredPermission()) ? "requesting" : "intro",
-  );
+  const [phase, setPhase] = useState<"intro" | "requesting" | "ready" | "error">("requesting");
   const [step, setStep] = useState<string>("");
   const [error, setError] = useState<string | null>(null);
   const [absolute, setAbsolute] = useState<boolean | null>(null);
@@ -194,6 +192,7 @@ function Qibla() {
     autoRef.current = true;
     if (!needsGesturePermission()) void start();
     else if (hasStoredPermission()) void start(true);
+    else setPhase("intro");
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
