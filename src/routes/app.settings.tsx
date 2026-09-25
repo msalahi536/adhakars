@@ -61,6 +61,7 @@ import {
   Sprout,
   Type,
   ALargeSmall,
+  Check,
 } from "lucide-react";
 
 const APP_VERSION = "1.0.3";
@@ -337,12 +338,13 @@ function Settings() {
                       className="settings-theme-option flex flex-col items-center gap-1 rounded-2xl p-2 transition"
                       style={{
                         background: "var(--surface)",
-                        border: active ? "2px solid var(--accent)" : "1px solid var(--border)",
+                        border: "1px solid var(--border)",
                       }}
                       aria-label={p.name}
                     >
                       <div
                         style={{
+                          position: "relative",
                           width: "100%",
                           height: 40,
                           borderRadius: 10,
@@ -370,6 +372,30 @@ function Settings() {
                               }}
                             />
                           </>
+                        )}
+                        {active && (
+                          <div
+                            className="settings-theme-check"
+                            style={{
+                              position: "absolute",
+                              top: 3,
+                              right: 3,
+                              width: 16,
+                              height: 16,
+                              borderRadius: "50%",
+                              background: "var(--accent)",
+                              display: "flex",
+                              alignItems: "center",
+                              justifyContent: "center",
+                              boxShadow: "0 1px 3px rgba(0,0,0,0.3)",
+                            }}
+                          >
+                            <Check
+                              size={11}
+                              strokeWidth={3.5}
+                              style={{ color: "var(--accent-foreground)" }}
+                            />
+                          </div>
                         )}
                       </div>
                       <span className="text-[10px] font-semibold">{p.name}</span>
