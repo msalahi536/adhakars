@@ -3421,6 +3421,16 @@ html[data-preset][data-visual-phase="evening"][data-section="salah"] :is(.prayer
   background: var(--card) !important;
   color: var(--card-foreground) !important;
 }
+
+html[data-preset="ocean"][data-visual-phase="evening"][data-section="salah"] {
+  --card: rgba(21, 47, 70, 0.9) !important;
+  --surface-card: rgba(21, 47, 70, 0.9) !important;
+  --card-foreground: #e6f3fb !important;
+  --card-border: rgba(170, 214, 240, 0.2) !important;
+  --border: rgba(170, 214, 240, 0.2) !important;
+  --nav-bg: rgba(25, 55, 80, 0.9) !important;
+  --nav-border: rgba(170, 214, 240, 0.26) !important;
+}
 .fs-switch::after { content: ""; position: absolute; top: 3px; left: 3px; width: 20px; height: 20px; border-radius: 50%; background: var(--background); box-shadow: 0 1px 3px rgba(0,0,0,.25); transition: transform .2s; }
 .fs-switch:checked { background: var(--accent); }
 .fs-switch:checked::after { transform: translateX(18px); }
