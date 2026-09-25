@@ -1,8 +1,8 @@
 import { useEffect, useMemo, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import {
-  Bookmark, ChevronDown, ChevronUp, Cloud, Copy, HeartPulse, Home, Info, Compass, Search, Shield,
-  Sparkles, Users, Wallet, X, CloudRain, Frown, RotateCcw, Flower2, HandHeart, Lock, Volume2,
+  Bookmark, ChevronDown, ChevronUp, ChevronRight, Cloud, Copy, HeartPulse, Home, Info, Compass, Search, Shield,
+  Sparkles, Sun, Users, Wallet, X, CloudRain, Frown, RotateCcw, Flower2, HandHeart, Lock, Volume2,
 } from "lucide-react";
 import { toast } from "sonner";
 import { HeaderBackButton } from "@/components/HeaderBackButton";
@@ -26,6 +26,8 @@ export const Route = createFileRoute("/app/duas")({
 const CAT_ICONS = [Flower2, HandHeart, Wallet, Shield, RotateCcw, HeartPulse, Frown, Compass, Home, Sparkles, Users, CloudRain, Cloud];
 const THUNDER_NOTE = "Practice of Abdullah bin az-Zubayr, not a prophetic narration. Graded authentic by al-Albani as his statement.";
 const byId = (id: string) => DUAS.find((d) => d.id === id);
+const JUMUAH_IDS = ["jum-01", "jum-02", "jum-03", "jum-04"];
+const JUMUAH_DUAS = JUMUAH_IDS.map(byId).filter(Boolean) as Dua[];
 const saw = (t: string) => t.split("ﷺ").flatMap((p, i) => (i ? [<span key={i} className="period-saw">ﷺ</span>, p] : [p]));
 
 type Tab = "library" | "saved";
@@ -54,7 +56,9 @@ function DuaLibrary() {
   };
 
   const results = useMemo(() => searchDuas(q), [q]);
+  const isFriday = mounted && now?.getDay() === 5;
   const catList = useMemo(() => {
+    if (cat === "jum") return JUMUAH_DUAS;
     if (!cat) return [];
     const list = DUAS.filter((d) => d.cat === cat);
     if (sort === "alpha") return [...list].sort((a, b) => a.title.localeCompare(b.title));
@@ -65,12 +69,6 @@ function DuaLibrary() {
     return list;
   }, [cat, sort, favs]);
   const emotional = results.some((d) => EMOTIONAL_CATS.has(d.cat));
-
-  const suggestions = useMemo(() => {
-    if (!now) return null;
-    if (now.getDay() === 5) return { title: "Jumu‘ah Sunnahs", gold: true, ids: ["jum-01", "jum-02", "jum-03", "jum-04"] };
-    return null;
-  }, [now]);
 
   const go = (t: Tab) => { setTab(t); setCat(null); void triggerHaptic("light"); document.querySelector(".period-scroll-area")?.scrollTo({ top: 0 }); };
   const card = (d: Dua, extra?: React.ReactNode) => <DuaCard key={d.id} d={d} fav={favIds.has(d.id)} onFav={() => toggleFav(d.id)} extra={extra} />;
@@ -108,12 +106,18 @@ function DuaLibrary() {
                 </>
               ) : (
                 <>
-                  {suggestions && (
-                    <section className={`dl-suggest ${suggestions.gold ? "is-gold" : ""}`}>
-                      <div className="dl-section-title">{suggestions.title}</div>
-                      {suggestions.ids.map(byId).filter(Boolean).map((d) => card(d!))}
-                    </section>
-                  )}
+                  <button
+                    className={`dl-jumuah ${isFriday ? "is-glow" : ""}`}
+                    onClick={() => { setCat("jum"); void triggerHaptic("light"); document.querySelector(".period-scroll-area")?.scrollTo({ top: 0 }); }}
+                  >
+                    <span className="dl-cat-icon"><Sun size={18} /></span>
+                    <span className="dl-jumuah-body">
+                      <span className="dl-jumuah-name">Jumu‘ah Sunnahs</span>
+                      <span className="dl-jumuah-sub">The Prophet’s ﷺ Friday practice</span>
+                    </span>
+                    <span className="dl-jumuah-count">4 duas</span>
+                    <ChevronRight size={18} className="dl-jumuah-chevron" />
+                  </button>
                   <div className="dl-grid">
                     {CATEGORIES.map((c, i) => {
                       const Icon = CAT_ICONS[i];
@@ -149,15 +153,17 @@ function DuaLibrary() {
             <>
               <div className="dl-cat-head">
                 <button className="dl-back" onClick={() => setCat(null)}>All categories</button>
-                <h2>{cat}</h2>
+                <h2>{cat === "jum" ? "Jumu‘ah Sunnahs" : cat}</h2>
                 <p>{catList.length} authentic {catList.length === 1 ? "dua" : "duas"}</p>
-                <div className="dl-sort" role="radiogroup" aria-label="Sort">
-                  {(["default", "alpha", "recent"] as Sort[]).map((s) => (
-                    <button key={s} role="radio" aria-checked={sort === s} className={sort === s ? "is-active" : ""} onClick={() => setSort(s)}>
-                      {s === "default" ? "Default" : s === "alpha" ? "A–Z" : "Recently saved"}
-                    </button>
-                  ))}
-                </div>
+                {cat !== "jum" && (
+                  <div className="dl-sort" role="radiogroup" aria-label="Sort">
+                    {(["default", "alpha", "recent"] as Sort[]).map((s) => (
+                      <button key={s} role="radio" aria-checked={sort === s} className={sort === s ? "is-active" : ""} onClick={() => setSort(s)}>
+                        {s === "default" ? "Default" : s === "alpha" ? "A–Z" : "Recently saved"}
+                      </button>
+                    ))}
+                  </div>
+                )}
               </div>
               {catList.map((d) => card(d))}
             </>
