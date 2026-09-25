@@ -3315,6 +3315,112 @@ html[data-preset="ocean"][data-visual-phase="evening"] .bottom-nav-row {
   color: var(--accent);
   box-shadow: inset 0 0 0 1px var(--accent);
 }
+
+/* Salah must follow the resolved evening palette, regardless of its route section. */
+html[data-preset][data-visual-phase="evening"][data-section="salah"] {
+  --preset-ink: var(--eve-ink);
+  --preset-ink-strong: var(--eve-title);
+  --preset-ink-rgb: var(--eve-ink-rgb);
+  --preset-muted: var(--eve-muted);
+  --foreground: var(--eve-title) !important;
+  --title: var(--eve-title) !important;
+  --eyebrow: var(--eve-eyebrow) !important;
+  --accent: var(--eve-ink) !important;
+  --primary: var(--eve-ink) !important;
+  --muted-foreground: var(--eve-muted) !important;
+  --text-muted: var(--eve-muted) !important;
+  --surface-deep: var(--card) !important;
+  --surface-deep-gradient: linear-gradient(135deg, color-mix(in oklab, var(--accent) 34%, var(--card)) 0%, var(--card) 100%) !important;
+  --surface-deep-fg: var(--eve-title) !important;
+  --surface-deep-muted: var(--eve-muted) !important;
+  --nav-active: var(--eve-nav-active) !important;
+  --nav-inactive: var(--eve-nav-inactive) !important;
+}
+
+html[data-preset][data-visual-phase="evening"][data-section="salah"] .salah-page {
+  color: var(--foreground);
+}
+
+html[data-preset][data-visual-phase="evening"][data-section="salah"] :is(
+  .salah-location-card,
+  .salah-recommended-card,
+  .salah-adhan-card,
+  .salah-upcoming-placeholder
+) {
+  border-color: var(--card-border) !important;
+  background: var(--card) !important;
+  color: var(--card-foreground) !important;
+  box-shadow: var(--card-shadow) !important;
+}
+
+html[data-preset][data-visual-phase="evening"][data-section="salah"] :is(
+  .salah-next-label,
+  .salah-countdown,
+  .salah-recommended-title,
+  .salah-action-label,
+  .salah-adhan-title
+) {
+  color: var(--eve-title) !important;
+}
+
+html[data-preset][data-visual-phase="evening"][data-section="salah"] :is(
+  .salah-location,
+  .salah-recommended-progress,
+  .salah-kicker,
+  .salah-adhan-subtitle,
+  .salah-adhan-chevron
+) {
+  color: var(--eve-muted) !important;
+}
+
+html[data-preset][data-visual-phase="evening"][data-section="salah"] :is(.salah-dismiss, .salah-change, .salah-adhan-icon) {
+  border-color: var(--card-border) !important;
+  background: color-mix(in oklab, var(--eve-ink) 14%, transparent) !important;
+  color: var(--eve-ink) !important;
+}
+
+html[data-preset][data-visual-phase="evening"][data-section="salah"] .salah-play,
+html[data-preset][data-visual-phase="evening"][data-section="salah"] .salah-action-track span {
+  background: var(--eve-ink) !important;
+}
+
+html[data-preset][data-visual-phase="evening"][data-section="salah"] .salah-play {
+  color: var(--accent-foreground) !important;
+}
+
+html[data-preset][data-visual-phase="evening"][data-section="salah"] .salah-action-track {
+  background: color-mix(in oklab, var(--eve-ink) 18%, transparent) !important;
+}
+
+html[data-preset][data-visual-phase="evening"][data-section="salah"] .prayer-timeline-card {
+  background: var(--surface-deep-gradient) !important;
+  color: var(--surface-deep-fg) !important;
+  box-shadow: var(--card-shadow) !important;
+}
+
+html[data-preset][data-visual-phase="evening"][data-section="salah"] .prayer-timeline-card :is(
+  .prayer-timeline-name,
+  .prayer-timeline-time,
+  .prayer-timeline-heading .label-caps,
+  .prayer-timeline-heading > span:last-child
+) {
+  color: var(--surface-deep-fg) !important;
+}
+
+html[data-preset][data-visual-phase="evening"][data-section="salah"] .prayer-timeline-card .prayer-timeline-row[data-state="next"] :is(.prayer-timeline-name, .prayer-timeline-time) {
+  color: var(--eve-ink) !important;
+}
+
+html[data-preset][data-visual-phase="evening"][data-section="salah"] .bottom-nav-row {
+  border-color: var(--nav-border) !important;
+  background: var(--nav-bg) !important;
+}
+
+html[data-preset][data-visual-phase="evening"][data-section="salah"] :is(.prayer-timeline-sheet, .after-salah-panel) {
+  border-color: var(--card-border) !important;
+  background: var(--card) !important;
+  color: var(--card-foreground) !important;
+}
 .fs-switch::after { content: ""; position: absolute; top: 3px; left: 3px; width: 20px; height: 20px; border-radius: 50%; background: var(--background); box-shadow: 0 1px 3px rgba(0,0,0,.25); transition: transform .2s; }
 .fs-switch:checked { background: var(--accent); }
 .fs-switch:checked::after { transform: translateX(18px); }
