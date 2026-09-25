@@ -110,12 +110,12 @@ function DailyView() {
                 const on = done.has(it.id);
                 return (
                   <li key={it.id} className="period-check-row">
-                    <button className={`period-check ${on ? "is-on" : ""}`} aria-pressed={on} aria-label={saw(it.label)}
+                    <button className={`period-check ${on ? "is-on" : ""}`} aria-pressed={on} aria-label={it.label}
                       onClick={() => { toggleRuqyahCheck(it.id); void triggerHaptic("light"); }}>
                       {on && <Check size={14} strokeWidth={2.6} />}
                     </button>
                     <span className="flex-1 text-sm leading-snug">{saw(it.label)}</span>
-                    {it.to && <Link to={it.to} className="period-icon-btn" aria-label={`Open ${saw(it.label)}`}><ChevronRight size={16} /></Link>}
+                    {it.to && <Link to={it.to} className="period-icon-btn" aria-label={`Open ${it.label}`}><ChevronRight size={16} /></Link>}
                   </li>
                 );
               })}
