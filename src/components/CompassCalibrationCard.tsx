@@ -122,12 +122,10 @@ export function CompassCalibrationCard({ onDone, onSkip }: Props) {
             </defs>
             <circle cx={c} cy={c} r={76} fill="color-mix(in oklab, var(--muted) 55%, transparent)" />
             <circle cx={c} cy={c} r={24} fill="none" strokeDasharray="3 4" stroke="color-mix(in oklab, var(--muted-foreground) 30%, transparent)" />
-            <ellipse cx={c + ball.x * 62 + 3} cy={c + ball.y * 62 + 12} rx={12} ry={4} fill="var(--foreground)" opacity={0.12} />
             <g transform={`translate(${c + ball.x * 62} ${c + ball.y * 62})`}>
-              <circle r={13} fill="url(#cal-ball)" />
-              <g transform={`rotate(${ball.rot})`}>
-                <path d="M -9 -3 Q 0 3 9 -3" fill="none" stroke="var(--card)" strokeOpacity={0.45} strokeWidth={1.4} strokeLinecap="round" />
-              </g>
+              {/* Flat circle — a simple solid dot, no 3D shading. */}
+              <circle r={11} fill="var(--accent)" />
+              <circle r={11} fill="none" stroke="color-mix(in oklab, var(--accent) 70%, var(--card))" strokeWidth={2} />
             </g>
             {complete && (
               <g transform={`translate(${c - 14} ${c - 14})`}>
