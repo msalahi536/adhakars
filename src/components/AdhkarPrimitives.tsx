@@ -1,4 +1,5 @@
 import { BookOpen, Check, ChevronLeft, ChevronRight } from "lucide-react";
+import { useState } from "react";
 import { ProgressRing } from "./ProgressRing";
 import { triggerHaptic } from "@/lib/theme";
 
@@ -108,6 +109,15 @@ export function Pagination({
   onNext: () => void;
   onScrub: (index: number) => void;
 }) {
+  const [isScrubbing, setIsScrubbing] = useState(false);
+
+  const finishScrubbing = (event: React.PointerEvent<HTMLDivElement>) => {
+    setIsScrubbing(false);
+    if (event.currentTarget.hasPointerCapture(event.pointerId)) {
+      event.currentTarget.releasePointerCapture(event.pointerId);
+    }
+  };
+
   return (
     <div className="adhkar-pagination-row">
       <button
@@ -123,10 +133,11 @@ export function Pagination({
         <ChevronLeft size={14} strokeWidth={1.8} />
       </button>
       <div
-        className="adhkar-pagination"
+        className={`adhkar-pagination ${isScrubbing ? "is-scrubbing" : ""}`}
         data-no-swipe
         onContextMenu={(event) => event.preventDefault()}
         onPointerDown={(event) => {
+          setIsScrubbing(true);
           event.currentTarget.setPointerCapture(event.pointerId);
           const rect = event.currentTarget.getBoundingClientRect();
           const ratio = Math.max(0, Math.min(1, (event.clientX - rect.left) / rect.width));
@@ -139,11 +150,9 @@ export function Pagination({
           const ratio = Math.max(0, Math.min(1, (event.clientX - rect.left) / rect.width));
           onScrub(Math.round(ratio * Math.max(0, total - 1)));
         }}
-        onPointerUp={(event) => {
-          if (event.currentTarget.hasPointerCapture(event.pointerId)) {
-            event.currentTarget.releasePointerCapture(event.pointerId);
-          }
-        }}
+        onPointerUp={finishScrubbing}
+        onPointerCancel={finishScrubbing}
+        onLostPointerCapture={() => setIsScrubbing(false)}
       >
         <div className="adhkar-pagination-dots" aria-hidden="true">
           {Array.from({ length: total }, (_, index) => (
