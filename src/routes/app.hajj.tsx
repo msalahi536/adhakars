@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import {
   BookOpen, Check, ChevronLeft, ChevronRight, CircleAlert, Compass, GraduationCap, Landmark,
-  MapPin, RotateCcw, Sparkles, UserRound, WifiOff, X,
+  MapPin, RotateCcw, Sparkles, UserRound, X,
 } from "lucide-react";
 import { HeaderBackButton } from "@/components/HeaderBackButton";
 import { triggerHaptic } from "@/lib/theme";
