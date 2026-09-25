@@ -4,6 +4,8 @@ import { DhikrCard } from "./DhikrCard";
 import { TasbeehComboCard } from "./TasbeehComboCard";
 import { ChevronLeft, ChevronRight, RotateCcw, ArrowRight, Pencil, Plus, Trash2 } from "lucide-react";
 import type { SalahItem } from "@/data/salah";
+import type { SalahItem as _SalahItem } from "@/data/salah";
+import { triggerHaptic } from "@/lib/theme";
 import { isItemComplete, itemId } from "@/data/salah";
 import { Pagination } from "./AdhkarPrimitives";
 
