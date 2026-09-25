@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { HeaderBackButton } from "@/components/HeaderBackButton";
 import { getDisplay, setDisplay } from "@/lib/theme";
@@ -43,11 +43,28 @@ import {
 } from "@/lib/prayer-times";
 import { rescheduleAdhanNotifications } from "@/lib/adhan-notifications";
 import { requestAppReview } from "@/lib/rate-app";
-import { Star } from "lucide-react";
-
-
+import {
+  Star,
+  BookOpen,
+  Scale,
+  Bell,
+  Volume2,
+  MapPin,
+  Sun,
+  Moon,
+  Vibrate,
+  Database,
+  Trash2,
+  Info,
+  FileText,
+  Mail,
+  Sprout,
+  Type,
+  ALargeSmall,
+} from "lucide-react";
 
 const APP_VERSION = "1.0.3";
+const CONTACT_EMAIL = "msalahi536@gmail.com";
 
 export const Route = createFileRoute("/app/settings")({
   head: () => ({
@@ -133,7 +150,6 @@ function Settings() {
       document.removeEventListener("visibilitychange", onVisible);
     };
   }, []);
-
 
 
   const handleEnableNotifications = async () => {
@@ -303,104 +319,95 @@ function Settings() {
               </div>
             </div>
 
-            {/* Preset grid */}
-            <div className="mb-2 text-xs font-semibold opacity-70">THEME</div>
-            <div className="settings-theme-grid mb-3 grid grid-cols-4 gap-2">
-              {PRESETS.map((p) => {
-                const active = presetId === p.id;
-                const morningSeed = sectionSeedFor(p.id, p.seed, "morning");
-                const eveningSeed = sectionSeedFor(p.id, p.seed, "evening");
-                const art = PRESET_BACKGROUNDS[p.id];
-                return (
-                  <button
-                    key={p.id}
-                    onClick={() => choosePreset(p)}
-                    className="settings-theme-option flex flex-col items-center gap-1 rounded-2xl p-2 transition"
-                    style={{
-                      background: "var(--surface)",
-                      border: active ? "2px solid var(--accent)" : "1px solid var(--border)",
-                    }}
-                    aria-label={p.name}
-                  >
-                    <div
+            <div className="settings-group mb-3 p-4">
+              <div className="settings-row-title">Theme</div>
+              <div className="settings-row-desc mb-3">
+                Choose a theme that matches your preference.
+              </div>
+              <div className="settings-theme-grid grid grid-cols-4 gap-2">
+                {PRESETS.map((p) => {
+                  const active = presetId === p.id;
+                  const morningSeed = sectionSeedFor(p.id, p.seed, "morning");
+                  const eveningSeed = sectionSeedFor(p.id, p.seed, "evening");
+                  const art = PRESET_BACKGROUNDS[p.id];
+                  return (
+                    <button
+                      key={p.id}
+                      onClick={() => choosePreset(p)}
+                      className="settings-theme-option flex flex-col items-center gap-1 rounded-2xl p-2 transition"
                       style={{
-                        width: "100%",
-                        height: 40,
-                        borderRadius: 10,
-                        overflow: "hidden",
-                        display: "flex",
-                        background: `linear-gradient(135deg, ${morningSeed} 0%, ${eveningSeed} 100%)`,
+                        background: "var(--surface)",
+                        border: active ? "2px solid var(--accent)" : "1px solid var(--border)",
                       }}
+                      aria-label={p.name}
                     >
-                      {art && (
-                        <>
-                          <div
-                            style={{
-                              flex: 1,
-                              backgroundImage: `url(${art.morning})`,
-                              backgroundSize: "cover",
-                              backgroundPosition: "center top",
-                            }}
-                          />
-                          <div
-                            style={{
-                              flex: 1,
-                              backgroundImage: `url(${art.evening})`,
-                              backgroundSize: "cover",
-                              backgroundPosition: "center top",
-                            }}
-                          />
-                        </>
-                      )}
-                    </div>
-                    <span className="text-[10px] font-semibold">{p.name}</span>
-                  </button>
-                );
-              })}
+                      <div
+                        style={{
+                          width: "100%",
+                          height: 40,
+                          borderRadius: 10,
+                          overflow: "hidden",
+                          display: "flex",
+                          background: `linear-gradient(135deg, ${morningSeed} 0%, ${eveningSeed} 100%)`,
+                        }}
+                      >
+                        {art && (
+                          <>
+                            <div
+                              style={{
+                                flex: 1,
+                                backgroundImage: `url(${art.morning})`,
+                                backgroundSize: "cover",
+                                backgroundPosition: "center top",
+                              }}
+                            />
+                            <div
+                              style={{
+                                flex: 1,
+                                backgroundImage: `url(${art.evening})`,
+                                backgroundSize: "cover",
+                                backgroundPosition: "center top",
+                              }}
+                            />
+                          </>
+                        )}
+                      </div>
+                      <span className="text-[10px] font-semibold">{p.name}</span>
+                    </button>
+                  );
+                })}
+              </div>
               <button
                 onClick={() => setSuggestOpen(true)}
-                className="settings-theme-option flex flex-col items-center justify-center gap-1 rounded-2xl p-2 transition"
+                className="settings-suggest-row"
+              >
+                <span className="settings-suggest-plus">+</span>
+                <span>Suggest a theme</span>
+              </button>
+              <button
+                onClick={doReset}
+                className="settings-reset-theme mt-2 w-full rounded-full py-2.5 text-xs font-semibold"
                 style={{
-                  background: "var(--surface)",
-                  border: "1px dashed var(--border)",
+                  background: "var(--muted)",
+                  color: "var(--foreground)",
                 }}
               >
-                <div
-                  className="flex items-center justify-center text-lg font-semibold"
-                  style={{
-                    width: "100%",
-                    height: 40,
-                    borderRadius: 10,
-                    background: "var(--muted)",
-                    color: "var(--foreground)",
-                    opacity: 0.8,
-                  }}
-                >
-                  +
-                </div>
-                <span className="text-[10px] font-semibold">Suggest</span>
+                Reset theme to default
               </button>
             </div>
 
-            <button
-              onClick={doReset}
-              className="settings-reset-theme mb-4 w-full rounded-full py-2 text-xs font-semibold"
-              style={{
-                background: "var(--muted)",
-                color: "var(--foreground)",
-              }}
-            >
-              Reset theme to default
-            </button>
-
-            <div className="mt-3 space-y-3">
+            <div className="settings-group">
               <Toggle
+                icon={<Type size={17} strokeWidth={1.8} />}
                 label="Show transliteration"
+                description="Show Arabic transliteration below dhikrs."
                 value={display.showTransliteration}
                 onChange={(v) => updateDisplay({ showTransliteration: v })}
               />
               <Toggle
+                icon={<ALargeSmall size={17} strokeWidth={1.8} />}
                 label="Large Arabic text"
+                description="Increase Arabic text size."
                 value={display.arabicLarge}
                 onChange={(v) => updateDisplay({ arabicLarge: v })}
               />
@@ -409,60 +416,59 @@ function Settings() {
 
           <SuggestColorSheet open={suggestOpen} onClose={() => setSuggestOpen(false)} />
 
-
-
-
-
           {/* PRAYER TIMES */}
           <section className="mb-6">
             <h2 className="label-caps mb-3">Prayer Times</h2>
-            <div className="space-y-3">
-              <div
-                className="rounded-2xl px-4 py-3"
-                data-settings-card=""
-              >
-                <div className="mb-2 text-sm font-semibold">Calculation method</div>
-                <select
-                  value={prayerSettings.method}
-                  onChange={(e) => updatePrayerSettings({ method: parseInt(e.target.value, 10) })}
-                  className="w-full rounded-xl px-3 py-2 outline-none"
-                  style={{
-                    fontSize: 16,
-                    background: "var(--background)",
-                    color: "var(--foreground)",
-                    border: "1px solid var(--border)",
-                  }}
-                >
-                  {CALC_METHODS.map((m) => (
-                    <option key={m.id} value={m.id}>
-                      {m.name}
-                    </option>
-                  ))}
-                </select>
+            <div className="settings-group">
+              <div className="settings-row">
+                <span className="settings-icon">
+                  <BookOpen size={17} strokeWidth={1.8} />
+                </span>
+                <div className="min-w-0 flex-1">
+                  <div className="settings-row-title">Calculation method</div>
+                  <div className="settings-row-desc">
+                    Select the method used for prayer times.
+                  </div>
+                  <select
+                    value={prayerSettings.method}
+                    onChange={(e) => updatePrayerSettings({ method: parseInt(e.target.value, 10) })}
+                    className="settings-select"
+                  >
+                    {CALC_METHODS.map((m) => (
+                      <option key={m.id} value={m.id}>
+                        {m.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
               </div>
 
               <Toggle
+                icon={<Scale size={17} strokeWidth={1.8} />}
                 label="Hanafi Asr"
-                description="Asr time calculated at double shadow length."
+                description="Calculate Asr time at double shadow length."
                 value={prayerSettings.hanafi}
                 onChange={(v) => updatePrayerSettings({ hanafi: v })}
               />
 
               {!nativeAvailable ? (
-                <div
-                  className="rounded-2xl px-4 py-3"
-                  data-settings-card=""
-                >
-                  <div className="text-sm font-semibold">Adhan notifications</div>
-                  <div className="mt-1 text-xs opacity-70">
-                    Adhan notifications are available in the mobile app.
+                <div className="settings-row">
+                  <span className="settings-icon">
+                    <Bell size={17} strokeWidth={1.8} />
+                  </span>
+                  <div className="min-w-0 flex-1">
+                    <div className="settings-row-title">Adhan notifications</div>
+                    <div className="settings-row-desc">
+                      Adhan notifications are available in the mobile app.
+                    </div>
                   </div>
                 </div>
               ) : (
                 <>
                   <Toggle
+                    icon={<Bell size={17} strokeWidth={1.8} />}
                     label="Adhan notifications"
-                    description="A local notification at each prayer time."
+                    description="Get notified for each prayer time."
                     value={prayerSettings.adhanEnabled}
                     onChange={(v) => {
                       void (async () => {
@@ -484,7 +490,7 @@ function Settings() {
                   />
 
                   {prayerSettings.adhanEnabled && (
-                    <div className="space-y-2 pl-1">
+                    <div className="settings-subrows">
                       {SALAH_IDS.map((id) => (
                         <Toggle
                           key={id}
@@ -502,129 +508,134 @@ function Settings() {
                 </>
               )}
 
-              <div
-                className="rounded-2xl px-4 py-3"
-                data-settings-card=""
-              >
-                <div className="mb-2 text-sm font-semibold">Notification sound</div>
-                <div className="grid grid-cols-3 gap-1 rounded-full p-1" style={{ background: "var(--muted)" }}>
-                  {(
-                    [
-                      { id: "adhan", label: "Adhan" },
-                      { id: "takbir", label: "Takbir only" },
-                      { id: "silent", label: "Silent notification" },
-                    ] as { id: AdhanSound; label: string }[]
-                  ).map((o) => {
-                    const active = prayerSettings.sound === o.id;
-                    return (
-                      <button
-                        key={o.id}
-                        onClick={() => updatePrayerSettings({ sound: o.id })}
-                        className="rounded-full px-2 py-2 text-[11px] font-semibold transition"
-                        style={{
-                          background: active ? "var(--surface-card)" : "transparent",
-                          color: "var(--foreground)",
-                          boxShadow: active ? "0 1px 4px rgba(0,0,0,0.08)" : "none",
-                        }}
-                      >
-                        {o.label}
-                      </button>
-                    );
-                  })}
+              <div className="settings-row">
+                <span className="settings-icon">
+                  <Volume2 size={17} strokeWidth={1.8} />
+                </span>
+                <div className="min-w-0 flex-1">
+                  <div className="settings-row-title">Notification sound</div>
+                  <div className="settings-row-desc mb-2">
+                    Choose how you want to be notified.
+                  </div>
+                  <div className="grid grid-cols-3 gap-1 rounded-full p-1" style={{ background: "var(--muted)" }}>
+                    {(
+                      [
+                        { id: "adhan", label: "Adhan" },
+                        { id: "takbir", label: "Takbir only" },
+                        { id: "silent", label: "Silent" },
+                      ] as { id: AdhanSound; label: string }[]
+                    ).map((o) => {
+                      const active = prayerSettings.sound === o.id;
+                      return (
+                        <button
+                          key={o.id}
+                          onClick={() => updatePrayerSettings({ sound: o.id })}
+                          className="rounded-full px-2 py-2 text-[11px] font-semibold transition"
+                          style={{
+                            background: active ? "var(--accent)" : "transparent",
+                            color: active ? "var(--accent-foreground)" : "var(--foreground)",
+                            boxShadow: active ? "0 1px 4px rgba(0,0,0,0.12)" : "none",
+                          }}
+                        >
+                          {o.label}
+                        </button>
+                      );
+                    })}
+                  </div>
                 </div>
               </div>
 
-              <div
-                className="rounded-2xl px-4 py-3"
-                data-settings-card=""
-              >
-                <div className="flex items-center justify-between gap-3">
-                  <div className="min-w-0">
-                    <div className="text-sm font-semibold">Location</div>
-                    <div className="mt-0.5 truncate text-xs opacity-70">
-                      {prayerSettings.location ? prayerSettings.location.label : "Not set"}
+              <div className="settings-row">
+                <span className="settings-icon">
+                  <MapPin size={17} strokeWidth={1.8} />
+                </span>
+                <div className="min-w-0 flex-1">
+                  <div className="flex items-center justify-between gap-3">
+                    <div className="min-w-0">
+                      <div className="settings-row-title">Location</div>
+                      <div className="settings-row-desc truncate">
+                        {prayerSettings.location ? prayerSettings.location.label : "Not set"}
+                      </div>
                     </div>
+                    <button
+                      onClick={() => setCityOpen((v) => !v)}
+                      className="shrink-0 rounded-full px-3.5 py-1.5 text-xs font-semibold"
+                      style={{ background: "var(--muted)", color: "var(--foreground)" }}
+                    >
+                      Change
+                    </button>
                   </div>
-                  <button
-                    onClick={() => setCityOpen((v) => !v)}
-                    className="shrink-0 rounded-full px-3 py-1.5 text-xs font-semibold"
-                    style={{ background: "var(--muted)", color: "var(--foreground)" }}
-                  >
-                    Change
-                  </button>
-                </div>
-                {locationSaved && !cityOpen && (
-                  <div
-                    className="mt-2 rounded-xl px-3 py-2 text-xs font-semibold"
-                    style={{
-                      background: "color-mix(in oklab, var(--accent) 14%, transparent)",
-                      color: "var(--foreground)",
-                    }}
-                  >
-                    {locationSaved}
-                  </div>
-                )}
-                {cityOpen && (
-                  <div className="mt-3 space-y-2">
-                    <div className="flex gap-2">
-                      <input
-                        value={cityInput}
-                        onChange={(e) => setCityInput(e.target.value)}
-                        placeholder="City, country"
-                        className="min-w-0 flex-1 rounded-full px-3 py-2 outline-none"
-                        style={{
-                          fontSize: 16,
-                          background: "var(--background)",
-                          color: "var(--foreground)",
-                          border: "1px solid var(--border)",
-                        }}
-                      />
+                  {locationSaved && !cityOpen && (
+                    <div
+                      className="mt-2 rounded-xl px-3 py-2 text-xs font-semibold"
+                      style={{
+                        background: "color-mix(in oklab, var(--accent) 14%, transparent)",
+                        color: "var(--foreground)",
+                      }}
+                    >
+                      {locationSaved}
+                    </div>
+                  )}
+                  {cityOpen && (
+                    <div className="mt-3 space-y-2">
+                      <div className="flex gap-2">
+                        <input
+                          value={cityInput}
+                          onChange={(e) => setCityInput(e.target.value)}
+                          placeholder="City, country"
+                          className="min-w-0 flex-1 rounded-full px-3 py-2 outline-none"
+                          style={{
+                            fontSize: 16,
+                            background: "var(--background)",
+                            color: "var(--foreground)",
+                            border: "1px solid var(--border)",
+                          }}
+                        />
+                        <button
+                          onClick={async () => {
+                            setCityBusy(true);
+                            setCityError(null);
+                            const loc = await lookupCity(cityInput);
+                            setCityBusy(false);
+                            if (!loc) {
+                              setCityError("We could not find that place. Try a city and country.");
+                              return;
+                            }
+                            updatePrayerSettings({ location: loc });
+                            setCityInput("");
+                            setCityOpen(false);
+                            setLocationSaved(`Location saved: ${loc.label}`);
+                          }}
+                          disabled={cityBusy}
+                          className="shrink-0 rounded-full px-4 text-sm font-bold"
+                          style={{ background: "var(--accent)", color: "var(--accent-foreground)" }}
+                        >
+                          {cityBusy ? "..." : "Set"}
+                        </button>
+                      </div>
                       <button
                         onClick={async () => {
                           setCityBusy(true);
                           setCityError(null);
-                          const loc = await lookupCity(cityInput);
+                          const loc = await resolveLocation(true);
                           setCityBusy(false);
                           if (!loc) {
-                            setCityError("We could not find that place. Try a city and country.");
+                            setCityError("We could not get your location. Type a city instead.");
                             return;
                           }
                           updatePrayerSettings({ location: loc });
-                          setCityInput("");
                           setCityOpen(false);
                           setLocationSaved(`Location saved: ${loc.label}`);
-                          setLocationSaved(`Location saved: ${loc.label}`);
                         }}
-                        disabled={cityBusy}
-                        className="shrink-0 rounded-full px-4 text-sm font-bold"
-                        style={{ background: "var(--accent)", color: "var(--accent-foreground)" }}
+                        className="w-full rounded-full py-2 text-xs font-semibold"
+                        style={{ background: "var(--muted)", color: "var(--foreground)" }}
                       >
-                        {cityBusy ? "..." : "Set"}
+                        Use my current location
                       </button>
+                      {cityError && <div className="text-[11px] opacity-70">{cityError}</div>}
                     </div>
-                    <button
-                      onClick={async () => {
-                        setCityBusy(true);
-                        setCityError(null);
-                        const loc = await resolveLocation(true);
-                        setCityBusy(false);
-                        if (!loc) {
-                          setCityError("We could not get your location. Type a city instead.");
-                          return;
-                        }
-                        updatePrayerSettings({ location: loc });
-                        setCityOpen(false);
-                        setLocationSaved(`Location saved: ${loc.label}`);
-                        setLocationSaved(`Location saved: ${loc.label}`);
-                      }}
-                      className="w-full rounded-full py-2 text-xs font-semibold"
-                      style={{ background: "var(--muted)", color: "var(--foreground)" }}
-                    >
-                      Use my current location
-                    </button>
-                    {cityError && <div className="text-[11px] opacity-70">{cityError}</div>}
-                  </div>
-                )}
+                  )}
+                </div>
               </div>
             </div>
           </section>
@@ -632,158 +643,189 @@ function Settings() {
           {/* REMINDERS */}
           <section className="mb-6">
             <h2 className="label-caps mb-3">Reminders</h2>
-            <div
-              className="rounded-[24px] p-4"
-              data-settings-card=""
-            >
+            <div className="settings-group">
               {!nativeAvailable ? (
-                <>
-                  <div className="text-sm" style={{ fontWeight: 600 }}>
-                    Daily Adhkar Reminders
+                <div className="settings-row">
+                  <span className="settings-icon">
+                    <Bell size={17} strokeWidth={1.8} />
+                  </span>
+                  <div className="min-w-0 flex-1">
+                    <div className="settings-row-title">Daily Adhkar Reminders</div>
+                    <div className="settings-row-desc">
+                      Reminders are unavailable on the web. Install the mobile app to
+                      get local device notifications at your chosen times.
+                    </div>
                   </div>
-                  <div className="mt-1 text-xs opacity-70">
-                    Reminders are unavailable on the web. Install the mobile app to
-                    get local device notifications at your chosen times.
-                  </div>
-                </>
+                </div>
               ) : notifChecking ? (
-                <div className="py-2 text-xs opacity-60">Checking notification permission...</div>
+                <div className="settings-row">
+                  <span className="settings-icon">
+                    <Bell size={17} strokeWidth={1.8} />
+                  </span>
+                  <div className="min-w-0 flex-1 py-1 text-xs opacity-60">
+                    Checking notification permission...
+                  </div>
+                </div>
               ) : !notifEnabled ? (
-                <>
-                  <div className="text-sm" style={{ fontWeight: 600 }}>
-                    Daily Adhkar Reminders
-                  </div>
-                  <div className="mt-1 text-xs opacity-70">
-                    Get local notifications on your device at times you choose. No internet needed.
-                  </div>
-                  <button
-                    onClick={handleEnableNotifications}
-                    disabled={notifRequesting}
-                    className="mt-3 w-full rounded-full py-2 text-sm font-semibold disabled:opacity-70"
-                    style={{ background: "#c9a84c", color: "#ffffff" }}
-                  >
-                    {notifRequesting ? "Requesting..." : "Enable Reminders"}
-                  </button>
-                  {notifError && (
-                    <div
-                      className="mt-2 rounded-lg px-3 py-2 text-xs"
-                      style={{
-                        background: "rgba(220, 38, 38, 0.1)",
-                        color: "#b91c1c",
-                        border: "1px solid rgba(220, 38, 38, 0.3)",
-                      }}
-                    >
-                      {notifError}
+                <div className="settings-row">
+                  <span className="settings-icon">
+                    <Bell size={17} strokeWidth={1.8} />
+                  </span>
+                  <div className="min-w-0 flex-1">
+                    <div className="settings-row-title">Daily Adhkar Reminders</div>
+                    <div className="settings-row-desc">
+                      Get local notifications on your device at times you choose. No internet needed.
                     </div>
-                  )}
-                </>
+                    <button
+                      onClick={handleEnableNotifications}
+                      disabled={notifRequesting}
+                      className="mt-3 w-full rounded-full py-2 text-sm font-semibold disabled:opacity-70"
+                      style={{ background: "var(--accent)", color: "var(--accent-foreground)" }}
+                    >
+                      {notifRequesting ? "Requesting..." : "Enable Reminders"}
+                    </button>
+                    {notifError && (
+                      <div
+                        className="mt-2 rounded-lg px-3 py-2 text-xs"
+                        style={{
+                          background: "rgba(220, 38, 38, 0.1)",
+                          color: "#b91c1c",
+                          border: "1px solid rgba(220, 38, 38, 0.3)",
+                        }}
+                      >
+                        {notifError}
+                      </div>
+                    )}
+                  </div>
+                </div>
               ) : (
-                <div className="space-y-3">
+                <>
+                  <div className="settings-row">
+                    <span className="settings-icon">
+                      <Bell size={17} strokeWidth={1.8} />
+                    </span>
+                    <div className="min-w-0 flex-1">
+                      <div className="settings-row-title">Daily Adhkar Reminders</div>
+                      <div className="settings-row-desc">
+                        Get reminded to read your morning and evening adhkar.
+                      </div>
+                    </div>
+                  </div>
                   {notifPrefs.reminders.length === 0 && (
-                    <div className="text-xs opacity-70">
-                      No reminders yet. Add one below to get a daily notification at your chosen time.
+                    <div className="settings-row">
+                      <div className="text-xs opacity-70">
+                        No reminders yet. Add one below to get a daily notification at your chosen time.
+                      </div>
                     </div>
                   )}
-                  {notifPrefs.reminders.map((r) => (
-                    <div
-                      key={r.id}
-                      className="flex items-center gap-2 rounded-2xl px-3 py-2"
-                      style={{
-                        background: "var(--background)",
-                        border: "1px solid var(--border)",
-                      }}
-                    >
-                      <input
-                        type="text"
-                        value={r.label}
-                        onChange={(e) => void updateReminder(r.id, { label: e.target.value })}
-                        placeholder="Reminder"
-                        className="min-w-0 flex-1 rounded-md bg-transparent font-semibold outline-none"
-                        style={{
-                          color: "var(--foreground)",
-                          opacity: r.enabled ? 1 : 0.6,
-                          fontSize: 16,
-                        }}
-                      />
-                      <input
-                        type="time"
-                        value={formatTime(r.hour, r.minute)}
-                        onChange={(e) => {
-                          const { hour, minute } = parseTime(e.target.value);
-                          void updateReminder(r.id, { hour, minute });
-                        }}
-                        disabled={!r.enabled}
-                        className="shrink-0 rounded-md px-2 py-1 font-semibold outline-none"
-                        style={{
-                          background: "var(--surface)",
-                          border: "1px solid var(--border)",
-                          color: "var(--foreground)",
-                          opacity: r.enabled ? 1 : 0.5,
-                          fontSize: 16,
-                        }}
-                      />
-                      <button
-                        onClick={() => void updateReminder(r.id, { enabled: !r.enabled })}
-                        className="relative inline-block h-6 w-11 shrink-0 rounded-full transition"
-                        style={{
-                          background: r.enabled
-                            ? "var(--accent)"
-                            : "color-mix(in oklab, var(--foreground) 20%, transparent)",
-                        }}
-                        aria-label={`Toggle ${r.label}`}
-                      >
-                        <span
-                          className="absolute top-0.5 h-5 w-5 rounded-full bg-white transition-all"
-                          style={{ left: r.enabled ? 22 : 2 }}
+                  {notifPrefs.reminders.map((r, i) => (
+                    <div key={r.id} className="settings-row">
+                      <span className="settings-icon">
+                        {i % 2 === 0 ? (
+                          <Sun size={17} strokeWidth={1.8} />
+                        ) : (
+                          <Moon size={17} strokeWidth={1.8} />
+                        )}
+                      </span>
+                      <div className="flex min-w-0 flex-1 items-center gap-2">
+                        <input
+                          type="text"
+                          value={r.label}
+                          onChange={(e) => void updateReminder(r.id, { label: e.target.value })}
+                          placeholder="Reminder"
+                          className="min-w-0 flex-1 rounded-md bg-transparent font-semibold outline-none"
+                          style={{
+                            color: "var(--foreground)",
+                            opacity: r.enabled ? 1 : 0.6,
+                            fontSize: 16,
+                          }}
                         />
-                      </button>
-                      <button
-                        onClick={() => void removeReminder(r.id)}
-                        className="shrink-0 rounded-full text-lg leading-none opacity-50 hover:opacity-100"
-                        style={{ color: "var(--foreground)", padding: "2px 6px" }}
-                        aria-label={`Remove ${r.label}`}
-                      >
-                        ×
-                      </button>
+                        <input
+                          type="time"
+                          value={formatTime(r.hour, r.minute)}
+                          onChange={(e) => {
+                            const { hour, minute } = parseTime(e.target.value);
+                            void updateReminder(r.id, { hour, minute });
+                          }}
+                          disabled={!r.enabled}
+                          className="shrink-0 rounded-md px-2 py-1 font-semibold outline-none"
+                          style={{
+                            background: "var(--surface)",
+                            border: "1px solid var(--border)",
+                            color: "var(--foreground)",
+                            opacity: r.enabled ? 1 : 0.5,
+                            fontSize: 16,
+                          }}
+                        />
+                        <button
+                          onClick={() => void updateReminder(r.id, { enabled: !r.enabled })}
+                          className="settings-switch"
+                          style={{
+                            background: r.enabled
+                              ? "var(--accent)"
+                              : "color-mix(in oklab, var(--foreground) 20%, transparent)",
+                          }}
+                          aria-label={`Toggle ${r.label}`}
+                        >
+                          <span
+                            className="settings-switch-knob"
+                            style={{ left: r.enabled ? 22 : 2 }}
+                          />
+                        </button>
+                        <button
+                          onClick={() => void removeReminder(r.id)}
+                          className="shrink-0 rounded-full text-lg leading-none opacity-50 hover:opacity-100"
+                          style={{ color: "var(--foreground)", padding: "2px 6px" }}
+                          aria-label={`Remove ${r.label}`}
+                        >
+                          ×
+                        </button>
+                      </div>
                     </div>
                   ))}
-                  <button
-                    onClick={addReminder}
-                    className="w-full rounded-full py-2 text-sm font-semibold"
-                    style={{
-                      background: "var(--background)",
-                      border: "1px dashed var(--border)",
-                      color: "var(--foreground)",
-                    }}
-                  >
-                    + Add reminder
-                  </button>
-                  <div className="text-[11px] opacity-60">
-                    Reminders fire on your device using your local time. Set as many as you like at any times that suit your schedule.
+                  <div className="settings-row">
+                    <button
+                      onClick={addReminder}
+                      className="w-full rounded-full py-2 text-sm font-semibold"
+                      style={{
+                        background: "var(--background)",
+                        border: "1px dashed var(--border)",
+                        color: "var(--foreground)",
+                      }}
+                    >
+                      + Add reminder
+                    </button>
                   </div>
-
-                </div>
+                  <div className="settings-row">
+                    <div className="text-[11px] opacity-60">
+                      Reminders fire on your device using your local time. Set as many as you like at any times that suit your schedule.
+                    </div>
+                  </div>
+                </>
               )}
             </div>
           </section>
 
           {/* FEEDBACK */}
-          <section className="mb-6 space-y-3">
-            <h2 className="label-caps mb-1">Feedback</h2>
-            <Toggle
-              label="Vibration on tap"
-              description="Vibrate when tapping counters and the tasbih."
-              value={display.haptics}
-              onChange={(v) => updateDisplay({ haptics: v })}
-            />
+          <section className="mb-6">
+            <h2 className="label-caps mb-3">Feedback</h2>
+            <div className="settings-group">
+              <Toggle
+                icon={<Vibrate size={17} strokeWidth={1.8} />}
+                label="Vibration on tap"
+                description="Vibrate when tapping counters and the tasbih."
+                value={display.haptics}
+                onChange={(v) => updateDisplay({ haptics: v })}
+              />
+            </div>
           </section>
 
           {/* DATA */}
-          <section className="mb-6 space-y-3">
-            <h2 className="label-caps mb-1">Data</h2>
+          <section className="mb-6">
+            <h2 className="label-caps mb-3">Data</h2>
             {resetNote && (
               <div
-                className="rounded-2xl px-4 py-3 text-sm font-medium"
+                className="mb-3 rounded-2xl px-4 py-3 text-sm font-medium"
                 style={{
                   background: "color-mix(in oklab, var(--accent) 16%, var(--surface))",
                   border: "1px solid var(--border)",
@@ -793,47 +835,55 @@ function Settings() {
                 {resetNote}
               </div>
             )}
-            {confirmReset ? (
-              <div
-                className="rounded-2xl p-4"
-                data-settings-card=""
-              >
-                <p className="mb-3 text-sm">Reset all counts for today?</p>
-                <div className="flex gap-2">
-                  <button
-                    onClick={() => {
-                      resetToday();
-                      setConfirmReset(false);
-                      window.dispatchEvent(new Event("adhkar:streak-update"));
-                      setResetNote("Today's progress has been reset.");
-                    }}
-                    className="flex-1 rounded-full py-2 text-sm font-semibold"
-                    style={{ background: "var(--accent)", color: "var(--accent-foreground)" }}
-                  >
-                    Yes, reset
-                  </button>
-                  <button
-                    onClick={() => setConfirmReset(false)}
-                    className="flex-1 rounded-full py-2 text-sm font-semibold"
-                    style={{ background: "var(--muted)", color: "var(--foreground)" }}
-                  >
-                    Cancel
-                  </button>
+            <div className="settings-group mb-3">
+              {confirmReset ? (
+                <div className="settings-row">
+                  <div className="min-w-0 flex-1">
+                    <p className="mb-3 text-sm">Reset all counts for today?</p>
+                    <div className="flex gap-2">
+                      <button
+                        onClick={() => {
+                          resetToday();
+                          setConfirmReset(false);
+                          window.dispatchEvent(new Event("adhkar:streak-update"));
+                          setResetNote("Today's progress has been reset.");
+                        }}
+                        className="flex-1 rounded-full py-2 text-sm font-semibold"
+                        style={{ background: "var(--accent)", color: "var(--accent-foreground)" }}
+                      >
+                        Yes, reset
+                      </button>
+                      <button
+                        onClick={() => setConfirmReset(false)}
+                        className="flex-1 rounded-full py-2 text-sm font-semibold"
+                        style={{ background: "var(--muted)", color: "var(--foreground)" }}
+                      >
+                        Cancel
+                      </button>
+                    </div>
+                  </div>
                 </div>
-              </div>
-            ) : (
-              <button
-                onClick={() => setConfirmReset(true)}
-                className="w-full rounded-full py-3 text-sm font-semibold"
-                data-settings-card=""
-              >
-                Reset today's progress
-              </button>
-            )}
+              ) : (
+                <button
+                  onClick={() => setConfirmReset(true)}
+                  className="settings-row w-full text-left"
+                >
+                  <span className="settings-icon">
+                    <Database size={17} strokeWidth={1.8} />
+                  </span>
+                  <div className="min-w-0 flex-1">
+                    <div className="settings-row-title">Reset today's progress</div>
+                    <div className="settings-row-desc">
+                      Clear today's dhikr, tasbih and checklist progress.
+                    </div>
+                  </div>
+                </button>
+              )}
+            </div>
 
             {confirmResetAll ? (
               <div
-                className="rounded-2xl p-4"
+                className="rounded-[24px] p-4"
                 style={{
                   background: "rgba(220, 38, 38, 0.08)",
                   border: "1px solid rgba(220, 38, 38, 0.3)",
@@ -868,59 +918,121 @@ function Settings() {
                 </div>
               </div>
             ) : (
-              <button
-                onClick={() => setConfirmResetAll(true)}
-                className="w-full rounded-full py-3 text-sm font-semibold transition-transform active:scale-[0.98]"
-                style={{
-                  background: "color-mix(in oklab, #dc2626 10%, var(--surface))",
-                  border: "1px solid color-mix(in oklab, #dc2626 30%, transparent)",
-                  color: "#b91c1c",
-                }}
-              >
-                Reset all progress
-              </button>
+              <div className="settings-group settings-danger">
+                <button
+                  onClick={() => setConfirmResetAll(true)}
+                  className="settings-row w-full text-left"
+                >
+                  <span className="settings-icon settings-icon-danger">
+                    <Trash2 size={17} strokeWidth={1.8} />
+                  </span>
+                  <div className="min-w-0 flex-1">
+                    <div className="settings-row-title" style={{ color: "#b91c1c" }}>
+                      Reset all progress
+                    </div>
+                    <div className="settings-row-desc" style={{ color: "#b91c1c", opacity: 0.8 }}>
+                      This will clear all your data, including history.
+                    </div>
+                  </div>
+                </button>
+              </div>
             )}
           </section>
 
           {/* ABOUT */}
-          <section className="mb-6 space-y-3">
-            <h2 className="label-caps mb-1">About</h2>
-            <button
-              type="button"
-              onClick={() => void requestAppReview()}
-              className="flex w-full items-center justify-between rounded-2xl px-4 py-3 text-sm font-semibold transition-transform active:scale-[0.99]"
-              data-settings-card=""
-            >
-              <span className="flex items-center gap-2.5">
-                <Star size={16} strokeWidth={1.6} style={{ color: "var(--accent)" }} />
-                <span>Rate This App</span>
-              </span>
-              <span className="opacity-40">›</span>
-            </button>
-            <div
-              className="flex items-center justify-between rounded-2xl px-4 py-3 text-sm"
-              data-settings-card=""
-            >
-              <span className="font-semibold">Version</span>
-              <span className="opacity-70">{APP_VERSION}</span>
+          <section className="mb-6">
+            <h2 className="label-caps mb-3">About</h2>
+            <div className="settings-group">
+              <button
+                type="button"
+                onClick={() => void requestAppReview()}
+                className="settings-row w-full text-left"
+              >
+                <span className="settings-icon">
+                  <Star size={17} strokeWidth={1.8} />
+                </span>
+                <div className="min-w-0 flex-1">
+                  <div className="settings-row-title">Rate This App</div>
+                  <div className="settings-row-desc">
+                    If you find this app beneficial, please consider leaving a review.
+                  </div>
+                </div>
+                <span className="settings-chevron">›</span>
+              </button>
+              <div className="settings-row">
+                <span className="settings-icon">
+                  <Info size={17} strokeWidth={1.8} />
+                </span>
+                <div className="min-w-0 flex-1">
+                  <div className="settings-row-title">Version</div>
+                </div>
+                <span className="text-sm opacity-70">{APP_VERSION}</span>
+              </div>
+              <Link to="/app/privacy" className="settings-row">
+                <span className="settings-icon">
+                  <FileText size={17} strokeWidth={1.8} />
+                </span>
+                <div className="min-w-0 flex-1">
+                  <div className="settings-row-title">Privacy Policy</div>
+                </div>
+                <span className="settings-chevron">›</span>
+              </Link>
+              <Link to="/app/terms" className="settings-row">
+                <span className="settings-icon">
+                  <FileText size={17} strokeWidth={1.8} />
+                </span>
+                <div className="min-w-0 flex-1">
+                  <div className="settings-row-title">Terms of Service</div>
+                </div>
+                <span className="settings-chevron">›</span>
+              </Link>
             </div>
-            <Link
-              to="/app/privacy"
-              className="flex w-full items-center justify-between rounded-2xl px-4 py-3 text-sm font-semibold"
-              data-settings-card=""
-            >
-              <span>Privacy Policy</span>
-              <span className="opacity-40">›</span>
-            </Link>
-            <Link
-              to="/app/terms"
-              className="flex w-full items-center justify-between rounded-2xl px-4 py-3 text-sm font-semibold"
-              data-settings-card=""
-            >
-              <span>Terms of Service</span>
-              <span className="opacity-40">›</span>
-            </Link>
+          </section>
 
+          {/* SUPPORT */}
+          <section className="mb-6">
+            <h2 className="label-caps mb-3">Support</h2>
+            <div className="settings-group">
+              <div className="settings-row">
+                <span className="settings-icon">
+                  <Mail size={17} strokeWidth={1.8} />
+                </span>
+                <div className="min-w-0 flex-1">
+                  <div className="settings-row-title">Contact &amp; Feedback</div>
+                  <div className="settings-row-desc">
+                    Found a mistake in an adhkar? Have an idea for a feature? I'd love to hear from you.
+                  </div>
+                  <a
+                    href={`mailto:${CONTACT_EMAIL}`}
+                    className="settings-contact-button"
+                  >
+                    <Mail size={14} strokeWidth={2} />
+                    <span>{CONTACT_EMAIL}</span>
+                  </a>
+                  <div className="mt-2 text-center text-[11px] opacity-60">
+                    Mohammad Salahi
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          {/* ABOUT THE PROJECT */}
+          <section className="mb-6">
+            <h2 className="label-caps mb-3">About the Project</h2>
+            <div className="settings-group">
+              <div className="settings-row items-start">
+                <span className="settings-icon">
+                  <Sprout size={17} strokeWidth={1.8} />
+                </span>
+                <p className="min-w-0 flex-1 text-[13px] leading-relaxed opacity-80">
+                  Sahih Al-Adhkar is a simple, offline friendly companion for the
+                  daily remembrance of Allah. Every dhikr and du'a in this app is
+                  taken from authentic narrations, with the source listed on each
+                  card so you can verify it yourself.
+                </p>
+              </div>
+            </div>
           </section>
         </div>
       </main>
@@ -929,11 +1041,13 @@ function Settings() {
 }
 
 function Toggle({
+  icon,
   label,
   description,
   value,
   onChange,
 }: {
+  icon?: ReactNode;
   label: string;
   description?: string;
   value: boolean;
@@ -942,17 +1056,15 @@ function Toggle({
   return (
     <button
       onClick={() => onChange(!value)}
-      className="flex w-full items-center justify-between gap-3 rounded-2xl px-4 py-3 text-left text-sm font-semibold"
-      data-settings-card=""
+      className="settings-row w-full text-left"
     >
-      <span className="flex min-w-0 flex-col">
-        <span>{label}</span>
-        {description && (
-          <span className="mt-0.5 text-xs font-normal opacity-70">{description}</span>
-        )}
+      {icon && <span className="settings-icon">{icon}</span>}
+      <span className="min-w-0 flex-1">
+        <span className="settings-row-title block">{label}</span>
+        {description && <span className="settings-row-desc block">{description}</span>}
       </span>
       <span
-        className="relative inline-block h-6 w-11 shrink-0 rounded-full transition"
+        className="settings-switch"
         style={{
           background: value
             ? "var(--accent)"
@@ -960,7 +1072,7 @@ function Toggle({
         }}
       >
         <span
-          className="absolute top-0.5 h-5 w-5 rounded-full bg-white transition-all"
+          className="settings-switch-knob"
           style={{ left: value ? 22 : 2 }}
         />
       </span>
