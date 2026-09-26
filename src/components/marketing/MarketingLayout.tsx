@@ -46,12 +46,12 @@ export function MarketingLayout({ children, onePage = false }: { children: React
       }}
     >
       <header
-        className="fixed inset-x-0 top-0 z-50 transition-all"
+        className={`fixed inset-x-0 top-0 z-50 transition-all ${onePage ? "marketing-floating-header" : ""}`}
         style={{
-          background: scrolled ? "rgba(250, 246, 236, 0.92)" : "rgba(250, 246, 236, 0.6)",
+          background: scrolled ? "rgba(250, 246, 236, 0.82)" : onePage ? "rgba(250, 246, 236, 0.24)" : "rgba(250, 246, 236, 0.6)",
           backdropFilter: "blur(14px) saturate(180%)",
-          WebkitBackdropFilter: "blur(14px) saturate(180%)",
-          borderBottom: scrolled ? "1px solid rgba(31, 61, 43, 0.08)" : "1px solid transparent",
+          borderBottom: "none",
+          boxShadow: scrolled ? "0 10px 30px rgba(31, 61, 43, 0.06)" : "none",
         }}
       >
         <div className="mx-auto flex max-w-6xl items-center justify-between px-5 py-4 md:px-10 md:py-5">
@@ -146,7 +146,7 @@ export function MarketingLayout({ children, onePage = false }: { children: React
         )}
       </header>
 
-      <main style={{ paddingTop: 72 }}>{children}</main>
+      <main style={{ paddingTop: onePage ? 0 : 72 }}>{children}</main>
 
       <Footer />
     </div>
