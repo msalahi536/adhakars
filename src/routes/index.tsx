@@ -81,7 +81,8 @@ function HomePage() {
   return (
     <MarketingLayout onePage>
       <div id="home" className="marketing-home">
-        <section className="marketing-hero" style={{ backgroundImage: `url(${heroAsset.url})` }}>
+        <section className="marketing-hero">
+          <div className="marketing-hero-image" style={{ backgroundImage: `url(${heroAsset.url})` }} />
           <div className="marketing-hero-shade" />
           <div className="marketing-shell marketing-hero-grid">
             <div className="marketing-hero-copy animate-fade-in">
