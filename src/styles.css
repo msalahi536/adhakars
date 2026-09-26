@@ -3679,11 +3679,11 @@ html { scroll-behavior: smooth; }
 .marketing-quick-trust { display: grid; grid-template-columns: repeat(4, max-content); gap: 22px; margin-top: 35px; color: var(--marketing-ink-soft); font-size: 11px; }
 .marketing-quick-trust span { display: inline-flex; align-items: center; gap: 6px; }
 .marketing-quick-trust svg { width: 15px; height: 15px; color: var(--marketing-gold); }
-.marketing-hero-phones { position: relative; width: min(100%, 565px); height: 650px; align-self: end; justify-self: center; }
-.marketing-hero-device { position: absolute; bottom: -92px; width: 232px; }
-.marketing-hero-device-evening { left: 0; z-index: 1; transform: rotate(-2deg) scale(.92); transform-origin: bottom center; }
-.marketing-hero-device-morning { left: 50%; z-index: 3; transform: translateX(-50%); }
-.marketing-hero-device-salah { right: 0; z-index: 2; transform: rotate(2deg) scale(.92); transform-origin: bottom center; }
+.marketing-hero-phones { position: relative; width: min(100%, 570px); height: 610px; align-self: end; justify-self: center; }
+.marketing-hero-device { position: absolute; bottom: 18px; width: 224px; }
+.marketing-hero-device-evening { left: 0; z-index: 1; transform: translateY(24px); }
+.marketing-hero-device-morning { left: 50%; z-index: 3; transform: translateX(-50%) translateY(-10px); }
+.marketing-hero-device-salah { right: 0; z-index: 2; transform: translateY(24px); }
 
 @keyframes marketing-hero-reveal {
   from { opacity: 0; transform: scale(1.025); }
@@ -3736,8 +3736,8 @@ html { scroll-behavior: smooth; }
   .marketing-hero-copy { text-align: center; margin-inline: auto; }
   .marketing-lead { margin-inline: auto; }
   .marketing-actions, .marketing-quick-trust { justify-content: center; }
-  .marketing-hero-phones { width: min(100%, 590px); height: 590px; align-self: auto; }
-  .marketing-hero-device { width: 218px; }
+  .marketing-hero-phones { width: min(100%, 590px); height: 535px; align-self: auto; }
+  .marketing-hero-device { width: 205px; }
   .marketing-feature-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .marketing-showcase { grid-template-columns: 1fr; justify-items: center; gap: 34px; }
   .marketing-showcase-note { max-width: 470px; justify-items: center; text-align: center; }
@@ -3758,8 +3758,8 @@ html { scroll-behavior: smooth; }
   .marketing-actions { display: grid; grid-template-columns: 1fr 1fr; }
   .marketing-primary-button, .marketing-secondary-button { width: 100%; padding-inline: 16px; }
   .marketing-quick-trust { grid-template-columns: repeat(2, max-content); justify-content: center; gap: 13px 20px; }
-  .marketing-hero-phones { width: calc(100% + 20px); height: 455px; margin-inline: -10px; }
-  .marketing-hero-device { bottom: -72px; width: 158px; }
+  .marketing-hero-phones { width: calc(100% + 24px); height: 350px; margin-inline: -12px; }
+  .marketing-hero-device { bottom: 20px; width: 142px; }
   .marketing-hero-device-evening { left: 1px; }
   .marketing-hero-device-salah { right: 1px; }
   .marketing-feature-grid { grid-template-columns: 1fr; }
