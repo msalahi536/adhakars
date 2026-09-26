@@ -3,6 +3,7 @@ import { Link, useRouterState } from "@tanstack/react-router";
 import { Menu, X } from "lucide-react";
 import logoAsset from "@/assets/logo.png.asset.json";
 import appScreenshot from "@/assets/app-screenshot.png.asset.json";
+import { Button } from "@/components/ui/button";
 
 
 const NAV = [
@@ -12,7 +13,14 @@ const NAV = [
   
 ] as const;
 
-export function MarketingLayout({ children }: { children: ReactNode }) {
+const HOME_NAV = [
+  { href: "#home", label: "Home" },
+  { href: "#features", label: "Features" },
+  { href: "#about", label: "About" },
+  { href: "#download", label: "Download" },
+] as const;
+
+export function MarketingLayout({ children, onePage = false }: { children: ReactNode; onePage?: boolean }) {
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const pathname = useRouterState({ select: (s) => s.location.pathname });
@@ -62,7 +70,16 @@ export function MarketingLayout({ children }: { children: ReactNode }) {
           </Link>
 
           <nav className="hidden items-center gap-8 md:flex">
-            {NAV.map((n) => (
+            {onePage ? HOME_NAV.map((n) => (
+              <a
+                key={n.href}
+                href={n.href}
+                className="text-sm font-medium transition-opacity hover:opacity-100"
+                style={{ color: "#1F3D2B", opacity: 0.72 }}
+              >
+                {n.label}
+              </a>
+            )) : NAV.map((n) => (
               <Link
                 key={n.to}
                 to={n.to}
@@ -74,24 +91,22 @@ export function MarketingLayout({ children }: { children: ReactNode }) {
                 {n.label}
               </Link>
             ))}
-            <Link
-              to="/app"
-              className="rounded-full px-5 py-2.5 text-sm font-semibold transition-transform active:scale-95"
-              style={{ background: "#1F3D2B", color: "#FAF6EC" }}
-            >
-              Open app
-            </Link>
+            <Button asChild className="h-10 rounded-full px-5 text-sm font-semibold">
+              <Link to="/app">Open app</Link>
+            </Button>
           </nav>
 
-          <button
+          <Button
             type="button"
+            variant="ghost"
+            size="icon"
             aria-label="Menu"
             onClick={() => setOpen((v) => !v)}
             className="flex h-10 w-10 items-center justify-center rounded-full md:hidden"
             style={{ background: "rgba(31, 61, 43, 0.08)", color: "#1F3D2B" }}
           >
             {open ? <X size={20} /> : <Menu size={20} />}
-          </button>
+          </Button>
         </div>
 
         {open && (
@@ -103,7 +118,17 @@ export function MarketingLayout({ children }: { children: ReactNode }) {
             }}
           >
             <div className="mx-auto flex max-w-6xl flex-col gap-1 px-5 py-4">
-              {NAV.map((n) => (
+              {onePage ? HOME_NAV.map((n) => (
+                <a
+                  key={n.href}
+                  href={n.href}
+                  onClick={() => setOpen(false)}
+                  className="rounded-xl px-3 py-3 text-base font-medium"
+                  style={{ color: "#1F3D2B" }}
+                >
+                  {n.label}
+                </a>
+              )) : NAV.map((n) => (
                 <Link
                   key={n.to}
                   to={n.to}
@@ -113,13 +138,9 @@ export function MarketingLayout({ children }: { children: ReactNode }) {
                   {n.label}
                 </Link>
               ))}
-              <Link
-                to="/app"
-                className="mt-2 rounded-full px-5 py-3 text-center text-base font-semibold"
-                style={{ background: "#1F3D2B", color: "#FAF6EC" }}
-              >
-                Open app
-              </Link>
+              <Button asChild className="mt-2 h-12 rounded-full px-5 text-base font-semibold">
+                <Link to="/app">Open app</Link>
+              </Button>
             </div>
           </div>
         )}
