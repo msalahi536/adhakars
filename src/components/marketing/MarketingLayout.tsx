@@ -48,8 +48,8 @@ export function MarketingLayout({ children, onePage = false }: { children: React
       <header
         className={`fixed inset-x-0 top-0 z-50 transition-all ${onePage ? "marketing-floating-header" : ""}`}
         style={{
-          background: scrolled ? "rgba(250, 246, 236, 0.82)" : onePage ? "rgba(250, 246, 236, 0.24)" : "rgba(250, 246, 236, 0.6)",
-          backdropFilter: "blur(14px) saturate(180%)",
+          background: scrolled ? "rgba(250, 246, 236, 0.82)" : onePage ? "transparent" : "rgba(250, 246, 236, 0.6)",
+          backdropFilter: scrolled || !onePage ? "blur(14px) saturate(180%)" : "none",
           borderBottom: "none",
           boxShadow: scrolled ? "0 10px 30px rgba(31, 61, 43, 0.06)" : "none",
         }}
