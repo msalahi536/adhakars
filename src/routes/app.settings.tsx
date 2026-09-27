@@ -53,7 +53,9 @@ import {
   getPeriodNotificationsEnabled,
   getSunnahNotificationEnabled,
   setPeriodNotificationsEnabled,
+  setStreakNotificationsEnabled,
   setSunnahNotificationEnabled,
+  getStreakNotificationsEnabled,
 } from "@/lib/smart-notifications";
 import { requestAppReview } from "@/lib/rate-app";
 import {
@@ -77,6 +79,7 @@ import {
   Check,
   Sparkles,
   Heart,
+  Flame,
 } from "lucide-react";
 
 const APP_VERSION = "1.0.3";
