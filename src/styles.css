@@ -3778,3 +3778,34 @@ html { scroll-behavior: smooth; }
   .marketing-feature-card { transition: none; }
   .marketing-hero-image { opacity: 1; transform: none; animation: none; }
 }
+
+/* ---------- Asset protection: deter casual copying of artwork ---------- */
+img,
+svg,
+canvas,
+picture,
+video,
+[data-protected-art] {
+  -webkit-user-drag: none;
+  -khtml-user-drag: none;
+  -moz-user-drag: none;
+  -o-user-drag: none;
+  user-drag: none;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+img,
+picture {
+  pointer-events: none;
+}
+
+a img,
+button img,
+[role="button"] img,
+label img {
+  pointer-events: auto;
+}
