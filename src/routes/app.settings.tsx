@@ -30,6 +30,10 @@ import {
   scheduleReminder,
   cancelReminder,
   isNativePlatform,
+  getJumuahNotificationEnabled,
+  setJumuahNotificationEnabled,
+  scheduleJumuahNotification,
+  cancelJumuahNotification,
   type NotificationPrefs,
   type Reminder,
 } from "@/lib/notifications";
@@ -102,6 +106,13 @@ function Settings() {
   const [notifChecking, setNotifChecking] = useState(true);
   const [notifRequesting, setNotifRequesting] = useState(false);
   const [notifError, setNotifError] = useState<string | null>(null);
+  const [jumuahNotif, setJumuahNotif] = useState(() => getJumuahNotificationEnabled());
+
+  const toggleJumuahNotif = (v: boolean) => {
+    setJumuahNotif(v);
+    setJumuahNotificationEnabled(v);
+    void (v ? scheduleJumuahNotification() : cancelJumuahNotification());
+  };
 
   const [notifPrefs, setNotifPrefsState] = useState<NotificationPrefs>(() => getNotificationPrefs());
 
@@ -166,6 +177,7 @@ function Settings() {
       if (result.granted) {
         setNotifEnabled(true);
         await applyReminders(notifPrefs);
+        if (getJumuahNotificationEnabled()) await scheduleJumuahNotification();
       } else {
         setNotifEnabled(false);
         if (result.reason === "denied") {
@@ -773,6 +785,29 @@ function Settings() {
                         Get reminded to read your morning and evening adhkar.
                       </div>
                     </div>
+                  </div>
+                  <div className="settings-row">
+                    <span className="settings-icon">
+                      <Sun size={17} strokeWidth={1.8} />
+                    </span>
+                    <div className="min-w-0 flex-1">
+                      <div className="settings-row-title">Jumu'ah Reminder</div>
+                      <div className="settings-row-desc">
+                        A Friday morning notification so you can learn the sunnahs of Jumu'ah.
+                      </div>
+                    </div>
+                    <button
+                      onClick={() => toggleJumuahNotif(!jumuahNotif)}
+                      className="settings-switch"
+                      style={{
+                        background: jumuahNotif
+                          ? "var(--accent)"
+                          : "color-mix(in oklab, var(--foreground) 20%, transparent)",
+                      }}
+                      aria-label="Toggle Jumu'ah reminder"
+                    >
+                      <span className="settings-switch-knob" style={{ left: jumuahNotif ? 22 : 2 }} />
+                    </button>
                   </div>
                   {notifPrefs.reminders.length === 0 && (
                     <div className="settings-row">

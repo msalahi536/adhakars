@@ -15,7 +15,7 @@ import appCss from "../styles.css?url";
 
 import { applyThemeForRoute, PRE_PAINT_SCRIPT } from "@/lib/theme-store";
 import { reconcileStreak } from "@/lib/storage";
-import { applyReminders, getNotificationPrefs, checkNotificationPermission } from "@/lib/notifications";
+import { applyReminders, getJumuahNotificationEnabled, getNotificationPrefs, scheduleJumuahNotification, checkNotificationPermission } from "@/lib/notifications";
 import { supabase } from "@/integrations/supabase/client";
 
 
@@ -156,6 +156,7 @@ function RootComponent() {
         const granted = await checkNotificationPermission();
         if (granted) {
           await applyReminders(getNotificationPrefs());
+          if (getJumuahNotificationEnabled()) await scheduleJumuahNotification();
           window.localStorage.setItem(scheduleKey, today);
         }
       } catch {

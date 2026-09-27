@@ -19,3 +19,7 @@
 - [x] Qibla: move compass/content up so the tip card is not hidden under the nav bar on iPhone.
 - [x] Add Page-based, Always morning, and Always evening appearance modes for the whole app.
 - [x] Redesign the homepage as one long reference-matched page with a scenic hero and smooth in-page navigation.
+- [x] Dua Library: uniform category card shades, Jumuah card = regular card except yellow Friday glow + 4 sunnahs wording, weekly Friday notification deep-linking to Jumuah Sunnahs.
+- [x] Midnight theme: harsh line/fade under card on morning page; selector dots invisible; "24/24" pill white/invisible; "Tap to dismiss" salah button invisible in evening mode.
+- [x] Relief dua: any symptom card on "How are you feeling today" opens the relief dua suggestion (currently only cramps and headache).
+- [x] Midnight theme: "Private — stored only on your device" note barely visible (Saved tab).

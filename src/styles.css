@@ -544,6 +544,37 @@ html[data-preset="rose"][data-section="default"] {
   --source-bg: #efd6d3 !important;
   --source-fg: #8a4356 !important;
 }
+/* Rose: satin glass dismiss pill — rose-tinted frost, hairline rose border, soft glow */
+html[data-preset="rose"]:not([data-visual-phase="evening"]) .salah-dismiss {
+  height: 34px;
+  padding: 0 20px;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.62), rgba(249, 232, 230, 0.42));
+  border: 1px solid rgba(176, 95, 114, 0.3);
+  color: var(--preset-ink-strong);
+  font-weight: 600;
+  letter-spacing: 0.012em;
+  backdrop-filter: blur(14px) saturate(150%);
+  box-shadow:
+    0 2px 10px rgba(176, 95, 114, 0.14),
+    inset 0 1px 0 rgba(255, 255, 255, 0.65);
+  transition: background 0.25s ease, box-shadow 0.25s ease, transform 0.15s ease;
+}
+html[data-preset="rose"]:not([data-visual-phase="evening"]) .salah-dismiss::after {
+  content: "";
+  width: 5px;
+  height: 5px;
+  margin-left: 8px;
+  flex: 0 0 auto;
+  border-radius: 999px;
+  background: var(--preset-ink);
+  opacity: 0.55;
+}
+html[data-preset="rose"]:not([data-visual-phase="evening"]) .salah-dismiss:active {
+  transform: scale(0.96);
+  box-shadow:
+    0 1px 5px rgba(176, 95, 114, 0.18),
+    inset 0 1px 0 rgba(255, 255, 255, 0.65);
+}
 html[data-preset][data-visual-phase="evening"] {
   --background: #0e0f22 !important; --foreground: var(--eve-title) !important; --title: var(--eve-title) !important; --eyebrow: var(--eve-eyebrow) !important; --accent: var(--eve-ink) !important; --card: #222539 !important; --card-foreground: #efeafe !important; --surface-card: #222539 !important; --border: rgba(255,255,255,0.09) !important; --card-border: rgba(255,255,255,0.09) !important; --translit: var(--eve-ink) !important; --text-muted: var(--eve-muted) !important; --pill-bg: rgba(255,255,255,0.08) !important; --source-bg: rgba(255,255,255,0.08) !important; --source-fg: var(--eve-source-fg) !important; --ring-track: rgba(var(--eve-ink-rgb),0.22) !important; --nav-bg: #292d43 !important; --nav-border: rgba(255,255,255,0.14) !important; --nav-active: var(--eve-nav-active) !important; --nav-inactive: var(--eve-nav-inactive) !important; --dot-active: var(--eve-ink) !important; --dot-inactive: rgba(var(--eve-ink-rgb),0.3) !important; --index-badge-bg: rgba(255,255,255,0.08) !important; --index-badge-fg: var(--eve-title) !important; --count-fg: var(--eve-source-fg) !important;
 }
@@ -2169,8 +2200,8 @@ html[data-preset="midnight"][data-section="default"] {
   --nav-border: rgba(169, 193, 247, 0.3) !important;
   --nav-active: #edf3ff !important;
   --nav-inactive: #9aadd3 !important;
-  --dot-active: #b9cdff !important;
-  --dot-inactive: rgba(145, 175, 245, 0.38) !important;
+  --dot-active: #c3d3ff !important;
+  --dot-inactive: rgba(145, 175, 245, 0.55) !important;
   --index-badge-bg: rgba(205, 220, 255, 0.14) !important;
   --index-badge-fg: #eaf1ff !important;
   --count-fg: #d6e2ff !important;
@@ -2251,8 +2282,8 @@ html[data-preset="midnight"][data-visual-phase="evening"] {
   --nav-border: rgba(126, 166, 239, 0.36) !important;
   --nav-active: #e3ebff !important;
   --nav-inactive: rgba(169, 190, 231, 0.58) !important;
-  --dot-active: #88aaff !important;
-  --dot-inactive: rgba(136, 170, 255, 0.34) !important;
+  --dot-active: #9dbcff !important;
+  --dot-inactive: rgba(136, 170, 255, 0.5) !important;
   --pill-bg: rgba(202, 219, 255, 0.08) !important;
   --text-muted: #9db2dc !important;
   --translit: #a9c1f7 !important;
@@ -2313,6 +2344,41 @@ html[data-preset="midnight"][data-visual-phase="evening"] .daily-swipe-stack .ad
   color: #c9d9fb !important;
   box-shadow: none !important;
   backdrop-filter: blur(8px);
+}
+
+/* Midnight (morning phase): soften the photo's horizon band under the card */
+html[data-preset="midnight"]:is([data-section="morning"], [data-visual-phase="morning"]) .app-shell::after,
+html[data-preset="midnight"][data-section="salah"] .app-shell::after,
+html[data-preset="midnight"][data-section="tasbih"] .app-shell::after,
+html[data-preset="midnight"][data-section="wake"] .app-shell::after,
+html[data-preset="midnight"][data-section="default"] .app-shell::after {
+  background: linear-gradient(180deg, rgba(23, 41, 79, 0.08) 0%, rgba(23, 41, 79, 0.05) 55%, rgba(16, 30, 62, 0.34) 78%, rgba(12, 24, 50, 0.5) 92%, rgba(10, 21, 44, 0.58) 100%) !important;
+}
+
+/* Midnight (morning phase): the counter pill and dismiss pill must sit on dark glass */
+html[data-preset="midnight"]:is([data-section="morning"], [data-visual-phase="morning"]) .daily-swipe-stack .adhkar-index-row > span,
+html[data-preset="midnight"][data-section="salah"] .daily-swipe-stack .adhkar-index-row > span,
+html[data-preset="midnight"][data-section="tasbih"] .daily-swipe-stack .adhkar-index-row > span,
+html[data-preset="midnight"][data-section="wake"] .daily-swipe-stack .adhkar-index-row > span,
+html[data-preset="midnight"][data-section="default"] .daily-swipe-stack .adhkar-index-row > span {
+  border: 1px solid rgba(169, 193, 247, 0.32) !important;
+  background: rgba(205, 220, 255, 0.12) !important;
+  color: #eaf1ff !important;
+  box-shadow: none !important;
+  backdrop-filter: blur(8px);
+}
+
+html[data-preset="midnight"]:is([data-section="morning"], [data-visual-phase="morning"]) .salah-dismiss,
+html[data-preset="midnight"][data-section="salah"] .salah-dismiss {
+  border-color: rgba(169, 193, 247, 0.32) !important;
+  background: rgba(205, 220, 255, 0.12) !important;
+  color: #eaf1ff !important;
+  backdrop-filter: blur(14px);
+}
+
+/* Midnight: the private-device note and other fine print need more contrast */
+html[data-preset="midnight"] .dl-private {
+  color: #d6e1f8 !important;
 }
 
 /* ---------- Dark Red: translucent oxblood glass from the supplied references ---------- */
@@ -3577,21 +3643,21 @@ html[data-preset="ocean"][data-visual-phase="evening"][data-section="salah"] {
 .dl-empty { text-align:center; font-size:14px; color:var(--muted-foreground); padding:24px 8px; }
 .dl-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
 .dl-cat { display:flex; flex-direction:column; align-items:flex-start; gap:6px; text-align:left; padding:14px; border-radius:20px; background:color-mix(in oklab, var(--card) 92%, transparent); color:var(--card-foreground); border:1px solid color-mix(in oklab, var(--border) 82%, transparent); min-height:112px; }
-.dl-cat.is-warm { background:color-mix(in oklab, var(--accent) 10%, var(--card)); }
 .dl-cat-icon { width:34px; height:34px; border-radius:12px; display:grid; place-items:center; background:color-mix(in oklab, var(--accent) 16%, transparent); color:var(--accent); }
 .dl-cat-name { font-weight:700; font-size:14px; line-height:1.25; }
 .dl-cat-count { font-size:12px; color:var(--muted-foreground); margin-top:auto; }
 .dl-section-title { font-size:12px; font-weight:800; letter-spacing:.12em; text-transform:uppercase; color:var(--muted-foreground); margin:6px 4px 10px; }
-.dl-jumuah { display:flex; align-items:center; gap:12px; width:100%; text-align:left; padding:16px; border-radius:20px; background:color-mix(in oklab, #c9a24a 9%, var(--card)); color:var(--card-foreground); border:1px solid color-mix(in oklab, #c9a24a 45%, var(--border)); box-shadow:var(--card-shadow); transition:transform .18s ease; }
+/* Jumu'ah card: a regular card by default; gold glow only on Friday (.is-glow) */
+.dl-jumuah { display:flex; align-items:center; gap:12px; width:100%; text-align:left; padding:16px; border-radius:20px; background:color-mix(in oklab, var(--card) 92%, transparent); color:var(--card-foreground); border:1px solid color-mix(in oklab, var(--border) 82%, transparent); box-shadow:var(--card-shadow); transition:transform .18s ease; }
 .dl-jumuah:active { transform:scale(.985); }
-.dl-jumuah .dl-cat-icon { background:color-mix(in oklab, #c9a24a 20%, transparent); color:#a17a1f; }
 .dl-jumuah-body { min-width:0; flex:1; display:flex; flex-direction:column; gap:2px; }
 .dl-jumuah-name { font-weight:800; font-size:15px; line-height:1.3; }
 .dl-jumuah-sub { font-size:12.5px; color:var(--muted-foreground); }
-.dl-jumuah-count { font-size:12px; font-weight:700; color:#a17a1f; flex-shrink:0; }
+.dl-jumuah-count { font-size:12px; font-weight:700; color:var(--muted-foreground); flex-shrink:0; }
 .dl-jumuah-chevron { color:var(--muted-foreground); flex-shrink:0; }
-.dl-jumuah.is-glow { animation:dl-glow 2.4s ease-in-out infinite; border-color:color-mix(in oklab, #d9a13b 75%, var(--border)); }
-.dl-jumuah.is-glow .dl-cat-icon, .dl-jumuah.is-glow .dl-jumuah-count { color:#8a6410; }
+.dl-jumuah.is-glow { animation:dl-glow 2.4s ease-in-out infinite; border-color:color-mix(in oklab, #d9a13b 75%, var(--border)); background:color-mix(in oklab, #c9a24a 9%, var(--card)); }
+.dl-jumuah.is-glow .dl-cat-icon { background:color-mix(in oklab, #c9a24a 20%, transparent); color:#a17a1f; }
+.dl-jumuah.is-glow .dl-jumuah-count { color:#8a6410; }
 @keyframes dl-glow {
   0%, 100% { box-shadow:0 0 12px 0 color-mix(in oklab, #d9a13b 16%, transparent), 0 0 0 0 color-mix(in oklab, #d9a13b 0%, transparent); }
   50% { box-shadow:0 0 26px 5px color-mix(in oklab, #d9a13b 36%, transparent), 0 0 0 3px color-mix(in oklab, #d9a13b 20%, transparent); }
@@ -3808,4 +3874,9 @@ button img,
 [role="button"] img,
 label img {
   pointer-events: auto;
+}
+
+/* Midnight evening salah: the dismiss pill inherits a white --card-border from .salah-page; restore the theme border */
+html[data-preset="midnight"][data-visual-phase="evening"][data-section="salah"] .salah-dismiss {
+  border-color: rgba(126, 166, 239, 0.42) !important;
 }

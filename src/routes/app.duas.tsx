@@ -42,6 +42,19 @@ function DuaLibrary() {
   const [sort, setSort] = useState<Sort>("default");
   const [now, setNow] = useState<Date | null>(null);
   useEffect(() => { setMounted(true); setF(getFavs()); setNow(new Date()); }, []);
+  // Deep link from the Friday (Jumu'ah) notification.
+  useEffect(() => {
+    if (window.localStorage.getItem("adhkar:open-jumuah") === "1") {
+      window.localStorage.removeItem("adhkar:open-jumuah");
+      setCat("jum");
+    }
+    const open = () => {
+      setCat("jum");
+      document.querySelector(".period-scroll-area")?.scrollTo({ top: 0 });
+    };
+    window.addEventListener("adhkar:open-jumuah", open);
+    return () => window.removeEventListener("adhkar:open-jumuah", open);
+  }, []);
 
   const favIds = new Set(favs.map((f) => f.id));
   const toggleFav = (id: string) => {
@@ -115,7 +128,7 @@ function DuaLibrary() {
                       <span className="dl-jumuah-name">Jumu‘ah Sunnahs</span>
                       <span className="dl-jumuah-sub">The Prophet’s ﷺ Friday practice</span>
                     </span>
-                    <span className="dl-jumuah-count">4 duas</span>
+                    <span className="dl-jumuah-count">4 sunnahs</span>
                     <ChevronRight size={18} className="dl-jumuah-chevron" />
                   </button>
                   <div className="dl-grid">
@@ -123,7 +136,7 @@ function DuaLibrary() {
                       const Icon = CAT_ICONS[i];
                       const n = DUAS.filter((d) => d.cat === c).length;
                       return (
-                        <button key={c} className={`dl-cat ${EMOTIONAL_CATS.has(c) ? "is-warm" : ""}`} onClick={() => { setCat(c); void triggerHaptic("light"); document.querySelector(".period-scroll-area")?.scrollTo({ top: 0 }); }}>
+                        <button key={c} className="dl-cat" onClick={() => { setCat(c); void triggerHaptic("light"); document.querySelector(".period-scroll-area")?.scrollTo({ top: 0 }); }}>
                           <span className="dl-cat-icon"><Icon size={18} /></span>
                           <span className="dl-cat-name">{c}</span>
                           <span className="dl-cat-count">{n} {n === 1 ? "dua" : "duas"}</span>
@@ -154,7 +167,7 @@ function DuaLibrary() {
               <div className="dl-cat-head">
                 <button className="dl-back" onClick={() => setCat(null)}>All categories</button>
                 <h2>{cat === "jum" ? "Jumu‘ah Sunnahs" : cat}</h2>
-                <p>{catList.length} authentic {catList.length === 1 ? "dua" : "duas"}</p>
+                <p>{cat === "jum" ? `${catList.length} sunnahs` : `${catList.length} authentic ${catList.length === 1 ? "dua" : "duas"}`}</p>
                 {cat !== "jum" && (
                   <div className="dl-sort" role="radiogroup" aria-label="Sort">
                     {(["default", "alpha", "recent"] as Sort[]).map((s) => (

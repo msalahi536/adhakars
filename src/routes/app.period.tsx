@@ -247,7 +247,6 @@ function SymptomsCard() {
     toggleSymptom(symptom);
     void triggerHaptic("light");
   };
-  const hasPain = s.includes("cramps") || s.includes("headache");
   const reliefDuas = SUNNAH_SECTIONS.find((section) => section.id === "duas")?.items ?? [PAIN_DUA];
   return (
     <>
@@ -267,7 +266,7 @@ function SymptomsCard() {
             );
           })}
         </div>
-        {hasPain && (
+        {s.length > 0 && (
           <button className="period-relief-row" onClick={() => setShowDua(true)}>
             <span className="period-relief-icon"><Sparkles size={17} /></span>
             <span><strong>Relief duas</strong><small>Six authentic duas for pain, illness, and hardship</small></span>

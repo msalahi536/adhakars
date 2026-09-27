@@ -1,11 +1,12 @@
 import { useEffect, useLayoutEffect, useState } from "react";
-import { createFileRoute, Outlet, useRouterState } from "@tanstack/react-router";
+import { createFileRoute, Outlet, useRouter, useRouterState } from "@tanstack/react-router";
 import { BottomNav } from "@/components/BottomNav";
 import { SettingsButton } from "@/components/SettingsButton";
 import { Onboarding, hasOnboarded } from "@/components/Onboarding";
 import { WhatsNewDialog } from "@/components/WhatsNewDialog";
 import { RatePrompt } from "@/components/RatePrompt";
 import { backgroundsForPreset } from "@/lib/backgrounds";
+import { JUMUAH_NOTIF_ID, registerNotificationTapHandler } from "@/lib/notifications";
 import { DEFAULT_PRESET_ID, getPresetId, resetTheme, resolveVisualPhase, type VisualPhase } from "@/lib/theme-store";
 import { rememberMoreDestination } from "@/lib/more-navigation";
 
@@ -47,9 +48,20 @@ function AppLayout() {
     }
   }, []);
 
+  const router = useRouter();
+
   useEffect(() => {
     rememberMoreDestination(pathname);
   }, [pathname]);
+
+  // Tapping the Friday (Jumu'ah) notification opens the Jumu'ah Sunnahs page.
+  useEffect(() => {
+    registerNotificationTapHandler((id) => {
+      if (id !== JUMUAH_NOTIF_ID) return;
+      window.localStorage.setItem("adhkar:open-jumuah", "1");
+      void router.navigate({ to: "/app/duas" });
+    });
+  }, [router]);
 
   useLayoutEffect(() => {
     const sync = () => {
