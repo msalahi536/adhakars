@@ -19,3 +19,4 @@
 - [x] Qibla: move compass/content up so the tip card is not hidden under the nav bar on iPhone.
 - [x] Add Page-based, Always morning, and Always evening appearance modes for the whole app.
 - [x] Redesign the homepage as one long reference-matched page with a scenic hero and smooth in-page navigation.
+- [ ] Dua Library: uniform category card shades, Jumuah card = regular card except yellow Friday glow + 4 sunnahs wording, weekly Friday notification deep-linking to Jumuah Sunnahs.
