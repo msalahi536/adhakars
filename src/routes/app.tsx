@@ -9,7 +9,6 @@ import { backgroundsForPreset } from "@/lib/backgrounds";
 import { JUMUAH_NOTIF_ID, registerNotificationTapHandler } from "@/lib/notifications";
 import { DEFAULT_PRESET_ID, getPresetId, resetTheme, resolveVisualPhase, type VisualPhase } from "@/lib/theme-store";
 import { rememberMoreDestination } from "@/lib/more-navigation";
-import { SunnahOfTheDay } from "@/components/SunnahOfTheDay";
 import { isPeriodNotifId, isSmartAdhkarId, smartAdhkarKind, SUNNAH_NOTIF_ID } from "@/lib/smart-notifications";
 import { FULL_ADHAN_URL, isPrayerNotifId } from "@/lib/adhan-notifications";
 import { getPrayerSettings } from "@/lib/prayer-times";
@@ -66,7 +65,7 @@ function AppLayout() {
         void router.navigate({ to: "/app/duas" });
       } else if (id === SUNNAH_NOTIF_ID) {
         window.localStorage.setItem("adhkar:open-sunnah", "1");
-        window.dispatchEvent(new Event("adhkar:open-sunnah"));
+        void router.navigate({ to: "/app/more" });
       } else if (isSmartAdhkarId(id)) {
         void router.navigate({ to: smartAdhkarKind(id) === "evening" ? "/app/evening" : "/app" });
       } else if (isPeriodNotifId(id)) {
@@ -130,7 +129,6 @@ function AppLayout() {
       {showOnboarding && <Onboarding onDone={() => setShowOnboarding(false)} />}
       <WhatsNewDialog open={showWhatsNew} onClose={() => setShowWhatsNew(false)} />
       <RatePrompt />
-      <SunnahOfTheDay hidden={isSettings || showOnboarding || showWhatsNew} />
     </div>
   );
 }

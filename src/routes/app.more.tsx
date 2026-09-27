@@ -8,6 +8,7 @@ import {
   type Consistency,
   type LifetimeCounts,
 } from "@/lib/storage";
+import { SunnahOfTheDay } from "@/components/SunnahOfTheDay";
 
 // Completed days follow the active palette accent.
 const DONE = "color-mix(in oklab, var(--surface-deep-fg) 88%, transparent)";
@@ -94,6 +95,7 @@ function More() {
 
       <main className="scroll-area">
          <div className="mx-auto max-w-md px-5 py-3 space-y-4">
+          <SunnahOfTheDay />
           {/* Consistency card */}
           <section
             className="overflow-hidden rounded-[24px] p-4"
