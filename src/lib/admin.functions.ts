@@ -22,6 +22,7 @@ function safeEqual(a: string, b: string) {
 }
 
 async function checkPassword(pw: string) {
+  // Only the server ever sees ADMIN_PASSWORD; the browser never receives it.
   const expected = process.env["ADMIN_PASSWORD"];
   // Fail closed: no secret configured means nobody gets in.
   if (!expected || expected.length < 8 || !safeEqual(pw, expected)) {
