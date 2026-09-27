@@ -202,22 +202,17 @@ function More() {
               <span>Current streak: {consistency.current} days</span>
               <span>Longest: {consistency.longest} days</span>
             </div>
-          </section>
 
-          {/* My Dhikr card, dual view */}
-          <section
-            className="overflow-hidden rounded-[24px] p-5"
-            style={{
-              background: "var(--surface-deep-gradient, var(--surface-deep))",
-              color: "var(--surface-deep-fg)",
-            }}
-          >
-            <div className="flex items-center justify-between">
+            {/* My Dhikr, folded into this card */}
+            <div
+              className="mt-3 flex items-center justify-between border-t pt-3"
+              style={{ borderColor: "var(--surface-deep-border)" }}
+            >
               <div className="label-caps" style={{ color: "var(--surface-deep-muted)", opacity: 1 }}>
                 My Dhikr
               </div>
               <div
-                className="flex items-center rounded-full p-0.5 text-[11px] font-semibold"
+                className="flex items-center rounded-full p-0.5 text-[10px] font-semibold"
                 style={{ background: "color-mix(in oklab, var(--surface-deep-fg) 12%, transparent)" }}
               >
                 {(["days", "count"] as const).map((v) => {
@@ -226,7 +221,7 @@ function More() {
                     <button
                       key={v}
                       onClick={() => setLifetimeView(v)}
-                      className="rounded-full px-3 py-1"
+                      className="rounded-full px-2.5 py-0.5"
                       style={{
                         background: active ? "var(--accent)" : "transparent",
                         color: active ? "var(--surface-deep-accent-fg)" : "var(--surface-deep-fg)",
@@ -240,44 +235,39 @@ function More() {
             </div>
 
             {lifetimeView === "days" ? (
-              <>
-                <div
-                  className="mt-2 text-[11px] font-semibold uppercase tracking-wider"
-                  style={{ color: "var(--surface-deep-muted)" }}
-                >
-                  Days of remembrance
+              <div className="mt-1.5 flex items-end justify-between">
+                <div className="flex items-baseline gap-2">
+                  <span style={{ fontSize: 28, fontWeight: 800, color: "var(--surface-deep-fg)", lineHeight: 1 }}>
+                    {daysOfRem.toLocaleString()}
+                  </span>
+                  <span className="text-[11px]" style={{ color: "var(--surface-deep-muted)" }}>
+                    days of remembrance
+                  </span>
                 </div>
-                <div style={{ fontSize: 40, fontWeight: 800, color: "var(--surface-deep-fg)", lineHeight: 1.1 }}>
-                  {daysOfRem.toLocaleString()}
-                </div>
-                <div className="mt-1 text-sm" style={{ color: "var(--surface-deep-muted)" }}>
+                <span className="text-[11px]" style={{ color: "var(--surface-deep-muted)" }}>
                   {weeksConsistent} weeks consistent
-                </div>
-              </>
+                </span>
+              </div>
             ) : (
               <>
-                <div
-                  className="mt-2 text-[11px] font-semibold uppercase tracking-wider"
-                  style={{ color: "var(--surface-deep-muted)" }}
-                >
-                  Total Remembrances
+                <div className="mt-1.5 flex items-baseline gap-2">
+                  <span style={{ fontSize: 28, fontWeight: 800, color: "var(--surface-deep-fg)", lineHeight: 1 }}>
+                    {lifetime.total.toLocaleString()}
+                  </span>
+                  <span className="text-[11px]" style={{ color: "var(--surface-deep-muted)" }}>
+                    total remembrances
+                  </span>
                 </div>
-                <div style={{ fontSize: 48, fontWeight: 800, color: "var(--surface-deep-fg)", lineHeight: 1.1 }}>
-                  {lifetime.total.toLocaleString()}
-                </div>
-                <div
-                  className="mt-4 grid grid-cols-4 gap-2 border-t pt-3"
-                  style={{ borderColor: "var(--surface-deep-border)" }}
-                >
+                <div className="mt-2 grid grid-cols-4 gap-2">
                   {(["morning", "evening", "salah", "tasbih"] as const).map((k) => (
                     <div key={k} className="flex flex-col items-center">
                       <span
-                        className="text-[10px] font-semibold uppercase tracking-wider"
+                        className="text-[9px] font-semibold uppercase tracking-wider"
                         style={{ color: "color-mix(in oklab, var(--surface-deep-fg) 60%, transparent)" }}
                       >
                         {k}
                       </span>
-                      <span style={{ fontSize: 16, fontWeight: 700, color: "var(--surface-deep-fg)" }}>
+                      <span style={{ fontSize: 14, fontWeight: 700, color: "var(--surface-deep-fg)" }}>
                         {lifetime[k].toLocaleString()}
                       </span>
                     </div>
