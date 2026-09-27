@@ -786,6 +786,29 @@ function Settings() {
                       </div>
                     </div>
                   </div>
+                  <div className="settings-row">
+                    <span className="settings-icon">
+                      <Sun size={17} strokeWidth={1.8} />
+                    </span>
+                    <div className="min-w-0 flex-1">
+                      <div className="settings-row-title">Jumu'ah Reminder</div>
+                      <div className="settings-row-desc">
+                        A Friday morning notification so you can learn the sunnahs of Jumu'ah.
+                      </div>
+                    </div>
+                    <button
+                      onClick={() => toggleJumuahNotif(!jumuahNotif)}
+                      className="settings-switch"
+                      style={{
+                        background: jumuahNotif
+                          ? "var(--accent)"
+                          : "color-mix(in oklab, var(--foreground) 20%, transparent)",
+                      }}
+                      aria-label="Toggle Jumu'ah reminder"
+                    >
+                      <span className="settings-switch-knob" style={{ left: jumuahNotif ? 22 : 2 }} />
+                    </button>
+                  </div>
                   {notifPrefs.reminders.length === 0 && (
                     <div className="settings-row">
                       <div className="text-xs opacity-70">
