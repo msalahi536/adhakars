@@ -120,20 +120,8 @@ export function AfterSalahSheet({ open, prayer, onPrayer, onClose }: Props) {
                 <button
                   key={p.id}
                   onClick={() => onPrayer(p.id)}
-                  className="flex shrink-0 items-center justify-center font-bold active:scale-95"
-                  style={{
-                    minWidth: 0,
-                    flex: "1 0 auto",
-                    height: 34,
-                    borderRadius: 17,
-                    padding: "0 13px",
-                    fontSize: 13,
-                    background: active
-                      ? "var(--accent)"
-                      : "color-mix(in oklab, var(--foreground) 10%, transparent)",
-                    color: active ? "var(--accent-foreground)" : "var(--foreground)",
-                    transition: "background 0.25s ease, color 0.25s ease",
-                  }}
+                  data-active={active}
+                  className="after-salah-prayer-btn flex shrink-0 items-center justify-center font-bold active:scale-95"
                 >
                   {p.label}
                 </button>
