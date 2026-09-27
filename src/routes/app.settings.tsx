@@ -49,6 +49,12 @@ import {
   type AdhanSound,
 } from "@/lib/prayer-times";
 import { rescheduleAdhanNotifications } from "@/lib/adhan-notifications";
+import {
+  getPeriodNotificationsEnabled,
+  getSunnahNotificationEnabled,
+  setPeriodNotificationsEnabled,
+  setSunnahNotificationEnabled,
+} from "@/lib/smart-notifications";
 import { requestAppReview } from "@/lib/rate-app";
 import {
   Star,
@@ -69,6 +75,8 @@ import {
   Type,
   ALargeSmall,
   Check,
+  Sparkles,
+  Heart,
 } from "lucide-react";
 
 const APP_VERSION = "1.0.3";
@@ -112,6 +120,17 @@ function Settings() {
     setJumuahNotif(v);
     setJumuahNotificationEnabled(v);
     void (v ? scheduleJumuahNotification() : cancelJumuahNotification());
+  };
+
+  const [sunnahNotif, setSunnahNotif] = useState(() => getSunnahNotificationEnabled());
+  const [periodNotif, setPeriodNotif] = useState(() => getPeriodNotificationsEnabled());
+  const toggleSunnahNotif = (v: boolean) => {
+    setSunnahNotif(v);
+    setSunnahNotificationEnabled(v);
+  };
+  const togglePeriodNotif = (v: boolean) => {
+    setPeriodNotif(v);
+    setPeriodNotificationsEnabled(v);
   };
 
   const [notifPrefs, setNotifPrefsState] = useState<NotificationPrefs>(() => getNotificationPrefs());
@@ -590,13 +609,13 @@ function Settings() {
                 <div className="min-w-0 flex-1">
                   <div className="settings-row-title">Notification sound</div>
                   <div className="settings-row-desc mb-2">
-                    Choose how you want to be notified.
+                    Choose what plays when each prayer time comes in.
                   </div>
                   <div className="grid grid-cols-3 gap-1 rounded-full p-1" style={{ background: "var(--muted)" }}>
                     {(
                       [
-                        { id: "adhan", label: "Adhan" },
                         { id: "takbir", label: "Takbir only" },
+                        { id: "adhan", label: "Full adhan" },
                         { id: "silent", label: "Silent" },
                       ] as { id: AdhanSound; label: string }[]
                     ).map((o) => {
@@ -616,6 +635,13 @@ function Settings() {
                         </button>
                       );
                     })}
+                  </div>
+                  <div className="settings-row-desc mt-2">
+                    {prayerSettings.sound === "adhan"
+                      ? "iPhone lets a notification play only 30 seconds of sound. To hear the full adhan, tap the notification each time and it continues in the app."
+                      : prayerSettings.sound === "takbir"
+                        ? "A short Allahu Akbar plays with each prayer notification."
+                        : "Prayer notifications arrive quietly, with no sound."}
                   </div>
                 </div>
               </div>
@@ -782,7 +808,9 @@ function Settings() {
                     <div className="min-w-0 flex-1">
                       <div className="settings-row-title">Daily Adhkar Reminders</div>
                       <div className="settings-row-desc">
-                        Get reminded to read your morning and evening adhkar.
+                        {prayerSettings.location
+                          ? "Morning adhkar reminds you 5 minutes after Fajr and evening adhkar 5 minutes after Asr. If you haven't opened them, a second reminder comes 1 hour before Dhuhr or 30 minutes before Maghrib."
+                          : "Get reminded to read your morning and evening adhkar. Set your location on the Salah page and these will follow your prayer times."}
                       </div>
                     </div>
                   </div>
@@ -807,6 +835,48 @@ function Settings() {
                       aria-label="Toggle Jumu'ah reminder"
                     >
                       <span className="settings-switch-knob" style={{ left: jumuahNotif ? 22 : 2 }} />
+                    </button>
+                  </div>
+                  <div className="settings-row">
+                    <span className="settings-icon">
+                      <Sparkles size={17} strokeWidth={1.8} />
+                    </span>
+                    <div className="min-w-0 flex-1">
+                      <div className="settings-row-title">Sunnah of the Day</div>
+                      <div className="settings-row-desc">A gentle morning notification with a new Sunnah to revive each day.</div>
+                    </div>
+                    <button
+                      onClick={() => toggleSunnahNotif(!sunnahNotif)}
+                      className="settings-switch"
+                      style={{
+                        background: sunnahNotif
+                          ? "var(--accent)"
+                          : "color-mix(in oklab, var(--foreground) 20%, transparent)",
+                      }}
+                      aria-label="Toggle Sunnah of the day reminder"
+                    >
+                      <span className="settings-switch-knob" style={{ left: sunnahNotif ? 22 : 2 }} />
+                    </button>
+                  </div>
+                  <div className="settings-row">
+                    <span className="settings-icon">
+                      <Heart size={17} strokeWidth={1.8} />
+                    </span>
+                    <div className="min-w-0 flex-1">
+                      <div className="settings-row-title">Period Companion</div>
+                      <div className="settings-row-desc">Private, gentle reminders around your cycle, only if you use the Period Companion.</div>
+                    </div>
+                    <button
+                      onClick={() => togglePeriodNotif(!periodNotif)}
+                      className="settings-switch"
+                      style={{
+                        background: periodNotif
+                          ? "var(--accent)"
+                          : "color-mix(in oklab, var(--foreground) 20%, transparent)",
+                      }}
+                      aria-label="Toggle Period Companion reminders"
+                    >
+                      <span className="settings-switch-knob" style={{ left: periodNotif ? 22 : 2 }} />
                     </button>
                   </div>
                   {notifPrefs.reminders.length === 0 && (
