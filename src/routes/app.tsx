@@ -9,6 +9,10 @@ import { backgroundsForPreset } from "@/lib/backgrounds";
 import { JUMUAH_NOTIF_ID, registerNotificationTapHandler } from "@/lib/notifications";
 import { DEFAULT_PRESET_ID, getPresetId, resetTheme, resolveVisualPhase, type VisualPhase } from "@/lib/theme-store";
 import { rememberMoreDestination } from "@/lib/more-navigation";
+import { SunnahOfTheDay } from "@/components/SunnahOfTheDay";
+import { isPeriodNotifId, isSmartAdhkarId, smartAdhkarKind, SUNNAH_NOTIF_ID } from "@/lib/smart-notifications";
+import { FULL_ADHAN_URL, isPrayerNotifId } from "@/lib/adhan-notifications";
+import { getPrayerSettings } from "@/lib/prayer-times";
 
 const UPDATE_WELCOME_KEY = "adhkar:update-welcome:2026-09";
 
@@ -57,9 +61,24 @@ function AppLayout() {
   // Tapping the Friday (Jumu'ah) notification opens the Jumu'ah Sunnahs page.
   useEffect(() => {
     registerNotificationTapHandler((id) => {
-      if (id !== JUMUAH_NOTIF_ID) return;
-      window.localStorage.setItem("adhkar:open-jumuah", "1");
-      void router.navigate({ to: "/app/duas" });
+      if (id === JUMUAH_NOTIF_ID) {
+        window.localStorage.setItem("adhkar:open-jumuah", "1");
+        void router.navigate({ to: "/app/duas" });
+      } else if (id === SUNNAH_NOTIF_ID) {
+        window.localStorage.setItem("adhkar:open-sunnah", "1");
+        window.dispatchEvent(new Event("adhkar:open-sunnah"));
+      } else if (isSmartAdhkarId(id)) {
+        void router.navigate({ to: smartAdhkarKind(id) === "evening" ? "/app/evening" : "/app" });
+      } else if (isPeriodNotifId(id)) {
+        void router.navigate({ to: "/app/period" });
+      } else if (isPrayerNotifId(id)) {
+        void router.navigate({ to: "/app/salah" });
+        // Full adhan: the notification plays 30s, the rest continues here.
+        if (getPrayerSettings().sound === "adhan" && FULL_ADHAN_URL) {
+          const a = new Audio(FULL_ADHAN_URL);
+          void a.play().catch(() => {});
+        }
+      }
     });
   }, [router]);
 
@@ -111,6 +130,7 @@ function AppLayout() {
       {showOnboarding && <Onboarding onDone={() => setShowOnboarding(false)} />}
       <WhatsNewDialog open={showWhatsNew} onClose={() => setShowWhatsNew(false)} />
       <RatePrompt />
+      <SunnahOfTheDay hidden={isSettings || showOnboarding || showWhatsNew} />
     </div>
   );
 }

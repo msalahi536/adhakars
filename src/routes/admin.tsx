@@ -106,7 +106,7 @@ function AdminPage() {
           <form onSubmit={submit} className="w-full max-w-sm rounded-2xl border border-border bg-card p-7 shadow-2xl">
             <p className="text-xs uppercase tracking-[0.2em] text-primary">Sahih Al-Adhkar</p>
             <h1 className="mb-5 mt-1 text-2xl font-semibold">Widget Admin</h1>
-            <Input type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Password" autoFocus />
+            <Input type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Password" autoFocus autoCapitalize="none" autoCorrect="off" spellCheck={false} />
             {err && <p className="mt-2 text-sm text-destructive">{err}</p>}
             <Button type="submit" className="mt-4 w-full">Sign in</Button>
           </form>

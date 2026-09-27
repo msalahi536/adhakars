@@ -4,6 +4,7 @@ import { AdhkarHeader } from "./AdhkarHeader";
 import type { Dhikr } from "@/data/adhkar";
 import type { SalahItem } from "@/data/salah";
 import { isItemComplete } from "@/data/salah";
+import { markAdhkarOpened } from "@/lib/smart-notifications";
 import { getCounts, setCount, clearCounts, bumpLifetime, type LifetimeCategory } from "@/lib/storage";
 
 type Props = {
@@ -45,6 +46,7 @@ export function AdhkarPage({
 
   useEffect(() => {
     setCounts(getCounts(storageKey));
+    if (storageKey === "morning" || storageKey === "evening") markAdhkarOpened(storageKey);
   }, [storageKey]);
 
   const baseItems: SalahItem[] = itemsProp ?? (list ?? []).map((d) => ({ dhikr: d }));

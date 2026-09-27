@@ -23,3 +23,8 @@
 - [x] Midnight theme: harsh line/fade under card on morning page; selector dots invisible; "24/24" pill white/invisible; "Tap to dismiss" salah button invisible in evening mode.
 - [x] Relief dua: any symptom card on "How are you feeling today" opens the relief dua suggestion (currently only cramps and headache).
 - [x] Midnight theme: "Private — stored only on your device" note barely visible (Saved tab).
+- [x] Location-aware adhkar reminders: morning = Fajr+5, evening = Asr+5; follow-ups 1h before Dhuhr / 30m before Maghrib if not done.
+- [x] Adhan notifications per salah with Takbir only / Full adhan / Silent explanation (full adhan continues on tap).
+- [x] Fix admin widget password.
+- [x] Sunnah of the day: dismissible floating card themed per preset + daily notification.
+- [x] Period Companion notifications (brief supplied; "reciting Quran" wording).

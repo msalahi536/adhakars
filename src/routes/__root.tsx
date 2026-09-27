@@ -163,11 +163,30 @@ function RootComponent() {
         // ignore
       }
     };
-    const timer = window.setTimeout(() => void reapply(), 1200);
+    // Prayer-based, Sunnah and period notifications refresh on every open.
+    const smart = async () => {
+      try {
+        if (!(await checkNotificationPermission())) return;
+        const m = await import("@/lib/smart-notifications");
+        await m.rescheduleSmartNotifications();
+      } catch {
+        // ignore
+      }
+    };
+    const onPeriod = () => void import("@/lib/smart-notifications").then((m) => m.reschedulePeriodNotifications());
+    window.addEventListener("period:update", onPeriod);
+    const onPrayer = () => void import("@/lib/smart-notifications").then((m) => m.rescheduleSmartAdhkar());
+    window.addEventListener("adhkar:prayer-settings", onPrayer);
+    const timer = window.setTimeout(() => {
+      void reapply();
+      void smart();
+    }, 1200);
     window.addEventListener("adhkar:day-complete", reapply);
     return () => {
       window.clearTimeout(timer);
       window.removeEventListener("adhkar:day-complete", reapply);
+      window.removeEventListener("period:update", onPeriod);
+      window.removeEventListener("adhkar:prayer-settings", onPrayer);
     };
   }, []);
 
