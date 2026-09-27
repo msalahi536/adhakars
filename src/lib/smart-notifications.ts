@@ -10,6 +10,7 @@ import {
 } from "@/lib/notifications";
 import { addDays, dateKey, fetchDay, getPrayerSettings, slotsForDay } from "@/lib/prayer-times";
 import { addK, getCycles, getStats, openCycle, parseK, todayK } from "@/lib/period";
+import { getConsistency } from "@/lib/storage";
 
 type N = Record<string, unknown>;
 const MIN = 60_000;
@@ -230,9 +231,72 @@ export const reschedulePeriodNotifications = async (): Promise<void> => {
   await schedule(plugin, out, "period");
 };
 
+/* ---------------- Streak reminders ---------------- */
+
+export const STREAK_RISK_ID = 882001;
+export const STREAK_MILESTONE_ID = 882002;
+const K_STREAK_NOTIF = "adhkar:streak-notification";
+const K_STREAK_CELEBRATED = "adhkar:streak-celebrated";
+const MILESTONES = [7, 30, 100, 365];
+
+export const getStreakNotificationsEnabled = () =>
+  typeof window === "undefined" || localStorage.getItem(K_STREAK_NOTIF) !== "0";
+
+export const setStreakNotificationsEnabled = (on: boolean) => {
+  localStorage.setItem(K_STREAK_NOTIF, on ? "1" : "0");
+  void rescheduleStreakNotifications();
+};
+
+export const rescheduleStreakNotifications = async (): Promise<void> => {
+  const plugin = await ready();
+  if (!plugin) return;
+  await cancel(plugin, [STREAK_RISK_ID, STREAK_MILESTONE_ID]);
+  if (!getStreakNotificationsEnabled()) return;
+
+  const c = getConsistency();
+  const now = new Date();
+  const out: N[] = [];
+
+  // Milestone celebration, once per milestone.
+  const celebrated = new Set(
+    (localStorage.getItem(K_STREAK_CELEBRATED) || "").split(",").filter(Boolean),
+  );
+  const hit = MILESTONES.find((m) => c.current >= m && !celebrated.has(String(m)));
+  if (hit) {
+    celebrated.add(String(hit));
+    localStorage.setItem(K_STREAK_CELEBRATED, [...celebrated].join(","));
+    out.push(
+      note(
+        STREAK_MILESTONE_ID,
+        "MashaAllah!",
+        `${hit} days of remembrance in a row. May Allah keep you steadfast.`,
+        new Date(now.getTime() + 3000),
+      ),
+    );
+  }
+
+  // Streak at risk: a streak is going but today isn't complete yet.
+  const today = c.days[c.days.length - 1];
+  if (c.current > 0 && today?.status !== "complete") {
+    const at = new Date(now);
+    at.setHours(20, 0, 0, 0);
+    if (at.getTime() <= now.getTime() + MIN) at.setDate(at.getDate() + 1);
+    out.push(
+      note(
+        STREAK_RISK_ID,
+        "Don't break your streak",
+        `You're on a ${c.current}-day streak. A few minutes of dhikr keeps it going.`,
+        at,
+      ),
+    );
+  }
+  await schedule(plugin, out, "streak");
+};
+
 /** Everything in this file, for app open. */
 export const rescheduleSmartNotifications = async () => {
   await rescheduleSmartAdhkar();
   await rescheduleSunnahNotification();
   await reschedulePeriodNotifications();
+  await rescheduleStreakNotifications();
 };
