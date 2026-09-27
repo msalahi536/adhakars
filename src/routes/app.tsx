@@ -12,6 +12,7 @@ import { rememberMoreDestination } from "@/lib/more-navigation";
 import { isPeriodNotifId, isSmartAdhkarId, smartAdhkarKind, SUNNAH_NOTIF_ID } from "@/lib/smart-notifications";
 import { FULL_ADHAN_URL, isPrayerNotifId } from "@/lib/adhan-notifications";
 import { getPrayerSettings } from "@/lib/prayer-times";
+import { initNativeBridge } from "@/lib/native-bridge";
 
 const UPDATE_WELCOME_KEY = "adhkar:update-welcome:2026-09";
 
@@ -36,6 +37,10 @@ function AppLayout() {
   // Derive phase and backgrounds directly during render to prevent transition flashes
   const backgrounds = backgroundsForPreset(activePresetId);
   const visualPhase = activeVisualPhase;
+
+  useEffect(() => {
+    initNativeBridge();
+  }, []);
 
   useEffect(() => {
     if (!hasOnboarded()) {

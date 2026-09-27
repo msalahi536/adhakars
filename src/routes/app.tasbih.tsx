@@ -1,9 +1,10 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { RotateCcw, Undo2 } from "lucide-react";
 import { triggerHaptic } from "@/lib/theme";
 import { bumpLifetime } from "@/lib/storage";
 import { ProgressRing } from "@/components/ProgressRing";
+import { startTasbihSession, updateTasbihSession, endTasbihSession } from "@/lib/native-bridge";
 
 export const Route = createFileRoute("/app/tasbih")({
   head: () => ({
@@ -31,6 +32,16 @@ function Tasbih() {
   const [pressed, setPressed] = useState(false);
   const [tapped, setTapped] = useState(false);
   const [confirmReset, setConfirmReset] = useState(false);
+  const sessionStarted = useRef(false);
+
+  useEffect(() => {
+    return () => {
+      if (sessionStarted.current) {
+        void endTasbihSession();
+        sessionStarted.current = false;
+      }
+    };
+  }, []);
 
   useEffect(() => {
     try {
@@ -61,6 +72,14 @@ function Tasbih() {
     bumpLifetime("tasbih", 1);
     setTapped(true);
     setTimeout(() => setTapped(false), 200);
+    const liveNext = total + 1;
+    const liveTarget = hasMilestone ? milestone : 0;
+    if (!sessionStarted.current) {
+      void startTasbihSession(liveNext, liveTarget);
+      sessionStarted.current = true;
+    } else {
+      void updateTasbihSession(liveNext, liveTarget);
+    }
     setTotal((n) => {
       const next = n + 1;
       if (hasMilestone && next % milestone === 0) {
@@ -75,6 +94,7 @@ function Tasbih() {
   const undo = (e: React.MouseEvent) => {
     e.stopPropagation();
     triggerHaptic("heavy");
+    if (sessionStarted.current) void updateTasbihSession(Math.max(0, total - 1), hasMilestone ? milestone : 0);
     setTotal((n) => Math.max(0, n - 1));
   };
 
@@ -86,6 +106,10 @@ function Tasbih() {
   const doReset = () => {
     triggerHaptic("heavy");
     setTotal(0);
+    if (sessionStarted.current) {
+      void endTasbihSession();
+      sessionStarted.current = false;
+    }
     setConfirmReset(false);
     showToast("Count reset");
   };
