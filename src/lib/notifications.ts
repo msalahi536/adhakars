@@ -325,6 +325,15 @@ export const scheduleReminder = async (r: Reminder, firstAt?: Date): Promise<Act
   if (!isNativePlatform()) return { ok: false, error: "Not running in the native app" };
   const plugin = await loadPlugin();
   if (!plugin) return { ok: false, error: "Notifications plugin is missing from this build." };
+  if (!firstAt) {
+    const smart = await import("@/lib/smart-notifications");
+    if (smart.usesPrayerTimes(r.id)) {
+      // Morning/evening follow Fajr and Asr once a location is known.
+      await cancelReminder(r.id);
+      await smart.rescheduleSmartAdhkar();
+      return { ok: true };
+    }
+  }
   try {
     await ensureChannel(plugin);
     await cancelReminder(r.id);
@@ -386,6 +395,8 @@ export const applyReminders = async (prefs: NotificationPrefs): Promise<void> =>
       await cancelReminder(r.id);
     }
   }
+  const smart = await import("@/lib/smart-notifications");
+  await smart.rescheduleSmartAdhkar();
 };
 
 
