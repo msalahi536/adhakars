@@ -178,6 +178,25 @@ function RootComponent() {
     return () => sub.subscription.unsubscribe();
   }, [router]);
 
+  // Deter casual copying of artwork: block right-click save and drag on media.
+  useEffect(() => {
+    const isMedia = (t: EventTarget | null) =>
+      t instanceof Element && !!t.closest("img, picture, svg, canvas, video, [data-protected-art]");
+    const onContextMenu = (e: MouseEvent) => {
+      if (isMedia(e.target)) e.preventDefault();
+    };
+    const onDragStart = (e: DragEvent) => {
+      if (isMedia(e.target)) e.preventDefault();
+    };
+    document.addEventListener("contextmenu", onContextMenu);
+    document.addEventListener("dragstart", onDragStart);
+    return () => {
+      document.removeEventListener("contextmenu", onContextMenu);
+      document.removeEventListener("dragstart", onDragStart);
+    };
+  }, []);
+
+
   return (
     <QueryClientProvider client={queryClient}>
       <Outlet />
