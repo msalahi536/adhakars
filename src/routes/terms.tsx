@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { MarketingLayout } from "@/components/marketing/MarketingLayout";
+import { LEGAL_UPDATED, TERMS_INTRO, TERMS_SECTIONS } from "@/data/legal";
 
 export const Route = createFileRoute("/terms")({
   head: () => ({
@@ -8,7 +9,7 @@ export const Route = createFileRoute("/terms")({
       {
         name: "description",
         content:
-          "Terms of service for Sahih Al-Adhkar. Free, provided as is, no warranty.",
+          "Terms of service for Sahih Al-Adhkar. Free, provided as is, with health, religious guidance, and intellectual property terms.",
       },
       { property: "og:title", content: "Terms of Service, Sahih Al-Adhkar" },
       { property: "og:description", content: "Terms of service for Sahih Al-Adhkar." },
@@ -18,33 +19,6 @@ export const Route = createFileRoute("/terms")({
   }),
   component: TermsPage,
 });
-
-const SECTIONS: { heading: string; body: string }[] = [
-  {
-    heading: "THE APP",
-    body: "Sahih Al-Adhkar is provided free of charge, as is, and without warranty of any kind. It is offered as a benefit to the community and is not a substitute for scholarly guidance. For any ruling or religious question, please return to the people of knowledge.",
-  },
-  {
-    heading: "ACCURACY",
-    body: "Every adhkar in this app is presented with its source so that you can verify it. Every effort has been made to be accurate. If you find a mistake, please report it and it will be corrected.",
-  },
-  {
-    heading: "YOUR CONTENT",
-    body: "Custom adhkar that you create are stored on your device only. You are responsible for what you add. We do not review, store, or have access to this content.",
-  },
-  {
-    heading: "LIMITATION OF LIABILITY",
-    body: "This app is provided without warranty. We are not responsible for any loss of data, including counts, streaks, or custom adhkar.",
-  },
-  {
-    heading: "CHANGES",
-    body: "These terms may be updated. Continued use of the app means you accept the current terms.",
-  },
-  {
-    heading: "CONTACT",
-    body: "msalahi536@gmail.com",
-  },
-];
 
 function TermsPage() {
   return (
@@ -63,17 +37,17 @@ function TermsPage() {
           Terms of Service
         </h1>
         <p className="mt-6 text-sm" style={{ color: "rgba(31, 61, 43, 0.6)" }}>
-          Last updated: July 2026
+          {LEGAL_UPDATED}
         </p>
         <p
           className="mt-6 text-lg leading-relaxed"
           style={{ color: "rgba(31, 61, 43, 0.85)" }}
         >
-          By using Sahih Al-Adhkar you agree to these terms.
+          {TERMS_INTRO}
         </p>
 
         <div className="mt-10 space-y-8">
-          {SECTIONS.map((s) => (
+          {TERMS_SECTIONS.map((s) => (
             <section key={s.heading}>
               <h2
                 className="text-xs font-semibold uppercase tracking-[0.2em]"
