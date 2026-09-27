@@ -3875,3 +3875,8 @@ button img,
 label img {
   pointer-events: auto;
 }
+
+/* Midnight evening salah: the dismiss pill inherits a white --card-border from .salah-page; restore the theme border */
+html[data-preset="midnight"][data-visual-phase="evening"][data-section="salah"] .salah-dismiss {
+  border-color: rgba(126, 166, 239, 0.42) !important;
+}
