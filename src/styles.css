@@ -3886,14 +3886,14 @@ html[data-preset="midnight"][data-visual-phase="evening"][data-section="salah"] 
   width: 100%;
   display: flex;
   align-items: center;
-  gap: 11px;
-  min-height: 56px;
-  padding: 9px 14px;
+  gap: 10px;
+  min-height: 50px;
+  padding: 7px 13px;
   text-align: left;
   color: var(--card-foreground);
   background: color-mix(in oklab, var(--surface, var(--card)) 94%, var(--accent) 6%);
   border: 1px solid color-mix(in oklab, var(--accent) 22%, var(--border));
-  border-radius: 16px;
+  border-radius: 14px;
   box-shadow: var(--card-shadow);
   transition: transform 0.2s ease, border-color 0.2s ease;
 }
@@ -3902,27 +3902,27 @@ html[data-preset="midnight"][data-visual-phase="evening"][data-section="salah"] 
   position: relative;
   display: grid;
   place-items: center;
-  width: 36px;
-  height: 36px;
-  flex: 0 0 36px;
+  width: 32px;
+  height: 32px;
+  flex: 0 0 32px;
   border: 1px solid color-mix(in oklab, var(--accent) 30%, transparent);
-  border-radius: 5px 8px 8px 5px;
+  border-radius: 5px 7px 7px 5px;
   color: var(--accent);
   background: color-mix(in oklab, var(--accent) 12%, var(--card));
   box-shadow: inset 2px 0 0 color-mix(in oklab, var(--accent) 24%, transparent);
 }
-.sunnah-more-icon svg { width: 17px; height: 17px; }
+.sunnah-more-icon svg { width: 15px; height: 15px; }
 .sunnah-more-page-line {
   position: absolute;
-  right: 5px;
-  bottom: 5px;
-  width: 12px;
+  right: 4px;
+  bottom: 4px;
+  width: 11px;
   height: 1px;
   background: color-mix(in oklab, var(--accent) 30%, transparent);
 }
 .sunnah-more-copy { display: flex; min-width: 0; flex: 1; flex-direction: column; gap: 2px; }
 .sunnah-float-kicker {
-  font-size: 9px;
+  font-size: 8.5px;
   font-weight: 700;
   letter-spacing: 0.12em;
   text-transform: uppercase;
