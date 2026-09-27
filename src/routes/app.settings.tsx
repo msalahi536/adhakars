@@ -135,6 +135,11 @@ function Settings() {
     setPeriodNotif(v);
     setPeriodNotificationsEnabled(v);
   };
+  const [streakNotif, setStreakNotif] = useState(() => getStreakNotificationsEnabled());
+  const toggleStreakNotif = (v: boolean) => {
+    setStreakNotif(v);
+    setStreakNotificationsEnabled(v);
+  };
 
   const [notifPrefs, setNotifPrefsState] = useState<NotificationPrefs>(() => getNotificationPrefs());
 
@@ -880,6 +885,27 @@ function Settings() {
                       aria-label="Toggle Period Companion reminders"
                     >
                       <span className="settings-switch-knob" style={{ left: periodNotif ? 22 : 2 }} />
+                    </button>
+                  </div>
+                  <div className="settings-row">
+                    <span className="settings-icon">
+                      <Flame size={17} strokeWidth={1.8} />
+                    </span>
+                    <div className="min-w-0 flex-1">
+                      <div className="settings-row-title">Streak Reminders</div>
+                      <div className="settings-row-desc">An evening nudge if your streak is at risk, and a celebration when you hit a milestone.</div>
+                    </div>
+                    <button
+                      onClick={() => toggleStreakNotif(!streakNotif)}
+                      className="settings-switch"
+                      style={{
+                        background: streakNotif
+                          ? "var(--accent)"
+                          : "color-mix(in oklab, var(--foreground) 20%, transparent)",
+                      }}
+                      aria-label="Toggle streak reminders"
+                    >
+                      <span className="settings-switch-knob" style={{ left: streakNotif ? 22 : 2 }} />
                     </button>
                   </div>
                   {notifPrefs.reminders.length === 0 && (
