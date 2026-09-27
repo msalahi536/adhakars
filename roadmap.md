@@ -28,3 +28,4 @@
 - [x] Fix admin widget password.
 - [x] Sunnah of the day: dismissible floating card themed per preset + daily notification.
 - [x] Period Companion notifications (brief supplied; "reciting Quran" wording).
+- [x] Move the Sunnah of the day into a draggable, collapsible side companion that never covers reading controls.
