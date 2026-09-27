@@ -185,6 +185,7 @@ const atHour = (k: string, h: number) => {
 };
 
 export const reschedulePeriodNotifications = async (): Promise<void> => {
+  void rescheduleFertilityNotifications();
   const plugin = await ready();
   if (!plugin) return;
   await cancel(plugin, PERIOD_IDS);
