@@ -388,3 +388,79 @@ export const applyReminders = async (prefs: NotificationPrefs): Promise<void> =>
   }
 };
 
+
+/* ---- Jumu'ah (Friday) notification ---- */
+
+export const JUMUAH_NOTIF_ID = 880001;
+const K_JUMUAH_ENABLED = "adhkar:jumuah-notification";
+/** Friday in the Capacitor Weekday enum (Sunday = 1). */
+const WEEKDAY_FRIDAY = 6;
+const JUMUAH_HOUR = 7;
+const JUMUAH_MINUTE = 0;
+
+export const getJumuahNotificationEnabled = (): boolean => {
+  if (typeof window === "undefined") return true;
+  return localStorage.getItem(K_JUMUAH_ENABLED) !== "0";
+};
+
+export const setJumuahNotificationEnabled = (on: boolean) => {
+  if (typeof window === "undefined") return;
+  localStorage.setItem(K_JUMUAH_ENABLED, on ? "1" : "0");
+};
+
+export const cancelJumuahNotification = async (): Promise<void> => {
+  const plugin = await loadPlugin();
+  if (!plugin) return;
+  try {
+    await plugin.cancel({ notifications: [{ id: JUMUAH_NOTIF_ID }] });
+  } catch {
+    // ignore
+  }
+};
+
+/** Weekly repeating notification on Friday at 07:00 local time. */
+export const scheduleJumuahNotification = async (): Promise<ActionResult> => {
+  if (!isNativePlatform()) return { ok: false, error: "Not running in the native app" };
+  const plugin = await loadPlugin();
+  if (!plugin) return { ok: false, error: "Notifications plugin is missing from this build." };
+  try {
+    await ensureChannel(plugin);
+    await cancelJumuahNotification();
+    await plugin.schedule({
+      notifications: [
+        {
+          id: JUMUAH_NOTIF_ID,
+          title: "Sahih Al-Adhkar",
+          body: "It's Jumu'ah — come learn the sunnahs of Jumu'ah.",
+          schedule: {
+            on: { weekday: WEEKDAY_FRIDAY, hour: JUMUAH_HOUR, minute: JUMUAH_MINUTE },
+            every: "week",
+            repeats: true,
+            allowWhileIdle: true,
+          },
+          channelId: ANDROID_CHANNEL,
+        },
+      ],
+    });
+    return { ok: true };
+  } catch (e) {
+    console.error("[notifications] jumuah schedule failed", e);
+    return { ok: false, error: (e as Error)?.message ?? "Could not schedule the Friday reminder." };
+  }
+};
+
+/** Fires whenever the user taps a delivered local notification. */
+export const registerNotificationTapHandler = (onAction: (id: number) => void): void => {
+  void (async () => {
+    const plugin = await loadPlugin();
+    if (!plugin?.addListener) return;
+    try {
+      await plugin.addListener("localNotificationActionPerformed", (e: any) => {
+        const id = e?.notification?.id;
+        if (typeof id === "number") onAction(id);
+      });
+    } catch (e) {
+      console.warn("[notifications] tap listener failed", e);
+    }
+  })();
+};
