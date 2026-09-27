@@ -44,11 +44,16 @@ function DuaLibrary() {
   useEffect(() => { setMounted(true); setF(getFavs()); setNow(new Date()); }, []);
   // Deep link from the Friday (Jumu'ah) notification.
   useEffect(() => {
-    if (typeof window !== "undefined" && window.localStorage.getItem("adhkar:open-jumuah") === "1") {
+    if (window.localStorage.getItem("adhkar:open-jumuah") === "1") {
       window.localStorage.removeItem("adhkar:open-jumuah");
       setCat("jum");
-      window.setTimeout(() => document.querySelector(".period-scroll-area")?.scrollTo({ top: 0 }), 50);
     }
+    const open = () => {
+      setCat("jum");
+      document.querySelector(".period-scroll-area")?.scrollTo({ top: 0 });
+    };
+    window.addEventListener("adhkar:open-jumuah", open);
+    return () => window.removeEventListener("adhkar:open-jumuah", open);
   }, []);
 
   const favIds = new Set(favs.map((f) => f.id));
