@@ -11,9 +11,23 @@ const CATEGORIES = [
   "sunnah_of_day",
 ] as const;
 
-function checkPassword(pw: string) {
-  const expected = process.env["ADMIN_PASSWORD"] || "Mindcast645!";
-  if (pw !== expected) throw new Error("Unauthorized");
+function safeEqual(a: string, b: string) {
+  const enc = new TextEncoder();
+  const x = enc.encode(a);
+  const y = enc.encode(b);
+  let diff = x.length ^ y.length;
+  const len = Math.max(x.length, y.length);
+  for (let i = 0; i < len; i++) diff |= (x[i] ?? 0) ^ (y[i] ?? 0);
+  return diff === 0;
+}
+
+async function checkPassword(pw: string) {
+  const expected = process.env["ADMIN_PASSWORD"];
+  // Fail closed: no secret configured means nobody gets in.
+  if (!expected || expected.length < 8 || !safeEqual(pw, expected)) {
+    await new Promise((r) => setTimeout(r, 800)); // slow down guessing
+    throw new Error("Unauthorized");
+  }
 }
 
 async function admin() {
