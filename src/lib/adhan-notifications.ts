@@ -44,6 +44,15 @@ const BODY: Record<Exclude<PrayerId, "sunrise">, string> = {
  * these paths (Android: res/raw, iOS: bundled .caf/.wav). Until then both
  * options fall back to the default notification sound.
  */
+/**
+ * Full adhan recording played in the app when a prayer notification is tapped
+ * (iOS caps notification sounds at 30 seconds). TODO: set to the adhan file URL.
+ */
+export const FULL_ADHAN_URL: string | undefined = undefined;
+
+export const isPrayerNotifId = (id: number) =>
+  Object.values(PRAYER_NOTIF_IDS).some((n) => n === id || n + TOMORROW_OFFSET === id);
+
 const SOUND_FILES: Record<string, string | undefined> = {
   adhan: undefined, // TODO: "adhan.wav"
   takbir: undefined, // TODO: "takbir.wav"

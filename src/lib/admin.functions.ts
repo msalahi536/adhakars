@@ -23,7 +23,7 @@ function safeEqual(a: string, b: string) {
 
 async function checkPassword(pw: string) {
   // Only the server ever sees ADMIN_PASSWORD; the browser never receives it.
-  const expected = process.env["ADMIN_PASSWORD"];
+  const expected = process.env["ADMIN_PASSWORD"]?.trim();
   // Fail closed: no secret configured means nobody gets in.
   if (!expected || expected.length < 8 || !safeEqual(pw, expected)) {
     await new Promise((r) => setTimeout(r, 800)); // slow down guessing
@@ -36,7 +36,7 @@ async function admin() {
   return supabaseAdmin;
 }
 
-const pw = z.object({ password: z.string() });
+const pw = z.object({ password: z.string().transform((s) => s.trim()) });
 const fields = z.object({
   arabic_text: z.string().min(1).max(5000),
   transliteration: z.string().max(5000).nullable().optional(),

@@ -175,6 +175,8 @@ function RootComponent() {
     };
     const onPeriod = () => void import("@/lib/smart-notifications").then((m) => m.reschedulePeriodNotifications());
     window.addEventListener("period:update", onPeriod);
+    const onPrayer = () => void import("@/lib/smart-notifications").then((m) => m.rescheduleSmartAdhkar());
+    window.addEventListener("adhkar:prayer-settings", onPrayer);
     const timer = window.setTimeout(() => {
       void reapply();
       void smart();
@@ -184,6 +186,7 @@ function RootComponent() {
       window.clearTimeout(timer);
       window.removeEventListener("adhkar:day-complete", reapply);
       window.removeEventListener("period:update", onPeriod);
+      window.removeEventListener("adhkar:prayer-settings", onPrayer);
     };
   }, []);
 
