@@ -22,6 +22,7 @@ function safeEqual(a: string, b: string) {
 }
 
 async function checkPassword(pw: string) {
+  // Only the server ever sees ADMIN_PASSWORD; the browser never receives it.
   const expected = process.env["ADMIN_PASSWORD"];
   // Fail closed: no secret configured means nobody gets in.
   if (!expected || expected.length < 8 || !safeEqual(pw, expected)) {
@@ -55,7 +56,7 @@ export const adminLogin = createServerFn({ method: "POST" })
   .inputValidator((d: unknown) => pw.parse(d))
   .handler(async ({ data }) => {
     try {
-      checkPassword(data.password);
+      await checkPassword(data.password);
       return { ok: true };
     } catch {
       return { ok: false };
@@ -65,7 +66,7 @@ export const adminLogin = createServerFn({ method: "POST" })
 export const adminLoadAll = createServerFn({ method: "POST" })
   .inputValidator((d: unknown) => pw.parse(d))
   .handler(async ({ data }) => {
-    checkPassword(data.password);
+    await checkPassword(data.password);
     const db = await admin();
     const [c, s] = await Promise.all([
       db
@@ -86,7 +87,7 @@ export const adminSaveItem = createServerFn({ method: "POST" })
       .parse(d),
   )
   .handler(async ({ data }) => {
-    checkPassword(data.password);
+    await checkPassword(data.password);
     const db = await admin();
     if (data.id) {
       const { error } = await db.from("widget_content").update(clean(data.item)).eq("id", data.id);
@@ -112,7 +113,7 @@ export const adminBulkImport = createServerFn({ method: "POST" })
     pw.extend({ category: z.enum(CATEGORIES), items: z.array(fields).min(1).max(500) }).parse(d),
   )
   .handler(async ({ data }) => {
-    checkPassword(data.password);
+    await checkPassword(data.password);
     const db = await admin();
     const { data: last } = await db
       .from("widget_content")
@@ -130,7 +131,7 @@ export const adminBulkImport = createServerFn({ method: "POST" })
 export const adminDeleteItem = createServerFn({ method: "POST" })
   .inputValidator((d: unknown) => pw.extend({ id: z.string().uuid() }).parse(d))
   .handler(async ({ data }) => {
-    checkPassword(data.password);
+    await checkPassword(data.password);
     const db = await admin();
     const { error } = await db.from("widget_content").delete().eq("id", data.id);
     if (error) throw new Error(error.message);
@@ -140,7 +141,7 @@ export const adminDeleteItem = createServerFn({ method: "POST" })
 export const adminToggleActive = createServerFn({ method: "POST" })
   .inputValidator((d: unknown) => pw.extend({ id: z.string().uuid(), is_active: z.boolean() }).parse(d))
   .handler(async ({ data }) => {
-    checkPassword(data.password);
+    await checkPassword(data.password);
     const db = await admin();
     const { error } = await db.from("widget_content").update({ is_active: data.is_active }).eq("id", data.id);
     if (error) throw new Error(error.message);
@@ -150,7 +151,7 @@ export const adminToggleActive = createServerFn({ method: "POST" })
 export const adminReorder = createServerFn({ method: "POST" })
   .inputValidator((d: unknown) => pw.extend({ ids: z.array(z.string().uuid()).max(1000) }).parse(d))
   .handler(async ({ data }) => {
-    checkPassword(data.password);
+    await checkPassword(data.password);
     const db = await admin();
     await Promise.all(
       data.ids.map((id, i) => db.from("widget_content").update({ display_order: i + 1 }).eq("id", id)),
@@ -169,7 +170,7 @@ export const adminSaveSchedule = createServerFn({ method: "POST" })
       .parse(d),
   )
   .handler(async ({ data }) => {
-    checkPassword(data.password);
+    await checkPassword(data.password);
     const db = await admin();
     const { error } = await db
       .from("widget_schedule")
