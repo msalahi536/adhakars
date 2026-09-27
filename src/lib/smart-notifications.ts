@@ -185,6 +185,7 @@ const atHour = (k: string, h: number) => {
 };
 
 export const reschedulePeriodNotifications = async (): Promise<void> => {
+  void rescheduleFertilityNotifications();
   const plugin = await ready();
   if (!plugin) return;
   await cancel(plugin, PERIOD_IDS);
@@ -299,4 +300,34 @@ export const rescheduleSmartNotifications = async () => {
   await rescheduleSunnahNotification();
   await reschedulePeriodNotifications();
   await rescheduleStreakNotifications();
+};
+
+/* ---------------- Fertility alerts (opt-in) ---------------- */
+export const FERTILITY_IDS = Array.from({ length: 12 }, (_, i) => 9530 + i);
+export const rescheduleFertilityNotifications = async (): Promise<void> => {
+  const plugin = await ready();
+  if (!plugin) return;
+  await cancel(plugin, FERTILITY_IDS);
+  const { getFertilitySettings, getFertility } = await import("@/lib/period");
+  const s = getFertilitySettings();
+  const info = getFertility();
+  if (!s.enabled || !s.alerts || info.status !== "ok") return;
+  const now = Date.now();
+  const today = todayK();
+  const out: N[] = [];
+  let n = 0;
+  for (const ov of info.ovulations) {
+    if (ov < today) continue;
+    const items: [string, string, string][] = [
+      [addK(ov, -5), "A Reminder", "Your fertile window is estimated to begin today based on your cycle history."],
+      [addK(ov, -2), "Gentle Reminder", "You are entering your estimated peak fertility days."],
+      [ov, "Today's Note", "Estimated ovulation day. Remember the dua before intimacy."],
+    ];
+    for (const [day, title, body] of items) {
+      const at = atHour(day, 9);
+      if (at.getTime() > now + 2000 && n < FERTILITY_IDS.length) out.push(note(FERTILITY_IDS[n++], title, body, at));
+    }
+    if (n >= 6) break;
+  }
+  await schedule(plugin, out, "fertility");
 };

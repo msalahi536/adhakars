@@ -188,3 +188,46 @@ export const gratitudeHistory = (): { date: string; lines: string[] }[] =>
     .filter(([, l]) => l.some((x) => x.trim()))
     .map(([date, lines]) => ({ date, lines }))
     .sort((a, b) => b.date.localeCompare(a.date));
+
+// ---- Fertility (opt-in, calendar method) ----
+const FERT = "period:fertility";
+export type FertilitySettings = { enabled: boolean; alerts: boolean; ttc: boolean; acknowledged: boolean };
+export const getFertilitySettings = (): FertilitySettings =>
+  ({ enabled: false, alerts: false, ttc: false, acknowledged: false, ...read<Partial<FertilitySettings>>(FERT, {}) });
+export const setFertilitySettings = (patch: Partial<FertilitySettings>) => write(FERT, { ...getFertilitySettings(), ...patch });
+
+export type FertilityDay = "ovulation" | "peak" | "fertile" | "wait" | null;
+export type FertilityInfo =
+  | { status: "none" }
+  | { status: "out-of-range"; cycleLen: number }
+  | { status: "ok"; cycleLen: number; fewCycles: boolean; variable: boolean; ovulations: string[] };
+
+export const getFertility = (): FertilityInfo => {
+  const c = getCycles();
+  if (!c.length) return { status: "none" };
+  const lens: number[] = [];
+  for (let i = 1; i < c.length; i++) lens.push(diffDays(c[i - 1].start, c[i].start));
+  const recent = lens.slice(-6);
+  const fewCycles = recent.length < 3;
+  const cycleLen = fewCycles ? 28 : Math.round(recent.reduce((s, n) => s + n, 0) / recent.length);
+  if (cycleLen < 21 || cycleLen > 40) return { status: "out-of-range", cycleLen };
+  const variable = recent.length >= 2 && Math.max(...recent) - Math.min(...recent) > 7;
+  // Ovulation ≈ 14 days before each next period (logged or predicted).
+  const nexts = c.slice(1).map((x) => x.start);
+  let n = addK(c[c.length - 1].start, cycleLen);
+  const horizon = addK(todayK(), 400);
+  while (n <= horizon) { nexts.push(n); n = addK(n, cycleLen); }
+  return { status: "ok", cycleLen, fewCycles, variable, ovulations: nexts.map((x) => addK(x, -14)) };
+};
+
+export const fertilityDay = (date: string, info: FertilityInfo): FertilityDay => {
+  if (info.status !== "ok") return null;
+  for (const ov of info.ovulations) {
+    const d = diffDays(ov, date);
+    if (d === 0) return "ovulation";
+    if (d >= -2 && d < 0) return "peak";
+    if (d >= -5 && d <= 1) return "fertile";
+    if (d >= 2 && d <= 8) return "wait";
+  }
+  return null;
+};

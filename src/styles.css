@@ -4019,3 +4019,21 @@ html[data-preset="midnight"][data-visual-phase="evening"][data-section="salah"] 
 @media (prefers-reduced-motion: reduce) {
   .sunnah-sheet, .sunnah-sheet-backdrop { animation: none; }
 }
+
+/* Fertility overlay (opt-in) — soft teal, understated */
+:root { --fert: color-mix(in oklab, oklch(0.68 0.09 190) 80%, var(--accent)); }
+.period-day.is-fertile { position: relative; }
+.period-day.is-fertile::after { content: ""; position: absolute; bottom: 3px; left: 50%; width: 5px; height: 5px; border-radius: 999px; border: 1.2px solid var(--fert); transform: translateX(-50%); }
+.period-day.is-peak::after { background: var(--fert); }
+.period-day.is-ov::after { width: 6px; height: 6px; border-radius: 1px; transform: translateX(-50%) rotate(45deg); }
+.fert-legend { margin-top: 8px; }
+.period-legend i.is-fertile { width: 9px; height: 9px; border: 1.4px solid var(--fert); }
+.period-legend i.is-peak { width: 9px; height: 9px; background: var(--fert); }
+.period-legend i.is-ov { width: 8px; height: 8px; border-radius: 1px; background: var(--fert); transform: rotate(45deg); }
+.fert-row { display: flex; align-items: center; justify-content: space-between; gap: 14px; padding: 12px 0; border-top: 1px solid color-mix(in oklab, var(--foreground) 8%, transparent); cursor: pointer; }
+.period-eyebrow + .fert-row { border-top: 0; }
+.fert-row strong { display: block; font-size: 14px; }
+.fert-row small { display: block; margin-top: 2px; font-size: 12px; line-height: 1.4; color: var(--muted-foreground); }
+.fert-card { border-left: 3px solid var(--fert); }
+.fert-warm { font-size: 13px; font-style: italic; color: var(--fert); }
+.fert-learn-head { display: flex; width: 100%; align-items: center; gap: 12px; font-size: 14px; }
