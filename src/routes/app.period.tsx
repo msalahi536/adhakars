@@ -18,6 +18,8 @@ import {
   PRAYER_LABELS, fetchDay, getPrayerSettings, slotsForDay,
 } from "@/lib/prayer-times";
 import { Button } from "@/components/ui/button";
+import { FertilityDayCard, FertilityLearn, FertilityNotes, FertilitySettingsCard } from "@/components/period/Fertility";
+import { fertilityDay, getFertility, getFertilitySettings } from "@/lib/period";
 import { Calendar } from "@/components/ui/calendar";
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from "@/components/ui/dialog";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
@@ -376,6 +378,8 @@ function CycleView() {
   const [selected, setSelected] = useState(today);
   const stats: Stats = getStats();
   const cycles = getCycles();
+  const fert = getFertilitySettings();
+  const fertInfo = fert.enabled ? getFertility() : ({ status: "none" } as const);
   const [editor, setEditor] = useState<{ cycle?: Cycle; start: string; end: string; ongoing: boolean } | null>(null);
 
   const cells = useMemo(() => {
@@ -410,7 +414,8 @@ function CycleView() {
               "period-day",
               isPeriodDay(k) ? "is-period" : "",
               isPredictedPeriodDay(k) ? "is-predicted" : "",
-              stats.ovulation === k ? "is-ovulation" : "",
+              !fert.enabled && stats.ovulation === k ? "is-ovulation" : "",
+              fert.enabled ? ({ fertile: "is-fertile", peak: "is-fertile is-peak", ovulation: "is-fertile is-peak is-ov", wait: "" } as const)[fertilityDay(k, fertInfo) ?? "wait"] : "",
               k === today ? "is-today" : "",
               k === selected ? "is-selected" : "",
             ].join(" ");
@@ -420,8 +425,15 @@ function CycleView() {
         <div className="period-legend">
           <span><i className="is-period" /> Period</span>
           <span><i className="is-predicted" /> Predicted</span>
-          <span><i className="is-ovulation" /> Ovulation</span>
+          {!fert.enabled && <span><i className="is-ovulation" /> Ovulation</span>}
         </div>
+        {fert.enabled && fertInfo.status === "ok" && (
+          <div className="period-legend fert-legend">
+            <span><i className="is-fertile" /> Fertile window</span>
+            <span><i className="is-peak" /> Peak</span>
+            <span><i className="is-ov" /> Est. ovulation</span>
+          </div>
+        )}
         <div className="period-calendar-actions">
           <Button className="period-btn period-calendar-primary" disabled={future} onClick={() => openEditor()}>
             <CalendarIcon size={16} /> Log a period
@@ -440,6 +452,9 @@ function CycleView() {
           ? "Add at least two past periods for predictions based on your cycle. Until then, estimates use a 28-day cycle."
           : `Predictions use your last ${Math.min(stats.cyclesLogged, 6)} logged cycles and update automatically.`}
       </p>
+
+      {fert.enabled && <FertilityNotes info={fertInfo} />}
+      {fert.enabled && <FertilityDayCard date={selected} info={fertInfo} settings={fert} />}
 
       {cycles.length > 0 && (
         <div className="period-card">
@@ -463,6 +478,8 @@ function CycleView() {
           </ul>
         </div>
       )}
+      <FertilitySettingsCard settings={fert} />
+      {fert.enabled && <FertilityLearn />}
       <PeriodEditor editor={editor} setEditor={setEditor} />
     </div>
   );
