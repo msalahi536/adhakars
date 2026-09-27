@@ -42,6 +42,7 @@ export function SunnahOfTheDay({ hidden }: { hidden?: boolean }) {
   const [state, setState] = useState<"off" | "card" | "pill">("off");
   const [open, setOpen] = useState(false);
   const [drag, setDrag] = useState({ x: 0, y: 0 });
+  const [dragging, setDragging] = useState(false);
   const floatRef = useRef<HTMLDivElement | null>(null);
   const start = useRef<{ x: number; y: number; dragX: number; dragY: number; left: number; top: number } | null>(null);
   const moved = useRef(false);
@@ -80,7 +81,7 @@ export function SunnahOfTheDay({ hidden }: { hidden?: boolean }) {
     const t = window.setTimeout(() => {
       setDrag({ x: 0, y: 0 });
       setState("pill");
-    }, 6500);
+    }, 4200);
     return () => window.clearTimeout(t);
   }, [state]);
 
@@ -103,6 +104,7 @@ export function SunnahOfTheDay({ hidden }: { hidden?: boolean }) {
       top: rect.top - drag.y,
     };
     moved.current = false;
+    setDragging(true);
     (e.currentTarget as HTMLElement).setPointerCapture?.(e.pointerId);
   };
   const onMove = (e: React.PointerEvent) => {
@@ -125,6 +127,7 @@ export function SunnahOfTheDay({ hidden }: { hidden?: boolean }) {
   const onUp = () => {
     if (!start.current) return;
     start.current = null;
+    setDragging(false);
     if (!moved.current) {
       if (state === "pill") {
         setDrag({ x: 0, y: 0 });
@@ -143,14 +146,14 @@ export function SunnahOfTheDay({ hidden }: { hidden?: boolean }) {
     <>
       <div
         ref={floatRef}
-        className={`sunnah-float is-${state} ${drag.x || drag.y ? "is-dragging" : ""}`}
+        className={`sunnah-float is-${state} ${dragging ? "is-dragging" : ""}`}
         style={{ transform: `translate3d(${drag.x}px, ${drag.y}px, 0)`, opacity: 1 - pull * 0.15 }}
         onPointerDown={onDown}
         onPointerMove={onMove}
         onPointerUp={onUp}
         onPointerCancel={onUp}
         role="button"
-        aria-label="Open Sunnah of the day"
+        aria-label={state === "pill" ? "Show Sunnah of the day" : "Open Sunnah of the day"}
       >
         <span className="sunnah-float-icon">
           <Sparkles size={state === "card" ? 16 : 18} strokeWidth={1.8} />
