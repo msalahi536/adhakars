@@ -119,18 +119,20 @@ function DuaLibrary() {
                 </>
               ) : (
                 <>
-                  <button
-                    className={`dl-jumuah ${isFriday ? "is-glow" : ""}`}
-                    onClick={() => { setCat("jum"); void triggerHaptic("light"); document.querySelector(".period-scroll-area")?.scrollTo({ top: 0 }); }}
-                  >
-                    <span className="dl-cat-icon"><Sun size={18} /></span>
-                    <span className="dl-jumuah-body">
-                      <span className="dl-jumuah-name">Jumu‘ah Sunnahs</span>
-                      <span className="dl-jumuah-sub">The Prophet’s ﷺ Friday practice</span>
-                    </span>
-                    <span className="dl-jumuah-count">4 sunnahs</span>
-                    <ChevronRight size={18} className="dl-jumuah-chevron" />
-                  </button>
+                  {isFriday && (
+                    <button
+                      className="dl-jumuah is-glow"
+                      onClick={() => { setCat("jum"); void triggerHaptic("light"); document.querySelector(".period-scroll-area")?.scrollTo({ top: 0 }); }}
+                    >
+                      <span className="dl-cat-icon"><Sun size={18} /></span>
+                      <span className="dl-jumuah-body">
+                        <span className="dl-jumuah-name">Jumu‘ah Sunnahs</span>
+                        <span className="dl-jumuah-sub">The Prophet’s ﷺ Friday practice</span>
+                      </span>
+                      <span className="dl-jumuah-count">4 sunnahs</span>
+                      <ChevronRight size={18} className="dl-jumuah-chevron" />
+                    </button>
+                  )}
                   <div className="dl-grid">
                     {CATEGORIES.map((c, i) => {
                       const Icon = CAT_ICONS[i];
@@ -144,6 +146,20 @@ function DuaLibrary() {
                       );
                     })}
                   </div>
+                  {!isFriday && (
+                    <button
+                      className="dl-jumuah"
+                      onClick={() => { setCat("jum"); void triggerHaptic("light"); document.querySelector(".period-scroll-area")?.scrollTo({ top: 0 }); }}
+                    >
+                      <span className="dl-cat-icon"><Sun size={18} /></span>
+                      <span className="dl-jumuah-body">
+                        <span className="dl-jumuah-name">Jumu‘ah Sunnahs</span>
+                        <span className="dl-jumuah-sub">The Prophet’s ﷺ Friday practice</span>
+                      </span>
+                      <span className="dl-jumuah-count">4 sunnahs</span>
+                      <ChevronRight size={18} className="dl-jumuah-chevron" />
+                    </button>
+                  )}
                   {mounted && favs.length > 0 && (
                     <section>
                       <div className="dl-section-title">Favorites</div>
