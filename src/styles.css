@@ -3885,7 +3885,8 @@ html[data-preset="midnight"][data-visual-phase="evening"][data-section="salah"] 
 .sunnah-float {
   position: fixed;
   z-index: 90;
-  bottom: calc(var(--bottom-nav-row) + env(safe-area-inset-bottom, 0px) + 18px);
+  top: clamp(150px, 28dvh, 260px);
+  right: max(10px, calc((100vw - 28rem) / 2 + 10px));
   display: flex;
   align-items: center;
   gap: 10px;
@@ -3898,24 +3899,26 @@ html[data-preset="midnight"][data-visual-phase="evening"][data-section="salah"] 
   touch-action: none;
   user-select: none;
   cursor: pointer;
+  will-change: transform;
   transition: transform 0.35s cubic-bezier(.22,1,.36,1), opacity 0.3s, width 0.45s cubic-bezier(.22,1,.36,1), border-radius 0.45s, padding 0.45s;
-  animation: sunnah-in 0.6s cubic-bezier(.22,1,.36,1) both;
+  animation: sunnah-peek-in 0.65s cubic-bezier(.22,1,.36,1) both;
 }
 .sunnah-float.is-dragging { transition: none; }
 .sunnah-float.is-card {
-  left: 50%;
-  width: min(calc(100% - 48px), 26rem);
-  margin-left: calc(min(calc(100% - 48px), 26rem) / -2);
-  padding: 12px 12px 12px 14px;
-  border-radius: 20px;
+  width: min(calc(100vw - 48px), 15rem);
+  padding: 11px 10px 11px 12px;
+  border-radius: 18px 8px 8px 18px;
 }
 .sunnah-float.is-pill {
-  right: 20px;
-  padding: 7px 13px 7px 9px;
-  border-radius: 999px;
-  animation: sunnah-in 0.5s both, sunnah-hover 4.5s ease-in-out 0.6s infinite;
+  width: 48px;
+  height: 48px;
+  justify-content: center;
+  padding: 0;
+  border-radius: 18px 8px 8px 18px;
+  animation: sunnah-peek-in 0.5s both, sunnah-breathe 4.5s ease-in-out 0.7s infinite;
 }
 .sunnah-float-icon {
+  position: relative;
   flex: none;
   display: grid;
   place-items: center;
@@ -3925,7 +3928,22 @@ html[data-preset="midnight"][data-visual-phase="evening"][data-section="salah"] 
   color: var(--accent);
   background: color-mix(in oklab, var(--accent) 14%, transparent);
 }
-.is-pill .sunnah-float-icon { width: 24px; height: 24px; }
+.is-pill .sunnah-float-icon {
+  width: 34px;
+  height: 34px;
+  border: 1px solid color-mix(in oklab, var(--accent) 25%, transparent);
+  box-shadow: inset 0 0 0 4px color-mix(in oklab, var(--card) 36%, transparent);
+}
+.sunnah-float-dot {
+  position: absolute;
+  top: -1px;
+  right: -1px;
+  width: 7px;
+  height: 7px;
+  border: 2px solid var(--card);
+  border-radius: 999px;
+  background: var(--accent);
+}
 .sunnah-float-body { display: flex; min-width: 0; flex: 1; flex-direction: column; gap: 2px; }
 .sunnah-float-kicker {
   font-size: 10px;
@@ -3989,8 +4007,8 @@ html[data-preset="midnight"][data-visual-phase="evening"][data-section="salah"] 
   background: var(--accent);
 }
 .sunnah-sheet-btn.is-ghost { color: var(--card-foreground); background: color-mix(in oklab, var(--card-foreground) 8%, transparent); }
-@keyframes sunnah-in { from { opacity: 0; transform: translateY(16px) scale(0.96); } }
-@keyframes sunnah-hover { 0%, 100% { translate: 0 0; } 50% { translate: 0 -4px; } }
+@keyframes sunnah-peek-in { from { opacity: 0; translate: 36px 0; scale: 0.92; } }
+@keyframes sunnah-breathe { 0%, 100% { scale: 1; } 50% { scale: 1.06; } }
 @keyframes sunnah-fade { from { opacity: 0; } }
 @keyframes sunnah-up { from { transform: translateY(100%); } }
 @media (prefers-reduced-motion: reduce) {
