@@ -2200,8 +2200,8 @@ html[data-preset="midnight"][data-section="default"] {
   --nav-border: rgba(169, 193, 247, 0.3) !important;
   --nav-active: #edf3ff !important;
   --nav-inactive: #9aadd3 !important;
-  --dot-active: #b9cdff !important;
-  --dot-inactive: rgba(145, 175, 245, 0.38) !important;
+  --dot-active: #c3d3ff !important;
+  --dot-inactive: rgba(145, 175, 245, 0.55) !important;
   --index-badge-bg: rgba(205, 220, 255, 0.14) !important;
   --index-badge-fg: #eaf1ff !important;
   --count-fg: #d6e2ff !important;
@@ -2282,8 +2282,8 @@ html[data-preset="midnight"][data-visual-phase="evening"] {
   --nav-border: rgba(126, 166, 239, 0.36) !important;
   --nav-active: #e3ebff !important;
   --nav-inactive: rgba(169, 190, 231, 0.58) !important;
-  --dot-active: #88aaff !important;
-  --dot-inactive: rgba(136, 170, 255, 0.34) !important;
+  --dot-active: #9dbcff !important;
+  --dot-inactive: rgba(136, 170, 255, 0.5) !important;
   --pill-bg: rgba(202, 219, 255, 0.08) !important;
   --text-muted: #9db2dc !important;
   --translit: #a9c1f7 !important;
