@@ -30,6 +30,10 @@ import {
   scheduleReminder,
   cancelReminder,
   isNativePlatform,
+  getJumuahNotificationEnabled,
+  setJumuahNotificationEnabled,
+  scheduleJumuahNotification,
+  cancelJumuahNotification,
   type NotificationPrefs,
   type Reminder,
 } from "@/lib/notifications";
@@ -102,6 +106,13 @@ function Settings() {
   const [notifChecking, setNotifChecking] = useState(true);
   const [notifRequesting, setNotifRequesting] = useState(false);
   const [notifError, setNotifError] = useState<string | null>(null);
+  const [jumuahNotif, setJumuahNotif] = useState(() => getJumuahNotificationEnabled());
+
+  const toggleJumuahNotif = (v: boolean) => {
+    setJumuahNotif(v);
+    setJumuahNotificationEnabled(v);
+    void (v ? scheduleJumuahNotification() : cancelJumuahNotification());
+  };
 
   const [notifPrefs, setNotifPrefsState] = useState<NotificationPrefs>(() => getNotificationPrefs());
 
@@ -166,6 +177,7 @@ function Settings() {
       if (result.granted) {
         setNotifEnabled(true);
         await applyReminders(notifPrefs);
+        if (getJumuahNotificationEnabled()) await scheduleJumuahNotification();
       } else {
         setNotifEnabled(false);
         if (result.reason === "denied") {
