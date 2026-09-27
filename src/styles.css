@@ -2805,6 +2805,28 @@ html[data-visual-phase="evening"] .tasbih-disc {
   box-shadow: 0 0 0 1px color-mix(in oklab, var(--accent) 12%, transparent),
     0 4px 14px color-mix(in oklab, var(--accent) 18%, transparent);
 }
+
+/* Sheet polish: soft accent glow at the top, calmer label, themed close button. */
+.after-salah-panel::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 180px;
+  pointer-events: none;
+  background: linear-gradient(
+    to bottom,
+    color-mix(in oklab, var(--accent) 9%, transparent),
+    transparent
+  );
+}
+.after-salah-panel { position: relative; }
+.after-salah-header { position: relative; }
+.after-salah-header .label-caps { color: var(--accent) !important; letter-spacing: 0.16em; }
+.after-salah-header button[aria-label="Close"] {
+  background: color-mix(in oklab, var(--card-foreground) 7%, transparent) !important;
+  border: 1px solid color-mix(in oklab, var(--card-foreground) 10%, transparent);
+  color: color-mix(in oklab, var(--card-foreground) 82%, transparent) !important;
+}
 .after-salah-stack .adhkar-index-row { min-height: 48px; align-items: center; padding-top: 3px; }
 .after-salah-stack .adhkar-index-row > span {
   height: 30px;
