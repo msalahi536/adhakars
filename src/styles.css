@@ -2346,6 +2346,41 @@ html[data-preset="midnight"][data-visual-phase="evening"] .daily-swipe-stack .ad
   backdrop-filter: blur(8px);
 }
 
+/* Midnight (morning phase): soften the photo's horizon band under the card */
+html[data-preset="midnight"]:is([data-section="morning"], [data-visual-phase="morning"]) .app-shell::after,
+html[data-preset="midnight"][data-section="salah"] .app-shell::after,
+html[data-preset="midnight"][data-section="tasbih"] .app-shell::after,
+html[data-preset="midnight"][data-section="wake"] .app-shell::after,
+html[data-preset="midnight"][data-section="default"] .app-shell::after {
+  background: linear-gradient(180deg, rgba(23, 41, 79, 0.08) 0%, rgba(23, 41, 79, 0.05) 55%, rgba(16, 30, 62, 0.34) 78%, rgba(12, 24, 50, 0.5) 92%, rgba(10, 21, 44, 0.58) 100%) !important;
+}
+
+/* Midnight (morning phase): the counter pill and dismiss pill must sit on dark glass */
+html[data-preset="midnight"]:is([data-section="morning"], [data-visual-phase="morning"]) .daily-swipe-stack .adhkar-index-row > span,
+html[data-preset="midnight"][data-section="salah"] .daily-swipe-stack .adhkar-index-row > span,
+html[data-preset="midnight"][data-section="tasbih"] .daily-swipe-stack .adhkar-index-row > span,
+html[data-preset="midnight"][data-section="wake"] .daily-swipe-stack .adhkar-index-row > span,
+html[data-preset="midnight"][data-section="default"] .daily-swipe-stack .adhkar-index-row > span {
+  border: 1px solid rgba(169, 193, 247, 0.32) !important;
+  background: rgba(205, 220, 255, 0.12) !important;
+  color: #eaf1ff !important;
+  box-shadow: none !important;
+  backdrop-filter: blur(8px);
+}
+
+html[data-preset="midnight"]:is([data-section="morning"], [data-visual-phase="morning"]) .salah-dismiss,
+html[data-preset="midnight"][data-section="salah"] .salah-dismiss {
+  border-color: rgba(169, 193, 247, 0.32) !important;
+  background: rgba(205, 220, 255, 0.12) !important;
+  color: #eaf1ff !important;
+  backdrop-filter: blur(14px);
+}
+
+/* Midnight: the private-device note and other fine print need more contrast */
+html[data-preset="midnight"] .dl-private {
+  color: #d6e1f8 !important;
+}
+
 /* ---------- Dark Red: translucent oxblood glass from the supplied references ---------- */
 html[data-preset="dark-red"]:is([data-section="morning"], [data-visual-phase="morning"]),
 html[data-preset="dark-red"][data-section="salah"],
