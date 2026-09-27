@@ -81,12 +81,6 @@ import {
   Heart,
   Flame,
 } from "lucide-react";
-import {
-  isNativeApp,
-  getLiveActivityPrefs,
-  onLiveActivityToggle,
-  type LiveActivityPrefs,
-} from "@/lib/native-bridge";
 
 const APP_VERSION = "1.0.3";
 const CONTACT_EMAIL = "msalahi536@gmail.com";
@@ -113,19 +107,6 @@ function Settings() {
   const [confirmReset, setConfirmReset] = useState(false);
   const [confirmResetAll, setConfirmResetAll] = useState(false);
   const [resetNote, setResetNote] = useState<string | null>(null);
-  const [laPrefs, setLaPrefsState] = useState<LiveActivityPrefs>(() => getLiveActivityPrefs());
-  const [showLiveActivities, setShowLiveActivities] = useState(false);
-  useEffect(() => {
-    setShowLiveActivities(isNativeApp());
-    setLaPrefsState(getLiveActivityPrefs());
-    const handler = () => setLaPrefsState(getLiveActivityPrefs());
-    window.addEventListener("adhkar:la-prefs-update", handler);
-    return () => window.removeEventListener("adhkar:la-prefs-update", handler);
-  }, []);
-  const handleLaToggle = (key: keyof LiveActivityPrefs, enabled: boolean) => {
-    onLiveActivityToggle(key, enabled);
-    setLaPrefsState(getLiveActivityPrefs());
-  };
 
   useEffect(() => {
     if (!resetNote) return;
@@ -1021,35 +1002,6 @@ function Settings() {
               )}
             </div>
           </section>
-
-          {showLiveActivities && (
-            <section className="mb-6">
-              <h2 className="label-caps mb-1">Live Activities</h2>
-              <p className="mb-3 text-xs opacity-70">
-                Show live updates on your Lock Screen and Dynamic Island.
-              </p>
-              <div className="settings-group">
-                <Toggle
-                  label="Prayer Countdown"
-                  description="Show a countdown to the next prayer on your Lock Screen."
-                  value={laPrefs.prayerCountdown}
-                  onChange={(v) => handleLaToggle("prayerCountdown", v)}
-                />
-                <Toggle
-                  label="Tasbih Counter"
-                  description="Show your tasbih count while counting."
-                  value={laPrefs.tasbihSession}
-                  onChange={(v) => handleLaToggle("tasbihSession", v)}
-                />
-                <Toggle
-                  label="Fasting Timer"
-                  description="Show a countdown to Iftar or Suhoor."
-                  value={laPrefs.fastingTimer}
-                  onChange={(v) => handleLaToggle("fastingTimer", v)}
-                />
-              </div>
-            </section>
-          )}
 
           {/* FEEDBACK */}
           <section className="mb-6">
