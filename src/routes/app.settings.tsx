@@ -43,10 +43,7 @@ import {
   lookupCity,
   resolveLocation,
   CALC_METHODS,
-  SALAH_IDS,
-  PRAYER_LABELS,
   type PrayerSettings,
-  type AdhanSound,
 } from "@/lib/prayer-times";
 import { rescheduleAdhanNotifications } from "@/lib/adhan-notifications";
 import {
@@ -63,7 +60,6 @@ import {
   BookOpen,
   Scale,
   Bell,
-  Volume2,
   MapPin,
   Sun,
   Moon,
@@ -144,7 +140,6 @@ function Settings() {
   const [notifPrefs, setNotifPrefsState] = useState<NotificationPrefs>(() => getNotificationPrefs());
 
   const [nativeAvailable, setNativeAvailable] = useState(false);
-  const [testNotifState, setTestNotifState] = useState<"idle" | "sending" | "done" | "error">("idle");
   const [prayerSettings, setPrayerSettingsState] = useState<PrayerSettings>(() =>
     getPrayerSettings(),
   );
@@ -553,107 +548,6 @@ function Settings() {
                 value={prayerSettings.hanafi}
                 onChange={(v) => updatePrayerSettings({ hanafi: v })}
               />
-
-              {!nativeAvailable ? (
-                <div className="settings-row">
-                  <span className="settings-icon">
-                    <Bell size={17} strokeWidth={1.8} />
-                  </span>
-                  <div className="min-w-0 flex-1">
-                    <div className="settings-row-title">Adhan notifications</div>
-                    <div className="settings-row-desc">
-                      Adhan notifications are available in the mobile app.
-                    </div>
-                  </div>
-                </div>
-              ) : (
-                <>
-                  <Toggle
-                    icon={<Bell size={17} strokeWidth={1.8} />}
-                    label="Adhan notifications"
-                    description="Get notified for each prayer time."
-                    value={prayerSettings.adhanEnabled}
-                    onChange={(v) => {
-                      void (async () => {
-                        if (v && !notifEnabled) {
-                          const res = await requestNotificationPermission();
-                          setNotifEnabled(res.granted);
-                          if (!res.granted) {
-                            setNotifError(
-                              res.granted === false && res.error
-                                ? res.error
-                                : "Could not request notification permission.",
-                            );
-                            return;
-                          }
-                        }
-                        updatePrayerSettings({ adhanEnabled: v });
-                      })();
-                    }}
-                  />
-
-                  {prayerSettings.adhanEnabled && (
-                    <div className="settings-subrows">
-                      {SALAH_IDS.map((id) => (
-                        <Toggle
-                          key={id}
-                          label={PRAYER_LABELS[id]}
-                          value={prayerSettings.perPrayer[id]}
-                          onChange={(v) =>
-                            updatePrayerSettings({
-                              perPrayer: { ...prayerSettings.perPrayer, [id]: v },
-                            })
-                          }
-                        />
-                      ))}
-                    </div>
-                  )}
-                </>
-              )}
-
-              <div className="settings-row">
-                <span className="settings-icon">
-                  <Volume2 size={17} strokeWidth={1.8} />
-                </span>
-                <div className="min-w-0 flex-1">
-                  <div className="settings-row-title">Notification sound</div>
-                  <div className="settings-row-desc mb-2">
-                    Choose what plays when each prayer time comes in.
-                  </div>
-                  <div className="grid grid-cols-3 gap-1 rounded-full p-1" style={{ background: "var(--muted)" }}>
-                    {(
-                      [
-                        { id: "takbir", label: "Takbir only" },
-                        { id: "adhan", label: "Full adhan" },
-                        { id: "silent", label: "Silent" },
-                      ] as { id: AdhanSound; label: string }[]
-                    ).map((o) => {
-                      const active = prayerSettings.sound === o.id;
-                      return (
-                        <button
-                          key={o.id}
-                          onClick={() => updatePrayerSettings({ sound: o.id })}
-                          className="rounded-full px-2 py-2 text-[11px] font-semibold transition"
-                          style={{
-                            background: active ? "var(--accent)" : "transparent",
-                            color: active ? "var(--accent-foreground)" : "var(--foreground)",
-                            boxShadow: active ? "0 1px 4px rgba(0,0,0,0.12)" : "none",
-                          }}
-                        >
-                          {o.label}
-                        </button>
-                      );
-                    })}
-                  </div>
-                  <div className="settings-row-desc mt-2">
-                    {prayerSettings.sound === "adhan"
-                      ? "iPhone lets a notification play only 30 seconds of sound. To hear the full adhan, tap the notification each time and it continues in the app."
-                      : prayerSettings.sound === "takbir"
-                        ? "A short Allahu Akbar plays with each prayer notification."
-                        : "Prayer notifications arrive quietly, with no sound."}
-                  </div>
-                </div>
-              </div>
 
               <div className="settings-row">
                 <span className="settings-icon">
@@ -1233,56 +1127,6 @@ function Settings() {
             </div>
           </section>
 
-          {/* ADHAN TEST (native only) */}
-          {nativeAvailable && (
-            <section className="mb-6">
-              <h2 className="label-caps mb-3">Adhan Test</h2>
-              <div className="settings-group">
-                <div className="settings-row">
-                  <button
-                    type="button"
-                    disabled={testNotifState === "sending"}
-                    onClick={async () => {
-                      setTestNotifState("sending");
-                      try {
-                        const plugin = (window as any).Capacitor?.Plugins?.AdhanNotifications;
-                        if (plugin) {
-                          const testTime = Date.now() + 30000;
-                          await plugin.schedulePrayerNotifications({
-                            prayerTimes: [{ name: "Test", time: testTime }],
-                          });
-                          setTestNotifState("done");
-                        } else {
-                          setTestNotifState("error");
-                        }
-                      } catch {
-                        setTestNotifState("error");
-                      }
-                    }}
-                    className="w-full flex items-center justify-center gap-2 rounded-full py-3 text-[13px] font-semibold transition"
-                    style={{
-                      border: "1px solid color-mix(in oklab, var(--accent) 55%, transparent)",
-                      background: "transparent",
-                      color: "var(--accent)",
-                      opacity: testNotifState === "sending" ? 0.6 : 1,
-                    }}
-                  >
-                    <Bell size={16} strokeWidth={1.8} />
-                    {testNotifState === "sending"
-                      ? "Scheduling…"
-                      : testNotifState === "done"
-                        ? "Test scheduled — 30 seconds"
-                        : testNotifState === "error"
-                          ? "Couldn't schedule — try again"
-                          : "Test Notification (30s)"}
-                  </button>
-                  <div className="mt-2 text-center text-[12px] opacity-70">
-                    Sends a test adhan notification in 30 seconds.
-                  </div>
-                </div>
-              </div>
-            </section>
-          )}
         </div>
       </main>
     </>
