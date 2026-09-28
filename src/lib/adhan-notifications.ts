@@ -57,18 +57,11 @@ export const FULL_ADHAN_URL: string | undefined = undefined;
 export const isPrayerNotifId = (id: number) =>
   Object.values(PRAYER_NOTIF_IDS).some((n) => n === id || n + TOMORROW_OFFSET === id);
 
-const SOUND_FILES: Record<string, string | undefined> = {
-  // 30-second adhan clip for the chosen reciter, bundled natively as
-  // `adhan-{reciterId}-30.caf`. Falls back to the default sound when absent.
-  adhan: undefined,
-  takbir: undefined, // TODO: "takbir.caf"
-  silent: undefined,
-};
-
-const adhanSoundFor = (settings: PrayerSettings, prayer: string): string | undefined => {
-  if (settings.sound !== "adhan") return SOUND_FILES[settings.sound];
-  return notificationSoundFile(getReciterForPrayer(prayer));
-};
+// Each prayer's toggle decides silence vs full adhan, so the sound is always
+// the chosen reciter's 30-second clip (falls back to the default sound when
+// the clip is not bundled yet).
+const adhanSoundFor = (_settings: PrayerSettings, prayer: string): string | undefined =>
+  notificationSoundFile(getReciterForPrayer(prayer));
 
 const allIds = () => [
   ...Object.values(PRAYER_NOTIF_IDS),

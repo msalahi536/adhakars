@@ -28,7 +28,6 @@ import {
   slotsForDay,
   type DayTimes,
   type PrayerSettings,
-  type AdhanSound,
   type Slot,
 } from "@/lib/prayer-times";
 import { isNativeApp } from "@/lib/native-bridge";
@@ -251,12 +250,6 @@ function Salah() {
     });
   };
 
-  const setSoundMode = async (sound: AdhanSound) => {
-    const nextPrefs = { ...adhanPrefs, soundMode: sound === "takbir" ? "default" as const : sound };
-    setAdhanPrefsState(nextPrefs);
-    setAdhanPrefs(nextPrefs);
-    await updateAdhanSettings({ sound });
-  };
 
   const setPrayerReciter = async (prayer: string, reciterId: string) => {
     const next = {
@@ -632,25 +625,17 @@ function Salah() {
                     const reciterId = adhanPrefs.reciterPerPrayer[label] ?? adhanPrefs.reciterId;
                     const reciter = RECITERS.find((item) => item.id === reciterId) ?? RECITERS[0];
                     return <div className="adhan-prayer-row" key={id}>
-                      <span className="adhan-settings-icon"><Volume2 size={17} /></span>
-                      <button type="button" className="adhan-prayer-details" onClick={() => setReciterPrayer(label)}>
-                        <small>{label} Adhan</small><strong>{reciter.name}</strong>
-                      </button>
-                      <button type="button" className={`adhan-toggle ${enabled ? "is-on" : ""}`} onClick={() => void setPrayerEnabled(id, !enabled)} aria-label={`${enabled ? "Turn off" : "Turn on"} ${label} notification`}><i /></button>
-                      <Button type="button" variant="ghost" size="icon" className="adhan-row-chevron" onClick={() => setReciterPrayer(label)} aria-label={`Choose ${label} reciter`}><ChevronRight size={19} /></Button>
-                    </div>;
-                  })}
-                </div>
-                <div className="adhan-mode-wrap">
-                  <span>Notification style</span>
-                  <div className="adhan-mode" aria-label="Notification sound">
-                    {([["takbir", "Takbir"], ["adhan", "Full"], ["silent", "Silent"]] as [AdhanSound, string][]).map(([id, label]) => (
-                      <button type="button" key={id} className={settings.sound === id ? "is-active" : ""} onClick={() => void setSoundMode(id)}>{label}</button>
-                    ))}
-                  </div>
-                </div>
-                {settings.sound === "adhan" && <p className="adhan-settings-note">Tap the notification to continue the full adhan after the 30-second alert.</p>}
-              </>}
+                       <span className="adhan-settings-icon"><Volume2 size={17} /></span>
+                       <button type="button" className="adhan-prayer-details" onClick={() => setReciterPrayer(label)}>
+                         <small>{label} Adhan</small><strong>{reciter.name}</strong>
+                       </button>
+                       <button type="button" className={`adhan-toggle ${enabled ? "is-on" : ""}`} onClick={() => void setPrayerEnabled(id, !enabled)} aria-label={`${enabled ? "Turn off" : "Turn on"} ${label} notification`}><i /></button>
+                       <span className="adhan-row-chevron" aria-hidden="true"><ChevronRight size={19} /></span>
+                     </div>;
+                   })}
+                 </div>
+                 <p className="adhan-settings-note">Tap the notification to continue the full adhan after the 30-second alert.</p>
+               </>}
               {!reciterPrayer && isNativeApp() && <>
                 <button type="button" className="adhan-test-btn" onClick={() => void sendTestNotification()} disabled={testingNotif}>
                   <Bell size={15} />
