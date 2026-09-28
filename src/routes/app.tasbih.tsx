@@ -33,6 +33,8 @@ function Tasbih() {
   const [tapped, setTapped] = useState(false);
   const [confirmReset, setConfirmReset] = useState(false);
 
+  const [loaded, setLoaded] = useState(false);
+
   useEffect(() => {
     try {
       const s = JSON.parse(localStorage.getItem(STORAGE) || "{}");
@@ -41,11 +43,15 @@ function Tasbih() {
     } catch {
       // Ignore malformed saved tasbih state.
     }
+    setLoaded(true);
   }, []);
 
   useEffect(() => {
+    if (!loaded) return;
     localStorage.setItem(STORAGE, JSON.stringify({ total, milestone }));
-  }, [total, milestone]);
+    // Keep the home screen widget in sync on every change (load, tap, undo, reset, target switch).
+    void syncTasbihToWidget(total, milestone);
+  }, [total, milestone, loaded]);
 
   const hasMilestone = milestone > 0;
   const cycleNum = hasMilestone ? Math.floor(total / milestone) + 1 : 1;
