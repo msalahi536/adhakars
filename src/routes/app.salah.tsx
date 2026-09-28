@@ -32,7 +32,7 @@ import {
   type Slot,
 } from "@/lib/prayer-times";
 import { rescheduleAdhanNotifications } from "@/lib/adhan-notifications";
-import { checkNotificationPermission, isNativePlatform, requestNotificationPermission } from "@/lib/notifications";
+import { checkNotificationPermission, requestNotificationPermission } from "@/lib/notifications";
 import { getAdhanPrefs, RECITERS, setAdhanPrefs, type AdhanPrefs } from "@/lib/adhan-bridge";
 
 export const Route = createFileRoute("/app/salah")({
@@ -97,7 +97,6 @@ function Salah() {
   const [locating, setLocating] = useState(false);
   const [dismissed, setDismissedState] = useState<ReturnType<typeof getDismissed>>(null);
 
-  const [nativeAvailable, setNativeAvailable] = useState(false);
   const [adhanSettingsOpen, setAdhanSettingsOpen] = useState(false);
   const [adhanPrefs, setAdhanPrefsState] = useState<AdhanPrefs>(() => getAdhanPrefs());
   const [adhanError, setAdhanError] = useState<string | null>(null);
@@ -109,7 +108,6 @@ function Salah() {
   }, []);
 
   useEffect(() => {
-    setNativeAvailable(isNativePlatform());
     setDismissedState(getDismissed());
     prunePrayerCache();
   }, []);
@@ -514,7 +512,7 @@ function Salah() {
           )}
 
 
-          {nativeAvailable && <button
+          <button
             onClick={() => setAdhanSettingsOpen(true)}
             className="salah-adhan-card flex w-full items-center text-left active:scale-[0.99]"
           >
@@ -528,7 +526,7 @@ function Salah() {
               </span>
             </span>
             <ChevronRight size={16} strokeWidth={1.5} className="salah-adhan-chevron" />
-          </button>}
+          </button>
         </div>
       </main>
 
