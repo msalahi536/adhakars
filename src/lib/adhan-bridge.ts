@@ -1,3 +1,10 @@
+import misharyAsset from "@/assets/adhan/mishary.mp3.asset.json";
+import basitAsset from "@/assets/adhan/basit.mp3.asset.json";
+import makkahAsset from "@/assets/adhan/makkah.mp3.asset.json";
+import madinahAsset from "@/assets/adhan/madinah.mp3.asset.json";
+import zailiAsset from "@/assets/adhan/zaili.mp3.asset.json";
+import majaleAsset from "@/assets/adhan/majale.mp3.asset.json";
+import qatamiAsset from "@/assets/adhan/qatami.mp3.asset.json";
 // adhan-bridge.ts
 // Bridges the web app to native adhan playback (Capacitor).
 // Native iOS plays the full adhan when a prayer notification is tapped
