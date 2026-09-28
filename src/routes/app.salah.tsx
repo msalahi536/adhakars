@@ -33,7 +33,7 @@ import {
 import { isNativeApp } from "@/lib/native-bridge";
 import { rescheduleAdhanNotifications } from "@/lib/adhan-notifications";
 import { checkNotificationPermission, requestNotificationPermission, loadNotificationPlugin, ensureNotificationChannel, NOTIFICATION_CHANNEL } from "@/lib/notifications";
-import { getAdhanPrefs, getReciterForPrayer, notificationSoundFile, playAdhanPreview, RECITERS, setAdhanPrefs, stopAdhanPreview, type AdhanPrefs } from "@/lib/adhan-bridge";
+import { getAdhanPrefs, getReciterForPrayer, notificationSoundFile, playAdhanPreview, preloadAdhanPreviews, RECITERS, setAdhanPrefs, stopAdhanPreview, type AdhanPrefs } from "@/lib/adhan-bridge";
 import { Button } from "@/components/ui/button";
 
 export const Route = createFileRoute("/app/salah")({
