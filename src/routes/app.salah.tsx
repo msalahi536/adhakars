@@ -276,19 +276,23 @@ function Salah() {
 
   const toggleReciterPreview = async (reciterId: string) => {
     if (previewingReciter === reciterId) {
-      await stopAdhanPreview();
+      stopAdhanPreview();
       setPreviewingReciter(null);
       return;
     }
-    await stopAdhanPreview();
+    // Show the playing state instantly; audio catches up.
+    setPreviewingReciter(reciterId);
+    setAdhanError(null);
     const started = await playAdhanPreview(reciterId, () => setPreviewingReciter((cur) => (cur === reciterId ? null : cur)));
-    if (started) {
-      setPreviewingReciter(reciterId);
-      setAdhanError(null);
-    } else {
-      setAdhanError("Audio previews are available in the phone app.");
+    if (!started) {
+      setPreviewingReciter((cur) => (cur === reciterId ? null : cur));
+      setAdhanError("Couldn't play this preview. Please try again.");
     }
   };
+
+  useEffect(() => {
+    if (reciterPrayer) preloadAdhanPreviews();
+  }, [reciterPrayer]);
 
   const closeAdhanSettings = () => {
     void stopAdhanPreview();
