@@ -131,6 +131,8 @@ interface AdhanPlugin {
   seekAdhan?(opts: { progress: number }): Promise<unknown>;
   getAdhanProgress?(): Promise<unknown>;
   isAdhanPlaying?(): Promise<unknown>;
+  playAdhanPreview?(opts: { reciterId: string; file: string }): Promise<unknown>;
+  stopAdhanPreview?(): Promise<unknown>;
   addListener?(event: string, cb: (info: unknown) => void): Promise<unknown> | unknown;
 }
 
@@ -212,6 +214,20 @@ export const pauseAdhan = () => call("pauseAdhan");
 export const resumeAdhan = () => call("resumeAdhan");
 export const seekAdhan = (progress: number) =>
   call("seekAdhan", { progress: Math.min(1, Math.max(0, progress)) });
+
+/** Plays the bundled full recording as a short in-app reciter preview. */
+export const playAdhanPreview = async (reciterId: string): Promise<boolean> => {
+  const plugin = getPlugin();
+  if (!plugin?.playAdhanPreview) return false;
+  try {
+    await plugin.playAdhanPreview({ reciterId: validReciter(reciterId), file: fullAdhanFile(validReciter(reciterId)) });
+    return true;
+  } catch {
+    return false;
+  }
+};
+
+export const stopAdhanPreview = () => call("stopAdhanPreview");
 
 const toInfo = (v: unknown): AdhanPlayingInfo => {
   if (typeof v === "string") return { prayer: v, reciterId: getReciterForPrayer(v) };
