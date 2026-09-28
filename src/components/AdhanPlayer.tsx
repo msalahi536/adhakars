@@ -34,20 +34,14 @@ const fmt = (s: number) => {
 function MosqueIcon() {
   return (
     <svg viewBox="0 0 64 64" width="56" height="56" aria-hidden="true">
-      <defs>
-        <linearGradient id="ap-gold" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0" stopColor="#E6CB7A" />
-          <stop offset="1" stopColor="#C9A84C" />
-        </linearGradient>
-      </defs>
-      <path d="M32 8c-1 4-6 6-10 11-3 4-4 8-4 11h28c0-3-1-7-4-11-4-5-9-7-10-11z" fill="url(#ap-gold)" />
-      <rect x="16" y="30" width="32" height="22" rx="2" fill="#2F6B4F" />
-      <path d="M28 52V42a4 4 0 0 1 8 0v10z" fill="#1a1a2e" />
-      <rect x="6" y="20" width="5" height="32" rx="1.5" fill="#2F6B4F" />
-      <rect x="53" y="20" width="5" height="32" rx="1.5" fill="#2F6B4F" />
-      <circle cx="8.5" cy="17" r="2.5" fill="url(#ap-gold)" />
-      <circle cx="55.5" cy="17" r="2.5" fill="url(#ap-gold)" />
-      <rect x="4" y="52" width="56" height="3" rx="1.5" fill="url(#ap-gold)" />
+      <path d="M32 8c-1 4-6 6-10 11-3 4-4 8-4 11h28c0-3-1-7-4-11-4-5-9-7-10-11z" className="ap-mosque-accent" />
+      <rect x="16" y="30" width="32" height="22" rx="2" className="ap-mosque-building" />
+      <path d="M28 52V42a4 4 0 0 1 8 0v10z" className="ap-mosque-door" />
+      <rect x="6" y="20" width="5" height="32" rx="1.5" className="ap-mosque-building" />
+      <rect x="53" y="20" width="5" height="32" rx="1.5" className="ap-mosque-building" />
+      <circle cx="8.5" cy="17" r="2.5" className="ap-mosque-accent" />
+      <circle cx="55.5" cy="17" r="2.5" className="ap-mosque-accent" />
+      <rect x="4" y="52" width="56" height="3" rx="1.5" className="ap-mosque-accent" />
     </svg>
   );
 }

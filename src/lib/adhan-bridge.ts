@@ -37,32 +37,66 @@ export const fullAdhanFile = (reciterId: string): string =>
   `adhan-${reciterId}-full.mp3`;
 
 const RECITER_KEY = "adhkar:adhan-reciter";
+const ADHAN_PREFS_KEY = "adhkar:adhan-prefs";
 const DEFAULT_RECITER_ID = RECITERS[0].id;
 
 export interface AdhanPrefs {
-  reciter: string;
+  soundMode: "adhan" | "silent" | "default";
+  reciterId: string;
+  reciterPerPrayer: Record<string, string>;
+  enabledPrayers: Record<string, boolean>;
 }
+
+const DEFAULT_PREFS: AdhanPrefs = {
+  soundMode: "adhan",
+  reciterId: DEFAULT_RECITER_ID,
+  reciterPerPrayer: {
+    Fajr: DEFAULT_RECITER_ID,
+    Dhuhr: DEFAULT_RECITER_ID,
+    Asr: DEFAULT_RECITER_ID,
+    Maghrib: DEFAULT_RECITER_ID,
+    Isha: DEFAULT_RECITER_ID,
+  },
+  enabledPrayers: { Fajr: false, Dhuhr: false, Asr: false, Maghrib: false, Isha: false },
+};
+
+const validReciter = (id: unknown): string =>
+  typeof id === "string" && RECITERS.some((r) => r.id === id) ? id : DEFAULT_RECITER_ID;
 
 export function getAdhanPrefs(): AdhanPrefs {
-  let reciter = DEFAULT_RECITER_ID;
-  if (typeof window !== "undefined") {
-    try {
-      reciter = window.localStorage.getItem(RECITER_KEY) || DEFAULT_RECITER_ID;
-    } catch {
-      // ignore
-    }
+  if (typeof window === "undefined") return { ...DEFAULT_PREFS };
+  try {
+    const parsed = JSON.parse(window.localStorage.getItem(ADHAN_PREFS_KEY) || "{}") as Partial<AdhanPrefs>;
+    const legacy = validReciter(parsed.reciterId ?? window.localStorage.getItem(RECITER_KEY));
+    const reciterPerPrayer = Object.fromEntries(
+      Object.entries({ ...DEFAULT_PREFS.reciterPerPrayer, ...(parsed.reciterPerPrayer ?? {}) })
+        .map(([prayer, id]) => [prayer, validReciter(id)]),
+    );
+    return {
+      soundMode: parsed.soundMode ?? DEFAULT_PREFS.soundMode,
+      reciterId: legacy,
+      reciterPerPrayer,
+      enabledPrayers: { ...DEFAULT_PREFS.enabledPrayers, ...(parsed.enabledPrayers ?? {}) },
+    };
+  } catch {
+    return { ...DEFAULT_PREFS };
   }
-  if (!RECITERS.some((r) => r.id === reciter)) reciter = DEFAULT_RECITER_ID;
-  return { reciter };
 }
 
-export function setAdhanPrefs(prefs: Partial<AdhanPrefs>): void {
-  if (typeof window === "undefined" || !prefs.reciter) return;
+export function setAdhanPrefs(prefs: AdhanPrefs): void {
+  if (typeof window === "undefined") return;
   try {
-    window.localStorage.setItem(RECITER_KEY, prefs.reciter);
+    window.localStorage.setItem(ADHAN_PREFS_KEY, JSON.stringify(prefs));
+    window.localStorage.setItem(RECITER_KEY, prefs.reciterId);
   } catch {
     // ignore
   }
+}
+
+export function getReciterForPrayer(prayer: string): string {
+  const prefs = getAdhanPrefs();
+  const label = `${prayer.charAt(0).toUpperCase()}${prayer.slice(1).toLowerCase()}`;
+  return validReciter(prefs.reciterPerPrayer[label] ?? prefs.reciterId);
 }
 
 export const reciterNameFor = (id: string): string =>
@@ -180,9 +214,10 @@ export const seekAdhan = (progress: number) =>
   call("seekAdhan", { progress: Math.min(1, Math.max(0, progress)) });
 
 const toInfo = (v: unknown): AdhanPlayingInfo => {
-  if (typeof v === "string") return { prayer: v, reciterId: getAdhanPrefs().reciter };
+  if (typeof v === "string") return { prayer: v, reciterId: getReciterForPrayer(v) };
   const o = (v ?? {}) as Record<string, unknown>;
-  return { prayer: str(o.prayer), reciterId: str(o.reciterId) || getAdhanPrefs().reciter };
+  const prayer = str(o.prayer);
+  return { prayer, reciterId: str(o.reciterId) || getReciterForPrayer(prayer) };
 };
 
 /**

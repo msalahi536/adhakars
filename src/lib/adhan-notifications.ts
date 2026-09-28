@@ -19,9 +19,8 @@ import {
   type PrayerSettings,
 } from "@/lib/prayer-times";
 import {
-  getAdhanPrefs,
+  getReciterForPrayer,
   notificationSoundFile,
-  RECITERS,
 } from "@/lib/adhan-bridge";
 
 /** Stable ids so a reschedule replaces instead of duplicating. */
@@ -66,13 +65,9 @@ const SOUND_FILES: Record<string, string | undefined> = {
   silent: undefined,
 };
 
-const adhanSoundFor = (settings: PrayerSettings): string | undefined => {
+const adhanSoundFor = (settings: PrayerSettings, prayer: string): string | undefined => {
   if (settings.sound !== "adhan") return SOUND_FILES[settings.sound];
-  const prefs = getAdhanPrefs();
-  const reciter = RECITERS.some((r) => r.id === prefs.reciter)
-    ? prefs.reciter
-    : RECITERS[0].id;
-  return notificationSoundFile(reciter);
+  return notificationSoundFile(getReciterForPrayer(prayer));
 };
 
 const allIds = () => [
@@ -120,8 +115,6 @@ export const rescheduleAdhanNotifications = async (
   const dismissed = getDismissed();
   const todayKey = dateKey(now);
 
-  const sound = adhanSoundFor(settings);
-
   const notifications: Record<string, unknown>[] = [];
 
   const push = (day: typeof today, offset: number) => {
@@ -133,6 +126,7 @@ export const rescheduleAdhanNotifications = async (
       if (slot.at.getTime() <= now.getTime() + 30_000) continue;
       if (muteAll && slot.dayKey === todayKey) continue;
       if (dismissed && dismissed.dayKey === slot.dayKey && dismissed.prayer === slot.id) continue;
+      const sound = adhanSoundFor(settings, slot.label);
       notifications.push({
         id: PRAYER_NOTIF_IDS[id] + offset,
         title: PRAYER_LABELS[id],

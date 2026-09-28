@@ -30,3 +30,4 @@
 - [x] Period Companion notifications (brief supplied; "reciting Quran" wording).
 - [x] Move the Sunnah of the day into a draggable, collapsible side companion that never covers reading controls.
 - [x] Replace the floating Sunnah companion with a refined book entry shown only on More.
+- [x] Theme the global Adhan player and move per-prayer notification and reciter controls onto Salah.
