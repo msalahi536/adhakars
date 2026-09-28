@@ -33,6 +33,8 @@ function Tasbih() {
   const [tapped, setTapped] = useState(false);
   const [confirmReset, setConfirmReset] = useState(false);
 
+  const [loaded, setLoaded] = useState(false);
+
   useEffect(() => {
     try {
       const s = JSON.parse(localStorage.getItem(STORAGE) || "{}");
@@ -41,11 +43,15 @@ function Tasbih() {
     } catch {
       // Ignore malformed saved tasbih state.
     }
+    setLoaded(true);
   }, []);
 
   useEffect(() => {
+    if (!loaded) return;
     localStorage.setItem(STORAGE, JSON.stringify({ total, milestone }));
-  }, [total, milestone]);
+    // Keep the home screen widget in sync on every change (load, tap, undo, reset, target switch).
+    void syncTasbihToWidget(total, milestone);
+  }, [total, milestone, loaded]);
 
   const hasMilestone = milestone > 0;
   const cycleNum = hasMilestone ? Math.floor(total / milestone) + 1 : 1;
@@ -62,7 +68,6 @@ function Tasbih() {
     bumpLifetime("tasbih", 1);
     setTapped(true);
     setTimeout(() => setTapped(false), 200);
-    void syncTasbihToWidget(total + 1, hasMilestone ? milestone : 0);
     setTotal((n) => {
       const next = n + 1;
       if (hasMilestone && next % milestone === 0) {
@@ -77,7 +82,6 @@ function Tasbih() {
   const undo = (e: React.MouseEvent) => {
     e.stopPropagation();
     triggerHaptic("heavy");
-    void syncTasbihToWidget(Math.max(0, total - 1), hasMilestone ? milestone : 0);
     setTotal((n) => Math.max(0, n - 1));
   };
 
@@ -89,7 +93,6 @@ function Tasbih() {
   const doReset = () => {
     triggerHaptic("heavy");
     setTotal(0);
-    void syncTasbihToWidget(0, hasMilestone ? milestone : 0);
     setConfirmReset(false);
     showToast("Count reset");
   };
