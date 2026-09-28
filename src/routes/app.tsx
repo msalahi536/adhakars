@@ -11,6 +11,7 @@ import { DEFAULT_PRESET_ID, getPresetId, resetTheme, resolveVisualPhase, type Vi
 import { rememberMoreDestination } from "@/lib/more-navigation";
 import { isPeriodNotifId, isSmartAdhkarId, smartAdhkarKind, SUNNAH_NOTIF_ID } from "@/lib/smart-notifications";
 import { FULL_ADHAN_URL, isPrayerNotifId } from "@/lib/adhan-notifications";
+import { AdhanPlayer } from "@/components/AdhanPlayer";
 import { getPrayerSettings } from "@/lib/prayer-times";
 import { initNativeBridge } from "@/lib/native-bridge";
 
@@ -131,6 +132,7 @@ function AppLayout() {
         <Outlet />
       </div>
       <BottomNav />
+      <AdhanPlayer />
       {showOnboarding && <Onboarding onDone={() => setShowOnboarding(false)} />}
       <WhatsNewDialog open={showWhatsNew} onClose={() => setShowWhatsNew(false)} />
       <RatePrompt />
