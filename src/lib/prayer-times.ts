@@ -40,7 +40,7 @@ export const CALC_METHODS: { id: number; name: string }[] = [
   { id: 1, name: "University of Karachi" },
 ];
 
-export type AdhanSound = "adhan" | "takbir" | "silent";
+export type AdhanSound = "adhan" | "silent";
 
 export type PrayerLocation = {
   lat: number;
@@ -78,7 +78,7 @@ export const DEFAULT_PRAYER_SETTINGS: PrayerSettings = {
   hanafi: false,
   adhanEnabled: false,
   perPrayer: { fajr: true, dhuhr: true, asr: true, maghrib: true, isha: true },
-  sound: "silent",
+  sound: "adhan",
   location: null,
 };
 
@@ -108,6 +108,9 @@ export const getPrayerSettings = (): PrayerSettings => {
       ...DEFAULT_PRAYER_SETTINGS,
       ...parsed,
       perPrayer: { ...DEFAULT_PRAYER_SETTINGS.perPrayer, ...(parsed.perPrayer ?? {}) },
+      // The sound picker was removed: each prayer's toggle decides silence vs
+      // full adhan, so every saved profile migrates to the adhan sound.
+      sound: "adhan" as const,
     };
   } catch {
     return DEFAULT_PRAYER_SETTINGS;
