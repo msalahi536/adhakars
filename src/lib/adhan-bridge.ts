@@ -68,8 +68,34 @@ export function setAdhanPrefs(prefs: Partial<AdhanPrefs>): void {
 export const reciterNameFor = (id: string): string =>
   RECITERS.find((r) => r.id === id)?.name ?? RECITERS[0].name;
 
+export interface AdhanProgress {
+  currentTime: number;
+  duration: number;
+  progress: number;
+  isPlaying: boolean;
+  hasSession: boolean;
+  prayer: string;
+  reciterId: string;
+}
+
+export interface AdhanStatus {
+  playing: boolean;
+  hasSession: boolean;
+  prayer: string;
+  reciterId: string;
+}
+
+export interface AdhanPlayingInfo {
+  prayer: string;
+  reciterId: string;
+}
+
 interface AdhanPlugin {
   stopAdhan?(): Promise<unknown>;
+  pauseAdhan?(): Promise<unknown>;
+  resumeAdhan?(): Promise<unknown>;
+  seekAdhan?(opts: { progress: number }): Promise<unknown>;
+  getAdhanProgress?(): Promise<unknown>;
   isAdhanPlaying?(): Promise<unknown>;
   addListener?(event: string, cb: (info: unknown) => void): Promise<unknown> | unknown;
 }
@@ -89,47 +115,83 @@ function getPlugin(): AdhanPlugin | null {
   return null;
 }
 
-const normalizePlaying = (result: unknown): boolean => {
-  if (typeof result === "boolean") return result;
-  return !!(result as { playing?: unknown } | null)?.playing;
-};
+const str = (v: unknown): string => (typeof v === "string" ? v : "");
+const num = (v: unknown): number => (typeof v === "number" && Number.isFinite(v) ? v : 0);
 
-/** True while the native side is still playing the adhan audio. */
-export const isAdhanPlaying = async (): Promise<boolean> => {
+const EMPTY_STATUS: AdhanStatus = { playing: false, hasSession: false, prayer: "", reciterId: "" };
+
+/** Current native playback status. */
+export const isAdhanPlaying = async (): Promise<AdhanStatus> => {
   const plugin = getPlugin();
-  if (!plugin?.isAdhanPlaying) return false;
+  if (!plugin?.isAdhanPlaying) return EMPTY_STATUS;
   try {
-    return normalizePlaying(await plugin.isAdhanPlaying());
+    const r = await plugin.isAdhanPlaying();
+    if (typeof r === "boolean") return { ...EMPTY_STATUS, playing: r, hasSession: r };
+    const o = (r ?? {}) as Record<string, unknown>;
+    const playing = !!o.playing;
+    return {
+      playing,
+      hasSession: o.hasSession === undefined ? playing : !!o.hasSession,
+      prayer: str(o.prayer),
+      reciterId: str(o.reciterId),
+    };
   } catch {
-    return false;
+    return EMPTY_STATUS;
   }
 };
 
-/** Stops the native adhan audio. No-ops when nothing is playing or on web. */
-export const stopAdhan = async (): Promise<void> => {
+/** Playback progress from the native side (null on web / failure). */
+export const getAdhanProgress = async (): Promise<AdhanProgress | null> => {
   const plugin = getPlugin();
-  if (!plugin?.stopAdhan) return;
+  if (!plugin?.getAdhanProgress) return null;
   try {
-    await plugin.stopAdhan();
+    const o = ((await plugin.getAdhanProgress()) ?? {}) as Record<string, unknown>;
+    const duration = num(o.duration);
+    const currentTime = num(o.currentTime);
+    return {
+      currentTime,
+      duration,
+      progress: o.progress !== undefined ? num(o.progress) : duration ? currentTime / duration : 0,
+      isPlaying: !!o.isPlaying,
+      hasSession: !!o.hasSession,
+      prayer: str(o.prayer),
+      reciterId: str(o.reciterId),
+    };
+  } catch {
+    return null;
+  }
+};
+
+const call = async (fn: keyof AdhanPlugin, arg?: unknown): Promise<void> => {
+  const plugin = getPlugin();
+  const f = plugin?.[fn] as ((a?: unknown) => Promise<unknown>) | undefined;
+  if (!f) return;
+  try {
+    await f.call(plugin, arg);
   } catch {
     // ignore
   }
 };
 
-/**
- * Fires when the user taps an adhan notification and the native side starts
- * playing: listens for the "adhan:playing" CustomEvent (detail.prayer) and
- * the native plugin event. Returns an unsubscribe function.
- */
-export const onAdhanPlaying = (handler: (prayer: string) => void): (() => void) => {
-  if (typeof window === "undefined") return () => {};
+export const stopAdhan = () => call("stopAdhan");
+export const pauseAdhan = () => call("pauseAdhan");
+export const resumeAdhan = () => call("resumeAdhan");
+export const seekAdhan = (progress: number) =>
+  call("seekAdhan", { progress: Math.min(1, Math.max(0, progress)) });
 
-  const onEvent = (event: Event) => {
-    const detail = (event as CustomEvent).detail;
-    const prayer =
-      typeof detail === "string" ? detail : ((detail as { prayer?: unknown } | null)?.prayer ?? "");
-    handler(typeof prayer === "string" ? prayer : "");
-  };
+const toInfo = (v: unknown): AdhanPlayingInfo => {
+  if (typeof v === "string") return { prayer: v, reciterId: getAdhanPrefs().reciter };
+  const o = (v ?? {}) as Record<string, unknown>;
+  return { prayer: str(o.prayer), reciterId: str(o.reciterId) || getAdhanPrefs().reciter };
+};
+
+/**
+ * Fires when the native side starts playing the adhan: listens for the
+ * "adhan:playing" CustomEvent and the native plugin event.
+ */
+export const onAdhanPlaying = (handler: (info: AdhanPlayingInfo) => void): (() => void) => {
+  if (typeof window === "undefined") return () => {};
+  const onEvent = (event: Event) => handler(toInfo((event as CustomEvent).detail));
   window.addEventListener(ADHAN_PLAYING_EVENT, onEvent);
 
   let cancelled = false;
@@ -137,14 +199,12 @@ export const onAdhanPlaying = (handler: (prayer: string) => void): (() => void) 
   const plugin = getPlugin();
   if (plugin?.addListener) {
     try {
-      const handle = plugin.addListener("adhanPlaying", (info) => {
-        const prayer = typeof info === "string" ? info : ((info as { prayer?: unknown } | null)?.prayer ?? "");
-        handler(typeof prayer === "string" ? prayer : "");
-      });
+      const handle = plugin.addListener("adhanPlaying", (info) => handler(toInfo(info)));
       if (handle && typeof (handle as Promise<unknown>).then === "function") {
         (handle as Promise<{ remove?: () => void }>)
           .then((h) => {
-            removers.push(() => h?.remove?.());
+            if (cancelled) h?.remove?.();
+            else removers.push(() => h?.remove?.());
           })
           .catch(() => {});
       }

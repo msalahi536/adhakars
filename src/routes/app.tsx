@@ -14,6 +14,7 @@ import { FULL_ADHAN_URL, isPrayerNotifId } from "@/lib/adhan-notifications";
 import { AdhanPlayer } from "@/components/AdhanPlayer";
 import { getPrayerSettings } from "@/lib/prayer-times";
 import { initNativeBridge } from "@/lib/native-bridge";
+import { onAdhanPlaying } from "@/lib/adhan-bridge";
 
 const UPDATE_WELCOME_KEY = "adhkar:update-welcome:2026-09";
 
@@ -39,9 +40,19 @@ function AppLayout() {
   const backgrounds = backgroundsForPreset(activePresetId);
   const visualPhase = activeVisualPhase;
 
+  const [adhan, setAdhan] = useState({ visible: false, prayer: "", reciterId: "" });
+
   useEffect(() => {
     initNativeBridge();
   }, []);
+
+  useEffect(
+    () =>
+      onAdhanPlaying(({ prayer, reciterId }) =>
+        setAdhan({ visible: true, prayer: prayer || "fajr", reciterId }),
+      ),
+    [],
+  );
 
   useEffect(() => {
     if (!hasOnboarded()) {
@@ -132,7 +143,12 @@ function AppLayout() {
         <Outlet />
       </div>
       <BottomNav />
-      <AdhanPlayer />
+      <AdhanPlayer
+        visible={adhan.visible}
+        prayer={adhan.prayer}
+        reciterId={adhan.reciterId}
+        onClose={() => setAdhan((a) => ({ ...a, visible: false }))}
+      />
       {showOnboarding && <Onboarding onDone={() => setShowOnboarding(false)} />}
       <WhatsNewDialog open={showWhatsNew} onClose={() => setShowWhatsNew(false)} />
       <RatePrompt />
