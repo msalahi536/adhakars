@@ -68,7 +68,6 @@ function Tasbih() {
     bumpLifetime("tasbih", 1);
     setTapped(true);
     setTimeout(() => setTapped(false), 200);
-    void syncTasbihToWidget(total + 1, hasMilestone ? milestone : 0);
     setTotal((n) => {
       const next = n + 1;
       if (hasMilestone && next % milestone === 0) {
@@ -83,7 +82,6 @@ function Tasbih() {
   const undo = (e: React.MouseEvent) => {
     e.stopPropagation();
     triggerHaptic("heavy");
-    void syncTasbihToWidget(Math.max(0, total - 1), hasMilestone ? milestone : 0);
     setTotal((n) => Math.max(0, n - 1));
   };
 
@@ -95,7 +93,6 @@ function Tasbih() {
   const doReset = () => {
     triggerHaptic("heavy");
     setTotal(0);
-    void syncTasbihToWidget(0, hasMilestone ? milestone : 0);
     setConfirmReset(false);
     showToast("Count reset");
   };
