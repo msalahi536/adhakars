@@ -111,7 +111,7 @@ function Salah() {
       if (!plugin?.schedulePrayerNotifications) {
         throw new Error("Adhan notifications are not available on this device.");
       }
-      const testTime = Date.now() + 30000;
+      const testTime = Date.now() + 5000;
       await plugin.schedulePrayerNotifications({
         prayerTimes: [{ name: "Test", time: testTime }],
       });
