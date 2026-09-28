@@ -18,6 +18,11 @@ import {
   type PrayerId,
   type PrayerSettings,
 } from "@/lib/prayer-times";
+import {
+  getAdhanPrefs,
+  notificationSoundFile,
+  RECITERS,
+} from "@/lib/adhan-bridge";
 
 /** Stable ids so a reschedule replaces instead of duplicating. */
 export const PRAYER_NOTIF_IDS: Record<Exclude<PrayerId, "sunrise">, number> = {
