@@ -32,8 +32,8 @@ import {
 } from "@/lib/prayer-times";
 import { isNativeApp } from "@/lib/native-bridge";
 import { rescheduleAdhanNotifications } from "@/lib/adhan-notifications";
-import { checkNotificationPermission, requestNotificationPermission } from "@/lib/notifications";
-import { getAdhanPrefs, playAdhanPreview, RECITERS, setAdhanPrefs, stopAdhanPreview, type AdhanPrefs } from "@/lib/adhan-bridge";
+import { checkNotificationPermission, requestNotificationPermission, loadNotificationPlugin, ensureNotificationChannel, NOTIFICATION_CHANNEL } from "@/lib/notifications";
+import { getAdhanPrefs, getReciterForPrayer, notificationSoundFile, playAdhanPreview, RECITERS, setAdhanPrefs, stopAdhanPreview, type AdhanPrefs } from "@/lib/adhan-bridge";
 import { Button } from "@/components/ui/button";
 
 export const Route = createFileRoute("/app/salah")({
@@ -109,13 +109,25 @@ function Salah() {
     if (testingNotif) return;
     setTestingNotif(true);
     try {
-      const plugin = (window as any).Capacitor?.Plugins?.AdhanNotifications;
-      if (!plugin?.schedulePrayerNotifications) {
+      const plugin = await loadNotificationPlugin();
+      if (!plugin) {
         throw new Error("Adhan notifications are not available on this device.");
       }
-      const testTime = Date.now() + 5000;
-      await plugin.schedulePrayerNotifications({
-        prayerTimes: [{ name: "Test", time: testTime }],
+      // Treat the test like any other salah: same channel, same reciter sound.
+      const s = getPrayerSettings();
+      const prayerId = SALAH_IDS.find((id) => s.perPrayer[id]) ?? "fajr";
+      const label = SALAH_PRAYERS.find((prayer) => prayer.id === prayerId)?.label ?? "Fajr";
+      const sound = notificationSoundFile(getReciterForPrayer(label));
+      await ensureNotificationChannel(plugin);
+      await plugin.schedule({
+        notifications: [{
+          id: 99,
+          title: `${label} Adhan`,
+          body: `It is time for ${label}.`,
+          schedule: { at: new Date(Date.now() + 5000), allowWhileIdle: true },
+          channelId: NOTIFICATION_CHANNEL,
+          sound,
+        }],
       });
       setAdhanError(null);
     } catch (err) {
