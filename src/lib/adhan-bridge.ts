@@ -9,19 +9,32 @@ import { isNativeApp } from "@/lib/native-bridge";
 
 export const ADHAN_PLAYING_EVENT = "adhan:playing";
 
-export interface ReciterOption {
+export interface Reciter {
   id: string;
   name: string;
+  origin: string;
 }
 
-export const RECITERS: ReciterOption[] = [
-  { id: "mishary", name: "Mishary Rashid Alafasy" },
-  { id: "maher", name: "Maher Al-Muaiqly" },
-  { id: "abdulbasit", name: "Abdul Basit Abdus-Samad" },
-  { id: "husary", name: "Mahmoud Khalil Al-Husary" },
-  { id: "minshawi", name: "Muhammad Siddeeq Al-Minshawi" },
-  { id: "sudais", name: "Abdul Rahman Al-Sudais" },
+export const RECITERS: Reciter[] = [
+  { id: "mishary", name: "Mishary Rashid Al Afasy", origin: "Kuwait" },
+  { id: "basit", name: "Abdul Basit Abdul Samad", origin: "Egypt" },
+  { id: "makkah", name: "Makkah Adhan", origin: "Masjid al-Haram" },
+  { id: "madinah", name: "Madinah Adhan", origin: "Masjid an-Nabawi" },
+  { id: "zaili", name: "Abdullah Al Zaili", origin: "Saudi Arabia" },
+  { id: "majale", name: "Hamza Al Majale", origin: "Saudi Arabia" },
+  { id: "qatami", name: "Nasir Al-Qatami", origin: "Saudi Arabia" },
 ];
+
+/**
+ * Native audio file naming:
+ * - notification (30s) sound: `adhan-{reciterId}-30.caf`
+ * - full playback file:       `adhan-{reciterId}-full.mp3`
+ */
+export const notificationSoundFile = (reciterId: string): string =>
+  `adhan-${reciterId}-30.caf`;
+
+export const fullAdhanFile = (reciterId: string): string =>
+  `adhan-${reciterId}-full.mp3`;
 
 const RECITER_KEY = "adhkar:adhan-reciter";
 const DEFAULT_RECITER_ID = RECITERS[0].id;
@@ -66,7 +79,7 @@ function getPlugin(): AdhanPlugin | null {
   try {
     const plugins = (window as any).Capacitor?.Plugins;
     if (!plugins) return null;
-    for (const name of ["AdhkarAdhan", "AdhkarPlayer", "AdhkarWidgets"]) {
+    for (const name of ["AdhanNotifications", "AdhkarAdhan", "AdhkarPlayer", "AdhkarWidgets"]) {
       const plugin = plugins[name];
       if (plugin && (plugin.stopAdhan || plugin.isAdhanPlaying)) return plugin as AdhanPlugin;
     }
