@@ -22,6 +22,7 @@ import {
   prunePrayerCache,
   repairLocation,
   resolveLocation,
+  SALAH_IDS,
   setDismissed,
   setPrayerSettings,
   slotsForDay,
@@ -217,7 +218,7 @@ function Salah() {
     await updateAdhanSettings({ adhanEnabled: enabled });
   };
 
-  const setPrayerEnabled = async (id: (typeof SALAH_PRAYERS)[number]["id"], enabled: boolean) => {
+  const setPrayerEnabled = async (id: (typeof SALAH_IDS)[number], enabled: boolean) => {
     const nextPerPrayer = { ...settings.perPrayer, [id]: enabled };
     const label = SALAH_PRAYERS.find((p) => p.id === id)?.label ?? id;
     const nextPrefs = {
@@ -577,7 +578,8 @@ function Salah() {
                 {settings.sound === "adhan" && <p className="adhan-settings-note">Tap each notification to continue hearing the full adhan after its 30-second preview.</p>}
 
                 <div className="adhan-prayer-list">
-                  {SALAH_PRAYERS.map(({ id, label }) => {
+                  {SALAH_IDS.map((id) => {
+                    const label = SALAH_PRAYERS.find((prayer) => prayer.id === id)?.label ?? id;
                     const enabled = settings.perPrayer[id];
                     return <div className="adhan-prayer-row" key={id}>
                       <button type="button" className="adhan-prayer-toggle" onClick={() => void setPrayerEnabled(id, !enabled)}>
