@@ -60,9 +60,11 @@ export function AdhanPlayer() {
   }, [prayer]);
 
   // Poll the native side so the card dismisses itself when the audio ends.
+  // A short grace period keeps the card up while the native plugin settles.
   useEffect(() => {
     if (!prayer) return;
     const poll = window.setInterval(() => {
+      if (Date.now() - startedAtRef.current < 5000) return;
       void isAdhanPlaying().then((playing) => {
         if (!playing) setPrayer(null);
       });
