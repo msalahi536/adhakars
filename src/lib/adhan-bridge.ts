@@ -120,7 +120,7 @@ export const onAdhanPlaying = (handler: (prayer: string) => void): (() => void) 
   window.addEventListener(ADHAN_PLAYING_EVENT, onEvent);
 
   let cancelled = false;
-  let unlisteners: Promise<void>[] = [];
+  const removers: Array<() => void> = [];
   const plugin = getPlugin();
   if (plugin?.addListener) {
     try {
@@ -129,9 +129,11 @@ export const onAdhanPlaying = (handler: (prayer: string) => void): (() => void) 
         handler(typeof prayer === "string" ? prayer : "");
       });
       if (handle && typeof (handle as Promise<unknown>).then === "function") {
-        unlisteners.push(
-          (handle as Promise<{ remove?: () => void }>).then((h) => () => h?.remove?.()).catch(() => () => {}),
-        );
+        (handle as Promise<{ remove?: () => void }>)
+          .then((h) => {
+            removers.push(() => h?.remove?.());
+          })
+          .catch(() => {});
       }
     } catch {
       // ignore
@@ -142,7 +144,6 @@ export const onAdhanPlaying = (handler: (prayer: string) => void): (() => void) 
     if (cancelled) return;
     cancelled = true;
     window.removeEventListener(ADHAN_PLAYING_EVENT, onEvent);
-    for (const entry of unlisteners) entry.then((off) => off?.()).catch(() => {});
-    unlisteners = [];
+    for (const off of removers) off();
   };
 };
