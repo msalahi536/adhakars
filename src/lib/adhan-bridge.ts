@@ -215,19 +215,45 @@ export const resumeAdhan = () => call("resumeAdhan");
 export const seekAdhan = (progress: number) =>
   call("seekAdhan", { progress: Math.min(1, Math.max(0, progress)) });
 
-/** Plays the bundled full recording as a short in-app reciter preview. */
-export const playAdhanPreview = async (reciterId: string): Promise<boolean> => {
-  const plugin = getPlugin();
-  if (!plugin?.playAdhanPreview) return false;
+const PREVIEW_URLS: Record<string, string> = {
+  mishary: misharyAsset.url,
+  basit: basitAsset.url,
+  makkah: makkahAsset.url,
+  madinah: madinahAsset.url,
+  zaili: zailiAsset.url,
+  majale: majaleAsset.url,
+  qatami: qatamiAsset.url,
+};
+
+let previewAudio: HTMLAudioElement | null = null;
+
+/** Plays the reciter's full recording as an in-app preview (web + native). */
+export const playAdhanPreview = async (reciterId: string, onEnded?: () => void): Promise<boolean> => {
+  stopAdhanPreview();
+  const url = PREVIEW_URLS[validReciter(reciterId)];
+  if (!url || typeof Audio === "undefined") return false;
   try {
-    await plugin.playAdhanPreview({ reciterId: validReciter(reciterId), file: fullAdhanFile(validReciter(reciterId)) });
+    const audio = new Audio(url);
+    audio.onended = () => {
+      if (previewAudio === audio) previewAudio = null;
+      onEnded?.();
+    };
+    previewAudio = audio;
+    await audio.play();
     return true;
   } catch {
+    previewAudio = null;
     return false;
   }
 };
 
-export const stopAdhanPreview = () => call("stopAdhanPreview");
+export const stopAdhanPreview = () => {
+  if (previewAudio) {
+    previewAudio.pause();
+    previewAudio.src = "";
+    previewAudio = null;
+  }
+};
 
 const toInfo = (v: unknown): AdhanPlayingInfo => {
   if (typeof v === "string") return { prayer: v, reciterId: getReciterForPrayer(v) };
