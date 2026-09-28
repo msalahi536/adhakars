@@ -620,9 +620,9 @@ function Salah() {
               {isNativeApp() && <>
                 <button type="button" className="adhan-test-btn" onClick={() => void sendTestNotification()} disabled={testingNotif}>
                   <Bell size={15} />
-                  <span>{testingNotif ? "Scheduling test…" : "Test Notification (30s)"}</span>
+                  <span>{testingNotif ? "Scheduling test…" : "Test Notification (5s)"}</span>
                 </button>
-                <p className="adhan-test-note">Sends a test adhan notification in 30 seconds.</p>
+                <p className="adhan-test-note">Sends a test adhan notification in 5 seconds.</p>
               </>}
               {adhanError && <p className="adhan-settings-error">{adhanError}</p>}
             </section>
