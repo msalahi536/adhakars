@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
-import { Bell, ChevronLeft, ChevronRight, MapPin, Pause, Play, Volume2, X } from "lucide-react";
+import { Bell, ChevronDown, ChevronLeft, ChevronRight, MapPin, Pause, Play, Volume2, X } from "lucide-react";
 import { PrayerTimeline } from "@/components/prayer/PrayerTimeline";
 import { AfterSalahSheet } from "@/components/prayer/AfterSalahSheet";
 import { PrayerPicker } from "@/components/prayer/PrayerPicker";
@@ -227,18 +227,6 @@ function Salah() {
     setPrayerSettings(next);
     setSettingsState(next);
     await rescheduleAdhanNotifications(next);
-  };
-
-  const toggleAdhan = async (enabled: boolean) => {
-    setAdhanError(null);
-    if (enabled && !(await checkNotificationPermission())) {
-      const result = await requestNotificationPermission();
-      if (!result.granted) {
-        setAdhanError("Notification permission is needed to turn on adhan alerts.");
-        return;
-      }
-    }
-    await updateAdhanSettings({ adhanEnabled: enabled });
   };
 
   const setPrayerEnabled = async (id: (typeof SALAH_IDS)[number], enabled: boolean) => {
