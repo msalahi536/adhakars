@@ -281,7 +281,7 @@ function Salah() {
       return;
     }
     await stopAdhanPreview();
-    const started = await playAdhanPreview(reciterId);
+    const started = await playAdhanPreview(reciterId, () => setPreviewingReciter((cur) => (cur === reciterId ? null : cur)));
     if (started) {
       setPreviewingReciter(reciterId);
       setAdhanError(null);
