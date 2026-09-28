@@ -31,6 +31,7 @@ import {
   type AdhanSound,
   type Slot,
 } from "@/lib/prayer-times";
+import { isNativeApp } from "@/lib/native-bridge";
 import { rescheduleAdhanNotifications } from "@/lib/adhan-notifications";
 import { checkNotificationPermission, requestNotificationPermission } from "@/lib/notifications";
 import { getAdhanPrefs, RECITERS, setAdhanPrefs, type AdhanPrefs } from "@/lib/adhan-bridge";
