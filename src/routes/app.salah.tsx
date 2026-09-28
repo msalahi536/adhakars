@@ -31,6 +31,7 @@ import {
   type AdhanSound,
   type Slot,
 } from "@/lib/prayer-times";
+import { isNativeApp } from "@/lib/native-bridge";
 import { rescheduleAdhanNotifications } from "@/lib/adhan-notifications";
 import { checkNotificationPermission, requestNotificationPermission } from "@/lib/notifications";
 import { getAdhanPrefs, RECITERS, setAdhanPrefs, type AdhanPrefs } from "@/lib/adhan-bridge";
@@ -100,6 +101,27 @@ function Salah() {
   const [adhanSettingsOpen, setAdhanSettingsOpen] = useState(false);
   const [adhanPrefs, setAdhanPrefsState] = useState<AdhanPrefs>(() => getAdhanPrefs());
   const [adhanError, setAdhanError] = useState<string | null>(null);
+  const [testingNotif, setTestingNotif] = useState(false);
+
+  const sendTestNotification = async () => {
+    if (testingNotif) return;
+    setTestingNotif(true);
+    try {
+      const plugin = (window as any).Capacitor?.Plugins?.AdhanNotifications;
+      if (!plugin?.schedulePrayerNotifications) {
+        throw new Error("Adhan notifications are not available on this device.");
+      }
+      const testTime = Date.now() + 30000;
+      await plugin.schedulePrayerNotifications({
+        prayerTimes: [{ name: "Test", time: testTime }],
+      });
+      setAdhanError(null);
+    } catch (err) {
+      setAdhanError(err instanceof Error ? err.message : "Could not send the test notification.");
+    } finally {
+      setTimeout(() => setTestingNotif(false), 1500);
+    }
+  };
   const autoSelected = useRef(false);
 
   useEffect(() => {
@@ -594,6 +616,13 @@ function Salah() {
                     </div>;
                   })}
                 </div>
+              </>}
+              {isNativeApp() && <>
+                <button type="button" className="adhan-test-btn" onClick={() => void sendTestNotification()} disabled={testingNotif}>
+                  <Bell size={15} />
+                  <span>{testingNotif ? "Scheduling test…" : "Test Notification (30s)"}</span>
+                </button>
+                <p className="adhan-test-note">Sends a test adhan notification in 30 seconds.</p>
               </>}
               {adhanError && <p className="adhan-settings-error">{adhanError}</p>}
             </section>
