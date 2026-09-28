@@ -18,6 +18,11 @@ import {
   type PrayerId,
   type PrayerSettings,
 } from "@/lib/prayer-times";
+import {
+  getAdhanPrefs,
+  notificationSoundFile,
+  RECITERS,
+} from "@/lib/adhan-bridge";
 
 /** Stable ids so a reschedule replaces instead of duplicating. */
 export const PRAYER_NOTIF_IDS: Record<Exclude<PrayerId, "sunrise">, number> = {
@@ -54,9 +59,20 @@ export const isPrayerNotifId = (id: number) =>
   Object.values(PRAYER_NOTIF_IDS).some((n) => n === id || n + TOMORROW_OFFSET === id);
 
 const SOUND_FILES: Record<string, string | undefined> = {
-  adhan: undefined, // TODO: "adhan.wav"
-  takbir: undefined, // TODO: "takbir.wav"
+  // 30-second adhan clip for the chosen reciter, bundled natively as
+  // `adhan-{reciterId}-30.caf`. Falls back to the default sound when absent.
+  adhan: undefined,
+  takbir: undefined, // TODO: "takbir.caf"
   silent: undefined,
+};
+
+const adhanSoundFor = (settings: PrayerSettings): string | undefined => {
+  if (settings.sound !== "adhan") return SOUND_FILES[settings.sound];
+  const prefs = getAdhanPrefs();
+  const reciter = RECITERS.some((r) => r.id === prefs.reciter)
+    ? prefs.reciter
+    : RECITERS[0].id;
+  return notificationSoundFile(reciter);
 };
 
 const allIds = () => [
@@ -104,7 +120,7 @@ export const rescheduleAdhanNotifications = async (
   const dismissed = getDismissed();
   const todayKey = dateKey(now);
 
-  const sound = SOUND_FILES[settings.sound];
+  const sound = adhanSoundFor(settings);
 
   const notifications: Record<string, unknown>[] = [];
 

@@ -144,6 +144,7 @@ function Settings() {
   const [notifPrefs, setNotifPrefsState] = useState<NotificationPrefs>(() => getNotificationPrefs());
 
   const [nativeAvailable, setNativeAvailable] = useState(false);
+  const [testNotifState, setTestNotifState] = useState<"idle" | "sending" | "done" | "error">("idle");
   const [prayerSettings, setPrayerSettingsState] = useState<PrayerSettings>(() =>
     getPrayerSettings(),
   );
@@ -1231,6 +1232,57 @@ function Settings() {
               </div>
             </div>
           </section>
+
+          {/* ADHAN TEST (native only) */}
+          {nativeAvailable && (
+            <section className="mb-6">
+              <h2 className="label-caps mb-3">Adhan Test</h2>
+              <div className="settings-group">
+                <div className="settings-row">
+                  <button
+                    type="button"
+                    disabled={testNotifState === "sending"}
+                    onClick={async () => {
+                      setTestNotifState("sending");
+                      try {
+                        const plugin = (window as any).Capacitor?.Plugins?.AdhanNotifications;
+                        if (plugin) {
+                          const testTime = Date.now() + 30000;
+                          await plugin.schedulePrayerNotifications({
+                            prayerTimes: [{ name: "Test", time: testTime }],
+                          });
+                          setTestNotifState("done");
+                        } else {
+                          setTestNotifState("error");
+                        }
+                      } catch {
+                        setTestNotifState("error");
+                      }
+                    }}
+                    className="w-full flex items-center justify-center gap-2 rounded-full py-3 text-[13px] font-semibold transition"
+                    style={{
+                      border: "1px solid color-mix(in oklab, var(--accent) 55%, transparent)",
+                      background: "transparent",
+                      color: "var(--accent)",
+                      opacity: testNotifState === "sending" ? 0.6 : 1,
+                    }}
+                  >
+                    <Bell size={16} strokeWidth={1.8} />
+                    {testNotifState === "sending"
+                      ? "Scheduling…"
+                      : testNotifState === "done"
+                        ? "Test scheduled — 30 seconds"
+                        : testNotifState === "error"
+                          ? "Couldn't schedule — try again"
+                          : "Test Notification (30s)"}
+                  </button>
+                  <div className="mt-2 text-center text-[12px] opacity-70">
+                    Sends a test adhan notification in 30 seconds.
+                  </div>
+                </div>
+              </div>
+            </section>
+          )}
         </div>
       </main>
     </>
