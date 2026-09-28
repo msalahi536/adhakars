@@ -100,6 +100,27 @@ function Salah() {
   const [adhanSettingsOpen, setAdhanSettingsOpen] = useState(false);
   const [adhanPrefs, setAdhanPrefsState] = useState<AdhanPrefs>(() => getAdhanPrefs());
   const [adhanError, setAdhanError] = useState<string | null>(null);
+  const [testingNotif, setTestingNotif] = useState(false);
+
+  const sendTestNotification = async () => {
+    if (testingNotif) return;
+    setTestingNotif(true);
+    try {
+      const plugin = (window as any).Capacitor?.Plugins?.AdhanNotifications;
+      if (!plugin?.schedulePrayerNotifications) {
+        throw new Error("Adhan notifications are not available on this device.");
+      }
+      const testTime = Date.now() + 30000;
+      await plugin.schedulePrayerNotifications({
+        prayerTimes: [{ name: "Test", time: testTime }],
+      });
+      setAdhanError(null);
+    } catch (err) {
+      setAdhanError(err instanceof Error ? err.message : "Could not send the test notification.");
+    } finally {
+      setTimeout(() => setTestingNotif(false), 1500);
+    }
+  };
   const autoSelected = useRef(false);
 
   useEffect(() => {
