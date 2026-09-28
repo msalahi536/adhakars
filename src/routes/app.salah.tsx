@@ -33,7 +33,7 @@ import {
 import { isNativeApp } from "@/lib/native-bridge";
 import { rescheduleAdhanNotifications } from "@/lib/adhan-notifications";
 import { checkNotificationPermission, requestNotificationPermission, loadNotificationPlugin, ensureNotificationChannel, NOTIFICATION_CHANNEL } from "@/lib/notifications";
-import { getAdhanPrefs, getReciterForPrayer, notificationSoundFile, playAdhanPreview, RECITERS, setAdhanPrefs, stopAdhanPreview, type AdhanPrefs } from "@/lib/adhan-bridge";
+import { getAdhanPrefs, getReciterForPrayer, notificationSoundFile, playAdhanPreview, preloadAdhanPreviews, RECITERS, setAdhanPrefs, stopAdhanPreview, type AdhanPrefs } from "@/lib/adhan-bridge";
 import { Button } from "@/components/ui/button";
 
 export const Route = createFileRoute("/app/salah")({
@@ -276,19 +276,23 @@ function Salah() {
 
   const toggleReciterPreview = async (reciterId: string) => {
     if (previewingReciter === reciterId) {
-      await stopAdhanPreview();
+      stopAdhanPreview();
       setPreviewingReciter(null);
       return;
     }
-    await stopAdhanPreview();
+    // Show the playing state instantly; audio catches up.
+    setPreviewingReciter(reciterId);
+    setAdhanError(null);
     const started = await playAdhanPreview(reciterId, () => setPreviewingReciter((cur) => (cur === reciterId ? null : cur)));
-    if (started) {
-      setPreviewingReciter(reciterId);
-      setAdhanError(null);
-    } else {
-      setAdhanError("Audio previews are available in the phone app.");
+    if (!started) {
+      setPreviewingReciter((cur) => (cur === reciterId ? null : cur));
+      setAdhanError("Couldn't play this preview. Please try again.");
     }
   };
+
+  useEffect(() => {
+    if (reciterPrayer) preloadAdhanPreviews();
+  }, [reciterPrayer]);
 
   const closeAdhanSettings = () => {
     void stopAdhanPreview();

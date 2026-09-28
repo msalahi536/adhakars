@@ -233,6 +233,20 @@ const PREVIEW_URLS: Record<string, string> = {
 };
 
 let previewAudio: HTMLAudioElement | null = null;
+const preloaded: Record<string, HTMLAudioElement> = {};
+
+/** Starts buffering every preview so taps play instantly. */
+export const preloadAdhanPreviews = () => {
+  if (typeof Audio === "undefined") return;
+  for (const [id, url] of Object.entries(PREVIEW_URLS)) {
+    if (preloaded[id]) continue;
+    const a = new Audio();
+    a.preload = "auto";
+    a.src = url;
+    a.load();
+    preloaded[id] = a;
+  }
+};
 
 /** Plays the reciter's full recording as an in-app preview (web + native). */
 export const playAdhanPreview = async (reciterId: string, onEnded?: () => void): Promise<boolean> => {
@@ -240,7 +254,10 @@ export const playAdhanPreview = async (reciterId: string, onEnded?: () => void):
   const url = PREVIEW_URLS[validReciter(reciterId)];
   if (!url || typeof Audio === "undefined") return false;
   try {
-    const audio = new Audio(url);
+    const id = validReciter(reciterId);
+    const audio = preloaded[id] ?? new Audio(url);
+    preloaded[id] = audio;
+    audio.currentTime = 0;
     audio.onended = () => {
       if (previewAudio === audio) previewAudio = null;
       onEnded?.();
@@ -257,7 +274,7 @@ export const playAdhanPreview = async (reciterId: string, onEnded?: () => void):
 export const stopAdhanPreview = () => {
   if (previewAudio) {
     previewAudio.pause();
-    previewAudio.src = "";
+    previewAudio.currentTime = 0;
     previewAudio = null;
   }
 };
