@@ -109,36 +109,14 @@ function Salah() {
     if (testingNotif) return;
     setTestingNotif(true);
     try {
-      const s0 = getPrayerSettings();
-      const pid = SALAH_IDS.find((id) => s0.perPrayer[id]) ?? "fajr";
-      const lbl = SALAH_PRAYERS.find((prayer) => prayer.id === pid)?.label ?? "Fajr";
-      if (hasNativeAdhanScheduler()) {
-        // Same path as real prayers so the tap continues the full adhan.
-        const ok = await scheduleNativeAdhan([{ name: "Test", time: Date.now() + 5000 }]);
-        if (!ok) throw new Error("Could not send the test notification.");
-        setAdhanError(null);
-        return;
-      }
-      const plugin = await loadNotificationPlugin();
-      if (!plugin) {
+      // Same path as real prayers: the native plugin schedules a "Test"
+      // notification (always allowed, even with all prayers off) and the tap
+      // continues the full adhan. No fallback to the standard plugin.
+      if (!hasNativeAdhanScheduler()) {
         throw new Error("Adhan notifications are not available on this device.");
       }
-      // Treat the test like any other salah: same channel, same reciter sound.
-      const s = getPrayerSettings();
-      const prayerId = SALAH_IDS.find((id) => s.perPrayer[id]) ?? "fajr";
-      const label = SALAH_PRAYERS.find((prayer) => prayer.id === prayerId)?.label ?? "Fajr";
-      const sound = notificationSoundFile(getReciterForPrayer(label));
-      await ensureNotificationChannel(plugin);
-      await plugin.schedule({
-        notifications: [{
-          id: 99,
-          title: `${label} Adhan`,
-          body: `It is time for ${label}.`,
-          schedule: { at: new Date(Date.now() + 5000), allowWhileIdle: true },
-          channelId: NOTIFICATION_CHANNEL,
-          sound,
-        }],
-      });
+      const ok = await scheduleNativeAdhan([{ name: "Test", time: Date.now() + 5000 }]);
+      if (!ok) throw new Error("Could not send the test notification.");
       setAdhanError(null);
     } catch (err) {
       setAdhanError(err instanceof Error ? err.message : "Could not send the test notification.");
