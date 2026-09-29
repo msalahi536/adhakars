@@ -1,33 +1,4 @@
-- [x] Restore reliable dot selector tap-and-drag behavior on real iPhone touch input.
-- [x] Eliminate blank background flashes when switching app tabs.
-- [x] Correct app identity shown where platform permission prompts allow it.
-- [x] Period Companion: cycle tracker, daily checklist, Sunnah knowledge, post-period + smart features.
-- [x] Separate aftercare and post-period guidance; remove Learn sharing.
-- [x] Restore themed relief dua, Three Quls formatting, and the card selector.
-- [x] Preserve the last opened More destination when switching main tabs.
-- [x] Refine Period Companion aftercare grouping, relief duas, and Today ordering.
-- [x] Reorder More tools and repair More-section navigation behavior.
-- [x] Refine Ruqyah warnings, verse accordions, article navigation, transitions, and remove all section sharing.
-- [x] Convert Ruqyah Learn articles to in-page dropdowns and remove the private-device note.
-- [x] Add complete stored recitations with audio to the self-Ruqyah guide and center expanded Learn content.
-- [x] Add Fasting Companion (calendar, Ramadan mode, log, learn) from the source document.
-- [x] Redesign Fasting Companion to match the supplied calm, compact reference.
-- [x] Keep the monthly Monday fasting summary accurate and synced with logged days.
-- [x] Qibla: stop repeat "Enable Compass" prompts once permission was granted (sensor-wake fallback, keep stored flag).
-- [x] Qibla: make bearing/distance verifiable — refresh-location button, cache-age note, recompute on refresh.
-- [x] Qibla: lighter, springier calibration ball rendered as a flat circle.
-- [x] Qibla: move compass/content up so the tip card is not hidden under the nav bar on iPhone.
-- [x] Add Page-based, Always morning, and Always evening appearance modes for the whole app.
-- [x] Redesign the homepage as one long reference-matched page with a scenic hero and smooth in-page navigation.
-- [x] Dua Library: uniform category card shades, Jumuah card = regular card except yellow Friday glow + 4 sunnahs wording, weekly Friday notification deep-linking to Jumuah Sunnahs.
-- [x] Midnight theme: harsh line/fade under card on morning page; selector dots invisible; "24/24" pill white/invisible; "Tap to dismiss" salah button invisible in evening mode.
-- [x] Relief dua: any symptom card on "How are you feeling today" opens the relief dua suggestion (currently only cramps and headache).
-- [x] Midnight theme: "Private — stored only on your device" note barely visible (Saved tab).
-- [x] Location-aware adhkar reminders: morning = Fajr+5, evening = Asr+5; follow-ups 1h before Dhuhr / 30m before Maghrib if not done.
-- [x] Adhan notifications per salah with Takbir only / Full adhan / Silent explanation (full adhan continues on tap).
-- [x] Fix admin widget password.
-- [x] Sunnah of the day: dismissible floating card themed per preset + daily notification.
-- [x] Period Companion notifications (brief supplied; "reciting Quran" wording).
-- [x] Move the Sunnah of the day into a draggable, collapsible side companion that never covers reading controls.
-- [x] Replace the floating Sunnah companion with a refined book entry shown only on More.
-- [x] Theme the global Adhan player and move per-prayer notification and reciter controls onto Salah.
+# Roadmap
+
+- [x] Qibla compass jitter fix (smoothing + removed CSS transition)
+- [ ] Adhan player: keep minimized state across page navigation
