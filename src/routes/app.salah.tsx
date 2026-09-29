@@ -102,27 +102,38 @@ function Salah() {
   const [adhanPrefs, setAdhanPrefsState] = useState<AdhanPrefs>(() => getAdhanPrefs());
   const [adhanError, setAdhanError] = useState<string | null>(null);
   const [testingNotif, setTestingNotif] = useState(false);
+  const [testPickerOpen, setTestPickerOpen] = useState(false);
   const [reciterPrayer, setReciterPrayer] = useState<string | null>(null);
   const [previewingReciter, setPreviewingReciter] = useState<string | null>(null);
 
-  const sendTestNotification = async () => {
+  // The native plugin's testPrayerNotification fires a real prayer alert in
+  // 5 seconds — identical to a real prayer, but it bypasses the enabled
+  // check so nothing here has to be switched on first.
+  const sendTestNotification = async (prayerLabel: string) => {
     if (testingNotif) return;
     setTestingNotif(true);
     try {
-      // The native plugin only guarantees "Test" passes its checks and doesn't
-      // wipe real prayer schedules, so the test uses that name.
-      if (!hasNativeAdhanScheduler()) {
-        throw new Error("Adhan notifications are not available on this device.");
+      if (!(await testPrayerNotification(prayerLabel))) {
+        throw new Error("Could not send the test notification.");
       }
-      const ok = await scheduleNativeAdhan([{ name: "Test", time: Date.now() + 5000 }]);
-      if (!ok) throw new Error("Could not send the test notification.");
       setAdhanError(null);
+      setTestPickerOpen(false);
     } catch (err) {
       setAdhanError(err instanceof Error ? err.message : "Could not send the test notification.");
     } finally {
       setTimeout(() => setTestingNotif(false), 1500);
     }
   };
+
+  const runDiagnostics = async () => {
+    try {
+      const diag = await getDiagnostics();
+      window.alert(JSON.stringify(diag, null, 2));
+    } catch (err) {
+      window.alert(err instanceof Error ? err.message : "Diagnostics unavailable.");
+    }
+  };
+
   const autoSelected = useRef(false);
 
   useEffect(() => {
@@ -640,11 +651,36 @@ function Salah() {
                  <p className="adhan-settings-note">Tap the notification to continue the full adhan after the 30-second alert.</p>
                </>}
               {!reciterPrayer && isNativeApp() && <>
-                <button type="button" className="adhan-test-btn" onClick={() => void sendTestNotification()} disabled={testingNotif}>
+                <button
+                  type="button"
+                  className="adhan-test-btn"
+                  onClick={() => setTestPickerOpen((open) => !open)}
+                  aria-expanded={testPickerOpen}
+                >
                   <Bell size={15} />
-                  <span>{testingNotif ? "Scheduling test…" : "Test Notification (5s)"}</span>
+                  <span>Test Notification (5s)</span>
+                  <ChevronDown size={14} className={`adhan-test-caret ${testPickerOpen ? "is-open" : ""}`} />
                 </button>
-                <p className="adhan-test-note">Sends a test adhan notification in 5 seconds.</p>
+                {testPickerOpen && (
+                  <div className="adhan-test-list">
+                    {["Fajr", "Dhuhr", "Asr", "Maghrib", "Isha"].map((label) => (
+                      <button
+                        key={label}
+                        type="button"
+                        className="adhan-test-item"
+                        onClick={() => void sendTestNotification(label)}
+                        disabled={testingNotif}
+                      >
+                        <span>{label}</span>
+                        <Bell size={13} />
+                      </button>
+                    ))}
+                  </div>
+                )}
+                <p className="adhan-test-note">Fires a real {testPickerOpen ? "prayer" : "test adhan"} notification in 5 seconds.</p>
+                <button type="button" className="adhan-diag-btn" onClick={() => void runDiagnostics()}>
+                  Run Diagnostics
+                </button>
               </>}
               {adhanError && <p className="adhan-settings-error">{adhanError}</p>}
             </section>
