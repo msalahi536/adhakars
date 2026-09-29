@@ -55,6 +55,7 @@ export function AdhanPlayer({ visible, prayer, reciterId, onClose }: Props) {
   const [volume, setVolume] = useState(() => getAdhanVolume());
   const [lastAudible, setLastAudible] = useState(() => getAdhanVolume() || 1);
   const volDragging = useRef(false);
+  const lastNativeVol = useRef<number | null>(null);
   const openedAt = useRef(0);
 
   useEffect(() => {
@@ -68,7 +69,17 @@ export function AdhanPlayer({ visible, prayer, reciterId, onClose }: Props) {
       void getAdhanProgress().then((next) => {
         if (next) {
           setP(next);
-          if (typeof next.volume === "number" && !volDragging.current) setVolume(next.volume);
+          // Only follow the native side when its own volume changed (e.g. the
+          // user used the hardware buttons) — never undo the in-app slider.
+          if (
+            typeof next.volume === "number" &&
+            !volDragging.current &&
+            (lastNativeVol.current === null || Math.abs(next.volume - lastNativeVol.current) > 0.001)
+          ) {
+            lastNativeVol.current = next.volume;
+            setVolume(next.volume);
+            if (next.volume > 0) setLastAudible(next.volume);
+          }
         }
         // Grace period while the native session starts.
         if (Date.now() - openedAt.current > 4000 && next && !next.hasSession) onClose();
