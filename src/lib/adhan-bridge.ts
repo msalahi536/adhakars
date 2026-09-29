@@ -144,25 +144,21 @@ interface AdhanPlugin {
   addListener?(event: string, cb: (info: unknown) => void): Promise<unknown> | unknown;
 }
 
-function getPlugin(): AdhanPlugin | null {
-  if (!isNativeApp()) return null;
+/**
+ * Capacitor plugins are Proxy objects: their methods aren't enumerable, so
+ * never probe for methods — just check the plugin exists and call it.
+ */
+function getAdhanPlugin(): AdhanPlugin | null {
+  if (typeof window === "undefined") return null;
+  const cap = (window as any).Capacitor;
+  if (!cap?.isNativePlatform?.()) return null;
   try {
-    const plugins = (window as any).Capacitor?.Plugins;
-    if (!plugins) return null;
-    for (const name of ["AdhanNotifications", "AdhkarAdhan", "AdhkarPlayer", "AdhkarWidgets"]) {
-      const plugin = plugins[name];
-      if (
-        plugin &&
-        (plugin.schedulePrayerNotifications || plugin.stopAdhan || plugin.isAdhanPlaying)
-      ) {
-        return plugin as AdhanPlugin;
-      }
-    }
+    return (cap.Plugins?.AdhanNotifications as AdhanPlugin) ?? null;
   } catch {
-    // ignore
+    return null;
   }
-  return null;
 }
+const getPlugin = getAdhanPlugin;
 
 /**
  * The native plugin expects exactly { name, time } per entry — it reads
@@ -174,8 +170,8 @@ export interface NativePrayerTime {
   time: number;
 }
 
-/** True when the custom AdhanNotifications plugin can schedule prayers. */
-export const hasNativeAdhanScheduler = (): boolean => !!getPlugin()?.schedulePrayerNotifications;
+/** True when the custom AdhanNotifications plugin is registered. */
+export const hasNativeAdhanScheduler = (): boolean => !!getAdhanPlugin();
 
 /**
  * Schedules prayer notifications through the custom native plugin so iOS
@@ -183,8 +179,8 @@ export const hasNativeAdhanScheduler = (): boolean => !!getPlugin()?.schedulePra
  * clears them. Never falls back to the standard notification plugin.
  */
 export const scheduleNativeAdhan = async (prayerTimes: NativePrayerTime[]): Promise<boolean> => {
-  const plugin = getPlugin();
-  if (!plugin?.schedulePrayerNotifications) return false;
+  const plugin = getAdhanPlugin() as any;
+  if (!plugin) return false;
   try {
     await plugin.schedulePrayerNotifications({
       prayerTimes: prayerTimes.map(({ name, time }) => ({ name, time })),
