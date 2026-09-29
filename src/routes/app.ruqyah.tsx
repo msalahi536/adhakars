@@ -281,7 +281,6 @@ function SelfGuide({ onBack }: { onBack: () => void }) {
     <>
       <StepGuide title="Self-Ruqyah" steps={SELF_STEPS} onBack={onBack} />
       <p className="period-muted px-1 text-sm">Repeat as often as you wish. No upper limit is set in the Sunnah.</p>
-      <div className="period-callout is-amber"><strong>Only step 6 is adapted</strong> — Eight of the nine steps are verbatim narration or Qur'an.</div>
       <div className="period-callout is-amber flex gap-2 font-semibold">
         <Stethoscope size={16} className="mt-0.5 flex-none" />
         <span>See a doctor for anything medical. Ruqyah accompanies treatment; it does not replace it.</span>
@@ -291,12 +290,7 @@ function SelfGuide({ onBack }: { onBack: () => void }) {
 }
 
 function OthersGuide({ onBack }: { onBack: () => void }) {
-  return (
-    <>
-      <StepGuide title="Ruqyah for Others" steps={OTHERS_STEPS} onBack={onBack} />
-      <p className="period-muted px-1 text-sm">Here the second-person wordings are used as narrated, because that is exactly the situation they were reported in. Nothing needs adapting.</p>
-    </>
-  );
+  return <StepGuide title="Ruqyah for Others" steps={OTHERS_STEPS} onBack={onBack} />;
 }
 
 function StepGuide({ title, steps, onBack }: { title: string; steps: RuqyahStep[]; onBack: () => void }) {
@@ -331,9 +325,16 @@ function StepGuide({ title, steps, onBack }: { title: string; steps: RuqyahStep[
             <span className="period-acc-num">{step + 1}</span>
             <p className="flex-1 text-[15px] font-semibold leading-snug">{saw(current.title)}</p>
           </div>
+          <div className="mt-3 flex items-start gap-2 rounded-lg border border-border bg-muted/50 px-3 py-2.5">
+            <BookOpen size={14} className="mt-0.5 flex-none text-accent" />
+            <div>
+              <div className="label-caps text-[9px] text-muted-foreground">Source</div>
+              <p className="mt-0.5 text-xs font-semibold leading-relaxed text-foreground">{current.source}</p>
+            </div>
+          </div>
           {current.note && <p className="period-callout is-grey mt-3">{saw(current.note)}</p>}
-          {recitation && <GuideRecitation item={recitation} scroll />}
-          {current.item && <div className="mt-3"><DuaCard item={current.item} /></div>}
+          {recitation && <GuideRecitation item={recitation} scroll hideSource />}
+          {current.item && <div className="mt-3"><DuaCard item={current.item} hideSource /></div>}
         </div>
         <div className="mt-5 flex gap-2">
           <button className="rq-btn-outline flex-1" disabled={step === 0} onClick={() => go(step - 1)}>
@@ -398,14 +399,14 @@ const AL_FATIHAH: Dhikr = {
   target: 1,
 };
 
-function GuideRecitation({ item, compact = false, scroll = false }: { item: Dhikr; compact?: boolean; scroll?: boolean }) {
+function GuideRecitation({ item, compact = false, scroll = false, hideSource = false }: { item: Dhikr; compact?: boolean; scroll?: boolean; hideSource?: boolean }) {
   const useScroll = compact || scroll;
   return (
     <article className={`rq-guide-recitation mt-4 ${useScroll ? "is-compact" : ""}`}>
       <div className="rq-guide-recitation-head">
         <div>
           <h3>{item.title}</h3>
-          <div className="period-source mt-1"><BookOpen size={12} /> {item.source}</div>
+          {!hideSource && <div className="period-source mt-1"><BookOpen size={12} /> {item.source}</div>}
         </div>
         <ListenButton dhikrId={item.id} size={34} />
       </div>
@@ -572,11 +573,11 @@ function Myths() {
   );
 }
 
-function DuaCard({ item, bare = false }: { item: SunnahItem; bare?: boolean }) {
+function DuaCard({ item, bare = false, hideSource = false }: { item: SunnahItem; bare?: boolean; hideSource?: boolean }) {
   return (
     <article className={bare ? "" : "period-item"}>
       <h3 className="text-sm font-bold">{saw(item.title)}</h3>
-      <div className="period-source mt-1"><BookOpen size={12} /> {item.source}</div>
+      {!hideSource && <div className="period-source mt-1"><BookOpen size={12} /> {item.source}</div>}
       {item.arabic && <p className="arabic mt-3 whitespace-pre-line text-right text-[21px] leading-[1.95]" lang="ar" dir="rtl">{item.arabic}</p>}
       {item.transliteration && <p className="adhkar-transliteration mt-2 !text-left text-[13px]">{item.transliteration}</p>}
       {item.translation && <p className="mt-2 text-sm">{saw(item.translation)}</p>}

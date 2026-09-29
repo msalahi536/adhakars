@@ -109,31 +109,20 @@ export const MUSLIM_2186: SunnahItem = {
 export const IBN_BAZ_SELF_RUQYAH: SunnahItem = {
   id: "ibn-baz-self",
   title: "Wording for oneself",
-  source: "Wording of Shaykh Ibn Baz, adapted from Muslim 2186",
+  source: "Wording of Shaykh Ibn Baz",
   arabic: `رَبَّ النَّاسِ أَذْهَبِ الْبَأْسَ وَاشْفِ وَأَنْتَ الشَّافِيْ لَا شِفَاءَ إِلَّا شِفَاؤُكَ، بِسْمِ اللَّهِ أَرْقِي نَفْسِي مِنْ كُلِّ شَيْءٍ يُؤْذِينِي، وَمِنْ شَرِّ كُلِّ نَفْسٍ أَوْ عَيْنٍ حَاسِدٍ، اللَّهُ يَشْفِينِي`,
   transliteration: `Rabba 'n-nāsi adhhibi 'l-ba'sa wa-shfi anta 'sh-Shāfi, lā shifā'a illā shifā'uk. Bismillāhi arqī nafsī min kulli shay'in yu'dhīnī, wa min sharri kulli nafsīn aw 'aynin ḥāsid, Allāhu yashfīnī.`,
   translation: `O Lord of mankind, take away the harm and heal — You are the Healer, there is no healing but Your healing. In the name of Allah I perform ruqyah for myself, from everything that harms me, and from the evil of every soul or envious eye. May Allah heal me.`,
-  notes: [
-    `This exact first-person wording is what Shaykh Ibn Baz gives in answer to the question of what a person says when performing ruqyah on himself.`,
-  ],
-  callout: {
-    tone: "amber",
-    label: "ADAPTED",
-    text: `Wording of Shaykh Ibn Baz, from Muslim 2186.`,
-  },
 };
 
 export const ABU_DAWUD_3106: SunnahItem = {
   id: "sick-seven-times",
   title: "Said over one who is unwell, seven times",
-  source: "Abu Dawud 3106  ·  Sahih (al-Albani)  ·  VERBATIM",
+  source: "Abu Dawud 3106  ·  Sahih (al-Albani)",
   arabic: `أَسْأَلُ ٱللَّهَ ٱلْعَظِيمَ رَبَّ ٱلْعَرْشِ ٱلْعَظِيمَ أَنْ يَشْفِيكَ`,
   transliteration: `As'alu 'llāha 'l-'Azīm, Rabba 'l-'arshi 'l-'āzīm, an yashfiyak. (7x)`,
   translation: `I ask Allah the Magnificent, Lord of the Magnificent Throne, to heal you. (seven times)`,
   narration: `Ibn 'Abbas reported that the Prophet (ﷺ) said: “Whoever visits a sick person whose time has not yet come and says seven times: 'I ask Allah the Magnificent, Lord of the Magnificent Throne, to heal you' — Allah will heal him of that illness.”`,
-  notes: [
-    `Reported specifically for visiting the sick, so it is verbatim in that setting. To say it for yourself the ending becomes an yashfiyanī — which is again an adaptation, and should be labelled as one.`,
-  ],
 };
 
 export const BUKHARI_5736: SunnahItem = {
@@ -373,49 +362,52 @@ export const RUQYAH_CHECKLIST: { group: string; items: RuqyahCheck[] }[] = [
 
 // ---------- Self-ruqyah steps ----------
 
-export type RuqyahStep = { title: string; item?: SunnahItem; note?: string; recitation?: "fatihah" | "kursi" | "quls" };
+export type RuqyahStep = { title: string; source: string; item?: SunnahItem; note?: string; recitation?: "fatihah" | "kursi" | "quls" };
 export const SELF_STEPS: RuqyahStep[] = [
-  { title: "Place your right hand on the place of pain, or on your chest. [Muslim 2202 — VERBATIM]" },
-  { title: "Recite al-Fatihah. [Bukhari 5736 — Qur'an, no adaptation]", recitation: "fatihah" },
-  { title: "Recite Ayat al-Kursi (2:255). [Qur'an, no adaptation]", recitation: "kursi" },
-  { title: "Recite al-Ikhlas, al-Falaq and an-Nas. [Bukhari 5017 — Qur'an, no adaptation]", recitation: "quls" },
-  { title: "Say: Adhhibi 'l-ba'sa Rabba 'n-nās, ishfi wa anta 'sh-Shāfi… [Bukhari 5675 — VERBATIM, no pronoun to change]", item: BUKHARI_5675 },
   {
-    title: "Say: Bismillāhi arqī nafsī min kulli shay'in yu'dhīni… [ADAPTED — wording of Shaykh Ibn Baz, from Muslim 2186]",
+    title: "Place your right hand on the place of pain, or on your chest",
+    source: "Muslim 2202 · Sahih (Muslim)",
+    note: "Keep the hand there for the recitation. No words are said at this step.",
+  },
+  { title: "Recite al-Fatihah, then blow lightly on the place", source: "Bukhari 5736 · Qur’an 1:1–7 · Sahih (al-Bukhari)", recitation: "fatihah" },
+  { title: "Recite Ayat al-Kursi", source: "Qur’an 2:255", recitation: "kursi" },
+  { title: "Recite al-Ikhlas, al-Falaq and an-Nas", source: "Bukhari 5017 · Qur’an 112:1–114:6 · Sahih (al-Bukhari)", recitation: "quls" },
+  { title: "Say the du‘a of healing", source: "Bukhari 5675 · Sahih (al-Bukhari)", item: BUKHARI_5675 },
+  {
+    title: "Say the ruqyah for yourself",
+    source: "Wording of Shaykh Ibn Baz",
     item: IBN_BAZ_SELF_RUQYAH,
   },
-  { title: "For localised pain: Bismillāh ×3, then A'ūdhu billāhi wa qudratihi min sharri mā ajidu wa uḥādhir ×7, hand on the spot. [Muslim 2202 — VERBATIM]", item: MUSLIM_2202 },
-  { title: "Blow lightly into the hands (nafath) and wipe over yourself — head, face, front, then as far as the hands reach. Three times. [Bukhari 5748 — VERBATIM]" },
-  { title: "If you suspect the evil eye from a specific person, ask them to wash and pour that water over yourself. [Muslim 2188 — a separate remedy, not a recitation]", item: MUSLIM_2188 },
+  { title: "For pain in one specific spot", source: "Muslim 2202 · Hisn al-Muslim 243 · Sahih (Muslim)", item: MUSLIM_2202, note: "Keep your hand on the painful spot while saying it." },
+  { title: "Blow into your palms and wipe over yourself — three times", source: "Bukhari 5748 · Bukhari 5017 · Sahih (al-Bukhari)", item: BUKHARI_5017, note: "Head and face first, then the front of the body, then as far as the hands reach. Three times." },
 ];
 
 export const OTHERS_STEPS: RuqyahStep[] = [
   {
     title: "Hand on the person, wipe, and say the healing du'a",
+    source: "Bukhari 5675 · Sahih (al-Bukhari)",
     item: BUKHARI_5675,
-    note: "The right hand, placed on the person, wiping over them. This is the same wording as self-ruqyah step 5 — which is precisely the point: it names no patient, so it serves both.",
   },
   {
-    title: "Jibril's ruqyah, used here exactly as narrated",
+    title: "Say Jibril's ruqyah over them",
+    source: "Muslim 2186 · Sahih (Muslim)",
     item: MUSLIM_2186,
-    note: "For a female, the endings become arqiki, yu'dhiki, yashfiki. This is the du'a that explicitly covers the envious eye, which is why it is the standard one for suspected 'ayn.",
+    note: "For a female, the endings become arqīki, yu'dhīki, yashfīki. This is the du‘a that explicitly covers the envious eye.",
   },
   {
-    title: "Al-Fatihah with nafath on the place",
+    title: "Recite al-Fatihah over them, with a light blow on the affected place",
+    source: "Bukhari 5736 · Qur’an 1:1–7 · Sahih (al-Bukhari)",
     item: BUKHARI_5736,
     recitation: "fatihah",
-    note: "Recite al-Fatihah over the person, with a light blow on the affected place. Note that the Prophet ﷺ also approved the payment they had taken for it, which is why charging is not forbidden in itself — only the industry built around it.",
+    note: "The companion recited al-Fatihah over a man stung by a scorpion; the Prophet ﷺ approved it and called it a ruqyah.",
   },
-  { title: "Said over one who is unwell, seven times", item: ABU_DAWUD_3106 },
-  { title: "For a sore or wound", item: BUKHARI_5745 },
+  { title: "Say seven times over the sick person", source: "Abu Dawud 3106 · Sahih (al-Albani)", item: ABU_DAWUD_3106 },
+  { title: "For a sore, a wound or an ailment in one place", source: "Bukhari 5745 · Sahih (al-Bukhari)", item: BUKHARI_5745 },
   {
-    title: "When the person is too ill to do it themselves",
-    note: "The narration of 'Aisha in Part 2 gives the model: when his pain grew severe she would recite over him and wipe using HIS hand rather than her own, hoping for its blessing. For an ordinary person there is no blessing specific to the hand, but the structure holds — a family member recites while the sick person is passive. This is the authentic basis for performing ruqyah on someone unconscious, bedridden or a young child. [Bukhari 5016 · Sahih (al-Bukhari)]",
-  },
-  {
-    title: "Suspected evil eye from a known person",
-    item: MUSLIM_2188,
-    note: "A distinct remedy, not a recitation: the person suspected of having given the eye washes, and that water is poured over the afflicted. The command “when you are asked to wash, then wash” places an obligation on the one asked. This applies identically whether you are treating yourself or someone else.",
+    title: "Recite al-Ikhlas, al-Falaq and an-Nas, blow into the hands and wipe over them",
+    source: "Bukhari 5017 · Bukhari 5016 · Qur’an 112:1–114:6 · Sahih (al-Bukhari)",
+    recitation: "quls",
+    note: "If the person is too ill to do it themselves, recite over them and wipe with their own hand. This is the basis for performing ruqyah on someone unconscious, bedridden, or a young child.",
   },
 ];
 
