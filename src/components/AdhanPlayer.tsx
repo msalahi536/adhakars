@@ -3,14 +3,16 @@
 // Closing minimizes to a floating pill so playback remains easy to reopen.
 
 import { useEffect, useRef, useState } from "react";
-import { Pause, Play, RotateCcw, RotateCw, X } from "lucide-react";
+import { Pause, Play, RotateCcw, RotateCw, Volume1, Volume2, VolumeX, X } from "lucide-react";
 import { Portal } from "@/components/Portal";
 import {
   getAdhanProgress,
+  getAdhanVolume,
   pauseAdhan,
   reciterNameFor,
   resumeAdhan,
   seekAdhan,
+  setAdhanVolume,
   type AdhanProgress,
 } from "@/lib/adhan-bridge";
 
@@ -50,6 +52,9 @@ export function AdhanPlayer({ visible, prayer, reciterId, onClose }: Props) {
   const [minimized, setMinimized] = useState(false);
   const [p, setP] = useState<AdhanProgress | null>(null);
   const [scrub, setScrub] = useState<number | null>(null);
+  const [volume, setVolume] = useState(() => getAdhanVolume());
+  const [lastAudible, setLastAudible] = useState(() => getAdhanVolume() || 1);
+  const volDragging = useRef(false);
   const openedAt = useRef(0);
 
   useEffect(() => {
@@ -57,9 +62,14 @@ export function AdhanPlayer({ visible, prayer, reciterId, onClose }: Props) {
     openedAt.current = Date.now();
     setMinimized(false);
     setP(null);
+    // Make the native session match the saved volume as soon as it appears.
+    void setAdhanVolume(getAdhanVolume());
     const tick = () => {
       void getAdhanProgress().then((next) => {
-        if (next) setP(next);
+        if (next) {
+          setP(next);
+          if (typeof next.volume === "number" && !volDragging.current) setVolume(next.volume);
+        }
         // Grace period while the native session starts.
         if (Date.now() - openedAt.current > 4000 && next && !next.hasSession) onClose();
       });
