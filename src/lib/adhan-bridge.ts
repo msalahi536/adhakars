@@ -301,6 +301,7 @@ export const getAdhanProgress = async (): Promise<AdhanProgress | null> => {
 
 const call = async (fn: keyof AdhanPlugin, arg?: unknown): Promise<void> => {
   const plugin = getPlugin() as any;
+  if (fn === "setAdhanVolume") console.log('[vol-debug] call', fn, !!plugin);
   if (!plugin) return;
   try {
     await plugin[fn](arg);
@@ -332,6 +333,7 @@ export const getAdhanVolume = (): number => {
 /** Saves the volume and pushes it to the native player mid-session. */
 export const setAdhanVolume = (volume: number): void => {
   const v = clampVolume(volume);
+  console.log('[vol-debug] setAdhanVolume', v);
   if (typeof window !== "undefined") {
     try {
       window.localStorage.setItem(ADHAN_VOLUME_KEY, String(v));
