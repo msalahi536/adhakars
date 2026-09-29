@@ -47,12 +47,13 @@ const schedule = async (plugin: any, list: N[], tag: string) => {
   }
 };
 
-const note = (id: number, title: string, body: string, at: Date): N => ({
+const note = (id: number, title: string, body: string, at: Date, route = "/app/more"): N => ({
   id,
   title,
   body,
   schedule: { at, allowWhileIdle: true },
   channelId: NOTIFICATION_CHANNEL,
+  extra: { route },
 });
 
 /* ---------------- Prayer-aware adhkar reminders ---------------- */
