@@ -124,8 +124,13 @@ function Qibla() {
     setShowCalibration(false);
   };
 
+  const rafRef = useRef(0);
+  const pendingRef = useRef<number | null>(null);
+
   const attachCompass = () => {
     unsubRef.current?.();
+    cancelAnimationFrame(rafRef.current);
+    pendingRef.current = null;
     let got = false;
     unsubRef.current = subscribeOrientation((r) => {
       if (r.heading === null) return;
@@ -135,12 +140,28 @@ function Qibla() {
       let next = r.heading;
       if (prev !== null) {
         const delta = ((r.heading - prev + 540) % 360) - 180;
-        // Ignore tiny jitter so the arrow sits still when the phone does.
-        if (Math.abs(delta) < 0.6) return;
-        next = normalizeHeading(prev + delta * 0.18);
+        // Dead zone: ignore sensor noise below ~0.8° so a still phone
+        // shows a still needle.
+        if (Math.abs(delta) < 0.8) return;
+        // Exponential smoothing: small moves get heavy damping, big turns
+        // follow faster, so the needle glides instead of twitching.
+        const strength = Math.min(1, Math.abs(delta) / 45);
+        const alpha = 0.08 + strength * 0.22;
+        next = normalizeHeading(prev + delta * alpha);
       }
       smoothRef.current = next;
-      setHeading(next);
+      pendingRef.current = next;
+      // Push to state at most once per animation frame — sensor events fire
+      // far more often than the screen refreshes.
+      if (!rafRef.current) {
+        rafRef.current = requestAnimationFrame(() => {
+          rafRef.current = 0;
+          if (pendingRef.current !== null) {
+            setHeading(Math.round(pendingRef.current * 10) / 10);
+            pendingRef.current = null;
+          }
+        });
+      }
     });
     setTimeout(() => {
       if (!got && needsGesturePermission()) {
