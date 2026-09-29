@@ -66,8 +66,8 @@ export const smartAdhkarKind = (id: number): "morning" | "evening" =>
 const K_OPENED = (kind: "morning" | "evening") => `adhkar:opened:${kind}`;
 
 /** Morning/evening reminders (ids 1 and 2) follow prayer times once a location is known. */
-export const usesPrayerTimes = (reminderId: number) =>
-  (reminderId === 1 || reminderId === 2) && !!getPrayerSettings().location;
+export const usesPrayerTimes = (r: { id: number; customTime?: boolean }) =>
+  (r.id === 1 || r.id === 2) && !r.customTime && !!getPrayerSettings().location;
 
 /** Call when the user opens morning/evening adhkar; drops today's follow-up. */
 export const markAdhkarOpened = (kind: "morning" | "evening") => {
@@ -87,8 +87,10 @@ export const rescheduleSmartAdhkar = async (): Promise<void> => {
   const settings = getPrayerSettings();
   if (!settings.location) return;
   const prefs = getNotificationPrefs();
-  const morningOn = prefs.reminders.find((r) => r.id === 1)?.enabled;
-  const eveningOn = prefs.reminders.find((r) => r.id === 2)?.enabled;
+  const morning = prefs.reminders.find((r) => r.id === 1);
+  const evening = prefs.reminders.find((r) => r.id === 2);
+  const morningOn = morning?.enabled && !morning.customTime;
+  const eveningOn = evening?.enabled && !evening.customTime;
   if (!morningOn && !eveningOn) return;
 
   const now = new Date();
