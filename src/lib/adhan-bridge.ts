@@ -144,25 +144,21 @@ interface AdhanPlugin {
   addListener?(event: string, cb: (info: unknown) => void): Promise<unknown> | unknown;
 }
 
-function getPlugin(): AdhanPlugin | null {
-  if (!isNativeApp()) return null;
+/**
+ * Capacitor plugins are Proxy objects: their methods aren't enumerable, so
+ * never probe for methods — just check the plugin exists and call it.
+ */
+function getAdhanPlugin(): AdhanPlugin | null {
+  if (typeof window === "undefined") return null;
+  const cap = (window as any).Capacitor;
+  if (!cap?.isNativePlatform?.()) return null;
   try {
-    const plugins = (window as any).Capacitor?.Plugins;
-    if (!plugins) return null;
-    for (const name of ["AdhanNotifications", "AdhkarAdhan", "AdhkarPlayer", "AdhkarWidgets"]) {
-      const plugin = plugins[name];
-      if (
-        plugin &&
-        (plugin.schedulePrayerNotifications || plugin.stopAdhan || plugin.isAdhanPlaying)
-      ) {
-        return plugin as AdhanPlugin;
-      }
-    }
+    return (cap.Plugins?.AdhanNotifications as AdhanPlugin) ?? null;
   } catch {
-    // ignore
+    return null;
   }
-  return null;
 }
+const getPlugin = getAdhanPlugin;
 
 /**
  * The native plugin expects exactly { name, time } per entry — it reads
@@ -174,8 +170,8 @@ export interface NativePrayerTime {
   time: number;
 }
 
-/** True when the custom AdhanNotifications plugin can schedule prayers. */
-export const hasNativeAdhanScheduler = (): boolean => !!getPlugin()?.schedulePrayerNotifications;
+/** True when the custom AdhanNotifications plugin is registered. */
+export const hasNativeAdhanScheduler = (): boolean => !!getAdhanPlugin();
 
 /**
  * Schedules prayer notifications through the custom native plugin so iOS
@@ -183,8 +179,8 @@ export const hasNativeAdhanScheduler = (): boolean => !!getPlugin()?.schedulePra
  * clears them. Never falls back to the standard notification plugin.
  */
 export const scheduleNativeAdhan = async (prayerTimes: NativePrayerTime[]): Promise<boolean> => {
-  const plugin = getPlugin();
-  if (!plugin?.schedulePrayerNotifications) return false;
+  const plugin = getAdhanPlugin() as any;
+  if (!plugin) return false;
   try {
     await plugin.schedulePrayerNotifications({
       prayerTimes: prayerTimes.map(({ name, time }) => ({ name, time })),
@@ -208,8 +204,8 @@ const EMPTY_STATUS: AdhanStatus = { playing: false, hasSession: false, prayer: "
 
 /** Current native playback status. */
 export const isAdhanPlaying = async (): Promise<AdhanStatus> => {
-  const plugin = getPlugin();
-  if (!plugin?.isAdhanPlaying) return EMPTY_STATUS;
+  const plugin = getPlugin() as any;
+  if (!plugin) return EMPTY_STATUS;
   try {
     const r = await plugin.isAdhanPlaying();
     if (typeof r === "boolean") return { ...EMPTY_STATUS, playing: r, hasSession: r };
@@ -228,8 +224,8 @@ export const isAdhanPlaying = async (): Promise<AdhanStatus> => {
 
 /** Playback progress from the native side (null on web / failure). */
 export const getAdhanProgress = async (): Promise<AdhanProgress | null> => {
-  const plugin = getPlugin();
-  if (!plugin?.getAdhanProgress) return null;
+  const plugin = getPlugin() as any;
+  if (!plugin) return null;
   try {
     const o = ((await plugin.getAdhanProgress()) ?? {}) as Record<string, unknown>;
     const duration = num(o.duration);
@@ -249,11 +245,10 @@ export const getAdhanProgress = async (): Promise<AdhanProgress | null> => {
 };
 
 const call = async (fn: keyof AdhanPlugin, arg?: unknown): Promise<void> => {
-  const plugin = getPlugin();
-  const f = plugin?.[fn] as ((a?: unknown) => Promise<unknown>) | undefined;
-  if (!f) return;
+  const plugin = getPlugin() as any;
+  if (!plugin) return;
   try {
-    await f.call(plugin, arg);
+    await plugin[fn](arg);
   } catch {
     // ignore
   }
@@ -340,10 +335,10 @@ export const onAdhanPlaying = (handler: (info: AdhanPlayingInfo) => void): (() =
 
   let cancelled = false;
   const removers: Array<() => void> = [];
-  const plugin = getPlugin();
-  if (plugin?.addListener) {
+  const plugin = getPlugin() as any;
+  if (plugin) {
     try {
-      const handle = plugin.addListener("adhanPlaying", (info) => handler(toInfo(info)));
+      const handle = plugin.addListener("adhanPlaying", (info: unknown) => handler(toInfo(info)));
       if (handle && typeof (handle as Promise<unknown>).then === "function") {
         (handle as Promise<{ remove?: () => void }>)
           .then((h) => {
