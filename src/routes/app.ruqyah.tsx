@@ -333,6 +333,15 @@ function StepGuide({ title, steps, onBack }: { title: string; steps: RuqyahStep[
               <h2 className="rq-step-title">{saw(current.title)}</h2>
             </div>
           </div>
+          <details className="rq-step-source-card">
+            <summary><span className="rq-source-pill"><BookOpen size={10} />Sources</span><ChevronRight size={15} /></summary>
+            <div className="rq-source-details">
+              <p>{current.source}</p>
+              {(current.item?.narration ?? current.item?.translation ?? validRecitations[0]?.details?.narration) && (
+                <p>{saw(current.item?.narration ?? current.item?.translation ?? validRecitations[0]?.details?.narration ?? "")}</p>
+              )}
+            </div>
+          </details>
           {current.note && (
             <div className={`rq-step-note ${current.note.toLowerCase().includes("weak") ? "is-warning" : ""}`}>
               {current.note.toLowerCase().includes("weak") ? <CircleAlert size={15} /> : <Hand size={15} />}
@@ -341,15 +350,8 @@ function StepGuide({ title, steps, onBack }: { title: string; steps: RuqyahStep[
           )}
           <div className="rq-step-readings">
             {validRecitations.map((item) => <GuideRecitation key={item.id} item={item} scroll hideSource />)}
-            {current.item && <div className="rq-step-dua"><DuaCard item={current.item} hideSource /></div>}
+            {current.item && !current.recitation && <div className="rq-step-dua"><DuaCard item={current.item} hideSource /></div>}
           </div>
-          <details className="rq-step-source-card">
-            <summary><span className="rq-source-pill"><BookOpen size={10} />Sources</span><ChevronRight size={15} /></summary>
-            <div className="rq-source-details">
-              <p>{current.source}</p>
-              {current.item?.narration && <p>{saw(current.item.narration)}</p>}
-            </div>
-          </details>
         </div>
         <div className="mt-5 flex gap-2">
           <button className="rq-btn-outline flex-1" disabled={step === 0} onClick={() => go(step - 1)}>

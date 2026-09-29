@@ -399,7 +399,7 @@ export const SELF_STEPS: RuqyahStep[] = [
     item: MUSLIM_2202,
     note: "Place your hand on the part of your body that hurts. If the pain is general, place it on your chest. Keep it there while you say it.",
   },
-  { title: "Recite al-Fatihah, then blow lightly", source: "Bukhari 5736 · Qur’an 1 · Sahih (al-Bukhari)", tag: "Qur’an", recitation: "fatihah", note: "Recite it over yourself, then blow lightly with a little moisture from your mouth — on your hands and wipe, or on the place of pain." },
+  { title: "Recite al-Fatihah, then blow lightly", source: "Bukhari 5736 · Qur’an 1 · Sahih (al-Bukhari)", tag: "Qur’an", item: BUKHARI_5736, recitation: "fatihah", note: "Recite it over yourself, then blow lightly with a little moisture from your mouth — on your hands and wipe, or on the place of pain." },
   { title: "Recite Ayat al-Kursi", source: "Ibn Majah 3549 · Bukhari 2311 · Qur’an 2:255", tag: "Qur’an", recitation: "kursi", note: "Its protective virtue against the shayatin is authentic. The narration naming it specifically for ruqyah is weak, so it is included as Qur’an under the general permission to treat with the Qur’an." },
   { title: "Recite the last two verses of Surat al-Baqarah", source: "Bukhari 5009 · Qur’an 2:285–286 · Sahih (al-Bukhari)", tag: "Qur’an", recitation: "baqarah-end", note: "Their sufficiency at night is authentic. Their place here rests on the general permission to treat with the Qur’an." },
   { title: "Say the du‘a of healing", source: "Bukhari 5675 · Sahih (al-Bukhari)", tag: "Narrated over another", item: BUKHARI_5675 },
@@ -410,7 +410,7 @@ export const SELF_STEPS: RuqyahStep[] = [
     item: IBN_BAZ_SELF_RUQYAH,
     note: "The wording is changed only where needed because you are reading on yourself: ‘you’ becomes ‘myself’, ‘harms you’ becomes ‘harms me’, and ‘heal you’ becomes ‘heal me’.",
   },
-  { title: "Recite al-Ikhlas, al-Falaq and an-Nas into your palms, blow, and wipe over yourself — three times", source: "Bukhari 5017 · Bukhari 5751 · Bukhari 5016 · Qur’an 112–114", tag: "Narrated for yourself", recitation: "quls", note: "Cup your hands together. Recite the three surahs and blow lightly into your palms. Wipe over as much of your body as you can reach — head and face first, then the front of your body. Do all of this three times." },
+  { title: "Recite al-Ikhlas, al-Falaq and an-Nas into your palms, blow, and wipe over yourself — three times", source: "Bukhari 5017 · Bukhari 5751 · Bukhari 5016 · Qur’an 112–114", tag: "Narrated for yourself", item: BUKHARI_5017, recitation: "quls", note: "Cup your hands together. Recite the three surahs and blow lightly into your palms. Wipe over as much of your body as you can reach — head and face first, then the front of your body. Do all of this three times." },
 ];
 
 export const OTHERS_STEPS: RuqyahStep[] = [
@@ -439,6 +439,7 @@ export const OTHERS_STEPS: RuqyahStep[] = [
     title: "Recite al-Fatihah over them, and blow lightly with a little saliva",
     source: "Bukhari 5736 · Qur’an 1 · Sahih (al-Bukhari)",
     tag: "Narrated over another",
+    item: BUKHARI_5736,
     recitation: "fatihah",
     note: "Recite it over the person, gathering a little saliva and blowing it lightly onto the place of pain.",
   },
@@ -449,6 +450,7 @@ export const OTHERS_STEPS: RuqyahStep[] = [
     title: "Recite al-Ikhlas, al-Falaq and an-Nas, blow into your hands, and wipe over them",
     source: "Bukhari 5748 · Bukhari 5016 · Qur’an 112–114 · Sahih (al-Bukhari)",
     tag: "Narrated over another",
+    item: BUKHARI_5017,
     recitation: "quls",
     note: "Recite the three surahs and blow lightly into your hands. Wipe over the person as far as you can reach. If they are too ill to do it themselves, recite and blow, then wipe over them using their own hand — as ‘Aisha did for the Prophet ﷺ.",
   },
