@@ -44,6 +44,9 @@ function AppLayout() {
 
   useEffect(() => {
     initNativeBridge();
+    // Prayer alerts are planned on every app open so nothing depends on the
+    // Salah page having been visited.
+    void rescheduleAdhanNotifications(getPrayerSettings());
   }, []);
 
   useEffect(
