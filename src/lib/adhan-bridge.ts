@@ -98,6 +98,25 @@ export function setAdhanPrefs(prefs: AdhanPrefs): void {
   } catch {
     // ignore
   }
+  void syncAdhanPrefsToNative(prefs);
+}
+
+/** Pushes reciter/enabled-prayer choices into the native plugin's preferences. */
+export async function syncAdhanPrefsToNative(prefs: AdhanPrefs = getAdhanPrefs()): Promise<void> {
+  const cap = typeof window !== "undefined" ? (window as any).Capacitor : null;
+  if (!cap?.isNativePlatform?.()) return;
+  const plugin = cap.Plugins?.AdhanNotifications;
+  if (!plugin) return;
+  try {
+    await plugin.updatePreferences({
+      soundMode: prefs.soundMode,
+      reciterId: prefs.reciterId,
+      reciterPerPrayer: prefs.reciterPerPrayer,
+      enabledPrayers: prefs.enabledPrayers,
+    });
+  } catch (e) {
+    console.error("[adhan] native prefs sync failed", e);
+  }
 }
 
 export function getReciterForPrayer(prayer: string): string {
@@ -203,6 +222,7 @@ export const scheduleNativeAdhan = async (prayerTimes: NativePrayerTime[]): Prom
 export const testPrayerNotification = async (prayer: string): Promise<boolean> => {
   const plugin = getPlugin() as any;
   if (!plugin) return false;
+  await syncAdhanPrefsToNative();
   try {
     await plugin.testPrayerNotification({ prayer });
     return true;
