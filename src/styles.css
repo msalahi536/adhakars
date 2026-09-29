@@ -4165,8 +4165,6 @@ html[data-preset="midnight"][data-visual-phase="evening"][data-section="salah"] 
 .ap-skip-n{position:absolute;font-size:8px;font-weight:700}
 .ap-play{width:62px;height:62px;border-radius:50%;display:grid;place-items:center;color:var(--accent-foreground);background:var(--accent);box-shadow:0 10px 28px color-mix(in oklab,var(--accent) 30%,transparent)}
 .ap-play:active{transform:scale(.96)}
-.ap-stop{display:flex;align-items:center;justify-content:center;gap:7px;margin:10px auto 0;padding:7px 12px;border-radius:999px;color:var(--destructive);background:transparent;font-size:12px;font-weight:600}
-.ap-stop:active{background:color-mix(in oklab,var(--destructive) 9%,transparent)}
 .ap-pill{position:fixed;right:0;bottom:calc(var(--bottom-nav-row) + env(safe-area-inset-bottom) + 14px);z-index:190;display:flex;align-items:center;gap:8px;padding:10px 14px 10px 12px;border-radius:999px 0 0 999px;background:color-mix(in oklab,var(--card) 92%,transparent);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border:1px solid color-mix(in oklab,var(--accent) 36%,var(--border));border-right:0;color:var(--card-foreground);font-size:12px;font-weight:700;box-shadow:var(--card-shadow);animation:ap-pill-in 260ms cubic-bezier(.22,1,.36,1)}
 @keyframes ap-pill-in{from{transform:translateX(18px);opacity:0}to{transform:none;opacity:1}}
 .ap-pill-wave{display:flex;gap:2px;align-items:center;height:14px}
