@@ -96,10 +96,6 @@ export function AdhanPlayer({ visible, prayer, reciterId, onClose }: Props) {
     if (!duration) return;
     void seekAdhan((current + delta) / duration);
   };
-  const stop = () => {
-    void stopAdhan();
-    onClose();
-  };
 
   if (minimized) {
     return (
@@ -166,9 +162,6 @@ export function AdhanPlayer({ visible, prayer, reciterId, onClose }: Props) {
           </button>
         </div>
 
-        <button type="button" className="ap-stop" onClick={stop}>
-          <Square size={11} fill="currentColor" /> Stop Adhan
-        </button>
       </div>
     </Portal>
   );
