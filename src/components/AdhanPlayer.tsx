@@ -3,7 +3,7 @@
 // Closing minimizes to a floating pill so playback remains easy to reopen.
 
 import { useEffect, useRef, useState } from "react";
-import { Pause, Play, RotateCcw, RotateCw, Square, X } from "lucide-react";
+import { Pause, Play, RotateCcw, RotateCw, X } from "lucide-react";
 import { Portal } from "@/components/Portal";
 import {
   getAdhanProgress,
@@ -11,7 +11,6 @@ import {
   reciterNameFor,
   resumeAdhan,
   seekAdhan,
-  stopAdhan,
   type AdhanProgress,
 } from "@/lib/adhan-bridge";
 
@@ -96,10 +95,6 @@ export function AdhanPlayer({ visible, prayer, reciterId, onClose }: Props) {
     if (!duration) return;
     void seekAdhan((current + delta) / duration);
   };
-  const stop = () => {
-    void stopAdhan();
-    onClose();
-  };
 
   if (minimized) {
     return (
@@ -166,9 +161,6 @@ export function AdhanPlayer({ visible, prayer, reciterId, onClose }: Props) {
           </button>
         </div>
 
-        <button type="button" className="ap-stop" onClick={stop}>
-          <Square size={11} fill="currentColor" /> Stop Adhan
-        </button>
       </div>
     </Portal>
   );
