@@ -462,6 +462,30 @@ export const scheduleJumuahNotification = async (): Promise<ActionResult> => {
   }
 };
 
+/** Fires the Jumu'ah notification 5 seconds from now, for testing. */
+export const sendTestJumuahNotification = async (): Promise<boolean> => {
+  if (!isNativePlatform()) return false;
+  const plugin = await loadPlugin();
+  if (!plugin) return false;
+  try {
+    await ensureChannel(plugin);
+    await plugin.schedule({
+      notifications: [
+        {
+          id: 889002,
+          title: "Sahih Al-Adhkar",
+          body: "It's Jumu'ah — come learn the sunnahs of Jumu'ah.",
+          schedule: { at: new Date(Date.now() + 5000), allowWhileIdle: true },
+          channelId: ANDROID_CHANNEL,
+        },
+      ],
+    });
+    return true;
+  } catch {
+    return false;
+  }
+};
+
 /** Fires whenever the user taps a delivered local notification. */
 export const registerNotificationTapHandler = (onAction: (id: number) => void): void => {
   void (async () => {
