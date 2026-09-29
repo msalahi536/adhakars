@@ -105,7 +105,8 @@ export const rescheduleSmartAdhkar = async (): Promise<void> => {
     const asr = at("asr");
     const maghrib = at("maghrib");
     const add = (id: number, title: string, body: string, when?: Date) => {
-      if (when && when.getTime() > now.getTime() + 30_000) out.push(note(id, title, body, when));
+      if (when && when.getTime() > now.getTime() + 30_000)
+        out.push(note(id, title, body, when, smartAdhkarKind(id) === "evening" ? "/app/evening" : "/app/"));
     };
     if (morningOn) {
       if (fajr) add(SMART_BASE.morning + i, "Morning Adhkar", "Start your day with the morning adhkar.", new Date(fajr.getTime() + 5 * MIN));
@@ -148,7 +149,7 @@ export const rescheduleSunnahNotification = async (): Promise<void> => {
         body: "Today's Sunnah is ready. Revive it and earn its reward.",
         schedule: { on: { hour: 9, minute: 0 }, repeats: true, allowWhileIdle: true },
         channelId: NOTIFICATION_CHANNEL,
-        extra: { route: "/app/more" },
+        extra: { route: "/app/more?open=sunnah-of-the-day" },
       },
     ],
     "sunnah",
@@ -203,7 +204,7 @@ export const reschedulePeriodNotifications = async (): Promise<void> => {
   let n = 0;
   const add = (body: string, at: Date) => {
     if (n >= PERIOD_IDS.length || at.getTime() <= now.getTime() + 2000) return;
-    out.push(note(PERIOD_IDS[n++], "Period Companion", body, at));
+    out.push(note(PERIOD_IDS[n++], "Period Companion", body, at, "/app/more?open=period-companion"));
   };
 
   // Day 1: sent right after she logs today's start.
@@ -316,7 +317,7 @@ export const sendTestSunnahNotification = async (): Promise<boolean> => {
   if (!plugin) return false;
   await schedule(
     plugin,
-    [note(TEST_SUNNAH_ID, "Sunnah of the day", "Today's Sunnah is ready. Revive it and earn its reward.", new Date(Date.now() + 5000))],
+    [note(TEST_SUNNAH_ID, "Sunnah of the day", "Today's Sunnah is ready. Revive it and earn its reward.", new Date(Date.now() + 5000), "/app/more?open=sunnah-of-the-day")],
     "sunnah-test",
   );
   return true;
@@ -333,7 +334,7 @@ export const sendTestAdhkarNotification = async (kind: "morning" | "evening"): P
       : "It's time for your evening adhkar.";
   await schedule(
     plugin,
-    [note(kind === "morning" ? 889003 : 889004, title, body, new Date(Date.now() + 5000))],
+    [note(kind === "morning" ? 889003 : 889004, title, body, new Date(Date.now() + 5000), kind === "evening" ? "/app/evening" : "/app/")],
     "adhkar-test",
   );
   return true;
@@ -345,7 +346,7 @@ export const sendTestPeriodNotification = async (): Promise<boolean> => {
   if (!plugin) return false;
   await schedule(
     plugin,
-    [note(889005, "Period Companion", DURING[0], new Date(Date.now() + 5000))],
+    [note(889005, "Period Companion", DURING[0], new Date(Date.now() + 5000), "/app/more?open=period-companion")],
     "period-test",
   );
   return true;
@@ -394,7 +395,7 @@ export const rescheduleFertilityNotifications = async (): Promise<void> => {
     ];
     for (const [day, title, body] of items) {
       const at = atHour(day, 9);
-      if (at.getTime() > now + 2000 && n < FERTILITY_IDS.length) out.push(note(FERTILITY_IDS[n++], title, body, at));
+      if (at.getTime() > now + 2000 && n < FERTILITY_IDS.length) out.push(note(FERTILITY_IDS[n++], title, body, at, "/app/more?open=period-companion"));
     }
     if (n >= 6) break;
   }
