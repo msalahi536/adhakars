@@ -6,6 +6,8 @@ export type Reminder = {
   hour: number;
   minute: number;
   enabled: boolean;
+  /** Morning/evening only: use a fixed clock time instead of following Fajr/Asr. */
+  customTime?: boolean;
 };
 
 export type NotificationPrefs = {
@@ -17,8 +19,8 @@ const PREFS_KEY = "adhkar:notifications";
 
 const defaults: NotificationPrefs = {
   reminders: [
-    { id: 1, label: "Morning Adhkar", hour: 6, minute: 0, enabled: false },
-    { id: 2, label: "Evening Adhkar", hour: 16, minute: 30, enabled: false },
+    { id: 1, label: "Morning Adhkar", hour: 6, minute: 0, enabled: true },
+    { id: 2, label: "Evening Adhkar", hour: 16, minute: 30, enabled: true },
   ],
   nextId: 3,
 };
