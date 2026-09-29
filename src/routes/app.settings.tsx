@@ -813,71 +813,105 @@ function Settings() {
                       </div>
                     </div>
                   )}
-                  {notifPrefs.reminders.map((r, i) => (
-                    <div key={r.id} className="settings-row">
-                      <span className="settings-icon">
-                        {i % 2 === 0 ? (
-                          <Sun size={17} strokeWidth={1.8} />
-                        ) : (
-                          <Moon size={17} strokeWidth={1.8} />
-                        )}
-                      </span>
-                      <div className="flex min-w-0 flex-1 items-center gap-2">
-                        <input
-                          type="text"
-                          value={r.label}
-                          onChange={(e) => void updateReminder(r.id, { label: e.target.value })}
-                          placeholder="Reminder"
-                          className="min-w-0 flex-1 rounded-md bg-transparent font-semibold outline-none"
-                          style={{
-                            color: "var(--foreground)",
-                            opacity: r.enabled ? 1 : 0.6,
-                            fontSize: 16,
-                          }}
-                        />
-                        <input
-                          type="time"
-                          value={formatTime(r.hour, r.minute)}
-                          onChange={(e) => {
-                            const { hour, minute } = parseTime(e.target.value);
-                            void updateReminder(r.id, { hour, minute });
-                          }}
-                          disabled={!r.enabled}
-                          className="shrink-0 rounded-md px-2 py-1 font-semibold outline-none"
-                          style={{
-                            background: "var(--surface)",
-                            border: "1px solid var(--border)",
-                            color: "var(--foreground)",
-                            opacity: r.enabled ? 1 : 0.5,
-                            fontSize: 16,
-                          }}
-                        />
-                        <button
-                          onClick={() => void updateReminder(r.id, { enabled: !r.enabled })}
-                          className="settings-switch"
-                          style={{
-                            background: r.enabled
-                              ? "var(--accent)"
-                              : "color-mix(in oklab, var(--foreground) 20%, transparent)",
-                          }}
-                          aria-label={`Toggle ${r.label}`}
-                        >
-                          <span
-                            className="settings-switch-knob"
-                            style={{ left: r.enabled ? 22 : 2 }}
-                          />
-                        </button>
-                        <button
-                          onClick={() => void removeReminder(r.id)}
-                          className="shrink-0 rounded-full text-lg leading-none opacity-50 hover:opacity-100"
-                          style={{ color: "var(--foreground)", padding: "2px 6px" }}
-                          aria-label={`Remove ${r.label}`}
-                        >
-                          ×
-                        </button>
+                  {notifPrefs.reminders.map((r, i) => {
+                    const isSmart = r.id === 1 || r.id === 2;
+                    const followsPrayer = isSmart && !r.customTime && !!prayerSettings.location;
+                    const prayerLabel = r.id === 1 ? "5 mins after Fajr" : "5 mins after Asr";
+                    return (
+                      <div key={r.id} className="settings-row">
+                        <span className="settings-icon">
+                          {i % 2 === 0 ? (
+                            <Sun size={17} strokeWidth={1.8} />
+                          ) : (
+                            <Moon size={17} strokeWidth={1.8} />
+                          )}
+                        </span>
+                        <div className="flex min-w-0 flex-1 flex-col gap-1">
+                          <div className="flex min-w-0 items-center gap-2">
+                            {isSmart ? (
+                              <div
+                                className="min-w-0 flex-1 font-semibold"
+                                style={{ color: "var(--foreground)", opacity: r.enabled ? 1 : 0.6, fontSize: 16 }}
+                              >
+                                {r.label}
+                              </div>
+                            ) : (
+                              <input
+                                type="text"
+                                value={r.label}
+                                onChange={(e) => void updateReminder(r.id, { label: e.target.value })}
+                                placeholder="Reminder"
+                                className="min-w-0 flex-1 rounded-md bg-transparent font-semibold outline-none"
+                                style={{
+                                  color: "var(--foreground)",
+                                  opacity: r.enabled ? 1 : 0.6,
+                                  fontSize: 16,
+                                }}
+                              />
+                            )}
+                            {!followsPrayer && (
+                              <input
+                                type="time"
+                                value={formatTime(r.hour, r.minute)}
+                                onChange={(e) => {
+                                  const { hour, minute } = parseTime(e.target.value);
+                                  void updateReminder(r.id, { hour, minute });
+                                }}
+                                disabled={!r.enabled}
+                                className="shrink-0 rounded-md px-2 py-1 font-semibold outline-none"
+                                style={{
+                                  background: "var(--surface)",
+                                  border: "1px solid var(--border)",
+                                  color: "var(--foreground)",
+                                  opacity: r.enabled ? 1 : 0.5,
+                                  fontSize: 16,
+                                }}
+                              />
+                            )}
+                            <button
+                              onClick={() => void updateReminder(r.id, { enabled: !r.enabled })}
+                              className="settings-switch"
+                              style={{
+                                background: r.enabled
+                                  ? "var(--accent)"
+                                  : "color-mix(in oklab, var(--foreground) 20%, transparent)",
+                              }}
+                              aria-label={`Toggle ${r.label}`}
+                            >
+                              <span
+                                className="settings-switch-knob"
+                                style={{ left: r.enabled ? 22 : 2 }}
+                              />
+                            </button>
+                            {!isSmart && (
+                              <button
+                                onClick={() => void removeReminder(r.id)}
+                                className="shrink-0 rounded-full text-lg leading-none opacity-50 hover:opacity-100"
+                                style={{ color: "var(--foreground)", padding: "2px 6px" }}
+                                aria-label={`Remove ${r.label}`}
+                              >
+                                ×
+                              </button>
+                            )}
+                          </div>
+                          {isSmart && (
+                            <div className="flex items-center gap-2 text-xs" style={{ color: "var(--muted-foreground)" }}>
+                              <span>{followsPrayer ? prayerLabel : "Fixed time"}</span>
+                              {prayerSettings.location && (
+                                <button
+                                  onClick={() => void updateReminder(r.id, { customTime: !r.customTime })}
+                                  className="font-semibold"
+                                  style={{ color: "var(--accent)" }}
+                                >
+                                  {followsPrayer ? "Set custom time" : "Follow prayer times"}
+                                </button>
+                              )}
+                            </div>
+                          )}
+                        </div>
                       </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                   <div className="settings-row">
                     <button
                       onClick={addReminder}
