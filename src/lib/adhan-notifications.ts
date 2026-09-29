@@ -106,9 +106,6 @@ export const rescheduleAdhanNotifications = async (
     if (native) await scheduleNativeAdhan([]);
     return;
   }
-  if (!plugin) {
-    // Native-only path still needs prayer times below.
-  }
 
   if (native) {
     const now = new Date();
