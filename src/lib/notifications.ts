@@ -329,7 +329,7 @@ export const scheduleReminder = async (r: Reminder, firstAt?: Date): Promise<Act
   if (!plugin) return { ok: false, error: "Notifications plugin is missing from this build." };
   if (!firstAt) {
     const smart = await import("@/lib/smart-notifications");
-    if (smart.usesPrayerTimes(r.id)) {
+    if (smart.usesPrayerTimes(r)) {
       // Morning/evening follow Fajr and Asr once a location is known.
       await cancelReminder(r.id);
       await smart.rescheduleSmartAdhkar();

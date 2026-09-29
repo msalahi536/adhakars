@@ -304,6 +304,22 @@ export const rescheduleSmartNotifications = async () => {
   await rescheduleStreakNotifications();
 };
 
+/* ---------------- 5-second test notifications ---------------- */
+
+const TEST_SUNNAH_ID = 889001;
+
+/** Fires the Sunnah-of-the-day notification 5 seconds from now, for testing. */
+export const sendTestSunnahNotification = async (): Promise<boolean> => {
+  const plugin = await ready();
+  if (!plugin) return false;
+  await schedule(
+    plugin,
+    [note(TEST_SUNNAH_ID, "Sunnah of the day", "Today's Sunnah is ready. Revive it and earn its reward.", new Date(Date.now() + 5000))],
+    "sunnah-test",
+  );
+  return true;
+};
+
 /* ---------------- Fertility alerts (opt-in) ---------------- */
 export const FERTILITY_IDS = Array.from({ length: 12 }, (_, i) => 9530 + i);
 export const rescheduleFertilityNotifications = async (): Promise<void> => {
