@@ -105,6 +105,17 @@ export function AdhanPlayer({ visible, prayer, reciterId, onClose }: Props) {
     if (!duration) return;
     void seekAdhan((current + delta) / duration);
   };
+  const changeVolume = (v: number) => {
+    const next = Math.min(1, Math.max(0, v));
+    if (next > 0) setLastAudible(next);
+    setVolume(next);
+    setAdhanVolume(next);
+  };
+  const toggleMute = () => {
+    if (volume > 0) changeVolume(0);
+    else changeVolume(lastAudible || 1);
+  };
+  const VolIcon = volume === 0 ? VolumeX : volume < 0.5 ? Volume1 : Volume2;
 
   if (minimized) {
     return (
@@ -169,6 +180,29 @@ export function AdhanPlayer({ visible, prayer, reciterId, onClose }: Props) {
           <button type="button" className="ap-icon-btn" onClick={() => skip(10)} aria-label="Forward 10 seconds">
             <RotateCw size={24} /><span className="ap-skip-n">10</span>
           </button>
+        </div>
+
+        <div className="ap-volume">
+          <button type="button" className={`ap-mute${volume === 0 ? " ap-mute-off" : ""}`} onClick={toggleMute} aria-label={volume === 0 ? "Unmute adhan" : "Mute adhan"}>
+            <VolIcon size={17} />
+          </button>
+          <input
+            type="range"
+            min={0}
+            max={100}
+            value={Math.round(volume * 100)}
+            aria-label="Adhan volume"
+            style={{ "--ap-vol": `${volume * 100}%` } as React.CSSProperties}
+            onChange={(e) => changeVolume(Number(e.target.value) / 100)}
+            onPointerDown={() => { volDragging.current = true; }}
+            onPointerUp={() => { volDragging.current = false; }}
+          />
+          <div className="ap-volume-bars" aria-hidden="true">
+            {Array.from({ length: 9 }, (_, i) => {
+              const level = (i + 1) / 9;
+              return <span key={i} className={volume >= level ? "on" : ""} />;
+            })}
+          </div>
         </div>
 
       </div>
