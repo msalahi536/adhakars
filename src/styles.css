@@ -3012,10 +3012,8 @@ html[data-preset="ocean"][data-visual-phase="evening"] .bottom-nav-row {
 .period-learn-body { padding: 2px 17px 17px 54px; }
 .period-item { padding-top: 14px; border-top: 1px solid color-mix(in oklab, var(--foreground) 8%, transparent); }
 .period-source { display: inline-flex; align-items: center; gap: 5px; font-size: 11px; font-weight: 600; color: var(--accent); }
-.period-callout { position: relative; padding: 12px 14px; border-radius: 14px; font-size: 13px; line-height: 1.5; }
-.period-callout::before { position: absolute; inset-block: 0; left: 0; width: 2px; background: color-mix(in oklab, var(--foreground) 30%, transparent); content: ""; }
+.period-callout { padding: 12px 14px; border: 1px solid color-mix(in oklab, var(--accent) 20%, var(--border)); border-radius: 18px; font-size: 13px; line-height: 1.5; }
 .period-callout.is-amber { background: color-mix(in oklab, var(--period-amber) 16%, transparent); color: var(--foreground); }
-.period-callout.is-amber::before { background: var(--period-amber); }
 .period-callout.is-grey { background: color-mix(in oklab, var(--foreground) 7%, transparent); color: var(--foreground); }
 .period-saw { font-family: "Amiri", serif; font-size: 1em; font-weight: 400; line-height: 0; vertical-align: 0.1em; }
 
@@ -3123,14 +3121,13 @@ html[data-preset="ocean"][data-visual-phase="evening"] .bottom-nav-row {
 }
 .rq-source-pill svg { flex: none; opacity: .65; }
 .rq-step-note {
-  position: relative; display: flex; align-items: flex-start; gap: 9px; margin-top: 14px; padding: 11px 12px;
+  display: flex; align-items: flex-start; gap: 9px; margin-top: 14px; padding: 11px 12px;
+  border: 1px solid color-mix(in oklab, var(--accent) 20%, var(--border)); border-radius: 18px;
   background: color-mix(in oklab, var(--accent) 5%, transparent);
   color: var(--muted-foreground); font-size: 12.5px; line-height: 1.55;
 }
-.rq-step-note::before { position: absolute; inset-block: 0; left: 0; width: 2px; background: color-mix(in oklab, var(--accent) 45%, transparent); content: ""; }
 .rq-step-note svg { margin-top: 2px; flex: none; color: var(--accent); }
 .rq-step-note.is-warning { background: color-mix(in oklab, var(--period-amber) 7%, transparent); }
-.rq-step-note.is-warning::before { background: var(--period-amber); }
 .rq-step-note.is-warning svg { color: var(--period-amber); }
 .rq-step-card { padding: 16px; border-radius: 18px; }
 .rq-step-body { min-width: 0; }
@@ -3237,7 +3234,6 @@ html[data-preset="ocean"][data-visual-phase="evening"] .bottom-nav-row {
   background: none; border: none; cursor: pointer; text-align: left; color: inherit;
 }
 .rq-sequence-note {
-  position: relative;
   padding: 13px 15px;
   border: 1px solid color-mix(in oklab, var(--accent) 22%, var(--border));
   border-radius: 15px;
@@ -3248,7 +3244,6 @@ html[data-preset="ocean"][data-visual-phase="evening"] .bottom-nav-row {
   line-height: 1.55;
   box-shadow: 0 5px 15px color-mix(in oklab, var(--foreground) 5%, transparent);
 }
-.rq-sequence-note::before { position: absolute; inset-block: 0; left: -1px; width: 2px; background: var(--accent); content: ""; }
 .rq-verse-accordion { overflow: clip; padding: 0; transition: box-shadow .25s ease, border-color .25s ease; }
 .rq-verse-accordion.is-open { border-color: color-mix(in oklab, var(--accent) 24%, var(--border)); box-shadow: 0 10px 28px color-mix(in oklab, var(--foreground) 7%, transparent); }
 .rq-verse-accordion.is-open .rq-group-chevron { transform: rotate(90deg); }
@@ -4068,8 +4063,7 @@ html[data-preset="midnight"][data-visual-phase="evening"][data-section="salah"] 
 .period-eyebrow + .fert-row { border-top: 0; }
 .fert-row strong { display: block; font-size: 14px; }
 .fert-row small { display: block; margin-top: 2px; font-size: 12px; line-height: 1.4; color: var(--muted-foreground); }
-.fert-card { position: relative; }
-.fert-card::before { position: absolute; inset-block: 0; left: 0; width: 2px; background: var(--fert); content: ""; }
+.fert-card { border-color: color-mix(in oklab, var(--fert) 20%, var(--border)); }
 .fert-warm { font-size: 13px; font-style: italic; color: var(--fert); }
 .fert-learn-head { display: flex; width: 100%; align-items: center; gap: 12px; font-size: 14px; }
 
