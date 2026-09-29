@@ -21,6 +21,11 @@ import {
 import {
   getReciterForPrayer,
   notificationSoundFile,
+  hasNativeAdhanScheduler,
+  scheduleNativeAdhan,
+  buildNativePrayerTime,
+  isAdhanPlaying,
+  type NativePrayerTime,
 } from "@/lib/adhan-bridge";
 
 /** Stable ids so a reschedule replaces instead of duplicating. */
@@ -86,11 +91,49 @@ export const rescheduleAdhanNotifications = async (
   settings: PrayerSettings,
 ): Promise<void> => {
   if (!isNativePlatform()) return;
-  const plugin = await loadNotificationPlugin();
-  if (!plugin) return;
+  // Never touch scheduling while the full adhan is playing (e.g. right after a
+  // notification tap opens the Salah page) so nothing interrupts playback.
+  const status = await isAdhanPlaying();
+  if (status.playing || status.hasSession) return;
 
+  const plugin = await loadNotificationPlugin();
+  const native = hasNativeAdhanScheduler();
+  if (!plugin && !native) return;
+
+  // Always clear any old local-notification copies so taps reach AppDelegate.
   await cancelAdhanNotifications();
-  if (!settings.adhanEnabled || !settings.location) return;
+  if (!settings.adhanEnabled || !settings.location) {
+    if (native) await scheduleNativeAdhan([]);
+    return;
+  }
+  if (!plugin) {
+    // Native-only path still needs prayer times below.
+  }
+
+  if (native) {
+    const now = new Date();
+    const today = await fetchDay(now, settings);
+    const tomorrow = await fetchDay(addDays(now, 1), settings);
+    const muteAll = isMutedAllToday();
+    const dismissed = getDismissed();
+    const todayKey = dateKey(now);
+    const list: NativePrayerTime[] = [];
+    for (const [day, offset] of [[today, 0], [tomorrow, TOMORROW_OFFSET]] as const) {
+      if (!day) continue;
+      for (const slot of slotsForDay(day)) {
+        if (slot.id === "sunrise") continue;
+        const id = slot.id as Exclude<PrayerId, "sunrise">;
+        if (!settings.perPrayer[id]) continue;
+        if (slot.at.getTime() <= now.getTime() + 30_000) continue;
+        if (muteAll && slot.dayKey === todayKey) continue;
+        if (dismissed && dismissed.dayKey === slot.dayKey && dismissed.prayer === slot.id) continue;
+        list.push(buildNativePrayerTime(PRAYER_NOTIF_IDS[id] + offset, slot.label, slot.at));
+      }
+    }
+    await scheduleNativeAdhan(list);
+    return;
+  }
+  if (!plugin) return;
 
   try {
     const perm = await plugin.checkPermissions?.().catch(() => null);
