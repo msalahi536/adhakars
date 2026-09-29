@@ -3114,6 +3114,16 @@ html[data-preset="ocean"][data-visual-phase="evening"] .bottom-nav-row {
   background: color-mix(in oklab, var(--foreground) 7%, transparent);
   font-size: 11.5px; font-weight: 700; color: var(--muted-foreground);
 }
+.rq-source-pill {
+  display: inline-flex; align-items: center; gap: 4px; border-radius: 999px; padding: 3px 9px;
+  background: color-mix(in oklab, var(--foreground) 5%, transparent);
+  font-size: 10px; font-weight: 600; color: var(--muted-foreground); width: fit-content;
+}
+.rq-source-pill svg { flex: none; opacity: .65; }
+.rq-step-note {
+  font-size: 12.5px; line-height: 1.55; color: var(--muted-foreground);
+  padding-left: 10px; border-left: 2px solid color-mix(in oklab, var(--accent) 45%, transparent);
+}
 .rq-tag {
   display: inline-flex; align-items: center; border-radius: 999px; padding: 3px 10px;
   background: color-mix(in oklab, var(--accent) 14%, transparent);
