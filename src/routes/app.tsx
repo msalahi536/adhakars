@@ -47,6 +47,8 @@ function AppLayout() {
     // Prayer alerts are planned on every app open so nothing depends on the
     // Salah page having been visited.
     void rescheduleAdhanNotifications(getPrayerSettings());
+    // Sunnah, Jumu'ah, streak, period and smart adhkar reminders too.
+    void import("@/lib/smart-notifications").then((m) => m.rescheduleSmartNotifications());
   }, []);
 
   useEffect(() => {

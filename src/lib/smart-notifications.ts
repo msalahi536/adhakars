@@ -66,8 +66,8 @@ export const smartAdhkarKind = (id: number): "morning" | "evening" =>
 const K_OPENED = (kind: "morning" | "evening") => `adhkar:opened:${kind}`;
 
 /** Morning/evening reminders (ids 1 and 2) follow prayer times once a location is known. */
-export const usesPrayerTimes = (reminderId: number) =>
-  (reminderId === 1 || reminderId === 2) && !!getPrayerSettings().location;
+export const usesPrayerTimes = (r: { id: number; customTime?: boolean }) =>
+  (r.id === 1 || r.id === 2) && !r.customTime && !!getPrayerSettings().location;
 
 /** Call when the user opens morning/evening adhkar; drops today's follow-up. */
 export const markAdhkarOpened = (kind: "morning" | "evening") => {
@@ -87,8 +87,10 @@ export const rescheduleSmartAdhkar = async (): Promise<void> => {
   const settings = getPrayerSettings();
   if (!settings.location) return;
   const prefs = getNotificationPrefs();
-  const morningOn = prefs.reminders.find((r) => r.id === 1)?.enabled;
-  const eveningOn = prefs.reminders.find((r) => r.id === 2)?.enabled;
+  const morning = prefs.reminders.find((r) => r.id === 1);
+  const evening = prefs.reminders.find((r) => r.id === 2);
+  const morningOn = morning?.enabled && !morning.customTime;
+  const eveningOn = evening?.enabled && !evening.customTime;
   if (!morningOn && !eveningOn) return;
 
   const now = new Date();
@@ -300,6 +302,22 @@ export const rescheduleSmartNotifications = async () => {
   await rescheduleSunnahNotification();
   await reschedulePeriodNotifications();
   await rescheduleStreakNotifications();
+};
+
+/* ---------------- 5-second test notifications ---------------- */
+
+const TEST_SUNNAH_ID = 889001;
+
+/** Fires the Sunnah-of-the-day notification 5 seconds from now, for testing. */
+export const sendTestSunnahNotification = async (): Promise<boolean> => {
+  const plugin = await ready();
+  if (!plugin) return false;
+  await schedule(
+    plugin,
+    [note(TEST_SUNNAH_ID, "Sunnah of the day", "Today's Sunnah is ready. Revive it and earn its reward.", new Date(Date.now() + 5000))],
+    "sunnah-test",
+  );
+  return true;
 };
 
 /* ---------------- Fertility alerts (opt-in) ---------------- */

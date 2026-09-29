@@ -6,6 +6,8 @@ export type Reminder = {
   hour: number;
   minute: number;
   enabled: boolean;
+  /** Morning/evening only: use a fixed clock time instead of following Fajr/Asr. */
+  customTime?: boolean;
 };
 
 export type NotificationPrefs = {
@@ -17,8 +19,8 @@ const PREFS_KEY = "adhkar:notifications";
 
 const defaults: NotificationPrefs = {
   reminders: [
-    { id: 1, label: "Morning Adhkar", hour: 6, minute: 0, enabled: false },
-    { id: 2, label: "Evening Adhkar", hour: 16, minute: 30, enabled: false },
+    { id: 1, label: "Morning Adhkar", hour: 6, minute: 0, enabled: true },
+    { id: 2, label: "Evening Adhkar", hour: 16, minute: 30, enabled: true },
   ],
   nextId: 3,
 };
@@ -327,7 +329,7 @@ export const scheduleReminder = async (r: Reminder, firstAt?: Date): Promise<Act
   if (!plugin) return { ok: false, error: "Notifications plugin is missing from this build." };
   if (!firstAt) {
     const smart = await import("@/lib/smart-notifications");
-    if (smart.usesPrayerTimes(r.id)) {
+    if (smart.usesPrayerTimes(r)) {
       // Morning/evening follow Fajr and Asr once a location is known.
       await cancelReminder(r.id);
       await smart.rescheduleSmartAdhkar();
@@ -337,6 +339,11 @@ export const scheduleReminder = async (r: Reminder, firstAt?: Date): Promise<Act
   try {
     await ensureChannel(plugin);
     await cancelReminder(r.id);
+    if (r.id === 1 || r.id === 2) {
+      // Clear or rebuild the prayer-time-based schedule for this reminder.
+      const smart = await import("@/lib/smart-notifications");
+      await smart.rescheduleSmartAdhkar();
+    }
 
     const first = firstAt ?? nextOccurrence(r.hour, r.minute);
     const ids = idsFor(r.id);
@@ -457,6 +464,30 @@ export const scheduleJumuahNotification = async (): Promise<ActionResult> => {
   } catch (e) {
     console.error("[notifications] jumuah schedule failed", e);
     return { ok: false, error: (e as Error)?.message ?? "Could not schedule the Friday reminder." };
+  }
+};
+
+/** Fires the Jumu'ah notification 5 seconds from now, for testing. */
+export const sendTestJumuahNotification = async (): Promise<boolean> => {
+  if (!isNativePlatform()) return false;
+  const plugin = await loadPlugin();
+  if (!plugin) return false;
+  try {
+    await ensureChannel(plugin);
+    await plugin.schedule({
+      notifications: [
+        {
+          id: 889002,
+          title: "Sahih Al-Adhkar",
+          body: "It's Jumu'ah — come learn the sunnahs of Jumu'ah.",
+          schedule: { at: new Date(Date.now() + 5000), allowWhileIdle: true },
+          channelId: ANDROID_CHANNEL,
+        },
+      ],
+    });
+    return true;
+  } catch {
+    return false;
   }
 };
 
