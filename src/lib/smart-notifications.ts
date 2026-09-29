@@ -47,12 +47,13 @@ const schedule = async (plugin: any, list: N[], tag: string) => {
   }
 };
 
-const note = (id: number, title: string, body: string, at: Date): N => ({
+const note = (id: number, title: string, body: string, at: Date, route = "/app/more"): N => ({
   id,
   title,
   body,
   schedule: { at, allowWhileIdle: true },
   channelId: NOTIFICATION_CHANNEL,
+  extra: { route },
 });
 
 /* ---------------- Prayer-aware adhkar reminders ---------------- */
@@ -147,6 +148,7 @@ export const rescheduleSunnahNotification = async (): Promise<void> => {
         body: "Today's Sunnah is ready. Revive it and earn its reward.",
         schedule: { on: { hour: 9, minute: 0 }, repeats: true, allowWhileIdle: true },
         channelId: NOTIFICATION_CHANNEL,
+        extra: { route: "/app/more" },
       },
     ],
     "sunnah",
