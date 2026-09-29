@@ -55,6 +55,9 @@ import {
   setSunnahNotificationEnabled,
   getStreakNotificationsEnabled,
   sendTestSunnahNotification,
+  sendTestAdhkarNotification,
+  sendTestPeriodNotification,
+  sendTestStreakNotification,
 } from "@/lib/smart-notifications";
 import { requestAppReview } from "@/lib/rate-app";
 import {
@@ -771,6 +774,13 @@ function Settings() {
                     <div className="min-w-0 flex-1">
                       <div className="settings-row-title">Period Companion</div>
                       <div className="settings-row-desc">Private, gentle reminders around your cycle, only if you use the Period Companion.</div>
+                      <button
+                        onClick={() => void sendTestPeriodNotification()}
+                        className="mt-1 text-xs font-semibold"
+                        style={{ color: "var(--accent)" }}
+                      >
+                        Send test in 5 seconds
+                      </button>
                     </div>
                     <button
                       onClick={() => togglePeriodNotif(!periodNotif)}
@@ -792,6 +802,13 @@ function Settings() {
                     <div className="min-w-0 flex-1">
                       <div className="settings-row-title">Streak Reminders</div>
                       <div className="settings-row-desc">An evening nudge if your streak is at risk, and a celebration when you hit a milestone.</div>
+                      <button
+                        onClick={() => void sendTestStreakNotification()}
+                        className="mt-1 text-xs font-semibold"
+                        style={{ color: "var(--accent)" }}
+                      >
+                        Send test in 5 seconds
+                      </button>
                     </div>
                     <button
                       onClick={() => toggleStreakNotif(!streakNotif)}
