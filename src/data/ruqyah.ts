@@ -128,11 +128,12 @@ export const MUSLIM_2185: SunnahItem = {
 
 export const IBN_BAZ_SELF_RUQYAH: SunnahItem = {
   id: "ibn-baz-self",
-  title: "Wording for oneself",
-  source: "Wording of Shaykh Ibn Baz",
-  arabic: `رَبَّ النَّاسِ أَذْهَبِ الْبَأْسَ وَاشْفِ وَأَنْتَ الشَّافِيْ لَا شِفَاءَ إِلَّا شِفَاؤُكَ، بِسْمِ اللَّهِ أَرْقِي نَفْسِي مِنْ كُلِّ شَيْءٍ يُؤْذِينِي، وَمِنْ شَرِّ كُلِّ نَفْسٍ أَوْ عَيْنٍ حَاسِدٍ، اللَّهُ يَشْفِينِي`,
-  transliteration: `Rabba 'n-nāsi adhhibi 'l-ba'sa wa-shfi anta 'sh-Shāfi, lā shifā'a illā shifā'uk. Bismillāhi arqī nafsī min kulli shay'in yu'dhīnī, wa min sharri kulli nafsīn aw 'aynin ḥāsid, Allāhu yashfīnī.`,
-  translation: `O Lord of mankind, take away the harm and heal — You are the Healer, there is no healing but Your healing. In the name of Allah I perform ruqyah for myself, from everything that harms me, and from the evil of every soul or envious eye. May Allah heal me.`,
+  title: "Jibril’s ruqyah said on yourself",
+  source: "Muslim 2186  ·  Wording for oneself given by Shaykh Ibn Baz",
+  arabic: `بِسْمِ اللَّهِ أَرْقِي نَفْسِي مِنْ كُلِّ شَيْءٍ يُؤْذِينِي مِنْ شَرِّ كُلِّ نَفْسٍ أَوْ عَيْنِ حَاسِدٍ اللَّهُ يَشْفِينِي بِسْمِ اللَّهِ أَرْقِي نَفْسِي`,
+  transliteration: `Bismillāhi arqī nafsī, min kulli shay'in yu'dhīnī, min sharri kulli nafsin aw 'ayni ḥāsid, Allāhu yashfīnī, bismillāhi arqī nafsī.`,
+  translation: `In the name of Allah I perform ruqyah on myself, from everything that harms me, from the evil of every soul or the eye of an envier. May Allah heal me. In the name of Allah I perform ruqyah on myself.`,
+  narration: MUSLIM_2186.narration,
 };
 
 export const ABU_DAWUD_3106: SunnahItem = {
@@ -160,11 +161,11 @@ export const MUSLIM_2202: SunnahItem = {
   id: "pain-place",
   title: "For pain in a specific place",
   source: "Muslim 2202  ·  Sahih (Muslim)",
-  arabic: `بِسْمِ اللَّهِ — ثَلاَثاً\nأَعُوذُ بِاللَّهِ وَقُدْرَتِهِ مِنْ شَرِّ مَا أَجِدُ وَأُحَاذِرُ — سَبْعَ مَرَّاتٍ`,
-  transliteration: `Bismillāh (3x), then: Aʿūdhu billāhi wa qudratihi min sharri mā ajidu wa uḥādhir (7x).`,
-  translation: `In the name of Allah (three times). I seek refuge in Allah and in His Power from the evil of what I find and of what I guard against (seven times).`,
+  arabic: `بِسْمِ اللَّهِ — ثَلَاثًا\nأَعُوذُ بِاللَّهِ وَقُدْرَتِهِ مِنْ شَرِّ مَا أَجِدُ وَأُحَاذِرُ — سَبْعَ مَرَّاتٍ\n\nأَعُوذُ بِعِزَّةِ اللَّهِ وَقُدْرَتِهِ مِنْ شَرِّ مَا أَجِدُ — سَبْعَ مَرَّاتٍ`,
+  transliteration: `Bismillāh (3x), then: Aʿūdhu billāhi wa qudratihi min sharri mā ajidu wa uḥādhir (7x).\n\nAnother authentic wording: Aʿūdhu bi-ʿizzati 'llāhi wa qudratihi min sharri mā ajid (7x).`,
+  translation: `In the name of Allah (three times). I seek refuge in Allah and His Power from the evil of what I find and what I fear (seven times).\n\nAnother authentic wording: I seek refuge in the Might of Allah and His Power from the evil of what I find (seven times).`,
   narration: `‘Uthman ibn Abi al-‘As complained to the Messenger of Allah (ﷺ) of pain in his body. He said: “Put your hand on the place where you feel pain and say Bismillah three times, and say seven times: I seek refuge in Allah and in His Power from the evil of what I find and of what I guard against.”`,
-  notes: [`Hand on the specific place. This is the targeted form, as opposed to the whole-body method above.`],
+  notes: [`The second wording is reported from the same Companion in Abu Dawud 3891: wipe the place with your right hand seven times while saying it.`],
 };
 
 export const BUKHARI_5745: SunnahItem = {
@@ -388,7 +389,7 @@ export type RuqyahStep = {
   tag: "Narrated for yourself" | "Narrated over another" | "Qur’an";
   item?: SunnahItem;
   note?: string;
-  recitation?: "fatihah" | "kursi" | "baqarah-end" | "quls";
+  recitation?: "fatihah" | "kursi" | "baqarah-end" | "kursi-baqarah" | "quls";
 };
 export const SELF_STEPS: RuqyahStep[] = [
   {
@@ -441,7 +442,7 @@ export const OTHERS_STEPS: RuqyahStep[] = [
     recitation: "fatihah",
     note: "Recite it over the person, gathering a little saliva and blowing it lightly onto the place of pain.",
   },
-  { title: "Recite Ayat al-Kursi and the last two verses of al-Baqarah over them", source: "Ibn Majah 3549 · Bukhari 2311 · Bukhari 5009 · Qur’an 2:255, 2:285–286", tag: "Qur’an", recitation: "kursi", note: "Read Ayat al-Kursi here, then open the next reading below for the last two verses of al-Baqarah. The narration naming these specifically for ruqyah is weak; they are included under the general permission to treat with the Qur’an." },
+  { title: "Recite Ayat al-Kursi and the last two verses of al-Baqarah over them", source: "Ibn Majah 3549 · Bukhari 2311 · Bukhari 5009 · Qur’an 2:255, 2:285–286", tag: "Qur’an", recitation: "kursi-baqarah", note: "The narration naming these specifically for ruqyah is weak; they are included under the general permission to treat with the Qur’an." },
   { title: "Say seven times over the sick person", source: "Abu Dawud 3106 · Sahih (al-Albani)", tag: "Narrated over another", item: ABU_DAWUD_3106, note: "For a woman, say an yashfiyaki." },
   { title: "For a sore, a wound or pain in one place", source: "Bukhari 5745 · Muslim 2194 · Sahih", tag: "Narrated over another", item: BUKHARI_5745, note: "Put a little of your saliva on your forefinger, touch it to the earth, then wipe the sore place with it while saying the words." },
   {

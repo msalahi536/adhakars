@@ -298,19 +298,24 @@ function StepGuide({ title, steps, onBack }: { title: string; steps: RuqyahStep[
   const current = steps[step];
   const last = steps.length - 1;
   const go = (next: number) => { setStep(next); void triggerHaptic("light"); };
-  const recitation = current.recitation === "fatihah"
-    ? AL_FATIHAH
+  const recitations = current.recitation === "fatihah"
+    ? [AL_FATIHAH]
     : current.recitation === "kursi"
-      ? STORED_VERSES[1]
-      : current.recitation === "quls"
-        ? STORED_VERSES[3]
-        : undefined;
+      ? [STORED_VERSES[1]]
+      : current.recitation === "baqarah-end"
+        ? [STORED_VERSES[2]]
+        : current.recitation === "kursi-baqarah"
+          ? [STORED_VERSES[1], STORED_VERSES[2]]
+          : current.recitation === "quls"
+            ? [STORED_VERSES[3]]
+            : [];
+  const validRecitations = recitations.filter((item): item is Dhikr => Boolean(item));
 
   return (
     <>
       <BackLink onBack={onBack} label="Ruqyah" />
-      <div className="period-card">
-        <div className="flex items-center justify-between">
+      <div className="period-card rq-step-card">
+        <div className="flex items-center justify-between gap-3">
           <div className="period-eyebrow">{title}</div>
           <span className="period-muted text-xs font-semibold">Step {step + 1} of {steps.length}</span>
         </div>
@@ -320,17 +325,31 @@ function StepGuide({ title, steps, onBack }: { title: string; steps: RuqyahStep[
               style={{ background: i <= step ? "var(--accent)" : "color-mix(in oklab, var(--foreground) 10%, transparent)" }} />
           ))}
         </div>
-        <div key={step} className="animate-in fade-in slide-in-from-right-2 duration-300">
-          <div className="mt-4 flex items-start gap-3">
+        <div key={step} className="rq-step-body animate-in fade-in slide-in-from-right-2 duration-300">
+          <div className="rq-step-heading">
             <span className="period-acc-num">{step + 1}</span>
-            <div className="flex-1">
-              <p className="text-[15px] font-semibold leading-snug">{saw(current.title)}</p>
-              <span className="rq-source-pill mt-1.5"><BookOpen size={10} />{current.source}</span>
-              {current.note && <p className="rq-step-note mt-2">{saw(current.note)}</p>}
+            <div className="min-w-0 flex-1">
+              <span className="rq-guidance-tag">{current.tag}</span>
+              <h2 className="rq-step-title">{saw(current.title)}</h2>
             </div>
           </div>
-          {recitation && <GuideRecitation item={recitation} scroll hideSource />}
-          {current.item && <div className="mt-3"><DuaCard item={current.item} hideSource /></div>}
+          {current.note && (
+            <div className={`rq-step-note ${current.note.toLowerCase().includes("weak") ? "is-warning" : ""}`}>
+              {current.note.toLowerCase().includes("weak") ? <CircleAlert size={15} /> : <Hand size={15} />}
+              <p>{saw(current.note)}</p>
+            </div>
+          )}
+          <div className="rq-step-readings">
+            {validRecitations.map((item) => <GuideRecitation key={item.id} item={item} scroll hideSource />)}
+            {current.item && <div className="rq-step-dua"><DuaCard item={current.item} hideSource /></div>}
+          </div>
+          <details className="rq-step-source-card">
+            <summary><span className="rq-source-pill"><BookOpen size={10} />Sources</span><ChevronRight size={15} /></summary>
+            <div className="rq-source-details">
+              <p>{current.source}</p>
+              {current.item?.narration && <p>{saw(current.item.narration)}</p>}
+            </div>
+          </details>
         </div>
         <div className="mt-5 flex gap-2">
           <button className="rq-btn-outline flex-1" disabled={step === 0} onClick={() => go(step - 1)}>
