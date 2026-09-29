@@ -124,7 +124,7 @@ export const rescheduleAdhanNotifications = async (
         if (slot.at.getTime() <= now.getTime() + 30_000) continue;
         if (muteAll && slot.dayKey === todayKey) continue;
         if (dismissed && dismissed.dayKey === slot.dayKey && dismissed.prayer === slot.id) continue;
-        list.push(buildNativePrayerTime(PRAYER_NOTIF_IDS[id] + offset, slot.label, slot.at));
+        list.push(buildNativePrayerTime(slot.label, slot.at));
       }
     }
     await scheduleNativeAdhan(list);
