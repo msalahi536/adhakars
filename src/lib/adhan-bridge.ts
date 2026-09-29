@@ -301,6 +301,7 @@ export const getAdhanProgress = async (): Promise<AdhanProgress | null> => {
 
 const call = async (fn: keyof AdhanPlugin, arg?: unknown): Promise<void> => {
   const plugin = getPlugin() as any;
+  if (fn === "setAdhanVolume") console.log('[vol-debug] call', fn, !!plugin);
   if (!plugin) return;
   try {
     await plugin[fn](arg);
@@ -339,6 +340,7 @@ export const setAdhanVolume = (volume: number): void => {
       // ignore
     }
   }
+  console.log('[vol-debug] setAdhanVolume', v);
   void call("setAdhanVolume", { volume: v });
 };
 
