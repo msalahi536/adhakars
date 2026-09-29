@@ -12,8 +12,8 @@ import { getRuqyahChecklist, toggleRuqyahCheck } from "@/lib/ruqyah";
 import type { SunnahItem } from "@/data/period-sunnah";
 import { eveningAdhkar, morningAdhkar, type Dhikr } from "@/data/adhkar";
 import {
-  BUKHARI_5675, CONDITION_LIST, MUSLIM_2186, MYTHS, RAQI_FLAGS, RUQYAH_CHECKLIST,
-  RUQYAH_SECTIONS, SELF_STEPS, VERSES, type RuqyahSection,
+  CONDITION_LIST, MYTHS, OTHERS_STEPS, RAQI_FLAGS, RUQYAH_CHECKLIST,
+  RUQYAH_SECTIONS, SELF_STEPS, VERSES, type RuqyahSection, type RuqyahStep,
 } from "@/data/ruqyah";
 
 export const Route = createFileRoute("/app/ruqyah")({
@@ -254,6 +254,7 @@ function RuqyahView() {
         <div className="rq-icon-circle mb-3"><Users size={20} /></div>
         <h2 className="rq-hero-title text-left">Ruqyah for Others</h2>
         <p className="period-muted mt-1 text-sm leading-relaxed">The method and authentic du‘as for performing ruqyah on someone else.</p>
+        <span className="rq-pill mt-3">{OTHERS_STEPS.length} steps</span>
         <button className="rq-btn-outline mt-4 w-full" onClick={() => { setMode("others"); void triggerHaptic("light"); }}>
           View guide <ChevronRight size={16} />
         </button>
@@ -276,43 +277,11 @@ function BackLink({ onBack, label = "Back" }: { onBack: () => void; label?: stri
 }
 
 function SelfGuide({ onBack }: { onBack: () => void }) {
-  const [step, setStep] = useState(0);
-  const s = SELF_STEPS[step];
-  const last = SELF_STEPS.length - 1;
-  const go = (n: number) => { setStep(n); void triggerHaptic("light"); };
-  const recitation = step === 1 ? AL_FATIHAH : step === 2 ? STORED_VERSES[1] : step === 3 ? STORED_VERSES[3] : undefined;
   return (
     <>
-      <BackLink onBack={onBack} label="Ruqyah" />
-      <div className="period-card">
-        <div className="flex items-center justify-between">
-          <div className="period-eyebrow">Self-Ruqyah</div>
-          <span className="period-muted text-xs font-semibold">Step {step + 1} of {SELF_STEPS.length}</span>
-        </div>
-        <div className="mt-3 flex gap-1">
-          {SELF_STEPS.map((_, i) => (
-            <button key={i} aria-label={`Step ${i + 1}`} onClick={() => go(i)} className="h-1.5 flex-1 rounded-full transition-colors"
-              style={{ background: i <= step ? "var(--accent)" : "color-mix(in oklab, var(--foreground) 10%, transparent)" }} />
-          ))}
-        </div>
-        <div key={step} className="animate-in fade-in slide-in-from-right-2 duration-300">
-          <div className="mt-4 flex items-start gap-3">
-            <span className="period-acc-num">{step + 1}</span>
-            <p className="flex-1 text-[15px] font-semibold leading-snug">{saw(s.title)}</p>
-          </div>
-          {s.note && <p className="period-callout is-grey mt-3">{saw(s.note)}</p>}
-           {recitation && <GuideRecitation item={recitation} scroll />}
-          {s.item && <div className="mt-3"><DuaCard item={s.item} /></div>}
-        </div>
-        <div className="mt-5 flex gap-2">
-          <button className="rq-btn-outline flex-1" disabled={step === 0} onClick={() => go(step - 1)}>
-            <ChevronLeft size={16} /> Back
-          </button>
-          <button className="rq-btn-primary flex-1" onClick={() => go(step === last ? 0 : step + 1)}>
-            {step === last ? "Start again" : <>Next <ChevronRight size={16} /></>}
-          </button>
-        </div>
-      </div>
+      <StepGuide title="Self-Ruqyah" steps={SELF_STEPS} onBack={onBack} />
+      <p className="period-muted px-1 text-sm">Repeat as often as you wish. No upper limit is set in the Sunnah.</p>
+      <div className="period-callout is-amber"><strong>Only step 6 is adapted</strong> — Eight of the nine steps are verbatim narration or Qur'an.</div>
       <div className="period-callout is-amber flex gap-2 font-semibold">
         <Stethoscope size={16} className="mt-0.5 flex-none" />
         <span>See a doctor for anything medical. Ruqyah accompanies treatment; it does not replace it.</span>
@@ -324,16 +293,55 @@ function SelfGuide({ onBack }: { onBack: () => void }) {
 function OthersGuide({ onBack }: { onBack: () => void }) {
   return (
     <>
+      <StepGuide title="Ruqyah for Others" steps={OTHERS_STEPS} onBack={onBack} />
+      <p className="period-muted px-1 text-sm">Here the second-person wordings are used as narrated, because that is exactly the situation they were reported in. Nothing needs adapting.</p>
+    </>
+  );
+}
+
+function StepGuide({ title, steps, onBack }: { title: string; steps: RuqyahStep[]; onBack: () => void }) {
+  const [step, setStep] = useState(0);
+  const current = steps[step];
+  const last = steps.length - 1;
+  const go = (next: number) => { setStep(next); void triggerHaptic("light"); };
+  const recitation = current.recitation === "fatihah"
+    ? AL_FATIHAH
+    : current.recitation === "kursi"
+      ? STORED_VERSES[1]
+      : current.recitation === "quls"
+        ? STORED_VERSES[3]
+        : undefined;
+
+  return (
+    <>
       <BackLink onBack={onBack} label="Ruqyah" />
       <div className="period-card">
-        <div className="rq-icon-circle mb-3"><Users size={20} /></div>
-        <h2 className="rq-hero-title text-left">Ruqyah for Others</h2>
-        <p className="period-muted mt-1 text-sm leading-relaxed">
-          The right hand, placed on the person, with this du‘a. This is the standard form when performing ruqyah for someone else.
-        </p>
-        <div className="mt-3 space-y-3">
-          <DuaCard item={BUKHARI_5675} />
-          <DuaCard item={MUSLIM_2186} />
+        <div className="flex items-center justify-between">
+          <div className="period-eyebrow">{title}</div>
+          <span className="period-muted text-xs font-semibold">Step {step + 1} of {steps.length}</span>
+        </div>
+        <div className="mt-3 flex gap-1">
+          {steps.map((_, i) => (
+            <button key={i} aria-label={`Step ${i + 1}`} onClick={() => go(i)} className="h-1.5 flex-1 rounded-full transition-colors"
+              style={{ background: i <= step ? "var(--accent)" : "color-mix(in oklab, var(--foreground) 10%, transparent)" }} />
+          ))}
+        </div>
+        <div key={step} className="animate-in fade-in slide-in-from-right-2 duration-300">
+          <div className="mt-4 flex items-start gap-3">
+            <span className="period-acc-num">{step + 1}</span>
+            <p className="flex-1 text-[15px] font-semibold leading-snug">{saw(current.title)}</p>
+          </div>
+          {current.note && <p className="period-callout is-grey mt-3">{saw(current.note)}</p>}
+          {recitation && <GuideRecitation item={recitation} scroll />}
+          {current.item && <div className="mt-3"><DuaCard item={current.item} /></div>}
+        </div>
+        <div className="mt-5 flex gap-2">
+          <button className="rq-btn-outline flex-1" disabled={step === 0} onClick={() => go(step - 1)}>
+            <ChevronLeft size={16} /> Back
+          </button>
+          <button className="rq-btn-primary flex-1" onClick={() => go(step === last ? 0 : step + 1)}>
+            {step === last ? "Start again" : <>Next <ChevronRight size={16} /></>}
+          </button>
         </div>
       </div>
     </>
