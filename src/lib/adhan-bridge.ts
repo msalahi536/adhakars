@@ -140,6 +140,7 @@ interface AdhanPlugin {
   isAdhanPlaying?(): Promise<unknown>;
   playAdhanPreview?(opts: { reciterId: string; file: string }): Promise<unknown>;
   stopAdhanPreview?(): Promise<unknown>;
+  schedulePrayerNotifications?(opts: { prayerTimes: NativePrayerTime[] }): Promise<unknown>;
   addListener?(event: string, cb: (info: unknown) => void): Promise<unknown> | unknown;
 }
 
@@ -157,6 +158,52 @@ function getPlugin(): AdhanPlugin | null {
   }
   return null;
 }
+
+export interface NativePrayerTime {
+  id: number;
+  name: string;
+  prayer: string;
+  time: number;
+  reciterId: string;
+  soundMode: "adhan" | "silent";
+  sound: string;
+  fullFile: string;
+}
+
+/** True when the custom AdhanNotifications plugin can schedule prayers. */
+export const hasNativeAdhanScheduler = (): boolean => !!getPlugin()?.schedulePrayerNotifications;
+
+/**
+ * Schedules prayer notifications through the custom native plugin so iOS
+ * AppDelegate receives the tap (with prayer, reciterId, soundMode; the native
+ * side adds firedAt) and continues the full adhan. An empty list clears them.
+ */
+export const scheduleNativeAdhan = async (prayerTimes: NativePrayerTime[]): Promise<boolean> => {
+  const plugin = getPlugin();
+  if (!plugin?.schedulePrayerNotifications) return false;
+  try {
+    await plugin.schedulePrayerNotifications({ prayerTimes });
+    return true;
+  } catch (e) {
+    console.error("[adhan] native schedule failed", e);
+    return false;
+  }
+};
+
+export const buildNativePrayerTime = (id: number, prayer: string, at: Date): NativePrayerTime => {
+  const name = `${prayer.charAt(0).toUpperCase()}${prayer.slice(1).toLowerCase()}`;
+  const reciterId = getReciterForPrayer(name);
+  return {
+    id,
+    name,
+    prayer: name,
+    time: at.getTime(),
+    reciterId,
+    soundMode: "adhan",
+    sound: notificationSoundFile(reciterId),
+    fullFile: fullAdhanFile(reciterId),
+  };
+};
 
 const str = (v: unknown): string => (typeof v === "string" ? v : "");
 const num = (v: unknown): number => (typeof v === "number" && Number.isFinite(v) ? v : 0);

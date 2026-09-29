@@ -33,7 +33,7 @@ import {
 import { isNativeApp } from "@/lib/native-bridge";
 import { rescheduleAdhanNotifications } from "@/lib/adhan-notifications";
 import { checkNotificationPermission, requestNotificationPermission, loadNotificationPlugin, ensureNotificationChannel, NOTIFICATION_CHANNEL } from "@/lib/notifications";
-import { getAdhanPrefs, getReciterForPrayer, notificationSoundFile, playAdhanPreview, preloadAdhanPreviews, RECITERS, setAdhanPrefs, stopAdhanPreview, type AdhanPrefs } from "@/lib/adhan-bridge";
+import { getAdhanPrefs, getReciterForPrayer, notificationSoundFile, playAdhanPreview, preloadAdhanPreviews, RECITERS, setAdhanPrefs, stopAdhanPreview, hasNativeAdhanScheduler, scheduleNativeAdhan, buildNativePrayerTime, type AdhanPrefs } from "@/lib/adhan-bridge";
 import { Button } from "@/components/ui/button";
 
 export const Route = createFileRoute("/app/salah")({
@@ -109,6 +109,16 @@ function Salah() {
     if (testingNotif) return;
     setTestingNotif(true);
     try {
+      const s0 = getPrayerSettings();
+      const pid = SALAH_IDS.find((id) => s0.perPrayer[id]) ?? "fajr";
+      const lbl = SALAH_PRAYERS.find((prayer) => prayer.id === pid)?.label ?? "Fajr";
+      if (hasNativeAdhanScheduler()) {
+        // Same path as real prayers so the tap continues the full adhan.
+        const ok = await scheduleNativeAdhan([buildNativePrayerTime(199, lbl, new Date(Date.now() + 5000))]);
+        if (!ok) throw new Error("Could not send the test notification.");
+        setAdhanError(null);
+        return;
+      }
       const plugin = await loadNotificationPlugin();
       if (!plugin) {
         throw new Error("Adhan notifications are not available on this device.");
