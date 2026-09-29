@@ -33,7 +33,7 @@ import {
 import { isNativeApp } from "@/lib/native-bridge";
 import { rescheduleAdhanNotifications } from "@/lib/adhan-notifications";
 import { checkNotificationPermission, requestNotificationPermission } from "@/lib/notifications";
-import { getAdhanPrefs, playAdhanPreview, preloadAdhanPreviews, RECITERS, setAdhanPrefs, stopAdhanPreview, testPrayerNotification, getDiagnostics, type AdhanPrefs } from "@/lib/adhan-bridge";
+import { getAdhanPrefs, playAdhanPreview, preloadAdhanPreviews, RECITERS, FAJR_RECITERS, setAdhanPrefs, stopAdhanPreview, testPrayerNotification, getDiagnostics, type AdhanPrefs } from "@/lib/adhan-bridge";
 import { Button } from "@/components/ui/button";
 
 export const Route = createFileRoute("/app/salah")({
@@ -262,7 +262,7 @@ function Salah() {
 
 
   const setPrayerReciter = async (prayer: string, reciterId: string) => {
-    const next = {
+    const next = prayer === "Fajr" ? { ...adhanPrefs, fajrReciterId: reciterId } : {
       ...adhanPrefs,
       reciterId,
       reciterPerPrayer: { ...adhanPrefs.reciterPerPrayer, [prayer]: reciterId },
@@ -616,8 +616,8 @@ function Salah() {
               {reciterPrayer ? (
                 <div className="adhan-reciter-list">
                   <p className="adhan-reciter-intro">Choose the voice for {reciterPrayer}. Tap play to preview.</p>
-                  {RECITERS.map((reciter) => {
-                    const selected = (adhanPrefs.reciterPerPrayer[reciterPrayer] ?? adhanPrefs.reciterId) === reciter.id;
+                  {(reciterPrayer === "Fajr" ? FAJR_RECITERS : RECITERS).map((reciter) => {
+                    const selected = reciterPrayer === "Fajr" ? adhanPrefs.fajrReciterId === reciter.id : (adhanPrefs.reciterPerPrayer[reciterPrayer] ?? adhanPrefs.reciterId) === reciter.id;
                     const previewing = previewingReciter === reciter.id;
                     return <div className={`adhan-reciter-row ${selected ? "is-selected" : ""}`} key={reciter.id}>
                       <Button type="button" variant="ghost" size="icon" className="adhan-preview-btn" onClick={() => void toggleReciterPreview(reciter.id)} aria-label={`${previewing ? "Pause" : "Play"} ${reciter.name}`}>
@@ -636,8 +636,9 @@ function Salah() {
                   {SALAH_IDS.map((id) => {
                     const label = SALAH_PRAYERS.find((prayer) => prayer.id === id)?.label ?? id;
                     const enabled = settings.perPrayer[id] && settings.adhanEnabled;
-                    const reciterId = adhanPrefs.reciterPerPrayer[label] ?? adhanPrefs.reciterId;
-                    const reciter = RECITERS.find((item) => item.id === reciterId) ?? RECITERS[0];
+                    const reciter = label === "Fajr"
+                      ? FAJR_RECITERS.find((item) => item.id === adhanPrefs.fajrReciterId) ?? FAJR_RECITERS[0]
+                      : RECITERS.find((item) => item.id === (adhanPrefs.reciterPerPrayer[label] ?? adhanPrefs.reciterId)) ?? RECITERS[0];
                     return <div className="adhan-prayer-row" key={id}>
                        <span className="adhan-settings-icon"><Volume2 size={17} /></span>
                        <button type="button" className="adhan-prayer-details" onClick={() => setReciterPrayer(label)}>
