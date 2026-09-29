@@ -136,6 +136,7 @@ export interface AdhanProgress {
   hasSession: boolean;
   prayer: string;
   reciterId: string;
+  volume?: number;
 }
 
 export interface AdhanStatus {
@@ -155,6 +156,7 @@ interface AdhanPlugin {
   pauseAdhan?(): Promise<unknown>;
   resumeAdhan?(): Promise<unknown>;
   seekAdhan?(opts: { progress: number }): Promise<unknown>;
+  setAdhanVolume?(opts: { volume: number }): Promise<unknown>;
   getAdhanProgress?(): Promise<unknown>;
   isAdhanPlaying?(): Promise<unknown>;
   playAdhanPreview?(opts: { reciterId: string; file: string }): Promise<unknown>;
@@ -290,6 +292,7 @@ export const getAdhanProgress = async (): Promise<AdhanProgress | null> => {
       hasSession: !!o.hasSession,
       prayer: str(o.prayer),
       reciterId: str(o.reciterId),
+      volume: typeof o.volume === "number" && Number.isFinite(o.volume) ? Math.min(1, Math.max(0, o.volume)) : undefined,
     };
   } catch {
     return null;
@@ -311,6 +314,33 @@ export const pauseAdhan = () => call("pauseAdhan");
 export const resumeAdhan = () => call("resumeAdhan");
 export const seekAdhan = (progress: number) =>
   call("seekAdhan", { progress: Math.min(1, Math.max(0, progress)) });
+
+const ADHAN_VOLUME_KEY = "adhkar:adhan-volume";
+const clampVolume = (v: number): number => Math.min(1, Math.max(0, Number.isFinite(v) ? v : 1));
+
+/** Last volume the user picked for adhan playback (0–1). */
+export const getAdhanVolume = (): number => {
+  if (typeof window === "undefined") return 1;
+  try {
+    const raw = window.localStorage.getItem(ADHAN_VOLUME_KEY);
+    return raw === null ? 1 : clampVolume(Number(raw));
+  } catch {
+    return 1;
+  }
+};
+
+/** Saves the volume and pushes it to the native player mid-session. */
+export const setAdhanVolume = (volume: number): void => {
+  const v = clampVolume(volume);
+  if (typeof window !== "undefined") {
+    try {
+      window.localStorage.setItem(ADHAN_VOLUME_KEY, String(v));
+    } catch {
+      // ignore
+    }
+  }
+  void call("setAdhanVolume", { volume: v });
+};
 
 const PREVIEW_URLS: Record<string, string> = {
   mishary: misharyAsset.url,

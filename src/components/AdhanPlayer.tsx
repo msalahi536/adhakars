@@ -3,14 +3,16 @@
 // Closing minimizes to a floating pill so playback remains easy to reopen.
 
 import { useEffect, useRef, useState } from "react";
-import { Pause, Play, RotateCcw, RotateCw, X } from "lucide-react";
+import { Pause, Play, RotateCcw, RotateCw, Volume1, Volume2, VolumeX, X } from "lucide-react";
 import { Portal } from "@/components/Portal";
 import {
   getAdhanProgress,
+  getAdhanVolume,
   pauseAdhan,
   reciterNameFor,
   resumeAdhan,
   seekAdhan,
+  setAdhanVolume,
   type AdhanProgress,
 } from "@/lib/adhan-bridge";
 
@@ -50,6 +52,10 @@ export function AdhanPlayer({ visible, prayer, reciterId, onClose }: Props) {
   const [minimized, setMinimized] = useState(false);
   const [p, setP] = useState<AdhanProgress | null>(null);
   const [scrub, setScrub] = useState<number | null>(null);
+  const [volume, setVolume] = useState(() => getAdhanVolume());
+  const [lastAudible, setLastAudible] = useState(() => getAdhanVolume() || 1);
+  const volDragging = useRef(false);
+  const lastNativeVol = useRef<number | null>(null);
   const openedAt = useRef(0);
 
   useEffect(() => {
@@ -57,9 +63,24 @@ export function AdhanPlayer({ visible, prayer, reciterId, onClose }: Props) {
     openedAt.current = Date.now();
     setMinimized(false);
     setP(null);
+    // Make the native session match the saved volume as soon as it appears.
+    void setAdhanVolume(getAdhanVolume());
     const tick = () => {
       void getAdhanProgress().then((next) => {
-        if (next) setP(next);
+        if (next) {
+          setP(next);
+          // Only follow the native side when its own volume changed (e.g. the
+          // user used the hardware buttons) — never undo the in-app slider.
+          if (
+            typeof next.volume === "number" &&
+            !volDragging.current &&
+            (lastNativeVol.current === null || Math.abs(next.volume - lastNativeVol.current) > 0.001)
+          ) {
+            lastNativeVol.current = next.volume;
+            setVolume(next.volume);
+            if (next.volume > 0) setLastAudible(next.volume);
+          }
+        }
         // Grace period while the native session starts.
         if (Date.now() - openedAt.current > 4000 && next && !next.hasSession) onClose();
       });
@@ -95,6 +116,17 @@ export function AdhanPlayer({ visible, prayer, reciterId, onClose }: Props) {
     if (!duration) return;
     void seekAdhan((current + delta) / duration);
   };
+  const changeVolume = (v: number) => {
+    const next = Math.min(1, Math.max(0, v));
+    if (next > 0) setLastAudible(next);
+    setVolume(next);
+    setAdhanVolume(next);
+  };
+  const toggleMute = () => {
+    if (volume > 0) changeVolume(0);
+    else changeVolume(lastAudible || 1);
+  };
+  const VolIcon = volume === 0 ? VolumeX : volume < 0.5 ? Volume1 : Volume2;
 
   if (minimized) {
     return (
@@ -159,6 +191,29 @@ export function AdhanPlayer({ visible, prayer, reciterId, onClose }: Props) {
           <button type="button" className="ap-icon-btn" onClick={() => skip(10)} aria-label="Forward 10 seconds">
             <RotateCw size={24} /><span className="ap-skip-n">10</span>
           </button>
+        </div>
+
+        <div className="ap-volume">
+          <button type="button" className={`ap-mute${volume === 0 ? " ap-mute-off" : ""}`} onClick={toggleMute} aria-label={volume === 0 ? "Unmute adhan" : "Mute adhan"}>
+            <VolIcon size={17} />
+          </button>
+          <input
+            type="range"
+            min={0}
+            max={100}
+            value={Math.round(volume * 100)}
+            aria-label="Adhan volume"
+            style={{ "--ap-vol": `${volume * 100}%` } as React.CSSProperties}
+            onChange={(e) => changeVolume(Number(e.target.value) / 100)}
+            onPointerDown={() => { volDragging.current = true; }}
+            onPointerUp={() => { volDragging.current = false; }}
+          />
+          <div className="ap-volume-bars" aria-hidden="true">
+            {Array.from({ length: 9 }, (_, i) => {
+              const level = (i + 1) / 9;
+              return <span key={i} className={volume >= level ? "on" : ""} />;
+            })}
+          </div>
         </div>
 
       </div>
