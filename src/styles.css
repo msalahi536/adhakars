@@ -3639,7 +3639,7 @@ html[data-preset="ocean"][data-visual-phase="evening"][data-section="salah"] {
   box-shadow: 0 0 0 6px color-mix(in oklab, var(--card) 70%, transparent), 0 18px 40px -18px color-mix(in oklab, var(--foreground) 35%, transparent), inset 0 2px 6px color-mix(in oklab, var(--foreground) 8%, transparent);
   border: 1px solid color-mix(in oklab, var(--border) 80%, transparent); transition: box-shadow 300ms; }
 .qb-dial[data-aligned] { box-shadow: 0 0 0 6px color-mix(in oklab, var(--primary) 30%, transparent), 0 0 36px color-mix(in oklab, var(--primary) 35%, transparent); }
-.qb-rose { position: absolute; inset: 0; transition: transform 280ms cubic-bezier(.22,1,.36,1); }
+.qb-rose { position: absolute; inset: 0; will-change: transform; }
 .qb-tick { position: absolute; left: 50%; top: 6px; width: 1px; height: 6px; margin-left: -.5px; transform-origin: 50% calc(var(--qb-r) - 6px); background: color-mix(in oklab, var(--foreground) 22%, transparent); }
 .qb-tick.is-mid { height: 9px; background: color-mix(in oklab, var(--foreground) 35%, transparent); }
 .qb-tick.is-major { height: 12px; width: 2px; background: color-mix(in oklab, var(--foreground) 55%, transparent); }
@@ -3647,7 +3647,7 @@ html[data-preset="ocean"][data-visual-phase="evening"][data-section="salah"] {
 .qb-inner { position: absolute; inset: 30%; border-radius: 50%; background: color-mix(in oklab, var(--muted) 60%, transparent); display: grid; place-items: center; }
 .qb-star { width: 90%; height: 90%; }
 .qb-star rect { fill: none; stroke: color-mix(in oklab, var(--foreground) 10%, transparent); stroke-width: .6; }
-.qb-needle { position: absolute; inset: 0; display: flex; justify-content: center; transition: transform 280ms cubic-bezier(.22,1,.36,1); }
+.qb-needle { position: absolute; inset: 0; display: flex; justify-content: center; will-change: transform; }
 .qb-needle svg { width: 17%; height: 50%; margin-top: 14%; }
 .qb-needle-dark { fill: color-mix(in oklab, var(--primary) 85%, var(--foreground)); }
 .qb-needle-light { fill: var(--primary); }
