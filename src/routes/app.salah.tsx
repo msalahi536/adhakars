@@ -114,7 +114,7 @@ function Salah() {
       const lbl = SALAH_PRAYERS.find((prayer) => prayer.id === pid)?.label ?? "Fajr";
       if (hasNativeAdhanScheduler()) {
         // Same path as real prayers so the tap continues the full adhan.
-        const ok = await scheduleNativeAdhan([buildNativePrayerTime(199, lbl, new Date(Date.now() + 5000))]);
+        const ok = await scheduleNativeAdhan([{ name: "Test", time: Date.now() + 5000 }]);
         if (!ok) throw new Error("Could not send the test notification.");
         setAdhanError(null);
         return;
