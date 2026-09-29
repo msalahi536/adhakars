@@ -161,29 +161,6 @@ export function AdhanPlayer({ visible, prayer, reciterId, onClose }: Props) {
           </button>
         </div>
 
-        <div className="ap-volume">
-          <button type="button" className={`ap-mute${volume === 0 ? " ap-mute-off" : ""}`} onClick={toggleMute} aria-label={volume === 0 ? "Unmute adhan" : "Mute adhan"}>
-            <VolIcon size={17} />
-          </button>
-          <input
-            type="range"
-            min={0}
-            max={100}
-            value={Math.round(volume * 100)}
-            aria-label="Adhan volume"
-            style={{ "--ap-vol": `${volume * 100}%` } as React.CSSProperties}
-            onChange={(e) => changeVolume(Number(e.target.value) / 100)}
-            onPointerDown={() => { volDragging.current = true; }}
-            onPointerUp={() => { volDragging.current = false; }}
-          />
-          <div className="ap-volume-bars" aria-hidden="true">
-            {Array.from({ length: 9 }, (_, i) => {
-              const level = (i + 1) / 9;
-              return <span key={i} className={volume >= level ? "on" : ""} />;
-            })}
-          </div>
-        </div>
-
       </div>
     </Portal>
   );
