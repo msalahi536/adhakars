@@ -54,11 +54,22 @@ export function AdhanPlayer({ visible, prayer, reciterId, onClose }: Props) {
   const trackRef = useRef<HTMLDivElement>(null);
   const pendingSeek = useRef<{ frac: number; until: number } | null>(null);
 
+  const wasVisible = useRef(false);
   useEffect(() => {
-    if (!visible) return;
-    openedAt.current = Date.now();
-    setMinimized(false);
-    setP(null);
+    if (!visible) {
+      wasVisible.current = false;
+      return;
+    }
+    // Only reset to the full popup when the player NEWLY opens. If it was
+    // already visible (e.g. page navigation re-rendered the parent), keep
+    // the minimized pill exactly as the user left it.
+    const freshlyOpened = !wasVisible.current;
+    wasVisible.current = true;
+    if (freshlyOpened) {
+      openedAt.current = Date.now();
+      setMinimized(false);
+      setP(null);
+    }
     const tick = () => {
       void getAdhanProgress().then((next) => {
         const ps = pendingSeek.current;
