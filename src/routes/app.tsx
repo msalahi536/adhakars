@@ -98,40 +98,67 @@ function AppLayout() {
     rememberMoreDestination(pathname);
   }, [pathname]);
 
-  // Tapping the Friday (Jumu'ah) notification opens the Jumu'ah Sunnahs page.
+  // Notification taps: opens the right page (and section) for each reminder.
+  // Taps can arrive three ways: the standard notification plugin's tap event,
+  // a window event the native side dispatches, or a tap the native side saved
+  // before the app finished loading (cold start).
   useEffect(() => {
-    registerNotificationTapHandler((id) => {
-      if (id === JUMUAH_NOTIF_ID) {
-        window.localStorage.setItem("adhkar:open-jumuah", "1");
-        window.dispatchEvent(new Event("adhkar:open-jumuah"));
-        void router.navigate({ to: "/app/duas" });
-      } else if (id === SUNNAH_NOTIF_ID) {
-        window.localStorage.setItem("adhkar:open-sunnah", "1");
-        window.dispatchEvent(new Event("adhkar:open-sunnah"));
-        void router.navigate({ to: "/app/more" });
-      } else if (id === 889001) {
-        // Sunnah test notification
-        window.localStorage.setItem("adhkar:open-sunnah", "1");
-        window.dispatchEvent(new Event("adhkar:open-sunnah"));
-        void router.navigate({ to: "/app/more" });
-      } else if (id === 889002) {
-        // Jumu'ah test notification
-        window.localStorage.setItem("adhkar:open-jumuah", "1");
-        window.dispatchEvent(new Event("adhkar:open-jumuah"));
-        void router.navigate({ to: "/app/duas" });
-      } else if (isSmartAdhkarId(id)) {
+    const openJumuah = () => {
+      window.localStorage.setItem("adhkar:open-jumuah", "1");
+      window.dispatchEvent(new Event("adhkar:open-jumuah"));
+      void router.navigate({ to: "/app/duas" });
+    };
+    const openSunnah = () => {
+      window.localStorage.setItem("adhkar:open-sunnah", "1");
+      window.dispatchEvent(new Event("adhkar:open-sunnah"));
+      void router.navigate({ to: "/app/more" });
+    };
+    const openFromNotification = (id: number | undefined, route: string | undefined) => {
+      if (id === JUMUAH_NOTIF_ID || id === 889002) return openJumuah();
+      if (id === SUNNAH_NOTIF_ID || id === 889001) return openSunnah();
+      if (id !== undefined && isSmartAdhkarId(id)) {
         void router.navigate({ to: smartAdhkarKind(id) === "evening" ? "/app/evening" : "/app" });
-      } else if (isPeriodNotifId(id)) {
+        return;
+      }
+      if (id !== undefined && isPeriodNotifId(id)) {
         void router.navigate({ to: "/app/period" });
-      } else if (isPrayerNotifId(id)) {
+        return;
+      }
+      if (id !== undefined && isPrayerNotifId(id)) {
         void router.navigate({ to: "/app/salah" });
         // Full adhan: the notification plays 30s, the rest continues here.
         if (getPrayerSettings().sound === "adhan" && FULL_ADHAN_URL) {
           const a = new Audio(FULL_ADHAN_URL);
           void a.play().catch(() => {});
         }
+        return;
       }
-    });
+      // Unknown id: fall back to the route carried on the notification.
+      if (route && route.startsWith("/app")) void router.history.push(route);
+    };
+
+    registerNotificationTapHandler(openFromNotification);
+
+    const onNativeTap = (e: Event) => {
+      const d = (e as CustomEvent).detail ?? {};
+      const id = d.id !== undefined ? Number(d.id) : undefined;
+      openFromNotification(Number.isFinite(id) ? id : undefined, typeof d.route === "string" ? d.route : undefined);
+    };
+    window.addEventListener("adhkar:notification-tap", onNativeTap);
+
+    // Cold start: ask the native plugin for a tap it saved before we loaded.
+    const plugin = (window as any).Capacitor?.Plugins?.AdhanNotifications;
+    if (plugin) {
+      Promise.resolve()
+        .then(() => plugin.getPendingNotificationTap())
+        .then((d: any) => {
+          if (!d || (d.id === undefined && !d.route)) return;
+          const id = d.id !== undefined ? Number(d.id) : undefined;
+          openFromNotification(Number.isFinite(id) ? id : undefined, typeof d.route === "string" ? d.route : undefined);
+        })
+        .catch(() => {});
+    }
+    return () => window.removeEventListener("adhkar:notification-tap", onNativeTap);
   }, [router]);
 
   useLayoutEffect(() => {
