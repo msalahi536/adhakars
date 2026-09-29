@@ -494,14 +494,17 @@ export const sendTestJumuahNotification = async (): Promise<boolean> => {
 };
 
 /** Fires whenever the user taps a delivered local notification. */
-export const registerNotificationTapHandler = (onAction: (id: number) => void): void => {
+export const registerNotificationTapHandler = (
+  onAction: (id: number | undefined, route: string | undefined) => void,
+): void => {
   void (async () => {
     const plugin = await loadPlugin();
     if (!plugin?.addListener) return;
     try {
       await plugin.addListener("localNotificationActionPerformed", (e: any) => {
-        const id = e?.notification?.id;
-        if (typeof id === "number") onAction(id);
+        const id = Number(e?.notification?.id);
+        const route = e?.notification?.extra?.route;
+        onAction(Number.isFinite(id) ? id : undefined, typeof route === "string" ? route : undefined);
       });
     } catch (e) {
       console.warn("[notifications] tap listener failed", e);
