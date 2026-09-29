@@ -1,9 +1,10 @@
 // AdhanPlayer.tsx
-// Full-screen adhan player shown while the native side plays the adhan.
-// Minimizes to a floating pill on the right edge. Polls native progress.
+// Compact adhan player shown while the native side plays the adhan.
+// Closing minimizes to a floating pill so playback remains easy to reopen.
 
 import { useEffect, useRef, useState } from "react";
-import { ChevronDown, Pause, Play, RotateCcw, RotateCw, Square } from "lucide-react";
+import { Pause, Play, RotateCcw, RotateCw, Square, X } from "lucide-react";
+import { Portal } from "@/components/Portal";
 import {
   getAdhanProgress,
   pauseAdhan,
@@ -69,6 +70,15 @@ export function AdhanPlayer({ visible, prayer, reciterId, onClose }: Props) {
     return () => window.clearInterval(id);
   }, [visible, onClose]);
 
+  useEffect(() => {
+    if (!visible || minimized) return;
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setMinimized(true);
+    };
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [visible, minimized]);
+
   if (!visible) return null;
 
   const duration = p?.duration ?? 0;
@@ -93,26 +103,31 @@ export function AdhanPlayer({ visible, prayer, reciterId, onClose }: Props) {
 
   if (minimized) {
     return (
-      <button type="button" className="ap-pill" onClick={() => setMinimized(false)} aria-label={`Open ${name} adhan player`}>
-        <span className="ap-pill-wave" aria-hidden="true">
-          <span /><span /><span />
-        </span>
-        <span className="ap-pill-text">{name}</span>
-      </button>
+      <Portal>
+        <button type="button" className="ap-pill" onClick={() => setMinimized(false)} aria-label={`Open ${name} adhan player`}>
+          <span className="ap-pill-wave" aria-hidden="true">
+            <span /><span /><span />
+          </span>
+          <span className="ap-pill-text">{name} Adhan</span>
+        </button>
+      </Portal>
     );
   }
 
   return (
-    <div className="ap-modal" role="dialog" aria-modal="true" aria-label={`${name} adhan`}>
-      <button type="button" className="ap-icon-btn ap-min" onClick={() => setMinimized(true)} aria-label="Minimize player">
-        <ChevronDown size={26} />
-      </button>
-
-      <div className="ap-body">
-        <div className="ap-mosque"><MosqueIcon /></div>
-        <p className="ap-kicker">Adhan</p>
-        <h2 className="ap-title">{name}</h2>
-        <p className="ap-reciter">{reciter}</p>
+    <Portal>
+      <div className="ap-modal" role="dialog" aria-label={`${name} adhan player`}>
+        <div className="ap-head">
+          <div className="ap-mosque"><MosqueIcon /></div>
+          <div className="ap-heading">
+            <p className="ap-kicker">Now playing</p>
+            <h2 className="ap-title">{name} Adhan</h2>
+            <p className="ap-reciter">{reciter}</p>
+          </div>
+          <button type="button" className="ap-close" onClick={() => setMinimized(true)} aria-label="Close and minimize player">
+            <X size={19} />
+          </button>
+        </div>
 
         <div className="ap-scrub">
           <input
@@ -150,11 +165,11 @@ export function AdhanPlayer({ visible, prayer, reciterId, onClose }: Props) {
             <RotateCw size={24} /><span className="ap-skip-n">10</span>
           </button>
         </div>
-      </div>
 
-      <button type="button" className="ap-stop" onClick={stop}>
-        <Square size={14} fill="currentColor" /> Stop Adhan
-      </button>
-    </div>
+        <button type="button" className="ap-stop" onClick={stop}>
+          <Square size={11} fill="currentColor" /> Stop Adhan
+        </button>
+      </div>
+    </Portal>
   );
 }
