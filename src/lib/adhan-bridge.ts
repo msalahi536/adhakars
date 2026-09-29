@@ -222,6 +222,7 @@ export const scheduleNativeAdhan = async (prayerTimes: NativePrayerTime[]): Prom
 export const testPrayerNotification = async (prayer: string): Promise<boolean> => {
   const plugin = getPlugin() as any;
   if (!plugin) return false;
+  await syncAdhanPrefsToNative();
   try {
     await plugin.testPrayerNotification({ prayer });
     return true;
