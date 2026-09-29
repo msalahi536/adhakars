@@ -85,6 +85,7 @@ function Qibla() {
   useEffect(() => {
     return () => {
       unsubRef.current?.();
+      cancelAnimationFrame(rafRef.current);
     };
   }, []);
 
