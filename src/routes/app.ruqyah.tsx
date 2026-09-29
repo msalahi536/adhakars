@@ -323,16 +323,12 @@ function StepGuide({ title, steps, onBack }: { title: string; steps: RuqyahStep[
         <div key={step} className="animate-in fade-in slide-in-from-right-2 duration-300">
           <div className="mt-4 flex items-start gap-3">
             <span className="period-acc-num">{step + 1}</span>
-            <p className="flex-1 text-[15px] font-semibold leading-snug">{saw(current.title)}</p>
-          </div>
-          <div className="mt-3 flex items-start gap-2 rounded-lg border border-border bg-muted/50 px-3 py-2.5">
-            <BookOpen size={14} className="mt-0.5 flex-none text-accent" />
-            <div>
-              <div className="label-caps text-[9px] text-muted-foreground">Source</div>
-              <p className="mt-0.5 text-xs font-semibold leading-relaxed text-foreground">{current.source}</p>
+            <div className="flex-1">
+              <p className="text-[15px] font-semibold leading-snug">{saw(current.title)}</p>
+              <span className="rq-source-pill mt-1.5"><BookOpen size={10} />{current.source}</span>
+              {current.note && <p className="rq-step-note mt-2">{saw(current.note)}</p>}
             </div>
           </div>
-          {current.note && <p className="period-callout is-grey mt-3">{saw(current.note)}</p>}
           {recitation && <GuideRecitation item={recitation} scroll hideSource />}
           {current.item && <div className="mt-3"><DuaCard item={current.item} hideSource /></div>}
         </div>
