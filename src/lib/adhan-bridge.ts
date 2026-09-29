@@ -223,6 +223,8 @@ export const getDiagnostics = async (): Promise<unknown> => {
     return null;
   }
 };
+
+export const buildNativePrayerTime = (prayer: string, at: Date): NativePrayerTime => ({
   name: `${prayer.charAt(0).toUpperCase()}${prayer.slice(1).toLowerCase()}`,
   time: at.getTime(),
 });
