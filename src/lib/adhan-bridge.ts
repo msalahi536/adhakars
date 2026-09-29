@@ -5,6 +5,8 @@ import madinahAsset from "@/assets/adhan/madinah.mp3.asset.json";
 import zailiAsset from "@/assets/adhan/zaili.mp3.asset.json";
 import majaleAsset from "@/assets/adhan/majale.mp3.asset.json";
 import qatamiAsset from "@/assets/adhan/qatami.mp3.asset.json";
+import fajrMisharyAsset from "@/assets/adhan/fajr-mishary.mp3.asset.json";
+import fajrMadinahAsset from "@/assets/adhan/fajr-madinah.mp3.asset.json";
 // adhan-bridge.ts
 // Bridges the web app to native adhan playback (Capacitor).
 // Native iOS plays the full adhan when a prayer notification is tapped
@@ -32,6 +34,15 @@ export const RECITERS: Reciter[] = [
   { id: "qatami", name: "Nasir Al-Qatami", origin: "Saudi Arabia" },
 ];
 
+/** Fajr has its own melody, so it gets a dedicated reciter list. */
+export const FAJR_RECITERS: Reciter[] = [
+  { id: "fajr-mishary", name: "Mishary Rashid Alafasy", origin: "Kuwait" },
+  { id: "fajr-madinah", name: "Madinah Fajr Adhan", origin: "Masjid an-Nabawi" },
+];
+const DEFAULT_FAJR_RECITER_ID = FAJR_RECITERS[0].id;
+const validFajrReciter = (id: unknown): string =>
+  typeof id === "string" && FAJR_RECITERS.some((r) => r.id === id) ? id : DEFAULT_FAJR_RECITER_ID;
+
 /**
  * Native audio file naming:
  * - notification (30s) sound: `adhan-{reciterId}-30.caf`
@@ -50,6 +61,7 @@ const DEFAULT_RECITER_ID = RECITERS[0].id;
 export interface AdhanPrefs {
   soundMode: "adhan" | "silent" | "default";
   reciterId: string;
+  fajrReciterId: string;
   reciterPerPrayer: Record<string, string>;
   enabledPrayers: Record<string, boolean>;
 }
@@ -57,6 +69,7 @@ export interface AdhanPrefs {
 const DEFAULT_PREFS: AdhanPrefs = {
   soundMode: "adhan",
   reciterId: DEFAULT_RECITER_ID,
+  fajrReciterId: DEFAULT_FAJR_RECITER_ID,
   reciterPerPrayer: {
     Fajr: DEFAULT_RECITER_ID,
     Dhuhr: DEFAULT_RECITER_ID,
@@ -82,6 +95,7 @@ export function getAdhanPrefs(): AdhanPrefs {
     return {
       soundMode: parsed.soundMode ?? DEFAULT_PREFS.soundMode,
       reciterId: legacy,
+      fajrReciterId: validFajrReciter(parsed.fajrReciterId),
       reciterPerPrayer,
       enabledPrayers: { ...DEFAULT_PREFS.enabledPrayers, ...(parsed.enabledPrayers ?? {}) },
     };
@@ -111,6 +125,7 @@ export async function syncAdhanPrefsToNative(prefs: AdhanPrefs = getAdhanPrefs()
     await plugin.updatePreferences({
       soundMode: prefs.soundMode,
       reciterId: prefs.reciterId,
+      fajrReciterId: prefs.fajrReciterId,
       reciterPerPrayer: prefs.reciterPerPrayer,
       enabledPrayers: prefs.enabledPrayers,
     });
@@ -122,11 +137,12 @@ export async function syncAdhanPrefsToNative(prefs: AdhanPrefs = getAdhanPrefs()
 export function getReciterForPrayer(prayer: string): string {
   const prefs = getAdhanPrefs();
   const label = `${prayer.charAt(0).toUpperCase()}${prayer.slice(1).toLowerCase()}`;
+  if (label === "Fajr") return validFajrReciter(prefs.fajrReciterId);
   return validReciter(prefs.reciterPerPrayer[label] ?? prefs.reciterId);
 }
 
 export const reciterNameFor = (id: string): string =>
-  RECITERS.find((r) => r.id === id)?.name ?? RECITERS[0].name;
+  [...RECITERS, ...FAJR_RECITERS].find((r) => r.id === id)?.name ?? RECITERS[0].name;
 
 export interface AdhanProgress {
   currentTime: number;
@@ -321,7 +337,10 @@ const PREVIEW_URLS: Record<string, string> = {
   zaili: zailiAsset.url,
   majale: majaleAsset.url,
   qatami: qatamiAsset.url,
+  "fajr-mishary": fajrMisharyAsset.url,
+  "fajr-madinah": fajrMadinahAsset.url,
 };
+const validPreview = (id: string): string => (PREVIEW_URLS[id] ? id : DEFAULT_RECITER_ID);
 
 let previewAudio: HTMLAudioElement | null = null;
 const preloaded: Record<string, HTMLAudioElement> = {};
@@ -342,10 +361,10 @@ export const preloadAdhanPreviews = () => {
 /** Plays the reciter's full recording as an in-app preview (web + native). */
 export const playAdhanPreview = async (reciterId: string, onEnded?: () => void): Promise<boolean> => {
   stopAdhanPreview();
-  const url = PREVIEW_URLS[validReciter(reciterId)];
+  const url = PREVIEW_URLS[validPreview(reciterId)];
   if (!url || typeof Audio === "undefined") return false;
   try {
-    const id = validReciter(reciterId);
+    const id = validPreview(reciterId);
     const audio = preloaded[id] ?? new Audio(url);
     preloaded[id] = audio;
     audio.currentTime = 0;
