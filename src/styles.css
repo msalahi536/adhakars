@@ -4171,8 +4171,21 @@ html[data-preset="midnight"][data-visual-phase="evening"][data-section="salah"] 
 .ap-pill-wave span{width:3px;height:100%;border-radius:2px;background:var(--accent);animation:ap-wave 900ms ease-in-out infinite}
 .ap-pill-wave span:nth-child(2){animation-delay:150ms}.ap-pill-wave span:nth-child(3){animation-delay:300ms}
 @keyframes ap-wave{0%,100%{transform:scaleY(.35)}50%{transform:scaleY(1)}}
-@media (max-height:700px){.ap-modal{padding:14px 16px;border-radius:24px}.ap-head{grid-template-columns:50px minmax(0,1fr) 34px}.ap-mosque{width:50px;height:50px;border-radius:15px}.ap-scrub{margin-top:14px}.ap-controls{margin-top:5px}.ap-play{width:54px;height:54px}}
-@media (prefers-reduced-motion:reduce){.ap-modal,.ap-pill,.ap-pill-wave span{animation:none}}
+.ap-volume{display:grid;grid-template-columns:36px minmax(0,1fr) auto;align-items:center;gap:12px;margin-top:14px;padding:0 4px}
+.ap-mute{display:grid;width:36px;height:36px;place-items:center;border-radius:50%;color:var(--foreground);background:color-mix(in oklab,var(--accent) 12%,transparent);border:1px solid color-mix(in oklab,var(--accent) 24%,var(--border));transition:transform .18s ease,background .18s ease,color .18s ease}
+.ap-mute:active{transform:scale(.9)}
+.ap-mute-off{color:var(--muted-foreground);background:color-mix(in oklab,var(--foreground) 6%,transparent);border-color:color-mix(in oklab,var(--foreground) 10%,var(--border))}
+.ap-volume input{width:100%;appearance:none;-webkit-appearance:none;height:6px;border-radius:6px;background:linear-gradient(to right,var(--accent) var(--ap-vol,100%),color-mix(in oklab,var(--foreground) 14%,transparent) var(--ap-vol,100%));box-shadow:inset 0 0 0 1px color-mix(in oklab,var(--foreground) 6%,transparent)}
+.ap-volume input::-webkit-slider-thumb{-webkit-appearance:none;width:18px;height:18px;border-radius:50%;background:var(--card);border:2px solid var(--accent);box-shadow:0 0 0 5px color-mix(in oklab,var(--accent) 18%,transparent),0 4px 12px color-mix(in oklab,var(--foreground) 20%,transparent)}
+.ap-volume input::-moz-range-thumb{width:18px;height:18px;border:2px solid var(--accent);border-radius:50%;background:var(--card);box-shadow:0 0 0 5px color-mix(in oklab,var(--accent) 18%,transparent)}
+.ap-volume-bars{display:flex;align-items:flex-end;gap:2.5px;height:18px}
+.ap-volume-bars span{width:3px;border-radius:2px;background:color-mix(in oklab,var(--foreground) 16%,transparent);transform-origin:bottom;transform:scaleY(.3);transition:background .2s ease,transform .2s ease}
+.ap-volume-bars span:nth-child(2n){height:9px}
+.ap-volume-bars span:nth-child(2n+1){height:14px}
+.ap-volume-bars span:nth-child(3n+1){height:18px}
+.ap-volume-bars span.on{background:var(--accent);transform:scaleY(1);box-shadow:0 0 8px color-mix(in oklab,var(--accent) 45%,transparent)}
+@media (max-height:700px){.ap-modal{padding:14px 16px;border-radius:24px}.ap-head{grid-template-columns:50px minmax(0,1fr) 34px}.ap-mosque{width:50px;height:50px;border-radius:15px}.ap-scrub{margin-top:14px}.ap-controls{margin-top:5px}.ap-play{width:54px;height:54px}.ap-volume{margin-top:10px}}
+@media (prefers-reduced-motion:reduce){.ap-modal,.ap-pill,.ap-pill-wave span{animation:none}.ap-volume-bars span{transition:none}}
 
 /* Native adhan settings, opened from Salah. */
 .adhan-settings-backdrop{position:fixed;inset:0;z-index:210;display:flex;align-items:flex-end;justify-content:center;background:color-mix(in oklab,var(--foreground) 38%,transparent);backdrop-filter:blur(7px);-webkit-backdrop-filter:blur(7px);padding-top:env(safe-area-inset-top)}
