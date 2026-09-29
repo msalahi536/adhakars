@@ -106,6 +106,16 @@ export const MUSLIM_2186: SunnahItem = {
   ],
 };
 
+export const MUSLIM_2185: SunnahItem = {
+  id: "jibril-second",
+  title: "Jibril’s second ruqyah",
+  source: "Muslim 2185  ·  Sahih (Muslim)",
+  arabic: `بِسْمِ اللَّهِ يُبْرِيكَ وَمِنْ كُلِّ دَاءٍ يَشْفِيكَ وَمِنْ شَرِّ حَاسِدٍ إِذَا حَسَدَ وَشَرِّ كُلِّ ذِي عَيْنٍ`,
+  transliteration: `Bismillāhi yubrik, wa min kulli dā'in yashfik, wa min sharri ḥāsidin idhā ḥasad, wa sharri kulli dhī 'ayn.`,
+  translation: `In the name of Allah — may He cure you, and from every illness may He heal you, and from the evil of an envier when he envies, and the evil of everyone with an eye.`,
+  narration: `‘A’isha, the wife of Allah’s Messenger ﷺ, said: When Allah’s Messenger ﷺ fell ill, Jibril used to recite: “In the name of Allah, may He cure you from all kinds of illnesses and safeguard you from the evil of a jealous one when he feels jealous and from the evil influence of the eye.”`,
+};
+
 export const IBN_BAZ_SELF_RUQYAH: SunnahItem = {
   id: "ibn-baz-self",
   title: "Wording for oneself",
