@@ -109,14 +109,12 @@ function Salah() {
     if (testingNotif) return;
     setTestingNotif(true);
     try {
-      // Fires exactly like a real Fajr notification — same name, same native
-      // handling, same sound — just scheduled 5 seconds from now. Note: the
-      // native plugin only allows prayer names whose switch is on, so Fajr
-      // must be enabled for this to arrive.
+      // The native plugin only guarantees "Test" passes its checks and doesn't
+      // wipe real prayer schedules, so the test uses that name.
       if (!hasNativeAdhanScheduler()) {
         throw new Error("Adhan notifications are not available on this device.");
       }
-      const ok = await scheduleNativeAdhan([{ name: "Fajr", time: Date.now() + 5000 }]);
+      const ok = await scheduleNativeAdhan([{ name: "Test", time: Date.now() + 5000 }]);
       if (!ok) throw new Error("Could not send the test notification.");
       setAdhanError(null);
     } catch (err) {
