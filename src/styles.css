@@ -4155,9 +4155,11 @@ html[data-preset="midnight"][data-visual-phase="evening"][data-section="salah"] 
 .ap-close{display:grid;width:34px;height:34px;place-items:center;border-radius:50%;background:color-mix(in oklab,var(--foreground) 7%,transparent);color:var(--muted-foreground);transition:background .18s ease,color .18s ease,transform .18s ease}
 .ap-close:active{transform:scale(.92);background:color-mix(in oklab,var(--accent) 13%,transparent);color:var(--foreground)}
 .ap-scrub{width:100%;margin-top:20px}
-.ap-scrub input{width:100%;appearance:none;-webkit-appearance:none;height:4px;border-radius:4px;background:linear-gradient(to right,var(--accent) var(--ap-pct,0%),color-mix(in oklab,var(--foreground) 14%,transparent) var(--ap-pct,0%))}
-.ap-scrub input::-webkit-slider-thumb{-webkit-appearance:none;width:16px;height:16px;border-radius:50%;background:var(--accent);box-shadow:0 0 0 4px color-mix(in oklab,var(--accent) 20%,transparent)}
-.ap-scrub input::-moz-range-thumb{width:16px;height:16px;border:0;border-radius:50%;background:var(--accent)}
+.ap-track{position:relative;height:28px;display:flex;align-items:center;touch-action:none;cursor:pointer;-webkit-user-select:none;user-select:none;outline:none}
+.ap-track-bar{position:relative;width:100%;height:4px;border-radius:4px;overflow:hidden;background:color-mix(in oklab,var(--foreground) 14%,transparent)}
+.ap-track-fill{position:absolute;inset:0 auto 0 0;width:var(--ap-pct,0%);background:var(--accent)}
+.ap-track-thumb{position:absolute;left:var(--ap-pct,0%);top:50%;width:16px;height:16px;margin-left:-8px;margin-top:-8px;border-radius:50%;background:var(--accent);box-shadow:0 0 0 4px color-mix(in oklab,var(--accent) 20%,transparent);pointer-events:none}
+.ap-track:focus-visible .ap-track-thumb{box-shadow:0 0 0 6px color-mix(in oklab,var(--accent) 35%,transparent)}
 .ap-times{display:flex;justify-content:space-between;margin-top:8px;color:var(--muted-foreground);font-size:11px;font-variant-numeric:tabular-nums}
 .ap-controls{display:flex;align-items:center;justify-content:center;gap:28px;margin-top:10px}
 .ap-icon-btn{position:relative;width:44px;height:44px;display:grid;place-items:center;border-radius:50%;color:var(--foreground);background:transparent}
