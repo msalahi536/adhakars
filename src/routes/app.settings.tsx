@@ -923,6 +923,13 @@ function Settings() {
                                   {followsPrayer ? "Set custom time" : "Follow prayer times"}
                                 </button>
                               )}
+                              <button
+                                onClick={() => void sendTestAdhkarNotification(r.id === 1 ? "morning" : "evening")}
+                                className="font-semibold"
+                                style={{ color: "var(--accent)" }}
+                              >
+                                Send test in 5 seconds
+                              </button>
                             </div>
                           )}
                         </div>
