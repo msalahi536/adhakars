@@ -204,8 +204,8 @@ const EMPTY_STATUS: AdhanStatus = { playing: false, hasSession: false, prayer: "
 
 /** Current native playback status. */
 export const isAdhanPlaying = async (): Promise<AdhanStatus> => {
-  const plugin = getPlugin();
-  if (!plugin?.isAdhanPlaying) return EMPTY_STATUS;
+  const plugin = getPlugin() as any;
+  if (!plugin) return EMPTY_STATUS;
   try {
     const r = await plugin.isAdhanPlaying();
     if (typeof r === "boolean") return { ...EMPTY_STATUS, playing: r, hasSession: r };
@@ -224,8 +224,8 @@ export const isAdhanPlaying = async (): Promise<AdhanStatus> => {
 
 /** Playback progress from the native side (null on web / failure). */
 export const getAdhanProgress = async (): Promise<AdhanProgress | null> => {
-  const plugin = getPlugin();
-  if (!plugin?.getAdhanProgress) return null;
+  const plugin = getPlugin() as any;
+  if (!plugin) return null;
   try {
     const o = ((await plugin.getAdhanProgress()) ?? {}) as Record<string, unknown>;
     const duration = num(o.duration);
@@ -245,11 +245,10 @@ export const getAdhanProgress = async (): Promise<AdhanProgress | null> => {
 };
 
 const call = async (fn: keyof AdhanPlugin, arg?: unknown): Promise<void> => {
-  const plugin = getPlugin();
-  const f = plugin?.[fn] as ((a?: unknown) => Promise<unknown>) | undefined;
-  if (!f) return;
+  const plugin = getPlugin() as any;
+  if (!plugin) return;
   try {
-    await f.call(plugin, arg);
+    await plugin[fn](arg);
   } catch {
     // ignore
   }
@@ -336,8 +335,8 @@ export const onAdhanPlaying = (handler: (info: AdhanPlayingInfo) => void): (() =
 
   let cancelled = false;
   const removers: Array<() => void> = [];
-  const plugin = getPlugin();
-  if (plugin?.addListener) {
+  const plugin = getPlugin() as any;
+  if (plugin) {
     try {
       const handle = plugin.addListener("adhanPlaying", (info) => handler(toInfo(info)));
       if (handle && typeof (handle as Promise<unknown>).then === "function") {
