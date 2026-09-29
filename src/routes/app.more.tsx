@@ -15,10 +15,12 @@ const DONE = "color-mix(in oklab, var(--surface-deep-fg) 88%, transparent)";
 const DONE_SOFT = "color-mix(in oklab, var(--surface-deep-fg) 45%, transparent)";
 
 export const Route = createFileRoute("/app/more")({
-  validateSearch: (s: Record<string, unknown>) => ({
-    open: typeof s.open === "string" ? s.open : undefined,
-    section: typeof s.section === "string" ? s.section : undefined,
-  }),
+  validateSearch: (s: Record<string, unknown>) => {
+    const out: { open?: string; section?: string } = {};
+    if (typeof s.open === "string") out.open = s.open;
+    if (typeof s.section === "string") out.section = s.section;
+    return out;
+  },
   head: () => ({
     meta: [
       { title: "More, Sahih Al-Adhkar" },
