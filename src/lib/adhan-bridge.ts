@@ -141,6 +141,8 @@ interface AdhanPlugin {
   playAdhanPreview?(opts: { reciterId: string; file: string }): Promise<unknown>;
   stopAdhanPreview?(): Promise<unknown>;
   schedulePrayerNotifications?(opts: { prayerTimes: NativePrayerTime[] }): Promise<unknown>;
+  testPrayerNotification?(opts: { prayer: string }): Promise<unknown>;
+  getDiagnostics?(): Promise<unknown>;
   addListener?(event: string, cb: (info: unknown) => void): Promise<unknown> | unknown;
 }
 
@@ -192,7 +194,35 @@ export const scheduleNativeAdhan = async (prayerTimes: NativePrayerTime[]): Prom
   }
 };
 
-export const buildNativePrayerTime = (prayer: string, at: Date): NativePrayerTime => ({
+/**
+ * Fires a real prayer notification in 5 seconds through the native plugin
+ * (bypasses its enabled-prayers check) so tests behave exactly like a real
+ * prayer: correct title, reciter and sound, and a tap that continues the
+ * full adhan. Only { prayer } is sent — the plugin fills in everything else.
+ */
+export const testPrayerNotification = async (prayer: string): Promise<boolean> => {
+  const plugin = getPlugin() as any;
+  if (!plugin) return false;
+  try {
+    await plugin.testPrayerNotification({ prayer });
+    return true;
+  } catch (e) {
+    console.error("[adhan] test notification failed", e);
+    return false;
+  }
+};
+
+/** Native diagnostics: enabled prayers, pending notifications, permissions. */
+export const getDiagnostics = async (): Promise<unknown> => {
+  const plugin = getPlugin() as any;
+  if (!plugin) return null;
+  try {
+    return await plugin.getDiagnostics();
+  } catch (e) {
+    console.error("[adhan] diagnostics failed", e);
+    return null;
+  }
+};
   name: `${prayer.charAt(0).toUpperCase()}${prayer.slice(1).toLowerCase()}`,
   time: at.getTime(),
 });
