@@ -322,6 +322,55 @@ export const sendTestSunnahNotification = async (): Promise<boolean> => {
   return true;
 };
 
+/** Fires a morning or evening adhkar reminder 5 seconds from now, for testing. */
+export const sendTestAdhkarNotification = async (kind: "morning" | "evening"): Promise<boolean> => {
+  const plugin = await ready();
+  if (!plugin) return false;
+  const title = kind === "morning" ? "Morning Adhkar" : "Evening Adhkar";
+  const body =
+    kind === "morning"
+      ? "Start your day with the morning adhkar."
+      : "It's time for your evening adhkar.";
+  await schedule(
+    plugin,
+    [note(kind === "morning" ? 889003 : 889004, title, body, new Date(Date.now() + 5000))],
+    "adhkar-test",
+  );
+  return true;
+};
+
+/** Fires a Period Companion notification 5 seconds from now, for testing. */
+export const sendTestPeriodNotification = async (): Promise<boolean> => {
+  const plugin = await ready();
+  if (!plugin) return false;
+  await schedule(
+    plugin,
+    [note(889005, "Period Companion", DURING[0], new Date(Date.now() + 5000))],
+    "period-test",
+  );
+  return true;
+};
+
+/** Fires a streak reminder notification 5 seconds from now, for testing. */
+export const sendTestStreakNotification = async (): Promise<boolean> => {
+  const plugin = await ready();
+  if (!plugin) return false;
+  const c = getConsistency();
+  await schedule(
+    plugin,
+    [
+      note(
+        889006,
+        "Don't break your streak",
+        `You're on a ${c.current}-day streak. A few minutes of dhikr keeps it going.`,
+        new Date(Date.now() + 5000),
+      ),
+    ],
+    "streak-test",
+  );
+  return true;
+};
+
 /* ---------------- Fertility alerts (opt-in) ---------------- */
 export const FERTILITY_IDS = Array.from({ length: 12 }, (_, i) => 9530 + i);
 export const rescheduleFertilityNotifications = async (): Promise<void> => {
