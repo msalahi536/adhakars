@@ -708,19 +708,6 @@ function Settings() {
                 <>
                   <div className="settings-row">
                     <span className="settings-icon">
-                      <Bell size={17} strokeWidth={1.8} />
-                    </span>
-                    <div className="min-w-0 flex-1">
-                      <div className="settings-row-title">Daily Adhkar Reminders</div>
-                      <div className="settings-row-desc">
-                        {prayerSettings.location
-                          ? "Morning adhkar reminds you 5 minutes after Fajr and evening adhkar 5 minutes after Asr. If you haven't opened them, a second reminder comes 1 hour before Dhuhr or 30 minutes before Maghrib."
-                          : "Get reminded to read your morning and evening adhkar. Set your location on the Salah page and these will follow your prayer times."}
-                      </div>
-                    </div>
-                  </div>
-                  <div className="settings-row">
-                    <span className="settings-icon">
                       <Sun size={17} strokeWidth={1.8} />
                     </span>
                     <div className="min-w-0 flex-1">
