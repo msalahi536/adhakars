@@ -338,7 +338,7 @@ export const onAdhanPlaying = (handler: (info: AdhanPlayingInfo) => void): (() =
   const plugin = getPlugin() as any;
   if (plugin) {
     try {
-      const handle = plugin.addListener("adhanPlaying", (info) => handler(toInfo(info)));
+      const handle = plugin.addListener("adhanPlaying", (info: unknown) => handler(toInfo(info)));
       if (handle && typeof (handle as Promise<unknown>).then === "function") {
         (handle as Promise<{ remove?: () => void }>)
           .then((h) => {
