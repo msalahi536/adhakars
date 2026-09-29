@@ -3,7 +3,7 @@
 // Closing minimizes to a floating pill so playback remains easy to reopen.
 
 import { useEffect, useRef, useState } from "react";
-import { Pause, Play, RotateCcw, RotateCw, Square, X } from "lucide-react";
+import { Pause, Play, RotateCcw, RotateCw, X } from "lucide-react";
 import { Portal } from "@/components/Portal";
 import {
   getAdhanProgress,
@@ -11,7 +11,6 @@ import {
   reciterNameFor,
   resumeAdhan,
   seekAdhan,
-  stopAdhan,
   type AdhanProgress,
 } from "@/lib/adhan-bridge";
 
