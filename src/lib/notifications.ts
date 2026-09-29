@@ -339,6 +339,11 @@ export const scheduleReminder = async (r: Reminder, firstAt?: Date): Promise<Act
   try {
     await ensureChannel(plugin);
     await cancelReminder(r.id);
+    if (r.id === 1 || r.id === 2) {
+      // Clear or rebuild the prayer-time-based schedule for this reminder.
+      const smart = await import("@/lib/smart-notifications");
+      await smart.rescheduleSmartAdhkar();
+    }
 
     const first = firstAt ?? nextOccurrence(r.hour, r.minute);
     const ids = idsFor(r.id);
