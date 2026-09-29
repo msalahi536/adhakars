@@ -148,6 +148,7 @@ export const rescheduleSunnahNotification = async (): Promise<void> => {
         body: "Today's Sunnah is ready. Revive it and earn its reward.",
         schedule: { on: { hour: 9, minute: 0 }, repeats: true, allowWhileIdle: true },
         channelId: NOTIFICATION_CHANNEL,
+        extra: { route: "/app/more" },
       },
     ],
     "sunnah",
