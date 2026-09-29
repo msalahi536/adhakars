@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { BedDouble, Compass, ChevronRight, HandHeart, Moon, ShieldCheck, Landmark, MoonStar, BookOpen } from "lucide-react";
 import {
   getConsistency,
@@ -15,6 +15,12 @@ const DONE = "color-mix(in oklab, var(--surface-deep-fg) 88%, transparent)";
 const DONE_SOFT = "color-mix(in oklab, var(--surface-deep-fg) 45%, transparent)";
 
 export const Route = createFileRoute("/app/more")({
+  validateSearch: (s: Record<string, unknown>) => {
+    const out: { open?: string; section?: string } = {};
+    if (typeof s.open === "string") out.open = s.open;
+    if (typeof s.section === "string") out.section = s.section;
+    return out;
+  },
   head: () => ({
     meta: [
       { title: "More, Sahih Al-Adhkar" },
@@ -47,6 +53,26 @@ const tiles: Tile[] = [
 ];
 
 function More() {
+  const navigate = useNavigate();
+  const { open, section } = Route.useSearch();
+
+  // Deep links from notification taps: /app/more?open=...&section=...
+  useEffect(() => {
+    if (!open) return;
+    if (open === "dua-library" && section === "jumuah") {
+      window.localStorage.setItem("adhkar:open-jumuah", "1");
+      window.dispatchEvent(new Event("adhkar:open-jumuah"));
+      void navigate({ to: "/app/duas" });
+    } else if (open === "dua-library") {
+      void navigate({ to: "/app/duas" });
+    } else if (open === "sunnah-of-the-day") {
+      window.localStorage.setItem("adhkar:open-sunnah", "1");
+      window.dispatchEvent(new Event("adhkar:open-sunnah"));
+    } else if (open === "period-companion") {
+      void navigate({ to: "/app/period" });
+    }
+  }, [open, section, navigate]);
+
   const [consistency, setConsistency] = useState<Consistency>({
     days: [],
     current: 0,

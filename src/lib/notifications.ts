@@ -356,6 +356,7 @@ export const scheduleReminder = async (r: Reminder, firstAt?: Date): Promise<Act
         body: `Time for ${r.label || "your adhkar"}.`,
         schedule: { at, allowWhileIdle: true },
         channelId: ANDROID_CHANNEL,
+        extra: { route: r.id === 1 ? "/app/" : r.id === 2 ? "/app/evening" : "/app/more" },
       };
     });
 
@@ -457,7 +458,7 @@ export const scheduleJumuahNotification = async (): Promise<ActionResult> => {
             allowWhileIdle: true,
           },
           channelId: ANDROID_CHANNEL,
-          extra: { route: "/app/salah" },
+          extra: { route: "/app/more?open=dua-library&section=jumuah" },
         },
       ],
     });
@@ -483,7 +484,7 @@ export const sendTestJumuahNotification = async (): Promise<boolean> => {
           body: "It's Jumu'ah — come learn the sunnahs of Jumu'ah.",
           schedule: { at: new Date(Date.now() + 5000), allowWhileIdle: true },
           channelId: ANDROID_CHANNEL,
-          extra: { route: "/app/salah" },
+          extra: { route: "/app/more?open=dua-library&section=jumuah" },
         },
       ],
     });
