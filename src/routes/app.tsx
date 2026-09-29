@@ -103,10 +103,22 @@ function AppLayout() {
     registerNotificationTapHandler((id) => {
       if (id === JUMUAH_NOTIF_ID) {
         window.localStorage.setItem("adhkar:open-jumuah", "1");
+        window.dispatchEvent(new Event("adhkar:open-jumuah"));
         void router.navigate({ to: "/app/duas" });
       } else if (id === SUNNAH_NOTIF_ID) {
         window.localStorage.setItem("adhkar:open-sunnah", "1");
+        window.dispatchEvent(new Event("adhkar:open-sunnah"));
         void router.navigate({ to: "/app/more" });
+      } else if (id === 889001) {
+        // Sunnah test notification
+        window.localStorage.setItem("adhkar:open-sunnah", "1");
+        window.dispatchEvent(new Event("adhkar:open-sunnah"));
+        void router.navigate({ to: "/app/more" });
+      } else if (id === 889002) {
+        // Jumu'ah test notification
+        window.localStorage.setItem("adhkar:open-jumuah", "1");
+        window.dispatchEvent(new Event("adhkar:open-jumuah"));
+        void router.navigate({ to: "/app/duas" });
       } else if (isSmartAdhkarId(id)) {
         void router.navigate({ to: smartAdhkarKind(id) === "evening" ? "/app/evening" : "/app" });
       } else if (isPeriodNotifId(id)) {
