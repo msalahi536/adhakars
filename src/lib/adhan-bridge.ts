@@ -136,6 +136,7 @@ export interface AdhanProgress {
   hasSession: boolean;
   prayer: string;
   reciterId: string;
+  volume?: number;
 }
 
 export interface AdhanStatus {
@@ -155,6 +156,7 @@ interface AdhanPlugin {
   pauseAdhan?(): Promise<unknown>;
   resumeAdhan?(): Promise<unknown>;
   seekAdhan?(opts: { progress: number }): Promise<unknown>;
+  setAdhanVolume?(opts: { volume: number }): Promise<unknown>;
   getAdhanProgress?(): Promise<unknown>;
   isAdhanPlaying?(): Promise<unknown>;
   playAdhanPreview?(opts: { reciterId: string; file: string }): Promise<unknown>;
