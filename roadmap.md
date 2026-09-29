@@ -1,4 +1,5 @@
 # Roadmap
 
 - [x] Qibla compass jitter fix (smoothing + removed CSS transition)
-- [ ] Adhan player: keep minimized state across page navigation
+- [x] Adhan player: keep minimized state across page navigation
+- [x] Replace Self-Ruqyah and Ruqyah for Others steps from the supplied document
