@@ -14,7 +14,7 @@ import { FULL_ADHAN_URL, isPrayerNotifId, rescheduleAdhanNotifications } from "@
 import { AdhanPlayer } from "@/components/AdhanPlayer";
 import { getPrayerSettings } from "@/lib/prayer-times";
 import { initNativeBridge } from "@/lib/native-bridge";
-import { onAdhanPlaying } from "@/lib/adhan-bridge";
+import { isAdhanPlaying, onAdhanPlaying } from "@/lib/adhan-bridge";
 
 const UPDATE_WELCOME_KEY = "adhkar:update-welcome:2026-09";
 
@@ -49,13 +49,32 @@ function AppLayout() {
     void rescheduleAdhanNotifications(getPrayerSettings());
   }, []);
 
-  useEffect(
-    () =>
-      onAdhanPlaying(({ prayer, reciterId }) =>
-        setAdhan({ visible: true, prayer: prayer || "fajr", reciterId }),
-      ),
-    [],
-  );
+  useEffect(() => {
+    const unsubscribe = onAdhanPlaying(({ prayer, reciterId }) =>
+      setAdhan({ visible: true, prayer: prayer || "fajr", reciterId }),
+    );
+    // Cold start: native may start the adhan before this listener exists, so
+    // ask the native side directly on launch and whenever the app resumes.
+    let cancelled = false;
+    const check = async () => {
+      const s = await isAdhanPlaying().catch(() => null);
+      if (cancelled || !s || !(s.playing || s.hasSession)) return;
+      setAdhan((a) =>
+        a.visible ? a : { visible: true, prayer: s.prayer || "fajr", reciterId: s.reciterId || "" },
+      );
+    };
+    const timers = [0, 600, 1500, 3000].map((ms) => window.setTimeout(() => void check(), ms));
+    const onVisible = () => {
+      if (document.visibilityState === "visible") void check();
+    };
+    document.addEventListener("visibilitychange", onVisible);
+    return () => {
+      cancelled = true;
+      timers.forEach((t) => window.clearTimeout(t));
+      document.removeEventListener("visibilitychange", onVisible);
+      if (typeof unsubscribe === "function") unsubscribe();
+    };
+  }, []);
 
   useEffect(() => {
     if (!hasOnboarded()) {
