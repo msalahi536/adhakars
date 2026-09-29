@@ -95,17 +95,6 @@ export function AdhanPlayer({ visible, prayer, reciterId, onClose }: Props) {
     if (!duration) return;
     void seekAdhan((current + delta) / duration);
   };
-  const changeVolume = (v: number) => {
-    const next = Math.min(1, Math.max(0, v));
-    if (next > 0) setLastAudible(next);
-    setVolume(next);
-    setAdhanVolume(next);
-  };
-  const toggleMute = () => {
-    if (volume > 0) changeVolume(0);
-    else changeVolume(lastAudible || 1);
-  };
-  const VolIcon = volume === 0 ? VolumeX : volume < 0.5 ? Volume1 : Volume2;
 
   if (minimized) {
     return (
