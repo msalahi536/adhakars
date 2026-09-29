@@ -51,6 +51,8 @@ export function AdhanPlayer({ visible, prayer, reciterId, onClose }: Props) {
   const [p, setP] = useState<AdhanProgress | null>(null);
   const [scrub, setScrub] = useState<number | null>(null);
   const openedAt = useRef(0);
+  const trackRef = useRef<HTMLDivElement>(null);
+  const pendingSeek = useRef<{ frac: number; until: number } | null>(null);
 
   useEffect(() => {
     if (!visible) return;
@@ -59,6 +61,12 @@ export function AdhanPlayer({ visible, prayer, reciterId, onClose }: Props) {
     setP(null);
     const tick = () => {
       void getAdhanProgress().then((next) => {
+        const ps = pendingSeek.current;
+        if (next && ps) {
+          if (Date.now() < ps.until && Math.abs(next.progress - ps.frac) > 0.02) {
+            next = { ...next, progress: ps.frac };
+          } else pendingSeek.current = null;
+        }
         if (next) setP(next);
         // Grace period while the native session starts.
         if (Date.now() - openedAt.current > 4000 && next && !next.hasSession) onClose();
@@ -91,9 +99,22 @@ export function AdhanPlayer({ visible, prayer, reciterId, onClose }: Props) {
     setP((prev) => (prev ? { ...prev, isPlaying: !playing } : prev));
     void (playing ? pauseAdhan() : resumeAdhan());
   };
+  const commitSeek = (frac: number) => {
+    const f = Math.min(1, Math.max(0, frac));
+    setScrub(null);
+    // Hold the new position until native reports it, so the thumb doesn't snap back.
+    pendingSeek.current = { frac: f, until: Date.now() + 1500 };
+    setP((prev) => (prev ? { ...prev, progress: f, currentTime: f * (prev.duration || 0) } : prev));
+    void seekAdhan(f);
+  };
+  const fracAt = (clientX: number) => {
+    const r = trackRef.current?.getBoundingClientRect();
+    if (!r || !r.width) return progress;
+    return Math.min(1, Math.max(0, (clientX - r.left) / r.width));
+  };
   const skip = (delta: number) => {
     if (!duration) return;
-    void seekAdhan((current + delta) / duration);
+    commitSeek((current + delta) / duration);
   };
 
   if (minimized) {
@@ -125,24 +146,33 @@ export function AdhanPlayer({ visible, prayer, reciterId, onClose }: Props) {
         </div>
 
         <div className="ap-scrub">
-          <input
-            type="range"
-            min={0}
-            max={1000}
-            value={Math.round(progress * 1000)}
-            disabled={!duration}
+          <div
+            ref={trackRef}
+            className="ap-track"
+            role="slider"
+            tabIndex={0}
             aria-label="Seek"
+            aria-valuemin={0}
+            aria-valuemax={100}
+            aria-valuenow={Math.round(progress * 100)}
             style={{ "--ap-pct": `${progress * 100}%` } as React.CSSProperties}
-            onChange={(e) => setScrub(Number(e.target.value) / 1000)}
-            onPointerUp={() => {
-              if (scrub !== null) void seekAdhan(scrub);
-              setScrub(null);
+            onPointerDown={(e) => {
+              e.currentTarget.setPointerCapture(e.pointerId);
+              setScrub(fracAt(e.clientX));
             }}
-            onKeyUp={() => {
-              if (scrub !== null) void seekAdhan(scrub);
-              setScrub(null);
+            onPointerMove={(e) => {
+              if (scrub !== null) setScrub(fracAt(e.clientX));
             }}
-          />
+            onPointerUp={(e) => commitSeek(fracAt(e.clientX))}
+            onPointerCancel={() => scrub !== null && commitSeek(scrub)}
+            onKeyDown={(e) => {
+              if (e.key === "ArrowRight") skip(5);
+              if (e.key === "ArrowLeft") skip(-5);
+            }}
+          >
+            <span className="ap-track-bar"><span className="ap-track-fill" /></span>
+            <span className="ap-track-thumb" />
+          </div>
           <div className="ap-times">
             <span>{fmt(current)}</span>
             <span>{duration ? fmt(duration) : "--:--"}</span>
