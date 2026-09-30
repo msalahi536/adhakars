@@ -8,3 +8,4 @@
 - [x] Remove incorrect morning card 21 and evening card 20
 - [x] Synchronize recitation visualizer and refine the mini player
 - [x] Add previous and next controls to the recitation mini player
+- [x] Fix recitation player next button greying out (wrong end-of-list detection)
