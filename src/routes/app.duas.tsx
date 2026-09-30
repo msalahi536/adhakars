@@ -89,10 +89,12 @@ function DuaLibrary() {
           <div className="label-caps" style={{ color: "var(--header-sub)", opacity: 1 }}>Dua Library</div>
           <h1 className="app-page-title mt-2">Call upon Me</h1>
         </div>
-        <div className="period-tabs mx-auto max-w-md" role="tablist">
-          <button role="tab" aria-selected={tab === "library"} className={tab === "library" ? "is-active" : ""} onClick={() => go("library")}>Library</button>
-          <button role="tab" aria-selected={tab === "saved"} className={tab === "saved" ? "is-active" : ""} onClick={() => go("saved")}>Saved{mounted && favs.length ? ` (${favs.length})` : ""}</button>
-        </div>
+        {!(tab === "library" && cat) && (
+          <div className="period-tabs mx-auto max-w-md" role="tablist">
+            <button role="tab" aria-selected={tab === "library"} className={tab === "library" ? "is-active" : ""} onClick={() => go("library")}>Library</button>
+            <button role="tab" aria-selected={tab === "saved"} className={tab === "saved" ? "is-active" : ""} onClick={() => go("saved")}>Saved{mounted && favs.length ? ` (${favs.length})` : ""}</button>
+          </div>
+        )}
       </header>
       <main className="scroll-area period-scroll-area">
         <div className="mx-auto max-w-md space-y-4 px-5 pb-8 pt-4">
