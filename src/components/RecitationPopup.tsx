@@ -22,15 +22,20 @@ export function RecitationPopup() {
 
   const track = player.track;
   const queueActive = player.queue.length > 0;
-  const listIndex = open
-    ? queueActive
-      ? -1
-      : open.tracks.findIndex((t) => t.dhikrId === (track?.dhikrId ?? open.openerId))
-    : -1;
+  // Position within the card list. The playing track may belong to another
+  // card (paused elsewhere) or not be in this list at all, so fall back to the
+  // card the popup was opened from before giving up.
+  const listIndex = (() => {
+    if (!open || queueActive) return -1;
+    const byTrack = track ? open.tracks.findIndex((t) => t.dhikrId === track.dhikrId) : -1;
+    const byOpener = open.tracks.findIndex((t) => t.dhikrId === open.openerId);
+    const switched = track && track.dhikrId !== open.openerId && !player.playing;
+    return switched ? (byOpener >= 0 ? byOpener : byTrack) : (byTrack >= 0 ? byTrack : byOpener);
+  })();
   const canPrevious = queueActive ? player.queueIndex > 0 : listIndex > 0;
   const canNext = queueActive
     ? player.queueIndex < player.queue.length - 1
-    : listIndex >= 0 && listIndex < (open?.tracks.length ?? 0) - 1;
+    : listIndex < (open?.tracks.length ?? 0) - 1;
 
   const openerTrack = open?.track ?? open?.tracks.find((t) => t.dhikrId === open.openerId) ?? null;
   // Paused on another card's recitation while viewing this one: offer this card instead.
@@ -46,7 +51,7 @@ export function RecitationPopup() {
   };
   const onNext = () => {
     if (queueActive) { recitationPlayer.next(); return; }
-    if (!open || listIndex < 0 || listIndex >= open.tracks.length - 1) return;
+    if (!open || listIndex >= open.tracks.length - 1) return;
     recitationPlayer.playAll(open.tracks, open.label ?? "recitations", listIndex + 1);
   };
 
