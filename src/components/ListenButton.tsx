@@ -42,7 +42,7 @@ export function ListenButton({ dhikrId, size = 32, title }: Props) {
   useLayoutEffect(() => {
     if (!open || !btnRef.current) return;
     const r = btnRef.current.getBoundingClientRect();
-    const w = 236;
+    const w = 264;
     setPos({ left: Math.max(10, Math.min(r.left, window.innerWidth - w - 10)), top: r.bottom + 8 });
   }, [open]);
 
@@ -118,28 +118,25 @@ export function ListenButton({ dhikrId, size = 32, title }: Props) {
             style={{ left: pos.left, top: pos.top }}
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="rec-pop-row">
-              <div className="rec-pop-transport">
-                <button type="button" className="rec-pop-skip" onClick={onPrevious} disabled={!canPrevious} aria-label="Previous recitation">
-                  <SkipBack size={13} fill="currentColor" />
-                </button>
-                <button
-                  type="button"
-                  className="rec-pop-play"
-                  onClick={onPlay}
-                  disabled={!rec}
-                  aria-label={playing ? "Pause" : "Play"}
-                >
-                  {playing ? <Pause size={14} fill="currentColor" /> : <Play size={14} fill="currentColor" style={{ marginLeft: 2 }} />}
-                </button>
-                <button type="button" className="rec-pop-skip" onClick={onNext} disabled={!canNext} aria-label="Next recitation">
-                  <SkipForward size={13} fill="currentColor" />
-                </button>
-              </div>
-              <div className="min-w-0 flex-1">
-                <div className="rec-pop-title">{name}</div>
-                <div className="rec-pop-sub">{rec ? "Imam Taha Hassane" : map ? "Recitation coming soon" : "Loading…"}</div>
-              </div>
+            <div className="rec-pop-title">{name}</div>
+            <div className="rec-pop-sub">{rec ? "Imam Taha Hassane" : map ? "Recitation coming soon" : "Loading…"}</div>
+
+            <div className="rec-pop-transport">
+              <button type="button" className="rec-pop-skip" onClick={onPrevious} disabled={!canPrevious} aria-label="Previous recitation">
+                <SkipBack size={15} fill="currentColor" />
+              </button>
+              <button
+                type="button"
+                className="rec-pop-play"
+                onClick={onPlay}
+                disabled={!rec}
+                aria-label={playing ? "Pause" : "Play"}
+              >
+                {playing ? <Pause size={19} fill="currentColor" /> : <Play size={19} fill="currentColor" style={{ marginLeft: 2 }} />}
+              </button>
+              <button type="button" className="rec-pop-skip" onClick={onNext} disabled={!canNext} aria-label="Next recitation">
+                <SkipForward size={15} fill="currentColor" />
+              </button>
             </div>
 
             {rec && (
@@ -164,10 +161,13 @@ export function ListenButton({ dhikrId, size = 32, title }: Props) {
 
             {playlist && queueTracks.length > 0 && (
               <button type="button" className="rec-pop-all" onClick={onPlayAll}>
-                {queueActive && player.playing ? <Pause size={12} /> : <ListMusic size={12} />}
-                {queueActive
-                  ? `${player.playing ? "Pause" : "Resume"} ${playlist.label} · ${player.queueIndex + 1}/${player.queue.length}`
-                  : `Play all ${playlist.label}`}
+                <span className="rec-pop-all-ic">{queueActive && player.playing ? <Pause size={13} /> : <ListMusic size={13} />}</span>
+                <span className="rec-pop-all-div" aria-hidden />
+                <span className="rec-pop-all-tx">
+                  {queueActive
+                    ? `${player.playing ? "Pause" : "Resume"} ${playlist.label} · ${player.queueIndex + 1}/${player.queue.length}`
+                    : `Play all ${playlist.label}`}
+                </span>
               </button>
             )}
           </div>
