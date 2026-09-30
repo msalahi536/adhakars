@@ -25,6 +25,7 @@ import {
   scheduleNativeAdhan,
   buildNativePrayerTime,
   isAdhanPlaying,
+  syncAdhanPrefsToNative,
   type NativePrayerTime,
 } from "@/lib/adhan-bridge";
 
@@ -91,10 +92,10 @@ export const rescheduleAdhanNotifications = async (
   settings: PrayerSettings,
 ): Promise<void> => {
   if (!isNativePlatform()) return;
-  // Never touch scheduling while the full adhan is playing (e.g. right after a
-  // notification tap opens the Salah page) so nothing interrupts playback.
+  // Never touch scheduling while the full adhan is actively playing. A paused
+  // player can retain a native session for hours and must not block re-arming.
   const status = await isAdhanPlaying();
-  if (status.playing || status.hasSession) return;
+  if (status.playing) return;
 
   const plugin = await loadNotificationPlugin();
   const native = hasNativeAdhanScheduler();
@@ -108,6 +109,9 @@ export const rescheduleAdhanNotifications = async (
   }
 
   if (native) {
+    // The test button bypasses enabled-prayer checks, while real alerts use
+    // native preferences. Keep those preferences synchronized before planning.
+    await syncAdhanPrefsToNative();
     const now = new Date();
     const today = await fetchDay(now, settings);
     const tomorrow = await fetchDay(addDays(now, 1), settings);

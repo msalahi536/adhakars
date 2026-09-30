@@ -11,3 +11,4 @@
 - [x] Fix recitation player next button greying out (wrong end-of-list detection)
 - [x] Rework More into a tools-first page with compact consistency details and refined Sunnah banner
 - [x] Add an All Duas entry with the complete library in one swipe reader
+- [x] Restore reliable real-time Salah alerts and period-start encouragement

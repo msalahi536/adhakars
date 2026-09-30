@@ -44,11 +44,19 @@ function AppLayout() {
 
   useEffect(() => {
     initNativeBridge();
-    // Prayer alerts are planned on every app open so nothing depends on the
-    // Salah page having been visited.
-    void rescheduleAdhanNotifications(getPrayerSettings());
-    // Sunnah, Jumu'ah, streak, period and smart adhkar reminders too.
-    void import("@/lib/smart-notifications").then((m) => m.rescheduleSmartNotifications());
+    const reschedule = () => {
+      // Prayer alerts are planned on every app open or resume so nothing
+      // depends on the Salah page having been visited.
+      void rescheduleAdhanNotifications(getPrayerSettings());
+      // Sunnah, Jumu'ah, streak, period and smart adhkar reminders too.
+      void import("@/lib/smart-notifications").then((m) => m.rescheduleSmartNotifications());
+    };
+    reschedule();
+    const onVisible = () => {
+      if (document.visibilityState === "visible") reschedule();
+    };
+    document.addEventListener("visibilitychange", onVisible);
+    return () => document.removeEventListener("visibilitychange", onVisible);
   }, []);
 
   useEffect(() => {
