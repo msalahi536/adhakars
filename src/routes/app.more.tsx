@@ -124,7 +124,7 @@ function More() {
       <main className="scroll-area">
          <div className="mx-auto max-w-md px-5 py-3 space-y-4">
            <div className="grid grid-cols-2 gap-3">
-             {tiles.map(({ to, title, subtitle, Icon }) => (
+             {tiles.slice(0, 4).map(({ to, title, subtitle, Icon }) => (
                <Link
                  key={to}
                  to={to}
@@ -163,6 +163,42 @@ function More() {
            </div>
 
            <SunnahOfTheDay />
+
+           <div className="grid grid-cols-2 gap-3">
+             {tiles.slice(4).map(({ to, title, subtitle, Icon }) => (
+               <Link
+                 key={to}
+                 to={to}
+                 className="group flex flex-col rounded-[24px] p-4 transition-transform active:scale-[0.98]"
+                 style={{
+                   background: "var(--surface, var(--card))",
+                   border: "1px solid var(--border)",
+                   boxShadow: "var(--card-shadow, 0 4px 16px rgba(0,0,0,0.06))",
+                   color: "var(--foreground)",
+                   minHeight: 132,
+                 }}
+               >
+                 <div
+                   className="flex h-10 w-10 items-center justify-center rounded-full"
+                   style={{
+                     background: "color-mix(in oklab, var(--accent) 14%, var(--card))",
+                     color: "var(--accent)",
+                   }}
+                 >
+                   <Icon size={20} strokeWidth={2} />
+                 </div>
+                 <div className="pt-3">
+                   <div className="flex min-h-9 items-start gap-1 text-[14px] font-bold leading-snug">
+                     <span>{title}</span>
+                     <ChevronRight size={14} className="mt-0.5 shrink-0 opacity-40 transition-transform group-hover:translate-x-0.5" />
+                   </div>
+                   <div className="text-[10px] leading-snug" style={{ color: "var(--muted-foreground)" }}>
+                     {subtitle}
+                   </div>
+                 </div>
+               </Link>
+             ))}
+           </div>
 
            <button
              type="button"
