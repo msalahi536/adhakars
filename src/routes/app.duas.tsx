@@ -422,6 +422,7 @@ function DuaSwipeStack({ children }: { children: React.ReactNode[] }) {
         onPrevious={goPrev}
         onNext={goNext}
         onScrub={scrubTo}
+        hideSelector={n > 24}
       />
     </div>
   );
