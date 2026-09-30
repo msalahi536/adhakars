@@ -915,12 +915,14 @@ html[data-visual-phase="evening"] .daily-swipe-stack .adhkar-index-row > span {
 .adhkar-card-action.is-icon-only { width: 30px; height: 30px; padding: 0; border: 1px solid var(--card-border, var(--border)); background: var(--pill-bg, var(--source-bg)) !important; color: var(--source-fg, var(--title)) !important; backdrop-filter: blur(12px); }
 .adhkar-card-action.is-delete { color: var(--destructive) !important; }
 
-.sleep-adhkar-header { position: relative; flex-shrink: 0; min-height: 228px; }
-.sleep-adhkar-header .adhkar-header { min-height: 182px; }
+.sleep-adhkar-header { position: relative; flex-shrink: 0; min-height: 196px; }
+.sleep-adhkar-header .adhkar-header { min-height: 160px; }
 .sleep-mode-switch { position: absolute; z-index: 4; left: 50%; bottom: 7px; display: grid; width: 264px; height: 42px; grid-template-columns: 1fr 1fr; gap: 3px; padding: 3px; border: 1px solid var(--card-border, var(--border)); border-radius: 14px; transform: translateX(-50%); background: color-mix(in oklab, var(--nav-bg) 78%, transparent); box-shadow: 0 6px 18px color-mix(in oklab, var(--foreground) 8%, transparent); backdrop-filter: blur(18px); }
 .sleep-mode-switch button { border-radius: 10px; color: var(--text-muted); font-size: 12px; font-weight: 600; }
 .sleep-mode-switch button.is-active { background: var(--accent); color: var(--accent-foreground); box-shadow: 0 2px 8px color-mix(in oklab, var(--accent) 22%, transparent); }
 .sleep-adhkar-page.daily-adhkar-page { margin-top: 0; }
+.sleep-adhkar-page .daily-swipe-stack .adhkar-card-stage { padding: 0 16px 14px; }
+.sleep-adhkar-page .daily-swipe-stack .adhkar-index-row { min-height: 42px; padding-top: 0; }
 
 .daily-swipe-stack .adhkar-card-stage { display: flex; min-height: 0; flex: 1 1 0%; overflow: hidden; padding: 0 28px 16px; }
 .adhkar-card-motion { display: flex; width: 100%; min-height: 0; flex: 1 1 0%; align-self: stretch; }
