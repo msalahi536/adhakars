@@ -1,5 +1,5 @@
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
-import { ListMusic, Pause, Play, SkipBack, SkipForward } from "lucide-react";
+import { ListMusic, Pause, Play, SkipBack, SkipForward, Square } from "lucide-react";
 import { Portal } from "./Portal";
 import { closePopup, getAnchor, usePopupOpen } from "@/lib/recitation-popup";
 import { recitationPlayer, usePlayer } from "@/lib/recitation-player";
