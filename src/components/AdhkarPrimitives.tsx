@@ -94,6 +94,8 @@ export function RepeatCounter({ count, target, complete, tapped, bursts, justCom
   );
 }
 
+const HINT_KEY = "adhkar:hint-pagination";
+
 export function Pagination({
   total,
   active,
@@ -125,6 +127,7 @@ export function Pagination({
 
   const startHold = (dir: 1 | -1) => {
     stopHold();
+    dismissHint();
     const step = (delay: number) => {
       holdTimerRef.current = setTimeout(() => {
         const next = activeRef.current + dir;
@@ -148,10 +151,23 @@ export function Pagination({
     }
   };
 
-  const thumbRatio = total > 1 ? active / (total - 1) : 0;
+  const [showHint, setShowHint] = useState(false);
+  useEffect(() => {
+    try { if (localStorage.getItem(HINT_KEY) !== "1") setShowHint(true); } catch { /* ignore */ }
+  }, []);
+  const dismissHint = () => {
+    if (!showHint) return;
+    setShowHint(false);
+    try { localStorage.setItem(HINT_KEY, "1"); } catch { /* ignore */ }
+  };
 
   return (
     <div className="adhkar-pagination-row">
+      {showHint && (
+        <div className="adhkar-pagination-hint" role="status">
+          Hold me down to quickly move through cards or go back to the beginning
+        </div>
+      )}
       <button
         type="button"
         className="adhkar-pagination-arrow"
@@ -174,6 +190,7 @@ export function Pagination({
         data-no-swipe
         onContextMenu={(event) => event.preventDefault()}
         onPointerDown={(event) => {
+          dismissHint();
           setIsScrubbing(true);
           event.currentTarget.setPointerCapture(event.pointerId);
           const rect = event.currentTarget.getBoundingClientRect();
@@ -195,10 +212,6 @@ export function Pagination({
           {Array.from({ length: total }, (_, index) => (
             <span key={index} className={index === active ? "is-active" : ""} />
           ))}
-          <span
-            className="adhkar-pagination-thumb"
-            style={{ left: `${(thumbRatio * 100).toFixed(2)}%` }}
-          />
         </div>
         <input
           className="adhkar-pagination-slider"
