@@ -125,6 +125,17 @@ export const recitationPlayer = {
     const a = el();
     if (a.paused) void a.play(); else a.pause();
   },
+  stop() {
+    const a = audio;
+    if (a) {
+      a.pause();
+      a.removeAttribute("src");
+      a.load();
+    }
+    stopMeter();
+    set({ track: null, playing: false, current: 0, duration: 0, queue: [], queueIndex: -1, queueLabel: null });
+    if (typeof navigator !== "undefined" && navigator.mediaSession) navigator.mediaSession.metadata = null;
+  },
   previous() {
     if (state.queueIndex <= 0) return;
     load(state.queueIndex - 1);
