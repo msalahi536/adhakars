@@ -120,11 +120,15 @@ export function SwipeStack({ items, counts, onIncrement, onReset, persistKey, fi
     : null;
   const scrubRef = useRef<(i: number) => void>(() => {});
   scrubRef.current = (i) => scrubTo(i);
+  const goToRef = useRef<(i: number) => void>(() => {});
+  goToRef.current = (i) => goTo(i);
   useEffect(() => {
     const onTrack = (e: Event) => {
       const id = (e as CustomEvent<string>).detail;
       const i = items.findIndex((it) => it.dhikr?.id === id);
-      if (i >= 0) scrubRef.current(i);
+      // Slide smoothly to the playing card (same animation as a manual
+      // swipe) so the card never jumps or changes size mid-listen.
+      if (i >= 0) goToRef.current(i);
     };
     window.addEventListener("recitation:track", onTrack);
     return () => window.removeEventListener("recitation:track", onTrack);
