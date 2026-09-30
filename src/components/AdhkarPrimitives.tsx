@@ -197,7 +197,7 @@ export function Pagination({
           ))}
           <span
             className="adhkar-pagination-thumb"
-            style={{ left: `calc(${(thumbRatio * 100).toFixed(2)}% + ${(10 - thumbRatio * 20).toFixed(2)}px)` }}
+            style={{ left: `${(thumbRatio * 100).toFixed(2)}%` }}
           />
         </div>
         <input
