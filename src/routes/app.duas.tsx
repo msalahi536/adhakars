@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import {
-  Bookmark, ChevronDown, ChevronUp, ChevronRight, Cloud, Copy, HeartPulse, Home, Info, Compass, Search, Shield,
+  Bookmark, ChevronDown, ChevronLeft, ChevronUp, ChevronRight, Cloud, Copy, HeartPulse, Home, Info, Compass, Search, Shield,
   Sparkles, Sun, Users, Wallet, X, CloudRain, Frown, RotateCcw, Flower2, HandHeart, Volume2,
 } from "lucide-react";
 import { toast } from "sonner";
@@ -42,8 +42,10 @@ function DuaLibrary() {
   const [cat, setCat] = useState<string | null>(null);
   const [favs, setF] = useState<Fav[]>([]);
   const [sort, setSort] = useState<Sort>("default");
+  const [duaIdx, setDuaIdx] = useState(0);
   const [now, setNow] = useState<Date | null>(null);
   useEffect(() => { setMounted(true); setF(getFavs()); setNow(new Date()); }, []);
+  useEffect(() => { setDuaIdx(0); }, [cat, sort]);
   // Deep link from the Friday (Jumu'ah) notification.
   useEffect(() => {
     if (window.localStorage.getItem("adhkar:open-jumuah") === "1") {
