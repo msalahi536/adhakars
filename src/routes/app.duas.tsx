@@ -1,12 +1,13 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import {
   Bookmark, ChevronDown, ChevronUp, ChevronRight, Cloud, Copy, HeartPulse, Home, Info, Compass, Search, Shield,
-  Sparkles, Sun, Users, Wallet, X, CloudRain, Frown, RotateCcw, Flower2, HandHeart, Lock, Volume2,
+  Sparkles, Sun, Users, Wallet, X, CloudRain, Frown, RotateCcw, Flower2, HandHeart, Volume2,
 } from "lucide-react";
 import { toast } from "sonner";
 import { ListenButton } from "@/components/ListenButton";
 import { HeaderBackButton } from "@/components/HeaderBackButton";
+import { Pagination } from "@/components/AdhkarPrimitives";
 import { triggerHaptic } from "@/lib/theme";
 import { CATEGORIES, DUAS, EMOTIONAL_CATS, getFavs, searchDuas, setFavs, sourceLabel, type Dua, type Fav } from "@/lib/dua-library";
 
@@ -195,13 +196,14 @@ function DuaLibrary() {
                   </div>
                 )}
               </div>
-              {catList.map((d) => card(d))}
+              <DuaSwipeStack key={`${cat}-${sort}`}>
+                {catList.map((d) => card(d))}
+              </DuaSwipeStack>
             </>
           )}
 
           {tab === "saved" && (
             <>
-              <p className="dl-private"><Lock size={13} /> Private — stored only on your device</p>
               {mounted && favs.length === 0 && (
                 <div className="period-card dl-empty-card">Save your most-used duas here for quick access. Tap the bookmark icon on any dua to save it.</div>
               )}
@@ -253,6 +255,174 @@ function DuaCard({ d, fav, onFav, extra }: { d: Dua; fav: boolean; onFav: () => 
         {extra}
       </div>
     </article>
+  );
+}
+
+type SwipePhase = "idle" | "out-left" | "out-right" | "in-left" | "in-right";
+const OUT_MS = 280;
+const IN_MS = 320;
+
+/** One dua at a time, swiped left-to-right like the morning/evening stacks. */
+function DuaSwipeStack({ children }: { children: React.ReactNode[] }) {
+  const n = children.length;
+  const [idx, setIdx] = useState(0);
+  const [phase, setPhase] = useState<SwipePhase>("idle");
+  const [enter, setEnter] = useState(false);
+  const [dragOffset, setDragOffset] = useState(0);
+  const animating = useRef(false);
+  const isDragging = useRef(false);
+  const startX = useRef(0);
+  const startY = useRef(0);
+  const axisLocked = useRef<null | "x" | "y">(null);
+  const wrapperRef = useRef<HTMLDivElement>(null);
+  const dragOffsetRef = useRef(0);
+  useEffect(() => { dragOffsetRef.current = dragOffset; }, [dragOffset]);
+
+  const scrollTop = () => {
+    document.querySelector(".period-scroll-area")?.scrollTo({ top: 0 });
+  };
+
+  const animateTo = (dir: "next" | "prev", destination?: number) => {
+    if (animating.current) return;
+    if (dir === "next" && idx >= n - 1) return;
+    if (dir === "prev" && idx <= 0) return;
+    animating.current = true;
+    void triggerHaptic("light");
+    setPhase(dir === "next" ? "out-left" : "out-right");
+    setDragOffset(0);
+    setTimeout(() => {
+      setIdx((i) => destination ?? i + (dir === "next" ? 1 : -1));
+      setPhase(dir === "next" ? "in-right" : "in-left");
+      setEnter(false);
+      scrollTop();
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => setEnter(true));
+      });
+      setTimeout(() => {
+        setPhase("idle");
+        setEnter(false);
+        animating.current = false;
+      }, IN_MS + 20);
+    }, OUT_MS);
+  };
+  const goNext = () => animateTo("next");
+  const goPrev = () => animateTo("prev");
+  const goTo = (i: number) => {
+    if (animating.current || i === idx) return;
+    animateTo(i > idx ? "next" : "prev", i);
+  };
+  const scrubTo = (i: number) => {
+    if (animating.current || i === idx) return;
+    void triggerHaptic("light");
+    setDragOffset(0);
+    setPhase("idle");
+    setEnter(false);
+    setIdx(i);
+    scrollTop();
+  };
+
+  useEffect(() => {
+    const el = wrapperRef.current;
+    if (!el) return;
+    const onTouchStart = (e: TouchEvent) => {
+      if (animating.current) return;
+      const target = e.target as HTMLElement | null;
+      if (target && target.closest("[data-no-swipe]")) return;
+      startX.current = e.touches[0].clientX;
+      startY.current = e.touches[0].clientY;
+      isDragging.current = true;
+      axisLocked.current = null;
+    };
+    const onTouchMove = (e: TouchEvent) => {
+      if (!isDragging.current) return;
+      const dx = e.touches[0].clientX - startX.current;
+      const dy = e.touches[0].clientY - startY.current;
+      if (axisLocked.current == null && Math.abs(dx) + Math.abs(dy) > 6) {
+        axisLocked.current = Math.abs(dx) > Math.abs(dy) ? "x" : "y";
+      }
+      if (axisLocked.current === "x") {
+        e.preventDefault();
+        setDragOffset(dx);
+      }
+    };
+    const onTouchEnd = () => {
+      if (!isDragging.current) return;
+      isDragging.current = false;
+      const dx = dragOffsetRef.current;
+      axisLocked.current = null;
+      if (dx < -50) {
+        goNext();
+      } else if (dx > 50) {
+        goPrev();
+      } else {
+        setDragOffset(0);
+      }
+    };
+    el.addEventListener("touchstart", onTouchStart, { passive: true });
+    el.addEventListener("touchmove", onTouchMove, { passive: false });
+    el.addEventListener("touchend", onTouchEnd);
+    el.addEventListener("touchcancel", onTouchEnd);
+    return () => {
+      el.removeEventListener("touchstart", onTouchStart);
+      el.removeEventListener("touchmove", onTouchMove);
+      el.removeEventListener("touchend", onTouchEnd);
+      el.removeEventListener("touchcancel", onTouchEnd);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [idx, n]);
+
+  let transform = `translateX(${dragOffset}px)`;
+  let opacity = 1;
+  let transition = "none";
+  if (phase === "out-left") {
+    transform = "translateX(-110%)";
+    opacity = 0;
+    transition = `transform ${OUT_MS}ms cubic-bezier(0.4,0,0.2,1), opacity ${OUT_MS}ms ease`;
+  } else if (phase === "out-right") {
+    transform = "translateX(110%)";
+    opacity = 0;
+    transition = `transform ${OUT_MS}ms cubic-bezier(0.4,0,0.2,1), opacity ${OUT_MS}ms ease`;
+  } else if (phase === "in-right" || phase === "in-left") {
+    if (!enter) {
+      transform = `translateX(${phase === "in-right" ? "110%" : "-110%"})`;
+      opacity = 0;
+      transition = "none";
+    } else {
+      transform = "translateX(0)";
+      opacity = 1;
+      transition = `transform ${IN_MS}ms cubic-bezier(0.4,0,0.2,1), opacity ${IN_MS}ms ease`;
+    }
+  } else {
+    transition = isDragging.current ? "none" : "transform 0.25s ease";
+  }
+
+  if (n === 0) return null;
+  return (
+    <div className="dl-swipe-stack">
+      <div className="adhkar-index-row mb-1 flex min-h-9 items-center justify-center gap-2 px-4">
+        <span
+          className="rounded-full px-4 py-1.5 text-sm font-medium tabular-nums"
+          style={{ background: "color-mix(in oklab, var(--surface-card) 82%, transparent)", border: "1px solid var(--border)", boxShadow: "0 5px 18px color-mix(in oklab, var(--foreground) 7%, transparent)" }}
+        >
+          {idx + 1} / {n}
+        </span>
+      </div>
+      <div
+        ref={wrapperRef}
+        className="relative overflow-hidden"
+        style={{ touchAction: "pan-y" }}
+      >
+        <div style={{ transform, opacity, transition, willChange: "transform, opacity" }}>{children[idx]}</div>
+      </div>
+      <Pagination
+        total={n}
+        active={idx}
+        onSelect={goTo}
+        onPrevious={goPrev}
+        onNext={goNext}
+        onScrub={scrubTo}
+      />
+    </div>
   );
 }
 
