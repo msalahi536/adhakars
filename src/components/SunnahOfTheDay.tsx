@@ -85,7 +85,7 @@ export function SunnahOfTheDay() {
         </span>
         <span className="sunnah-more-copy">
           <span className="sunnah-float-kicker">Sunnah of the day</span>
-          <span className="sunnah-more-text">“{item.translation}”</span>
+          <span className="sunnah-more-text">{item.translation}</span>
           {item.reference && <span className="sunnah-more-reference">{item.reference}</span>}
         </span>
         <span className="sunnah-more-open" aria-hidden="true">

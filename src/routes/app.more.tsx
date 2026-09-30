@@ -121,8 +121,10 @@ function More() {
         </div>
       </header>
 
-      <main className="scroll-area">
+       <main className="scroll-area">
          <div className="mx-auto max-w-md px-5 py-3 space-y-4">
+           <SunnahOfTheDay />
+
            <div className="grid grid-cols-2 gap-3">
              {tiles.slice(0, 4).map(({ to, title, subtitle, Icon }) => (
                <Link
@@ -162,10 +164,8 @@ function More() {
              ))}
            </div>
 
-           <SunnahOfTheDay />
-
-           <div className="grid grid-cols-2 gap-3">
-             {tiles.slice(4).map(({ to, title, subtitle, Icon }) => (
+            <div className="grid grid-cols-2 gap-3">
+              {tiles.slice(4).map(({ to, title, subtitle, Icon }) => (
                <Link
                  key={to}
                  to={to}
