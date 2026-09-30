@@ -1,5 +1,5 @@
 import { BookOpen, Check, ChevronLeft, ChevronRight } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { ProgressRing } from "./ProgressRing";
 import { triggerHaptic } from "@/lib/theme";
 
@@ -110,6 +110,36 @@ export function Pagination({
   onScrub: (index: number) => void;
 }) {
   const [isScrubbing, setIsScrubbing] = useState(false);
+  const activeRef = useRef(active);
+  activeRef.current = active;
+  const holdTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const stopHold = () => {
+    if (holdTimerRef.current) {
+      clearTimeout(holdTimerRef.current);
+      holdTimerRef.current = null;
+    }
+  };
+
+  useEffect(() => stopHold, []);
+
+  const startHold = (dir: 1 | -1) => {
+    stopHold();
+    const step = (delay: number) => {
+      holdTimerRef.current = setTimeout(() => {
+        const next = activeRef.current + dir;
+        if (next < 0 || next > total - 1) {
+          stopHold();
+          return;
+        }
+        onScrub(next);
+        void triggerHaptic("light");
+        // Accelerate: 340ms → 240ms → 150ms → 100ms floor
+        step(Math.max(100, Math.round(delay * 0.7)));
+      }, delay);
+    };
+    step(380);
+  };
 
   const finishScrubbing = (event: React.PointerEvent<HTMLDivElement>) => {
     setIsScrubbing(false);
@@ -117,6 +147,8 @@ export function Pagination({
       event.currentTarget.releasePointerCapture(event.pointerId);
     }
   };
+
+  const thumbRatio = total > 1 ? active / (total - 1) : 0;
 
   return (
     <div className="adhkar-pagination-row">
@@ -128,6 +160,11 @@ export function Pagination({
           onPrevious();
           void triggerHaptic("light");
         }}
+        onPointerDown={() => startHold(-1)}
+        onPointerUp={stopHold}
+        onPointerLeave={stopHold}
+        onPointerCancel={stopHold}
+        onContextMenu={(event) => event.preventDefault()}
         aria-label="previous"
       >
         <ChevronLeft size={14} strokeWidth={1.8} />
@@ -158,6 +195,10 @@ export function Pagination({
           {Array.from({ length: total }, (_, index) => (
             <span key={index} className={index === active ? "is-active" : ""} />
           ))}
+          <span
+            className="adhkar-pagination-thumb"
+            style={{ left: `${(thumbRatio * 100).toFixed(2)}%` }}
+          />
         </div>
         <input
           className="adhkar-pagination-slider"
@@ -178,6 +219,11 @@ export function Pagination({
           onNext();
           void triggerHaptic("light");
         }}
+        onPointerDown={() => startHold(1)}
+        onPointerUp={stopHold}
+        onPointerLeave={stopHold}
+        onPointerCancel={stopHold}
+        onContextMenu={(event) => event.preventDefault()}
         aria-label="next"
       >
         <ChevronRight size={14} strokeWidth={1.8} />
