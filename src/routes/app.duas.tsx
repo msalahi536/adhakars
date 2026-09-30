@@ -33,7 +33,7 @@ const JUMUAH_DUAS = JUMUAH_IDS.map(byId).filter(Boolean) as Dua[];
 const saw = (t: string) => t.split("ﷺ").flatMap((p, i) => (i ? [<span key={i} className="period-saw">ﷺ</span>, p] : [p]));
 
 type Tab = "library" | "saved";
-type Sort = "default" | "alpha" | "recent";
+
 
 function DuaLibrary() {
   const [mounted, setMounted] = useState(false);
@@ -41,11 +41,8 @@ function DuaLibrary() {
   const [q, setQ] = useState("");
   const [cat, setCat] = useState<string | null>(null);
   const [favs, setF] = useState<Fav[]>([]);
-  const [sort, setSort] = useState<Sort>("default");
-  const [duaIdx, setDuaIdx] = useState(0);
   const [now, setNow] = useState<Date | null>(null);
   useEffect(() => { setMounted(true); setF(getFavs()); setNow(new Date()); }, []);
-  useEffect(() => { setDuaIdx(0); }, [cat, sort]);
   // Deep link from the Friday (Jumu'ah) notification.
   useEffect(() => {
     if (window.localStorage.getItem("adhkar:open-jumuah") === "1") {
@@ -77,14 +74,8 @@ function DuaLibrary() {
   const catList = useMemo(() => {
     if (cat === "jum") return JUMUAH_DUAS;
     if (!cat) return [];
-    const list = DUAS.filter((d) => d.cat === cat);
-    if (sort === "alpha") return [...list].sort((a, b) => a.title.localeCompare(b.title));
-    if (sort === "recent") {
-      const at = new Map(favs.map((f) => [f.id, f.at]));
-      return [...list].sort((a, b) => (at.get(b.id) ?? 0) - (at.get(a.id) ?? 0));
-    }
-    return list;
-  }, [cat, sort, favs]);
+    return DUAS.filter((d) => d.cat === cat);
+  }, [cat]);
   const emotional = results.some((d) => EMOTIONAL_CATS.has(d.cat));
 
   const go = (t: Tab) => { setTab(t); setCat(null); void triggerHaptic("light"); document.querySelector(".period-scroll-area")?.scrollTo({ top: 0 }); };
