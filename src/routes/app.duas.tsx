@@ -5,6 +5,7 @@ import {
   Sparkles, Sun, Users, Wallet, X, CloudRain, Frown, RotateCcw, Flower2, HandHeart, Lock, Volume2,
 } from "lucide-react";
 import { toast } from "sonner";
+import { ListenButton } from "@/components/ListenButton";
 import { HeaderBackButton } from "@/components/HeaderBackButton";
 import { triggerHaptic } from "@/lib/theme";
 import { CATEGORIES, DUAS, EMOTIONAL_CATS, getFavs, searchDuas, setFavs, sourceLabel, type Dua, type Fav } from "@/lib/dua-library";
@@ -248,7 +249,7 @@ function DuaCard({ d, fav, onFav, extra }: { d: Dua; fav: boolean; onFav: () => 
       {(d.id === "hea-02" || d.id === "hea-04") && <Link to="/app/ruqyah" className="dl-link">Open the Ruqyah Companion for the full guide</Link>}
       <div className="dl-actions">
         <button onClick={copy}><Copy size={15} /> Copy</button>
-        <button disabled aria-hidden className="dl-audio-slot"><Volume2 size={15} /></button>
+        <ListenButton dhikrId={`dua-${d.id}`} size={32} title={d.title} />
         {extra}
       </div>
     </article>
