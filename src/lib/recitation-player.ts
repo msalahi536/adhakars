@@ -125,6 +125,14 @@ export const recitationPlayer = {
     const a = el();
     if (a.paused) void a.play(); else a.pause();
   },
+  previous() {
+    if (state.queueIndex <= 0) return;
+    load(state.queueIndex - 1);
+  },
+  next() {
+    if (state.queueIndex < 0 || state.queueIndex >= state.queue.length - 1) return;
+    load(state.queueIndex + 1);
+  },
   seek(t: number) { el().currentTime = t; set({ current: t }); },
 };
 

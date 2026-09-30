@@ -7,3 +7,4 @@
 - [x] Rebuild both Ruqyah walkthroughs from the full guide with expandable sources and scrollable readings
 - [x] Remove incorrect morning card 21 and evening card 20
 - [x] Synchronize recitation visualizer and refine the mini player
+- [x] Add previous and next controls to the recitation mini player
