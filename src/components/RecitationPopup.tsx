@@ -148,7 +148,7 @@ export function RecitationPopup() {
             <span className="rec-pop-all-div" aria-hidden />
             <span className="rec-pop-all-tx">
               {queueActive
-                ? `End ${open.label.charAt(0).toUpperCase()}${open.label.slice(1)}`
+                ? `End ${open.label}`
                 : `Play all ${open.label}`}
             </span>
           </button>
