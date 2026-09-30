@@ -11,6 +11,7 @@ import {
 } from "@tanstack/react-router";
 
 import { Toaster } from "@/components/ui/sonner";
+import { RecitationPopup } from "@/components/RecitationPopup";
 import appCss from "../styles.css?url";
 
 import { applyThemeForRoute, PRE_PAINT_SCRIPT } from "@/lib/theme-store";
