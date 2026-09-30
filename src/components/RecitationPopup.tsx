@@ -30,10 +30,11 @@ export function RecitationPopup() {
   const canPrevious = queueActive ? player.queueIndex > 0 : listIndex > 0;
   const canNext = queueActive
     ? player.queueIndex < player.queue.length - 1
-    : listIndex >= 0 && listIndex < open.tracks.length - 1;
+    : listIndex >= 0 && listIndex < (open?.tracks.length ?? 0) - 1;
 
   const name = track?.title ?? open?.title ?? "Recitation";
   const hasAudio = !!track;
+  const playing = player.playing;
 
   const onPrevious = () => {
     if (queueActive) { recitationPlayer.previous(); return; }
