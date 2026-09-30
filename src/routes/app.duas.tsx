@@ -176,34 +176,13 @@ function DuaLibrary() {
           {tab === "library" && cat && (
             <>
               <div className="dl-cat-head">
-                <div className="dl-head-row">
-                  <button className="dl-back" onClick={() => setCat(null)}>
-                    <ChevronLeft size={15} strokeWidth={2.5} />
-                    All categories
-                  </button>
-                  <span className="dl-count">{cat === "jum" ? `${catList.length} sunnahs` : `${catList.length} authentic ${catList.length === 1 ? "dua" : "duas"}`}</span>
-                </div>
+                <button className="dl-back" onClick={() => setCat(null)}>
+                  <ChevronLeft size={15} strokeWidth={2.5} />
+                  All categories
+                </button>
                 <h2>{cat === "jum" ? "Jumu‘ah Sunnahs" : cat}</h2>
-                {cat !== "jum" ? (
-                  <div className="dl-controls-row">
-                    <div className="dl-sort" role="radiogroup" aria-label="Sort">
-                      {(["default", "alpha", "recent"] as Sort[]).map((s) => (
-                        <button key={s} role="radio" aria-checked={sort === s} className={sort === s ? "is-active" : ""} onClick={() => setSort(s)}>
-                          {s === "default" ? "Default" : s === "alpha" ? "A–Z" : "Recently saved"}
-                        </button>
-                      ))}
-                    </div>
-                    {catList.length > 0 && <span className="dl-counter">{duaIdx + 1} / {catList.length}</span>}
-                  </div>
-                ) : (
-                  catList.length > 0 && (
-                    <div className="dl-controls-row is-alone">
-                      <span className="dl-counter">{duaIdx + 1} / {catList.length}</span>
-                    </div>
-                  )
-                )}
               </div>
-              <DuaSwipeStack key={`${cat}-${sort}`} index={duaIdx} onIndexChange={setDuaIdx}>
+              <DuaSwipeStack key={`${cat}`}>
                 {catList.map((d) => card(d))}
               </DuaSwipeStack>
             </>
@@ -270,10 +249,9 @@ const OUT_MS = 280;
 const IN_MS = 320;
 
 /** One dua at a time, swiped left-to-right like the morning/evening stacks. */
-function DuaSwipeStack({ children, index, onIndexChange }: { children: React.ReactNode[]; index: number; onIndexChange: (v: React.SetStateAction<number>) => void }) {
+function DuaSwipeStack({ children }: { children: React.ReactNode[] }) {
   const n = children.length;
-  const idx = index;
-  const setIdx: (v: React.SetStateAction<number>) => void = (v) => onIndexChange(typeof v === "function" ? (v as (i: number) => number)(index) : v);
+  const [idx, setIdx] = useState(0);
   const [phase, setPhase] = useState<SwipePhase>("idle");
   const [enter, setEnter] = useState(false);
   const [dragOffset, setDragOffset] = useState(0);
