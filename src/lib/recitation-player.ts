@@ -47,8 +47,29 @@ function runMeter() {
   meterFrame = requestAnimationFrame(runMeter);
 }
 
+// Routing audio through Web Audio makes phones pause it when the app is
+// minimized, so on phones/native we animate the bars without touching the audio.
+function canAnalyse() {
+  if (typeof window === "undefined") return false;
+  const w = window as unknown as { Capacitor?: { isNativePlatform?: () => boolean } };
+  if (w.Capacitor?.isNativePlatform?.()) return false;
+  return !/iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+}
+
+function runSynthMeter() {
+  if (!audio || audio.paused) return;
+  const t = performance.now() / 1000;
+  const lv = (f: number, p: number) => 0.3 + 0.7 * Math.abs(Math.sin(t * f + p) * Math.sin(t * f * 0.37 + p * 2));
+  set({ levels: [lv(5.1, 0), lv(6.3, 1.3), lv(4.4, 2.6)] });
+  meterFrame = requestAnimationFrame(runSynthMeter);
+}
+
 function startMeter() {
   if (!audio) return;
+  if (!canAnalyse()) {
+    if (meterFrame == null) meterFrame = requestAnimationFrame(runSynthMeter);
+    return;
+  }
   try {
     if (!audioContext) {
       audioContext = new AudioContext();
