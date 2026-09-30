@@ -136,17 +136,19 @@ export function RecitationPopup() {
           <button
             type="button"
             className="rec-pop-all"
+            aria-label={queueActive ? `End ${open.label}` : `Play all ${open.label}`}
             onClick={() => {
-              if (!queueActive && open.tracks.length) recitationPlayer.playAll(open.tracks, open.label!, 0);
+              if (queueActive) { recitationPlayer.stop(); closePopup(); return; }
+              if (open.tracks.length) recitationPlayer.playAll(open.tracks, open.label!, 0);
             }}
           >
             <span className="rec-pop-all-ic">
-              {queueActive && player.playing ? <Pause size={13} /> : <ListMusic size={13} />}
+              {queueActive ? <Square size={11} fill="currentColor" /> : <ListMusic size={13} />}
             </span>
             <span className="rec-pop-all-div" aria-hidden />
             <span className="rec-pop-all-tx">
               {queueActive
-                ? `${player.playing ? "Pause" : "Resume"} ${open.label} · ${player.queueIndex + 1}/${player.queue.length}`
+                ? `End ${open.label.charAt(0).toUpperCase()}${open.label.slice(1)}`
                 : `Play all ${open.label}`}
             </span>
           </button>
