@@ -72,6 +72,7 @@ function DuaLibrary() {
   const isFriday = mounted && now?.getDay() === 5;
   const catList = useMemo(() => {
     if (cat === "jum") return JUMUAH_DUAS;
+    if (cat === "all") return DUAS;
     if (!cat) return [];
     return DUAS.filter((d) => d.cat === cat);
   }, [cat]);
@@ -142,6 +143,18 @@ function DuaLibrary() {
                       );
                     })}
                   </div>
+                  <button
+                    className="dl-jumuah"
+                    onClick={() => { setCat("all"); void triggerHaptic("light"); document.querySelector(".period-scroll-area")?.scrollTo({ top: 0 }); }}
+                  >
+                    <span className="dl-cat-icon"><BookOpen size={18} /></span>
+                    <span className="dl-jumuah-body">
+                      <span className="dl-jumuah-name">All Duas</span>
+                      <span className="dl-jumuah-sub">Browse the complete dua library</span>
+                    </span>
+                    <span className="dl-jumuah-count">{DUAS.length} duas</span>
+                    <ChevronRight size={18} className="dl-jumuah-chevron" />
+                  </button>
                   {!isFriday && (
                     <button
                       className="dl-jumuah"
@@ -177,7 +190,7 @@ function DuaLibrary() {
           {tab === "library" && cat && (
             <>
               <div className="dl-cat-head">
-                <h2>{cat === "jum" ? "Jumu‘ah Sunnahs" : cat}</h2>
+                <h2>{cat === "jum" ? "Jumu‘ah Sunnahs" : cat === "all" ? "All Duas" : cat}</h2>
                 <button className="dl-back" onClick={() => setCat(null)}>
                   <ChevronLeft size={15} strokeWidth={2.5} />
                   All categories
