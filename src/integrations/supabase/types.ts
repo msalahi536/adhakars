@@ -14,6 +14,59 @@ export type Database = {
   }
   public: {
     Tables: {
+      dhikr_recitations: {
+        Row: {
+          dhikr_id: string
+          file_id: string
+          updated_at: string
+        }
+        Insert: {
+          dhikr_id: string
+          file_id: string
+          updated_at?: string
+        }
+        Update: {
+          dhikr_id?: string
+          file_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "dhikr_recitations_file_id_fkey"
+            columns: ["file_id"]
+            isOneToOne: false
+            referencedRelation: "recitation_files"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      recitation_files: {
+        Row: {
+          created_at: string
+          id: string
+          name: string
+          path: string
+          size: number | null
+          url: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          name: string
+          path: string
+          size?: number | null
+          url: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          name?: string
+          path?: string
+          size?: number | null
+          url?: string
+        }
+        Relationships: []
+      }
       suggestions: {
         Row: {
           body: string
