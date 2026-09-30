@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import {
-  Bookmark, ChevronDown, ChevronUp, ChevronRight, Cloud, Copy, HeartPulse, Home, Info, Compass, Search, Shield,
+  Bookmark, ChevronDown, ChevronLeft, ChevronUp, ChevronRight, Cloud, Copy, HeartPulse, Home, Info, Compass, Search, Shield,
   Sparkles, Sun, Users, Wallet, X, CloudRain, Frown, RotateCcw, Flower2, HandHeart, Volume2,
 } from "lucide-react";
 import { toast } from "sonner";
@@ -42,8 +42,10 @@ function DuaLibrary() {
   const [cat, setCat] = useState<string | null>(null);
   const [favs, setF] = useState<Fav[]>([]);
   const [sort, setSort] = useState<Sort>("default");
+  const [duaIdx, setDuaIdx] = useState(0);
   const [now, setNow] = useState<Date | null>(null);
   useEffect(() => { setMounted(true); setF(getFavs()); setNow(new Date()); }, []);
+  useEffect(() => { setDuaIdx(0); }, [cat, sort]);
   // Deep link from the Friday (Jumu'ah) notification.
   useEffect(() => {
     if (window.localStorage.getItem("adhkar:open-jumuah") === "1") {
@@ -183,20 +185,34 @@ function DuaLibrary() {
           {tab === "library" && cat && (
             <>
               <div className="dl-cat-head">
-                <button className="dl-back" onClick={() => setCat(null)}>All categories</button>
+                <div className="dl-head-row">
+                  <button className="dl-back" onClick={() => setCat(null)}>
+                    <ChevronLeft size={15} strokeWidth={2.5} />
+                    All categories
+                  </button>
+                  <span className="dl-count">{cat === "jum" ? `${catList.length} sunnahs` : `${catList.length} authentic ${catList.length === 1 ? "dua" : "duas"}`}</span>
+                </div>
                 <h2>{cat === "jum" ? "Jumu‘ah Sunnahs" : cat}</h2>
-                <p>{cat === "jum" ? `${catList.length} sunnahs` : `${catList.length} authentic ${catList.length === 1 ? "dua" : "duas"}`}</p>
-                {cat !== "jum" && (
-                  <div className="dl-sort" role="radiogroup" aria-label="Sort">
-                    {(["default", "alpha", "recent"] as Sort[]).map((s) => (
-                      <button key={s} role="radio" aria-checked={sort === s} className={sort === s ? "is-active" : ""} onClick={() => setSort(s)}>
-                        {s === "default" ? "Default" : s === "alpha" ? "A–Z" : "Recently saved"}
-                      </button>
-                    ))}
+                {cat !== "jum" ? (
+                  <div className="dl-controls-row">
+                    <div className="dl-sort" role="radiogroup" aria-label="Sort">
+                      {(["default", "alpha", "recent"] as Sort[]).map((s) => (
+                        <button key={s} role="radio" aria-checked={sort === s} className={sort === s ? "is-active" : ""} onClick={() => setSort(s)}>
+                          {s === "default" ? "Default" : s === "alpha" ? "A–Z" : "Recently saved"}
+                        </button>
+                      ))}
+                    </div>
+                    {catList.length > 0 && <span className="dl-counter">{duaIdx + 1} / {catList.length}</span>}
                   </div>
+                ) : (
+                  catList.length > 0 && (
+                    <div className="dl-controls-row is-alone">
+                      <span className="dl-counter">{duaIdx + 1} / {catList.length}</span>
+                    </div>
+                  )
                 )}
               </div>
-              <DuaSwipeStack key={`${cat}-${sort}`}>
+              <DuaSwipeStack key={`${cat}-${sort}`} index={duaIdx} onIndexChange={setDuaIdx}>
                 {catList.map((d) => card(d))}
               </DuaSwipeStack>
             </>
@@ -263,9 +279,10 @@ const OUT_MS = 280;
 const IN_MS = 320;
 
 /** One dua at a time, swiped left-to-right like the morning/evening stacks. */
-function DuaSwipeStack({ children }: { children: React.ReactNode[] }) {
+function DuaSwipeStack({ children, index, onIndexChange }: { children: React.ReactNode[]; index: number; onIndexChange: (v: React.SetStateAction<number>) => void }) {
   const n = children.length;
-  const [idx, setIdx] = useState(0);
+  const idx = index;
+  const setIdx: (v: React.SetStateAction<number>) => void = (v) => onIndexChange(typeof v === "function" ? (v as (i: number) => number)(index) : v);
   const [phase, setPhase] = useState<SwipePhase>("idle");
   const [enter, setEnter] = useState(false);
   const [dragOffset, setDragOffset] = useState(0);
@@ -399,14 +416,6 @@ function DuaSwipeStack({ children }: { children: React.ReactNode[] }) {
   if (n === 0) return null;
   return (
     <div className="dl-swipe-stack">
-      <div className="adhkar-index-row mb-1 flex min-h-9 items-center justify-center gap-2 px-4">
-        <span
-          className="rounded-full px-4 py-1.5 text-sm font-medium tabular-nums"
-          style={{ background: "color-mix(in oklab, var(--surface-card) 82%, transparent)", border: "1px solid var(--border)", boxShadow: "0 5px 18px color-mix(in oklab, var(--foreground) 7%, transparent)" }}
-        >
-          {idx + 1} / {n}
-        </span>
-      </div>
       <div
         ref={wrapperRef}
         className="relative overflow-hidden"
