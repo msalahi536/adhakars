@@ -20,6 +20,7 @@ import {
 } from "@/lib/prayer-times";
 import {
   getReciterForPrayer,
+  getAdhanPrefs,
   notificationSoundFile,
   hasNativeAdhanScheduler,
   scheduleNativeAdhan,
@@ -101,9 +102,8 @@ export const rescheduleAdhanNotifications = async (
   const native = hasNativeAdhanScheduler();
   if (!plugin && !native) return;
 
-  // Always clear any old local-notification copies so taps reach AppDelegate.
-  await cancelAdhanNotifications();
   if (!settings.adhanEnabled || !settings.location) {
+    await cancelAdhanNotifications();
     if (native) await scheduleNativeAdhan([]);
     return;
   }
@@ -111,7 +111,18 @@ export const rescheduleAdhanNotifications = async (
   if (native) {
     // The test button bypasses enabled-prayer checks, while real alerts use
     // native preferences. Keep those preferences synchronized before planning.
-    await syncAdhanPrefsToNative();
+    const prefs = getAdhanPrefs();
+    await syncAdhanPrefsToNative({
+      ...prefs,
+      enabledPrayers: {
+        ...prefs.enabledPrayers,
+        Fajr: settings.perPrayer.fajr,
+        Dhuhr: settings.perPrayer.dhuhr,
+        Asr: settings.perPrayer.asr,
+        Maghrib: settings.perPrayer.maghrib,
+        Isha: settings.perPrayer.isha,
+      },
+    });
     const now = new Date();
     const today = await fetchDay(now, settings);
     const tomorrow = await fetchDay(addDays(now, 1), settings);
@@ -148,6 +159,10 @@ export const rescheduleAdhanNotifications = async (
   const now = new Date();
   const today = await fetchDay(now, settings);
   const tomorrow = await fetchDay(addDays(now, 1), settings);
+  // Keep the last valid schedule when prayer-time fetching fails. Clearing it
+  // first meant one offline app open could silently remove every real alert.
+  if (!today && !tomorrow) return;
+  await cancelAdhanNotifications();
   const muteAll = isMutedAllToday();
   const dismissed = getDismissed();
   const todayKey = dateKey(now);
