@@ -223,6 +223,7 @@ function RootComponent() {
   return (
     <QueryClientProvider client={queryClient}>
       <Outlet />
+      <RecitationPopup />
       <Toaster position="top-center" />
     </QueryClientProvider>
   );
