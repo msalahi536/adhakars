@@ -1,13 +1,12 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import {
-  Bookmark, ChevronDown, ChevronLeft, ChevronUp, ChevronRight, Cloud, Copy, HeartPulse, Home, Info, Compass, Search, Shield,
+  Bookmark, ChevronDown, ChevronLeft, ChevronUp, ChevronRight, BookOpen, Cloud, HeartPulse, Home, Info, Compass, Search, Shield,
   Sparkles, Sun, Users, Wallet, X, CloudRain, Frown, RotateCcw, Flower2, HandHeart, Volume2,
 } from "lucide-react";
-import { toast } from "sonner";
 import { ListenButton } from "@/components/ListenButton";
 import { HeaderBackButton } from "@/components/HeaderBackButton";
-import { Pagination } from "@/components/AdhkarPrimitives";
+import { ArabicText, OrnamentalDivider, Pagination, Transliteration } from "@/components/AdhkarPrimitives";
 import { triggerHaptic } from "@/lib/theme";
 import { CATEGORIES, DUAS, EMOTIONAL_CATS, getFavs, searchDuas, setFavs, sourceLabel, type Dua, type Fav } from "@/lib/dua-library";
 
@@ -213,34 +212,35 @@ function DuaLibrary() {
 }
 
 function DuaCard({ d, fav, onFav, extra }: { d: Dua; fav: boolean; onFav: () => void; extra?: React.ReactNode }) {
-  const copy = async () => {
-    try {
-      await navigator.clipboard.writeText(`${d.title}\n\n${d.ar}\n\n${d.tr}\n\n${d.en}\n\n${d.ref}`);
-      toast("Copied to clipboard"); void triggerHaptic("light");
-    } catch { toast("Could not copy"); }
-  };
   return (
-    <article className="period-card dl-card">
-      <div className="dl-card-head">
-        <div className="min-w-0">
-          <h3>{d.title}</h3>
-          <span className="dl-badge">{sourceLabel(d.src)}</span>
-        </div>
+    <article className="dhikr-card adhkar-reference-card relative flex w-full flex-col overflow-hidden">
+      <div className="adhkar-card-heading grid items-center gap-4" style={{ gridTemplateColumns: "34px minmax(0,1fr) auto" }}>
+        <ListenButton dhikrId={`dua-${d.id}`} size={34} title={d.title} />
+        <h3 className="min-w-0 uppercase">{d.title}</h3>
         <button className={`dl-fav ${fav ? "is-on" : ""}`} onClick={onFav} aria-label={fav ? "Remove from saved" : "Save dua"} aria-pressed={fav}>
           <Bookmark size={19} fill={fav ? "currentColor" : "none"} />
         </button>
       </div>
-      <p className="arabic dl-ar" lang="ar" dir="rtl">{d.ar}</p>
-      <p className="dl-tr">{d.tr}</p>
-      <p className="dl-en">{saw(d.en)}</p>
-      <p className="dl-ref">{d.ref}</p>
-      {d.id === "wea-02" && <div className="dl-note is-amber"><Info size={14} /><span>{THUNDER_NOTE}</span></div>}
-      {d.note && <div className="dl-note"><Info size={14} /><span>{saw(d.note)}</span></div>}
-      {(d.id === "hea-02" || d.id === "hea-04") && <Link to="/app/ruqyah" className="dl-link">Open the Ruqyah Companion for the full guide</Link>}
-      <div className="dl-actions">
-        <button onClick={copy}><Copy size={15} /> Copy</button>
-        <ListenButton dhikrId={`dua-${d.id}`} size={32} title={d.title} />
-        {extra}
+      <div className="relative min-h-0 flex-1">
+        <div className="hide-scrollbar relative h-full overflow-y-auto" style={{ scrollbarWidth: "none", WebkitOverflowScrolling: "touch" }}>
+          <ArabicText size={24}>{d.ar}</ArabicText>
+          <OrnamentalDivider />
+          <Transliteration>{d.tr}</Transliteration>
+          <p className="adhkar-translation">{saw(d.en)}</p>
+          <p className="dl-ref">{d.ref}</p>
+          {d.id === "wea-02" && <div className="dl-note is-amber"><Info size={14} /><span>{THUNDER_NOTE}</span></div>}
+          {d.note && <div className="dl-note"><Info size={14} /><span>{saw(d.note)}</span></div>}
+          {(d.id === "hea-02" || d.id === "hea-04") && <Link to="/app/ruqyah" className="dl-link">Open the Ruqyah Companion for the full guide</Link>}
+          {extra && <div className="dl-extra">{extra}</div>}
+        </div>
+      </div>
+      <div className="adhkar-card-footer flex items-end justify-between gap-3">
+        <div className="adhkar-source-column flex min-w-0 flex-col">
+          <span className="adhkar-source-badge">
+            <BookOpen size={13} strokeWidth={1.5} />
+            <span>{sourceLabel(d.src)}</span>
+          </span>
+        </div>
       </div>
     </article>
   );
