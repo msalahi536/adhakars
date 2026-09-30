@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import {
   Bookmark, ChevronDown, ChevronUp, ChevronRight, Cloud, Copy, HeartPulse, Home, Info, Compass, Search, Shield,
-  Sparkles, Sun, Users, Wallet, X, CloudRain, Frown, RotateCcw, Flower2, HandHeart, Lock, Volume2,
+  Sparkles, Sun, Users, Wallet, X, CloudRain, Frown, RotateCcw, Flower2, HandHeart, Volume2,
 } from "lucide-react";
 import { toast } from "sonner";
 import { ListenButton } from "@/components/ListenButton";
@@ -195,13 +195,14 @@ function DuaLibrary() {
                   </div>
                 )}
               </div>
-              {catList.map((d) => card(d))}
+              <DuaSwipeStack key={`${cat}-${sort}`}>
+                {catList.map((d) => card(d))}
+              </DuaSwipeStack>
             </>
           )}
 
           {tab === "saved" && (
             <>
-              <p className="dl-private"><Lock size={13} /> Private — stored only on your device</p>
               {mounted && favs.length === 0 && (
                 <div className="period-card dl-empty-card">Save your most-used duas here for quick access. Tap the bookmark icon on any dua to save it.</div>
               )}
