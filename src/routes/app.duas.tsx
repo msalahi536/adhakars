@@ -397,8 +397,8 @@ function DuaSwipeStack({ children }: { children: React.ReactNode[] }) {
       </div>
       <div
         ref={wrapperRef}
-        className="relative overflow-hidden"
-        style={{ touchAction: "pan-y" }}
+        className="relative flex overflow-hidden"
+        style={{ touchAction: "pan-y", height: "calc(100dvh - 400px)", minHeight: 400 }}
       >
         <div style={{ transform, opacity, transition, willChange: "transform, opacity" }}>{children[idx]}</div>
       </div>
