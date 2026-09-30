@@ -178,11 +178,11 @@ function DuaLibrary() {
           {tab === "library" && cat && (
             <>
               <div className="dl-cat-head">
+                <h2>{cat === "jum" ? "Jumu‘ah Sunnahs" : cat}</h2>
                 <button className="dl-back" onClick={() => setCat(null)}>
                   <ChevronLeft size={15} strokeWidth={2.5} />
                   All categories
                 </button>
-                <h2>{cat === "jum" ? "Jumu‘ah Sunnahs" : cat}</h2>
               </div>
               <DuaSwipeStack key={`${cat}`}>
                 {catList.map((d) => card(d))}
