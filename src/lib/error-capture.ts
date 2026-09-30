@@ -5,6 +5,12 @@ let lastCapturedError: { error: unknown; at: number } | undefined;
 const TTL_MS = 5_000;
 
 function record(error: unknown) {
+  if (
+    error instanceof Error &&
+    (error.name === "AbortError" || error.message === "aborted" || "code" in error && error.code === "ECONNRESET")
+  ) {
+    return;
+  }
   lastCapturedError = { error, at: Date.now() };
 }
 

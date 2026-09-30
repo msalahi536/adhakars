@@ -103,6 +103,7 @@ export function Pagination({
   onPrevious,
   onNext,
   onScrub,
+  hideSelector = false,
 }: {
   total: number;
   active: number;
@@ -110,6 +111,7 @@ export function Pagination({
   onPrevious: () => void;
   onNext: () => void;
   onScrub: (index: number) => void;
+  hideSelector?: boolean;
 }) {
   const [isScrubbing, setIsScrubbing] = useState(false);
   const activeRef = useRef(active);
@@ -163,7 +165,7 @@ export function Pagination({
 
   return (
     <div className="adhkar-pagination-row">
-      {showHint && (
+      {showHint && !hideSelector && (
         <div className="adhkar-pagination-hint" role="status">
           Hold me down to quickly move through cards or go back to the beginning
         </div>
@@ -185,45 +187,47 @@ export function Pagination({
       >
         <ChevronLeft size={14} strokeWidth={1.8} />
       </button>
-      <div
-        className={`adhkar-pagination ${isScrubbing ? "is-scrubbing" : ""} ${showHint && !isScrubbing ? "is-hinting" : ""}`}
-        data-no-swipe
-        onContextMenu={(event) => event.preventDefault()}
-        onPointerDown={(event) => {
-          dismissHint();
-          setIsScrubbing(true);
-          event.currentTarget.setPointerCapture(event.pointerId);
-          const rect = event.currentTarget.getBoundingClientRect();
-          const ratio = Math.max(0, Math.min(1, (event.clientX - rect.left) / rect.width));
-          onScrub(Math.round(ratio * Math.max(0, total - 1)));
-          void triggerHaptic("light");
-        }}
-        onPointerMove={(event) => {
-          if (!event.currentTarget.hasPointerCapture(event.pointerId)) return;
-          const rect = event.currentTarget.getBoundingClientRect();
-          const ratio = Math.max(0, Math.min(1, (event.clientX - rect.left) / rect.width));
-          onScrub(Math.round(ratio * Math.max(0, total - 1)));
-        }}
-        onPointerUp={finishScrubbing}
-        onPointerCancel={finishScrubbing}
-        onLostPointerCapture={() => setIsScrubbing(false)}
-      >
-        <div className="adhkar-pagination-dots" aria-hidden="true">
-          {Array.from({ length: total }, (_, index) => (
-            <span key={index} className={index === active ? "is-active" : ""} />
-          ))}
+      {!hideSelector && (
+        <div
+          className={`adhkar-pagination ${isScrubbing ? "is-scrubbing" : ""} ${showHint && !isScrubbing ? "is-hinting" : ""}`}
+          data-no-swipe
+          onContextMenu={(event) => event.preventDefault()}
+          onPointerDown={(event) => {
+            dismissHint();
+            setIsScrubbing(true);
+            event.currentTarget.setPointerCapture(event.pointerId);
+            const rect = event.currentTarget.getBoundingClientRect();
+            const ratio = Math.max(0, Math.min(1, (event.clientX - rect.left) / rect.width));
+            onScrub(Math.round(ratio * Math.max(0, total - 1)));
+            void triggerHaptic("light");
+          }}
+          onPointerMove={(event) => {
+            if (!event.currentTarget.hasPointerCapture(event.pointerId)) return;
+            const rect = event.currentTarget.getBoundingClientRect();
+            const ratio = Math.max(0, Math.min(1, (event.clientX - rect.left) / rect.width));
+            onScrub(Math.round(ratio * Math.max(0, total - 1)));
+          }}
+          onPointerUp={finishScrubbing}
+          onPointerCancel={finishScrubbing}
+          onLostPointerCapture={() => setIsScrubbing(false)}
+        >
+          <div className="adhkar-pagination-dots" aria-hidden="true">
+            {Array.from({ length: total }, (_, index) => (
+              <span key={index} className={index === active ? "is-active" : ""} />
+            ))}
+          </div>
+          <input
+            className="adhkar-pagination-slider"
+            type="range"
+            min={0}
+            max={Math.max(0, total - 1)}
+            step={1}
+            value={active}
+            aria-label={`Adhkar ${active + 1} of ${total}`}
+            onChange={(event) => onSelect(Number(event.currentTarget.value))}
+          />
         </div>
-        <input
-          className="adhkar-pagination-slider"
-          type="range"
-          min={0}
-          max={Math.max(0, total - 1)}
-          step={1}
-          value={active}
-          aria-label={`Adhkar ${active + 1} of ${total}`}
-          onChange={(event) => onSelect(Number(event.currentTarget.value))}
-        />
-      </div>
+      )}
       <button
         type="button"
         className="adhkar-pagination-arrow"
