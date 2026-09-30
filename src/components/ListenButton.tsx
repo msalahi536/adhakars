@@ -83,7 +83,11 @@ export function ListenButton({ dhikrId, size = 32, title }: Props) {
           color: "var(--index-badge-fg, var(--accent-foreground))",
         }}
       >
-        {playing ? <span className="rec-eq" aria-hidden><i /><i /><i /></span> : <Volume2 size={Math.round(size * 0.5)} strokeWidth={1.75} />}
+        {playing ? (
+          <span className="rec-eq" aria-hidden>
+            {player.levels.map((level, index) => <i key={index} style={{ height: `${Math.round(level * 100)}%` }} />)}
+          </span>
+        ) : <Volume2 size={Math.round(size * 0.5)} strokeWidth={1.75} />}
       </button>
 
       {open && pos && (
@@ -109,7 +113,7 @@ export function ListenButton({ dhikrId, size = 32, title }: Props) {
               </button>
               <div className="min-w-0 flex-1">
                 <div className="rec-pop-title">{name}</div>
-                {!rec && <div className="rec-pop-sub">{map ? "Recitation coming soon" : "Loading…"}</div>}
+                <div className="rec-pop-sub">{rec ? "Imam Taha Hassane" : map ? "Recitation coming soon" : "Loading…"}</div>
               </div>
             </div>
 
