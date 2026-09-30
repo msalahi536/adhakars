@@ -94,7 +94,7 @@ export function RepeatCounter({ count, target, complete, tapped, bursts, justCom
   );
 }
 
-const HINT_KEY = "adhkar:hint-pagination";
+const HINT_KEY = "adhkar:hint-pagination-v2";
 
 export function Pagination({
   total,
