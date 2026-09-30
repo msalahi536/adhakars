@@ -9,3 +9,4 @@
 - [x] Synchronize recitation visualizer and refine the mini player
 - [x] Add previous and next controls to the recitation mini player
 - [x] Fix recitation player next button greying out (wrong end-of-list detection)
+- [x] Rework More into a tools-first page with compact consistency details and refined Sunnah banner
