@@ -32,8 +32,10 @@ export function RecitationPopup() {
     ? player.queueIndex < player.queue.length - 1
     : listIndex >= 0 && listIndex < (open?.tracks.length ?? 0) - 1;
 
-  const name = track?.title ?? open?.title ?? "Recitation";
   const openerTrack = open?.track ?? open?.tracks.find((t) => t.dhikrId === open.openerId) ?? null;
+  // Paused on another card's recitation while viewing this one: offer this card instead.
+  const mismatch = !!open && !!track && track.dhikrId !== open.openerId && !queueActive;
+  const name = (mismatch && !player.playing ? open?.title : track?.title) ?? open?.title ?? "Recitation";
   const hasAudio = !!track || !!openerTrack;
   const playing = player.playing;
 
@@ -95,6 +97,12 @@ export function RecitationPopup() {
         <div className="rec-pop-title">{name}</div>
         <div className="rec-pop-sub">{hasAudio ? "Imam Taha Hassane" : "Recitation coming soon"}</div>
 
+        {mismatch && playing && openerTrack && (
+          <button type="button" className="rec-pop-switch" onClick={() => recitationPlayer.playOne(openerTrack)}>
+            Play this card instead
+          </button>
+        )}
+
         <div className="rec-pop-transport">
           <button type="button" className="rec-pop-skip" onClick={onPrevious} disabled={!canPrevious} aria-label="Previous recitation">
             <SkipBack size={15} fill="currentColor" />
@@ -103,7 +111,8 @@ export function RecitationPopup() {
             type="button"
             className="rec-pop-play"
             onClick={() => {
-              if (track) recitationPlayer.toggle();
+              if (mismatch && !playing && openerTrack) recitationPlayer.playOne(openerTrack);
+              else if (track) recitationPlayer.toggle();
               else if (openerTrack) recitationPlayer.playOne(openerTrack);
             }}
             disabled={!hasAudio}

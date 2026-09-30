@@ -186,7 +186,7 @@ export function Pagination({
         <ChevronLeft size={14} strokeWidth={1.8} />
       </button>
       <div
-        className={`adhkar-pagination ${isScrubbing ? "is-scrubbing" : ""}`}
+        className={`adhkar-pagination ${isScrubbing ? "is-scrubbing" : ""} ${showHint && !isScrubbing ? "is-hinting" : ""}`}
         data-no-swipe
         onContextMenu={(event) => event.preventDefault()}
         onPointerDown={(event) => {

@@ -1017,7 +1017,12 @@ html[data-visual-phase="evening"] .adhkar-card-heading button { background: rgba
 .adhkar-pagination { position: relative; display: flex; width: fit-content; max-width: min(260px, calc(100vw - 112px)); min-width: 150px; height: 30px; align-items: center; justify-content: center; padding: 0 10px; border: 1px solid transparent; border-radius: 999px; background: transparent; color: var(--text-muted); cursor: ew-resize; touch-action: pan-x; transition: background .16s ease, border-color .16s ease, box-shadow .16s ease, transform .16s ease; -webkit-touch-callout: none; -webkit-user-select: none; user-select: none; }
 .adhkar-pagination.is-scrubbing { border-color: color-mix(in oklab, var(--dot-active) 30%, transparent); background: color-mix(in oklab, var(--pill-bg, var(--source-bg)) 86%, transparent); box-shadow: 0 5px 16px color-mix(in oklab, var(--foreground) 9%, transparent); transform: scale(1.015); }
 .adhkar-pagination-hint { position: absolute; bottom: calc(100% + 8px); left: 50%; z-index: 30; width: max-content; max-width: min(216px, calc(100vw - 56px)); padding: 7px 11px; border: 1px solid color-mix(in oklab, var(--accent) 24%, var(--border)); border-radius: 12px; background: color-mix(in oklab, var(--card) 92%, transparent); color: var(--foreground); font-size: 11px; line-height: 1.4; text-align: center; box-shadow: 0 6px 18px color-mix(in oklab, var(--foreground) 14%, transparent); backdrop-filter: blur(8px); transform: translateX(-50%); pointer-events: none; animation: pag-hint-in .3s ease both; }
-.adhkar-pagination-hint::after { position: absolute; top: 100%; left: 50%; border: 6px solid transparent; border-top-color: color-mix(in oklab, var(--accent) 24%, var(--border)); content: ""; transform: translateX(-50%); }
+.adhkar-pagination-hint { bottom: calc(100% + 16px); }
+.adhkar-pagination-hint::after { position: absolute; top: 100%; left: 50%; width: 1.5px; height: 14px; border-radius: 1px; background: color-mix(in oklab, var(--accent) 55%, var(--border)); content: ""; transform: translateX(-50%); }
+.adhkar-pagination-hint::before { position: absolute; top: calc(100% + 12px); left: 50%; width: 5px; height: 5px; border-radius: 50%; background: color-mix(in oklab, var(--accent) 70%, var(--border)); content: ""; transform: translateX(-50%); }
+.adhkar-pagination.is-hinting { border-color: color-mix(in oklab, var(--accent) 34%, transparent); background: color-mix(in oklab, var(--pill-bg, var(--source-bg)) 70%, transparent); animation: pag-calm-pulse 2.8s ease-in-out infinite; }
+@keyframes pag-calm-pulse { 0%, 100% { box-shadow: 0 0 0 0 color-mix(in oklab, var(--accent) 0%, transparent); border-color: color-mix(in oklab, var(--accent) 22%, transparent); } 50% { box-shadow: 0 0 0 5px color-mix(in oklab, var(--accent) 12%, transparent); border-color: color-mix(in oklab, var(--accent) 48%, transparent); } }
+@media (prefers-reduced-motion: reduce) { .adhkar-pagination.is-hinting { animation: none; } }
 @keyframes pag-hint-in { from { opacity: 0; translate: 0 6px; } to { opacity: 1; translate: 0 0; } }
 .adhkar-pagination-dots { position: relative; display: flex; align-items: center; justify-content: center; gap: 8px; min-width: 0; pointer-events: none; }
 .adhkar-pagination-dots span { position: relative; height: 30px; width: 5px; flex: 0 1 5px; min-width: 3px; }
@@ -4237,6 +4242,7 @@ html[data-preset="midnight"][data-visual-phase="evening"][data-section="salah"] 
 }
 @keyframes rec-pop-in { from { opacity: 0; transform: scale(.94) translateY(-4px); } to { opacity: 1; transform: none; } }
 .rec-pop-title { font-family: var(--font-display); font-size: 15px; font-weight: 700; line-height: 1.3; text-align: center; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.rec-pop-switch { display: block; margin: 8px auto 0; padding: 5px 11px; border: 1px solid color-mix(in oklab, var(--accent) 35%, var(--border)); border-radius: 999px; background: color-mix(in oklab, var(--accent) 10%, transparent); color: var(--foreground); font-size: 11px; font-weight: 600; }
 .rec-pop-sub { font-size: 10.5px; color: var(--muted-foreground); text-align: center; margin-top: 3px; }
 .rec-pop-transport { display: flex; align-items: center; justify-content: center; gap: 16px; margin-top: 13px; }
 .rec-pop-skip {
