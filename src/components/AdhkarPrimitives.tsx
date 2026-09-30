@@ -1,5 +1,5 @@
 import { BookOpen, Check, ChevronLeft, ChevronRight } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { ProgressRing } from "./ProgressRing";
 import { triggerHaptic } from "@/lib/theme";
 
@@ -195,6 +195,10 @@ export function Pagination({
           {Array.from({ length: total }, (_, index) => (
             <span key={index} className={index === active ? "is-active" : ""} />
           ))}
+          <span
+            className="adhkar-pagination-thumb"
+            style={{ left: `calc(${(thumbRatio * 100).toFixed(2)}% + ${(10 - thumbRatio * 20).toFixed(2)}px)` }}
+          />
         </div>
         <input
           className="adhkar-pagination-slider"
