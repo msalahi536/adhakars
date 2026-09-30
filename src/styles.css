@@ -3746,17 +3746,9 @@ html[data-preset="ocean"][data-visual-phase="evening"][data-section="salah"] {
 .dl-fav-chip span { white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
 .dl-fav-chip svg { color:var(--accent); flex-shrink:0; }
 .dl-cat-head { text-align:left; }
-.dl-head-row { display:flex; align-items:center; justify-content:space-between; gap:8px; }
-.dl-back { display:inline-flex; align-items:center; gap:3px; font-size:13px; font-weight:700; color:var(--accent); min-width:0; }
-.dl-count { flex-shrink:0; font-size:12px; font-weight:600; color:var(--muted-foreground); background:color-mix(in oklab, var(--card) 72%, transparent); border:1px solid color-mix(in oklab, var(--border) 80%, transparent); padding:4px 11px; border-radius:999px; white-space:nowrap; }
-.dl-cat-head h2 { font-size:22px; font-weight:800; line-height:1.2; letter-spacing:-.01em; margin-top:8px; }
-.dl-controls-row { display:flex; align-items:center; justify-content:space-between; gap:10px; margin-top:12px; }
-.dl-controls-row.is-alone { justify-content:center; }
-.dl-sort { display:flex; gap:6px; min-width:0; overflow-x:auto; scrollbar-width:none; }
-.dl-sort::-webkit-scrollbar { display:none; }
-.dl-sort button { white-space:nowrap; font-size:12px; font-weight:700; padding:6px 12px; border-radius:999px; border:1px solid var(--border); color:var(--muted-foreground); background:color-mix(in oklab, var(--card) 80%, transparent); }
-.dl-sort button.is-active { background:var(--accent); color:var(--accent-foreground); border-color:var(--accent); }
-.dl-counter { flex-shrink:0; font-size:12.5px; font-weight:800; color:var(--card-foreground); font-variant-numeric:tabular-nums; padding:6px 12px; border-radius:999px; background:var(--card); border:1px solid color-mix(in oklab, var(--border) 80%, transparent); box-shadow:var(--card-shadow); }
+.dl-back { display:inline-flex; align-items:center; gap:3px; font-size:13px; font-weight:700; color:var(--accent); padding:8px 14px; border-radius:999px; background:color-mix(in oklab, var(--card) 55%, transparent); border:1px solid color-mix(in oklab, var(--border) 70%, transparent); backdrop-filter:blur(14px); -webkit-backdrop-filter:blur(14px); box-shadow:0 2px 12px color-mix(in oklab, var(--foreground) 10%, transparent); transition:transform .15s ease; }
+.dl-back:active { transform:scale(.96); }
+.dl-cat-head h2 { font-size:22px; font-weight:800; line-height:1.2; letter-spacing:-.01em; margin-top:10px; }
 .dl-cat-head + .dl-swipe-stack { margin-top:10px; }
 .dl-card { display:flex; flex-direction:column; gap:12px; }
 .dl-card-head { display:flex; justify-content:space-between; gap:10px; }
