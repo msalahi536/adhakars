@@ -41,7 +41,7 @@ export function ListenButton({ dhikrId, size = 32, title }: Props) {
         type="button"
         onClick={(e) => {
           e.stopPropagation();
-          setPopupOpen(isOpen ? null : { openerId: dhikrId, title: name, tracks: queueTracks, label: playlist?.label ?? null });
+          setPopupOpen(isOpen ? null : { openerId: dhikrId, title: name, tracks: queueTracks, label: playlist?.label ?? null, track: rec ? { dhikrId, title: name, url: rec.url } : null });
         }}
         aria-label="play recitation"
         aria-expanded={isOpen}

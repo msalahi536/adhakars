@@ -10,6 +10,7 @@ export type PopupOpen = {
   title: string;
   tracks: Track[];
   label: string | null;
+  track?: Track | null;
 };
 
 let open: PopupOpen | null = null;

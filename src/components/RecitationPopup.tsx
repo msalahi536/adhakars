@@ -33,7 +33,8 @@ export function RecitationPopup() {
     : listIndex >= 0 && listIndex < (open?.tracks.length ?? 0) - 1;
 
   const name = track?.title ?? open?.title ?? "Recitation";
-  const hasAudio = !!track;
+  const openerTrack = open?.track ?? open?.tracks.find((t) => t.dhikrId === open.openerId) ?? null;
+  const hasAudio = !!track || !!openerTrack;
   const playing = player.playing;
 
   const onPrevious = () => {
@@ -101,7 +102,10 @@ export function RecitationPopup() {
           <button
             type="button"
             className="rec-pop-play"
-            onClick={() => hasAudio && recitationPlayer.toggle()}
+            onClick={() => {
+              if (track) recitationPlayer.toggle();
+              else if (openerTrack) recitationPlayer.playOne(openerTrack);
+            }}
             disabled={!hasAudio}
             aria-label={playing ? "Pause" : "Play"}
           >
