@@ -85,9 +85,12 @@ export function SunnahOfTheDay() {
         </span>
         <span className="sunnah-more-copy">
           <span className="sunnah-float-kicker">Sunnah of the day</span>
-          <span className="sunnah-more-text">{item.translation}</span>
+          <span className="sunnah-more-text">“{item.translation}”</span>
+          {item.reference && <span className="sunnah-more-reference">{item.reference}</span>}
         </span>
-        <ChevronRight className="sunnah-more-chevron" size={18} strokeWidth={1.8} aria-hidden="true" />
+        <span className="sunnah-more-open" aria-hidden="true">
+          <ChevronRight className="sunnah-more-chevron" size={17} strokeWidth={1.8} />
+        </span>
       </button>
 
       {open && (

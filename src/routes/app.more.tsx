@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { BedDouble, Compass, ChevronRight, HandHeart, Moon, ShieldCheck, Landmark, MoonStar, BookOpen } from "lucide-react";
+import { BedDouble, Compass, ChevronRight, HandHeart, Moon, ShieldCheck, Landmark, MoonStar, BookOpen, CalendarDays, X } from "lucide-react";
 import {
   getConsistency,
   getLifetime,
@@ -9,6 +9,7 @@ import {
   type LifetimeCounts,
 } from "@/lib/storage";
 import { SunnahOfTheDay } from "@/components/SunnahOfTheDay";
+import { Portal } from "@/components/Portal";
 
 // Completed days follow the active palette accent.
 const DONE = "color-mix(in oklab, var(--surface-deep-fg) 88%, transparent)";
@@ -85,6 +86,7 @@ function More() {
   });
   const [daysOfRem, setDaysOfRem] = useState(0);
   const [lifetimeView, setLifetimeView] = useState<"days" | "count">("days");
+  const [statsOpen, setStatsOpen] = useState(false);
 
   useEffect(() => {
     const refresh = () => {
@@ -121,10 +123,114 @@ function More() {
 
       <main className="scroll-area">
          <div className="mx-auto max-w-md px-5 py-3 space-y-4">
-          <SunnahOfTheDay />
+           <div className="grid grid-cols-2 gap-3">
+             {tiles.slice(0, 4).map(({ to, title, subtitle, Icon }) => (
+               <Link
+                 key={to}
+                 to={to}
+                 className="group flex flex-col rounded-[24px] p-4 transition-transform active:scale-[0.98]"
+                 style={{
+                   background: "var(--surface, var(--card))",
+                   border: "1px solid var(--border)",
+                   boxShadow: "var(--card-shadow, 0 4px 16px rgba(0,0,0,0.06))",
+                   color: "var(--foreground)",
+                   minHeight: 132,
+                 }}
+               >
+                 <div
+                   className="flex h-10 w-10 items-center justify-center rounded-full"
+                   style={{
+                     background: "color-mix(in oklab, var(--accent) 14%, var(--card))",
+                     color: "var(--accent)",
+                   }}
+                 >
+                   <Icon size={20} strokeWidth={2} />
+                 </div>
+                 <div className="pt-3">
+                   <div className="flex min-h-9 items-start gap-1 text-[14px] font-bold leading-snug">
+                     <span>{title}</span>
+                     <ChevronRight
+                       size={14}
+                       className="mt-0.5 shrink-0 opacity-40 transition-transform group-hover:translate-x-0.5"
+                     />
+                   </div>
+                   <div className="text-[10px] leading-snug" style={{ color: "var(--muted-foreground)" }}>
+                     {subtitle}
+                   </div>
+                 </div>
+               </Link>
+             ))}
+           </div>
+
+           <SunnahOfTheDay />
+
+           <div className="grid grid-cols-2 gap-3">
+             {tiles.slice(4).map(({ to, title, subtitle, Icon }) => (
+               <Link
+                 key={to}
+                 to={to}
+                 className="group flex flex-col rounded-[24px] p-4 transition-transform active:scale-[0.98]"
+                 style={{
+                   background: "var(--surface, var(--card))",
+                   border: "1px solid var(--border)",
+                   boxShadow: "var(--card-shadow, 0 4px 16px rgba(0,0,0,0.06))",
+                   color: "var(--foreground)",
+                   minHeight: 132,
+                 }}
+               >
+                 <div
+                   className="flex h-10 w-10 items-center justify-center rounded-full"
+                   style={{
+                     background: "color-mix(in oklab, var(--accent) 14%, var(--card))",
+                     color: "var(--accent)",
+                   }}
+                 >
+                   <Icon size={20} strokeWidth={2} />
+                 </div>
+                 <div className="pt-3">
+                   <div className="flex min-h-9 items-start gap-1 text-[14px] font-bold leading-snug">
+                     <span>{title}</span>
+                     <ChevronRight size={14} className="mt-0.5 shrink-0 opacity-40 transition-transform group-hover:translate-x-0.5" />
+                   </div>
+                   <div className="text-[10px] leading-snug" style={{ color: "var(--muted-foreground)" }}>
+                     {subtitle}
+                   </div>
+                 </div>
+               </Link>
+             ))}
+           </div>
+
+           <button
+             type="button"
+             className="more-consistency-entry"
+             onClick={() => setStatsOpen(true)}
+             aria-label="Open consistency and dhikr statistics"
+           >
+             <span className="more-consistency-icon" aria-hidden="true"><CalendarDays size={20} strokeWidth={1.8} /></span>
+             <span className="min-w-0 flex-1 text-left">
+               <span className="label-caps block">Consistency</span>
+               <span className="mt-0.5 block text-sm font-semibold">{consistency.completedCount} of the last 30 days</span>
+               <span className="mt-0.5 block text-[10px] opacity-70">Current streak: {consistency.current} days</span>
+             </span>
+             <ChevronRight size={17} className="shrink-0 opacity-60" aria-hidden="true" />
+           </button>
+
+           {statsOpen && (
+             <Portal>
+               <div className="more-stats-backdrop" onClick={() => setStatsOpen(false)}>
+                 <div className="more-stats-sheet" role="dialog" aria-modal="true" aria-label="Consistency and dhikr statistics" onClick={(event) => event.stopPropagation()}>
+                   <div className="more-stats-sheet-header">
+                     <div>
+                       <div className="label-caps">Your remembrance</div>
+                       <h2>Consistency</h2>
+                     </div>
+                     <button type="button" className="more-stats-close" onClick={() => setStatsOpen(false)} aria-label="Close statistics">
+                       <X size={18} />
+                     </button>
+                   </div>
           {/* Consistency card */}
           <section
-            className="overflow-hidden rounded-[24px] p-4"
+             className="overflow-hidden rounded-[24px] p-4 more-stats-card"
             style={{
               background: "var(--surface-deep-gradient, var(--surface-deep))",
               color: "var(--surface-deep-fg)",
@@ -302,48 +408,10 @@ function More() {
               </>
             )}
           </section>
-
-          <div className="grid grid-cols-2 gap-3">
-            {tiles.map(({ to, title, subtitle, Icon }) => (
-              <Link
-                key={to}
-                to={to}
-                className="group flex flex-col rounded-[24px] p-4 transition-transform active:scale-[0.98]"
-                style={{
-                  background: "var(--surface, var(--card))",
-                  border: "1px solid var(--border)",
-                  boxShadow: "var(--card-shadow, 0 4px 16px rgba(0,0,0,0.06))",
-                  color: "var(--foreground)",
-                  minHeight: 148,
-                }}
-              >
-                <div
-                  className="flex h-11 w-11 items-center justify-center rounded-2xl"
-                  style={{
-                    background: "color-mix(in oklab, var(--accent) 18%, transparent)",
-                    color: "var(--accent)",
-                  }}
-                >
-                  <Icon size={22} strokeWidth={2.2} />
-                </div>
-                <div className="pt-4">
-                  <div className="flex min-h-10 items-start gap-1 text-[15px] font-bold leading-snug">
-                    <span>{title}</span>
-                    <ChevronRight
-                      size={14}
-                      className="mt-0.5 shrink-0 opacity-40 transition-transform group-hover:translate-x-0.5"
-                    />
-                  </div>
-                  <div
-                    className="text-[11px] leading-snug"
-                    style={{ color: "var(--muted-foreground)" }}
-                  >
-                    {subtitle}
-                  </div>
-                </div>
-              </Link>
-            ))}
-          </div>
+                 </div>
+               </div>
+             </Portal>
+           )}
         </div>
       </main>
     </>
