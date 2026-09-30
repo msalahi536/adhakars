@@ -3,12 +3,13 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import {
   BookOpen, GripVertical, LayoutDashboard, Moon, Pencil, Plus, Settings2, Sparkles, Star, Sun,
-  Trash2, Upload, Heart, Leaf, LogOut,
+  Trash2, Upload, Heart, Leaf, LogOut, Music,
 } from "lucide-react";
 import {
   adminBulkImport, adminDeleteItem, adminLoadAll, adminLogin, adminReorder, adminSaveItem,
   adminSaveSchedule, adminToggleActive,
 } from "@/lib/admin.functions";
+import { RecitationsAdmin } from "@/components/admin/RecitationsAdmin";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -132,6 +133,7 @@ function Dashboard({ password, onLogout }: { password: string; onLogout: () => v
   const nav = [
     { key: "dashboard", label: "Dashboard", icon: LayoutDashboard },
     ...SECTIONS.map((s) => ({ key: s.key, label: s.label, icon: s.icon })),
+    { key: "recitations", label: "Recitations", icon: Music },
     { key: "settings", label: "Widget Settings", icon: Settings2 },
   ];
   const section = SECTIONS.find((s) => s.key === view);
@@ -161,6 +163,7 @@ function Dashboard({ password, onLogout }: { password: string; onLogout: () => v
           <ContentSection key={section.key} password={password} category={section.key} label={section.label}
             items={content.filter((c) => c.category === section.key)} onChange={refresh} setContent={setContent} all={content} />
         )}
+        {view === "recitations" && <RecitationsAdmin password={password} />}
         {view === "settings" && <WidgetSettings password={password} content={content} schedule={schedule} onChange={refresh} />}
       </main>
     </div>
