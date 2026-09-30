@@ -20,11 +20,13 @@ import {
 } from "@/lib/prayer-times";
 import {
   getReciterForPrayer,
+  getAdhanPrefs,
   notificationSoundFile,
   hasNativeAdhanScheduler,
   scheduleNativeAdhan,
   buildNativePrayerTime,
   isAdhanPlaying,
+  syncAdhanPrefsToNative,
   type NativePrayerTime,
 } from "@/lib/adhan-bridge";
 
@@ -91,26 +93,41 @@ export const rescheduleAdhanNotifications = async (
   settings: PrayerSettings,
 ): Promise<void> => {
   if (!isNativePlatform()) return;
-  // Never touch scheduling while the full adhan is playing (e.g. right after a
-  // notification tap opens the Salah page) so nothing interrupts playback.
+  // Never touch scheduling while the full adhan is actively playing. A paused
+  // player can retain a native session for hours and must not block re-arming.
   const status = await isAdhanPlaying();
-  if (status.playing || status.hasSession) return;
+  if (status.playing) return;
 
   const plugin = await loadNotificationPlugin();
   const native = hasNativeAdhanScheduler();
   if (!plugin && !native) return;
 
-  // Always clear any old local-notification copies so taps reach AppDelegate.
-  await cancelAdhanNotifications();
   if (!settings.adhanEnabled || !settings.location) {
+    await cancelAdhanNotifications();
     if (native) await scheduleNativeAdhan([]);
     return;
   }
 
   if (native) {
+    // The test button bypasses enabled-prayer checks, while real alerts use
+    // native preferences. Keep those preferences synchronized before planning.
+    const prefs = getAdhanPrefs();
+    await syncAdhanPrefsToNative({
+      ...prefs,
+      enabledPrayers: {
+        ...prefs.enabledPrayers,
+        Fajr: settings.perPrayer.fajr,
+        Dhuhr: settings.perPrayer.dhuhr,
+        Asr: settings.perPrayer.asr,
+        Maghrib: settings.perPrayer.maghrib,
+        Isha: settings.perPrayer.isha,
+      },
+    });
     const now = new Date();
     const today = await fetchDay(now, settings);
     const tomorrow = await fetchDay(addDays(now, 1), settings);
+    // An offline refresh must not replace a valid native schedule with empty.
+    if (!today && !tomorrow) return;
     const muteAll = isMutedAllToday();
     const dismissed = getDismissed();
     const todayKey = dateKey(now);
@@ -144,6 +161,10 @@ export const rescheduleAdhanNotifications = async (
   const now = new Date();
   const today = await fetchDay(now, settings);
   const tomorrow = await fetchDay(addDays(now, 1), settings);
+  // Keep the last valid schedule when prayer-time fetching fails. Clearing it
+  // first meant one offline app open could silently remove every real alert.
+  if (!today && !tomorrow) return;
+  await cancelAdhanNotifications();
   const muteAll = isMutedAllToday();
   const dismissed = getDismissed();
   const todayKey = dateKey(now);

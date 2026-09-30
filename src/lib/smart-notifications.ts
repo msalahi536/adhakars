@@ -158,10 +158,11 @@ export const rescheduleSunnahNotification = async (): Promise<void> => {
 
 /* ---------------- Period Companion ---------------- */
 
-export const PERIOD_IDS = Array.from({ length: 20 }, (_, i) => 9500 + i);
+const PERIOD_START_ID = 9519;
+export const PERIOD_IDS = Array.from({ length: 19 }, (_, i) => 9500 + i);
 export const isPeriodNotifId = (id: number) => id >= 9500 && id < 9520;
 const K_PERIOD_NOTIF = "period:notifications";
-const K_START_SENT = "period:notified-start";
+const K_START_TARGET = "period:notification-start-target";
 const K_END_SENT = "period:notified-end";
 
 export const getPeriodNotificationsEnabled = () =>
@@ -194,7 +195,10 @@ export const reschedulePeriodNotifications = async (): Promise<void> => {
   const plugin = await ready();
   if (!plugin) return;
   await cancel(plugin, PERIOD_IDS);
-  if (!getPeriodNotificationsEnabled() || getCycles().length === 0) return;
+  if (!getPeriodNotificationsEnabled() || getCycles().length === 0) {
+    await cancel(plugin, [PERIOD_START_ID]);
+    return;
+  }
 
   const now = new Date();
   const today = todayK();
@@ -207,10 +211,31 @@ export const reschedulePeriodNotifications = async (): Promise<void> => {
     out.push(note(PERIOD_IDS[n++], "Period Companion", body, at, "/app/more?open=period-companion"));
   };
 
-  // Day 1: sent right after she logs today's start.
-  if (open && open.start === today && localStorage.getItem(K_START_SENT) !== open.start) {
-    localStorage.setItem(K_START_SENT, open.start);
-    add("Your period has started. Salah and fasting are paused, but dhikr, dua, and reciting Quran are all open to you.", new Date(now.getTime() + 3000));
+  // Day 1: keep a durable target so an app refresh cannot cancel and lose the
+  // reminder before it is delivered. Seven minutes stays within the promised
+  // 5–10 minute window.
+  if (open && open.start === today) {
+    let target: { start: string; at: number } | null = null;
+    try {
+      target = JSON.parse(localStorage.getItem(K_START_TARGET) || "null") as { start: string; at: number } | null;
+    } catch {
+      target = null;
+    }
+    if (!target || target.start !== open.start) {
+      target = { start: open.start, at: now.getTime() + 7 * MIN };
+      localStorage.setItem(K_START_TARGET, JSON.stringify(target));
+    }
+    if (target.at > now.getTime() + 2000) {
+      out.push(note(
+        PERIOD_START_ID,
+        "Period Companion",
+        "Your period has started. Salah and fasting are paused, but dhikr, dua, and reciting Quran are all open to you.",
+        new Date(target.at),
+        "/app/more?open=period-companion",
+      ));
+    }
+  } else {
+    await cancel(plugin, [PERIOD_START_ID]);
   }
 
   if (open) {
