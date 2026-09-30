@@ -384,7 +384,15 @@ function DuaSwipeStack({ children }: { children: React.ReactNode[] }) {
 
   if (n === 0) return null;
   return (
-    <div className="dl-swipe-stack">
+    <div className="dl-swipe-stack daily-swipe-stack">
+      <div className="adhkar-index-row mb-1 flex min-h-9 items-center justify-center gap-2 px-4">
+        <span
+          className="rounded-full px-4 py-1.5 text-sm font-medium tabular-nums"
+          style={{ background: "color-mix(in oklab, var(--surface-card) 82%, transparent)", border: "1px solid var(--border)", boxShadow: "0 5px 18px color-mix(in oklab, var(--foreground) 7%, transparent)" }}
+        >
+          {idx + 1} / {n}
+        </span>
+      </div>
       <div
         ref={wrapperRef}
         className="relative overflow-hidden"
