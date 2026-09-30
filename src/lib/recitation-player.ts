@@ -12,22 +12,71 @@ export type PlayerState = {
   queue: Track[];
   queueIndex: number;
   queueLabel: string | null;
+  levels: [number, number, number];
 };
 
-let state: PlayerState = { track: null, playing: false, current: 0, duration: 0, queue: [], queueIndex: -1, queueLabel: null };
+let state: PlayerState = { track: null, playing: false, current: 0, duration: 0, queue: [], queueIndex: -1, queueLabel: null, levels: [0.28, 0.28, 0.28] };
 const subs = new Set<() => void>();
 const set = (p: Partial<PlayerState>) => { state = { ...state, ...p }; subs.forEach((f) => f()); };
 
 let audio: HTMLAudioElement | null = null;
+let audioContext: AudioContext | null = null;
+let analyser: AnalyserNode | null = null;
+let analyserData: Uint8Array<ArrayBuffer> | null = null;
+let meterFrame: number | null = null;
+
+function stopMeter() {
+  if (meterFrame != null) cancelAnimationFrame(meterFrame);
+  meterFrame = null;
+  set({ levels: [0.28, 0.28, 0.28] });
+}
+
+function runMeter() {
+  if (!analyser || !analyserData || !audio || audio.paused) return;
+  analyser.getByteFrequencyData(analyserData);
+  const bands: [number, number, number] = [0, 0, 0];
+  const width = Math.max(1, Math.floor(analyserData.length / 3));
+  for (let band = 0; band < 3; band += 1) {
+    let sum = 0;
+    const start = band * width;
+    const end = band === 2 ? analyserData.length : Math.min(analyserData.length, start + width);
+    for (let i = start; i < end; i += 1) sum += analyserData[i] ?? 0;
+    bands[band] = Math.max(0.22, Math.min(1, sum / Math.max(1, end - start) / 150));
+  }
+  set({ levels: bands });
+  meterFrame = requestAnimationFrame(runMeter);
+}
+
+function startMeter() {
+  if (!audio) return;
+  try {
+    if (!audioContext) {
+      audioContext = new AudioContext();
+      analyser = audioContext.createAnalyser();
+      analyser.fftSize = 64;
+      analyser.smoothingTimeConstant = 0.72;
+      const source = audioContext.createMediaElementSource(audio);
+      source.connect(analyser);
+      analyser.connect(audioContext.destination);
+      analyserData = new Uint8Array(analyser.frequencyBinCount);
+    }
+    void audioContext.resume();
+    if (meterFrame == null) meterFrame = requestAnimationFrame(runMeter);
+  } catch {
+    // Playback remains available if a browser does not expose audio analysis.
+  }
+}
+
 function el() {
   if (audio) return audio;
   audio = new Audio();
+  audio.crossOrigin = "anonymous";
   audio.preload = "auto";
   audio.setAttribute("playsinline", "");
   audio.addEventListener("timeupdate", () => set({ current: audio!.currentTime }));
   audio.addEventListener("loadedmetadata", () => set({ duration: audio!.duration || 0 }));
-  audio.addEventListener("play", () => set({ playing: true }));
-  audio.addEventListener("pause", () => set({ playing: false }));
+  audio.addEventListener("play", () => { set({ playing: true }); startMeter(); });
+  audio.addEventListener("pause", () => { set({ playing: false }); stopMeter(); });
   audio.addEventListener("ended", () => {
     if (state.queue.length && state.queueIndex < state.queue.length - 1) load(state.queueIndex + 1);
     else set({ playing: false, current: 0, queue: [], queueIndex: -1, queueLabel: null });
