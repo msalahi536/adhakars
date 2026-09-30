@@ -7,6 +7,7 @@ import type { SalahItem } from "@/data/salah";
 import { triggerHaptic } from "@/lib/theme";
 import { isItemComplete, itemId } from "@/data/salah";
 import { Pagination } from "./AdhkarPrimitives";
+import { RecitationPlaylistContext, playlistLabel } from "./RecitationPlaylist";
 
 type Props = {
   items: SalahItem[];
@@ -113,6 +114,21 @@ export function SwipeStack({ items, counts, onIncrement, onReset, persistKey, fi
   };
 
   const current = items[idx];
+  const recLabel = playlistLabel(persistKey);
+  const playlist = recLabel
+    ? { label: recLabel, items: items.flatMap((it) => (it.dhikr ? [{ id: it.dhikr.id, title: it.dhikr.title }] : [])) }
+    : null;
+  const scrubRef = useRef<(i: number) => void>(() => {});
+  scrubRef.current = (i) => scrubTo(i);
+  useEffect(() => {
+    const onTrack = (e: Event) => {
+      const id = (e as CustomEvent<string>).detail;
+      const i = items.findIndex((it) => it.dhikr?.id === id);
+      if (i >= 0) scrubRef.current(i);
+    };
+    window.addEventListener("recitation:track", onTrack);
+    return () => window.removeEventListener("recitation:track", onTrack);
+  }, [items]);
   const currentDhikr = current?.dhikr;
 
   // Auto-advance ONLY when the current card transitions from incomplete → complete
@@ -250,6 +266,7 @@ export function SwipeStack({ items, counts, onIncrement, onReset, persistKey, fi
   };
 
   return (
+    <RecitationPlaylistContext.Provider value={playlist}>
     <div className={`flex flex-1 flex-col overflow-hidden ${dailyLayout ? "daily-swipe-stack" : ""}`}>
       <div className="adhkar-index-row mb-1 flex min-h-9 items-center justify-center gap-2 px-4">
         <span
@@ -418,5 +435,6 @@ export function SwipeStack({ items, counts, onIncrement, onReset, persistKey, fi
         </button>
       </div>}
     </div>
+    </RecitationPlaylistContext.Provider>
   );
 }
