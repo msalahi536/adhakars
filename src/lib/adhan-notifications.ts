@@ -126,6 +126,8 @@ export const rescheduleAdhanNotifications = async (
     const now = new Date();
     const today = await fetchDay(now, settings);
     const tomorrow = await fetchDay(addDays(now, 1), settings);
+    // An offline refresh must not replace a valid native schedule with empty.
+    if (!today && !tomorrow) return;
     const muteAll = isMutedAllToday();
     const dismissed = getDismissed();
     const todayKey = dateKey(now);

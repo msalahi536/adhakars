@@ -158,7 +158,8 @@ export const rescheduleSunnahNotification = async (): Promise<void> => {
 
 /* ---------------- Period Companion ---------------- */
 
-export const PERIOD_IDS = Array.from({ length: 20 }, (_, i) => 9500 + i);
+const PERIOD_START_ID = 9519;
+export const PERIOD_IDS = Array.from({ length: 19 }, (_, i) => 9500 + i);
 export const isPeriodNotifId = (id: number) => id >= 9500 && id < 9520;
 const K_PERIOD_NOTIF = "period:notifications";
 const K_START_TARGET = "period:notification-start-target";
@@ -194,7 +195,10 @@ export const reschedulePeriodNotifications = async (): Promise<void> => {
   const plugin = await ready();
   if (!plugin) return;
   await cancel(plugin, PERIOD_IDS);
-  if (!getPeriodNotificationsEnabled() || getCycles().length === 0) return;
+  if (!getPeriodNotificationsEnabled() || getCycles().length === 0) {
+    await cancel(plugin, [PERIOD_START_ID]);
+    return;
+  }
 
   const now = new Date();
   const today = todayK();
@@ -221,10 +225,17 @@ export const reschedulePeriodNotifications = async (): Promise<void> => {
       target = { start: open.start, at: now.getTime() + 7 * MIN };
       localStorage.setItem(K_START_TARGET, JSON.stringify(target));
     }
-    add(
-      "Your period has started. Salah and fasting are paused, but dhikr, dua, and reciting Quran are all open to you.",
-      new Date(target.at),
-    );
+    if (target.at > now.getTime() + 2000) {
+      out.push(note(
+        PERIOD_START_ID,
+        "Period Companion",
+        "Your period has started. Salah and fasting are paused, but dhikr, dua, and reciting Quran are all open to you.",
+        new Date(target.at),
+        "/app/more?open=period-companion",
+      ));
+    }
+  } else {
+    await cancel(plugin, [PERIOD_START_ID]);
   }
 
   if (open) {
