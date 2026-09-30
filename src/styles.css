@@ -1021,7 +1021,6 @@ html[data-visual-phase="evening"] .adhkar-card-heading button { background: rgba
 @keyframes pag-hint-in { from { opacity: 0; translate: 0 6px; } to { opacity: 1; translate: 0 0; } }
 @keyframes pag-hint-bob { 0%, 100% { translate: 0 0; } 50% { translate: 0 -3px; } }
 .adhkar-pagination-dots { position: relative; display: flex; align-items: center; justify-content: center; gap: 8px; min-width: 0; pointer-events: none; }
-.adhkar-pagination-thumb { position: absolute; top: 50%; width: 16px; height: 16px; border-radius: 50%; background: var(--dot-active, var(--accent)); border: 2px solid var(--surface-card, var(--background)); box-shadow: 0 1px 6px color-mix(in oklab, var(--foreground) 26%, transparent), 0 0 0 3px color-mix(in oklab, var(--dot-active, var(--accent)) 22%, transparent); transform: translate(-50%, -50%); transition: left .18s ease; pointer-events: none; }
 .adhkar-pagination-dots span { position: relative; height: 30px; width: 5px; flex: 0 1 5px; min-width: 3px; }
 .adhkar-pagination-dots span::after { position: absolute; top: 50%; left: 50%; width: 5px; height: 5px; border-radius: 50%; background: var(--dot-inactive); content: ""; transform: translate(-50%, -50%); transition: width .18s ease, background .18s ease; }
 .adhkar-pagination-dots span.is-active::after { width: 7px; height: 7px; background: var(--dot-active); }
