@@ -213,7 +213,7 @@ function DuaLibrary() {
 
 function DuaCard({ d, fav, onFav, extra }: { d: Dua; fav: boolean; onFav: () => void; extra?: React.ReactNode }) {
   return (
-    <article className="dhikr-card adhkar-reference-card relative flex w-full flex-col overflow-hidden">
+    <article className="dhikr-card adhkar-reference-card relative flex w-full flex-col overflow-hidden" style={{ height: "100%" }}>
       <div className="adhkar-card-heading grid items-center gap-4" style={{ gridTemplateColumns: "34px minmax(0,1fr) auto" }}>
         <ListenButton dhikrId={`dua-${d.id}`} size={34} title={d.title} />
         <h3 className="min-w-0 uppercase">{d.title}</h3>
