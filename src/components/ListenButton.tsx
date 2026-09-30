@@ -1,5 +1,5 @@
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
-import { ListMusic, Pause, Play, Volume2 } from "lucide-react";
+import { ListMusic, Pause, Play, SkipBack, SkipForward, Volume2 } from "lucide-react";
 import { Portal } from "./Portal";
 import { usePlaylist } from "./RecitationPlaylist";
 import { recitationPlayer, usePlayer, useRecitationMap, type Track } from "@/lib/recitation-player";
@@ -33,6 +33,11 @@ export function ListenButton({ dhikrId, size = 32, title }: Props) {
     ? playlist.items.flatMap((i) => (map[i.id] ? [{ dhikrId: i.id, title: i.title, url: map[i.id].url }] : []))
     : [];
   const queueActive = !!playlist && player.queueLabel === playlist.label && player.queue.length > 0;
+  const currentQueueIndex = queueActive
+    ? player.queueIndex
+    : queueTracks.findIndex((track) => track.dhikrId === dhikrId);
+  const canPrevious = currentQueueIndex > 0;
+  const canNext = currentQueueIndex >= 0 && currentQueueIndex < queueTracks.length - 1;
 
   useLayoutEffect(() => {
     if (!open || !btnRef.current) return;
@@ -65,6 +70,18 @@ export function ListenButton({ dhikrId, size = 32, title }: Props) {
     if (queueActive) { recitationPlayer.toggle(); return; }
     const start = Math.max(0, queueTracks.findIndex((t) => t.dhikrId === dhikrId));
     recitationPlayer.playAll(queueTracks, playlist.label, start);
+  };
+
+  const onPrevious = () => {
+    if (!playlist || !canPrevious) return;
+    if (queueActive) recitationPlayer.previous();
+    else recitationPlayer.playAll(queueTracks, playlist.label, currentQueueIndex - 1);
+  };
+
+  const onNext = () => {
+    if (!playlist || !canNext) return;
+    if (queueActive) recitationPlayer.next();
+    else recitationPlayer.playAll(queueTracks, playlist.label, currentQueueIndex + 1);
   };
 
   return (
@@ -102,15 +119,23 @@ export function ListenButton({ dhikrId, size = 32, title }: Props) {
             onClick={(e) => e.stopPropagation()}
           >
             <div className="rec-pop-row">
-              <button
-                type="button"
-                className="rec-pop-play"
-                onClick={onPlay}
-                disabled={!rec}
-                aria-label={playing ? "Pause" : "Play"}
-              >
-                {playing ? <Pause size={14} fill="currentColor" /> : <Play size={14} fill="currentColor" style={{ marginLeft: 2 }} />}
-              </button>
+              <div className="rec-pop-transport">
+                <button type="button" className="rec-pop-skip" onClick={onPrevious} disabled={!canPrevious} aria-label="Previous recitation">
+                  <SkipBack size={13} fill="currentColor" />
+                </button>
+                <button
+                  type="button"
+                  className="rec-pop-play"
+                  onClick={onPlay}
+                  disabled={!rec}
+                  aria-label={playing ? "Pause" : "Play"}
+                >
+                  {playing ? <Pause size={14} fill="currentColor" /> : <Play size={14} fill="currentColor" style={{ marginLeft: 2 }} />}
+                </button>
+                <button type="button" className="rec-pop-skip" onClick={onNext} disabled={!canNext} aria-label="Next recitation">
+                  <SkipForward size={13} fill="currentColor" />
+                </button>
+              </div>
               <div className="min-w-0 flex-1">
                 <div className="rec-pop-title">{name}</div>
                 <div className="rec-pop-sub">{rec ? "Imam Taha Hassane" : map ? "Recitation coming soon" : "Loading…"}</div>
