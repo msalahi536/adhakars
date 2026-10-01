@@ -131,20 +131,25 @@ export const rescheduleAdhanNotifications = async (
     const muteAll = isMutedAllToday();
     const dismissed = getDismissed();
     const todayKey = dateKey(now);
-    const list: NativePrayerTime[] = [];
-    for (const [day, offset] of [[today, 0], [tomorrow, TOMORROW_OFFSET]] as const) {
+    // The native plugin uses ONE notification ID per prayer name (Fajr=100 …
+    // Isha=104). Sending today's and tomorrow's Asr made tomorrow's replace
+    // today's, so same-day alerts never fired. Send only the next upcoming
+    // occurrence of each prayer; reopening/resuming the app re-arms the rest.
+    const next = new Map<string, NativePrayerTime>();
+    for (const day of [today, tomorrow]) {
       if (!day) continue;
       for (const slot of slotsForDay(day)) {
         if (slot.id === "sunrise") continue;
         const id = slot.id as Exclude<PrayerId, "sunrise">;
         if (!settings.perPrayer[id]) continue;
+        if (next.has(id)) continue;
         if (slot.at.getTime() <= now.getTime() + 30_000) continue;
         if (muteAll && slot.dayKey === todayKey) continue;
         if (dismissed && dismissed.dayKey === slot.dayKey && dismissed.prayer === slot.id) continue;
-        list.push(buildNativePrayerTime(slot.label, slot.at));
+        next.set(id, buildNativePrayerTime(slot.label, slot.at));
       }
     }
-    await scheduleNativeAdhan(list);
+    await scheduleNativeAdhan([...next.values()].sort((a, b) => a.time - b.time));
     return;
   }
   if (!plugin) return;
