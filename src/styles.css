@@ -557,7 +557,7 @@ html[data-preset="rose"]:not([data-visual-phase="evening"]) .salah-dismiss {
   box-shadow:
     0 2px 10px rgba(176, 95, 114, 0.14),
     inset 0 1px 0 rgba(255, 255, 255, 0.65);
-  transition: background 0.25s ease, box-shadow 0.25s ease, transform 0.15s ease;
+  transition: width 0.5s cubic-bezier(0.32, 0.72, 0.24, 1), background 0.25s ease, box-shadow 0.25s ease, transform 0.15s ease;
 }
 html[data-preset="rose"]:not([data-visual-phase="evening"]) .salah-dismiss::after {
   content: "";
