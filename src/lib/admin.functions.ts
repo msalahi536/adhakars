@@ -179,3 +179,25 @@ export const adminSaveSchedule = createServerFn({ method: "POST" })
     if (error) throw new Error(error.message);
     return { ok: true };
   });
+
+export type AdminSuggestion = {
+  id: string;
+  kind: string;
+  body: string;
+  contact: string | null;
+  created_at: string;
+};
+
+export const adminListSuggestions = createServerFn({ method: "POST" })
+  .inputValidator((d: unknown) => pw.parse(d))
+  .handler(async ({ data }) => {
+    await checkPassword(data.password);
+    const db = await admin();
+    const { data: rows, error } = await db
+      .from("suggestions")
+      .select("id, kind, body, contact, created_at")
+      .order("created_at", { ascending: false })
+      .limit(500);
+    if (error) throw new Error(error.message);
+    return { items: (rows ?? []) as AdminSuggestion[] };
+  });

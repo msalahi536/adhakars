@@ -2,12 +2,12 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import {
-  BookOpen, GripVertical, LayoutDashboard, Moon, Pencil, Plus, Settings2, Sparkles, Star, Sun,
+  BookOpen, GripVertical, LayoutDashboard, MessageSquare, Moon, Pencil, Plus, Settings2, Sparkles, Star, Sun,
   Trash2, Upload, Heart, Leaf, LogOut, Music,
 } from "lucide-react";
 import {
-  adminBulkImport, adminDeleteItem, adminLoadAll, adminLogin, adminReorder, adminSaveItem,
-  adminSaveSchedule, adminToggleActive,
+  adminBulkImport, adminDeleteItem, adminListSuggestions, adminLoadAll, adminLogin, adminReorder, adminSaveItem,
+  adminSaveSchedule, adminToggleActive, type AdminSuggestion,
 } from "@/lib/admin.functions";
 import { RecitationsAdmin } from "@/components/admin/RecitationsAdmin";
 import { Button } from "@/components/ui/button";
@@ -134,6 +134,7 @@ function Dashboard({ password, onLogout }: { password: string; onLogout: () => v
     { key: "dashboard", label: "Dashboard", icon: LayoutDashboard },
     ...SECTIONS.map((s) => ({ key: s.key, label: s.label, icon: s.icon })),
     { key: "recitations", label: "Recitations", icon: Music },
+    { key: "suggestions", label: "Suggestions", icon: MessageSquare },
     { key: "settings", label: "Widget Settings", icon: Settings2 },
   ];
   const section = SECTIONS.find((s) => s.key === view);
@@ -164,6 +165,7 @@ function Dashboard({ password, onLogout }: { password: string; onLogout: () => v
             items={content.filter((c) => c.category === section.key)} onChange={refresh} setContent={setContent} all={content} />
         )}
         {view === "recitations" && <RecitationsAdmin password={password} />}
+        {view === "suggestions" && <SuggestionsAdmin password={password} />}
         {view === "settings" && <WidgetSettings password={password} content={content} schedule={schedule} onChange={refresh} />}
       </main>
     </div>
@@ -404,6 +406,44 @@ function WidgetSettings({ password, content, schedule, onChange }: { password: s
           );
         })}
       </div>
+    </div>
+  );
+}
+
+function SuggestionsAdmin({ password }: { password: string }) {
+  const load = useServerFn(adminListSuggestions);
+  const [items, setItems] = useState<AdminSuggestion[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    load({ data: { password } })
+      .then((r) => setItems(r.items))
+      .catch(() => setItems([]))
+      .finally(() => setLoading(false));
+  }, [load, password]);
+
+  return (
+    <div>
+      <h1 className="text-2xl font-semibold">Suggestions</h1>
+      <p className="mt-1 text-sm text-muted-foreground">Theme ideas and feedback sent from the app.</p>
+      {loading ? (
+        <p className="mt-6 text-sm text-muted-foreground">Loading…</p>
+      ) : items.length === 0 ? (
+        <p className="mt-6 text-sm text-muted-foreground">No suggestions yet.</p>
+      ) : (
+        <div className="mt-6 grid gap-3">
+          {items.map((s) => (
+            <div key={s.id} className="rounded-xl border border-border bg-card p-4">
+              <div className="flex items-center justify-between gap-3">
+                <span className="rounded-full bg-primary/15 px-2.5 py-0.5 text-xs font-medium text-primary">{s.kind}</span>
+                <span className="text-xs text-muted-foreground">{new Date(s.created_at).toLocaleString()}</span>
+              </div>
+              <p className="mt-2 whitespace-pre-wrap text-sm">{s.body}</p>
+              {s.contact && <p className="mt-2 text-xs text-muted-foreground">Contact: {s.contact}</p>}
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 }

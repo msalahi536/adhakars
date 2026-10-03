@@ -2521,11 +2521,6 @@ html[data-preset="dark-red"] .app-shell.is-settings .settings-theme-option[style
   box-shadow: 0 0 0 1px rgba(239, 133, 137, 0.15), 0 8px 20px rgba(13, 2, 3, 0.22);
 }
 
-html[data-preset="dark-red"] .app-shell.is-settings .settings-reset-theme {
-  border: 1px solid rgba(242, 157, 158, 0.18);
-  background: rgba(91, 37, 40, 0.82) !important;
-  color: #f5d8d1 !important;
-}
 
 html[data-preset="dark-red"] .app-shell.is-settings select,
 html[data-preset="dark-red"] .app-shell.is-settings input {
