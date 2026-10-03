@@ -1190,7 +1190,12 @@ function AndroidNotificationTests() {
     { label: "Test Morning Adhkar Notif", build: () => ({ id: 901, title: "Morning Adhkar", body: "Test - Time for your morning adhkar.", extra: { route: "/app/" } }) },
     { label: "Test Evening Adhkar Notif", build: () => ({ id: 902, title: "Evening Adhkar", body: "Test - Time for your evening adhkar.", extra: { route: "/app/evening" } }) },
     { label: "Test Nudge/Streak Notif", build: () => ({ id: 903, title: "Sahih Al-Adhkar", body: "Test - Your adhkar are still waiting.", extra: { route: "/app/more" } }) },
-    { label: "Test Adhan Notif (Fajr)", build: () => ({ id: 904, title: "Fajr", body: "Test adhan notification", extra: { prayer: "fajr", reciterId: toNativeReciterId(getReciterForPrayer("fajr")), soundMode: "adhan", firedAt: Math.floor(Date.now() / 1000) } }) },
+    { label: "Test Adhan Notif (Fajr)", build: () => {
+      const storedReciter = getReciterForPrayer("fajr");
+      const androidReciterId = toNativeReciterId(storedReciter);
+      console.log("[adhan-debug] Stored reciter:", storedReciter, "→ Android ID:", androidReciterId);
+      return { id: 904, title: "Fajr", body: "Test adhan notification", extra: { prayer: "fajr", reciterId: androidReciterId, soundMode: androidReciterId === "silent" ? "silent" : "adhan", firedAt: Math.floor(Date.now() / 1000) } };
+    } },
     { label: "Test Deep Link (Tasbih)", build: () => ({ id: 905, title: "Tasbih", body: "Test deep link", extra: { route: "/app/tasbih" } }) },
   ];
 

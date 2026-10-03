@@ -5,14 +5,19 @@
 /** App reciter ids → native Android AdhanPlugin ids. */
 const NATIVE_RECITER_IDS: Record<string, string> = {
   mishary: "mishary",
+  afasy: "mishary",
   "fajr-mishary": "mishary",
   basit: "abdulbasit",
+  abdulbasit: "abdulbasit",
   makkah: "makkah",
   madinah: "madinah",
   "fajr-madinah": "madinah",
   zaili: "abdullahzaili",
+  abdullahzaili: "abdullahzaili",
   majale: "hamzamajale",
+  hamzamajale: "hamzamajale",
   qatami: "nasirqatami",
+  nasirqatami: "nasirqatami",
   silent: "silent",
 };
 
@@ -20,7 +25,10 @@ const NATIVE_RECITER_IDS: Record<string, string> = {
 export const fromNativeReciterId = (id: string): string =>
   ({ abdulbasit: "basit", abdullahzaili: "zaili", hamzamajale: "majale", nasirqatami: "qatami" } as Record<string, string>)[id] ?? id;
 
-export const toNativeReciterId = (id: string): string => NATIVE_RECITER_IDS[id] ?? id;
+export const toNativeReciterId = (id: string): string => {
+  const normalized = id.trim().toLowerCase();
+  return NATIVE_RECITER_IDS[normalized] ?? normalized;
+};
 
 export const ANDROID_ADHAN_CHANNEL = "adhan_silent";
 
@@ -55,7 +63,9 @@ export async function registerAndroidAdhanListener(onTap?: TapHandler): Promise<
     const { LocalNotifications } = await import("@capacitor/local-notifications");
     await LocalNotifications.addListener("localNotificationReceived", async (notification) => {
       const extra = (notification.extra ?? {}) as Record<string, unknown>;
-      const reciterId = typeof extra.reciterId === "string" ? extra.reciterId : "";
+      const storedReciter = typeof extra.reciterId === "string" ? extra.reciterId : "";
+      const reciterId = toNativeReciterId(storedReciter);
+      console.log("[adhan-debug] Stored reciter:", storedReciter, "→ Android ID:", reciterId);
       if (extra.soundMode !== "adhan" || !reciterId || reciterId === "silent") return;
       try {
         const { AdhanPlugin } = await import("./native-bridge");
@@ -86,18 +96,20 @@ const n = (v: unknown) => (typeof v === "number" && Number.isFinite(v) ? v : Num
 export async function androidGetAdhanProgress() {
   const { AdhanPlugin } = await import("./native-bridge");
   try {
-    const o = ((await AdhanPlugin.getAdhanProgress?.()) ?? null) as Record<string, unknown> | null;
+    const o = ((await AdhanPlugin.getAdhanStatus()) ?? null) as Record<string, unknown> | null;
     if (o) {
       const duration = n(o.duration);
       const currentTime = n(o.currentTime);
+      const playing = !!o.playing;
+      const paused = !!o.paused;
       return {
         currentTime,
         duration,
-        progress: o.progress !== undefined ? n(o.progress) : duration ? currentTime / duration : 0,
-        isPlaying: !!o.isPlaying,
-        hasSession: o.hasSession !== undefined ? !!o.hasSession : !!o.isPlaying,
-        prayer: typeof o.prayer === "string" ? o.prayer : "",
-        reciterId: typeof o.reciterId === "string" ? o.reciterId : "",
+        progress: duration ? currentTime / duration : 0,
+        isPlaying: playing,
+        hasSession: playing || paused,
+        prayer: "",
+        reciterId: "",
       };
     }
   } catch {
@@ -111,17 +123,23 @@ export async function androidGetAdhanProgress() {
   }
 }
 
-const callAndroid = async (method: "pauseAdhan" | "resumeAdhan" | "seekAdhan", arg?: { progress: number }) => {
+const callAndroid = async (
+  method: "pauseAdhan" | "resumeAdhan" | "seekAdhan" | "stopAdhan",
+  arg?: { position: number },
+) => {
+  console.log("[adhan-player] button pressed:", method);
   try {
     const { AdhanPlugin } = await import("./native-bridge");
-    const fn = (AdhanPlugin as any)[method];
-    if (typeof fn === "function") await fn.call(AdhanPlugin, arg);
-    else if (method === "pauseAdhan") await AdhanPlugin.stopAdhan();
+    if (method === "pauseAdhan") await AdhanPlugin.pauseAdhan();
+    else if (method === "resumeAdhan") await AdhanPlugin.resumeAdhan();
+    else if (method === "stopAdhan") await AdhanPlugin.stopAdhan();
+    else if (arg) await AdhanPlugin.seekAdhan(arg);
   } catch (e) {
     console.error(`[android-adhan] ${method} failed`, e);
   }
 };
 export const androidPauseAdhan = () => callAndroid("pauseAdhan");
 export const androidResumeAdhan = () => callAndroid("resumeAdhan");
-export const androidSeekAdhan = (progress: number) =>
-  callAndroid("seekAdhan", { progress: Math.min(1, Math.max(0, progress)) });
+export const androidStopAdhan = () => callAndroid("stopAdhan");
+export const androidSeekAdhan = (position: number) =>
+  callAndroid("seekAdhan", { position: Math.max(0, position) });

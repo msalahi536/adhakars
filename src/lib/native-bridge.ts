@@ -14,20 +14,16 @@ export interface AdhanPluginInterface {
   playFullAdhan(options: { reciterId: string; prayer: string }): Promise<void>;
   playShortAdhan(options: { reciterId: string; prayer: string }): Promise<void>;
   stopAdhan(): Promise<void>;
-  isPlaying(): Promise<{ playing: boolean }>;
-  // Player controls (same contract as the iOS plugin).
-  pauseAdhan?(): Promise<void>;
-  resumeAdhan?(): Promise<void>;
-  seekAdhan?(options: { progress: number }): Promise<void>;
-  getAdhanProgress?(): Promise<{
-    currentTime?: number;
-    duration?: number;
-    progress?: number;
-    isPlaying?: boolean;
-    hasSession?: boolean;
-    prayer?: string;
-    reciterId?: string;
+  pauseAdhan(): Promise<void>;
+  resumeAdhan(): Promise<void>;
+  seekAdhan(options: { position: number }): Promise<void>;
+  getAdhanStatus(): Promise<{
+    playing: boolean;
+    paused: boolean;
+    currentTime: number;
+    duration: number;
   }>;
+  isPlaying(): Promise<{ playing: boolean }>;
 }
 
 /** Native Android adhan player (foreground service). */

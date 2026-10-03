@@ -9,6 +9,7 @@ import {
   androidPauseAdhan,
   androidResumeAdhan,
   androidSeekAdhan,
+  androidStopAdhan,
   fromNativeReciterId,
   isAndroidPlatform,
 } from "@/lib/android-adhan";
@@ -125,7 +126,7 @@ export function AdhanPlayer({ visible, prayer, reciterId, onClose }: Props) {
     // Hold the new position until native reports it, so the thumb doesn't snap back.
     pendingSeek.current = { frac: f, until: Date.now() + 1500 };
     setP((prev) => (prev ? { ...prev, progress: f, currentTime: f * (prev.duration || 0) } : prev));
-    void (android ? androidSeekAdhan(f) : seekAdhan(f));
+    void (android ? androidSeekAdhan(f * duration) : seekAdhan(f));
   };
   const fracAt = (clientX: number) => {
     const r = trackRef.current?.getBoundingClientRect();
@@ -135,6 +136,14 @@ export function AdhanPlayer({ visible, prayer, reciterId, onClose }: Props) {
   const skip = (delta: number) => {
     if (!duration) return;
     commitSeek((current + delta) / duration);
+  };
+  const close = () => {
+    if (!android) {
+      setMinimized(true);
+      return;
+    }
+    void androidStopAdhan();
+    onClose();
   };
 
   if (minimized) {
@@ -160,7 +169,7 @@ export function AdhanPlayer({ visible, prayer, reciterId, onClose }: Props) {
             <h2 className="ap-title">{name} Adhan</h2>
             <p className="ap-reciter">{reciter}</p>
           </div>
-          <button type="button" className="ap-close" onClick={() => setMinimized(true)} aria-label="Close and minimize player">
+          <button type="button" className="ap-close" onClick={close} aria-label={android ? "Stop and close player" : "Close and minimize player"}>
             <X size={19} />
           </button>
         </div>
