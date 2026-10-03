@@ -3,8 +3,15 @@
 // Closing minimizes to a floating pill so playback remains easy to reopen.
 
 import { useEffect, useRef, useState } from "react";
-import { Pause, Play, RotateCcw, RotateCw, Square, X } from "lucide-react";
-import { fromNativeReciterId, isAndroidPlatform } from "@/lib/android-adhan";
+import { Pause, Play, RotateCcw, RotateCw, X } from "lucide-react";
+import {
+  androidGetAdhanProgress,
+  androidPauseAdhan,
+  androidResumeAdhan,
+  androidSeekAdhan,
+  fromNativeReciterId,
+  isAndroidPlatform,
+} from "@/lib/android-adhan";
 import { Portal } from "@/components/Portal";
 import {
   getAdhanProgress,
@@ -71,23 +78,8 @@ export function AdhanPlayer({ visible, prayer, reciterId, onClose }: Props) {
       setMinimized(false);
       setP(null);
     }
-    if (isAndroidPlatform()) {
-      // Android: the native AdhanPlugin service only supports play/stop.
-      const tickAndroid = async () => {
-        try {
-          const { AdhanPlugin } = await import("@/lib/native-bridge");
-          const { playing } = await AdhanPlugin.isPlaying();
-          if (!playing && Date.now() - openedAt.current > 4000) onClose();
-        } catch {
-          // ignore
-        }
-      };
-      void tickAndroid();
-      const aid = window.setInterval(() => void tickAndroid(), 1000);
-      return () => window.clearInterval(aid);
-    }
     const tick = () => {
-      void getAdhanProgress().then((next) => {
+      void (isAndroidPlatform() ? androidGetAdhanProgress() : getAdhanProgress()).then((next) => {
         const ps = pendingSeek.current;
         if (next && ps) {
           if (Date.now() < ps.until && Math.abs(next.progress - ps.frac) > 0.02) {
@@ -122,19 +114,10 @@ export function AdhanPlayer({ visible, prayer, reciterId, onClose }: Props) {
   const name = labelFor(p?.prayer || prayer);
   const reciter = reciterNameFor(fromNativeReciterId(p?.reciterId || reciterId));
   const android = isAndroidPlatform();
-  const stopAndroid = async () => {
-    try {
-      const { AdhanPlugin } = await import("@/lib/native-bridge");
-      await AdhanPlugin.stopAdhan();
-    } catch (e) {
-      console.error("[adhan] stop failed", e);
-    }
-    onClose();
-  };
 
   const togglePlay = () => {
     setP((prev) => (prev ? { ...prev, isPlaying: !playing } : prev));
-    void (playing ? pauseAdhan() : resumeAdhan());
+    void (android ? (playing ? androidPauseAdhan() : androidResumeAdhan()) : playing ? pauseAdhan() : resumeAdhan());
   };
   const commitSeek = (frac: number) => {
     const f = Math.min(1, Math.max(0, frac));
@@ -142,7 +125,7 @@ export function AdhanPlayer({ visible, prayer, reciterId, onClose }: Props) {
     // Hold the new position until native reports it, so the thumb doesn't snap back.
     pendingSeek.current = { frac: f, until: Date.now() + 1500 };
     setP((prev) => (prev ? { ...prev, progress: f, currentTime: f * (prev.duration || 0) } : prev));
-    void seekAdhan(f);
+    void (android ? androidSeekAdhan(f) : seekAdhan(f));
   };
   const fracAt = (clientX: number) => {
     const r = trackRef.current?.getBoundingClientRect();
@@ -182,13 +165,6 @@ export function AdhanPlayer({ visible, prayer, reciterId, onClose }: Props) {
           </button>
         </div>
 
-        {android ? (
-          <div className="ap-controls">
-            <button type="button" className="ap-play" onClick={() => void stopAndroid()} aria-label="Stop adhan">
-              <Square size={26} fill="currentColor" />
-            </button>
-          </div>
-        ) : (<>
         <div className="ap-scrub">
           <div
             ref={trackRef}
@@ -234,7 +210,6 @@ export function AdhanPlayer({ visible, prayer, reciterId, onClose }: Props) {
             <RotateCw size={24} /><span className="ap-skip-n">10</span>
           </button>
         </div>
-        </>)}
 
       </div>
     </Portal>
