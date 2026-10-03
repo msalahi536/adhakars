@@ -34,7 +34,6 @@ import {
   setJumuahNotificationEnabled,
   scheduleJumuahNotification,
   cancelJumuahNotification,
-  sendTestJumuahNotification,
   type NotificationPrefs,
   type Reminder,
 } from "@/lib/notifications";
@@ -54,10 +53,6 @@ import {
   setStreakNotificationsEnabled,
   setSunnahNotificationEnabled,
   getStreakNotificationsEnabled,
-  sendTestSunnahNotification,
-  sendTestAdhkarNotification,
-  sendTestPeriodNotification,
-  sendTestStreakNotification,
 } from "@/lib/smart-notifications";
 import { requestAppReview } from "@/lib/rate-app";
 import {
