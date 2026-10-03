@@ -399,7 +399,10 @@ function Salah() {
           disabled={!nextSalah}
           className={`salah-dismiss active:scale-95 ${nextIsDismissed ? "is-dismissed" : ""}`}
         >
-          {nextIsDismissed ? `Dismissed until after ${nextSalah?.label}` : "Tap to dismiss next salah"}
+          <span className="salah-dismiss-label salah-dismiss-active">Tap to dismiss</span>
+          <span className="salah-dismiss-label salah-dismiss-dismissed" aria-hidden={nextIsDismissed}>
+            Dismissed
+          </span>
         </button>
       </header>
 
