@@ -560,6 +560,7 @@ html[data-preset="rose"]:not([data-visual-phase="evening"]) .salah-dismiss {
     inset 0 1px 0 rgba(255, 255, 255, 0.65);
   transition: width 0.5s cubic-bezier(0.32, 0.72, 0.24, 1), background 0.25s ease, box-shadow 0.25s ease, transform 0.15s ease;
 }
+html[data-preset="rose"]:not([data-visual-phase="evening"]) .salah-dismiss.is-dismissed { width: 208px; }
 html[data-preset="rose"]:not([data-visual-phase="evening"]) .salah-dismiss::after {
   content: "";
   width: 5px;
