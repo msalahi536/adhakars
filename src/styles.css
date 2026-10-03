@@ -1069,26 +1069,26 @@ html[data-visual-phase="evening"] .adhkar-card-heading button { background: rgba
   color: #2f4f34;
   font-family: var(--font-display);
 }
-.salah-hero { position: relative; display: flex; flex: 0 0 auto; flex-direction: column; align-items: center; box-sizing: border-box; padding: 53px 24px 12px; text-align: center; }
+.salah-hero { position: relative; display: flex; flex: 0 0 auto; flex-direction: column; align-items: center; box-sizing: border-box; padding: 42px 24px 12px; text-align: center; }
 .salah-next-label { color: #3f5a3c; font-size: 18px; font-weight: 500; line-height: 22px; }
-.salah-countdown { margin-top: 4px; color: #2f4f34; font-size: 52px; font-weight: 500; line-height: 52px; letter-spacing: 0; font-variant-numeric: tabular-nums; transition: color 400ms ease; }
-.salah-dismiss { display: inline-flex; height: 32px; flex: 0 0 auto; align-items: center; justify-content: center; margin-top: 16px; padding: 0 22px; border: 1px solid rgba(255, 255, 255, 0.8); border-radius: 999px; background: rgba(233, 233, 222, 0.9); color: #2f4f34; font-size: 15px; font-weight: 500; line-height: 1; white-space: nowrap; backdrop-filter: blur(20px); }
+.salah-countdown { margin-top: 4px; color: #2f4f34; font-size: 46px; font-weight: 500; line-height: 46px; letter-spacing: 0; font-variant-numeric: tabular-nums; transition: color 400ms ease; }
+.salah-dismiss { display: inline-flex; height: 32px; flex: 0 0 auto; align-items: center; justify-content: center; margin-top: 12px; padding: 0 22px; border: 1px solid rgba(255, 255, 255, 0.8); border-radius: 999px; background: rgba(233, 233, 222, 0.9); color: #2f4f34; font-size: 15px; font-weight: 500; line-height: 1; white-space: nowrap; backdrop-filter: blur(20px); }
 .salah-dismiss:active { transform: scale(0.95); }
 .salah-dismiss:disabled { opacity: 0.45; }
-.salah-location { display: flex; align-items: center; justify-content: center; gap: 6px; margin-top: 11px; color: #5f7a5a; font-size: 13px; font-weight: 400; line-height: 16px; }
+.salah-location { display: flex; align-items: center; justify-content: center; gap: 6px; margin-top: 9px; color: #5f7a5a; font-size: 13px; font-weight: 400; line-height: 16px; }
 .salah-content { flex: 1; min-height: 0; overflow-x: hidden; overflow-y: auto; padding-bottom: 24px; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
 .salah-content::-webkit-scrollbar { display: none; }
-.salah-content-inner { display: grid; grid-template-rows: 242px 62px 170px; gap: 12px; width: 100%; max-width: 390px; height: 498px; margin: 16px auto 0; padding: 0 28px; box-sizing: border-box; }
+.salah-content-inner { display: grid; grid-template-rows: 148px 62px 242px; gap: 10px; width: 100%; max-width: 390px; height: 472px; margin: 10px auto 0; padding: 0 28px; box-sizing: border-box; }
 .salah-content-inner.no-location { display: flex; flex-direction: column; height: auto; max-height: 100%; overflow-y: auto; -webkit-overflow-scrolling: touch; padding-bottom: 24px; }
 .salah-location-card { position: relative; z-index: 5; width: 100%; box-sizing: border-box; border-radius: 18px; }
-.salah-recommended-card { box-sizing: border-box; height: 170px; padding: 18px 20px; border: 1px solid rgba(255, 255, 255, 0.8); border-radius: 18px; background: rgba(250, 247, 240, 0.92); box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06); backdrop-filter: blur(20px); }
-.salah-recommended-top { height: 26px; }
+.salah-recommended-card { box-sizing: border-box; height: 148px; padding: 12px 18px; border: 1px solid rgba(255, 255, 255, 0.8); border-radius: 18px; background: rgba(250, 247, 240, 0.92); box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06); backdrop-filter: blur(20px); }
+.salah-recommended-top { height: 24px; }
 .salah-kicker { color: #8a9a80; font-family: var(--font-sans); font-size: 11px; font-weight: 500; line-height: 1; letter-spacing: 0.18em; text-transform: uppercase; }
-.salah-change { height: 26px; padding: 0 12px; border-radius: 999px; background: #ebe9e0; color: #2f4f34; font-family: var(--font-sans); font-size: 12px; font-weight: 500; }
-.salah-recommended-title { margin-top: 6px; color: #2f4f34; font-size: 26px; font-weight: 500; line-height: 28px; }
+.salah-change { height: 24px; padding: 0 12px; border-radius: 999px; background: #ebe9e0; color: #2f4f34; font-family: var(--font-sans); font-size: 12px; font-weight: 500; }
+.salah-recommended-title { margin-top: 4px; color: #2f4f34; font-size: 24px; font-weight: 500; line-height: 26px; }
 .salah-recommended-progress { margin-top: 2px; color: #5f7a5a; font-size: 15px; font-weight: 400; line-height: 18px; }
-.salah-recommended-action { gap: 16px; margin-top: 14px; }
-.salah-play { width: 48px; height: 48px; background: var(--preset-ink); color: #ffffff; box-shadow: 0 6px 16px rgba(var(--preset-ink-rgb), 0.35); }
+.salah-recommended-action { gap: 14px; margin-top: 8px; }
+.salah-play { width: 40px; height: 40px; background: var(--preset-ink); color: #ffffff; box-shadow: 0 6px 16px rgba(var(--preset-ink-rgb), 0.35); }
 .salah-play svg { margin-left: 2px; }
 .salah-action-label { color: #2f4f34; font-size: 16px; font-weight: 500; line-height: 19px; }
 .salah-action-track { height: 4px; margin-top: 8px; overflow: hidden; border-radius: 999px; background: rgba(0, 0, 0, 0.08); }
@@ -1423,19 +1423,19 @@ html[data-preset][data-section="tasbih"] {
   .qibla-page { padding-inline: 24px; }
   .qibla-compass { width: min(76vw, 318px); }
 
-  .salah-hero { padding-top: 55px; }
+  .salah-hero { padding-top: 44px; }
   .salah-next-label { font-size: 19px; }
-  .salah-countdown { font-size: 56px; line-height: 56px; }
+  .salah-countdown { font-size: 48px; line-height: 48px; }
   .salah-dismiss { height: 36px; font-size: 16px; }
   .salah-location { font-size: 14px; }
   .salah-content-inner {
     max-width: 430px;
-    grid-template-rows: 250px 66px 178px;
-    height: 518px;
+    grid-template-rows: 148px 66px 250px;
+    height: 484px;
     padding-inline: 20px;
   }
-  .salah-recommended-card { height: 178px; padding: 19px 21px; }
-  .salah-recommended-title { font-size: 28px; line-height: 30px; }
+  .salah-recommended-card { height: 148px; padding: 12px 18px; }
+  .salah-recommended-title { font-size: 25px; line-height: 27px; }
   .salah-upcoming-wrap,
   .prayer-timeline-card,
   .salah-upcoming-placeholder { height: 250px !important; }
@@ -1465,18 +1465,18 @@ html[data-preset][data-section="tasbih"] {
   .adhkar-repeat-counter { width: 78px !important; height: 78px !important; }
   .adhkar-counter-value { font-size: 32px !important; }
 
-  .salah-hero { padding-top: 44px !important; }
+  .salah-hero { padding-top: 38px !important; }
   .salah-next-label { font-size: 18px !important; }
-  .salah-countdown { font-size: 46px !important; line-height: 46px !important; }
+  .salah-countdown { font-size: 44px !important; line-height: 44px !important; }
   .salah-dismiss { height: 34px !important; font-size: 15px !important; }
   .salah-location { font-size: 13px !important; }
   .salah-content-inner:not(.no-location) {
     height: 100% !important;
     min-height: 0 !important;
-    grid-template-rows: 62px minmax(0, 1fr) 154px !important;
+    grid-template-rows: 148px 62px minmax(0, 1fr) !important;
   }
-  .salah-recommended-card { height: 154px !important; padding: 16px 18px !important; }
-  .salah-recommended-title { font-size: 25px !important; line-height: 27px !important; }
+  .salah-recommended-card { height: 148px !important; padding: 12px 18px !important; }
+  .salah-recommended-title { font-size: 24px !important; line-height: 26px !important; }
   .salah-upcoming-wrap,
   .prayer-timeline-card,
   .salah-upcoming-placeholder { height: 100% !important; min-height: 0 !important; }

@@ -463,7 +463,61 @@ function Salah() {
             </div>
           )}
 
-          {/* Prayer times first — the core of this page */}
+          {/* Recommended: entry into the after salah adhkar */}
+          <section className="salah-recommended-card">
+            <div className="salah-recommended-top flex items-center justify-between gap-3">
+              <div className="min-w-0">
+                <div className="salah-kicker">
+                  Recommended
+                </div>
+              </div>
+              <button
+                onClick={() => setPickerOpen(true)}
+                className="salah-change flex shrink-0 items-center gap-1 active:scale-95"
+              >
+                Change
+                <ChevronDown size={12} strokeWidth={2} />
+              </button>
+            </div>
+            <div className="salah-recommended-title">After {selectedLabel} Adhkar</div>
+            <div className="salah-recommended-progress">{cur.done} of {cur.total} complete</div>
+
+            <div className="salah-recommended-action flex items-center">
+              <button
+                onClick={() => setSheetOpen(true)}
+                aria-label={`Open after ${selectedLabel} adhkar`}
+                className="salah-play flex shrink-0 items-center justify-center rounded-full active:scale-95"
+              >
+                <Play size={18} fill="currentColor" strokeWidth={1.5} />
+              </button>
+              <div className="min-w-0 flex-1">
+                <div className="salah-action-label">
+                  {pct === 100 ? "Completed today" : pct > 0 ? "Continue" : "Begin the adhkar"}
+                </div>
+                <div className="salah-action-track">
+                  <span style={{ width: `${pct}%` }} />
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <button
+            onClick={() => setAdhanSettingsOpen(true)}
+            className="salah-adhan-card flex w-full items-center text-left active:scale-[0.99]"
+          >
+            <span className="salah-adhan-icon flex shrink-0 items-center justify-center rounded-full">
+              <Bell size={16} />
+            </span>
+            <span className="min-w-0 flex-1">
+              <span className="salah-adhan-title block">Adhan Settings</span>
+              <span className="salah-adhan-subtitle block">
+                {settings.adhanEnabled ? "Prayer alerts are on" : "Choose prayer alerts and reciters"}
+              </span>
+            </span>
+            <ChevronRight size={16} strokeWidth={1.5} className="salah-adhan-chevron" />
+          </button>
+
+          {/* Prayer times */}
           {settings.location ? (
             <div className="salah-upcoming-wrap">
               <PrayerTimeline
@@ -510,60 +564,6 @@ function Salah() {
               </div>
             </div>
           )}
-
-          <button
-            onClick={() => setAdhanSettingsOpen(true)}
-            className="salah-adhan-card flex w-full items-center text-left active:scale-[0.99]"
-          >
-            <span className="salah-adhan-icon flex shrink-0 items-center justify-center rounded-full">
-              <Bell size={16} />
-            </span>
-            <span className="min-w-0 flex-1">
-              <span className="salah-adhan-title block">Adhan Settings</span>
-              <span className="salah-adhan-subtitle block">
-                {settings.adhanEnabled ? "Prayer alerts are on" : "Choose prayer alerts and reciters"}
-              </span>
-            </span>
-            <ChevronRight size={16} strokeWidth={1.5} className="salah-adhan-chevron" />
-          </button>
-
-          {/* Recommended: entry into the after salah adhkar */}
-          <section className="salah-recommended-card">
-            <div className="salah-recommended-top flex items-center justify-between gap-3">
-              <div className="min-w-0">
-                <div className="salah-kicker">
-                  Recommended
-                </div>
-              </div>
-              <button
-                onClick={() => setPickerOpen(true)}
-                className="salah-change flex shrink-0 items-center gap-1 active:scale-95"
-              >
-                Change
-                <ChevronDown size={12} strokeWidth={2} />
-              </button>
-            </div>
-            <div className="salah-recommended-title">After {selectedLabel} Adhkar</div>
-            <div className="salah-recommended-progress">{cur.done} of {cur.total} complete</div>
-
-            <div className="salah-recommended-action flex items-center">
-              <button
-                onClick={() => setSheetOpen(true)}
-                aria-label={`Open after ${selectedLabel} adhkar`}
-                className="salah-play flex shrink-0 items-center justify-center rounded-full active:scale-95"
-              >
-                <Play size={18} fill="currentColor" strokeWidth={1.5} />
-              </button>
-              <div className="min-w-0 flex-1">
-                <div className="salah-action-label">
-                  {pct === 100 ? "Completed today" : pct > 0 ? "Continue" : "Begin the adhkar"}
-                </div>
-                <div className="salah-action-track">
-                  <span style={{ width: `${pct}%` }} />
-                </div>
-              </div>
-            </div>
-          </section>
 
 
 
