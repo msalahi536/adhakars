@@ -7,7 +7,6 @@ import {
   getPresetId,
   setPresetId,
   setCustomTriplet,
-  resetTheme,
   PRESETS,
   DEFAULT_PRESET_ID,
   getModeSetting,
@@ -297,11 +296,6 @@ function Settings() {
   };
 
 
-  const doReset = () => {
-    resetTheme();
-    setPresetIdState(DEFAULT_PRESET_ID);
-    window.dispatchEvent(new Event("adhkar:theme-change"));
-  };
 
   const updateDisplay = (patch: Partial<typeof display>) => {
     const d = { ...display, ...patch };
