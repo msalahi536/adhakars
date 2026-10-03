@@ -135,27 +135,6 @@ export const rescheduleAdhanNotifications = async (
     // Isha=104). Sending today's and tomorrow's Asr made tomorrow's replace
     // today's, so same-day alerts never fired. Send only the next upcoming
     // occurrence of each prayer; reopening/resuming the app re-arms the rest.
-    // DEBUG: with localStorage "adhkar:debug-notify-recent" set, re-fire the
-    // most recent enabled prayer ~75s from now to verify real delivery.
-    if (localStorage.getItem("adhkar:debug-notify-recent")) {
-      const debug: NativePrayerTime[] = [];
-      const fireAt = new Date(now.getTime() + 75_000);
-      for (const day of [today, tomorrow]) {
-        if (!day) continue;
-        for (const slot of slotsForDay(day)) {
-          if (slot.id === "sunrise") continue;
-          const id = slot.id as Exclude<PrayerId, "sunrise">;
-          if (!settings.perPrayer[id]) continue;
-          if (slot.at.getTime() > now.getTime()) continue;
-          if (now.getTime() - slot.at.getTime() > 24 * 60 * 60 * 1000) continue;
-          debug.push(buildNativePrayerTime(slot.label, fireAt));
-        }
-      }
-      if (debug.length > 0) {
-        await scheduleNativeAdhan(debug);
-        return;
-      }
-    }
     const next = new Map<string, NativePrayerTime>();
     for (const day of [today, tomorrow]) {
       if (!day) continue;
