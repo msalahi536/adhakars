@@ -1047,10 +1047,10 @@ html[data-visual-phase="evening"] .adhkar-card-heading button { background: rgba
   font-family: var(--font-display);
 }
 .salah-hero { position: relative; display: flex; flex: 0 0 auto; flex-direction: column; align-items: center; box-sizing: border-box; padding: 36px 24px 10px; text-align: center; }
-.salah-next-label { color: #3f5a3c; font-family: "Outfit", var(--font-sans); font-size: 18px; font-weight: 500; line-height: 23px; letter-spacing: 0.005em; }
-.salah-countdown { margin-top: 3px; color: #2f4f34; font-family: "Outfit", var(--font-sans); font-size: 42px; font-weight: 500; line-height: 42px; letter-spacing: -0.005em; font-variant-numeric: tabular-nums; transition: color 400ms ease; }
-.salah-dismiss { display: inline-flex; height: 33px; flex: 0 0 auto; align-items: center; justify-content: center; margin-top: 12px; padding: 0 16px; width: 187px; box-sizing: border-box; border: 1.5px solid rgba(47, 79, 52, 0.32); border-radius: 999px; background: transparent; color: #2f4f34; font-family: "Outfit", var(--font-sans); font-size: 14px; font-weight: 500; line-height: 1; white-space: nowrap; overflow: hidden; transition: width 0.5s cubic-bezier(0.32, 0.72, 0.24, 1), transform 0.15s ease, opacity 0.15s ease, background 0.3s ease, border-color 0.3s ease; }
-.salah-dismiss.is-dismissed { width: 201px; border-color: rgba(47, 79, 52, 0.22); background: rgba(233, 233, 222, 0.14); }
+.salah-next-label { color: #3f5a3c; font-family: "Outfit", var(--font-sans); font-size: 17px; font-weight: 500; line-height: 22px; letter-spacing: 0.005em; }
+.salah-countdown { margin-top: 2px; color: #2f4f34; font-family: "Outfit", var(--font-sans); font-size: 38px; font-weight: 500; line-height: 38px; letter-spacing: -0.005em; font-variant-numeric: tabular-nums; transition: color 400ms ease; }
+.salah-dismiss { display: inline-flex; height: 30px; flex: 0 0 auto; align-items: center; justify-content: center; margin-top: 10px; padding: 0 14px; width: 172px; box-sizing: border-box; border: 1.5px solid rgba(47, 79, 52, 0.32); border-radius: 999px; background: transparent; color: #2f4f34; font-family: "Outfit", var(--font-sans); font-size: 13px; font-weight: 500; line-height: 1; white-space: nowrap; overflow: hidden; transition: width 0.5s cubic-bezier(0.32, 0.72, 0.24, 1), transform 0.15s ease, opacity 0.15s ease, background 0.3s ease, border-color 0.3s ease; }
+.salah-dismiss.is-dismissed { width: 188px; border-color: rgba(47, 79, 52, 0.22); background: rgba(233, 233, 222, 0.14); }
 .salah-dismiss:active { transform: scale(0.96); }
 .salah-dismiss:disabled { opacity: 0.45; }
 .salah-location { display: flex; align-items: center; justify-content: center; gap: 6px; margin-top: 9px; color: #5f7a5a; font-size: 13px; font-weight: 400; line-height: 16px; }
