@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
-import { Bell, BellOff, ChevronDown, ChevronLeft, ChevronRight, MapPin, Pause, Play, Volume2, X } from "lucide-react";
+import { Bell, BellOff, ChevronDown, ChevronLeft, ChevronRight, Pause, Play, Volume2, X } from "lucide-react";
 import { PrayerTimeline } from "@/components/prayer/PrayerTimeline";
 import { AfterSalahSheet } from "@/components/prayer/AfterSalahSheet";
 import { PrayerPicker } from "@/components/prayer/PrayerPicker";
@@ -397,10 +397,6 @@ function Salah() {
         <button onClick={toggleDismissNext} disabled={!nextSalah} className="salah-dismiss active:scale-95">
           {nextIsDismissed ? `${nextSalah?.label} dismissed · tap to undo` : "Tap to dismiss next salah"}
         </button>
-        <div className="salah-location">
-          <MapPin size={12} strokeWidth={1.5} />
-          {settings.location ? settings.location.label : "Location not set"}
-        </div>
       </header>
 
       <main className="salah-content">
