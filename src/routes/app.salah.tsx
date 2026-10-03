@@ -215,10 +215,16 @@ function Salah() {
     [allSlots, now],
   );
 
+  // Sunrise has no adhan, so dismissing always targets the next actual salah.
+  const nextSalah = useMemo(
+    () => allSlots.find((s) => s.id !== "sunrise" && s.at.getTime() > now.getTime()) ?? null,
+    [allSlots, now],
+  );
   const nextIsDismissed =
-    !!next && !!dismissed && dismissed.dayKey === next.dayKey && dismissed.prayer === next.id;
+    !!nextSalah && !!dismissed && dismissed.dayKey === nextSalah.dayKey && dismissed.prayer === nextSalah.id;
 
   const toggleDismissNext = () => {
+    const next = nextSalah;
     if (!next) return;
     if (nextIsDismissed) {
       setDismissed(null);
@@ -409,8 +415,8 @@ function Salah() {
         >
           {next ? formatCountdown(next.at.getTime() - now.getTime()) : "--:--:--"}
         </div>
-        <button onClick={toggleDismissNext} disabled={!next} className="salah-dismiss active:scale-95">
-          {nextIsDismissed ? "Tap to unmute next salah" : "Tap to dismiss"}
+        <button onClick={toggleDismissNext} disabled={!nextSalah} className="salah-dismiss active:scale-95">
+          {nextIsDismissed ? `${nextSalah?.label} dismissed · tap to undo` : "Tap to dismiss next salah"}
         </button>
         <div className="salah-location">
           <MapPin size={12} strokeWidth={1.5} />
