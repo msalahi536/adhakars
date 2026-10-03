@@ -79,3 +79,49 @@ export async function registerAndroidAdhanListener(onTap?: TapHandler): Promise<
     console.warn("[android-adhan] listener setup failed", e);
   }
 }
+
+// ---- Player controls (Android native AdhanPlugin, iOS-identical contract) ----
+const n = (v: unknown) => (typeof v === "number" && Number.isFinite(v) ? v : Number(v) || 0);
+
+export async function androidGetAdhanProgress() {
+  const { AdhanPlugin } = await import("./native-bridge");
+  try {
+    const o = ((await AdhanPlugin.getAdhanProgress?.()) ?? null) as Record<string, unknown> | null;
+    if (o) {
+      const duration = n(o.duration);
+      const currentTime = n(o.currentTime);
+      return {
+        currentTime,
+        duration,
+        progress: o.progress !== undefined ? n(o.progress) : duration ? currentTime / duration : 0,
+        isPlaying: !!o.isPlaying,
+        hasSession: o.hasSession !== undefined ? !!o.hasSession : !!o.isPlaying,
+        prayer: typeof o.prayer === "string" ? o.prayer : "",
+        reciterId: typeof o.reciterId === "string" ? o.reciterId : "",
+      };
+    }
+  } catch {
+    // fall through to isPlaying
+  }
+  try {
+    const { playing } = await AdhanPlugin.isPlaying();
+    return { currentTime: 0, duration: 0, progress: 0, isPlaying: playing, hasSession: playing, prayer: "", reciterId: "" };
+  } catch {
+    return null;
+  }
+}
+
+const callAndroid = async (method: "pauseAdhan" | "resumeAdhan" | "seekAdhan", arg?: { progress: number }) => {
+  try {
+    const { AdhanPlugin } = await import("./native-bridge");
+    const fn = (AdhanPlugin as any)[method];
+    if (typeof fn === "function") await fn.call(AdhanPlugin, arg);
+    else if (method === "pauseAdhan") await AdhanPlugin.stopAdhan();
+  } catch (e) {
+    console.error(`[android-adhan] ${method} failed`, e);
+  }
+};
+export const androidPauseAdhan = () => callAndroid("pauseAdhan");
+export const androidResumeAdhan = () => callAndroid("resumeAdhan");
+export const androidSeekAdhan = (progress: number) =>
+  callAndroid("seekAdhan", { progress: Math.min(1, Math.max(0, progress)) });
