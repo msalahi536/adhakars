@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
-import { Bell, ChevronDown, ChevronLeft, ChevronRight, MapPin, Pause, Play, Volume2, X } from "lucide-react";
+import { Bell, BellOff, ChevronDown, ChevronLeft, ChevronRight, MapPin, Pause, Play, Volume2, X } from "lucide-react";
 import { PrayerTimeline } from "@/components/prayer/PrayerTimeline";
 import { AfterSalahSheet } from "@/components/prayer/AfterSalahSheet";
 import { PrayerPicker } from "@/components/prayer/PrayerPicker";
@@ -33,7 +33,7 @@ import {
 import { isNativeApp } from "@/lib/native-bridge";
 import { rescheduleAdhanNotifications } from "@/lib/adhan-notifications";
 import { checkNotificationPermission, requestNotificationPermission } from "@/lib/notifications";
-import { getAdhanPrefs, playAdhanPreview, preloadAdhanPreviews, RECITERS, FAJR_RECITERS, setAdhanPrefs, stopAdhanPreview, testPrayerNotification, getDiagnostics, type AdhanPrefs } from "@/lib/adhan-bridge";
+import { getAdhanPrefs, playAdhanPreview, preloadAdhanPreviews, RECITERS, FAJR_RECITERS, SILENT_RECITER_ID, setAdhanPrefs, stopAdhanPreview, testPrayerNotification, getDiagnostics, type AdhanPrefs } from "@/lib/adhan-bridge";
 import { Button } from "@/components/ui/button";
 
 export const Route = createFileRoute("/app/salah")({

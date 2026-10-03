@@ -32,12 +32,17 @@ export const RECITERS: Reciter[] = [
   { id: "zaili", name: "Abdullah Al Zaili", origin: "Saudi Arabia" },
   { id: "majale", name: "Hamza Al Majale", origin: "Saudi Arabia" },
   { id: "qatami", name: "Nasir Al-Qatami", origin: "Saudi Arabia" },
+  { id: "silent", name: "Silent", origin: "Notification only, no sound" },
 ];
+
+/** Reciter id meaning "show the notification with no sound and no adhan". */
+export const SILENT_RECITER_ID = "silent";
 
 /** Fajr has its own melody, so it gets a dedicated reciter list. */
 export const FAJR_RECITERS: Reciter[] = [
   { id: "fajr-mishary", name: "Mishary Rashid Alafasy", origin: "Kuwait" },
   { id: "fajr-madinah", name: "Madinah Fajr Adhan", origin: "Masjid an-Nabawi" },
+  { id: "silent", name: "Silent", origin: "Notification only, no sound" },
 ];
 const DEFAULT_FAJR_RECITER_ID = FAJR_RECITERS[0].id;
 const validFajrReciter = (id: unknown): string =>
@@ -116,6 +121,18 @@ export function setAdhanPrefs(prefs: AdhanPrefs): void {
 }
 
 /** Pushes reciter/enabled-prayer choices into the native plugin's preferences. */
+/** Turns on alerts for all five prayers (used once, when permission is first granted). */
+export async function enableAllPrayerAlerts(): Promise<void> {
+  if (typeof window === "undefined") return;
+  const prefs = getAdhanPrefs();
+  setAdhanPrefs({ ...prefs, enabledPrayers: { Fajr: true, Dhuhr: true, Asr: true, Maghrib: true, Isha: true } });
+  const { getPrayerSettings, setPrayerSettings } = await import("@/lib/prayer-times");
+  const { rescheduleAdhanNotifications } = await import("@/lib/adhan-notifications");
+  const next = { ...getPrayerSettings(), adhanEnabled: true, perPrayer: { fajr: true, dhuhr: true, asr: true, maghrib: true, isha: true } };
+  setPrayerSettings(next);
+  await rescheduleAdhanNotifications(next);
+}
+
 export async function syncAdhanPrefsToNative(prefs: AdhanPrefs = getAdhanPrefs()): Promise<void> {
   const cap = typeof window !== "undefined" ? (window as any).Capacitor : null;
   if (!cap?.isNativePlatform?.()) return;

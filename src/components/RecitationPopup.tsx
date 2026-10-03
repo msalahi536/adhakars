@@ -39,7 +39,9 @@ export function RecitationPopup() {
 
   const openerTrack = open?.track ?? open?.tracks.find((t) => t.dhikrId === open.openerId) ?? null;
   // Paused on another card's recitation while viewing this one: offer this card instead.
-  const mismatch = !!open && !!track && track.dhikrId !== open.openerId && !queueActive;
+  // Also covers a playlist from another page (e.g. morning playing while on evening).
+  const openerInQueue = queueActive && player.queue.some((t) => t.dhikrId === open?.openerId);
+  const mismatch = !!open && !!track && track.dhikrId !== open.openerId && !openerInQueue;
   const name = (mismatch && !player.playing ? open?.title : track?.title) ?? open?.title ?? "Recitation";
   const hasAudio = !!track || !!openerTrack;
   const playing = player.playing;

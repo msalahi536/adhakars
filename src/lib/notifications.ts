@@ -181,7 +181,12 @@ export const requestNotificationPermission = async (): Promise<PermissionResult>
     const current = await plugin.checkPermissions?.().catch(() => null);
     if (current?.display === "granted") return { granted: true };
     const res = await plugin.requestPermissions();
-    if (res?.display === "granted") return { granted: true };
+    if (res?.display === "granted") {
+      // First time permission is granted: switch on adhan alerts for all five prayers.
+      const { enableAllPrayerAlerts } = await import("@/lib/adhan-bridge");
+      await enableAllPrayerAlerts().catch(() => {});
+      return { granted: true };
+    }
     return { granted: false, reason: "denied", error: `Permission ${res?.display ?? "unknown"}` };
   } catch (e) {
     console.error("[notifications] requestPermissions failed", e);
