@@ -1,3 +1,5 @@
+import { getReciterForPrayer } from "@/lib/adhan-bridge";
+import { toNativeReciterId } from "@/lib/android-adhan";
 import { useEffect, useState, type ReactNode } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { HeaderBackButton } from "@/components/HeaderBackButton";
@@ -1147,6 +1149,7 @@ type TestNotifConfig = {
 };
 
 async function scheduleTestNotification(config: TestNotifConfig) {
+  if (config.extra.soundMode === "adhan") console.log("[adhan-test] extra.reciterId =", config.extra.reciterId);
   try {
     const { LocalNotifications } = await import("@capacitor/local-notifications");
     const perm = await LocalNotifications.checkPermissions();
@@ -1187,7 +1190,7 @@ function AndroidNotificationTests() {
     { label: "Test Morning Adhkar Notif", build: () => ({ id: 901, title: "Morning Adhkar", body: "Test - Time for your morning adhkar.", extra: { route: "/app/" } }) },
     { label: "Test Evening Adhkar Notif", build: () => ({ id: 902, title: "Evening Adhkar", body: "Test - Time for your evening adhkar.", extra: { route: "/app/evening" } }) },
     { label: "Test Nudge/Streak Notif", build: () => ({ id: 903, title: "Sahih Al-Adhkar", body: "Test - Your adhkar are still waiting.", extra: { route: "/app/more" } }) },
-    { label: "Test Adhan Notif (Fajr)", build: () => ({ id: 904, title: "Fajr", body: "Test adhan notification", extra: { prayer: "fajr", reciterId: "mishary", soundMode: "adhan", firedAt: Math.floor(Date.now() / 1000) } }) },
+    { label: "Test Adhan Notif (Fajr)", build: () => ({ id: 904, title: "Fajr", body: "Test adhan notification", extra: { prayer: "fajr", reciterId: toNativeReciterId(getReciterForPrayer("fajr")), soundMode: "adhan", firedAt: Math.floor(Date.now() / 1000) } }) },
     { label: "Test Deep Link (Tasbih)", build: () => ({ id: 905, title: "Tasbih", body: "Test deep link", extra: { route: "/app/tasbih" } }) },
   ];
 

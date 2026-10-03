@@ -3,7 +3,8 @@
 // Closing minimizes to a floating pill so playback remains easy to reopen.
 
 import { useEffect, useRef, useState } from "react";
-import { Pause, Play, RotateCcw, RotateCw, X } from "lucide-react";
+import { Pause, Play, RotateCcw, RotateCw, Square, X } from "lucide-react";
+import { fromNativeReciterId, isAndroidPlatform } from "@/lib/android-adhan";
 import { Portal } from "@/components/Portal";
 import {
   getAdhanProgress,
@@ -70,6 +71,21 @@ export function AdhanPlayer({ visible, prayer, reciterId, onClose }: Props) {
       setMinimized(false);
       setP(null);
     }
+    if (isAndroidPlatform()) {
+      // Android: the native AdhanPlugin service only supports play/stop.
+      const tickAndroid = async () => {
+        try {
+          const { AdhanPlugin } = await import("@/lib/native-bridge");
+          const { playing } = await AdhanPlugin.isPlaying();
+          if (!playing && Date.now() - openedAt.current > 4000) onClose();
+        } catch {
+          // ignore
+        }
+      };
+      void tickAndroid();
+      const aid = window.setInterval(() => void tickAndroid(), 1000);
+      return () => window.clearInterval(aid);
+    }
     const tick = () => {
       void getAdhanProgress().then((next) => {
         const ps = pendingSeek.current;
@@ -104,7 +120,17 @@ export function AdhanPlayer({ visible, prayer, reciterId, onClose }: Props) {
   const current = duration * progress;
   const playing = p?.isPlaying ?? true;
   const name = labelFor(p?.prayer || prayer);
-  const reciter = reciterNameFor(p?.reciterId || reciterId);
+  const reciter = reciterNameFor(fromNativeReciterId(p?.reciterId || reciterId));
+  const android = isAndroidPlatform();
+  const stopAndroid = async () => {
+    try {
+      const { AdhanPlugin } = await import("@/lib/native-bridge");
+      await AdhanPlugin.stopAdhan();
+    } catch (e) {
+      console.error("[adhan] stop failed", e);
+    }
+    onClose();
+  };
 
   const togglePlay = () => {
     setP((prev) => (prev ? { ...prev, isPlaying: !playing } : prev));
@@ -156,6 +182,13 @@ export function AdhanPlayer({ visible, prayer, reciterId, onClose }: Props) {
           </button>
         </div>
 
+        {android ? (
+          <div className="ap-controls">
+            <button type="button" className="ap-play" onClick={() => void stopAndroid()} aria-label="Stop adhan">
+              <Square size={26} fill="currentColor" />
+            </button>
+          </div>
+        ) : (<>
         <div className="ap-scrub">
           <div
             ref={trackRef}
@@ -201,6 +234,7 @@ export function AdhanPlayer({ visible, prayer, reciterId, onClose }: Props) {
             <RotateCw size={24} /><span className="ap-skip-n">10</span>
           </button>
         </div>
+        </>)}
 
       </div>
     </Portal>

@@ -16,6 +16,10 @@ const NATIVE_RECITER_IDS: Record<string, string> = {
   silent: "silent",
 };
 
+/** Native id → app id, for showing the reciter name. */
+export const fromNativeReciterId = (id: string): string =>
+  ({ abdulbasit: "basit", abdullahzaili: "zaili", hamzamajale: "majale", nasirqatami: "qatami" } as Record<string, string>)[id] ?? id;
+
 export const toNativeReciterId = (id: string): string => NATIVE_RECITER_IDS[id] ?? id;
 
 export const ANDROID_ADHAN_CHANNEL = "adhan_silent";
@@ -59,6 +63,7 @@ export async function registerAndroidAdhanListener(onTap?: TapHandler): Promise<
           reciterId,
           prayer: typeof extra.prayer === "string" ? extra.prayer : "",
         });
+        console.log("[android-adhan] playFullAdhan reciterId =", reciterId);
       } catch (e) {
         console.error("Failed to play adhan via native plugin:", e);
       }
