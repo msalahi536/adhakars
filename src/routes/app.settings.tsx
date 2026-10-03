@@ -482,16 +482,6 @@ function Settings() {
                 <span className="settings-suggest-plus">+</span>
                 <span>Suggest a theme</span>
               </button>
-              <button
-                onClick={doReset}
-                className="settings-reset-theme mt-2 w-full rounded-full py-2.5 text-xs font-semibold"
-                style={{
-                  background: "var(--muted)",
-                  color: "var(--foreground)",
-                }}
-              >
-                Reset theme to default
-              </button>
             </div>
 
             <div className="settings-group">

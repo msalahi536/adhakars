@@ -409,3 +409,41 @@ function WidgetSettings({ password, content, schedule, onChange }: { password: s
     </div>
   );
 }
+
+function SuggestionsAdmin({ password }: { password: string }) {
+  const load = useServerFn(adminListSuggestions);
+  const [items, setItems] = useState<AdminSuggestion[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    load({ data: { password } })
+      .then((r) => setItems(r.items))
+      .catch(() => setItems([]))
+      .finally(() => setLoading(false));
+  }, [load, password]);
+
+  return (
+    <div>
+      <h1 className="text-2xl font-semibold">Suggestions</h1>
+      <p className="mt-1 text-sm text-muted-foreground">Theme ideas and feedback sent from the app.</p>
+      {loading ? (
+        <p className="mt-6 text-sm text-muted-foreground">Loading…</p>
+      ) : items.length === 0 ? (
+        <p className="mt-6 text-sm text-muted-foreground">No suggestions yet.</p>
+      ) : (
+        <div className="mt-6 grid gap-3">
+          {items.map((s) => (
+            <div key={s.id} className="rounded-xl border border-border bg-card p-4">
+              <div className="flex items-center justify-between gap-3">
+                <span className="rounded-full bg-primary/15 px-2.5 py-0.5 text-xs font-medium text-primary">{s.kind}</span>
+                <span className="text-xs text-muted-foreground">{new Date(s.created_at).toLocaleString()}</span>
+              </div>
+              <p className="mt-2 whitespace-pre-wrap text-sm">{s.body}</p>
+              {s.contact && <p className="mt-2 text-xs text-muted-foreground">Contact: {s.contact}</p>}
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
