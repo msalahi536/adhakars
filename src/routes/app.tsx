@@ -44,7 +44,13 @@ function AppLayout() {
 
   useEffect(() => {
     initNativeBridge();
-    void import("@/lib/android-adhan").then((m) => m.registerAndroidAdhanListener());
+    // Android: tapping an adhan notification shows the player; native audio is
+    // already playing, so the player only reflects it.
+    void import("@/lib/android-adhan").then((m) =>
+      m.registerAndroidAdhanListener(({ prayer, reciterId }) =>
+        setAdhan({ visible: true, prayer: prayer || "fajr", reciterId }),
+      ),
+    );
     const reschedule = () => {
       // Prayer alerts are planned on every app open or resume so nothing
       // depends on the Salah page having been visited.

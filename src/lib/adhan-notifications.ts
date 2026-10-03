@@ -29,6 +29,11 @@ import {
   syncAdhanPrefsToNative,
   type NativePrayerTime,
 } from "@/lib/adhan-bridge";
+import {
+  ANDROID_ADHAN_CHANNEL,
+  ensureAndroidAdhanChannel,
+  toNativeReciterId,
+} from "@/lib/android-adhan";
 
 /** Stable ids so a reschedule replaces instead of duplicating. */
 export const PRAYER_NOTIF_IDS: Record<Exclude<PrayerId, "sunrise">, number> = {
@@ -162,6 +167,7 @@ export const rescheduleAdhanNotifications = async (
   }
 
   await ensureNotificationChannel(plugin);
+  await ensureAndroidAdhanChannel(plugin);
 
   const now = new Date();
   const today = await fetchDay(now, settings);
@@ -197,14 +203,15 @@ export const rescheduleAdhanNotifications = async (
         title: PRAYER_LABELS[id],
         body: BODY[id],
         schedule: { at: slot.at, allowWhileIdle: true },
-        channelId: NOTIFICATION_CHANNEL,
+        channelId: isAndroid ? ANDROID_ADHAN_CHANNEL : NOTIFICATION_CHANNEL,
         ...(sound ? { sound } : {}),
         ...(isAndroid
           ? {
               extra: {
                 prayer: id,
-                reciterId,
+                reciterId: toNativeReciterId(reciterId),
                 soundMode: reciterId === "silent" ? "silent" : "adhan",
+                firedAt: Math.floor(slot.at.getTime() / 1000),
               },
             }
           : {}),
