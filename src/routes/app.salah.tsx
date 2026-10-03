@@ -101,29 +101,8 @@ function Salah() {
   const [adhanSettingsOpen, setAdhanSettingsOpen] = useState(false);
   const [adhanPrefs, setAdhanPrefsState] = useState<AdhanPrefs>(() => getAdhanPrefs());
   const [adhanError, setAdhanError] = useState<string | null>(null);
-  const [testingNotif, setTestingNotif] = useState(false);
-  const [testPickerOpen, setTestPickerOpen] = useState(false);
   const [reciterPrayer, setReciterPrayer] = useState<string | null>(null);
   const [previewingReciter, setPreviewingReciter] = useState<string | null>(null);
-
-  // The native plugin's testPrayerNotification fires a real prayer alert in
-  // 5 seconds — identical to a real prayer, but it bypasses the enabled
-  // check so nothing here has to be switched on first.
-  const sendTestNotification = async (prayerLabel: string) => {
-    if (testingNotif) return;
-    setTestingNotif(true);
-    try {
-      if (!(await testPrayerNotification(prayerLabel))) {
-        throw new Error("Could not send the test notification.");
-      }
-      setAdhanError(null);
-      setTestPickerOpen(false);
-    } catch (err) {
-      setAdhanError(err instanceof Error ? err.message : "Could not send the test notification.");
-    } finally {
-      setTimeout(() => setTestingNotif(false), 1500);
-    }
-  };
 
   const runDiagnostics = async () => {
     try {
@@ -662,38 +641,11 @@ function Salah() {
                  </div>
                  <p className="adhan-settings-note">Tap the notification to continue the full adhan after the 30-second alert.</p>
                </>}
-              {!reciterPrayer && isNativeApp() && <>
-                <button
-                  type="button"
-                  className="adhan-test-btn"
-                  onClick={() => setTestPickerOpen((open) => !open)}
-                  aria-expanded={testPickerOpen}
-                >
-                  <Bell size={15} />
-                  <span>Test Notification (5s)</span>
-                  <ChevronDown size={14} className={`adhan-test-caret ${testPickerOpen ? "is-open" : ""}`} />
-                </button>
-                {testPickerOpen && (
-                  <div className="adhan-test-list">
-                    {["Fajr", "Dhuhr", "Asr", "Maghrib", "Isha"].map((label) => (
-                      <button
-                        key={label}
-                        type="button"
-                        className="adhan-test-item"
-                        onClick={() => void sendTestNotification(label)}
-                        disabled={testingNotif}
-                      >
-                        <span>{label}</span>
-                        <Bell size={13} />
-                      </button>
-                    ))}
-                  </div>
-                )}
-                <p className="adhan-test-note">Fires a real {testPickerOpen ? "prayer" : "test adhan"} notification in 5 seconds.</p>
+              {!reciterPrayer && isNativeApp() && (
                 <button type="button" className="adhan-diag-btn" onClick={() => void runDiagnostics()}>
                   Run Diagnostics
                 </button>
-              </>}
+              )}
               {adhanError && <p className="adhan-settings-error">{adhanError}</p>}
             </section>
           </div>
