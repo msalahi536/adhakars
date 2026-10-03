@@ -175,6 +175,9 @@ export const rescheduleAdhanNotifications = async (
   const todayKey = dateKey(now);
 
   const notifications: Record<string, unknown>[] = [];
+  const isAndroid =
+    typeof window !== "undefined" &&
+    (window as any).Capacitor?.getPlatform?.() === "android";
 
   const push = (day: typeof today, offset: number) => {
     if (!day) return;
@@ -185,7 +188,10 @@ export const rescheduleAdhanNotifications = async (
       if (slot.at.getTime() <= now.getTime() + 30_000) continue;
       if (muteAll && slot.dayKey === todayKey) continue;
       if (dismissed && dismissed.dayKey === slot.dayKey && dismissed.prayer === slot.id) continue;
-      const sound = adhanSoundFor(settings, slot.label);
+      // Android: no notification sound; the native AdhanPlugin plays the real
+      // adhan when the notification fires (see android-adhan.ts).
+      const reciterId = getReciterForPrayer(slot.label);
+      const sound = isAndroid ? undefined : adhanSoundFor(settings, slot.label);
       notifications.push({
         id: PRAYER_NOTIF_IDS[id] + offset,
         title: PRAYER_LABELS[id],
@@ -193,6 +199,15 @@ export const rescheduleAdhanNotifications = async (
         schedule: { at: slot.at, allowWhileIdle: true },
         channelId: NOTIFICATION_CHANNEL,
         ...(sound ? { sound } : {}),
+        ...(isAndroid
+          ? {
+              extra: {
+                prayer: id,
+                reciterId,
+                soundMode: reciterId === "silent" ? "silent" : "adhan",
+              },
+            }
+          : {}),
       });
     }
   };

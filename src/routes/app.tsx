@@ -44,6 +44,7 @@ function AppLayout() {
 
   useEffect(() => {
     initNativeBridge();
+    void import("@/lib/android-adhan").then((m) => m.registerAndroidAdhanListener());
     const reschedule = () => {
       // Prayer alerts are planned on every app open or resume so nothing
       // depends on the Salah page having been visited.

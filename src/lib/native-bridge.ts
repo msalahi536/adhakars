@@ -8,6 +8,18 @@
  *  - Widget data sync (tasbih count, theme)
  */
 
+import { registerPlugin } from "@capacitor/core";
+
+export interface AdhanPluginInterface {
+  playFullAdhan(options: { reciterId: string; prayer: string }): Promise<void>;
+  playShortAdhan(options: { reciterId: string; prayer: string }): Promise<void>;
+  stopAdhan(): Promise<void>;
+  isPlaying(): Promise<{ playing: boolean }>;
+}
+
+/** Native Android adhan player (foreground service). */
+export const AdhanPlugin = registerPlugin<AdhanPluginInterface>("AdhanPlugin");
+
 interface CapacitorPlugin {
   updateLocation(opts: { latitude: number; longitude: number; method: number }): Promise<void>;
   updateTasbih(opts: { count: number; target: number; phrase: string }): Promise<void>;
