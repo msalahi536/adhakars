@@ -1078,7 +1078,7 @@ html[data-visual-phase="evening"] .adhkar-card-heading button { background: rgba
 .salah-location { display: flex; align-items: center; justify-content: center; gap: 6px; margin-top: 11px; color: #5f7a5a; font-size: 13px; font-weight: 400; line-height: 16px; }
 .salah-content { flex: 1; min-height: 0; overflow-x: hidden; overflow-y: auto; padding-bottom: 24px; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
 .salah-content::-webkit-scrollbar { display: none; }
-.salah-content-inner { display: grid; grid-template-rows: 170px 242px 62px; gap: 12px; width: 100%; max-width: 390px; height: 498px; margin: 16px auto 0; padding: 0 28px; box-sizing: border-box; }
+.salah-content-inner { display: grid; grid-template-rows: 242px 62px 170px; gap: 12px; width: 100%; max-width: 390px; height: 498px; margin: 16px auto 0; padding: 0 28px; box-sizing: border-box; }
 .salah-content-inner.no-location { display: flex; flex-direction: column; height: auto; max-height: 100%; overflow-y: auto; -webkit-overflow-scrolling: touch; padding-bottom: 24px; }
 .salah-location-card { position: relative; z-index: 5; width: 100%; box-sizing: border-box; border-radius: 18px; }
 .salah-recommended-card { box-sizing: border-box; height: 170px; padding: 18px 20px; border: 1px solid rgba(255, 255, 255, 0.8); border-radius: 18px; background: rgba(250, 247, 240, 0.92); box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06); backdrop-filter: blur(20px); }
@@ -1430,7 +1430,7 @@ html[data-preset][data-section="tasbih"] {
   .salah-location { font-size: 14px; }
   .salah-content-inner {
     max-width: 430px;
-    grid-template-rows: 178px 250px 66px;
+    grid-template-rows: 250px 66px 178px;
     height: 518px;
     padding-inline: 20px;
   }
@@ -1473,7 +1473,7 @@ html[data-preset][data-section="tasbih"] {
   .salah-content-inner:not(.no-location) {
     height: 100% !important;
     min-height: 0 !important;
-    grid-template-rows: 154px minmax(0, 1fr) 62px !important;
+    grid-template-rows: 62px minmax(0, 1fr) 154px !important;
   }
   .salah-recommended-card { height: 154px !important; padding: 16px 18px !important; }
   .salah-recommended-title { font-size: 25px !important; line-height: 27px !important; }
