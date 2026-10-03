@@ -1423,19 +1423,19 @@ html[data-preset][data-section="tasbih"] {
   .qibla-page { padding-inline: 24px; }
   .qibla-compass { width: min(76vw, 318px); }
 
-  .salah-hero { padding-top: 55px; }
+  .salah-hero { padding-top: 44px; }
   .salah-next-label { font-size: 19px; }
-  .salah-countdown { font-size: 56px; line-height: 56px; }
+  .salah-countdown { font-size: 48px; line-height: 48px; }
   .salah-dismiss { height: 36px; font-size: 16px; }
   .salah-location { font-size: 14px; }
   .salah-content-inner {
     max-width: 430px;
-    grid-template-rows: 250px 66px 178px;
-    height: 518px;
+    grid-template-rows: 148px 250px 66px;
+    height: 484px;
     padding-inline: 20px;
   }
-  .salah-recommended-card { height: 178px; padding: 19px 21px; }
-  .salah-recommended-title { font-size: 28px; line-height: 30px; }
+  .salah-recommended-card { height: 148px; padding: 12px 18px; }
+  .salah-recommended-title { font-size: 25px; line-height: 27px; }
   .salah-upcoming-wrap,
   .prayer-timeline-card,
   .salah-upcoming-placeholder { height: 250px !important; }
@@ -1465,18 +1465,18 @@ html[data-preset][data-section="tasbih"] {
   .adhkar-repeat-counter { width: 78px !important; height: 78px !important; }
   .adhkar-counter-value { font-size: 32px !important; }
 
-  .salah-hero { padding-top: 44px !important; }
+  .salah-hero { padding-top: 38px !important; }
   .salah-next-label { font-size: 18px !important; }
-  .salah-countdown { font-size: 46px !important; line-height: 46px !important; }
+  .salah-countdown { font-size: 44px !important; line-height: 44px !important; }
   .salah-dismiss { height: 34px !important; font-size: 15px !important; }
   .salah-location { font-size: 13px !important; }
   .salah-content-inner:not(.no-location) {
     height: 100% !important;
     min-height: 0 !important;
-    grid-template-rows: 62px minmax(0, 1fr) 154px !important;
+    grid-template-rows: 148px minmax(0, 1fr) 62px !important;
   }
-  .salah-recommended-card { height: 154px !important; padding: 16px 18px !important; }
-  .salah-recommended-title { font-size: 25px !important; line-height: 27px !important; }
+  .salah-recommended-card { height: 148px !important; padding: 12px 18px !important; }
+  .salah-recommended-title { font-size: 24px !important; line-height: 26px !important; }
   .salah-upcoming-wrap,
   .prayer-timeline-card,
   .salah-upcoming-placeholder { height: 100% !important; min-height: 0 !important; }
