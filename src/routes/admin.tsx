@@ -2,12 +2,12 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import {
-  BookOpen, GripVertical, LayoutDashboard, Moon, Pencil, Plus, Settings2, Sparkles, Star, Sun,
+  BookOpen, GripVertical, LayoutDashboard, MessageSquare, Moon, Pencil, Plus, Settings2, Sparkles, Star, Sun,
   Trash2, Upload, Heart, Leaf, LogOut, Music,
 } from "lucide-react";
 import {
-  adminBulkImport, adminDeleteItem, adminLoadAll, adminLogin, adminReorder, adminSaveItem,
-  adminSaveSchedule, adminToggleActive,
+  adminBulkImport, adminDeleteItem, adminListSuggestions, adminLoadAll, adminLogin, adminReorder, adminSaveItem,
+  adminSaveSchedule, adminToggleActive, type AdminSuggestion,
 } from "@/lib/admin.functions";
 import { RecitationsAdmin } from "@/components/admin/RecitationsAdmin";
 import { Button } from "@/components/ui/button";
@@ -134,6 +134,7 @@ function Dashboard({ password, onLogout }: { password: string; onLogout: () => v
     { key: "dashboard", label: "Dashboard", icon: LayoutDashboard },
     ...SECTIONS.map((s) => ({ key: s.key, label: s.label, icon: s.icon })),
     { key: "recitations", label: "Recitations", icon: Music },
+    { key: "suggestions", label: "Suggestions", icon: MessageSquare },
     { key: "settings", label: "Widget Settings", icon: Settings2 },
   ];
   const section = SECTIONS.find((s) => s.key === view);
@@ -164,6 +165,7 @@ function Dashboard({ password, onLogout }: { password: string; onLogout: () => v
             items={content.filter((c) => c.category === section.key)} onChange={refresh} setContent={setContent} all={content} />
         )}
         {view === "recitations" && <RecitationsAdmin password={password} />}
+        {view === "suggestions" && <SuggestionsAdmin password={password} />}
         {view === "settings" && <WidgetSettings password={password} content={content} schedule={schedule} onChange={refresh} />}
       </main>
     </div>
