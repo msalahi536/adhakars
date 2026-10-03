@@ -1402,10 +1402,6 @@ html[data-preset][data-section="tasbih"] {
   .qibla-compass { width: min(76vw, 318px); }
 
   .salah-hero { padding-top: 44px; }
-  .salah-next-label { font-size: 19px; }
-  .salah-countdown { font-size: 48px; line-height: 48px; }
-  .salah-dismiss { height: 36px; font-size: 16px; }
-  .salah-location { font-size: 14px; }
   .salah-content-inner {
     max-width: 430px;
     grid-template-rows: 148px 66px 250px;
@@ -1444,10 +1440,6 @@ html[data-preset][data-section="tasbih"] {
   .adhkar-counter-value { font-size: 32px !important; }
 
   .salah-hero { padding-top: 38px !important; }
-  .salah-next-label { font-size: 18px !important; }
-  .salah-countdown { font-size: 44px !important; line-height: 44px !important; }
-  .salah-dismiss { height: 34px !important; font-size: 15px !important; }
-  .salah-location { font-size: 13px !important; }
   .salah-content-inner:not(.no-location) {
     height: 100% !important;
     min-height: 0 !important;
