@@ -1072,7 +1072,8 @@ html[data-visual-phase="evening"] .adhkar-card-heading button { background: rgba
 .salah-hero { position: relative; display: flex; flex: 0 0 auto; flex-direction: column; align-items: center; box-sizing: border-box; padding: 42px 24px 12px; text-align: center; }
 .salah-next-label { color: #3f5a3c; font-size: 18px; font-weight: 500; line-height: 22px; }
 .salah-countdown { margin-top: 4px; color: #2f4f34; font-size: 46px; font-weight: 500; line-height: 46px; letter-spacing: 0; font-variant-numeric: tabular-nums; transition: color 400ms ease; }
-.salah-dismiss { display: inline-flex; height: 32px; flex: 0 0 auto; align-items: center; justify-content: center; margin-top: 12px; padding: 0 22px; width: 262px; box-sizing: border-box; border: 1px solid rgba(255, 255, 255, 0.8); border-radius: 999px; background: rgba(233, 233, 222, 0.9); color: #2f4f34; font-size: 15px; font-weight: 500; line-height: 1; white-space: nowrap; backdrop-filter: blur(20px); transition: transform 0.15s ease, opacity 0.15s ease; }
+.salah-dismiss { display: inline-flex; height: 32px; flex: 0 0 auto; align-items: center; justify-content: center; margin-top: 12px; padding: 0 18px; width: 218px; box-sizing: border-box; border: 1px solid rgba(255, 255, 255, 0.45); border-radius: 999px; background: rgba(233, 233, 222, 0.38); color: #2f4f34; font-size: 14px; font-weight: 500; line-height: 1; white-space: nowrap; overflow: hidden; backdrop-filter: blur(18px) saturate(140%); transition: width 0.5s cubic-bezier(0.32, 0.72, 0.24, 1), transform 0.15s ease, opacity 0.15s ease, background 0.3s ease; }
+.salah-dismiss.is-dismissed { width: 252px; background: rgba(233, 233, 222, 0.55); }
 .salah-dismiss:active { transform: scale(0.95); }
 .salah-dismiss:disabled { opacity: 0.45; }
 .salah-location { display: flex; align-items: center; justify-content: center; gap: 6px; margin-top: 9px; color: #5f7a5a; font-size: 13px; font-weight: 400; line-height: 16px; }
