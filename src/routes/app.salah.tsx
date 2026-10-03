@@ -202,6 +202,27 @@ function Salah() {
   const nextIsDismissed =
     !!nextSalah && !!dismissed && dismissed.dayKey === nextSalah.dayKey && dismissed.prayer === nextSalah.id;
 
+  // Measure both pill labels so the width can animate between exact fits.
+  const [dismissWidths, setDismissWidths] = useState<{ active: number; dismissed: number } | null>(null);
+  useEffect(() => {
+    let cancelled = false;
+    const measure = () => {
+      const ctx = document.createElement("canvas").getContext("2d");
+      if (!ctx) return;
+      ctx.font = "400 12px Outfit, sans-serif";
+      const active = Math.ceil(ctx.measureText("Tap to dismiss").width);
+      const dismissed = Math.ceil(ctx.measureText(`Dismissed until after ${nextSalah?.label ?? ""}`).width);
+      if (!cancelled) setDismissWidths({ active: active + 29, dismissed: dismissed + 29 });
+    };
+    measure();
+    if (typeof document !== "undefined" && document.fonts?.ready) {
+      document.fonts.ready.then(measure).catch(() => {});
+    }
+    return () => {
+      cancelled = true;
+    };
+  }, [nextSalah?.label]);
+
   const toggleDismissNext = () => {
     const next = nextSalah;
     if (!next) return;
@@ -397,12 +418,10 @@ function Salah() {
         <button
           onClick={toggleDismissNext}
           disabled={!nextSalah}
+          style={dismissWidths ? { width: nextIsDismissed ? dismissWidths.dismissed : dismissWidths.active } : undefined}
           className={`salah-dismiss active:scale-95 ${nextIsDismissed ? "is-dismissed" : ""}`}
         >
-          <span className="salah-dismiss-label salah-dismiss-active">Tap to dismiss</span>
-          <span className="salah-dismiss-label salah-dismiss-dismissed" aria-hidden={nextIsDismissed}>
-            Dismissed
-          </span>
+          {nextIsDismissed ? `Dismissed until after ${nextSalah?.label ?? ""}` : "Tap to dismiss"}
         </button>
       </header>
 
