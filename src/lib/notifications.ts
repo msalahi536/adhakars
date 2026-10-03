@@ -240,8 +240,6 @@ const nextOccurrence = (hour: number, minute: number): Date => {
 
 export type ActionResult = { ok: true } | { ok: false; error: string };
 
-/** Test notification id, kept far away from reminder id ranges. */
-const TEST_ID = 990001;
 /** How many future days each reminder is pre-scheduled for. */
 const DAYS_AHEAD = 14;
 /** Derived notification ids for a reminder: id*1000 + dayOffset. */
@@ -252,39 +250,6 @@ const idsFor = (reminderId: number) =>
 let lastSchedule: { at: string; count: number; ids: number[]; label: string } | null = null;
 export const getLastSchedule = () => lastSchedule;
 
-/** Fires a notification a few seconds from now so the user can verify setup. */
-export const sendTestNotification = async (): Promise<ActionResult> => {
-  if (!isNativePlatform()) {
-    return { ok: false, error: "Test notifications only work in the installed app." };
-  }
-  const plugin = await loadPlugin();
-  if (!plugin) return { ok: false, error: "Notifications plugin is missing from this build." };
-  try {
-    const perm = await plugin.checkPermissions?.().catch(() => null);
-    if (perm && perm.display !== "granted") {
-      const asked = await plugin.requestPermissions();
-      if (asked?.display !== "granted") {
-        return { ok: false, error: "Notification permission is not granted." };
-      }
-    }
-    await ensureChannel(plugin);
-    await plugin.schedule({
-      notifications: [
-        {
-          id: TEST_ID,
-          title: "Sahih Al-Adhkar",
-          body: "Test reminder. Notifications are working.",
-          schedule: { at: new Date(Date.now() + 5000), allowWhileIdle: true },
-          channelId: ANDROID_CHANNEL,
-        },
-      ],
-    });
-    return { ok: true };
-  } catch (e) {
-    console.error("[notifications] test failed", e);
-    return { ok: false, error: (e as Error)?.message ?? "Could not schedule the test notification." };
-  }
-};
 
 /** Notification ids that are currently scheduled on the device. */
 export const getScheduledIds = async (): Promise<number[]> => {
@@ -474,30 +439,6 @@ export const scheduleJumuahNotification = async (): Promise<ActionResult> => {
   }
 };
 
-/** Fires the Jumu'ah notification 5 seconds from now, for testing. */
-export const sendTestJumuahNotification = async (): Promise<boolean> => {
-  if (!isNativePlatform()) return false;
-  const plugin = await loadPlugin();
-  if (!plugin) return false;
-  try {
-    await ensureChannel(plugin);
-    await plugin.schedule({
-      notifications: [
-        {
-          id: 889002,
-          title: "Sahih Al-Adhkar",
-          body: "It's Jumu'ah — come learn the sunnahs of Jumu'ah.",
-          schedule: { at: new Date(Date.now() + 5000), allowWhileIdle: true },
-          channelId: ANDROID_CHANNEL,
-          extra: { route: "/app/more?open=dua-library&section=jumuah" },
-        },
-      ],
-    });
-    return true;
-  } catch {
-    return false;
-  }
-};
 
 /** Fires whenever the user taps a delivered local notification. */
 export const registerNotificationTapHandler = (
