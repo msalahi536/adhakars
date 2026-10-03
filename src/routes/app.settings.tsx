@@ -718,13 +718,6 @@ function Settings() {
                       <div className="settings-row-desc">
                         A Friday morning notification so you can learn the sunnahs of Jumu'ah.
                       </div>
-                      <button
-                        onClick={() => void sendTestJumuahNotification()}
-                        className="mt-1 text-xs font-semibold"
-                        style={{ color: "var(--accent)" }}
-                      >
-                        Send test in 5 seconds
-                      </button>
                     </div>
                     <button
                       onClick={() => toggleJumuahNotif(!jumuahNotif)}
@@ -746,13 +739,6 @@ function Settings() {
                     <div className="min-w-0 flex-1">
                       <div className="settings-row-title">Sunnah of the Day</div>
                       <div className="settings-row-desc">A gentle morning notification with a new Sunnah to revive each day.</div>
-                      <button
-                        onClick={() => void sendTestSunnahNotification()}
-                        className="mt-1 text-xs font-semibold"
-                        style={{ color: "var(--accent)" }}
-                      >
-                        Send test in 5 seconds
-                      </button>
                     </div>
                     <button
                       onClick={() => toggleSunnahNotif(!sunnahNotif)}
@@ -774,13 +760,6 @@ function Settings() {
                     <div className="min-w-0 flex-1">
                       <div className="settings-row-title">Period Companion</div>
                       <div className="settings-row-desc">Private, gentle reminders around your cycle, only if you use the Period Companion.</div>
-                      <button
-                        onClick={() => void sendTestPeriodNotification()}
-                        className="mt-1 text-xs font-semibold"
-                        style={{ color: "var(--accent)" }}
-                      >
-                        Send test in 5 seconds
-                      </button>
                     </div>
                     <button
                       onClick={() => togglePeriodNotif(!periodNotif)}
@@ -802,13 +781,6 @@ function Settings() {
                     <div className="min-w-0 flex-1">
                       <div className="settings-row-title">Streak Reminders</div>
                       <div className="settings-row-desc">An evening nudge if your streak is at risk, and a celebration when you hit a milestone.</div>
-                      <button
-                        onClick={() => void sendTestStreakNotification()}
-                        className="mt-1 text-xs font-semibold"
-                        style={{ color: "var(--accent)" }}
-                      >
-                        Send test in 5 seconds
-                      </button>
                     </div>
                     <button
                       onClick={() => toggleStreakNotif(!streakNotif)}
@@ -923,13 +895,6 @@ function Settings() {
                                   {followsPrayer ? "Set custom time" : "Follow prayer times"}
                                 </button>
                               )}
-                              <button
-                                onClick={() => void sendTestAdhkarNotification(r.id === 1 ? "morning" : "evening")}
-                                className="font-semibold"
-                                style={{ color: "var(--accent)" }}
-                              >
-                                Send test in 5 seconds
-                              </button>
                             </div>
                           )}
                         </div>
