@@ -394,8 +394,12 @@ function Salah() {
         >
           {next ? formatCountdown(next.at.getTime() - now.getTime()) : "--:--:--"}
         </div>
-        <button onClick={toggleDismissNext} disabled={!nextSalah} className="salah-dismiss active:scale-95">
-          {nextIsDismissed ? `${nextSalah?.label} dismissed · tap to undo` : "Tap to dismiss next salah"}
+        <button
+          onClick={toggleDismissNext}
+          disabled={!nextSalah}
+          className={`salah-dismiss active:scale-95 ${nextIsDismissed ? "is-dismissed" : ""}`}
+        >
+          {nextIsDismissed ? `Dismissed until after ${nextSalah?.label}` : "Tap to dismiss next salah"}
         </button>
       </header>
 
