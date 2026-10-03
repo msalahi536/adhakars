@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
-import { Bell, ChevronDown, ChevronLeft, ChevronRight, MapPin, Pause, Play, Volume2, X } from "lucide-react";
+import { Bell, BellOff, ChevronDown, ChevronLeft, ChevronRight, MapPin, Pause, Play, Volume2, X } from "lucide-react";
 import { PrayerTimeline } from "@/components/prayer/PrayerTimeline";
 import { AfterSalahSheet } from "@/components/prayer/AfterSalahSheet";
 import { PrayerPicker } from "@/components/prayer/PrayerPicker";
@@ -33,7 +33,7 @@ import {
 import { isNativeApp } from "@/lib/native-bridge";
 import { rescheduleAdhanNotifications } from "@/lib/adhan-notifications";
 import { checkNotificationPermission, requestNotificationPermission } from "@/lib/notifications";
-import { getAdhanPrefs, playAdhanPreview, preloadAdhanPreviews, RECITERS, FAJR_RECITERS, setAdhanPrefs, stopAdhanPreview, testPrayerNotification, getDiagnostics, type AdhanPrefs } from "@/lib/adhan-bridge";
+import { getAdhanPrefs, playAdhanPreview, preloadAdhanPreviews, RECITERS, FAJR_RECITERS, SILENT_RECITER_ID, setAdhanPrefs, stopAdhanPreview, testPrayerNotification, getDiagnostics, type AdhanPrefs } from "@/lib/adhan-bridge";
 import { Button } from "@/components/ui/button";
 
 export const Route = createFileRoute("/app/salah")({
@@ -517,6 +517,22 @@ function Salah() {
             </div>
           </section>
 
+          <button
+            onClick={() => setAdhanSettingsOpen(true)}
+            className="salah-adhan-card flex w-full items-center text-left active:scale-[0.99]"
+          >
+            <span className="salah-adhan-icon flex shrink-0 items-center justify-center rounded-full">
+              <Bell size={16} />
+            </span>
+            <span className="min-w-0 flex-1">
+              <span className="salah-adhan-title block">Adhan Settings</span>
+              <span className="salah-adhan-subtitle block">
+                {settings.adhanEnabled ? "Prayer alerts are on" : "Choose prayer alerts and reciters"}
+              </span>
+            </span>
+            <ChevronRight size={16} strokeWidth={1.5} className="salah-adhan-chevron" />
+          </button>
+
           {settings.location ? (
             <div className="salah-upcoming-wrap">
               <PrayerTimeline
@@ -565,21 +581,6 @@ function Salah() {
           )}
 
 
-          <button
-            onClick={() => setAdhanSettingsOpen(true)}
-            className="salah-adhan-card flex w-full items-center text-left active:scale-[0.99]"
-          >
-            <span className="salah-adhan-icon flex shrink-0 items-center justify-center rounded-full">
-              <Bell size={16} />
-            </span>
-            <span className="min-w-0 flex-1">
-              <span className="salah-adhan-title block">Adhan Settings</span>
-              <span className="salah-adhan-subtitle block">
-                {settings.adhanEnabled ? "Prayer alerts are on" : "Choose prayer alerts and reciters"}
-              </span>
-            </span>
-            <ChevronRight size={16} strokeWidth={1.5} className="salah-adhan-chevron" />
-          </button>
         </div>
       </main>
 
@@ -620,9 +621,13 @@ function Salah() {
                     const selected = reciterPrayer === "Fajr" ? adhanPrefs.fajrReciterId === reciter.id : (adhanPrefs.reciterPerPrayer[reciterPrayer] ?? adhanPrefs.reciterId) === reciter.id;
                     const previewing = previewingReciter === reciter.id;
                     return <div className={`adhan-reciter-row ${selected ? "is-selected" : ""}`} key={reciter.id}>
+                      {reciter.id === SILENT_RECITER_ID ? (
+                        <span className="adhan-preview-btn inline-flex items-center justify-center" aria-hidden="true"><BellOff size={18} /></span>
+                      ) : (
                       <Button type="button" variant="ghost" size="icon" className="adhan-preview-btn" onClick={() => void toggleReciterPreview(reciter.id)} aria-label={`${previewing ? "Pause" : "Play"} ${reciter.name}`}>
                         {previewing ? <Pause size={18} fill="currentColor" /> : <Play size={18} fill="currentColor" />}
                       </Button>
+                      )}
                       <button type="button" className="adhan-reciter-choice" onClick={() => void setPrayerReciter(reciterPrayer, reciter.id)}>
                         <strong>{reciter.name}</strong><small>{reciter.origin}</small>
                       </button>
