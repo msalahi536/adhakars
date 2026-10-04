@@ -129,8 +129,8 @@ export function Pagination({
   useEffect(() => stopHold, []);
   useEffect(() => {
     import("@capacitor/core")
-      .then(({ Capacitor }) => setIsAndroid(Capacitor.getPlatform() === "android"))
-      .catch(() => setIsAndroid(false));
+      .then(({ Capacitor }) => setIsAndroid(Capacitor.getPlatform() === "android" || /Android/i.test(navigator.userAgent)))
+      .catch(() => setIsAndroid(/Android/i.test(navigator.userAgent)));
   }, []);
 
   const startHold = (dir: 1 | -1) => {
