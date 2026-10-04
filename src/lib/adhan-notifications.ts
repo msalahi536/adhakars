@@ -198,7 +198,13 @@ export const rescheduleAdhanNotifications = async (
       // adhan when the notification fires (see android-adhan.ts).
       const reciterId = getReciterForPrayer(slot.label);
       const sound = isAndroid ? undefined : adhanSoundFor(settings, slot.label);
-      if (isAndroid) console.log("[adhan] android", id, "reciterId =", toNativeReciterId(reciterId));
+      if (isAndroid)
+        console.log("[AdhanNotif] Scheduling notification:", {
+          prayer: id,
+          reciterId: toNativeReciterId(reciterId),
+          soundMode: reciterId === "silent" ? "silent" : "adhan",
+          firedAt: Math.floor(slot.at.getTime() / 1000),
+        });
       notifications.push({
         id: PRAYER_NOTIF_IDS[id] + offset,
         title: PRAYER_LABELS[id],

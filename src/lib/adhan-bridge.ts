@@ -111,6 +111,10 @@ export function getAdhanPrefs(): AdhanPrefs {
 
 export function setAdhanPrefs(prefs: AdhanPrefs): void {
   if (typeof window === "undefined") return;
+  console.log("[AdhanReciter] Saved reciter for", "fajr", ":", prefs.fajrReciterId);
+  for (const [prayer, reciterId] of Object.entries(prefs.reciterPerPrayer ?? {})) {
+    console.log("[AdhanReciter] Saved reciter for", prayer.toLowerCase(), ":", reciterId);
+  }
   try {
     window.localStorage.setItem(ADHAN_PREFS_KEY, JSON.stringify(prefs));
     window.localStorage.setItem(RECITER_KEY, prefs.reciterId);
