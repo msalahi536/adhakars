@@ -150,6 +150,8 @@ function Salah() {
         if (loc) {
           s = { ...s, location: loc };
           setPrayerSettings(s);
+        } else {
+          setCityError("Location permission is off. Enable it in your phone settings, or type a city instead.");
         }
       } else {
         // One time repair for city coordinates saved by an older build.

@@ -51,7 +51,11 @@ function AppLayout() {
       void resolveLocation(true).then((location) => {
         if (!location) return;
         const latest = getPrayerSettings();
-        if (!latest.location) setPrayerSettings({ ...latest, location });
+        if (!latest.location) {
+          const next = { ...latest, location };
+          setPrayerSettings(next);
+          void rescheduleAdhanNotifications(next);
+        }
       });
     }
     // Android: tapping an adhan notification shows the player; native audio is
