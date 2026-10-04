@@ -74,6 +74,13 @@ function AppLayout() {
     // ask the native side directly on launch and whenever the app resumes.
     let cancelled = false;
     const check = async () => {
+      const android = await import("@/lib/android-adhan");
+      if (android.isAndroidPlatform()) {
+        const p = await android.androidGetAdhanProgress().catch(() => null);
+        if (cancelled || !p || !p.hasSession) return;
+        setAdhan((a) => (a.visible ? a : { visible: true, prayer: "fajr", reciterId: "" }));
+        return;
+      }
       const s = await isAdhanPlaying().catch(() => null);
       if (cancelled || !s || !(s.playing || s.hasSession)) return;
       setAdhan((a) =>
@@ -84,11 +91,14 @@ function AppLayout() {
     const onVisible = () => {
       if (document.visibilityState === "visible") void check();
     };
+    const onResume = () => void check();
     document.addEventListener("visibilitychange", onVisible);
+    document.addEventListener("resume", onResume);
     return () => {
       cancelled = true;
       timers.forEach((t) => window.clearTimeout(t));
       document.removeEventListener("visibilitychange", onVisible);
+      document.removeEventListener("resume", onResume);
       if (typeof unsubscribe === "function") unsubscribe();
     };
   }, []);
