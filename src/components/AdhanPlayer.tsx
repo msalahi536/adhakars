@@ -16,6 +16,7 @@ import {
 import { Portal } from "@/components/Portal";
 import {
   getAdhanProgress,
+  getReciterForPrayer,
   pauseAdhan,
   reciterNameFor,
   resumeAdhan,
@@ -113,7 +114,7 @@ export function AdhanPlayer({ visible, prayer, reciterId, onClose }: Props) {
   const current = duration * progress;
   const playing = p?.isPlaying ?? true;
   const name = labelFor(p?.prayer || prayer);
-  const reciter = reciterNameFor(fromNativeReciterId(p?.reciterId || reciterId));
+  const reciter = reciterNameFor(fromNativeReciterId(p?.reciterId || reciterId) || getReciterForPrayer(name));
   const android = isAndroidPlatform();
 
   const togglePlay = () => {
