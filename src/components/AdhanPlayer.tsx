@@ -9,7 +9,6 @@ import {
   androidPauseAdhan,
   androidResumeAdhan,
   androidSeekAdhan,
-  androidStopAdhan,
   fromNativeReciterId,
   isAndroidPlatform,
 } from "@/lib/android-adhan";
@@ -139,12 +138,7 @@ export function AdhanPlayer({ visible, prayer, reciterId, onClose }: Props) {
     commitSeek((current + delta) / duration);
   };
   const close = () => {
-    if (!android) {
-      setMinimized(true);
-      return;
-    }
-    void androidStopAdhan();
-    onClose();
+    setMinimized(true);
   };
 
   if (minimized) {
@@ -170,7 +164,7 @@ export function AdhanPlayer({ visible, prayer, reciterId, onClose }: Props) {
             <h2 className="ap-title">{name} Adhan</h2>
             <p className="ap-reciter">{reciter}</p>
           </div>
-          <button type="button" className="ap-close" onClick={close} aria-label={android ? "Stop and close player" : "Close and minimize player"}>
+          <button type="button" className="ap-close" onClick={close} aria-label="Close and minimize player">
             <X size={19} />
           </button>
         </div>
