@@ -9,60 +9,35 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as TermsRouteImport } from './routes/terms'
-import { Route as SuggestionsRouteImport } from './routes/suggestions'
-import { Route as PrivacyRouteImport } from './routes/privacy'
-import { Route as DownloadRouteImport } from './routes/download'
-import { Route as AppRouteImport } from './routes/app'
-import { Route as AdminRouteImport } from './routes/admin'
-import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as AppIndexRouteImport } from './routes/app.index'
-import { Route as AppTermsRouteImport } from './routes/app.terms'
-import { Route as AppTasbihRouteImport } from './routes/app.tasbih'
-import { Route as AppSleepRouteImport } from './routes/app.sleep'
-import { Route as AppSettingsRouteImport } from './routes/app.settings'
-import { Route as AppSalahRouteImport } from './routes/app.salah'
-import { Route as AppRuqyahRouteImport } from './routes/app.ruqyah'
-import { Route as AppQiblaRouteImport } from './routes/app.qibla'
-import { Route as AppPrivacyRouteImport } from './routes/app.privacy'
-import { Route as AppPeriodRouteImport } from './routes/app.period'
-import { Route as AppMoreRouteImport } from './routes/app.more'
-import { Route as AppHajjRouteImport } from './routes/app.hajj'
-import { Route as AppFastingRouteImport } from './routes/app.fasting'
-import { Route as AppEveningRouteImport } from './routes/app.evening'
-import { Route as AppDuasRouteImport } from './routes/app.duas'
-import { Route as AppAboutRouteImport } from './routes/app.about'
+import { Route as AboutRouteImport } from './routes/about'
+import { Route as AdminRouteImport } from './routes/admin'
+import { Route as AppRouteImport } from './routes/app'
+import { Route as DownloadRouteImport } from './routes/download'
+import { Route as PrivacyRouteImport } from './routes/privacy'
+import { Route as SuggestionsRouteImport } from './routes/suggestions'
+import { Route as TermsRouteImport } from './routes/terms'
 import { Route as ApiWidgetsRouteImport } from './routes/api/widgets'
+import { Route as AppIndexRouteImport } from './routes/app.index'
+import { Route as AppAboutRouteImport } from './routes/app.about'
+import { Route as AppDuasRouteImport } from './routes/app.duas'
+import { Route as AppEveningRouteImport } from './routes/app.evening'
+import { Route as AppFastingRouteImport } from './routes/app.fasting'
+import { Route as AppHajjRouteImport } from './routes/app.hajj'
+import { Route as AppMoreRouteImport } from './routes/app.more'
+import { Route as AppPeriodRouteImport } from './routes/app.period'
+import { Route as AppPrivacyRouteImport } from './routes/app.privacy'
+import { Route as AppQiblaRouteImport } from './routes/app.qibla'
+import { Route as AppRuqyahRouteImport } from './routes/app.ruqyah'
+import { Route as AppSalahRouteImport } from './routes/app.salah'
+import { Route as AppSettingsRouteImport } from './routes/app.settings'
+import { Route as AppSleepRouteImport } from './routes/app.sleep'
+import { Route as AppTasbihRouteImport } from './routes/app.tasbih'
+import { Route as AppTermsRouteImport } from './routes/app.terms'
 
-const TermsRoute = TermsRouteImport.update({
-  id: '/terms',
-  path: '/terms',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const SuggestionsRoute = SuggestionsRouteImport.update({
-  id: '/suggestions',
-  path: '/suggestions',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const PrivacyRoute = PrivacyRouteImport.update({
-  id: '/privacy',
-  path: '/privacy',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const DownloadRoute = DownloadRouteImport.update({
-  id: '/download',
-  path: '/download',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AppRoute = AppRouteImport.update({
-  id: '/app',
-  path: '/app',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AdminRoute = AdminRouteImport.update({
-  id: '/admin',
-  path: '/admin',
+const IndexRoute = IndexRouteImport.update({
+  id: '/',
+  path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AboutRoute = AboutRouteImport.update({
@@ -70,9 +45,39 @@ const AboutRoute = AboutRouteImport.update({
   path: '/about',
   getParentRoute: () => rootRouteImport,
 } as any)
-const IndexRoute = IndexRouteImport.update({
-  id: '/',
-  path: '/',
+const AdminRoute = AdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AppRoute = AppRouteImport.update({
+  id: '/app',
+  path: '/app',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DownloadRoute = DownloadRouteImport.update({
+  id: '/download',
+  path: '/download',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PrivacyRoute = PrivacyRouteImport.update({
+  id: '/privacy',
+  path: '/privacy',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SuggestionsRoute = SuggestionsRouteImport.update({
+  id: '/suggestions',
+  path: '/suggestions',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TermsRoute = TermsRouteImport.update({
+  id: '/terms',
+  path: '/terms',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiWidgetsRoute = ApiWidgetsRouteImport.update({
+  id: '/api/widgets',
+  path: '/api/widgets',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AppIndexRoute = AppIndexRouteImport.update({
@@ -80,69 +85,9 @@ const AppIndexRoute = AppIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AppRoute,
 } as any)
-const AppTermsRoute = AppTermsRouteImport.update({
-  id: '/terms',
-  path: '/terms',
-  getParentRoute: () => AppRoute,
-} as any)
-const AppTasbihRoute = AppTasbihRouteImport.update({
-  id: '/tasbih',
-  path: '/tasbih',
-  getParentRoute: () => AppRoute,
-} as any)
-const AppSleepRoute = AppSleepRouteImport.update({
-  id: '/sleep',
-  path: '/sleep',
-  getParentRoute: () => AppRoute,
-} as any)
-const AppSettingsRoute = AppSettingsRouteImport.update({
-  id: '/settings',
-  path: '/settings',
-  getParentRoute: () => AppRoute,
-} as any)
-const AppSalahRoute = AppSalahRouteImport.update({
-  id: '/salah',
-  path: '/salah',
-  getParentRoute: () => AppRoute,
-} as any)
-const AppRuqyahRoute = AppRuqyahRouteImport.update({
-  id: '/ruqyah',
-  path: '/ruqyah',
-  getParentRoute: () => AppRoute,
-} as any)
-const AppQiblaRoute = AppQiblaRouteImport.update({
-  id: '/qibla',
-  path: '/qibla',
-  getParentRoute: () => AppRoute,
-} as any)
-const AppPrivacyRoute = AppPrivacyRouteImport.update({
-  id: '/privacy',
-  path: '/privacy',
-  getParentRoute: () => AppRoute,
-} as any)
-const AppPeriodRoute = AppPeriodRouteImport.update({
-  id: '/period',
-  path: '/period',
-  getParentRoute: () => AppRoute,
-} as any)
-const AppMoreRoute = AppMoreRouteImport.update({
-  id: '/more',
-  path: '/more',
-  getParentRoute: () => AppRoute,
-} as any)
-const AppHajjRoute = AppHajjRouteImport.update({
-  id: '/hajj',
-  path: '/hajj',
-  getParentRoute: () => AppRoute,
-} as any)
-const AppFastingRoute = AppFastingRouteImport.update({
-  id: '/fasting',
-  path: '/fasting',
-  getParentRoute: () => AppRoute,
-} as any)
-const AppEveningRoute = AppEveningRouteImport.update({
-  id: '/evening',
-  path: '/evening',
+const AppAboutRoute = AppAboutRouteImport.update({
+  id: '/about',
+  path: '/about',
   getParentRoute: () => AppRoute,
 } as any)
 const AppDuasRoute = AppDuasRouteImport.update({
@@ -150,15 +95,70 @@ const AppDuasRoute = AppDuasRouteImport.update({
   path: '/duas',
   getParentRoute: () => AppRoute,
 } as any)
-const AppAboutRoute = AppAboutRouteImport.update({
-  id: '/about',
-  path: '/about',
+const AppEveningRoute = AppEveningRouteImport.update({
+  id: '/evening',
+  path: '/evening',
   getParentRoute: () => AppRoute,
 } as any)
-const ApiWidgetsRoute = ApiWidgetsRouteImport.update({
-  id: '/api/widgets',
-  path: '/api/widgets',
-  getParentRoute: () => rootRouteImport,
+const AppFastingRoute = AppFastingRouteImport.update({
+  id: '/fasting',
+  path: '/fasting',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppHajjRoute = AppHajjRouteImport.update({
+  id: '/hajj',
+  path: '/hajj',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppMoreRoute = AppMoreRouteImport.update({
+  id: '/more',
+  path: '/more',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppPeriodRoute = AppPeriodRouteImport.update({
+  id: '/period',
+  path: '/period',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppPrivacyRoute = AppPrivacyRouteImport.update({
+  id: '/privacy',
+  path: '/privacy',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppQiblaRoute = AppQiblaRouteImport.update({
+  id: '/qibla',
+  path: '/qibla',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppRuqyahRoute = AppRuqyahRouteImport.update({
+  id: '/ruqyah',
+  path: '/ruqyah',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppSalahRoute = AppSalahRouteImport.update({
+  id: '/salah',
+  path: '/salah',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppSettingsRoute = AppSettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppSleepRoute = AppSleepRouteImport.update({
+  id: '/sleep',
+  path: '/sleep',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppTasbihRoute = AppTasbihRouteImport.update({
+  id: '/tasbih',
+  path: '/tasbih',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppTermsRoute = AppTermsRouteImport.update({
+  id: '/terms',
+  path: '/terms',
+  getParentRoute: () => AppRoute,
 } as any)
 
 export interface FileRoutesByFullPath {
@@ -339,46 +339,11 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/terms': {
-      id: '/terms'
-      path: '/terms'
-      fullPath: '/terms'
-      preLoaderRoute: typeof TermsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/suggestions': {
-      id: '/suggestions'
-      path: '/suggestions'
-      fullPath: '/suggestions'
-      preLoaderRoute: typeof SuggestionsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/privacy': {
-      id: '/privacy'
-      path: '/privacy'
-      fullPath: '/privacy'
-      preLoaderRoute: typeof PrivacyRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/download': {
-      id: '/download'
-      path: '/download'
-      fullPath: '/download'
-      preLoaderRoute: typeof DownloadRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/app': {
-      id: '/app'
-      path: '/app'
-      fullPath: '/app'
-      preLoaderRoute: typeof AppRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/admin': {
-      id: '/admin'
-      path: '/admin'
-      fullPath: '/admin'
-      preLoaderRoute: typeof AdminRouteImport
+    '/': {
+      id: '/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/about': {
@@ -388,11 +353,53 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AboutRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/': {
-      id: '/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
+    '/admin': {
+      id: '/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AdminRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/app': {
+      id: '/app'
+      path: '/app'
+      fullPath: '/app'
+      preLoaderRoute: typeof AppRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/download': {
+      id: '/download'
+      path: '/download'
+      fullPath: '/download'
+      preLoaderRoute: typeof DownloadRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/privacy': {
+      id: '/privacy'
+      path: '/privacy'
+      fullPath: '/privacy'
+      preLoaderRoute: typeof PrivacyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/suggestions': {
+      id: '/suggestions'
+      path: '/suggestions'
+      fullPath: '/suggestions'
+      preLoaderRoute: typeof SuggestionsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/terms': {
+      id: '/terms'
+      path: '/terms'
+      fullPath: '/terms'
+      preLoaderRoute: typeof TermsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/widgets': {
+      id: '/api/widgets'
+      path: '/api/widgets'
+      fullPath: '/api/widgets'
+      preLoaderRoute: typeof ApiWidgetsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/app/': {
@@ -402,95 +409,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppIndexRouteImport
       parentRoute: typeof AppRoute
     }
-    '/app/terms': {
-      id: '/app/terms'
-      path: '/terms'
-      fullPath: '/app/terms'
-      preLoaderRoute: typeof AppTermsRouteImport
-      parentRoute: typeof AppRoute
-    }
-    '/app/tasbih': {
-      id: '/app/tasbih'
-      path: '/tasbih'
-      fullPath: '/app/tasbih'
-      preLoaderRoute: typeof AppTasbihRouteImport
-      parentRoute: typeof AppRoute
-    }
-    '/app/sleep': {
-      id: '/app/sleep'
-      path: '/sleep'
-      fullPath: '/app/sleep'
-      preLoaderRoute: typeof AppSleepRouteImport
-      parentRoute: typeof AppRoute
-    }
-    '/app/settings': {
-      id: '/app/settings'
-      path: '/settings'
-      fullPath: '/app/settings'
-      preLoaderRoute: typeof AppSettingsRouteImport
-      parentRoute: typeof AppRoute
-    }
-    '/app/salah': {
-      id: '/app/salah'
-      path: '/salah'
-      fullPath: '/app/salah'
-      preLoaderRoute: typeof AppSalahRouteImport
-      parentRoute: typeof AppRoute
-    }
-    '/app/ruqyah': {
-      id: '/app/ruqyah'
-      path: '/ruqyah'
-      fullPath: '/app/ruqyah'
-      preLoaderRoute: typeof AppRuqyahRouteImport
-      parentRoute: typeof AppRoute
-    }
-    '/app/qibla': {
-      id: '/app/qibla'
-      path: '/qibla'
-      fullPath: '/app/qibla'
-      preLoaderRoute: typeof AppQiblaRouteImport
-      parentRoute: typeof AppRoute
-    }
-    '/app/privacy': {
-      id: '/app/privacy'
-      path: '/privacy'
-      fullPath: '/app/privacy'
-      preLoaderRoute: typeof AppPrivacyRouteImport
-      parentRoute: typeof AppRoute
-    }
-    '/app/period': {
-      id: '/app/period'
-      path: '/period'
-      fullPath: '/app/period'
-      preLoaderRoute: typeof AppPeriodRouteImport
-      parentRoute: typeof AppRoute
-    }
-    '/app/more': {
-      id: '/app/more'
-      path: '/more'
-      fullPath: '/app/more'
-      preLoaderRoute: typeof AppMoreRouteImport
-      parentRoute: typeof AppRoute
-    }
-    '/app/hajj': {
-      id: '/app/hajj'
-      path: '/hajj'
-      fullPath: '/app/hajj'
-      preLoaderRoute: typeof AppHajjRouteImport
-      parentRoute: typeof AppRoute
-    }
-    '/app/fasting': {
-      id: '/app/fasting'
-      path: '/fasting'
-      fullPath: '/app/fasting'
-      preLoaderRoute: typeof AppFastingRouteImport
-      parentRoute: typeof AppRoute
-    }
-    '/app/evening': {
-      id: '/app/evening'
-      path: '/evening'
-      fullPath: '/app/evening'
-      preLoaderRoute: typeof AppEveningRouteImport
+    '/app/about': {
+      id: '/app/about'
+      path: '/about'
+      fullPath: '/app/about'
+      preLoaderRoute: typeof AppAboutRouteImport
       parentRoute: typeof AppRoute
     }
     '/app/duas': {
@@ -500,19 +423,96 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppDuasRouteImport
       parentRoute: typeof AppRoute
     }
-    '/app/about': {
-      id: '/app/about'
-      path: '/about'
-      fullPath: '/app/about'
-      preLoaderRoute: typeof AppAboutRouteImport
+    '/app/evening': {
+      id: '/app/evening'
+      path: '/evening'
+      fullPath: '/app/evening'
+      preLoaderRoute: typeof AppEveningRouteImport
       parentRoute: typeof AppRoute
     }
-    '/api/widgets': {
-      id: '/api/widgets'
-      path: '/api/widgets'
-      fullPath: '/api/widgets'
-      preLoaderRoute: typeof ApiWidgetsRouteImport
-      parentRoute: typeof rootRouteImport
+    '/app/fasting': {
+      id: '/app/fasting'
+      path: '/fasting'
+      fullPath: '/app/fasting'
+      preLoaderRoute: typeof AppFastingRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/hajj': {
+      id: '/app/hajj'
+      path: '/hajj'
+      fullPath: '/app/hajj'
+      preLoaderRoute: typeof AppHajjRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/more': {
+      id: '/app/more'
+      path: '/more'
+      fullPath: '/app/more'
+      preLoaderRoute: typeof AppMoreRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/period': {
+      id: '/app/period'
+      path: '/period'
+      fullPath: '/app/period'
+      preLoaderRoute: typeof AppPeriodRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/privacy': {
+      id: '/app/privacy'
+      path: '/privacy'
+      fullPath: '/app/privacy'
+      preLoaderRoute: typeof AppPrivacyRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/qibla': {
+      id: '/app/qibla'
+      path: '/qibla'
+      fullPath: '/app/qibla'
+      preLoaderRoute: typeof AppQiblaRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/ruqyah': {
+      id: '/app/ruqyah'
+      path: '/ruqyah'
+      fullPath: '/app/ruqyah'
+      preLoaderRoute: typeof AppRuqyahRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/salah': {
+      id: '/app/salah'
+      path: '/salah'
+      fullPath: '/app/salah'
+      preLoaderRoute: typeof AppSalahRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/settings': {
+      id: '/app/settings'
+      path: '/settings'
+      fullPath: '/app/settings'
+      preLoaderRoute: typeof AppSettingsRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/sleep': {
+      id: '/app/sleep'
+      path: '/sleep'
+      fullPath: '/app/sleep'
+      preLoaderRoute: typeof AppSleepRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/tasbih': {
+      id: '/app/tasbih'
+      path: '/tasbih'
+      fullPath: '/app/tasbih'
+      preLoaderRoute: typeof AppTasbihRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/terms': {
+      id: '/app/terms'
+      path: '/terms'
+      fullPath: '/app/terms'
+      preLoaderRoute: typeof AppTermsRouteImport
+      parentRoute: typeof AppRoute
     }
   }
 }
