@@ -102,14 +102,16 @@ export async function androidGetAdhanProgress() {
       const currentTime = n(o.currentTime);
       const playing = !!o.playing;
       const paused = !!o.paused;
+      const prayer = typeof o.prayer === "string" ? o.prayer : "";
+      const reciterId = typeof o.reciterId === "string" ? fromNativeReciterId(o.reciterId) : "";
       return {
         currentTime,
         duration,
         progress: duration ? currentTime / duration : 0,
         isPlaying: playing,
         hasSession: playing || paused,
-        prayer: "",
-        reciterId: "",
+        prayer,
+        reciterId,
       };
     }
   } catch {

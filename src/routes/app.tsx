@@ -14,7 +14,7 @@ import { FULL_ADHAN_URL, isPrayerNotifId, rescheduleAdhanNotifications } from "@
 import { AdhanPlayer } from "@/components/AdhanPlayer";
 import { getPrayerSettings } from "@/lib/prayer-times";
 import { initNativeBridge } from "@/lib/native-bridge";
-import { isAdhanPlaying, onAdhanPlaying } from "@/lib/adhan-bridge";
+import { getReciterForPrayer, isAdhanPlaying, onAdhanPlaying } from "@/lib/adhan-bridge";
 
 const UPDATE_WELCOME_KEY = "adhkar:update-welcome:2026-09";
 
@@ -78,7 +78,10 @@ function AppLayout() {
       if (android.isAndroidPlatform()) {
         const p = await android.androidGetAdhanProgress().catch(() => null);
         if (cancelled || !p || !p.hasSession) return;
-        setAdhan((a) => (a.visible ? a : { visible: true, prayer: "fajr", reciterId: "" }));
+        const prayer = p.prayer || "fajr";
+        setAdhan((a) =>
+          a.visible ? a : { visible: true, prayer, reciterId: p.reciterId || getReciterForPrayer(prayer) },
+        );
         return;
       }
       const s = await isAdhanPlaying().catch(() => null);
