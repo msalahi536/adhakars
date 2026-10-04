@@ -209,8 +209,8 @@ export const rescheduleAdhanNotifications = async (
         });
       notifications.push({
         id: PRAYER_NOTIF_IDS[id] + offset,
-        title: PRAYER_LABELS[id],
-        body: BODY[id],
+        title: isAndroid ? `Time for ${PRAYER_LABELS[id]}` : PRAYER_LABELS[id],
+        body: isAndroid ? "Tap for the full adhan." : BODY[id],
         schedule: { at: slot.at, allowWhileIdle: true },
         channelId: isAndroid ? ANDROID_ADHAN_CHANNEL : NOTIFICATION_CHANNEL,
         ...(sound ? { sound } : {}),

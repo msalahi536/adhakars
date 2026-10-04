@@ -1216,7 +1216,7 @@ function AndroidNotificationTests() {
       const storedReciter = getReciterForPrayer("fajr");
       const androidReciterId = toNativeReciterId(storedReciter);
       console.log("[adhan-debug] Stored reciter:", storedReciter, "→ Android ID:", androidReciterId);
-      return { id: 904, title: "Fajr", body: "It is time for Fajr.", extra: { prayer: "fajr", reciterId: androidReciterId, soundMode: androidReciterId === "silent" ? "silent" : "adhan" } };
+      return { id: 904, title: "Time for Fajr", body: "Tap for the full adhan.", extra: { prayer: "fajr", reciterId: androidReciterId, soundMode: androidReciterId === "silent" ? "silent" : "adhan" } };
     } },
     { label: "Test Deep Link (Tasbih)", build: () => ({ id: 905, title: "Tasbih", body: "Test deep link", extra: { route: "/app/tasbih" } }) },
   ];
