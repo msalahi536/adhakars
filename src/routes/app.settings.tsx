@@ -1,5 +1,5 @@
 import { getReciterForPrayer } from "@/lib/adhan-bridge";
-import { toNativeReciterId } from "@/lib/android-adhan";
+import { ANDROID_ADHAN_CHANNEL, ensureAndroidAdhanChannel, toNativeReciterId } from "@/lib/android-adhan";
 import { useEffect, useState, type ReactNode } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { HeaderBackButton } from "@/components/HeaderBackButton";
@@ -1176,14 +1176,20 @@ async function scheduleTestNotification(config: TestNotifConfig) {
         return;
       }
     }
+    const fireAt = new Date(Date.now() + 5000);
+    const isAdhan = config.extra.soundMode === "adhan" || config.extra.soundMode === "silent";
+    if (isAdhan) await ensureAndroidAdhanChannel(LocalNotifications);
     await LocalNotifications.schedule({
       notifications: [
         {
           id: config.id,
           title: config.title,
           body: config.body,
-          extra: config.extra,
-          schedule: { at: new Date(Date.now() + 5000), allowWhileIdle: true },
+          extra: isAdhan
+            ? { ...config.extra, firedAt: Math.floor(fireAt.getTime() / 1000) }
+            : config.extra,
+          schedule: { at: fireAt, allowWhileIdle: true },
+          ...(isAdhan ? { channelId: ANDROID_ADHAN_CHANNEL } : {}),
         },
       ],
     });
@@ -1206,11 +1212,11 @@ function AndroidNotificationTests() {
     { label: "Test Morning Adhkar Notif", build: () => ({ id: 901, title: "Morning Adhkar", body: "Test - Time for your morning adhkar.", extra: { route: "/app/" } }) },
     { label: "Test Evening Adhkar Notif", build: () => ({ id: 902, title: "Evening Adhkar", body: "Test - Time for your evening adhkar.", extra: { route: "/app/evening" } }) },
     { label: "Test Nudge/Streak Notif", build: () => ({ id: 903, title: "Sahih Al-Adhkar", body: "Test - Your adhkar are still waiting.", extra: { route: "/app/more" } }) },
-    { label: "Test Adhan Notif (Fajr)", build: () => {
+    { label: "🔊 Test Adhan (Dev)", build: () => {
       const storedReciter = getReciterForPrayer("fajr");
       const androidReciterId = toNativeReciterId(storedReciter);
       console.log("[adhan-debug] Stored reciter:", storedReciter, "→ Android ID:", androidReciterId);
-      return { id: 904, title: "Fajr", body: "Test adhan notification", extra: { prayer: "fajr", reciterId: androidReciterId, soundMode: androidReciterId === "silent" ? "silent" : "adhan", firedAt: Math.floor(Date.now() / 1000) } };
+      return { id: 904, title: "Fajr", body: "It is time for Fajr.", extra: { prayer: "fajr", reciterId: androidReciterId, soundMode: androidReciterId === "silent" ? "silent" : "adhan" } };
     } },
     { label: "Test Deep Link (Tasbih)", build: () => ({ id: 905, title: "Tasbih", body: "Test deep link", extra: { route: "/app/tasbih" } }) },
   ];
