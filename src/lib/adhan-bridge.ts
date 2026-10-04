@@ -45,8 +45,13 @@ export const FAJR_RECITERS: Reciter[] = [
   { id: "silent", name: "Silent", origin: "Notification only, no sound" },
 ];
 const DEFAULT_FAJR_RECITER_ID = FAJR_RECITERS[0].id;
-const validFajrReciter = (id: unknown): string =>
-  typeof id === "string" && FAJR_RECITERS.some((r) => r.id === id) ? id : DEFAULT_FAJR_RECITER_ID;
+// Only Mishary and Madinah have Fajr recordings; anything else (e.g. an old
+// "abdulbasit" save) resets to Mishary.
+const validFajrReciter = (id: unknown): string => {
+  if (id === "mishary" || id === "afasy") return "fajr-mishary";
+  if (id === "madinah") return "fajr-madinah";
+  return typeof id === "string" && FAJR_RECITERS.some((r) => r.id === id) ? id : DEFAULT_FAJR_RECITER_ID;
+};
 
 /**
  * Native audio file naming:
