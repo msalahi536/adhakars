@@ -151,6 +151,7 @@ export const rescheduleAdhanNotifications = async (
         if (slot.at.getTime() <= now.getTime() + 30_000) continue;
         if (muteAll && slot.dayKey === todayKey) continue;
         if (dismissed && dismissed.dayKey === slot.dayKey && dismissed.prayer === slot.id) continue;
+        console.log("[PrayerTimes] Scheduling notification for", slot.id, "at", slot.at);
         next.set(id, buildNativePrayerTime(slot.label, slot.at));
       }
     }
@@ -198,6 +199,7 @@ export const rescheduleAdhanNotifications = async (
       // adhan when the notification fires (see android-adhan.ts).
       const reciterId = getReciterForPrayer(slot.label);
       const sound = isAndroid ? undefined : adhanSoundFor(settings, slot.label);
+      console.log("[PrayerTimes] Scheduling notification for", id, "at", slot.at);
       if (isAndroid)
         console.log("[AdhanNotif] Scheduling notification:", {
           prayer: id,

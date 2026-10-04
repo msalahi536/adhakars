@@ -12,7 +12,7 @@ import { rememberMoreDestination } from "@/lib/more-navigation";
 import { isPeriodNotifId, isSmartAdhkarId, smartAdhkarKind, SUNNAH_NOTIF_ID } from "@/lib/smart-notifications";
 import { FULL_ADHAN_URL, isPrayerNotifId, rescheduleAdhanNotifications } from "@/lib/adhan-notifications";
 import { AdhanPlayer } from "@/components/AdhanPlayer";
-import { getPrayerSettings } from "@/lib/prayer-times";
+import { getPrayerSettings, resolveLocation, setPrayerSettings } from "@/lib/prayer-times";
 import { initNativeBridge } from "@/lib/native-bridge";
 import { getReciterForPrayer, isAdhanPlaying, onAdhanPlaying } from "@/lib/adhan-bridge";
 
@@ -44,6 +44,20 @@ function AppLayout() {
 
   useEffect(() => {
     initNativeBridge();
+    // First launch: ask Android for its real coordinates immediately, then
+    // persist them in prayer settings for offline calculation and scheduling.
+    const currentPrayerSettings = getPrayerSettings();
+    if (!currentPrayerSettings.location) {
+      void resolveLocation(true).then((location) => {
+        if (!location) return;
+        const latest = getPrayerSettings();
+        if (!latest.location) {
+          const next = { ...latest, location };
+          setPrayerSettings(next);
+          void rescheduleAdhanNotifications(next);
+        }
+      });
+    }
     // Android: tapping an adhan notification shows the player; native audio is
     // already playing, so the player only reflects it.
     void import("@/lib/android-adhan").then((m) =>

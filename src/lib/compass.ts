@@ -117,10 +117,25 @@ export type PositionResult =
   | { ok: true; coords: Coords; source: "fresh" | "cached"; at: number }
   | { ok: false; error: string };
 
-function webPosition(): Promise<PositionResult> {
+async function logLocationPermissionStatus(): Promise<void> {
+  try {
+    if (!("permissions" in navigator)) {
+      console.log("[Location] Permission status:", "prompt-or-unavailable");
+      return;
+    }
+    const permission = await navigator.permissions.query({ name: "geolocation" });
+    console.log("[Location] Permission status:", permission.state);
+  } catch {
+    console.log("[Location] Permission status:", "unknown");
+  }
+}
+
+async function webPosition(): Promise<PositionResult> {
   if (typeof navigator === "undefined" || !("geolocation" in navigator)) {
+    console.log("[Location] Permission status:", "unsupported");
     return Promise.resolve({ ok: false, error: "Location is not supported on this device." });
   }
+  await logLocationPermissionStatus();
   return new Promise((resolve) => {
     let settled = false;
     const timer = setTimeout(() => {
@@ -137,12 +152,16 @@ function webPosition(): Promise<PositionResult> {
         if (settled) return;
         settled = true;
         clearTimeout(timer);
-        resolve({ ok: true, coords: { lat: pos.coords.latitude, lng: pos.coords.longitude }, source: "fresh", at: Date.now() });
+        const coords = { lat: pos.coords.latitude, lng: pos.coords.longitude };
+        console.log("[Location] Permission status:", "granted");
+        console.log("[Location] Got coordinates:", coords.lat, coords.lng);
+        resolve({ ok: true, coords, source: "fresh", at: Date.now() });
       },
       (err) => {
         if (settled) return;
         settled = true;
         clearTimeout(timer);
+        console.log("[Location] Permission status:", err.code === err.PERMISSION_DENIED ? "denied" : "unavailable");
         resolve({
           ok: false,
           error:
@@ -191,6 +210,15 @@ export async function getPosition(opts?: { force?: boolean }): Promise<PositionR
     if (cached) return { ok: true, coords: cached, source: "cached", at: cached.at };
   }
 
+  const platform = typeof window !== "undefined" ? (window as any).Capacitor?.getPlatform?.() : undefined;
+  // Android's WebView forwards navigator.geolocation to the native permission
+  // prompt, and using this single path avoids plugin/manifest drift.
+  if (platform === "android") {
+    const android = await webPosition();
+    if (android.ok) cachePosition(android.coords);
+    return android.ok ? { ...android, source: "fresh", at: Date.now() } : android;
+  }
+
   if (isNative()) {
     try {
       const { Geolocation } = await import("@capacitor/geolocation");
@@ -211,6 +239,8 @@ export async function getPosition(opts?: { force?: boolean }): Promise<PositionR
         timeout: 15000,
       });
       const coords = { lat: pos.coords.latitude, lng: pos.coords.longitude };
+      console.log("[Location] Permission status:", "granted");
+      console.log("[Location] Got coordinates:", coords.lat, coords.lng);
       cachePosition(coords);
       return { ok: true, coords, source: "fresh", at: Date.now() };
     } catch {
