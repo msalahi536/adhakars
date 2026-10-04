@@ -114,6 +114,7 @@ export function Pagination({
   hideSelector?: boolean;
 }) {
   const [isScrubbing, setIsScrubbing] = useState(false);
+  const [isAndroid, setIsAndroid] = useState(false);
   const activeRef = useRef(active);
   activeRef.current = active;
   const holdTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -126,6 +127,11 @@ export function Pagination({
   };
 
   useEffect(() => stopHold, []);
+  useEffect(() => {
+    import("@capacitor/core")
+      .then(({ Capacitor }) => setIsAndroid(Capacitor.getPlatform() === "android"))
+      .catch(() => setIsAndroid(false));
+  }, []);
 
   const startHold = (dir: 1 | -1) => {
     stopHold();
@@ -189,7 +195,7 @@ export function Pagination({
       </button>
       {!hideSelector && (
         <div
-          className={`adhkar-pagination ${isScrubbing ? "is-scrubbing" : ""} ${showHint && !isScrubbing ? "is-hinting" : ""}`}
+          className={`adhkar-pagination ${isAndroid ? "is-android" : ""} ${isScrubbing ? "is-scrubbing" : ""} ${showHint && !isScrubbing ? "is-hinting" : ""}`}
           data-no-swipe
           onContextMenu={(event) => event.preventDefault()}
           onPointerDown={(event) => {
