@@ -164,6 +164,22 @@ function Settings() {
     setPrayerSettingsState(getPrayerSettings());
     setNotifPrefsState(getNotificationPrefs());
 
+    const savedPrayerSettings = getPrayerSettings();
+    if (!savedPrayerSettings.location) {
+      setCityOpen(true);
+      setCityBusy(true);
+      void resolveLocation(true).then((location) => {
+        setCityBusy(false);
+        if (!location) {
+          setCityError("Location permission is off. Enable it in your phone settings, or type a city instead.");
+          return;
+        }
+        updatePrayerSettings({ location });
+        setCityOpen(false);
+        setLocationSaved(`Location saved: ${location.label}`);
+      });
+    }
+
     setNativeAvailable(isNativePlatform());
     let cancelled = false;
     const refresh = () => {

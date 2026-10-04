@@ -58,13 +58,13 @@ function getPlugin(): CapacitorPlugin | null {
 let cachedLat = 0;
 let cachedLon = 0;
 
-async function getLocation(): Promise<{ lat: number; lon: number }> {
+async function getLocation(): Promise<{ lat: number; lon: number } | null> {
   if (cachedLat !== 0 && cachedLon !== 0) {
     return { lat: cachedLat, lon: cachedLon };
   }
   return new Promise((resolve) => {
     if (!navigator.geolocation) {
-      resolve({ lat: 21.4225, lon: 39.8262 });
+      resolve(null);
       return;
     }
     navigator.geolocation.getCurrentPosition(
@@ -73,7 +73,7 @@ async function getLocation(): Promise<{ lat: number; lon: number }> {
         cachedLon = pos.coords.longitude;
         resolve({ lat: cachedLat, lon: cachedLon });
       },
-      () => resolve({ lat: 21.4225, lon: 39.8262 }),
+      () => resolve(null),
       { timeout: 10000, enableHighAccuracy: false },
     );
   });
@@ -85,7 +85,9 @@ async function syncLocationToWidgets() {
   const plugin = getPlugin();
   if (!plugin) return;
 
-  const { lat, lon } = await getLocation();
+  const location = await getLocation();
+  if (!location) return;
+  const { lat, lon } = location;
 
   let method = 2;
   try {

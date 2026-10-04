@@ -252,6 +252,14 @@ export const fetchDay = async (
     if (!timings) return null;
     const times = buildTimes(timings);
     if (!times) return null;
+    console.log("[PrayerTimes] Calculated for coordinates:", loc.lat, loc.lng);
+    console.log(
+      "[PrayerTimes] Fajr:", formatMinutes(times.fajr),
+      "Dhuhr:", formatMinutes(times.dhuhr),
+      "Asr:", formatMinutes(times.asr),
+      "Maghrib:", formatMinutes(times.maghrib),
+      "Isha:", formatMinutes(times.isha),
+    );
     const day: DayTimes = { key, times };
     writeCache(day, settings);
     return day;
