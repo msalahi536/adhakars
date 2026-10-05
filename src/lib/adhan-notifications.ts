@@ -15,6 +15,7 @@ import {
   isMutedAllToday,
   dateKey,
   addDays,
+  getPrayerSettings,
   type PrayerId,
   type PrayerSettings,
 } from "@/lib/prayer-times";
@@ -96,11 +97,11 @@ export const cancelAdhanNotifications = async (): Promise<void> => {
  */
 let retryTimer: ReturnType<typeof setTimeout> | null = null;
 /** Retry shortly when planning was skipped, so alerts never silently stop. */
-const retryLater = (settings: PrayerSettings) => {
+const retryLater = (_settings: PrayerSettings) => {
   if (typeof window === "undefined" || retryTimer) return;
   retryTimer = setTimeout(() => {
     retryTimer = null;
-    void rescheduleAdhanNotifications(settings);
+    void rescheduleAdhanNotifications(getPrayerSettings());
   }, 60_000);
 };
 
