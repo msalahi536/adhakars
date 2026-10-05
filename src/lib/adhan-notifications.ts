@@ -15,6 +15,7 @@ import {
   isMutedAllToday,
   dateKey,
   addDays,
+  getPrayerSettings,
   type PrayerId,
   type PrayerSettings,
 } from "@/lib/prayer-times";
@@ -94,20 +95,37 @@ export const cancelAdhanNotifications = async (): Promise<void> => {
  * Cancels everything, then schedules the remaining prayers today and all of
  * tomorrow. Safe to call on every app open.
  */
+let retryTimer: ReturnType<typeof setTimeout> | null = null;
+/** Retry shortly when planning was skipped, so alerts never silently stop. */
+const retryLater = (_settings: PrayerSettings) => {
+  if (typeof window === "undefined" || retryTimer) return;
+  retryTimer = setTimeout(() => {
+    retryTimer = null;
+    void rescheduleAdhanNotifications(getPrayerSettings());
+  }, 60_000);
+};
+
 export const rescheduleAdhanNotifications = async (
   settings: PrayerSettings,
 ): Promise<void> => {
   if (!isNativePlatform()) return;
-  // Never touch scheduling while the full adhan is actively playing. A paused
-  // player can retain a native session for hours and must not block re-arming.
+  // Never touch scheduling while the full adhan is actively playing, but retry
+  // afterwards so a lingering native session can't leave prayers unscheduled.
   const status = await isAdhanPlaying();
-  if (status.playing) return;
+  if (status.playing) {
+    console.log("[PrayerTimes] Adhan playing; retrying schedule in 60s");
+    retryLater(settings);
+    return;
+  }
 
   const plugin = await loadNotificationPlugin();
   const native = hasNativeAdhanScheduler();
   if (!plugin && !native) return;
 
-  if (!settings.adhanEnabled || !settings.location) {
+  // The Salah page keeps adhanEnabled in sync with the per-prayer toggles.
+  const anyEnabled = SALAH_IDS.some((id) => settings.perPrayer[id]);
+  if (!settings.adhanEnabled || !anyEnabled || !settings.location) {
+    console.log("[PrayerTimes] No prayers enabled or no location; clearing alerts");
     await cancelAdhanNotifications();
     if (native) await scheduleNativeAdhan([]);
     return;
@@ -132,7 +150,10 @@ export const rescheduleAdhanNotifications = async (
     const today = await fetchDay(now, settings);
     const tomorrow = await fetchDay(addDays(now, 1), settings);
     // An offline refresh must not replace a valid native schedule with empty.
-    if (!today && !tomorrow) return;
+    if (!today && !tomorrow) {
+      retryLater(settings);
+      return;
+    }
     const muteAll = isMutedAllToday();
     const dismissed = getDismissed();
     const todayKey = dateKey(now);
@@ -155,7 +176,10 @@ export const rescheduleAdhanNotifications = async (
         next.set(id, buildNativePrayerTime(slot.label, slot.at));
       }
     }
-    await scheduleNativeAdhan([...next.values()].sort((a, b) => a.time - b.time));
+    const list = [...next.values()].sort((a, b) => a.time - b.time);
+    const ok = await scheduleNativeAdhan(list);
+    console.log("[PrayerTimes] Native schedule", ok ? "ok" : "FAILED", list.length, "prayers");
+    if (!ok) retryLater(settings);
     return;
   }
   if (!plugin) return;
@@ -175,7 +199,10 @@ export const rescheduleAdhanNotifications = async (
   const tomorrow = await fetchDay(addDays(now, 1), settings);
   // Keep the last valid schedule when prayer-time fetching fails. Clearing it
   // first meant one offline app open could silently remove every real alert.
-  if (!today && !tomorrow) return;
+  if (!today && !tomorrow) {
+    retryLater(settings);
+    return;
+  }
   await cancelAdhanNotifications();
   const muteAll = isMutedAllToday();
   const dismissed = getDismissed();
