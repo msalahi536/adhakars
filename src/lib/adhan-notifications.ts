@@ -121,10 +121,9 @@ export const rescheduleAdhanNotifications = async (
   const native = hasNativeAdhanScheduler();
   if (!plugin && !native) return;
 
-  // No master switch: each prayer's own toggle decides (see AGENTS.md). An
-  // older saved "adhanEnabled: false" must not cancel enabled prayers.
+  // The Salah page keeps adhanEnabled in sync with the per-prayer toggles.
   const anyEnabled = SALAH_IDS.some((id) => settings.perPrayer[id]);
-  if (!anyEnabled || !settings.location) {
+  if (!settings.adhanEnabled || !anyEnabled || !settings.location) {
     console.log("[PrayerTimes] No prayers enabled or no location; clearing alerts");
     await cancelAdhanNotifications();
     if (native) await scheduleNativeAdhan([]);
