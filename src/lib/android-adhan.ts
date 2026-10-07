@@ -78,11 +78,23 @@ export async function registerAndroidAdhanListener(onTap?: TapHandler): Promise<
         console.error("Failed to play adhan via native plugin:", e);
       }
     });
-    await LocalNotifications.addListener("localNotificationActionPerformed", (e) => {
+    await LocalNotifications.addListener("localNotificationActionPerformed", async (e) => {
       const extra = (e?.notification?.extra ?? {}) as Record<string, unknown>;
       if (extra.soundMode !== "adhan") return;
       const prayer = typeof extra.prayer === "string" ? extra.prayer : "fajr";
-      const reciterId = typeof extra.reciterId === "string" ? extra.reciterId : "";
+      let reciterId = typeof extra.reciterId === "string" ? extra.reciterId : "";
+      // Silent prayer: nothing played when the notification fired, so tapping
+      // starts the full adhan from zero with the default reciter.
+      if (!reciterId || toNativeReciterId(reciterId) === "silent") {
+        reciterId = "mishary";
+        try {
+          const { AdhanPlugin } = await import("./native-bridge");
+          await AdhanPlugin.playFullAdhan({ reciterId: toNativeReciterId(reciterId), prayer });
+          console.log("[android-adhan] silent tap: playing full adhan from zero, reciter =", reciterId);
+        } catch (err) {
+          console.error("[android-adhan] silent tap playback failed", err);
+        }
+      }
       onTap?.({ prayer, reciterId });
     });
   } catch (e) {
