@@ -26,9 +26,7 @@ import morningAsset from "@/assets/morning-landscape.webp.asset.json";
 import eveningAsset from "@/assets/evening-landscape.webp.asset.json";
 import roseAsset from "@/assets/rose-morning.webp.asset.json";
 import oceanAsset from "@/assets/ocean-morning.webp.asset.json";
-import heroEveningScreen from "@/assets/homepage-evening.png.asset.json";
-import heroMorningScreen from "@/assets/homepage-morning.png.asset.json";
-import heroSalahScreen from "@/assets/homepage-salah.png.asset.json";
+import heroPhones from "@/assets/homepage-phones.png.asset.json";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -113,15 +111,13 @@ function HomePage() {
               </div>
             </div>
             <div className="marketing-hero-phones animate-fade-in" aria-label="Sahih Al-Adhkar app screens">
-              <div className="marketing-hero-device marketing-hero-device-evening">
-                <IPhoneFrame src={heroEveningScreen.url} width="100%" alt="Evening Adhkar screen in Sahih Al-Adhkar" />
-              </div>
-              <div className="marketing-hero-device marketing-hero-device-morning">
-                <IPhoneFrame src={heroMorningScreen.url} width="100%" alt="Morning Adhkar screen in Sahih Al-Adhkar" />
-              </div>
-              <div className="marketing-hero-device marketing-hero-device-salah">
-                <IPhoneFrame src={heroSalahScreen.url} width="100%" alt="Prayer times screen in Sahih Al-Adhkar" />
-              </div>
+              <img
+                src={heroPhones.url}
+                alt="Sahih Al-Adhkar app showing Morning Adhkar, Evening Adhkar, and prayer times"
+                className="marketing-hero-phones-img"
+                width={1879}
+                height={1920}
+              />
             </div>
           </div>
         </section>
