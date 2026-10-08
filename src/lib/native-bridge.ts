@@ -9,7 +9,7 @@
  */
 
 import { registerPlugin } from "@capacitor/core";
-import { getPrayerSettings, fetchDay, dateKey } from "@/lib/prayer-times";
+import { getPrayerSettings, fetchDay } from "@/lib/prayer-times";
 
 export interface AdhanPluginInterface {
   playFullAdhan(options: { reciterId: string; prayer: string }): Promise<void>;
