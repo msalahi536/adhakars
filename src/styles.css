@@ -3886,8 +3886,8 @@ html { scroll-behavior: smooth; }
   .marketing-trust-grid article:first-child { border-top: 0; }
   .marketing-download-panel { grid-template-columns: 1fr; gap: 30px; padding: 42px 24px; border-radius: 26px; }
   .marketing-download h2 { font-size: 38px; }
-  .marketing-download-visual { width: min(100%, 400px); justify-self: center; height: auto; }
-  .marketing-download-visual img { height: 430px; margin: 0 auto; transform: rotate(-8deg); }
+  .marketing-download-visual { width: min(100%, 380px); justify-self: center; height: auto; }
+  .marketing-download-visual img { position: static; height: 470px; margin: 0 auto; transform: rotate(8deg); }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -4296,5 +4296,5 @@ html[data-preset="midnight"][data-visual-phase="evening"][data-section="salah"] 
 @media (max-width: 600px) {
   .marketing-download h2 { font-size: 36px; }
   .marketing-download-copy > p:last-of-type { font-size: 15px; }
-  .marketing-download-panel .store-badge-img { width: 144px; }
+  .marketing-download-panel .store-badge-img { width: 172px; }
 }

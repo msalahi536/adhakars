@@ -33,7 +33,7 @@ export function StoreBadges() {
           height={576}
         />
       </span>
-      <span className="store-badge-soon">Coming soon</span>
+      <span className="store-badge-soon">Google Play · Coming soon</span>
     </div>
   );
 }
