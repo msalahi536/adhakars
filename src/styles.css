@@ -3822,15 +3822,15 @@ html { scroll-behavior: smooth; }
 .marketing-trust-grid article:first-child { border-left: 0; }
 .marketing-trust-grid .marketing-icon { margin-inline: auto; }
 
-.marketing-download { scroll-margin-top: 74px; background: var(--download-forest); color: var(--download-cream); overflow: hidden; }
-.marketing-download-panel { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, .9fr); align-items: center; gap: 36px; padding-block: 78px; }
+.marketing-download { scroll-margin-top: 74px; padding-block: 0 92px; }
+.marketing-download-panel { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, .9fr); align-items: center; gap: 36px; border-radius: 34px; background: var(--download-forest); color: var(--download-cream); overflow: hidden; padding: 68px 58px; }
 .marketing-download-copy { position: relative; z-index: 1; min-width: 0; }
 .marketing-download-panel .marketing-eyebrow { display: inline-block; color: var(--download-gold); border: 1px solid color-mix(in oklab, var(--download-gold) 35%, transparent); padding: 7px 12px; border-radius: 999px; letter-spacing: 0; }
-.marketing-download h2 { margin-top: 24px; font-size: 58px; line-height: 1.1; max-width: 600px; }
+.marketing-download h2 { margin-top: 24px; font-size: 54px; line-height: 1.1; max-width: 600px; }
 .marketing-download h2 span { color: var(--download-gold); }
 .marketing-download-copy > p:last-of-type { margin-top: 24px; max-width: 440px; color: color-mix(in oklab, var(--download-cream) 76%, transparent); font-size: 17px; line-height: 1.7; }
-.marketing-download-visual { min-width: 0; position: relative; }
-.marketing-download-visual img { display: block; width: 116%; max-width: none; height: auto; margin-left: -6%; transform: rotate(4deg); }
+.marketing-download-visual { position: relative; min-width: 0; height: 100%; }
+.marketing-download-visual img { display: block; height: min(620px, 52vw); width: auto; margin: 0 auto; transform: rotate(-10deg); }
 .marketing-download-panel .marketing-download-button { background: var(--download-gold); color: var(--download-forest); min-height: 52px; padding-inline: 30px; font-weight: 600; }
 .marketing-download-panel .marketing-download-button:hover { background: var(--download-cream); }
 .marketing-download-panel .store-badge-img { width: 160px; filter: none; }

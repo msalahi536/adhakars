@@ -205,7 +205,7 @@ function HomePage() {
               </div>
             </div>
             <div className="marketing-download-visual">
-              <img src={heroPhones.url} alt="Sahih Al-Adhkar morning, evening, and prayer screens" width={1879} height={1920} loading="lazy" />
+              <img src={experiencePhone.url} alt="Sahih Al-Adhkar morning adhkar screen" width={1030} height={1920} loading="lazy" />
             </div>
           </div>
         </section>
