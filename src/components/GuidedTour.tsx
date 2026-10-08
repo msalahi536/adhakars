@@ -8,7 +8,7 @@ type TourStep = { route: string; target: string; title: string; body: string };
 const NAV = (n: number) => `.bottom-nav .nav-item:nth-child(${n})`;
 
 export const TOUR_STEPS: TourStep[] = [
-  { route: "/app", target: ".adhkar-card-stage", title: "Morning adhkar", body: "Tap the counter each time you recite. Swipe the card left or right to move on." },
+  { route: "/app", target: ".adhkar-counter-value", title: "Morning adhkar", body: "Tap the counter each time you recite. Swipe the card left or right to move on." },
   { route: "/app", target: NAV(2), title: "Evening adhkar", body: "Your evening remembrance lives here, ready after Asr." },
   { route: "/app/salah", target: NAV(3), title: "Salah", body: "Prayer times for your location, a live countdown, and adhan alerts." },
   { route: "/app/tasbih", target: NAV(4), title: "Tasbih", body: "A simple counter for your dhikr. Just tap anywhere." },
