@@ -143,7 +143,7 @@ function Salah() {
       // alert for this prayer is untouched; reschedule restores it after.
       const notification = isAndroid
         ? {
-            id: 920 + SALAH_IDS.indexOf(prayerId),
+            id: 920 + SALAH_IDS.indexOf(prayerId as (typeof SALAH_IDS)[number]),
             title: `Time for ${label}`,
             body: "The adhan is now playing.",
             channelId: ANDROID_ADHAN_CHANNEL,
