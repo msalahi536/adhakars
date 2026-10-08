@@ -5,6 +5,10 @@ import {
   MarketingLayout,
 } from "@/components/marketing/MarketingLayout";
 import {
+  APP_STORE_URL,
+  StoreBadges,
+} from "@/components/marketing/StoreBadges";
+import {
   Apple,
   Play,
   ArrowRight,
