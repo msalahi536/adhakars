@@ -324,23 +324,67 @@ export const getAdhanProgress = async (): Promise<AdhanProgress | null> => {
 // ---- In-app fallback session (iPhone silent alerts) ----
 // A silent notification has no adhan file natively, so tapping it plays
 // Mishary (his Fajr recording for Fajr) from zero inside the app instead.
-let webAdhan: { audio: HTMLAudioElement; prayer: string; reciterId: string } | null = null;
+let webAdhan: { audio: HTMLAudioElement; prayer: string; reciterId: string; userPaused: boolean } | null = null;
 
 export const isSilentReciter = (id: string | undefined | null): boolean => !id || id === SILENT_RECITER_ID;
 
 export const startSilentFallbackAdhan = async (prayer: string): Promise<string> => {
   const label = `${prayer.charAt(0).toUpperCase()}${prayer.slice(1).toLowerCase()}` || "Fajr";
   const reciterId = label === "Fajr" ? "fajr-mishary" : "mishary";
-  if (webAdhan && webAdhan.prayer === label) return webAdhan.reciterId;
+  console.log("[adhan-silent] tap on silent", label, "alert → playing", reciterId, "from zero");
+  if (webAdhan && webAdhan.prayer === label) {
+    void ensureWebAdhanPlaying();
+    return webAdhan.reciterId;
+  }
   stopWebAdhan();
-  const plugin = getPlugin() as any;
-  try { await plugin?.stopAdhan?.(); } catch { /* ignore */ }
   if (typeof Audio === "undefined") return reciterId;
-  const audio = new Audio(PREVIEW_URLS[reciterId]);
+  const audio = preloaded[reciterId] ?? new Audio(PREVIEW_URLS[reciterId]);
+  preloaded[reciterId] = audio;
+  audio.preload = "auto";
+  audio.currentTime = 0;
   audio.onended = () => { if (webAdhan?.audio === audio) webAdhan = null; };
-  webAdhan = { audio, prayer: label, reciterId };
-  try { await audio.play(); } catch (e) { console.error("[adhan] silent fallback play failed", e); }
+  webAdhan = { audio, prayer: label, reciterId, userPaused: false };
+  void ensureWebAdhanPlaying();
   return reciterId;
+};
+
+/**
+ * iPhone may refuse to start audio while the app is still waking from the
+ * notification tap, so keep retrying until it plays (or the user pauses),
+ * including when the app becomes active and on the first touch.
+ */
+const ensureWebAdhanPlaying = async (): Promise<void> => {
+  const session = webAdhan;
+  if (!session) return;
+  const tryPlay = async (why: string) => {
+    if (webAdhan !== session || session.userPaused || !session.audio.paused) return true;
+    try {
+      await session.audio.play();
+      console.log("[adhan-silent] playing (", why, ")");
+      return true;
+    } catch (e) {
+      console.warn("[adhan-silent] play blocked (", why, ")", e);
+      return false;
+    }
+  };
+  if (await tryPlay("start")) return;
+  const cleanup = () => {
+    document.removeEventListener("visibilitychange", onVisible);
+    window.removeEventListener("focus", onFocus);
+    window.removeEventListener("touchend", onTouch, true);
+    window.removeEventListener("click", onTouch, true);
+    timers.forEach((t) => window.clearTimeout(t));
+  };
+  const attempt = (why: string) => void tryPlay(why).then((ok) => ok && cleanup());
+  const onVisible = () => document.visibilityState === "visible" && attempt("visible");
+  const onFocus = () => attempt("focus");
+  const onTouch = () => attempt("touch");
+  document.addEventListener("visibilitychange", onVisible);
+  window.addEventListener("focus", onFocus);
+  window.addEventListener("touchend", onTouch, true);
+  window.addEventListener("click", onTouch, true);
+  const timers = [300, 800, 1500, 2500, 4000, 6000].map((ms) => window.setTimeout(() => attempt(`retry ${ms}ms`), ms));
+  window.setTimeout(cleanup, 60000);
 };
 
 const stopWebAdhan = () => {
@@ -357,7 +401,7 @@ const webProgress = (): AdhanProgress | null => {
     currentTime: audio.currentTime,
     duration,
     progress: duration ? audio.currentTime / duration : 0,
-    isPlaying: !audio.paused,
+    isPlaying: !audio.paused || !webAdhan.userPaused && audio.currentTime === 0,
     hasSession: true,
     prayer,
     reciterId,
@@ -375,8 +419,17 @@ const call = async (fn: keyof AdhanPlugin, arg?: unknown): Promise<void> => {
 };
 
 export const stopAdhan = () => (webAdhan ? Promise.resolve(stopWebAdhan()) : call("stopAdhan"));
-export const pauseAdhan = () => (webAdhan ? Promise.resolve(webAdhan.audio.pause()) : call("pauseAdhan"));
-export const resumeAdhan = () => (webAdhan ? webAdhan.audio.play().then(() => {}, () => {}) : call("resumeAdhan"));
+export const pauseAdhan = () => {
+  if (!webAdhan) return call("pauseAdhan");
+  webAdhan.userPaused = true;
+  webAdhan.audio.pause();
+  return Promise.resolve();
+};
+export const resumeAdhan = () => {
+  if (!webAdhan) return call("resumeAdhan");
+  webAdhan.userPaused = false;
+  return webAdhan.audio.play().then(() => {}, (e) => console.warn("[adhan-silent] resume failed", e));
+};
 export const seekAdhan = (progress: number) => {
   const f = Math.min(1, Math.max(0, progress));
   if (webAdhan) {
