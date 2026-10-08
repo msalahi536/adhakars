@@ -17,6 +17,7 @@ import {
   Sunrise,
 } from "lucide-react";
 import { MarketingLayout } from "@/components/marketing/MarketingLayout";
+import { StoreBadges } from "@/components/marketing/StoreBadges";
 import { Button } from "@/components/ui/button";
 import heroAsset from "@/assets/homepage-hero.png.asset.json";
 import heroPhones from "@/assets/homepage-phones.png.asset.json";
@@ -197,9 +198,12 @@ function HomePage() {
               <h2>Open it today,<br />right in your browser.</h2>
               <p>Use Sahih Al-Adhkar on iPhone, iPad, Android, or desktop. No account needed.</p>
             </div>
-            <Button asChild className="marketing-download-button">
-              <Link to="/app">Open the app <ArrowRight /></Link>
-            </Button>
+            <div className="marketing-download-actions">
+              <Button asChild className="marketing-download-button">
+                <Link to="/app">Open the app <ArrowRight /></Link>
+              </Button>
+              <StoreBadges />
+            </div>
           </div>
         </section>
       </div>
