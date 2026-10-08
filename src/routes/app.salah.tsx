@@ -19,6 +19,7 @@ import {
   getDismissed,
   getPrayerSettings,
   lookupCity,
+  PRAYER_LABELS,
   prunePrayerCache,
   repairLocation,
   resolveLocation,
