@@ -32,10 +32,9 @@ import {
   type Slot,
 } from "@/lib/prayer-times";
 import { isNativeApp } from "@/lib/native-bridge";
-import { PRAYER_NOTIF_IDS, rescheduleAdhanNotifications } from "@/lib/adhan-notifications";
-import { NOTIFICATION_CHANNEL, checkNotificationPermission, requestNotificationPermission } from "@/lib/notifications";
-import { ANDROID_ADHAN_CHANNEL, ensureAndroidAdhanChannel, toNativeReciterId } from "@/lib/android-adhan";
-import { getAdhanPrefs, getReciterForPrayer, notificationSoundFile, playAdhanPreview, preloadAdhanPreviews, RECITERS, FAJR_RECITERS, SILENT_RECITER_ID, setAdhanPrefs, stopAdhanPreview, getDiagnostics, type AdhanPrefs } from "@/lib/adhan-bridge";
+import { rescheduleAdhanNotifications } from "@/lib/adhan-notifications";
+import { checkNotificationPermission, requestNotificationPermission } from "@/lib/notifications";
+import { getAdhanPrefs, playAdhanPreview, preloadAdhanPreviews, RECITERS, FAJR_RECITERS, SILENT_RECITER_ID, setAdhanPrefs, stopAdhanPreview, getDiagnostics, type AdhanPrefs } from "@/lib/adhan-bridge";
 import { Button } from "@/components/ui/button";
 
 export const Route = createFileRoute("/app/salah")({
