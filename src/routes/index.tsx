@@ -67,12 +67,6 @@ const TRUST = [
   { Icon: WifiOff, label: "Works offline", body: "All content stays available wherever you are." },
 ] as const;
 
-const THEMES = [
-  { name: "Morning", image: morningAsset.url },
-  { name: "Evening", image: eveningAsset.url },
-  { name: "Rose", image: roseAsset.url },
-  { name: "Ocean", image: oceanAsset.url },
-] as const;
 
 function HomePage() {
   return (
@@ -145,14 +139,18 @@ function HomePage() {
               <p>Clean, distraction-free design with everything you need, right at your fingertips.</p>
             </div>
             <div className="marketing-showcase">
-              <div className="marketing-showcase-note marketing-showcase-note-left">
-                <Sparkles />
+              <div className="marketing-showcase-note">
                 <strong>Made for focus</strong>
                 <span>Clear Arabic, translation, references, and counters without clutter.</span>
               </div>
-              <IPhoneFrame width="min(330px, 78vw)" />
+              <img
+                src={experiencePhone.url}
+                alt="Morning Adhkar screen in Sahih Al-Adhkar"
+                className="marketing-experience-phone"
+                width={1030}
+                height={1920}
+              />
               <div className="marketing-showcase-note marketing-showcase-note-right">
-                <Check />
                 <strong>Your daily rhythm</strong>
                 <span>Move naturally from morning adhkar to salah, evening, and sleep.</span>
               </div>
