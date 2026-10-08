@@ -186,7 +186,7 @@ function AppLayout() {
         const isAndroidTap = (window as any).Capacitor?.getPlatform?.() === "android";
         const ids = ["fajr", "dhuhr", "asr", "maghrib", "isha"] as const;
         const prayer =
-          ids.find((p) => PRAYER_NOTIF_IDS[p] === id || PRAYER_NOTIF_IDS[p] + 1000 === id) ??
+          ids.find((p) => PRAYER_NOTIF_IDS[p] === id || PRAYER_NOTIF_IDS[p] + 10 === id) ??
           (id >= 100 && id <= 104 ? ids[id - 100] : undefined);
         if (!isAndroidTap && prayer && isSilentReciter(getReciterForPrayer(prayer))) {
           void startSilentFallbackAdhan(prayer).then((rid) => setAdhan({ visible: true, prayer, reciterId: rid }));
