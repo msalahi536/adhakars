@@ -137,20 +137,29 @@ function HomePage() {
               <p>Clean, distraction-free design with everything you need, right at your fingertips.</p>
             </div>
             <div className="marketing-showcase">
-              <div className="marketing-showcase-note">
-                <strong>Made for focus</strong>
-                <span>Clear Arabic, translation, references, and counters without clutter.</span>
+              <div className="marketing-showcase-note marketing-showcase-note-left">
+                <div className="marketing-note-card">
+                  <span className="marketing-note-rule" aria-hidden="true" />
+                  <strong>Made for focus</strong>
+                  <span>Clear Arabic, translation, references, and counters without clutter.</span>
+                </div>
               </div>
-              <img
-                src={experiencePhone.url}
-                alt="Morning Adhkar screen in Sahih Al-Adhkar"
-                className="marketing-experience-phone"
-                width={1030}
-                height={1920}
-              />
+              <div className="marketing-showcase-phone">
+                <div className="marketing-phone-glow" aria-hidden="true" />
+                <img
+                  src={experiencePhone.url}
+                  alt="Morning Adhkar screen in Sahih Al-Adhkar"
+                  className="marketing-experience-phone"
+                  width={1030}
+                  height={1920}
+                />
+              </div>
               <div className="marketing-showcase-note marketing-showcase-note-right">
-                <strong>Your daily rhythm</strong>
-                <span>Move naturally from morning adhkar to salah, evening, and sleep.</span>
+                <div className="marketing-note-card">
+                  <span className="marketing-note-rule" aria-hidden="true" />
+                  <strong>Your daily rhythm</strong>
+                  <span>Move naturally from morning adhkar to salah, evening, and sleep.</span>
+                </div>
               </div>
             </div>
           </div>
