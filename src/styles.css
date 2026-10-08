@@ -3884,10 +3884,10 @@ html { scroll-behavior: smooth; }
   .marketing-trust-grid { grid-template-columns: 1fr; }
   .marketing-trust-grid article { border-left: 0; border-top: 1px solid var(--marketing-line); padding: 24px 6px 0; }
   .marketing-trust-grid article:first-child { border-top: 0; }
-  .marketing-download-panel { grid-template-columns: 1fr; gap: 36px; padding-block: 48px 32px; }
+  .marketing-download-panel { grid-template-columns: 1fr; gap: 30px; padding: 42px 24px; border-radius: 26px; }
   .marketing-download h2 { font-size: 38px; }
-  .marketing-download-visual { width: min(100%, 400px); justify-self: center; }
-  .marketing-download-visual img { width: 100%; margin-left: 0; }
+  .marketing-download-visual { width: min(100%, 400px); justify-self: center; height: auto; }
+  .marketing-download-visual img { height: 430px; margin: 0 auto; transform: rotate(-8deg); }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -4290,11 +4290,10 @@ html[data-preset="midnight"][data-visual-phase="evening"][data-section="salah"] 
 .marketing-download-panel .store-badges { display: grid; grid-template-columns: max-content max-content; gap: 0 12px; justify-content: start; }
 .marketing-download-panel .store-badge-soon { grid-column: 2; justify-self: center; border: 0; padding: 0; font-size: 9px; letter-spacing: 0; color: var(--download-gold); background: transparent; }
 @media (max-width: 900px) {
-  .marketing-download h2 { font-size: 44px; }
-  .marketing-download-panel { gap: 24px; padding-block: 54px; }
+  .marketing-download h2 { font-size: 40px; }
 }
 @media (max-width: 600px) {
-  .marketing-download h2 { font-size: 38px; }
+  .marketing-download h2 { font-size: 36px; }
   .marketing-download-copy > p:last-of-type { font-size: 15px; }
   .marketing-download-panel .store-badge-img { width: 144px; }
 }
