@@ -6,7 +6,6 @@ import {
   BellRing,
   BookOpen,
   CalendarHeart,
-  Check,
   CircleDot,
   Compass,
   Hand,
@@ -15,18 +14,15 @@ import {
   Moon,
   Palette,
   ShieldCheck,
-  Sparkles,
   Sunrise,
   WifiOff,
 } from "lucide-react";
-import { MarketingLayout, IPhoneFrame } from "@/components/marketing/MarketingLayout";
+import { MarketingLayout } from "@/components/marketing/MarketingLayout";
 import { Button } from "@/components/ui/button";
 import heroAsset from "@/assets/homepage-hero.png.asset.json";
-import morningAsset from "@/assets/morning-landscape.webp.asset.json";
-import eveningAsset from "@/assets/evening-landscape.webp.asset.json";
-import roseAsset from "@/assets/rose-morning.webp.asset.json";
-import oceanAsset from "@/assets/ocean-morning.webp.asset.json";
 import heroPhones from "@/assets/homepage-phones.png.asset.json";
+import experiencePhone from "@/assets/experience-morning.png.asset.json";
+import themePhones from "@/assets/themes-phones.png.asset.json";
 
 export const Route = createFileRoute("/")({
   head: () => ({
