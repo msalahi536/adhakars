@@ -1,5 +1,4 @@
 import { afterEach, beforeEach, expect, mock, test } from "bun:test";
-import { initNativeBridge, syncLocationToWidgets } from "./native-bridge";
 import { setPrayerSettings, type PrayerSettings } from "./prayer-times";
 
 const store = new Map<string, string>();
@@ -19,6 +18,20 @@ const settings: PrayerSettings = {
   sound: "adhan",
   location: { lat: 51.5, lng: -0.12, label: "London", verified: true },
 };
+
+// native-bridge registers its plugin at import time, so the mock has to be
+// installed before the module is loaded.
+mock.module("@capacitor/core", () => ({
+  registerPlugin: () => ({
+    updateLocation,
+    reloadWidgets,
+    updateTheme: async () => {},
+    syncPrayerTimes: async () => {},
+    updateTasbih: async () => {},
+  }),
+}));
+
+const { initNativeBridge, syncLocationToWidgets } = await import("./native-bridge");
 
 beforeEach(() => {
   store.clear();

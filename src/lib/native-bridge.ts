@@ -46,13 +46,11 @@ export function isNativeApp(): boolean {
   return isCapacitor();
 }
 
+const AdhkarWidgetsPlugin = registerPlugin<CapacitorPlugin>("AdhkarWidgets");
+
 function getPlugin(): CapacitorPlugin | null {
   if (!isCapacitor()) return null;
-  try {
-    return (window as any).Capacitor.Plugins.AdhkarWidgets as CapacitorPlugin;
-  } catch {
-    return null;
-  }
+  return AdhkarWidgetsPlugin;
 }
 
 // --------------- Location ---------------
