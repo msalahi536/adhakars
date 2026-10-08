@@ -169,7 +169,28 @@ function AppLayout() {
       window.dispatchEvent(new Event("adhkar:open-sunnah"));
       void router.navigate({ to: "/app/more" });
     };
-    const openFromNotification = (id: number | undefined, route: string | undefined) => {
+    const SILENT_PRAYERS = ["fajr", "dhuhr", "asr", "maghrib", "isha"] as const;
+    const prayerFromTap = (id: number | undefined, detail?: any): string | undefined => {
+      const named = [detail?.prayer, detail?.name, detail?.userInfo?.prayer, detail?.extra?.prayer]
+        .find((v) => typeof v === "string" && v);
+      if (named) return String(named).toLowerCase();
+      if (id === undefined) return undefined;
+      const isAndroidTap = (window as any).Capacitor?.getPlatform?.() === "android";
+      // iPhone's native scheduler numbers prayers Fajr=100 … Isha=104.
+      if (!isAndroidTap && id >= 100 && id <= 104) return SILENT_PRAYERS[id - 100];
+      return SILENT_PRAYERS.find((p) => PRAYER_NOTIF_IDS[p] === id || PRAYER_NOTIF_IDS[p] + 10 === id);
+    };
+    // iPhone silent alert tapped: play Mishary's adhan from zero in the app.
+    const playSilentTap = (prayer: string | undefined): boolean => {
+      if ((window as any).Capacitor?.getPlatform?.() === "android" || !prayer) return false;
+      if (!isSilentReciter(getReciterForPrayer(prayer))) return false;
+      void router.navigate({ to: "/app/salah" });
+      void startSilentFallbackAdhan(prayer).then((rid) => setAdhan({ visible: true, prayer, reciterId: rid }));
+      return true;
+    };
+    const openFromNotification = (id: number | undefined, route: string | undefined, detail?: any) => {
+      console.log("[adhan-silent] notification tap", id, route, detail ? JSON.stringify(detail) : "");
+      if (playSilentTap(prayerFromTap(id, detail))) return;
       if (id === JUMUAH_NOTIF_ID || id === 889002) return openJumuah();
       if (id === SUNNAH_NOTIF_ID || id === 889001) return openSunnah();
       if (id !== undefined && isSmartAdhkarId(id)) {
@@ -182,16 +203,6 @@ function AppLayout() {
       }
       if (id !== undefined && isPrayerNotifId(id)) {
         void router.navigate({ to: "/app/salah" });
-        // iPhone silent alert tapped: play Mishary's adhan from zero in the app.
-        const isAndroidTap = (window as any).Capacitor?.getPlatform?.() === "android";
-        const ids = ["fajr", "dhuhr", "asr", "maghrib", "isha"] as const;
-        const prayer =
-          ids.find((p) => PRAYER_NOTIF_IDS[p] === id || PRAYER_NOTIF_IDS[p] + 10 === id) ??
-          (id >= 100 && id <= 104 ? ids[id - 100] : undefined);
-        if (!isAndroidTap && prayer && isSilentReciter(getReciterForPrayer(prayer))) {
-          void startSilentFallbackAdhan(prayer).then((rid) => setAdhan({ visible: true, prayer, reciterId: rid }));
-          return;
-        }
         // Full adhan: the notification plays 30s, the rest continues here.
         if (getPrayerSettings().sound === "adhan" && FULL_ADHAN_URL) {
           const a = new Audio(FULL_ADHAN_URL);
@@ -208,7 +219,7 @@ function AppLayout() {
     const onNativeTap = (e: Event) => {
       const d = (e as CustomEvent).detail ?? {};
       const id = d.id !== undefined ? Number(d.id) : undefined;
-      openFromNotification(Number.isFinite(id) ? id : undefined, typeof d.route === "string" ? d.route : undefined);
+      openFromNotification(Number.isFinite(id) ? id : undefined, typeof d.route === "string" ? d.route : undefined, d);
     };
     window.addEventListener("adhkar:notification-tap", onNativeTap);
 
@@ -218,9 +229,9 @@ function AppLayout() {
       Promise.resolve()
         .then(() => plugin.getPendingNotificationTap())
         .then((d: any) => {
-          if (!d || (d.id === undefined && !d.route)) return;
+          if (!d || (d.id === undefined && !d.route && !d.prayer)) return;
           const id = d.id !== undefined ? Number(d.id) : undefined;
-          openFromNotification(Number.isFinite(id) ? id : undefined, typeof d.route === "string" ? d.route : undefined);
+          openFromNotification(Number.isFinite(id) ? id : undefined, typeof d.route === "string" ? d.route : undefined, d);
         })
         .catch(() => {});
     }
