@@ -31,7 +31,7 @@ import {
   type PrayerSettings,
   type Slot,
 } from "@/lib/prayer-times";
-import { isNativeApp } from "@/lib/native-bridge";
+import { isNativeApp, syncPrayerTimesToWidgets } from "@/lib/native-bridge";
 import { rescheduleAdhanNotifications } from "@/lib/adhan-notifications";
 import { checkNotificationPermission, requestNotificationPermission } from "@/lib/notifications";
 import { getAdhanPrefs, playAdhanPreview, preloadAdhanPreviews, RECITERS, FAJR_RECITERS, SILENT_RECITER_ID, setAdhanPrefs, stopAdhanPreview, getDiagnostics, type AdhanPrefs } from "@/lib/adhan-bridge";
@@ -138,6 +138,8 @@ function Salah() {
     );
     setDays(results.filter((d): d is DayTimes => d !== null));
     setLoading(false);
+    // Keep native home/lock-screen widgets on the exact times shown here.
+    if (results[1]) void syncPrayerTimesToWidgets(results[1].times);
     void rescheduleAdhanNotifications(s);
   }, []);
 
