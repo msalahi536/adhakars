@@ -91,7 +91,7 @@ export function MarketingLayout({ children, onePage = false }: { children: React
                 {n.label}
               </Link>
             ))}
-            <Button asChild className="h-10 rounded-full px-5 text-sm font-semibold">
+            <Button asChild className="marketing-header-button h-10 rounded-full px-5 text-sm font-semibold">
               <Link to="/app">Open app</Link>
             </Button>
           </nav>
@@ -138,7 +138,7 @@ export function MarketingLayout({ children, onePage = false }: { children: React
                   {n.label}
                 </Link>
               ))}
-              <Button asChild className="mt-2 h-12 rounded-full px-5 text-base font-semibold">
+              <Button asChild className="marketing-header-button mt-2 h-12 rounded-full px-5 text-base font-semibold">
                 <Link to="/app">Open app</Link>
               </Button>
             </div>

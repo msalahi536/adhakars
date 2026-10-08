@@ -33,6 +33,9 @@ const SHADOW_CARD =
 const SHADOW_CARD_HOVER =
   "0 1px 0 rgba(31,61,43,0.05), 0 12px 32px -14px rgba(31,61,43,0.14), 0 32px 60px -32px rgba(31,61,43,0.20)";
 
+const APP_STORE_URL =
+  "https://apps.apple.com/us/app/sahih-al-adhkar/id6791834420";
+
 const TRUST = [
   { Icon: Heart2Icon, label: "Free forever" },
   { Icon: Ban, label: "No ads" },
@@ -50,7 +53,7 @@ export const Route = createFileRoute("/download")({
       {
         name: "description",
         content:
-          "Use Sahih Al-Adhkar right in your browser today, or install it to your home screen. Native apps for iPhone and Android are on the way.",
+          "Use Sahih Al-Adhkar right in your browser today, or install it to your home screen. Now on the App Store for iPhone, with Android coming soon.",
       },
       { property: "og:title", content: "Get Sahih Al-Adhkar" },
       { property: "og:description", content: "Free, private, no accounts." },
@@ -124,8 +127,8 @@ function DownloadPage() {
               }}
             >
               Open the app now on any modern phone or computer. Nothing to
-              install, no account needed. Native apps for iPhone and Android
-              are on the way.
+              install, no account needed. The iPhone app is live on the App
+              Store, and Android is coming soon.
             </p>
 
             <div className="mt-9 flex flex-wrap items-center gap-3">
@@ -174,6 +177,10 @@ function DownloadPage() {
                 </span>
               ))}
             </div>
+
+            <div className="mt-9">
+              <StoreBadges />
+            </div>
           </div>
 
           <div className="mt-14 flex items-center justify-center lg:mt-0">
@@ -208,7 +215,7 @@ function DownloadPage() {
                 color: INK,
               }}
             >
-              Coming to the App Store
+              Now on the App Store
               <br />
               <span style={{ fontStyle: "italic", color: GREEN_SOFT }}>
                 and Google Play.
@@ -218,9 +225,9 @@ function DownloadPage() {
               className="mt-5 max-w-xl"
               style={{ color: "rgba(31,61,43,0.68)", fontSize: "1.0625rem", lineHeight: 1.65 }}
             >
-              Native builds are in review. Until they land, the web app runs
-              the same on every device, and installs to your home screen with
-              the same feel.
+              The iPhone app is live. Android is still in the works — until it
+              lands, the web app runs the same on every device and installs to
+              your home screen with the same feel.
             </p>
           </div>
 
@@ -267,33 +274,30 @@ function DownloadPage() {
                     letterSpacing: "-0.015em",
                   }}
                 >
-                  Coming to the App Store.
+                  Now on the App Store.
                 </div>
                 <p
                   className="mt-3 max-w-md"
                   style={{ color: "rgba(250,246,236,0.72)", fontSize: "0.95rem", lineHeight: 1.6 }}
                 >
-                  In the meantime, add the web app to your home screen for the
-                  same one tap experience.
+                  Download the iPhone and iPad app, or add the web app to your
+                  home screen for the same one tap experience.
                 </p>
                 <div className="mt-6 flex flex-wrap items-center gap-3">
                   <a
-                    href="#install"
-                    className="btn-primary inline-flex items-center gap-2"
-                    style={{
-                      background: GOLD,
-                      color: GREEN_DEEP,
-                      padding: "12px 20px",
-                      borderRadius: RADIUS.pill,
-                      fontWeight: 700,
-                      fontSize: 13,
-                    }}
+                    className="store-badge"
+                    href={APP_STORE_URL}
+                    target="_blank"
+                    rel="noopener noreferrer"
                   >
-                    Install on iPhone
-                    <ArrowRight size={14} />
+                    <Apple size={25} />
+                    <span className="store-badge-text">
+                      <span className="store-badge-eyebrow">Download on the</span>
+                      <span className="store-badge-name">App Store</span>
+                    </span>
                   </a>
                   <a
-                    href="mailto:msalahi536@gmail.com?subject=Notify%20me%20when%20iOS%20is%20live"
+                    href="#install"
                     className="inline-flex items-center gap-2"
                     style={{
                       color: "rgba(250,246,236,0.85)",
@@ -303,8 +307,7 @@ function DownloadPage() {
                       textUnderlineOffset: 4,
                     }}
                   >
-                    <Bell size={13} />
-                    Notify me at launch
+                    Or add to home screen
                   </a>
                 </div>
               </div>
@@ -364,25 +367,18 @@ function DownloadPage() {
                   className="mt-3 max-w-md"
                   style={{ color: "rgba(31,61,43,0.68)", fontSize: "0.95rem", lineHeight: 1.6 }}
                 >
-                  Android users can install the web app straight from Chrome,
-                  and get a proper icon on the home screen right away.
+                  Android is in the works. Until then, install the web app
+                  straight from Chrome and get a proper icon on the home screen.
                 </p>
                 <div className="mt-6 flex flex-wrap items-center gap-3">
-                  <a
-                    href="#install"
-                    className="btn-primary inline-flex items-center gap-2"
-                    style={{
-                      background: GREEN,
-                      color: CREAM,
-                      padding: "12px 20px",
-                      borderRadius: RADIUS.pill,
-                      fontWeight: 700,
-                      fontSize: 13,
-                    }}
-                  >
-                    Install on Android
-                    <ArrowRight size={14} />
-                  </a>
+                  <span className="store-badge is-soon" aria-disabled="true">
+                    <Play size={25} />
+                    <span className="store-badge-text">
+                      <span className="store-badge-eyebrow">GET IT ON</span>
+                      <span className="store-badge-name">Google Play</span>
+                    </span>
+                  </span>
+                  <span className="store-badge-soon">Coming soon</span>
                   <a
                     href="mailto:msalahi536@gmail.com?subject=Notify%20me%20when%20Android%20is%20live"
                     className="inline-flex items-center gap-2"
@@ -611,6 +607,33 @@ function InstallCard({
           </li>
         ))}
       </ol>
+    </div>
+  );
+}
+
+function StoreBadges() {
+  return (
+    <div className="store-badges">
+      <a
+        className="store-badge"
+        href={APP_STORE_URL}
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        <Apple size={25} />
+        <span className="store-badge-text">
+          <span className="store-badge-eyebrow">Download on the</span>
+          <span className="store-badge-name">App Store</span>
+        </span>
+      </a>
+      <span className="store-badge is-soon" aria-disabled="true">
+        <Play size={25} />
+        <span className="store-badge-text">
+          <span className="store-badge-eyebrow">GET IT ON</span>
+          <span className="store-badge-name">Google Play</span>
+        </span>
+      </span>
+      <span className="store-badge-soon">Coming soon</span>
     </div>
   );
 }
