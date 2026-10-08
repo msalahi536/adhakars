@@ -14,6 +14,7 @@ import {
 import { Toaster } from "@/components/ui/sonner";
 import { RecitationPopup } from "@/components/RecitationPopup";
 import appCss from "../styles.css?url";
+import homeIcon from "@/assets/home-icon-192.png.asset.json";
 
 import { applyThemeForRoute, PRE_PAINT_SCRIPT } from "@/lib/theme-store";
 import { reconcileStreak } from "@/lib/storage";
@@ -95,8 +96,8 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { property: "og:type", content: "website" },
     ],
     links: [
-      { rel: "icon", type: "image/png", href: "/favicon.png" },
-      { rel: "apple-touch-icon", href: "/favicon.png" },
+      { rel: "icon", type: "image/png", href: "/favicon.png?v=sunrise" },
+      { rel: "apple-touch-icon", sizes: "192x192", href: homeIcon.url },
       { rel: "stylesheet", href: appCss },
       { rel: "manifest", href: "/manifest.json" },
       { rel: "preconnect", href: "https://fonts.googleapis.com" },
