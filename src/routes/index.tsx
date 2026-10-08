@@ -165,14 +165,13 @@ function HomePage() {
               <h2>Beautiful themes<br />for every moment.</h2>
               <p>Choose morning, evening, or a color theme that feels right to you.</p>
             </div>
-            <div className="marketing-theme-grid">
-              {THEMES.map((theme) => (
-                <figure key={theme.name}>
-                  <div className="marketing-theme-preview" style={{ backgroundImage: `url(${theme.image})` }} />
-                  <figcaption>{theme.name}</figcaption>
-                </figure>
-              ))}
-            </div>
+            <img
+              src={themePhones.url}
+              alt="Sahih Al-Adhkar theme previews: ocean, rose, midnight, and sand"
+              className="marketing-theme-phones"
+              width={1920}
+              height={979}
+            />
           </div>
         </section>
 
