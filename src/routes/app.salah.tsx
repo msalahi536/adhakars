@@ -707,8 +707,8 @@ function Salah() {
                       <span className={`adhan-choice-mark ${selected ? "is-selected" : ""}`} aria-hidden="true" />
                     </div>;
                   })}
-                  <button type="button" className="adhan-diag-btn" disabled={testingNotif === reciterPrayer} onClick={() => void sendTestPrayerNotification(prayerIdFromLabel(reciterPrayer))}>
-                    {testingNotif === reciterPrayer ? "Scheduled ✓" : "Send test notification"}
+                  <button type="button" className="adhan-diag-btn" disabled={testingNotif === reciterTestId} onClick={() => void sendTestPrayerNotification(reciterTestId)}>
+                    {testingNotif === reciterTestId ? "Scheduled ✓" : "Send test notification"}
                   </button>
                   <p className="adhan-reciter-intro">The test notification arrives in 5 seconds and opens like a real prayer alert — useful for checking Silent and the adhan player.</p>
                 </div>
