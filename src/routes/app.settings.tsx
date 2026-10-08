@@ -1212,11 +1212,12 @@ function AndroidNotificationTests() {
     { label: "Test Morning Adhkar Notif", build: () => ({ id: 901, title: "Morning Adhkar", body: "Test - Time for your morning adhkar.", extra: { route: "/app/" } }) },
     { label: "Test Evening Adhkar Notif", build: () => ({ id: 902, title: "Evening Adhkar", body: "Test - Time for your evening adhkar.", extra: { route: "/app/evening" } }) },
     { label: "Test Nudge/Streak Notif", build: () => ({ id: 903, title: "Sahih Al-Adhkar", body: "Test - Your adhkar are still waiting.", extra: { route: "/app/more" } }) },
-    { label: "🔊 Test Adhan (Dev)", build: () => {
+    { label: "🔊 Test Adhan (Real Fajr Notif)", build: () => {
+      // Identical to the real Fajr alert: same id, title, body, channel, extras.
       const storedReciter = getReciterForPrayer("fajr");
       const androidReciterId = toNativeReciterId(storedReciter);
       console.log("[adhan-debug] Stored reciter:", storedReciter, "→ Android ID:", androidReciterId);
-      return { id: 904, title: "Time for Fajr", body: "The adhan is now playing.", extra: { prayer: "fajr", reciterId: androidReciterId, soundMode: androidReciterId === "silent" ? "silent" : "adhan" } };
+      return { id: PRAYER_NOTIF_IDS.fajr, title: "Time for Fajr", body: "The adhan is now playing.", extra: { prayer: "fajr", reciterId: androidReciterId, soundMode: storedReciter === "silent" ? "silent" : "adhan" } };
     } },
     { label: "Test Deep Link (Tasbih)", build: () => ({ id: 905, title: "Tasbih", body: "Test deep link", extra: { route: "/app/tasbih" } }) },
   ];
