@@ -121,8 +121,8 @@ function Salah() {
    * channel and reciter) 5 seconds after tapping, so the tap → adhan flow can
    * be tested end to end — e.g. with a prayer set to Silent.
    */
-  const sendTestPrayerNotification = async (prayerId: string) => {
-    if (!isNativeApp() || testingNotif) return;
+  const sendTestPrayerNotification = async (prayerId: (typeof SALAH_IDS)[number] | null) => {
+    if (!isNativeApp() || !prayerId || testingNotif) return;
     const label = PRAYER_LABELS[prayerId as keyof typeof PRAYER_LABELS] ?? prayerId;
     try {
       const { LocalNotifications } = await import("@capacitor/local-notifications");
