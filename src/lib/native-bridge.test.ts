@@ -1,5 +1,4 @@
 import { afterEach, beforeEach, expect, mock, test } from "bun:test";
-import { initNativeBridge, syncLocationToWidgets } from "./native-bridge";
 import { setPrayerSettings, type PrayerSettings } from "./prayer-times";
 
 const store = new Map<string, string>();
