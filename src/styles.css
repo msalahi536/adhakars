@@ -3892,8 +3892,7 @@ html { scroll-behavior: smooth; }
   .marketing-download h2 { font-size: 34px; margin-top: 18px; }
   .marketing-download-copy > p:last-of-type { margin-top: 16px; }
   .marketing-download-actions { margin-top: 24px; gap: 16px; }
-  .marketing-download-visual { width: min(100%, 340px); justify-self: center; height: auto; overflow: hidden; }
-  .marketing-download-visual img { position: static; display: block; height: 380px; margin: 0 auto -70px; transform: rotate(6deg); }
+  .marketing-download-visual { display: none; }
 }
 
 @media (prefers-reduced-motion: reduce) {
