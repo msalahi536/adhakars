@@ -14,7 +14,8 @@ import { FULL_ADHAN_URL, isPrayerNotifId, rescheduleAdhanNotifications } from "@
 import { AdhanPlayer } from "@/components/AdhanPlayer";
 import { getPrayerSettings, resolveLocation, setPrayerSettings } from "@/lib/prayer-times";
 import { initNativeBridge } from "@/lib/native-bridge";
-import { getReciterForPrayer, isAdhanPlaying, onAdhanPlaying } from "@/lib/adhan-bridge";
+import { getReciterForPrayer, isAdhanPlaying, isSilentReciter, onAdhanPlaying, startSilentFallbackAdhan } from "@/lib/adhan-bridge";
+import { PRAYER_NOTIF_IDS } from "@/lib/adhan-notifications";
 
 const UPDATE_WELCOME_KEY = "adhkar:update-welcome:2026-09";
 
@@ -81,9 +82,16 @@ function AppLayout() {
   }, []);
 
   useEffect(() => {
-    const unsubscribe = onAdhanPlaying(({ prayer, reciterId }) =>
-      setAdhan({ visible: true, prayer: prayer || "fajr", reciterId }),
-    );
+    const isAndroid = (window as any).Capacitor?.getPlatform?.() === "android";
+    const unsubscribe = onAdhanPlaying(({ prayer, reciterId }) => {
+      const name = prayer || "fajr";
+      // iPhone silent alert: nothing to continue natively, so play Mishary from zero.
+      if (!isAndroid && isSilentReciter(reciterId)) {
+        void startSilentFallbackAdhan(name).then((id) => setAdhan({ visible: true, prayer: name, reciterId: id }));
+        return;
+      }
+      setAdhan({ visible: true, prayer: name, reciterId });
+    });
     // Cold start: native may start the adhan before this listener exists, so
     // ask the native side directly on launch and whenever the app resumes.
     let cancelled = false;
@@ -100,6 +108,12 @@ function AppLayout() {
       }
       const s = await isAdhanPlaying().catch(() => null);
       if (cancelled || !s || !(s.playing || s.hasSession)) return;
+      if (isSilentReciter(s.reciterId)) {
+        const name = s.prayer || "fajr";
+        const id = await startSilentFallbackAdhan(name);
+        if (!cancelled) setAdhan((a) => (a.visible ? a : { visible: true, prayer: name, reciterId: id }));
+        return;
+      }
       setAdhan((a) =>
         a.visible ? a : { visible: true, prayer: s.prayer || "fajr", reciterId: s.reciterId || "" },
       );
@@ -168,6 +182,16 @@ function AppLayout() {
       }
       if (id !== undefined && isPrayerNotifId(id)) {
         void router.navigate({ to: "/app/salah" });
+        // iPhone silent alert tapped: play Mishary's adhan from zero in the app.
+        const isAndroidTap = (window as any).Capacitor?.getPlatform?.() === "android";
+        const ids = ["fajr", "dhuhr", "asr", "maghrib", "isha"] as const;
+        const prayer =
+          ids.find((p) => PRAYER_NOTIF_IDS[p] === id || PRAYER_NOTIF_IDS[p] + 10 === id) ??
+          (id >= 100 && id <= 104 ? ids[id - 100] : undefined);
+        if (!isAndroidTap && prayer && isSilentReciter(getReciterForPrayer(prayer))) {
+          void startSilentFallbackAdhan(prayer).then((rid) => setAdhan({ visible: true, prayer, reciterId: rid }));
+          return;
+        }
         // Full adhan: the notification plays 30s, the rest continues here.
         if (getPrayerSettings().sound === "adhan" && FULL_ADHAN_URL) {
           const a = new Audio(FULL_ADHAN_URL);
