@@ -19,7 +19,9 @@ class AdhkarWidgetBridge {
         // Clear cached prayer times so widgets re-fetch with new settings
         defaults?.removeObject(forKey: WidgetDataKeys.prayerTimes)
         defaults?.removeObject(forKey: WidgetDataKeys.prayerTimesDate)
-        reloadPrayerWidgets()
+        // Do NOT reload widgets here. syncPrayerTimes() will reload after
+        // writing the correct app-calculated times. Reloading now (with the
+        // cache cleared) would force the widget into its API fallback.
     }
 
     // MARK: - Prayer Times Sync (from web app)

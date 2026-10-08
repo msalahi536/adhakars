@@ -107,7 +107,6 @@ struct AllPrayersStackedView: View {
     }
 
     private func prayerRow(_ prayer: PrayerTime) -> some View {
-        let isPast = prayer.time < Date() && prayer.id != nextPrayerId
         let isNext = prayer.id == nextPrayerId
         let iconSize: CGFloat = family == .systemSmall ? 10 : 12
         let textSize: CGFloat = family == .systemSmall ? 12 : 14
@@ -118,7 +117,7 @@ struct AllPrayersStackedView: View {
                 .font(.system(size: iconSize, weight: isNext ? .bold : .regular))
                 .foregroundColor(
                     isNext ? WidgetColors.nextPrayerAccent(colorScheme)
-                    : (isPast ? WidgetColors.tertiaryText(colorScheme) : WidgetColors.secondaryText(colorScheme))
+                    : WidgetColors.secondaryText(colorScheme)
                 )
                 .frame(width: 16)
 
@@ -126,7 +125,7 @@ struct AllPrayersStackedView: View {
                 .font(.system(size: textSize, weight: isNext ? .bold : .regular))
                 .foregroundColor(
                     isNext ? WidgetColors.nextPrayerAccent(colorScheme)
-                    : (isPast ? WidgetColors.tertiaryText(colorScheme) : WidgetColors.text(colorScheme))
+                    : WidgetColors.text(colorScheme)
                 )
 
             Spacer()
@@ -135,7 +134,7 @@ struct AllPrayersStackedView: View {
                 .font(WidgetFont.mono(size: timeSize))
                 .foregroundColor(
                     isNext ? WidgetColors.nextPrayerAccent(colorScheme)
-                    : (isPast ? WidgetColors.tertiaryText(colorScheme) : WidgetColors.secondaryText(colorScheme))
+                    : WidgetColors.secondaryText(colorScheme)
                 )
         }
         .padding(.vertical, 2)
@@ -159,7 +158,7 @@ struct AllPrayersStackedView: View {
                     Text(prayer.timeString)
                         .font(.system(size: 10, design: .monospaced))
                 }
-                .opacity(prayer.time < Date() && prayer.id != nextPrayerId ? 0.4 : 1.0)
+                .opacity(1.0)
             }
         }
         .containerBackground(.clear, for: .widget)

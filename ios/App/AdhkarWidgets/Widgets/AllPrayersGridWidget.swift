@@ -113,12 +113,11 @@ struct AllPrayersGridView: View {
 
     private func compactColumn(_ prayer: PrayerTime) -> some View {
         let isNext = prayer.id == nextPrayerId
-        let isPast = prayer.time < Date() && !isNext
 
         return VStack(spacing: 3) {
             Image(systemName: prayer.icon)
                 .font(.system(size: 12, weight: isNext ? .bold : .medium))
-                .foregroundColor(isNext ? .white : (isPast ? WidgetColors.tertiaryText(colorScheme) : WidgetColors.primary(colorScheme)))
+                .foregroundColor(isNext ? .white : WidgetColors.primary(colorScheme))
                 .frame(width: 24, height: 24)
                 .background(
                     Circle()
@@ -127,11 +126,11 @@ struct AllPrayersGridView: View {
 
             Text(prayer.abbreviation)
                 .font(.system(size: 9, weight: isNext ? .bold : .medium))
-                .foregroundColor(isNext ? WidgetColors.nextPrayerAccent(colorScheme) : (isPast ? WidgetColors.tertiaryText(colorScheme) : WidgetColors.text(colorScheme)))
+                .foregroundColor(isNext ? WidgetColors.nextPrayerAccent(colorScheme) : WidgetColors.text(colorScheme))
 
             Text(prayer.timeString)
                 .font(WidgetFont.mono(size: 8))
-                .foregroundColor(isNext ? WidgetColors.nextPrayerAccent(colorScheme) : (isPast ? WidgetColors.tertiaryText(colorScheme) : WidgetColors.secondaryText(colorScheme)))
+                .foregroundColor(isNext ? WidgetColors.nextPrayerAccent(colorScheme) : WidgetColors.secondaryText(colorScheme))
                 .minimumScaleFactor(0.6)
         }
         .frame(maxWidth: .infinity)
@@ -158,7 +157,6 @@ struct AllPrayersGridView: View {
             HStack(spacing: 8) {
                 ForEach(entry.prayers, id: \.id) { prayer in
                     let isNext = prayer.id == nextPrayerId
-                    let isPast = prayer.time < Date() && !isNext
 
                     VStack(spacing: 6) {
                         GlowingIcon(
@@ -167,16 +165,15 @@ struct AllPrayersGridView: View {
                             colorScheme: colorScheme,
                             size: 36
                         )
-                        .opacity(isPast ? 0.4 : 1.0)
 
                         Text(prayer.name)
                             .font(.system(size: 12, weight: isNext ? .bold : .semibold))
-                            .foregroundColor(isNext ? WidgetColors.nextPrayerAccent(colorScheme) : (isPast ? WidgetColors.tertiaryText(colorScheme) : WidgetColors.text(colorScheme)))
+                            .foregroundColor(isNext ? WidgetColors.nextPrayerAccent(colorScheme) : WidgetColors.text(colorScheme))
                             .minimumScaleFactor(0.7)
 
                         Text(prayer.timeString)
                             .font(WidgetFont.mono(size: 11))
-                            .foregroundColor(isNext ? WidgetColors.nextPrayerAccent(colorScheme) : (isPast ? WidgetColors.tertiaryText(colorScheme) : WidgetColors.secondaryText(colorScheme)))
+                            .foregroundColor(isNext ? WidgetColors.nextPrayerAccent(colorScheme) : WidgetColors.secondaryText(colorScheme))
                             .minimumScaleFactor(0.7)
                     }
                     .frame(maxWidth: .infinity)
