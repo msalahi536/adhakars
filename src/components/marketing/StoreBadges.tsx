@@ -5,8 +5,10 @@ import googlePlayBadge from "@/assets/badge-googleplay.png.asset.json";
 export const APP_STORE_URL =
   "https://apps.apple.com/us/app/sahih-al-adhkar/id6791834420";
 
-/** A single "Coming soon" label, plain text, gliding slowly around
- *  the Google Play badge. */
+/** A single "Coming soon" label — plain gold text, no pill and no
+ *  border line — gliding slowly around the Google Play badge. The
+ *  travel path sits just outside the badge so the words ride in the
+ *  empty space above and below it rather than across the artwork. */
 function SoonOrbit() {
   const trackId = `soon-track-${useId().replace(/[^a-zA-Z0-9]/g, "")}`;
   return (
@@ -20,7 +22,7 @@ function SoonOrbit() {
       <defs>
         <path
           id={trackId}
-          d="M 26 7 H 174 Q 193 7 193 26 V 74 Q 193 93 174 93 H 26 Q 7 93 7 74 V 26 Q 7 7 26 7 Z"
+          d="M 12 -12 H 188 Q 208 -12 208 8 V 92 Q 208 112 188 112 H 12 Q -8 112 -8 92 V 8 Q -8 -12 12 -12 Z"
           fill="none"
         />
       </defs>
@@ -28,7 +30,7 @@ function SoonOrbit() {
         <text textAnchor="middle" dominantBaseline="central">
           COMING SOON
         </text>
-        <animateMotion dur="16s" repeatCount="indefinite" rotate="0">
+        <animateMotion dur="18s" repeatCount="indefinite" rotate="0">
           <mpath href={`#${trackId}`} />
         </animateMotion>
       </g>
