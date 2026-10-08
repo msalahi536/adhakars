@@ -3878,16 +3878,22 @@ html { scroll-behavior: smooth; }
   .marketing-primary-button, .marketing-secondary-button { width: 100%; padding-inline: 16px; }
   .marketing-quick-trust { grid-template-columns: repeat(2, max-content); justify-content: center; gap: 13px 20px; }
   .marketing-hero-phones { width: min(100%, 430px); margin-inline: auto; }
-  .marketing-feature-grid { grid-template-columns: 1fr; }
-  .marketing-feature-card { min-height: 0; }
+  .marketing-feature-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin-top: 30px; }
+  .marketing-feature-card { min-height: 0; padding: 14px; border-radius: 12px; }
+  .marketing-feature-card .marketing-icon { width: 34px; height: 34px; }
+  .marketing-feature-card .marketing-icon svg { width: 16px; height: 16px; }
+  .marketing-feature-card h3 { margin-top: 10px; font-size: 14.5px; line-height: 1.25; }
+  .marketing-feature-card p { display: none; }
   .marketing-theme-panel { gap: 34px; padding: 28px 20px; }
   .marketing-trust-grid { grid-template-columns: 1fr; }
   .marketing-trust-grid article { border-left: 0; border-top: 1px solid var(--marketing-line); padding: 24px 6px 0; }
   .marketing-trust-grid article:first-child { border-top: 0; }
-  .marketing-download-panel { grid-template-columns: 1fr; gap: 30px; padding: 42px 24px; border-radius: 26px; }
-  .marketing-download h2 { font-size: 38px; }
-  .marketing-download-visual { width: min(100%, 380px); justify-self: center; height: auto; }
-  .marketing-download-visual img { position: static; height: 470px; margin: 0 auto; transform: rotate(8deg); }
+  .marketing-download-panel { grid-template-columns: 1fr; gap: 18px; padding: 34px 20px 0; border-radius: 26px; }
+  .marketing-download h2 { font-size: 34px; margin-top: 18px; }
+  .marketing-download-copy > p:last-of-type { margin-top: 16px; }
+  .marketing-download-actions { margin-top: 24px; gap: 16px; }
+  .marketing-download-visual { width: min(100%, 340px); justify-self: center; height: auto; overflow: hidden; }
+  .marketing-download-visual img { position: static; display: block; height: 380px; margin: 0 auto -70px; transform: rotate(6deg); }
 }
 
 @media (prefers-reduced-motion: reduce) {
