@@ -1,5 +1,3 @@
-import { getReciterForPrayer } from "@/lib/adhan-bridge";
-import { ANDROID_ADHAN_CHANNEL, ensureAndroidAdhanChannel, toNativeReciterId } from "@/lib/android-adhan";
 import { useEffect, useState, type ReactNode } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { HeaderBackButton } from "@/components/HeaderBackButton";
@@ -46,7 +44,7 @@ import {
   CALC_METHODS,
   type PrayerSettings,
 } from "@/lib/prayer-times";
-import { PRAYER_NOTIF_IDS, rescheduleAdhanNotifications } from "@/lib/adhan-notifications";
+import { rescheduleAdhanNotifications } from "@/lib/adhan-notifications";
 import {
   getPeriodNotificationsEnabled,
   getSunnahNotificationEnabled,
