@@ -3814,9 +3814,10 @@ html { scroll-behavior: smooth; }
 .marketing-theme-phones { display: block; width: 100%; height: auto; }
 
 .marketing-trust { background: var(--marketing-paper); }
-.marketing-trust-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); margin-top: 46px; }
-.marketing-trust-grid article { padding: 8px 28px 6px; border-left: 1px solid var(--marketing-line); }
+.marketing-trust-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); margin-top: 46px; }
+.marketing-trust-grid article { padding: 8px 28px 6px; border-left: 1px solid var(--marketing-line); text-align: center; }
 .marketing-trust-grid article:first-child { border-left: 0; }
+.marketing-trust-grid .marketing-icon { margin-inline: auto; }
 
 .marketing-download { scroll-margin-top: 74px; padding: 0 0 72px; background: var(--marketing-paper); }
 .marketing-download-panel { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 40px; border-radius: 8px; background: var(--marketing-ink); color: var(--marketing-paper); padding: 48px 58px; box-shadow: var(--marketing-shadow); }
