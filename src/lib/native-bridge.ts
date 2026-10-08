@@ -14,6 +14,7 @@
  */
 
 import { registerPlugin } from "@capacitor/core";
+import { getPrayerSettings, fetchDay, dateKey } from "@/lib/prayer-times";
 
 // --------------- Types ---------------
 
@@ -161,14 +162,6 @@ function parseTimeToday(timeStr: string): Date {
   return d;
 }
 
-/** Read the prayer calculation method from localStorage (matches adhan-bridge). */
-function getCalcMethod(): number {
-  try {
-    const stored = localStorage.getItem("prayerCalcMethod");
-    if (stored) return parseInt(stored, 10) || 2;
-  } catch {}
-  return 2; // ISNA default
-}
 
 // --------------- Location ---------------
 
@@ -214,9 +207,11 @@ async function fetchPrayerTimes(lat: number, lon: number): Promise<{ name: strin
     const dd = String(d.getDate()).padStart(2, "0");
     const mm = String(d.getMonth() + 1).padStart(2, "0");
     const yyyy = d.getFullYear();
-    const method = getCalcMethod();
+    const settings = getPrayerSettings();
+    const method = settings.method;
+    const school = settings.hanafi ? 1 : 0;
     const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
-    const url = `https://api.aladhan.com/v1/timings/${dd}-${mm}-${yyyy}?latitude=${lat}&longitude=${lon}&method=${method}&timezonestring=${tz}`;
+    const url = `https://api.aladhan.com/v1/timings/${dd}-${mm}-${yyyy}?latitude=${lat}&longitude=${lon}&method=${method}&school=${school}&timezonestring=${tz}`;
     const res = await fetch(url);
     const json: PrayerTimesResponse = await res.json();
     const timings = json.data.timings;
@@ -307,21 +302,34 @@ function stopPrayerCountdownLoop() {
 
 // --------------- Widget Data Sync ---------------
 
+let locationSyncVersion = 0;
+
 export async function syncLocationToWidgets() {
   const plugin = getPlugin();
   if (!plugin) return;
 
-  const { lat, lon } = await getLocation();
-  const method = getCalcMethod();
+  const version = ++locationSyncVersion;
+  const settings = getPrayerSettings();
+  const saved = settings.location;
+  const location = saved
+    ? { lat: saved.lat, lon: saved.lng }
+    : await getLocation();
+  // A settings change during a GPS request must not restore the older fix.
+  if (version !== locationSyncVersion) return;
+  const { lat, lon } = location;
 
   try {
     await plugin.updateLocation({
       latitude: lat,
       longitude: lon,
-      method,
-      school: 0,
+      method: settings.method,
+      school: settings.hanafi ? 1 : 0,
     });
     await plugin.reloadWidgets();
+    // After syncing location, also sync today's prayer times so widgets
+    // always show the exact values the app calculated.
+    const today = await fetchDay(new Date(), settings);
+    if (today) await syncPrayerTimesToWidgets(today.times);
   } catch (err) {
     console.warn("[NativeBridge] Location sync error:", err);
   }
@@ -489,9 +497,16 @@ export function initNativeBridge() {
     startPrayerCountdownLoop();
   }
 
+  // setPrayerSettings emits this after persisting every Salah settings change.
+  window.addEventListener("adhkar:prayer-settings", () => {
+    prayerTimesFetchedDate = ""; // invalidate cache so new settings take effect
+    void syncLocationToWidgets();
+  });
+
   window.addEventListener("storage", (e) => {
     if (e.key === "theme") syncThemeToWidgets();
-    if (e.key === "prayerCalcMethod" || e.key === null) {
+    if (e.key === "adhkar:prayer-settings" || e.key === null) {
+      prayerTimesFetchedDate = ""; // invalidate cache
       void syncLocationToWidgets();
     }
   });
