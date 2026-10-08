@@ -3848,9 +3848,16 @@ html { scroll-behavior: smooth; }
 .store-badge.is-soon:hover { transform: none; }
 .store-badge.is-soon .store-badge-img { opacity: 0.5; filter: grayscale(0.4); }
 .soon-orbit { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; overflow: visible; }
-.soon-orbit-track { fill: none; stroke: color-mix(in oklab, var(--download-gold, var(--marketing-gold)) 38%, transparent); stroke-width: 1.1; }
-.soon-orbit-chip rect { fill: color-mix(in oklab, var(--download-forest, #143722) 90%, transparent); stroke: var(--download-gold, var(--marketing-gold)); stroke-width: 0.9; }
-.soon-orbit-chip text { fill: var(--download-gold, var(--marketing-gold)); font-size: 9.5px; font-weight: 700; letter-spacing: 1.5px; }
+.soon-orbit-chip text {
+  fill: var(--download-gold, var(--marketing-gold));
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 1.6px;
+  paint-order: stroke;
+  stroke: color-mix(in oklab, var(--download-forest, #143722) 75%, transparent);
+  stroke-width: 2.6;
+  stroke-linejoin: round;
+}
 @media (prefers-reduced-motion: reduce) { .soon-orbit-chip { display: none; } }
 .store-badge-soon { display: inline-flex; align-items: center; padding: 6px 13px; border-radius: 999px; background: color-mix(in oklab, var(--marketing-gold) 16%, transparent); border: 1px solid color-mix(in oklab, var(--marketing-gold) 34%, transparent); color: var(--marketing-ink); font-size: 11px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; }
 
@@ -4298,7 +4305,6 @@ html[data-preset="midnight"][data-visual-phase="evening"][data-section="salah"] 
 /* Store badges inside the dark download panel */
 .marketing-download-actions { display: flex; flex-direction: column; align-items: flex-start; gap: 20px; margin-top: 32px; }
 .marketing-download-panel .store-badges { display: grid; grid-template-columns: max-content max-content; gap: 14px 12px; justify-content: start; align-items: center; }
-.marketing-download-panel .soon-orbit-track { stroke: color-mix(in oklab, var(--download-gold) 45%, transparent); }
 @media (max-width: 1180px) {
   .marketing-download-panel { padding: 44px 46px; gap: 30px; }
   .marketing-download h2 { font-size: 46px; }

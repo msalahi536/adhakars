@@ -5,8 +5,8 @@ import googlePlayBadge from "@/assets/badge-googleplay.png.asset.json";
 export const APP_STORE_URL =
   "https://apps.apple.com/us/app/sahih-al-adhkar/id6791834420";
 
-/** Thin gold border around the Google Play badge with a single
- *  "Coming soon" tag gliding slowly around it. */
+/** A single "Coming soon" label, plain text, gliding slowly around
+ *  the Google Play badge. */
 function SoonOrbit() {
   const trackId = `soon-track-${useId().replace(/[^a-zA-Z0-9]/g, "")}`;
   return (
@@ -24,9 +24,7 @@ function SoonOrbit() {
           fill="none"
         />
       </defs>
-      <use className="soon-orbit-track" href={`#${trackId}`} />
       <g className="soon-orbit-chip">
-        <rect x="-48" y="-10" width="96" height="20" rx="10" />
         <text textAnchor="middle" dominantBaseline="central">
           COMING SOON
         </text>
