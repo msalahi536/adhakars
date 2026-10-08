@@ -33,8 +33,6 @@ const SHADOW_CARD =
 const SHADOW_CARD_HOVER =
   "0 1px 0 rgba(31,61,43,0.05), 0 12px 32px -14px rgba(31,61,43,0.14), 0 32px 60px -32px rgba(31,61,43,0.20)";
 
-const APP_STORE_URL =
-  "https://apps.apple.com/us/app/sahih-al-adhkar/id6791834420";
 
 const TRUST = [
   { Icon: Heart2Icon, label: "Free forever" },
@@ -611,29 +609,3 @@ function InstallCard({
   );
 }
 
-function StoreBadges() {
-  return (
-    <div className="store-badges">
-      <a
-        className="store-badge"
-        href={APP_STORE_URL}
-        target="_blank"
-        rel="noopener noreferrer"
-      >
-        <Apple size={25} />
-        <span className="store-badge-text">
-          <span className="store-badge-eyebrow">Download on the</span>
-          <span className="store-badge-name">App Store</span>
-        </span>
-      </a>
-      <span className="store-badge is-soon" aria-disabled="true">
-        <Play size={25} />
-        <span className="store-badge-text">
-          <span className="store-badge-eyebrow">GET IT ON</span>
-          <span className="store-badge-name">Google Play</span>
-        </span>
-      </span>
-      <span className="store-badge-soon">Coming soon</span>
-    </div>
-  );
-}
