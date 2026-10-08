@@ -3849,7 +3849,9 @@ html { scroll-behavior: smooth; }
 .store-badge.is-soon .store-badge-img { opacity: 0.5; filter: grayscale(0.4); }
 .soon-orbit { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; overflow: visible; }
 .soon-orbit-track { fill: none; stroke: color-mix(in oklab, var(--download-gold, var(--marketing-gold)) 38%, transparent); stroke-width: 1.1; }
-.soon-orbit-text { fill: var(--download-gold, var(--marketing-gold)); font-size: 9px; font-weight: 700; letter-spacing: 1.6px; }
+.soon-orbit-chip rect { fill: color-mix(in oklab, var(--download-forest, #143722) 90%, transparent); stroke: var(--download-gold, var(--marketing-gold)); stroke-width: 0.9; }
+.soon-orbit-chip text { fill: var(--download-gold, var(--marketing-gold)); font-size: 9.5px; font-weight: 700; letter-spacing: 1.5px; }
+@media (prefers-reduced-motion: reduce) { .soon-orbit-chip { display: none; } }
 .store-badge-soon { display: inline-flex; align-items: center; padding: 6px 13px; border-radius: 999px; background: color-mix(in oklab, var(--marketing-gold) 16%, transparent); border: 1px solid color-mix(in oklab, var(--marketing-gold) 34%, transparent); color: var(--marketing-ink); font-size: 11px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; }
 
 @media (max-width: 900px) {
