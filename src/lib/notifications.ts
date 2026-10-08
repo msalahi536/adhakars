@@ -24,10 +24,10 @@ const NOTIF_IDS: Record<ReminderId, number> = {
   nudge: 3,
 };
 
-const NOTIF_COPY: Record<ReminderId, { title: string; body: string }> = {
-  morning: { title: "Morning Adhkar", body: "Time for your morning adhkar." },
-  evening: { title: "Evening Adhkar", body: "Time for your evening adhkar." },
-  nudge: { title: "Sahih Al-Adhkar", body: "Your adhkar are still waiting. There is still time today." },
+const NOTIF_COPY: Record<ReminderId, { title: string; body: string; route: string }> = {
+  morning: { title: "Morning Adhkar", body: "Time for your morning adhkar.", route: "/app/" },
+  evening: { title: "Evening Adhkar", body: "Time for your evening adhkar.", route: "/app/evening" },
+  nudge: { title: "Sahih Al-Adhkar", body: "Your adhkar are still waiting. There is still time today.", route: "/app/more" },
 };
 
 const defaults: NotificationPrefs = {
@@ -132,6 +132,7 @@ export const scheduleReminder = async (
             allowWhileIdle: true,
           },
           smallIcon: "ic_stat_icon_config_sample",
+          extra: { route: copy.route },
         },
       ],
     });

@@ -6,6 +6,7 @@ import { HeaderSettingsButton } from "@/components/HeaderSettingsButton";
 import { MuqarnasPattern } from "@/components/HeaderPatterns";
 import { triggerHaptic } from "@/lib/theme";
 import { bumpLifetime } from "@/lib/storage";
+import { startTasbihSession, updateTasbihSession, endTasbihSession } from "@/lib/native-bridge";
 
 export const Route = createFileRoute("/app/tasbih")({
   head: () => ({ meta: [{ title: "Tasbih, Sahih Al-Adhkar" }] }),
@@ -24,6 +25,7 @@ function Tasbih() {
   const [pressed, setPressed] = useState(false);
   const [tapped, setTapped] = useState(false);
   const resetTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const sessionStarted = useRef(false);
 
   useEffect(() => {
     try {
@@ -38,6 +40,16 @@ function Tasbih() {
   useEffect(() => {
     localStorage.setItem(STORAGE, JSON.stringify({ total, milestone }));
   }, [total, milestone]);
+
+  // End Live Activity when leaving the tasbih page
+  useEffect(() => {
+    return () => {
+      if (sessionStarted.current) {
+        endTasbihSession();
+        sessionStarted.current = false;
+      }
+    };
+  }, []);
 
   const hasMilestone = milestone > 0;
   const cycleCount = hasMilestone ? total % milestone : 0;
@@ -63,6 +75,16 @@ function Tasbih() {
         setFlash(true);
         setTimeout(() => setFlash(false), 260);
       }
+
+      // Update Live Activity
+      const target = hasMilestone ? milestone : 0;
+      if (!sessionStarted.current) {
+        startTasbihSession(next, target);
+        sessionStarted.current = true;
+      } else {
+        updateTasbihSession(next, target);
+      }
+
       return next;
     });
   };
@@ -70,7 +92,14 @@ function Tasbih() {
   const undo = (e: React.MouseEvent) => {
     e.stopPropagation();
     triggerHaptic("light");
-    setTotal((n) => Math.max(0, n - 1));
+    setTotal((n) => {
+      const next = Math.max(0, n - 1);
+      if (sessionStarted.current) {
+        const target = hasMilestone ? milestone : 0;
+        updateTasbihSession(next, target);
+      }
+      return next;
+    });
   };
 
   const onResetStart = (e: React.PointerEvent | React.TouchEvent | React.MouseEvent) => {
@@ -79,6 +108,11 @@ function Tasbih() {
       triggerHaptic("heavy");
       setTotal(0);
       showToast("Count reset ✓");
+      // End the Live Activity on reset
+      if (sessionStarted.current) {
+        endTasbihSession();
+        sessionStarted.current = false;
+      }
     }, 2500);
   };
   const onResetEnd = (e?: React.SyntheticEvent) => {

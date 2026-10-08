@@ -32,6 +32,22 @@ import {
   type NotificationPrefs,
   type ReminderId,
 } from "@/lib/notifications";
+import {
+  isNativeApp,
+  getLiveActivityPrefs,
+  onLiveActivityToggle,
+  type LiveActivityPrefs,
+} from "@/lib/native-bridge";
+import {
+  getAdhanPrefs,
+  setAdhanPrefs,
+  scheduleAdhanNotifications,
+  stopAdhan,
+  isAdhanPlaying,
+  onAdhanPlaying,
+  RECITERS,
+  type AdhanPrefs,
+} from "@/lib/adhan-bridge";
 
 const APP_VERSION = "1.0.3";
 
@@ -49,7 +65,11 @@ function Settings() {
   const [notifPrefs, setNotifPrefsState] = useState<NotificationPrefs>(() => getNotificationPrefs());
   const [commitment, setCommitmentState] = useState<Record<CommitmentSection, boolean>>(() => getCommitment());
   const [hasCustom, setHasCustom] = useState(false);
+  const [laPrefs, setLaPrefsState] = useState<LiveActivityPrefs>(() => getLiveActivityPrefs());
+  const [adhanPrefs, setAdhanPrefsState] = useState<AdhanPrefs>(() => getAdhanPrefs());
+  const [adhanPlaying, setAdhanPlaying] = useState(false);
   const nativeAvailable = isNativePlatform();
+  const showLiveActivities = isNativeApp();
 
   useEffect(() => {
     setModeState(getMode());
@@ -57,13 +77,34 @@ function Settings() {
     setNotifPrefsState(getNotificationPrefs());
     setCommitmentState(getCommitment());
     setHasCustom(getCustomAdhkarRows().length > 0);
+    setLaPrefsState(getLiveActivityPrefs());
+    setAdhanPrefsState(getAdhanPrefs());
     let cancelled = false;
     checkNotificationPermission().then((v) => {
       if (!cancelled) setNotifEnabled(v);
     });
+    // Check if adhan is currently playing
+    isAdhanPlaying().then((v) => {
+      if (!cancelled) setAdhanPlaying(v);
+    });
     return () => {
       cancelled = true;
     };
+  }, []);
+
+  // Listen for external Live Activity pref changes
+  useEffect(() => {
+    const handler = () => setLaPrefsState(getLiveActivityPrefs());
+    window.addEventListener("adhkar:la-prefs-update", handler);
+    return () => window.removeEventListener("adhkar:la-prefs-update", handler);
+  }, []);
+
+  // Listen for adhan playing events (from native tap handler)
+  useEffect(() => {
+    const cleanup = onAdhanPlaying(() => {
+      setAdhanPlaying(true);
+    });
+    return cleanup;
   }, []);
 
   const handleEnableNotifications = async () => {
@@ -114,6 +155,41 @@ function Settings() {
     setDisplayState(d);
     setDisplay(d);
     window.dispatchEvent(new Event("adhkar:display-update"));
+  };
+
+  const handleLaToggle = (key: keyof LiveActivityPrefs, enabled: boolean) => {
+    onLiveActivityToggle(key, enabled);
+    setLaPrefsState(getLiveActivityPrefs());
+  };
+
+  // Adhan pref handlers
+  const handlePrayerToggle = async (prayer: string, enabled: boolean) => {
+    const next: AdhanPrefs = {
+      ...adhanPrefs,
+      enabledPrayers: { ...adhanPrefs.enabledPrayers, [prayer]: enabled },
+    };
+    setAdhanPrefsState(next);
+    await setAdhanPrefs(next);
+    await scheduleAdhanNotifications();
+  };
+
+  const handleSoundModeChange = async (soundMode: "adhan" | "silent" | "default") => {
+    const next: AdhanPrefs = { ...adhanPrefs, soundMode };
+    setAdhanPrefsState(next);
+    await setAdhanPrefs(next);
+    await scheduleAdhanNotifications();
+  };
+
+  const handleReciterChange = async (reciterId: string) => {
+    const next: AdhanPrefs = { ...adhanPrefs, reciterId };
+    setAdhanPrefsState(next);
+    await setAdhanPrefs(next);
+    await scheduleAdhanNotifications();
+  };
+
+  const handleStopAdhan = async () => {
+    await stopAdhan();
+    setAdhanPlaying(false);
   };
 
   const themePreview = (variant: "morning" | "evening") => {
@@ -338,6 +414,162 @@ function Settings() {
               )}
             </div>
           </section>
+
+          {/* ADHAN NOTIFICATIONS — only visible on native iOS */}
+          {nativeAvailable && notifEnabled && (
+            <section className="mb-6">
+              <h2 className="label-caps mb-1">Adhan Notifications</h2>
+              <p className="mb-3 text-xs opacity-70">
+                Get notified at prayer time with the adhan of your choice.
+              </p>
+
+              {/* Per-prayer toggles */}
+              <div className="space-y-2">
+                {(["Fajr", "Dhuhr", "Asr", "Maghrib", "Isha"] as const).map((prayer) => (
+                  <Toggle
+                    key={prayer}
+                    label={prayer}
+                    value={adhanPrefs.enabledPrayers[prayer] ?? false}
+                    onChange={(v) => handlePrayerToggle(prayer, v)}
+                  />
+                ))}
+              </div>
+
+              {/* Sound mode selector */}
+              <div className="mt-4">
+                <div className="mb-2 text-xs font-semibold opacity-80">Notification Sound</div>
+                <div
+                  className="flex gap-2 rounded-2xl p-1"
+                  style={{ background: "var(--surface)", border: "1px solid var(--border)" }}
+                >
+                  {([
+                    { id: "adhan" as const, label: "Adhan" },
+                    { id: "silent" as const, label: "Silent" },
+                    { id: "default" as const, label: "Default" },
+                  ]).map(({ id, label }) => (
+                    <button
+                      key={id}
+                      onClick={() => handleSoundModeChange(id)}
+                      className="flex-1 rounded-xl py-2 text-center text-sm font-semibold transition"
+                      style={{
+                        background: adhanPrefs.soundMode === id ? "var(--accent)" : "transparent",
+                        color: adhanPrefs.soundMode === id ? "var(--accent-foreground)" : "var(--foreground)",
+                        opacity: adhanPrefs.soundMode === id ? 1 : 0.7,
+                      }}
+                    >
+                      {label}
+                    </button>
+                  ))}
+                </div>
+                <div className="mt-1 text-[11px] opacity-50">
+                  {adhanPrefs.soundMode === "adhan"
+                    ? "Plays a 30s adhan clip. Tap the notification to hear the full adhan."
+                    : adhanPrefs.soundMode === "silent"
+                    ? "No sound — notification banner only."
+                    : "Uses your device's default notification sound."}
+                </div>
+              </div>
+
+              {/* Reciter picker — only shown when adhan mode is selected */}
+              {adhanPrefs.soundMode === "adhan" && (
+                <div className="mt-4">
+                  <div className="mb-2 text-xs font-semibold opacity-80">Reciter</div>
+                  <div className="space-y-2">
+                    {RECITERS.map((reciter) => {
+                      const selected = adhanPrefs.reciterId === reciter.id;
+                      return (
+                        <button
+                          key={reciter.id}
+                          onClick={() => handleReciterChange(reciter.id)}
+                          className="flex w-full items-center gap-3 rounded-2xl px-4 py-3 text-left transition"
+                          style={{
+                            background: "var(--surface)",
+                            border: selected
+                              ? "2px solid var(--accent)"
+                              : "1px solid var(--border)",
+                          }}
+                        >
+                          <div
+                            className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full"
+                            style={{
+                              border: selected
+                                ? "none"
+                                : "2px solid color-mix(in oklab, var(--foreground) 30%, transparent)",
+                              background: selected ? "var(--accent)" : "transparent",
+                            }}
+                          >
+                            {selected && (
+                              <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+                                <path
+                                  d="M2.5 6L5 8.5L9.5 4"
+                                  stroke="var(--accent-foreground)"
+                                  strokeWidth="1.5"
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                />
+                              </svg>
+                            )}
+                          </div>
+                          <div className="flex min-w-0 flex-col">
+                            <span className="text-sm font-semibold">{reciter.name}</span>
+                            <span className="text-xs opacity-60">{reciter.origin}</span>
+                          </div>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+
+              {/* Stop adhan button — shown when adhan is playing */}
+              {adhanPlaying && (
+                <button
+                  onClick={handleStopAdhan}
+                  className="mt-4 flex w-full items-center justify-center gap-2 rounded-full py-3 text-sm font-semibold"
+                  style={{
+                    background: "rgba(220, 38, 38, 0.1)",
+                    color: "#dc2626",
+                    border: "1px solid rgba(220, 38, 38, 0.3)",
+                  }}
+                >
+                  <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                    <rect x="3" y="3" width="10" height="10" rx="2" />
+                  </svg>
+                  Stop Adhan
+                </button>
+              )}
+            </section>
+          )}
+
+          {/* LIVE ACTIVITIES — only visible on native iOS */}
+          {showLiveActivities && (
+            <section className="mb-6">
+              <h2 className="label-caps mb-1">Live Activities</h2>
+              <p className="mb-3 text-xs opacity-70">
+                Show live updates on your Lock Screen and Dynamic Island.
+              </p>
+              <div className="space-y-2">
+                <Toggle
+                  label="Prayer Countdown"
+                  description="Show a countdown to the next prayer on your Lock Screen."
+                  value={laPrefs.prayerCountdown}
+                  onChange={(v) => handleLaToggle("prayerCountdown", v)}
+                />
+                <Toggle
+                  label="Tasbih Counter"
+                  description="Show your tasbih count while counting."
+                  value={laPrefs.tasbihSession}
+                  onChange={(v) => handleLaToggle("tasbihSession", v)}
+                />
+                <Toggle
+                  label="Fasting Timer"
+                  description="Show a countdown to Iftar or Suhoor."
+                  value={laPrefs.fastingTimer}
+                  onChange={(v) => handleLaToggle("fastingTimer", v)}
+                />
+              </div>
+            </section>
+          )}
 
           {/* FEEDBACK */}
           <section className="mb-6 space-y-3">

@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { createFileRoute, Outlet } from "@tanstack/react-router";
 import { BottomNav } from "@/components/BottomNav";
 import { Onboarding, hasOnboarded } from "@/components/Onboarding";
+import { initNativeBridge } from "@/lib/native-bridge";
 
 export const Route = createFileRoute("/app")({
   component: AppLayout,
@@ -25,6 +26,11 @@ function AppLayout() {
     };
   }, []);
 
+  // Initialize native bridge (Capacitor/iOS widgets + Live Activities)
+  useEffect(() => {
+    initNativeBridge();
+  }, []);
+
   return (
     <>
       <Outlet />
@@ -33,4 +39,3 @@ function AppLayout() {
     </>
   );
 }
-
