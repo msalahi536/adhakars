@@ -113,15 +113,13 @@ function HomePage() {
               </div>
             </div>
             <div className="marketing-hero-phones animate-fade-in" aria-label="Sahih Al-Adhkar app screens">
-              <div className="marketing-hero-device marketing-hero-device-evening">
-                <IPhoneFrame src={heroEveningScreen.url} width="100%" alt="Evening Adhkar screen in Sahih Al-Adhkar" />
-              </div>
-              <div className="marketing-hero-device marketing-hero-device-morning">
-                <IPhoneFrame src={heroMorningScreen.url} width="100%" alt="Morning Adhkar screen in Sahih Al-Adhkar" />
-              </div>
-              <div className="marketing-hero-device marketing-hero-device-salah">
-                <IPhoneFrame src={heroSalahScreen.url} width="100%" alt="Prayer times screen in Sahih Al-Adhkar" />
-              </div>
+              <img
+                src={heroPhones.url}
+                alt="Sahih Al-Adhkar app showing Morning Adhkar, Evening Adhkar, and prayer times"
+                className="marketing-hero-phones-img"
+                width={1879}
+                height={1920}
+              />
             </div>
           </div>
         </section>
