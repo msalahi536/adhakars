@@ -105,7 +105,6 @@ function Salah() {
   const [adhanError, setAdhanError] = useState<string | null>(null);
   const [reciterPrayer, setReciterPrayer] = useState<string | null>(null);
   const [previewingReciter, setPreviewingReciter] = useState<string | null>(null);
-  const [testingNotif, setTestingNotif] = useState<string | null>(null);
 
   const runDiagnostics = async () => {
     try {
@@ -115,72 +114,6 @@ function Salah() {
       window.alert(err instanceof Error ? err.message : "Diagnostics unavailable.");
     }
   };
-
-  /**
-   * Fires a notification identical to a real prayer alert (same title, body,
-   * channel and reciter) 5 seconds after tapping, so the tap → adhan flow can
-   * be tested end to end — e.g. with a prayer set to Silent.
-   */
-  const sendTestPrayerNotification = async (prayerId: string | null) => {
-    if (!isNativeApp() || !prayerId || testingNotif) return;
-    const label = PRAYER_LABELS[prayerId as keyof typeof PRAYER_LABELS] ?? prayerId;
-    try {
-      const { LocalNotifications } = await import("@capacitor/local-notifications");
-      const perm = await LocalNotifications.checkPermissions();
-      if (perm.display !== "granted") {
-        const req = await LocalNotifications.requestPermissions();
-        if (req.display !== "granted") {
-          setAdhanError("Notification permission is off. Allow it to receive the test.");
-          return;
-        }
-      }
-      const reciterId = getReciterForPrayer(label);
-      const fireAt = new Date(Date.now() + 5000);
-      const isAndroid = (window as any).Capacitor?.getPlatform?.() === "android";
-      if (isAndroid) await ensureAndroidAdhanChannel(LocalNotifications);
-      // Android: recognized by extra (mirrors rescheduleAdhanNotifications).
-      // iPhone: recognized by id — use the tomorrow block so today's real
-      // alert for this prayer is untouched; reschedule restores it after.
-      const notification = isAndroid
-        ? {
-            id: 920 + SALAH_IDS.indexOf(prayerId as (typeof SALAH_IDS)[number]),
-            title: `Time for ${label}`,
-            body: "The adhan is now playing.",
-            channelId: ANDROID_ADHAN_CHANNEL,
-            schedule: { at: fireAt, allowWhileIdle: true },
-            extra: {
-              prayer: prayerId,
-              reciterId: toNativeReciterId(reciterId),
-              soundMode: reciterId === SILENT_RECITER_ID ? "silent" : "adhan",
-              firedAt: Math.floor(fireAt.getTime() / 1000),
-            },
-          }
-        : {
-            id: PRAYER_NOTIF_IDS[prayerId as Exclude<(typeof SALAH_IDS)[number], "sunrise">] + 10,
-            title: label,
-            body: `It is time for ${label}.`,
-            channelId: NOTIFICATION_CHANNEL,
-            schedule: { at: fireAt, allowWhileIdle: true },
-            sound: notificationSoundFile(reciterId),
-          };
-      await LocalNotifications.schedule({ notifications: [notification] });
-      console.log("[adhan-test] test prayer notification scheduled:", label, reciterId, "at", fireAt.toISOString());
-      setTestingNotif(prayerId);
-      window.setTimeout(() => setTestingNotif((t) => (t === prayerId ? null : t)), 3000);
-      // Restore any real alert displaced by the test id (iOS tomorrow block).
-      window.setTimeout(() => void rescheduleAdhanNotifications(getPrayerSettings()), 12_000);
-    } catch (err) {
-      console.error("[adhan-test] failed", err);
-      setAdhanError(`Test failed: ${err instanceof Error ? err.message : String(err)}`);
-    }
-  };
-
-  const reciterTestId = useMemo(
-    () => (reciterPrayer ? (Object.keys(PRAYER_LABELS) as Array<keyof typeof PRAYER_LABELS>).find((k) => PRAYER_LABELS[k] === reciterPrayer) ?? null : null),
-    [reciterPrayer],
-  );
-
-
 
   const autoSelected = useRef(false);
 
@@ -713,10 +646,6 @@ function Salah() {
                       <span className={`adhan-choice-mark ${selected ? "is-selected" : ""}`} aria-hidden="true" />
                     </div>;
                   })}
-                  <button type="button" className="adhan-diag-btn" disabled={testingNotif === reciterTestId} onClick={() => void sendTestPrayerNotification(reciterTestId)}>
-                    {testingNotif === reciterTestId ? "Scheduled ✓" : "Send test notification"}
-                  </button>
-                  <p className="adhan-reciter-intro">The test notification arrives in 5 seconds and opens like a real prayer alert — useful for checking Silent and the adhan player.</p>
                 </div>
               ) : <>
                 <p className="adhan-settings-lead">Choose which prayers notify you and select a reciter for each one.</p>
