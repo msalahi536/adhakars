@@ -20,7 +20,7 @@ export const Route = createFileRoute("/app/hajj")({
       { title: "Hajj & Umrah Companion, Sahih Al-Adhkar" },
       { name: "description", content: "Station-by-station Hajj and Umrah guide with authentic du‘as, checklists and circuit counter." },
       { property: "og:title", content: "Hajj & Umrah Companion, Sahih Al-Adhkar" },
-      { property: "og:description", content: "Take your rites from the Prophet ﷺ — every source verified, works offline." },
+      { property: "og:description", content: "Take your rites from the Prophet ﷺ — every source verified." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
     ],

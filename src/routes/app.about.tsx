@@ -48,7 +48,7 @@ function About() {
           >
             <h2 className="label-caps mb-2">About the project</h2>
             <p className="text-sm leading-relaxed" style={{ color: "var(--foreground)" }}>
-              Sahih Al-Adhkar is a simple, offline friendly companion for the
+              Sahih Al-Adhkar is a simple companion for the
               daily remembrance of Allah. Every dhikr and du'a in this app is
               taken from authentic narrations, with the source listed on each
               card so you can verify it yourself.

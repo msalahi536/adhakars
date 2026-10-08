@@ -1141,7 +1141,7 @@ function Settings() {
                   <Sprout size={17} strokeWidth={1.8} />
                 </span>
                 <p className="min-w-0 flex-1 text-[13px] leading-relaxed opacity-80">
-                  Sahih Al-Adhkar is a simple, offline friendly companion for the
+                  Sahih Al-Adhkar is a simple companion for the
                   daily remembrance of Allah. Every dhikr and du'a in this app is
                   taken from authentic narrations, with the source listed on each
                   card so you can verify it yourself.

@@ -176,7 +176,7 @@ function Footer() {
               style={{ color: "rgba(31, 61, 43, 0.72)" }}
             >
               Authentic daily remembrance of Allah, sourced from the Sunnah.
-              Free, offline friendly, and private by design.
+              Free and private by design.
             </p>
           </div>
           <div>
