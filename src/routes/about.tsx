@@ -8,7 +8,6 @@ import {
   BookOpen,
   ShieldCheck,
   Lock,
-  WifiOff,
   Heart,
   Mail,
   ArrowRight,

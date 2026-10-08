@@ -15,7 +15,6 @@ import {
   Palette,
   ShieldCheck,
   Sunrise,
-  WifiOff,
 } from "lucide-react";
 import { MarketingLayout } from "@/components/marketing/MarketingLayout";
 import { Button } from "@/components/ui/button";

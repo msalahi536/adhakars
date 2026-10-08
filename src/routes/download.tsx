@@ -12,7 +12,6 @@ import {
   MoreVertical,
   Plus,
   ShieldCheck,
-  WifiOff,
   Lock,
   Ban,
   Bell,
