@@ -1,5 +1,5 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { useEffect } from "react";
+import { useEffect, useLayoutEffect } from "react";
 import {
   Outlet,
   Link,
@@ -8,13 +8,17 @@ import {
   useRouterState,
   HeadContent,
   Scripts,
+  type ErrorComponentProps,
 } from "@tanstack/react-router";
 
+import { Toaster } from "@/components/ui/sonner";
+import { RecitationPopup } from "@/components/RecitationPopup";
 import appCss from "../styles.css?url";
+import homeIcon from "@/assets/home-icon-192.png.asset.json";
 
-import { applyTheme, getMode, resolveTheme } from "@/lib/theme";
+import { applyThemeForRoute, PRE_PAINT_SCRIPT } from "@/lib/theme-store";
 import { reconcileStreak } from "@/lib/storage";
-import { applyReminders, getNotificationPrefs, checkNotificationPermission } from "@/lib/notifications";
+import { applyReminders, getJumuahNotificationEnabled, getNotificationPrefs, scheduleJumuahNotification, checkNotificationPermission } from "@/lib/notifications";
 import { supabase } from "@/integrations/supabase/client";
 
 
@@ -36,7 +40,7 @@ function NotFoundComponent() {
   );
 }
 
-function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
+function ErrorComponent({ error, reset }: ErrorComponentProps) {
   console.error(error);
   const router = useRouter();
   return (
@@ -62,11 +66,17 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
   head: () => ({
     meta: [
       { charSet: "utf-8" },
-      { name: "viewport", content: "width=device-width, initial-scale=1, viewport-fit=cover" },
+      {
+        name: "viewport",
+        content:
+          "width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover, interactive-widget=resizes-content",
+      },
       { title: "Sahih Al-Adhkar" },
       { name: "description", content: "Personal daily Islamic adhkar and tasbih." },
       { name: "theme-color", content: "#1f3d2b" },
       { name: "apple-mobile-web-app-capable", content: "yes" },
+      { name: "apple-mobile-web-app-title", content: "Sahih Al-Adhkar" },
+      { name: "application-name", content: "Sahih Al-Adhkar" },
       { name: "apple-mobile-web-app-status-bar-style", content: "black-translucent" },
       { property: "og:title", content: "Sahih Al-Adhkar" },
       { name: "twitter:title", content: "Sahih Al-Adhkar" },
@@ -86,13 +96,15 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { property: "og:type", content: "website" },
     ],
     links: [
+      { rel: "icon", type: "image/png", href: "/favicon.png?v=sunrise" },
+      { rel: "apple-touch-icon", sizes: "192x192", href: homeIcon.url },
       { rel: "stylesheet", href: appCss },
       { rel: "manifest", href: "/manifest.json" },
       { rel: "preconnect", href: "https://fonts.googleapis.com" },
       { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
       {
         rel: "stylesheet",
-        href: "https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Scheherazade+New:wght@400;500;600;700&display=swap",
+        href: "https://fonts.googleapis.com/css2?family=Amiri:wght@400&family=Cormorant+Garamond:wght@500;600&family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700;9..144,800&family=Hanken+Grotesk:wght@400;500;600;700&family=Jost:ital,wght@0,400;0,500;0,600;1,400&family=Outfit:wght@400;500;600&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Scheherazade+New:wght@400;500;600;700&display=swap",
       },
     ],
   }),
@@ -104,9 +116,10 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
 
 function RootShell({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <head>
         <HeadContent />
+        <script dangerouslySetInnerHTML={{ __html: PRE_PAINT_SCRIPT }} />
       </head>
       <body>
         {children}
@@ -121,23 +134,68 @@ function RootComponent() {
   const router = useRouter();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
 
-  useEffect(() => {
-    applyTheme(resolveTheme(getMode(), pathname));
+  // Apply before paint so a new route never shows the previous page's colors.
+  const useThemeEffect = typeof window === "undefined" ? useEffect : useLayoutEffect;
+  useThemeEffect(() => {
+    applyThemeForRoute(pathname);
   }, [pathname]);
+
+  // Re-apply when the selected color preset changes.
+  useEffect(() => {
+    const reapply = () => applyThemeForRoute(window.location.pathname);
+    window.addEventListener("adhkar:theme-change", reapply);
+    window.addEventListener("adhkar:visual-phase-change", reapply);
+    return () => {
+      window.removeEventListener("adhkar:theme-change", reapply);
+      window.removeEventListener("adhkar:visual-phase-change", reapply);
+    };
+  }, []);
 
   useEffect(() => {
     reconcileStreak();
     const reapply = async () => {
       try {
+        const scheduleKey = "adhkar:reminders-checked";
+        const today = new Date().toISOString().slice(0, 10);
+        if (window.localStorage.getItem(scheduleKey) === today) return;
         const granted = await checkNotificationPermission();
-        if (granted) await applyReminders(getNotificationPrefs());
+        if (granted) {
+          await applyReminders(getNotificationPrefs());
+          if (getJumuahNotificationEnabled()) await scheduleJumuahNotification();
+          window.localStorage.setItem(scheduleKey, today);
+        }
       } catch {
         // ignore
       }
     };
-    void reapply();
+    // Prayer-based, Sunnah and period notifications refresh on every open.
+    const smart = async () => {
+      try {
+        if (!(await checkNotificationPermission())) return;
+        const m = await import("@/lib/smart-notifications");
+        await m.rescheduleSmartNotifications();
+      } catch {
+        // ignore
+      }
+    };
+    const onPeriod = () => void import("@/lib/smart-notifications").then((m) => m.reschedulePeriodNotifications());
+    window.addEventListener("period:update", onPeriod);
+    const onPrayer = () => void import("@/lib/smart-notifications").then((m) => m.rescheduleSmartAdhkar());
+    window.addEventListener("adhkar:prayer-settings", onPrayer);
+    const onStreak = () => void import("@/lib/smart-notifications").then((m) => m.rescheduleStreakNotifications());
+    window.addEventListener("adhkar:streak-update", onStreak);
+    const timer = window.setTimeout(() => {
+      void reapply();
+      void smart();
+    }, 1200);
     window.addEventListener("adhkar:day-complete", reapply);
-    return () => window.removeEventListener("adhkar:day-complete", reapply);
+    return () => {
+      window.clearTimeout(timer);
+      window.removeEventListener("adhkar:day-complete", reapply);
+      window.removeEventListener("period:update", onPeriod);
+      window.removeEventListener("adhkar:prayer-settings", onPrayer);
+      window.removeEventListener("adhkar:streak-update", onStreak);
+    };
   }, []);
 
   useEffect(() => {
@@ -148,9 +206,30 @@ function RootComponent() {
     return () => sub.subscription.unsubscribe();
   }, [router]);
 
+  // Deter casual copying of artwork: block right-click save and drag on media.
+  useEffect(() => {
+    const isMedia = (t: EventTarget | null) =>
+      t instanceof Element && !!t.closest("img, picture, svg, canvas, video, [data-protected-art]");
+    const onContextMenu = (e: MouseEvent) => {
+      if (isMedia(e.target)) e.preventDefault();
+    };
+    const onDragStart = (e: DragEvent) => {
+      if (isMedia(e.target)) e.preventDefault();
+    };
+    document.addEventListener("contextmenu", onContextMenu);
+    document.addEventListener("dragstart", onDragStart);
+    return () => {
+      document.removeEventListener("contextmenu", onContextMenu);
+      document.removeEventListener("dragstart", onDragStart);
+    };
+  }, []);
+
+
   return (
     <QueryClientProvider client={queryClient}>
       <Outlet />
+      <RecitationPopup />
+      <Toaster position="top-center" />
     </QueryClientProvider>
   );
 }

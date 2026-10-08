@@ -12,4 +12,10 @@ export default defineConfig({
   tanstackStart: {
     server: { entry: "server" },
   },
+  vite: {
+    build: {
+      // No source maps in production: shipped bundles stay minified and unreadable.
+      sourcemap: false,
+    },
+  },
 });

@@ -1,42 +1,50 @@
-import { useEffect, useRef, useState } from "react";
+// ============= Full file contents =============
+import { useLayoutEffect, useRef } from "react";
 import { Volume2 } from "lucide-react";
+import { usePlaylist } from "./RecitationPlaylist";
+import { recitationPlayer, usePlayer, useRecitationMap, type Track } from "@/lib/recitation-player";
+import { setAnchor, setPopupOpen, usePopupOpen } from "@/lib/recitation-popup";
 
 type Props = {
   dhikrId: string;
   size?: number;
+  title?: string;
 };
 
-export function ListenButton({ size = 32 }: Props) {
-  const [open, setOpen] = useState(false);
-  const wrapRef = useRef<HTMLDivElement | null>(null);
+export function ListenButton({ dhikrId, size = 32, title }: Props) {
+  const btnRef = useRef<HTMLButtonElement | null>(null);
+  const map = useRecitationMap();
+  const player = usePlayer();
+  const playlist = usePlaylist();
+  const open = usePopupOpen();
 
-  useEffect(() => {
-    if (!open) return;
-    const onDoc = (e: MouseEvent) => {
-      if (!wrapRef.current?.contains(e.target as Node)) setOpen(false);
-    };
-    const t = window.setTimeout(() => document.addEventListener("click", onDoc), 0);
-    const auto = window.setTimeout(() => setOpen(false), 2400);
-    return () => {
-      window.clearTimeout(t);
-      window.clearTimeout(auto);
-      document.removeEventListener("click", onDoc);
-    };
-  }, [open]);
+  const rec = map?.[dhikrId];
+  const name = title ?? playlist?.items.find((i) => i.id === dhikrId)?.title ?? rec?.name ?? "Recitation";
+  const isThis = player.track?.dhikrId === dhikrId;
+  const playing = isThis && player.playing;
 
-  const handleClick = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    setOpen((v) => !v);
-  };
+  const queueTracks: Track[] = playlist && map
+    ? playlist.items.flatMap((i) => (map[i.id] ? [{ dhikrId: i.id, title: i.title, url: map[i.id].url }] : []))
+    : [];
 
-  const iconSize = Math.round(size * 0.5);
+  const isOpen = open?.openerId === dhikrId;
+
+  useLayoutEffect(() => {
+    setAnchor(dhikrId, btnRef.current);
+    return () => setAnchor(dhikrId, null);
+  }, [dhikrId]);
 
   return (
-    <div ref={wrapRef} className="relative shrink-0" data-no-swipe>
+    <div className="listen-button-wrap relative shrink-0" data-no-swipe style={{ width: size, height: size }}>
       <button
+        ref={btnRef}
         type="button"
-        onClick={handleClick}
+        onClick={(e) => {
+          e.stopPropagation();
+          setPopupOpen(isOpen ? null : { openerId: dhikrId, title: name, tracks: queueTracks, label: playlist?.label ?? null, track: rec ? { dhikrId, title: name, url: rec.url } : null });
+        }}
         aria-label="play recitation"
+        aria-expanded={isOpen}
         className="flex items-center justify-center rounded-full transition-transform active:scale-95"
         style={{
           width: size,
@@ -45,36 +53,12 @@ export function ListenButton({ size = 32 }: Props) {
           color: "var(--index-badge-fg, var(--accent-foreground))",
         }}
       >
-        <Volume2 size={iconSize} strokeWidth={2.4} />
+        {playing ? (
+          <span className="rec-eq" aria-hidden>
+            {player.levels.map((level, index) => <i key={index} style={{ height: `${Math.round(level * 100)}%` }} />)}
+          </span>
+        ) : <Volume2 size={Math.round(size * 0.5)} strokeWidth={1.75} />}
       </button>
-
-      {open && (
-        <div
-          role="status"
-          className="absolute left-[calc(100%+8px)] top-1/2 z-20 -translate-y-1/2 whitespace-nowrap rounded-full px-3 py-1.5 text-[11px] font-medium shadow-md"
-          style={{
-            background: "var(--popover, var(--card))",
-            color: "var(--popover-foreground, var(--card-foreground))",
-            border: "1px solid var(--border)",
-            animation: "listen-pop 160ms ease-out",
-          }}
-        >
-          <span
-            aria-hidden
-            className="absolute right-full top-1/2 -translate-y-1/2"
-            style={{
-              width: 0,
-              height: 0,
-              borderTop: "5px solid transparent",
-              borderBottom: "5px solid transparent",
-              borderRight: "6px solid var(--border)",
-            }}
-          />
-          Audio recitations coming soon
-        </div>
-      )}
-
-      <style>{`@keyframes listen-pop { from { opacity: 0; transform: translate(-4px, -50%);} to { opacity: 1; transform: translate(0, -50%);} }`}</style>
     </div>
   );
 }

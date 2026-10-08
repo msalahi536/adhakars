@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
 import { SwipeStack } from "./SwipeStack";
-import { HeaderSettingsButton } from "./HeaderSettingsButton";
+import { AdhkarHeader } from "./AdhkarHeader";
 import type { Dhikr } from "@/data/adhkar";
 import type { SalahItem } from "@/data/salah";
 import { isItemComplete } from "@/data/salah";
+import { markAdhkarOpened } from "@/lib/smart-notifications";
 import { getCounts, setCount, clearCounts, bumpLifetime, type LifetimeCategory } from "@/lib/storage";
 
 type Props = {
@@ -18,8 +19,10 @@ type Props = {
   headerPattern?: React.ReactNode;
   headerAction?: React.ReactNode;
   emptyState?: React.ReactNode;
+  onAddItem?: () => void;
   onEditItem?: (id: string) => void;
   onDeleteItem?: (id: string) => void;
+  dailyLayout?: boolean;
 };
 
 export function AdhkarPage({
@@ -34,13 +37,16 @@ export function AdhkarPage({
   headerPattern,
   headerAction,
   emptyState,
+  onAddItem,
   onEditItem,
   onDeleteItem,
+  dailyLayout: dailyLayoutProp,
 }: Props) {
   const [counts, setCounts] = useState<Record<string, number>>({});
 
   useEffect(() => {
     setCounts(getCounts(storageKey));
+    if (storageKey === "morning" || storageKey === "evening") markAdhkarOpened(storageKey);
   }, [storageKey]);
 
   const baseItems: SalahItem[] = itemsProp ?? (list ?? []).map((d) => ({ dhikr: d }));
@@ -57,63 +63,22 @@ export function AdhkarPage({
     bumpLifetime(lifetimeCategory, next - prev);
   };
 
-  const defaultHeader: React.CSSProperties = {
-    background: "var(--grad-header)",
-    color: "var(--header-fg, var(--accent-foreground))",
-  };
+  const dailyLayout = dailyLayoutProp ?? ["morning", "evening", "sleep", "wake"].includes(storageKey);
 
   return (
     <>
-      <header className="page-header relative overflow-hidden" style={{ ...defaultHeader, ...headerStyle }}>
-        {headerPattern}
-        <HeaderSettingsButton />
-        {headerAction && (
-          <div
-            className="absolute z-10"
-            style={{ top: "calc(env(safe-area-inset-top) + 10px)", right: 56 }}
-          >
-            {headerAction}
-          </div>
-        )}
-        <div className="relative mx-auto max-w-md px-5 pb-4 pt-5">
+      <AdhkarHeader
+        title={title}
+        subtitle={subtitle}
+        completed={completed}
+        total={items.length}
+        action={headerAction}
+        style={headerStyle}
+        pattern={headerPattern}
+      />
 
-
-          <div
-            className="label-caps"
-            style={{
-              color: "var(--header-sub, var(--header-fg, var(--accent-foreground)))",
-              opacity: 1,
-            }}
-          >
-            {subtitle}
-          </div>
-
-          <h1 className="mt-1 text-2xl font-bold tracking-tight">{title}</h1>
-          <div className="mt-3 flex items-center gap-3">
-            <div
-              className="h-1.5 flex-1 overflow-hidden rounded-full"
-              style={{
-                background:
-                  "color-mix(in oklab, var(--header-fg, var(--accent-foreground)) 22%, transparent)",
-              }}
-            >
-              <div
-                className="h-full rounded-full transition-all duration-500"
-                style={{
-                  width: `${items.length ? (completed / items.length) * 100 : 0}%`,
-                  background: "var(--accent)",
-                }}
-              />
-            </div>
-            <div className="text-xs font-bold">
-              {completed} / {items.length}
-            </div>
-          </div>
-        </div>
-      </header>
-
-      <main className="scroll-area flex flex-col">
-        <div className="mx-auto flex min-h-0 w-full max-w-md flex-1 flex-col pt-3">
+      <main className={`scroll-area flex flex-col ${dailyLayout ? "daily-adhkar-page" : ""}`}>
+        <div className="mx-auto flex min-h-0 w-full max-w-md flex-1 flex-col">
           {items.length === 0 && emptyState ? (
             emptyState
           ) : (
@@ -126,8 +91,10 @@ export function AdhkarPage({
                 setCounts({});
               }}
               persistKey={storageKey}
+              onAddItem={onAddItem}
               onEditItem={onEditItem}
               onDeleteItem={onDeleteItem}
+              dailyLayout={dailyLayout}
             />
           )}
         </div>

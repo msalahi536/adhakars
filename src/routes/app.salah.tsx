@@ -1,15 +1,84 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
-import { SwipeStack } from "@/components/SwipeStack";
-import { HeaderSettingsButton } from "@/components/HeaderSettingsButton";
-import { ConcentricCirclesPattern } from "@/components/HeaderPatterns";
+import { Bell, BellOff, ChevronDown, ChevronLeft, ChevronRight, Pause, Play, Volume2, X } from "lucide-react";
+import { PrayerTimeline } from "@/components/prayer/PrayerTimeline";
+import { AfterSalahSheet } from "@/components/prayer/AfterSalahSheet";
+import { PrayerPicker } from "@/components/prayer/PrayerPicker";
+import { Portal } from "@/components/Portal";
 import { SALAH_PRAYERS, getSalahItems, isItemComplete, type SalahPrayer } from "@/data/salah";
-import { getCounts, setCount, clearCounts, bumpLifetime } from "@/lib/storage";
+import { getCounts } from "@/lib/storage";
+
+import {
+  DEFAULT_PRAYER_SETTINGS,
+  addDays,
+  currentPrayer,
+  dateKey,
+  fetchDay,
+  formatCountdown,
+  formatMinutes,
+  getDismissed,
+  getPrayerSettings,
+  lookupCity,
+  PRAYER_LABELS,
+  prunePrayerCache,
+  repairLocation,
+  resolveLocation,
+  SALAH_IDS,
+  setDismissed,
+  setPrayerSettings,
+  slotsForDay,
+  type DayTimes,
+  type PrayerSettings,
+  type Slot,
+} from "@/lib/prayer-times";
+import { isNativeApp } from "@/lib/native-bridge";
+import { rescheduleAdhanNotifications } from "@/lib/adhan-notifications";
+import { checkNotificationPermission, requestNotificationPermission } from "@/lib/notifications";
+import { getAdhanPrefs, playAdhanPreview, preloadAdhanPreviews, RECITERS, FAJR_RECITERS, SILENT_RECITER_ID, setAdhanPrefs, stopAdhanPreview, getDiagnostics, type AdhanPrefs } from "@/lib/adhan-bridge";
+import { Button } from "@/components/ui/button";
 
 export const Route = createFileRoute("/app/salah")({
-  head: () => ({ meta: [{ title: "Salah Adhkar, Sahih Al-Adhkar" }] }),
+  head: () => ({
+    meta: [
+      { title: "Prayer Times and Salah Adhkar, Sahih Al-Adhkar" },
+      {
+        name: "description",
+        content:
+          "Daily prayer times with a live countdown, an upcoming timeline, adhan notifications, and the adhkar said after each prayer.",
+      },
+      { property: "og:title", content: "Prayer Times and Salah Adhkar" },
+      {
+        property: "og:description",
+        content: "Live prayer countdown, timeline, adhan notifications, and after salah adhkar.",
+      },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
+    ],
+  }),
   component: Salah,
+  errorComponent: SalahError,
 });
+
+function SalahError() {
+  return (
+    <main
+      className="scroll-area flex flex-col items-center justify-center px-6 text-center"
+      style={{ background: "var(--background)", color: "var(--foreground)" }}
+    >
+      <div className="text-lg font-bold">Prayer times could not load</div>
+      <p className="mt-2 text-sm" style={{ color: "var(--muted-foreground)" }}>
+        Check your connection or set your location again in Settings.
+      </p>
+      <button
+        onClick={() => window.location.reload()}
+        className="mt-5 rounded-full px-5 py-2.5 text-sm font-bold"
+        style={{ background: "var(--accent)", color: "var(--accent-foreground)" }}
+      >
+        Try again
+      </button>
+    </main>
+  );
+}
 
 const PRAYER_KEY = "selectedPrayer";
 const validPrayer = (v: string | null): SalahPrayer => {
@@ -17,136 +86,598 @@ const validPrayer = (v: string | null): SalahPrayer => {
   return (v && ids.includes(v) ? v : "fajr") as SalahPrayer;
 };
 
+const DAY_LABELS = ["Yesterday", "Today", "Tomorrow", "Day after"];
+
 function Salah() {
-  const [prayer, setPrayerState] = useState<SalahPrayer>(() => {
-    if (typeof window === "undefined") return "fajr";
-    return validPrayer(window.localStorage.getItem(PRAYER_KEY));
-  });
+  /* ---------------- prayer times ---------------- */
+  const [settings, setSettingsState] = useState<PrayerSettings>(DEFAULT_PRAYER_SETTINGS);
+  const [days, setDays] = useState<DayTimes[]>([]);
+  const [now, setNow] = useState(() => new Date());
+  const [loading, setLoading] = useState(true);
+  const [cityInput, setCityInput] = useState("");
+  const [cityError, setCityError] = useState<string | null>(null);
+  const [locating, setLocating] = useState(false);
+  const [dismissed, setDismissedState] = useState<ReturnType<typeof getDismissed>>(null);
+
+  const [adhanSettingsOpen, setAdhanSettingsOpen] = useState(false);
+  const [adhanPrefs, setAdhanPrefsState] = useState<AdhanPrefs>(() => getAdhanPrefs());
+  const [adhanError, setAdhanError] = useState<string | null>(null);
+  const [reciterPrayer, setReciterPrayer] = useState<string | null>(null);
+  const [previewingReciter, setPreviewingReciter] = useState<string | null>(null);
+
+  const runDiagnostics = async () => {
+    try {
+      const diag = await getDiagnostics();
+      window.alert(JSON.stringify(diag, null, 2));
+    } catch (err) {
+      window.alert(err instanceof Error ? err.message : "Diagnostics unavailable.");
+    }
+  };
+
+  const autoSelected = useRef(false);
+
+  useEffect(() => {
+    const t = setInterval(() => setNow(new Date()), 1000);
+    return () => clearInterval(t);
+  }, []);
+
+  useEffect(() => {
+    setDismissedState(getDismissed());
+    prunePrayerCache();
+  }, []);
+
+  const load = useCallback(async (s = getPrayerSettings()) => {
+    if (!s.location) {
+      setLoading(false);
+      return;
+    }
+    setLoading(true);
+    const base = new Date();
+    const results = await Promise.all(
+      [-1, 0, 1, 2].map((offset) => fetchDay(addDays(base, offset), s)),
+    );
+    setDays(results.filter((d): d is DayTimes => d !== null));
+    setLoading(false);
+    void rescheduleAdhanNotifications(s);
+  }, []);
+
+  // First load: reuse the stored location, otherwise try the device once.
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      let s = getPrayerSettings();
+      if (!s.location) {
+        const loc = await resolveLocation();
+        if (loc) {
+          s = { ...s, location: loc };
+          setPrayerSettings(s);
+        } else {
+          setCityError("Location permission is off. Enable it in your phone settings, or type a city instead.");
+        }
+      } else {
+        // One time repair for city coordinates saved by an older build.
+        const fixed = await repairLocation(s.location);
+        if (fixed) {
+          s = { ...s, location: fixed };
+          setPrayerSettings(s);
+        }
+      }
+      if (cancelled) return;
+      setSettingsState(s);
+      await load(s);
+    })();
+    const onSettings = () => {
+      const s = getPrayerSettings();
+      setSettingsState(s);
+      void load(s);
+    };
+    window.addEventListener("adhkar:prayer-settings", onSettings);
+    return () => {
+      cancelled = true;
+      window.removeEventListener("adhkar:prayer-settings", onSettings);
+    };
+  }, [load]);
+
+  const todayKey = dateKey(now);
+
+  const timelineDays = useMemo(() => {
+    const base = new Date();
+    return [-1, 0, 1, 2]
+      .map((offset, i) => {
+        const key = dateKey(addDays(base, offset));
+        const day = days.find((d) => d.key === key);
+        return day ? { key, label: DAY_LABELS[i], slots: slotsForDay(day) } : null;
+      })
+      .filter((d): d is { key: string; label: string; slots: Slot[] } => d !== null);
+  }, [days]);
+
+  const allSlots = useMemo(() => timelineDays.flatMap((d) => d.slots), [timelineDays]);
+  const next = useMemo(
+    () => allSlots.find((s) => s.at.getTime() > now.getTime()) ?? null,
+    [allSlots, now],
+  );
+
+  // Sunrise has no adhan, so dismissing always targets the next actual salah.
+  const nextSalah = useMemo(
+    () => allSlots.find((s) => s.id !== "sunrise" && s.at.getTime() > now.getTime()) ?? null,
+    [allSlots, now],
+  );
+  const nextIsDismissed =
+    !!nextSalah && !!dismissed && dismissed.dayKey === nextSalah.dayKey && dismissed.prayer === nextSalah.id;
+
+  // Measure both pill labels so the width can animate between exact fits.
+  const [dismissWidths, setDismissWidths] = useState<{ active: number; dismissed: number } | null>(null);
+  useEffect(() => {
+    let cancelled = false;
+    const measure = () => {
+      const ctx = document.createElement("canvas").getContext("2d");
+      if (!ctx) return;
+      ctx.font = "400 12px Outfit, sans-serif";
+      const active = Math.ceil(ctx.measureText("Tap to dismiss").width);
+      const dismissed = Math.ceil(ctx.measureText(`Dismissed until after ${nextSalah?.label ?? ""}`).width);
+      if (!cancelled) setDismissWidths({ active: active + 29, dismissed: dismissed + 29 });
+    };
+    measure();
+    if (typeof document !== "undefined" && document.fonts?.ready) {
+      document.fonts.ready.then(measure).catch(() => {});
+    }
+    return () => {
+      cancelled = true;
+    };
+  }, [nextSalah?.label]);
+
+  const toggleDismissNext = () => {
+    const next = nextSalah;
+    if (!next) return;
+    if (nextIsDismissed) {
+      setDismissed(null);
+      setDismissedState(null);
+    } else {
+      const v = { dayKey: next.dayKey, prayer: next.id };
+      setDismissed(v);
+      setDismissedState(v);
+    }
+    void rescheduleAdhanNotifications(getPrayerSettings());
+  };
+
+  const updateAdhanSettings = async (patch: Partial<PrayerSettings>) => {
+    const next = { ...getPrayerSettings(), ...patch };
+    setPrayerSettings(next);
+    setSettingsState(next);
+    await rescheduleAdhanNotifications(next);
+  };
+
+  const setPrayerEnabled = async (id: (typeof SALAH_IDS)[number], enabled: boolean) => {
+    if (enabled && !(await checkNotificationPermission())) {
+      const result = await requestNotificationPermission();
+      if (!result.granted) {
+        setAdhanError("Enable notifications in your phone settings to receive adhan alerts.");
+        return;
+      }
+    }
+    const nextPerPrayer = { ...settings.perPrayer, [id]: enabled };
+    const label = SALAH_PRAYERS.find((p) => p.id === id)?.label ?? id;
+    const nextPrefs = {
+      ...adhanPrefs,
+      enabledPrayers: { ...adhanPrefs.enabledPrayers, [label]: enabled },
+    };
+    setAdhanPrefsState(nextPrefs);
+    setAdhanPrefs(nextPrefs);
+    await updateAdhanSettings({
+      adhanEnabled: Object.values(nextPerPrayer).some(Boolean),
+      perPrayer: nextPerPrayer,
+    });
+  };
+
+
+  const setPrayerReciter = async (prayer: string, reciterId: string) => {
+    const next = prayer === "Fajr" ? { ...adhanPrefs, fajrReciterId: reciterId } : {
+      ...adhanPrefs,
+      reciterId,
+      reciterPerPrayer: { ...adhanPrefs.reciterPerPrayer, [prayer]: reciterId },
+    };
+    setAdhanPrefsState(next);
+    setAdhanPrefs(next);
+    await rescheduleAdhanNotifications(getPrayerSettings());
+  };
+
+  const toggleReciterPreview = async (reciterId: string) => {
+    if (previewingReciter === reciterId) {
+      stopAdhanPreview();
+      setPreviewingReciter(null);
+      return;
+    }
+    // Show the playing state instantly; audio catches up.
+    setPreviewingReciter(reciterId);
+    setAdhanError(null);
+    const started = await playAdhanPreview(reciterId, () => setPreviewingReciter((cur) => (cur === reciterId ? null : cur)));
+    if (!started) {
+      setPreviewingReciter((cur) => (cur === reciterId ? null : cur));
+      setAdhanError("Couldn't play this preview. Please try again.");
+    }
+  };
+
+  useEffect(() => {
+    if (reciterPrayer) preloadAdhanPreviews();
+  }, [reciterPrayer]);
+
+  const closeAdhanSettings = () => {
+    void stopAdhanPreview();
+    setPreviewingReciter(null);
+    setReciterPrayer(null);
+    setAdhanSettingsOpen(false);
+  };
+
+  const useMyLocation = async () => {
+    setLocating(true);
+    setCityError(null);
+    const loc = await resolveLocation(true);
+    setLocating(false);
+    if (!loc) {
+      setCityError("We could not get your location. Type a city instead.");
+      return;
+    }
+    const s = { ...getPrayerSettings(), location: loc };
+    setPrayerSettings(s);
+    setSettingsState(s);
+    void load(s);
+  };
+
+  const submitCity = async () => {
+    setLocating(true);
+    setCityError(null);
+    const loc = await lookupCity(cityInput);
+    setLocating(false);
+    if (!loc) {
+      setCityError("We could not find that place. Try a city and country.");
+      return;
+    }
+    const s = { ...getPrayerSettings(), location: loc };
+    setPrayerSettings(s);
+    setSettingsState(s);
+    setCityInput("");
+    void load(s);
+  };
+
+  /* ---------------- adhkar ---------------- */
+  const [prayer, setPrayerState] = useState<SalahPrayer>("fajr");
+  useEffect(() => {
+    setPrayerState(validPrayer(window.localStorage.getItem(PRAYER_KEY)));
+  }, []);
+
+  const [sheetOpen, setSheetOpen] = useState(false);
+  const [pickerOpen, setPickerOpen] = useState(false);
   const setPrayer = (p: SalahPrayer) => {
     if (typeof window !== "undefined") window.localStorage.setItem(PRAYER_KEY, p);
     setPrayerState(p);
   };
-
-  const [counts, setCounts] = useState<Record<string, number>>({});
-  const storageKey = `salah_${prayer}`;
-  const items = getSalahItems(prayer);
-  const completed = items.filter((i) => isItemComplete(i, counts)).length;
-
-  useEffect(() => {
-    setCounts(getCounts(storageKey));
-  }, [storageKey]);
-
-  const inc = (id: string, target: number) => {
-    const prev = counts[id] ?? 0;
-    const next = Math.min(target, prev + 1);
-    if (next === prev) return;
-    const updated = { ...counts, [id]: next };
-    setCounts(updated);
-    setCount(storageKey, id, next);
-    bumpLifetime("salah", next - prev);
+  const openAdhkar = (p: SalahPrayer) => {
+    setPrayer(p);
+    setSheetOpen(true);
   };
 
+  // Auto select the most recent prayer once times are known.
+  useEffect(() => {
+    if (autoSelected.current) return;
+    const today = timelineDays.find((d) => d.key === todayKey);
+    if (!today) return;
+    autoSelected.current = true;
+    const cur = currentPrayer(today.slots, new Date());
+    if (cur) setPrayer(cur as SalahPrayer);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [timelineDays, todayKey]);
+
+  // Progress per prayer, refreshed whenever the sheet closes.
+  const [progress, setProgress] = useState<Record<string, { done: number; total: number }>>({});
+  useEffect(() => {
+    if (sheetOpen) return;
+    const out: Record<string, { done: number; total: number }> = {};
+    SALAH_PRAYERS.forEach((p) => {
+      const items = getSalahItems(p.id);
+      const counts = getCounts(`salah_${p.id}`);
+      out[p.id] = {
+        done: items.filter((i) => isItemComplete(i, counts)).length,
+        total: items.length,
+      };
+    });
+    setProgress(out);
+  }, [sheetOpen]);
+
   const selectedLabel = SALAH_PRAYERS.find((p) => p.id === prayer)?.label ?? "";
+  const cur = progress[prayer] ?? { done: 0, total: 0 };
+  const pct = cur.total ? Math.round((cur.done / cur.total) * 100) : 0;
+
+  // Countdown urgency: amber inside 30 minutes, red inside 10 minutes.
+  const msLeft = next ? next.at.getTime() - now.getTime() : null;
+  const urgencyColor =
+    msLeft === null || msLeft < 0
+      ? null
+      : msLeft <= 10 * 60 * 1000
+        ? "var(--urgency-critical)"
+        : msLeft <= 30 * 60 * 1000
+          ? "var(--urgency-warning)"
+          : null;
+
+
 
   return (
-    <>
-      <header
-        className="page-header relative overflow-hidden"
-        style={{
-          background: "linear-gradient(135deg, #2e7d5e 0%, #1a5c42 100%)",
-          color: "#ffffff",
-        }}
-      >
-        <ConcentricCirclesPattern />
-        <HeaderSettingsButton />
-        <div className="relative mx-auto max-w-md px-5 pb-4 pt-5">
-          <div className="label-caps" style={{ color: "rgba(255,255,255,0.85)", opacity: 1 }}>
-            After {selectedLabel}
-          </div>
-          <h1 className="mt-1 text-2xl font-bold tracking-tight">After Salah</h1>
-          <div className="mt-3 flex items-center gap-3">
-            <div
-              className="h-1.5 flex-1 overflow-hidden rounded-full"
-              style={{ background: "rgba(255,255,255,0.25)" }}
-            >
-              <div
-                className="h-full rounded-full transition-all duration-500"
-                style={{
-                  width: `${items.length ? (completed / items.length) * 100 : 0}%`,
-                  background: "#c9a84c",
-                }}
-              />
-            </div>
-            <div className="text-xs font-bold">
-              {completed} / {items.length}
-            </div>
-          </div>
-
-          {/* Prayer selector — inside the header */}
-          <div
-            className="hide-scrollbar -mx-5 mt-4 flex gap-2 overflow-x-auto px-5 pb-1"
-            style={{ scrollbarWidth: "none" }}
-          >
-            {SALAH_PRAYERS.map((p) => {
-              const active = p.id === prayer;
-              return (
-                <button
-                  key={p.id}
-                  onClick={() => setPrayer(p.id)}
-                  className="flex shrink-0 items-center justify-center font-bold transition-all active:scale-95"
-                  style={{
-                    minWidth: 70,
-                    height: 36,
-                    borderRadius: 18,
-                    padding: "0 16px",
-                    fontSize: 13,
-                    background: active ? "#c9a84c" : "rgba(255,255,255,0.15)",
-                    color: active ? "#1a3d2b" : "#ffffff",
-                    border: "none",
-                    transition: "background 0.25s ease, color 0.25s ease",
-                  }}
-                >
-                  {p.label}
-                </button>
-              );
-            })}
-          </div>
+    <div className="salah-page">
+      <header className="salah-hero">
+        <div className="salah-next-label">
+          {!settings.location
+            ? "Prayer times"
+            : next
+              ? `${next.label} in`
+              : loading
+                ? "Loading prayer times"
+                : "No times yet"}
         </div>
+        <div
+          className="salah-countdown"
+          style={{ color: urgencyColor ?? undefined, opacity: settings.location ? 1 : 0.55 }}
+        >
+          {next ? formatCountdown(next.at.getTime() - now.getTime()) : "--:--:--"}
+        </div>
+        <button
+          onClick={toggleDismissNext}
+          disabled={!nextSalah}
+          style={dismissWidths ? { width: nextIsDismissed ? dismissWidths.dismissed : dismissWidths.active } : undefined}
+          className={`salah-dismiss active:scale-95 ${nextIsDismissed ? "is-dismissed" : ""}`}
+        >
+          {nextIsDismissed ? `Dismissed until after ${nextSalah?.label ?? ""}` : "Tap to dismiss"}
+        </button>
       </header>
 
-      <main className="scroll-area flex flex-col" style={{ background: "#f0f7f4" }}>
-        <div
-          className="mx-auto flex min-h-0 w-full max-w-md flex-1 flex-col pt-3"
-          style={
-            {
-              // Salah card theme overrides (scoped to this page)
-              ["--card" as string]: "#1a4a35",
-              ["--card-foreground" as string]: "#f0f7f2",
-              ["--translit" as string]: "#8fc4a8",
-              ["--accent" as string]: "#c9a84c",
-              ["--accent-foreground" as string]: "#1a3d2b",
-              ["--border" as string]: "rgba(255,255,255,0.08)",
-              ["--source-bg" as string]: "rgba(0,0,0,0.3)",
-              ["--source-fg" as string]: "#8fc4a8",
-              ["--combo-card" as string]: "#0f2e1e",
-              ["--index-badge-bg" as string]: "#c9a84c",
-              ["--index-badge-fg" as string]: "#1a3d2b",
-              ["--count-fg" as string]: "#f0f7f2",
-            } as React.CSSProperties
-          }
-        >
-          <SwipeStack
-            items={items}
-            counts={counts}
-            onIncrement={inc}
-            onReset={() => {
-              clearCounts(storageKey);
-              setCounts({});
-            }}
-            persistKey={storageKey}
-          />
+      <main className="salah-content">
+        <div className={`salah-content-inner ${settings.location ? "" : "no-location"}`}>
+          {!settings.location && (
+            <div
+               className="salah-location-card w-full overflow-hidden p-5"
+              style={{
+                background: "var(--surface-card)",
+                border: "1px solid var(--border)",
+                color: "var(--foreground)",
+                boxShadow: "var(--card-shadow)",
+              }}
+            >
+              <div className="label-caps" style={{ color: "var(--muted-foreground)" }}>
+                Location
+              </div>
+              <div className="mt-1 text-xl font-bold tracking-tight">Set your location</div>
+              <p className="mt-1 text-sm" style={{ color: "var(--muted-foreground)" }}>
+                We use it only to calculate your prayer times. Nothing leaves your device except
+                the coordinates used to look up the times.
+              </p>
+              <button
+                onClick={() => void useMyLocation()}
+                disabled={locating}
+                className="mt-4 w-full rounded-full py-3 text-sm font-bold active:scale-[0.99]"
+                style={{ background: "var(--accent)", color: "var(--accent-foreground)" }}
+              >
+                {locating ? "Locating..." : "Use my location"}
+              </button>
+              <div className="mt-2 flex gap-2">
+                <input
+                  value={cityInput}
+                  onChange={(e) => setCityInput(e.target.value)}
+                  placeholder="Or type a city"
+                  className="min-w-0 flex-1 rounded-full px-4 py-2.5 outline-none"
+                  style={{
+                    fontSize: 16,
+                    background: "var(--background)",
+                    color: "var(--foreground)",
+                    border: "1px solid var(--border)",
+                  }}
+                />
+                <button
+                  onClick={() => void submitCity()}
+                  className="shrink-0 rounded-full px-5 text-sm font-bold"
+                  style={{
+                    background: "color-mix(in oklab, var(--foreground) 8%, transparent)",
+                    color: "var(--foreground)",
+                  }}
+                >
+                  Set
+                </button>
+              </div>
+              {cityError && (
+                <div className="mt-2 text-[12px]" style={{ color: "var(--muted-foreground)" }}>
+                  {cityError}
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Recommended: entry into the after salah adhkar */}
+          <section className="salah-recommended-card">
+            <div className="salah-recommended-top flex items-center justify-between gap-3">
+              <div className="min-w-0">
+                <div className="salah-kicker">
+                  Recommended
+                </div>
+              </div>
+              <button
+                onClick={() => setPickerOpen(true)}
+                className="salah-change flex shrink-0 items-center gap-1 active:scale-95"
+              >
+                Change
+                <ChevronDown size={12} strokeWidth={2} />
+              </button>
+            </div>
+            <div className="salah-recommended-title">After {selectedLabel} Adhkar</div>
+            <div className="salah-recommended-progress">{cur.done} of {cur.total} complete</div>
+
+            <div className="salah-recommended-action flex items-center">
+              <button
+                onClick={() => setSheetOpen(true)}
+                aria-label={`Open after ${selectedLabel} adhkar`}
+                className="salah-play flex shrink-0 items-center justify-center rounded-full active:scale-95"
+              >
+                <Play size={18} fill="currentColor" strokeWidth={1.5} />
+              </button>
+              <div className="min-w-0 flex-1">
+                <div className="salah-action-label">
+                  {pct === 100 ? "Completed today" : pct > 0 ? "Continue" : "Begin the adhkar"}
+                </div>
+                <div className="salah-action-track">
+                  <span style={{ width: `${pct}%` }} />
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <button
+            onClick={() => setAdhanSettingsOpen(true)}
+            className="salah-adhan-card flex w-full items-center text-left active:scale-[0.99]"
+          >
+            <span className="salah-adhan-icon flex shrink-0 items-center justify-center rounded-full">
+              <Bell size={16} />
+            </span>
+            <span className="min-w-0 flex-1">
+              <span className="salah-adhan-title block">Adhan Settings</span>
+              <span className="salah-adhan-subtitle block">
+                {settings.adhanEnabled ? "Prayer alerts are on" : "Choose prayer alerts and reciters"}
+              </span>
+            </span>
+            <ChevronRight size={16} strokeWidth={1.5} className="salah-adhan-chevron" />
+          </button>
+
+          {/* Prayer times */}
+          {settings.location ? (
+            <div className="salah-upcoming-wrap">
+              <PrayerTimeline
+                days={timelineDays}
+                now={now}
+                todayKey={todayKey}
+                tone="deep"
+              />
+            </div>
+          ) : (
+            <div
+              className="dhikr-card salah-upcoming-placeholder w-full overflow-hidden p-5"
+              style={{
+                background: "var(--surface-deep, var(--surface-card))",
+                border: "1px solid var(--border)",
+                color: "var(--foreground)",
+                boxShadow: "var(--card-shadow)",
+              }}
+            >
+              <div className="label-caps" style={{ color: "var(--muted-foreground)" }}>
+                Upcoming
+              </div>
+              <div className="mt-3 space-y-3">
+                {["Fajr", "Sunrise", "Dhuhr", "Asr", "Maghrib", "Isha"].map((label) => (
+                  <div key={label} className="flex items-center gap-3">
+                    <span
+                      className="h-2 w-2 shrink-0 rounded-full"
+                      style={{ background: "color-mix(in oklab, var(--foreground) 18%, transparent)" }}
+                    />
+                    <span className="flex-1 text-sm font-semibold" style={{ opacity: 0.5 }}>
+                      {label}
+                    </span>
+                    <span
+                      className="text-sm font-semibold"
+                      style={{ color: "var(--muted-foreground)", fontVariantNumeric: "tabular-nums" }}
+                    >
+                      --:--
+                    </span>
+                  </div>
+                ))}
+              </div>
+              <div className="mt-4 text-xs" style={{ color: "var(--muted-foreground)" }}>
+                Times appear once your location is set.
+              </div>
+            </div>
+          )}
+
+
+
         </div>
       </main>
-    </>
+
+      <AfterSalahSheet
+        open={sheetOpen}
+        prayer={prayer}
+        onPrayer={setPrayer}
+        onClose={() => setSheetOpen(false)}
+      />
+      <PrayerPicker
+        open={pickerOpen}
+        selected={prayer}
+        progress={progress}
+        onPick={(p) => {
+          setPrayer(p);
+          setPickerOpen(false);
+        }}
+        onClose={() => setPickerOpen(false)}
+      />
+
+      {adhanSettingsOpen && (
+        <Portal>
+          <div className="adhan-settings-backdrop" role="presentation" onClick={closeAdhanSettings}>
+            <section className="adhan-settings-sheet" role="dialog" aria-modal="true" aria-label="Adhan settings" onClick={(event) => event.stopPropagation()}>
+              <header className="adhan-settings-head">
+                {reciterPrayer ? <Button type="button" variant="ghost" size="icon" className="adhan-settings-close" onClick={() => { void stopAdhanPreview(); setPreviewingReciter(null); setReciterPrayer(null); }} aria-label="Back to prayers"><ChevronLeft size={20} /></Button> : <span className="adhan-head-spacer" />}
+                <div className="adhan-head-copy">
+                  <div className="label-caps">Prayer alerts</div>
+                  <h2>{reciterPrayer ? `${reciterPrayer} Adhan` : "Adhan Settings"}</h2>
+                </div>
+                <Button type="button" variant="ghost" size="icon" className="adhan-settings-close" onClick={closeAdhanSettings} aria-label="Close adhan settings"><X size={20} /></Button>
+              </header>
+
+              {reciterPrayer ? (
+                <div className="adhan-reciter-list">
+                  <p className="adhan-reciter-intro">Choose the voice for {reciterPrayer}. Tap play to preview.</p>
+                  {(reciterPrayer === "Fajr" ? FAJR_RECITERS : RECITERS).map((reciter) => {
+                    const selected = reciterPrayer === "Fajr" ? adhanPrefs.fajrReciterId === reciter.id : (adhanPrefs.reciterPerPrayer[reciterPrayer] ?? adhanPrefs.reciterId) === reciter.id;
+                    const previewing = previewingReciter === reciter.id;
+                    return <div className={`adhan-reciter-row ${selected ? "is-selected" : ""}`} key={reciter.id}>
+                      {reciter.id === SILENT_RECITER_ID ? (
+                        <span className="adhan-preview-btn inline-flex items-center justify-center" aria-hidden="true"><BellOff size={18} /></span>
+                      ) : (
+                      <Button type="button" variant="ghost" size="icon" className="adhan-preview-btn" onClick={() => void toggleReciterPreview(reciter.id)} aria-label={`${previewing ? "Pause" : "Play"} ${reciter.name}`}>
+                        {previewing ? <Pause size={18} fill="currentColor" /> : <Play size={18} fill="currentColor" />}
+                      </Button>
+                      )}
+                      <button type="button" className="adhan-reciter-choice" onClick={() => void setPrayerReciter(reciterPrayer, reciter.id)}>
+                        <strong>{reciter.name}</strong><small>{reciter.origin}</small>
+                      </button>
+                      <span className={`adhan-choice-mark ${selected ? "is-selected" : ""}`} aria-hidden="true" />
+                    </div>;
+                  })}
+                </div>
+              ) : <>
+                <p className="adhan-settings-lead">Choose which prayers notify you and select a reciter for each one.</p>
+                <div className="adhan-prayer-list">
+                  {SALAH_IDS.map((id) => {
+                    const label = SALAH_PRAYERS.find((prayer) => prayer.id === id)?.label ?? id;
+                    const enabled = settings.perPrayer[id] && settings.adhanEnabled;
+                    const reciter = label === "Fajr"
+                      ? FAJR_RECITERS.find((item) => item.id === adhanPrefs.fajrReciterId) ?? FAJR_RECITERS[0]
+                      : RECITERS.find((item) => item.id === (adhanPrefs.reciterPerPrayer[label] ?? adhanPrefs.reciterId)) ?? RECITERS[0];
+                    return <div className="adhan-prayer-row" key={id}>
+                       <span className="adhan-settings-icon"><Volume2 size={17} /></span>
+                       <button type="button" className="adhan-prayer-details" onClick={() => setReciterPrayer(label)}>
+                         <small>{label} Adhan</small><strong>{reciter.name}</strong>
+                       </button>
+                       <button type="button" className={`adhan-toggle ${enabled ? "is-on" : ""}`} onClick={() => void setPrayerEnabled(id, !enabled)} aria-label={`${enabled ? "Turn off" : "Turn on"} ${label} notification`}><i /></button>
+                       <span className="adhan-row-chevron" aria-hidden="true"><ChevronRight size={19} /></span>
+                     </div>;
+                   })}
+                 </div>
+                 <p className="adhan-settings-note">Tap the notification to continue the full adhan after the 30-second alert.</p>
+               </>}
+              {!reciterPrayer && isNativeApp() && (
+                <button type="button" className="adhan-diag-btn" onClick={() => void runDiagnostics()}>
+                  Run Diagnostics
+                </button>
+              )}
+              {adhanError && <p className="adhan-settings-error">{adhanError}</p>}
+            </section>
+          </div>
+        </Portal>
+      )}
+
+    </div>
   );
 }

@@ -1,5 +1,6 @@
 import { useRouter } from "@tanstack/react-router";
 import { ChevronLeft } from "lucide-react";
+import { isMoreDestination } from "@/lib/more-navigation";
 
 /**
  * Small back-arrow button shown in the top-left corner of a page's header
@@ -10,6 +11,11 @@ export function HeaderBackButton({ fallbackTo = "/app/more" }: { fallbackTo?: st
   const router = useRouter();
 
   const onClick = () => {
+    const pathname = router.state.location.pathname;
+    if (isMoreDestination(pathname) && pathname !== "/app/more") {
+      router.navigate({ to: "/app/more" });
+      return;
+    }
     if (typeof window !== "undefined" && window.history.length > 1) {
       router.history.back();
     } else {
@@ -22,19 +28,23 @@ export function HeaderBackButton({ fallbackTo = "/app/more" }: { fallbackTo?: st
       type="button"
       onClick={onClick}
       aria-label="Back"
-      className="absolute z-10 flex items-center justify-center rounded-full transition-transform active:scale-90"
+      className="header-icon-button absolute z-10 flex items-center justify-center transition-transform active:scale-90"
       style={{
-        top: "calc(env(safe-area-inset-top) + 10px)",
-        left: 12,
+        top: 18,
+        left: 20,
         width: 36,
         height: 36,
-        color: "currentColor",
-        background: "color-mix(in oklab, currentColor 14%, transparent)",
-        border: "none",
+        borderRadius: 999,
+        color: "var(--foreground)",
+        background: "color-mix(in oklab, var(--surface-card, var(--background)) 55%, transparent)",
+        border: "1px solid color-mix(in oklab, currentColor 16%, transparent)",
+        boxShadow: "0 4px 14px color-mix(in oklab, var(--foreground) 6%, transparent)",
+        backdropFilter: "blur(14px) saturate(130%)",
+        WebkitBackdropFilter: "blur(14px) saturate(130%)",
         cursor: "pointer",
       }}
     >
-      <ChevronLeft size={20} />
+      <ChevronLeft size={18} strokeWidth={2.2} />
     </button>
   );
 }

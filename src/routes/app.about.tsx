@@ -1,11 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { HeaderBackButton } from "@/components/HeaderBackButton";
-import { HeaderSettingsButton } from "@/components/HeaderSettingsButton";
-import { ConcentricCirclesPattern } from "@/components/HeaderPatterns";
-import { Heart, Mail } from "lucide-react";
-
-// TODO: Replace with real donation URL when available.
-const DONATE_URL = "#";
+import { Mail } from "lucide-react";
+import { BenefitsList } from "@/components/BenefitsList";
 
 export const Route = createFileRoute("/app/about")({
   head: () => ({
@@ -16,6 +12,10 @@ export const Route = createFileRoute("/app/about")({
         content:
           "About the Sahih Al-Adhkar project, how to support it, and how to get in touch.",
       },
+      { property: "og:title", content: "About & Support, Sahih Al-Adhkar" },
+      { property: "og:description", content: "Learn about and support the Sahih Al-Adhkar project." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
     ],
   }),
   component: About,
@@ -28,29 +28,27 @@ function About() {
         className="page-header relative overflow-hidden"
         style={{ background: "var(--grad-header)", color: "var(--header-fg)" }}
       >
-        <ConcentricCirclesPattern />
         <HeaderBackButton />
-        <HeaderSettingsButton />
         <div
-          className="relative mx-auto max-w-md px-4 pb-5 pt-4"
+          className="relative mx-auto max-w-md px-16 pb-6 pt-9 text-center"
           style={{ paddingLeft: 60, paddingRight: 60 }}
         >
           <div className="label-caps" style={{ color: "var(--header-sub)", opacity: 1 }}>
             Information
           </div>
-          <h1 className="mt-1 text-3xl font-bold tracking-tight">About &amp; Support</h1>
+          <h1 className="app-page-title mt-2">About &amp; Support</h1>
         </div>
       </header>
 
       <main className="scroll-area">
         <div className="mx-auto max-w-md px-4 py-4 space-y-4">
           <section
-            className="rounded-[24px] p-5"
+            className="glass-card p-5"
             style={{ background: "var(--surface)", border: "1px solid var(--border)" }}
           >
             <h2 className="label-caps mb-2">About the project</h2>
             <p className="text-sm leading-relaxed" style={{ color: "var(--foreground)" }}>
-              Sahih Al-Adhkar is a simple, offline friendly companion for the
+              Sahih Al-Adhkar is a simple companion for the
               daily remembrance of Allah. Every dhikr and du'a in this app is
               taken from authentic narrations, with the source listed on each
               card so you can verify it yourself.
@@ -64,44 +62,27 @@ function About() {
           </section>
 
           <section
-            className="rounded-[24px] p-5"
+            className="glass-card p-5"
+            style={{ background: "var(--surface)", border: "1px solid var(--border)" }}
+          >
+            <h2 className="label-caps mb-3">How Adhkar benefits you</h2>
+            <BenefitsList />
+          </section>
+
+          <section
+            className="glass-card p-5"
             style={{ background: "var(--surface)", border: "1px solid var(--border)" }}
           >
             <h2 className="label-caps mb-2">Support this project</h2>
             <p className="text-sm leading-relaxed" style={{ color: "var(--foreground)" }}>
-              This app is free. There are no ads and nothing is sold. If it
-              has benefited you, a donation helps cover hosting and keeps the
-              work going, as sadaqah jariyah, in sha' Allah.
+              This app is free. There are no ads and nothing is sold. If it has
+              benefited you, please make du'a for this project and for everyone
+              who uses it.
             </p>
-            <p className="mt-3 text-sm leading-relaxed" style={{ color: "var(--foreground)" }}>
-              And if you are not able to give, please make du'a for this
-              project and for everyone who uses it. That is a support worth
-              more than any amount.
-            </p>
-            <a
-              href={DONATE_URL}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-full py-3 text-sm font-semibold"
-              style={{
-                background: "linear-gradient(135deg, #c9a84c, #b8923a)",
-                color: "#ffffff",
-              }}
-            >
-              <Heart size={16} strokeWidth={2.4} />
-              Donate
-            </a>
-            <div
-              className="mt-2 text-[11px]"
-              style={{ color: "var(--muted-foreground)" }}
-            >
-              {/* TODO: replace # with the real donation URL */}
-              Donation link coming soon.
-            </div>
           </section>
 
           <section
-            className="rounded-[24px] p-5"
+            className="glass-card p-5"
             style={{ background: "var(--surface)", border: "1px solid var(--border)" }}
           >
             <h2 className="label-caps mb-2">Contact &amp; feedback</h2>

@@ -250,7 +250,7 @@ const fajrG2: Dhikr = {
     "There is no god but Allah, alone, with no partner. To Him belongs sovereignty and all praise. He gives life and causes death, and He has power over all things.",
   source: "Jami at-Tirmidhi 3474 — Hasan Sahih (Darussalam)",
   commentary:
-    "⚠️ Say this FIRST — before speaking to anyone, while your feet are still folded after Fajr salam. The Prophet ﷺ said: \"Whoever says this ten times at the end of Fajr prayer, while his feet are still folded, before speaking — ten good deeds will be written for him, ten sins erased, he will be raised ten degrees, he will be protected all that day from every disliked thing, guarded from Shaytan, and no sin will reach him that day except shirk.\" This dhikr is specific to Fajr only and is a largely forgotten sunnah — do not neglect it.",
+    "Say this FIRST — before speaking to anyone, while your feet are still folded after Fajr salam. The Prophet ﷺ said: \"Whoever says this ten times at the end of Fajr prayer, while his feet are still folded, before speaking — ten good deeds will be written for him, ten sins erased, he will be raised ten degrees, he will be protected all that day from every disliked thing, guarded from Shaytan, and no sin will reach him that day except shirk.\" This dhikr is specific to Fajr only and is a largely forgotten sunnah — do not neglect it.",
   target: 10,
 };
 
@@ -326,7 +326,7 @@ export function getSalahItems(prayer: SalahPrayer): SalahItem[] {
       {
         dhikr: fajrG2,
         isSpecial: true,
-        specialLabel: "⚠️ Say this before speaking — feet still folded",
+        specialLabel: "Say this before speaking — feet still folded",
       },
       ...sharedSequence("fajr"),
       { dhikr: fajrKnowledge },

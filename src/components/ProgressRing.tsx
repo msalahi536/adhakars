@@ -12,7 +12,7 @@ export function ProgressRing({ value, max, size = 88, stroke = 7, complete }: Pr
   const pct = Math.min(1, value / max);
   const offset = c * (1 - pct);
   return (
-    <svg width={size} height={size} className="block">
+    <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} className="block">
       <circle
         cx={size / 2}
         cy={size / 2}
@@ -32,7 +32,7 @@ export function ProgressRing({ value, max, size = 88, stroke = 7, complete }: Pr
         strokeDasharray={c}
         strokeDashoffset={offset}
         transform={`rotate(-90 ${size / 2} ${size / 2})`}
-        style={{ transition: "stroke-dashoffset 350ms cubic-bezier(0.34,1.56,0.64,1)" }}
+        style={{ transition: "stroke-dashoffset 200ms ease-out" }}
       />
     </svg>
   );

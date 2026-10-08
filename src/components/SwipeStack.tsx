@@ -2,9 +2,12 @@ import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "@tanstack/react-router";
 import { DhikrCard } from "./DhikrCard";
 import { TasbeehComboCard } from "./TasbeehComboCard";
-import { ChevronLeft, ChevronRight, RotateCcw, ArrowRight, Pencil, Trash2 } from "lucide-react";
+import { ChevronLeft, ChevronRight, RotateCcw, ArrowRight, Pencil, Plus, Trash2 } from "lucide-react";
 import type { SalahItem } from "@/data/salah";
+import { triggerHaptic } from "@/lib/theme";
 import { isItemComplete, itemId } from "@/data/salah";
+import { Pagination } from "./AdhkarPrimitives";
+import { RecitationPlaylistContext, playlistLabel } from "./RecitationPlaylist";
 
 type Props = {
   items: SalahItem[];
@@ -14,8 +17,10 @@ type Props = {
   persistKey?: string;
   finishCta?: { label: string; to: string };
   onFinishNav?: () => void;
+  onAddItem?: () => void;
   onEditItem?: (id: string) => void;
   onDeleteItem?: (id: string) => void;
+  dailyLayout?: boolean;
 };
 
 type Phase = "idle" | "out-left" | "out-right" | "in-left" | "in-right";
@@ -30,11 +35,9 @@ const readPersistedIdx = (key?: string): number => {
   return Number.isFinite(n) && n >= 0 ? n : 0;
 };
 
-export function SwipeStack({ items, counts, onIncrement, onReset, persistKey, finishCta, onFinishNav, onEditItem, onDeleteItem }: Props) {
+export function SwipeStack({ items, counts, onIncrement, onReset, persistKey, finishCta, onFinishNav, onAddItem, onEditItem, onDeleteItem, dailyLayout = false }: Props) {
   const navigate = useNavigate();
-  const [idx, setIdxState] = useState(() =>
-    Math.min(readPersistedIdx(persistKey), Math.max(0, items.length - 1)),
-  );
+  const [idx, setIdxState] = useState(0);
   const setIdx = (updater: number | ((i: number) => number)) => {
     setIdxState((prev) => {
       const next = typeof updater === "function" ? (updater as (i: number) => number)(prev) : updater;
@@ -70,16 +73,17 @@ export function SwipeStack({ items, counts, onIncrement, onReset, persistKey, fi
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [items.length]);
 
-  const animateTo = (dir: "next" | "prev") => {
+  const animateTo = (dir: "next" | "prev", destination?: number) => {
     if (animating.current) return;
     if (dir === "next" && idx >= items.length - 1) return;
     if (dir === "prev" && idx <= 0) return;
     animating.current = true;
+    triggerHaptic("light");
     setPhase(dir === "next" ? "out-left" : "out-right");
     setDragOffset(0);
 
     setTimeout(() => {
-      setIdx((i) => i + (dir === "next" ? 1 : -1));
+      setIdx((i) => destination ?? i + (dir === "next" ? 1 : -1));
       setPhase(dir === "next" ? "in-right" : "in-left");
       setEnter(false);
       requestAnimationFrame(() => {
@@ -98,10 +102,38 @@ export function SwipeStack({ items, counts, onIncrement, onReset, persistKey, fi
   const goPrev = () => animateTo("prev");
   const goTo = (i: number) => {
     if (animating.current || i === idx) return;
-    animateTo(i > idx ? "next" : "prev");
+    animateTo(i > idx ? "next" : "prev", i);
+  };
+  const scrubTo = (i: number) => {
+    if (animating.current || i === idx) return;
+    triggerHaptic("light");
+    setDragOffset(0);
+    setPhase("idle");
+    setEnter(false);
+    setIdx(i);
   };
 
   const current = items[idx];
+  const recLabel = playlistLabel(persistKey);
+  const playlist = recLabel
+    ? { label: recLabel, items: items.flatMap((it) => (it.dhikr ? [{ id: it.dhikr.id, title: it.dhikr.title }] : [])) }
+    : null;
+  const scrubRef = useRef<(i: number) => void>(() => {});
+  scrubRef.current = (i) => scrubTo(i);
+  const goToRef = useRef<(i: number) => void>(() => {});
+  goToRef.current = (i) => goTo(i);
+  useEffect(() => {
+    const onTrack = (e: Event) => {
+      const id = (e as CustomEvent<string>).detail;
+      const i = items.findIndex((it) => it.dhikr?.id === id);
+      // Slide smoothly to the playing card (same animation as a manual
+      // swipe) so the card never jumps or changes size mid-listen.
+      if (i >= 0) goToRef.current(i);
+    };
+    window.addEventListener("recitation:track", onTrack);
+    return () => window.removeEventListener("recitation:track", onTrack);
+  }, [items]);
+  const currentDhikr = current?.dhikr;
 
   // Auto-advance ONLY when the current card transitions from incomplete → complete
   // due to a user tap in this session. Ignore already-complete cards on mount and
@@ -144,7 +176,8 @@ export function SwipeStack({ items, counts, onIncrement, onReset, persistKey, fi
 
     const onTouchStart = (e: TouchEvent) => {
       if (animating.current) return;
-      // ignore swipes that start inside a scrollable card body
+      // Keep controls interactive, but allow horizontal swipes to begin over
+      // the card's scrollable reading area. Axis locking preserves vertical reading.
       const target = e.target as HTMLElement | null;
       if (target && target.closest("[data-no-swipe]")) return;
       startX.current = e.touches[0].clientX;
@@ -237,15 +270,16 @@ export function SwipeStack({ items, counts, onIncrement, onReset, persistKey, fi
   };
 
   return (
-    <div className="flex flex-1 flex-col overflow-hidden">
-      <div className="mb-2 flex items-center justify-center gap-2 px-4">
+    <RecitationPlaylistContext.Provider value={playlist}>
+    <div className={`flex flex-1 flex-col overflow-hidden ${dailyLayout ? "daily-swipe-stack" : ""}`}>
+      <div className="adhkar-index-row mb-1 flex min-h-9 items-center justify-center gap-2 px-4">
         <span
-          className="rounded-[12px] px-3 py-1 text-xs font-semibold"
-          style={{ background: "var(--surface)" }}
+          className="rounded-full px-4 py-1.5 text-sm font-medium tabular-nums"
+          style={{ background: "color-mix(in oklab, var(--surface-card) 82%, transparent)", border: "1px solid var(--border)", boxShadow: "0 5px 18px color-mix(in oklab, var(--foreground) 7%, transparent)" }}
         >
           {idx + 1} / {items.length}
         </span>
-        {idx > 0 && (
+        {!dailyLayout && idx > 0 && (
           <button
             onClick={restart}
             className="flex items-center gap-1 rounded-[12px] px-2.5 py-1 text-[11px] font-semibold transition active:scale-95"
@@ -255,24 +289,37 @@ export function SwipeStack({ items, counts, onIncrement, onReset, persistKey, fi
             <RotateCcw size={12} /> Restart
           </button>
         )}
-        {current?.dhikr && onEditItem && (
+        {currentDhikr && onAddItem && (
           <button
-            onClick={() => onEditItem(current.dhikr!.id)}
-            className="flex items-center gap-1 rounded-[12px] px-2.5 py-1 text-[11px] font-semibold transition active:scale-95"
+            type="button"
+            onClick={onAddItem}
+            className={`adhkar-card-action flex items-center justify-center gap-1 rounded-full text-[11px] font-semibold transition active:scale-95 ${dailyLayout ? "is-icon-only" : "px-2.5 py-1"}`}
+            style={{ background: "var(--surface)", color: "var(--foreground)" }}
+            aria-label="add adhkar"
+          >
+            <Plus size={13} /> {!dailyLayout && "Add"}
+          </button>
+        )}
+        {currentDhikr && onEditItem && (
+          <button
+            type="button"
+            onClick={() => onEditItem(currentDhikr.id)}
+            className={`adhkar-card-action flex items-center justify-center gap-1 rounded-full text-[11px] font-semibold transition active:scale-95 ${dailyLayout ? "is-icon-only" : "px-2.5 py-1"}`}
             style={{ background: "var(--surface)", color: "var(--foreground)" }}
             aria-label="edit"
           >
-            <Pencil size={12} /> Edit
+            <Pencil size={12} /> {!dailyLayout && "Edit"}
           </button>
         )}
-        {current?.dhikr && onDeleteItem && (
+        {currentDhikr && onDeleteItem && (
           <button
-            onClick={() => onDeleteItem(current.dhikr!.id)}
-            className="flex items-center gap-1 rounded-[12px] px-2.5 py-1 text-[11px] font-semibold transition active:scale-95"
-            style={{ background: "var(--surface)", color: "#c0392b" }}
+            type="button"
+            onClick={() => onDeleteItem(currentDhikr.id)}
+            className={`adhkar-card-action is-delete flex items-center justify-center gap-1 rounded-full text-[11px] font-semibold transition active:scale-95 ${dailyLayout ? "is-icon-only" : "px-2.5 py-1"}`}
+            style={{ background: "var(--surface)", color: "var(--destructive)" }}
             aria-label="delete"
           >
-            <Trash2 size={12} /> Delete
+            <Trash2 size={12} /> {!dailyLayout && "Delete"}
           </button>
         )}
       </div>
@@ -280,25 +327,26 @@ export function SwipeStack({ items, counts, onIncrement, onReset, persistKey, fi
 
       <div
         ref={wrapperRef}
-        className="relative min-h-0 flex-1 overflow-hidden"
-        style={{ touchAction: "pan-y", padding: "12px 16px" }}
+        className="adhkar-card-stage relative min-h-0 flex-1 overflow-hidden"
+        style={{ touchAction: "pan-y" }}
       >
         {current && (
           <div
-            className="h-full w-full"
+            className={dailyLayout ? "adhkar-card-motion w-full" : "h-full w-full"}
             style={{ transform, opacity, transition, willChange: "transform, opacity" }}
           >
-            {current.dhikr ? (
+            {currentDhikr ? (
               <DhikrCard
-                key={current.dhikr.id}
-                dhikr={current.dhikr}
-                count={counts[current.dhikr.id] ?? 0}
-                onIncrement={() => onIncrement(current.dhikr!.id, current.dhikr!.target)}
+                key={currentDhikr.id}
+                dhikr={currentDhikr}
+                count={counts[currentDhikr.id] ?? 0}
+                onIncrement={() => onIncrement(currentDhikr.id, currentDhikr.target)}
                 index={idx + 1}
                 total={items.length}
                 isSpecial={current.isSpecial}
                 specialLabel={current.specialLabel}
                 isPersonalDua={current.isPersonalDua}
+                referenceLayout={dailyLayout}
               />
             ) : (
               <TasbeehComboCard
@@ -314,7 +362,7 @@ export function SwipeStack({ items, counts, onIncrement, onReset, persistKey, fi
         )}
       </div>
 
-      {isLast && (finishCta || true) && (
+      {!dailyLayout && isLast && (finishCta || true) && (
         <div className="mt-2 flex flex-col gap-2 px-4">
           {finishCta && (
             <button
@@ -337,11 +385,20 @@ export function SwipeStack({ items, counts, onIncrement, onReset, persistKey, fi
 
 
 
-      <div className="mt-3 flex items-center justify-between px-6">
+      {dailyLayout ? (
+        <Pagination
+          total={items.length}
+          active={idx}
+          onSelect={goTo}
+          onPrevious={goPrev}
+          onNext={goNext}
+          onScrub={scrubTo}
+        />
+      ) : <div className="mt-2 flex items-center justify-center px-6">
         <button
           onClick={goPrev}
           disabled={idx === 0}
-          className="flex h-11 w-11 items-center justify-center rounded-full transition-transform active:scale-95 disabled:opacity-30"
+          className="sr-only"
           style={{
             background: "var(--arrow-bg, var(--surface))",
             color: "var(--arrow-fg, var(--foreground))",
@@ -351,14 +408,14 @@ export function SwipeStack({ items, counts, onIncrement, onReset, persistKey, fi
         >
           <ChevronLeft size={20} />
         </button>
-        <div className="flex flex-wrap items-center justify-center gap-1.5">
+        <div className="flex max-w-[250px] flex-wrap items-center justify-center gap-2">
           {items.map((it, i) => (
             <button
               key={itemId(it) + i}
               onClick={() => goTo(i)}
-              className="h-1.5 rounded-full transition-all"
+               className="h-2 rounded-full transition-all"
               style={{
-                width: i === idx ? 20 : 6,
+                 width: i === idx ? 20 : 8,
                 background: i === idx
                   ? "var(--dot-active, var(--accent))"
                   : "var(--dot-inactive, color-mix(in oklab, var(--foreground) 22%, transparent))",
@@ -370,7 +427,7 @@ export function SwipeStack({ items, counts, onIncrement, onReset, persistKey, fi
         <button
           onClick={goNext}
           disabled={idx === items.length - 1}
-          className="flex h-11 w-11 items-center justify-center rounded-full transition-transform active:scale-95 disabled:opacity-30"
+          className="sr-only"
           style={{
             background: "var(--arrow-bg, var(--surface))",
             color: "var(--arrow-fg, var(--foreground))",
@@ -380,7 +437,8 @@ export function SwipeStack({ items, counts, onIncrement, onReset, persistKey, fi
         >
           <ChevronRight size={20} />
         </button>
-      </div>
+      </div>}
     </div>
+    </RecitationPlaylistContext.Provider>
   );
 }

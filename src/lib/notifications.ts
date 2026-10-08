@@ -1,39 +1,70 @@
 // Local device notifications via @capacitor/local-notifications.
 
-import { isDayComplete } from "@/lib/storage";
-
-export type ReminderId = "morning" | "evening" | "nudge";
-
 export type Reminder = {
-  enabled: boolean;
+  id: number;
+  label: string;
   hour: number;
   minute: number;
+  enabled: boolean;
+  /** Morning/evening only: use a fixed clock time instead of following Fajr/Asr. */
+  customTime?: boolean;
 };
 
 export type NotificationPrefs = {
-  morning: Reminder;
-  evening: Reminder;
-  nudge: Reminder;
+  reminders: Reminder[];
+  nextId: number;
 };
 
 const PREFS_KEY = "adhkar:notifications";
 
-const NOTIF_IDS: Record<ReminderId, number> = {
-  morning: 1,
-  evening: 2,
-  nudge: 3,
-};
-
-const NOTIF_COPY: Record<ReminderId, { title: string; body: string; route: string }> = {
-  morning: { title: "Morning Adhkar", body: "Time for your morning adhkar.", route: "/app/" },
-  evening: { title: "Evening Adhkar", body: "Time for your evening adhkar.", route: "/app/evening" },
-  nudge: { title: "Sahih Al-Adhkar", body: "Your adhkar are still waiting. There is still time today.", route: "/app/more" },
-};
-
 const defaults: NotificationPrefs = {
-  morning: { enabled: false, hour: 6, minute: 0 },
-  evening: { enabled: false, hour: 16, minute: 30 },
-  nudge: { enabled: false, hour: 20, minute: 0 },
+  reminders: [
+    { id: 1, label: "Morning Adhkar", hour: 6, minute: 0, enabled: true },
+    { id: 2, label: "Evening Adhkar", hour: 16, minute: 30, enabled: true },
+  ],
+  nextId: 3,
+};
+
+type LegacyReminder = { enabled?: boolean; hour?: number; minute?: number };
+type LegacyPrefs = {
+  morning?: LegacyReminder;
+  evening?: LegacyReminder;
+  nudge?: LegacyReminder;
+  reminders?: Reminder[];
+  nextId?: number;
+};
+
+const migrate = (parsed: LegacyPrefs): NotificationPrefs => {
+  if (Array.isArray(parsed.reminders)) {
+    const reminders = parsed.reminders.filter(
+      (r) => r && typeof r.id === "number" && typeof r.hour === "number",
+    );
+    const maxId = reminders.reduce((m, r) => Math.max(m, r.id), 0);
+    return {
+      reminders,
+      nextId: Math.max(parsed.nextId ?? 0, maxId + 1, 1),
+    };
+  }
+  // Migrate legacy morning/evening/nudge shape.
+  const legacy: Array<[string, LegacyReminder | undefined, number, number]> = [
+    ["Morning Adhkar", parsed.morning, 6, 0],
+    ["Evening Adhkar", parsed.evening, 16, 30],
+    ["Gentle nudge", parsed.nudge, 20, 0],
+  ];
+  const reminders: Reminder[] = [];
+  let idCounter = 1;
+  for (const [label, r, defH, defM] of legacy) {
+    if (!r) continue;
+    reminders.push({
+      id: idCounter++,
+      label,
+      hour: typeof r.hour === "number" ? r.hour : defH,
+      minute: typeof r.minute === "number" ? r.minute : defM,
+      enabled: r.enabled === true,
+    });
+  }
+  if (reminders.length === 0) return defaults;
+  return { reminders, nextId: idCounter };
 };
 
 export const getNotificationPrefs = (): NotificationPrefs => {
@@ -41,12 +72,7 @@ export const getNotificationPrefs = (): NotificationPrefs => {
   try {
     const raw = localStorage.getItem(PREFS_KEY);
     if (!raw) return defaults;
-    const parsed = JSON.parse(raw) as Partial<NotificationPrefs>;
-    return {
-      morning: { ...defaults.morning, ...(parsed.morning ?? {}) },
-      evening: { ...defaults.evening, ...(parsed.evening ?? {}) },
-      nudge: { ...defaults.nudge, ...(parsed.nudge ?? {}) },
-    };
+    return migrate(JSON.parse(raw) as LegacyPrefs);
   } catch {
     return defaults;
   }
@@ -57,105 +83,378 @@ export const setNotificationPrefs = (p: NotificationPrefs) => {
   localStorage.setItem(PREFS_KEY, JSON.stringify(p));
 };
 
+type CapPlugins = { LocalNotifications?: any };
 type CapWindow = {
-  Capacitor?: { isNativePlatform?: () => boolean; getPlatform?: () => string };
+  Capacitor?: {
+    isNativePlatform?: () => boolean;
+    getPlatform?: () => string;
+    Plugins?: CapPlugins;
+  };
+};
+
+const cap = () => (typeof window === "undefined" ? undefined : (window as unknown as CapWindow).Capacitor);
+
+export const getPlatform = (): string => {
+  try {
+    return cap()?.getPlatform?.() ?? "web";
+  } catch {
+    return "web";
+  }
 };
 
 export const isNativePlatform = (): boolean => {
-  if (typeof window === "undefined") return false;
-  const cap = (window as unknown as CapWindow).Capacitor;
-  return cap?.isNativePlatform?.() === true;
+  const c = cap();
+  if (!c) return false;
+  try {
+    if (c.isNativePlatform?.() === true) return true;
+  } catch {
+    // ignore
+  }
+  const p = getPlatform();
+  return p === "ios" || p === "android";
 };
 
+let pluginCache: any = null;
+
+/**
+ * Resolve the LocalNotifications plugin.
+ * Prefer the runtime bridge injected by the native wrapper (window.Capacitor.Plugins),
+ * which exists even when the npm module was not bundled into this build.
+ */
 const loadPlugin = async (): Promise<any> => {
+  if (pluginCache) return pluginCache;
   if (!isNativePlatform()) return null;
+  const bridge = cap()?.Plugins?.LocalNotifications;
+  if (bridge) {
+    pluginCache = bridge;
+    return bridge;
+  }
   try {
-    const modName = "@capacitor/local-notifications";
-    const mod: any = await import(/* @vite-ignore */ modName).catch(() => null);
-    return mod?.LocalNotifications ?? null;
-  } catch {
+    const mod = await import("@capacitor/local-notifications");
+    pluginCache = mod?.LocalNotifications ?? null;
+    return pluginCache;
+  } catch (e) {
+    console.error("[notifications] plugin import failed", e);
     return null;
   }
 };
 
-export const requestNotificationPermission = async (): Promise<boolean> => {
-  const plugin = await loadPlugin();
-  if (!plugin) return false;
+const ANDROID_CHANNEL = "adhkar-reminders";
+
+let channelReady = false;
+const ensureChannel = async (plugin: any) => {
+  if (channelReady || getPlatform() !== "android") return;
   try {
+    await plugin.createChannel?.({
+      id: ANDROID_CHANNEL,
+      name: "Adhkar reminders",
+      description: "Daily adhkar reminders",
+      importance: 5,
+      visibility: 1,
+
+    });
+  } catch (e) {
+    console.warn("[notifications] createChannel failed", e);
+  }
+  channelReady = true;
+};
+
+/** Shared with the adhan scheduler so both use the same plugin resolution. */
+export const loadNotificationPlugin = loadPlugin;
+export const ensureNotificationChannel = ensureChannel;
+export const NOTIFICATION_CHANNEL = ANDROID_CHANNEL;
+
+
+export type PermissionResult =
+  | { granted: true }
+  | { granted: false; reason: "unavailable" | "denied" | "error"; error?: string };
+
+export const requestNotificationPermission = async (): Promise<PermissionResult> => {
+  if (!isNativePlatform()) {
+    return { granted: false, reason: "unavailable", error: "Not running in the native app" };
+  }
+  const plugin = await loadPlugin();
+  if (!plugin) {
+    return { granted: false, reason: "unavailable", error: "LocalNotifications plugin missing from this build" };
+  }
+  try {
+    const current = await plugin.checkPermissions?.().catch(() => null);
+    if (current?.display === "granted") return { granted: true };
     const res = await plugin.requestPermissions();
-    return res?.display === "granted";
-  } catch {
-    return false;
+    if (res?.display === "granted") {
+      // First time permission is granted: switch on adhan alerts for all five prayers.
+      const { enableAllPrayerAlerts } = await import("@/lib/adhan-bridge");
+      await enableAllPrayerAlerts().catch(() => {});
+      return { granted: true };
+    }
+    return { granted: false, reason: "denied", error: `Permission ${res?.display ?? "unknown"}` };
+  } catch (e) {
+    console.error("[notifications] requestPermissions failed", e);
+    return { granted: false, reason: "error", error: (e as Error)?.message ?? "Unknown error" };
   }
 };
+
+const withTimeout = <T,>(p: Promise<T>, ms: number, fallback: T): Promise<T> =>
+  new Promise<T>((resolve) => {
+    let done = false;
+    const timer = setTimeout(() => {
+      if (!done) {
+        done = true;
+        resolve(fallback);
+      }
+    }, ms);
+    p.then((v) => {
+      if (!done) {
+        done = true;
+        clearTimeout(timer);
+        resolve(v);
+      }
+    }).catch(() => {
+      if (!done) {
+        done = true;
+        clearTimeout(timer);
+        resolve(fallback);
+      }
+    });
+  });
 
 export const checkNotificationPermission = async (): Promise<boolean> => {
-  const plugin = await loadPlugin();
+  const plugin = await withTimeout(loadPlugin(), 4000, null);
   if (!plugin) return false;
   try {
-    const res = await plugin.checkPermissions();
+    const res = await withTimeout<any>(plugin.checkPermissions(), 4000, null);
     return res?.display === "granted";
   } catch {
     return false;
   }
 };
 
-export const cancelReminder = async (id: ReminderId): Promise<void> => {
+/** Next occurrence of hour:minute, today if still ahead, otherwise tomorrow. */
+const nextOccurrence = (hour: number, minute: number): Date => {
+  const now = new Date();
+  const d = new Date();
+  d.setHours(hour, minute, 0, 0);
+  if (d.getTime() <= now.getTime() + 1000) d.setDate(d.getDate() + 1);
+  return d;
+};
+
+export type ActionResult = { ok: true } | { ok: false; error: string };
+
+/** How many future days each reminder is pre-scheduled for. */
+const DAYS_AHEAD = 14;
+/** Derived notification ids for a reminder: id*1000 + dayOffset. */
+const idsFor = (reminderId: number) =>
+  Array.from({ length: DAYS_AHEAD }, (_, i) => reminderId * 1000 + i);
+
+/** Last schedule payload passed to the plugin, for diagnostics. */
+let lastSchedule: { at: string; count: number; ids: number[]; label: string } | null = null;
+export const getLastSchedule = () => lastSchedule;
+
+
+/** Notification ids that are currently scheduled on the device. */
+export const getScheduledIds = async (): Promise<number[]> => {
+  const plugin = await loadPlugin();
+  if (!plugin) return [];
+  try {
+    const res = await plugin.getPending();
+    return (res?.notifications ?? []).map((n: { id: number }) => n.id);
+  } catch {
+    return [];
+  }
+};
+
+export const getDiagnostics = async (): Promise<string> => {
+  const platform = getPlatform();
+  if (!isNativePlatform()) return `Platform: ${platform} (reminders need the installed app)`;
+  const plugin = await loadPlugin();
+  if (!plugin) return `Platform: ${platform}, plugin: missing`;
+  let perm = "unknown";
+  try {
+    perm = (await plugin.checkPermissions())?.display ?? "unknown";
+  } catch {
+    // ignore
+  }
+  const pending = await getScheduledIds();
+  const last = lastSchedule
+    ? ` | last: "${lastSchedule.label}" at ${lastSchedule.at} (${lastSchedule.count} slots, ids ${lastSchedule.ids[0]}..${lastSchedule.ids[lastSchedule.ids.length - 1]})`
+    : "";
+  return `Platform: ${platform}, permission: ${perm}, pending: ${pending.length}${last}`;
+};
+
+export const cancelReminder = async (id: number): Promise<void> => {
   const plugin = await loadPlugin();
   if (!plugin) return;
   try {
-    await plugin.cancel({ notifications: [{ id: NOTIF_IDS[id] }] });
+    await plugin.cancel({
+      notifications: [{ id }, ...idsFor(id).map((n) => ({ id: n }))],
+    });
   } catch {
     // ignore
   }
 };
 
-export const scheduleReminder = async (
-  id: ReminderId,
-  hour: number,
-  minute: number,
-): Promise<boolean> => {
+export const scheduleReminder = async (r: Reminder, firstAt?: Date): Promise<ActionResult> => {
+  if (!isNativePlatform()) return { ok: false, error: "Not running in the native app" };
   const plugin = await loadPlugin();
-  if (!plugin) return false;
-  try {
-    await plugin.cancel({ notifications: [{ id: NOTIF_IDS[id] }] }).catch(() => {});
-    const copy = NOTIF_COPY[id];
-    await plugin.schedule({
-      notifications: [
-        {
-          id: NOTIF_IDS[id],
-          title: copy.title,
-          body: copy.body,
-          schedule: {
-            on: { hour, minute },
-            repeats: true,
-            allowWhileIdle: true,
-          },
-          smallIcon: "ic_stat_icon_config_sample",
-          extra: { route: copy.route },
-        },
-      ],
-    });
-    return true;
-  } catch (e) {
-    console.error("scheduleReminder failed", e);
-    return false;
+  if (!plugin) return { ok: false, error: "Notifications plugin is missing from this build." };
+  if (!firstAt) {
+    const smart = await import("@/lib/smart-notifications");
+    if (smart.usesPrayerTimes(r)) {
+      // Morning/evening follow Fajr and Asr once a location is known.
+      await cancelReminder(r.id);
+      await smart.rescheduleSmartAdhkar();
+      return { ok: true };
+    }
   }
+  try {
+    await ensureChannel(plugin);
+    await cancelReminder(r.id);
+    if (r.id === 1 || r.id === 2) {
+      // Clear or rebuild the prayer-time-based schedule for this reminder.
+      const smart = await import("@/lib/smart-notifications");
+      await smart.rescheduleSmartAdhkar();
+    }
+
+    const first = firstAt ?? nextOccurrence(r.hour, r.minute);
+    const ids = idsFor(r.id);
+    const notifications = ids.map((id, i) => {
+      const at = new Date(first.getTime());
+      at.setDate(at.getDate() + i);
+      return {
+        id,
+        title: r.label || "Adhkar reminder",
+        body: `Time for ${r.label || "your adhkar"}.`,
+        schedule: { at, allowWhileIdle: true },
+        channelId: ANDROID_CHANNEL,
+        extra: { route: r.id === 1 ? "/app/" : r.id === 2 ? "/app/evening" : "/app/more" },
+      };
+    });
+
+    lastSchedule = {
+      at: first.toLocaleString(),
+      count: notifications.length,
+      ids,
+      label: r.label || "Adhkar reminder",
+    };
+    console.log(
+      "[notifications] schedule payload",
+      JSON.stringify(
+        notifications.map((n) => ({ ...n, schedule: { ...n.schedule, at: n.schedule.at.toISOString() } })),
+        null,
+        2,
+      ),
+    );
+
+    await plugin.schedule({ notifications });
+    const pending = await getScheduledIds();
+    console.log("[notifications] pending after schedule:", pending.length, pending);
+    return { ok: true };
+  } catch (e) {
+    console.error("[notifications] scheduleReminder failed", e);
+    return { ok: false, error: (e as Error)?.message ?? "Could not schedule this reminder." };
+  }
+};
+
+/** Debug helper: schedules through the exact reminder code path, 60s from now. */
+export const scheduleOneMinuteTest = async (): Promise<ActionResult> => {
+  const t = new Date(Date.now() + 60_000);
+  return scheduleReminder(
+    { id: 995, label: "1 minute test", hour: t.getHours(), minute: t.getMinutes(), enabled: true },
+    t,
+  );
 };
 
 export const applyReminders = async (prefs: NotificationPrefs): Promise<void> => {
   if (!isNativePlatform()) return;
-  for (const key of ["morning", "evening", "nudge"] as ReminderId[]) {
-    const r = prefs[key];
+  for (const r of prefs.reminders) {
     if (r.enabled) {
-      // For nudge: only keep scheduled while day is incomplete.
-      if (key === "nudge" && isDayComplete()) {
-        await cancelReminder(key);
-        continue;
-      }
-      await scheduleReminder(key, r.hour, r.minute);
+      await scheduleReminder(r);
     } else {
-      await cancelReminder(key);
+      await cancelReminder(r.id);
     }
   }
+  const smart = await import("@/lib/smart-notifications");
+  await smart.rescheduleSmartAdhkar();
+};
+
+
+/* ---- Jumu'ah (Friday) notification ---- */
+
+export const JUMUAH_NOTIF_ID = 880001;
+const K_JUMUAH_ENABLED = "adhkar:jumuah-notification";
+/** Friday in the Capacitor Weekday enum (Sunday = 1). */
+const WEEKDAY_FRIDAY = 6;
+const JUMUAH_HOUR = 7;
+const JUMUAH_MINUTE = 0;
+
+export const getJumuahNotificationEnabled = (): boolean => {
+  if (typeof window === "undefined") return true;
+  return localStorage.getItem(K_JUMUAH_ENABLED) !== "0";
+};
+
+export const setJumuahNotificationEnabled = (on: boolean) => {
+  if (typeof window === "undefined") return;
+  localStorage.setItem(K_JUMUAH_ENABLED, on ? "1" : "0");
+};
+
+export const cancelJumuahNotification = async (): Promise<void> => {
+  const plugin = await loadPlugin();
+  if (!plugin) return;
+  try {
+    await plugin.cancel({ notifications: [{ id: JUMUAH_NOTIF_ID }] });
+  } catch {
+    // ignore
+  }
+};
+
+/** Weekly repeating notification on Friday at 07:00 local time. */
+export const scheduleJumuahNotification = async (): Promise<ActionResult> => {
+  if (!isNativePlatform()) return { ok: false, error: "Not running in the native app" };
+  const plugin = await loadPlugin();
+  if (!plugin) return { ok: false, error: "Notifications plugin is missing from this build." };
+  try {
+    await ensureChannel(plugin);
+    await cancelJumuahNotification();
+    await plugin.schedule({
+      notifications: [
+        {
+          id: JUMUAH_NOTIF_ID,
+          title: "Sahih Al-Adhkar",
+          body: "It's Jumu'ah — come learn the sunnahs of Jumu'ah.",
+          schedule: {
+            on: { weekday: WEEKDAY_FRIDAY, hour: JUMUAH_HOUR, minute: JUMUAH_MINUTE },
+            every: "week",
+            repeats: true,
+            allowWhileIdle: true,
+          },
+          channelId: ANDROID_CHANNEL,
+          extra: { route: "/app/more?open=dua-library&section=jumuah" },
+        },
+      ],
+    });
+    return { ok: true };
+  } catch (e) {
+    console.error("[notifications] jumuah schedule failed", e);
+    return { ok: false, error: (e as Error)?.message ?? "Could not schedule the Friday reminder." };
+  }
+};
+
+
+/** Fires whenever the user taps a delivered local notification. */
+export const registerNotificationTapHandler = (
+  onAction: (id: number | undefined, route: string | undefined) => void,
+): void => {
+  void (async () => {
+    const plugin = await loadPlugin();
+    if (!plugin?.addListener) return;
+    try {
+      await plugin.addListener("localNotificationActionPerformed", (e: any) => {
+        const id = Number(e?.notification?.id);
+        const route = e?.notification?.extra?.route;
+        onAction(Number.isFinite(id) ? id : undefined, typeof route === "string" ? route : undefined);
+      });
+    } catch (e) {
+      console.warn("[notifications] tap listener failed", e);
+    }
+  })();
 };

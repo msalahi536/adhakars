@@ -1,6 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { AdhkarPage } from "@/components/AdhkarPage";
-import { GirihStarPattern } from "@/components/HeaderPatterns";
 import { morningAdhkar } from "@/data/adhkar";
 
 export const Route = createFileRoute("/app/")({
@@ -8,6 +7,10 @@ export const Route = createFileRoute("/app/")({
     meta: [
       { title: "Morning Adhkar, Sahih Al-Adhkar" },
       { name: "description", content: "Recite your morning adhkar with counters and streaks." },
+      { property: "og:title", content: "Morning Adhkar, Sahih Al-Adhkar" },
+      { property: "og:description", content: "Recite your morning adhkar with counters and streaks." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
     ],
   }),
   component: Morning,
@@ -21,7 +24,7 @@ function Morning() {
       title="Morning Adhkar"
       subtitle="Between Fajr & Sunrise"
       list={morningAdhkar}
-      headerPattern={<GirihStarPattern />}
+      headerPattern={null}
     />
   );
 }

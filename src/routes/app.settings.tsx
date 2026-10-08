@@ -1,24 +1,24 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { ConcentricCirclesPattern } from "@/components/HeaderPatterns";
 import { HeaderBackButton } from "@/components/HeaderBackButton";
+import { getDisplay, setDisplay, themes } from "@/lib/theme";
 import {
-  themes,
-  getMode,
-  setMode,
-  applyTheme,
-  resolveTheme,
-  getDisplay,
-  setDisplay,
-  type ThemeMode,
-} from "@/lib/theme";
+  setSeed,
+  getPresetId,
+  setPresetId,
+  setCustomTriplet,
+  PRESETS,
+  DEFAULT_PRESET_ID,
+  getModeSetting,
+  setModeSetting,
+  type ModeSetting,
+} from "@/lib/theme-store";
+import { sectionSeedFor } from "@/lib/theming";
+import { backgroundsForPreset, PRESET_BACKGROUNDS } from "@/lib/backgrounds";
+import { SuggestColorSheet } from "@/components/theme/SuggestColorSheet";
 import {
   resetToday,
   resetAllProgress,
-  getCommitment,
-  setCommitment,
-  getCustomAdhkarRows,
-  type CommitmentSection,
 } from "@/lib/storage";
 import {
   getNotificationPrefs,
@@ -29,108 +29,261 @@ import {
   scheduleReminder,
   cancelReminder,
   isNativePlatform,
+  getJumuahNotificationEnabled,
+  setJumuahNotificationEnabled,
+  scheduleJumuahNotification,
+  cancelJumuahNotification,
   type NotificationPrefs,
-  type ReminderId,
+  type Reminder,
 } from "@/lib/notifications";
 import {
-  isNativeApp,
-  getLiveActivityPrefs,
-  onLiveActivityToggle,
-  type LiveActivityPrefs,
-} from "@/lib/native-bridge";
+  getPrayerSettings,
+  setPrayerSettings,
+  lookupCity,
+  resolveLocation,
+  CALC_METHODS,
+  type PrayerSettings,
+} from "@/lib/prayer-times";
+import { rescheduleAdhanNotifications } from "@/lib/adhan-notifications";
 import {
-  getAdhanPrefs,
-  setAdhanPrefs,
-  scheduleAdhanNotifications,
-  stopAdhan,
-  isAdhanPlaying,
-  onAdhanPlaying,
-  RECITERS,
-  type AdhanPrefs,
-} from "@/lib/adhan-bridge";
+  getPeriodNotificationsEnabled,
+  getSunnahNotificationEnabled,
+  setPeriodNotificationsEnabled,
+  setStreakNotificationsEnabled,
+  setSunnahNotificationEnabled,
+  getStreakNotificationsEnabled,
+} from "@/lib/smart-notifications";
+import { requestAppReview } from "@/lib/rate-app";
+import {
+  Star,
+  BookOpen,
+  Scale,
+  Bell,
+  MapPin,
+  Sun,
+  Moon,
+  Vibrate,
+  Database,
+  Trash2,
+  Info,
+  FileText,
+  Mail,
+  Sprout,
+  Type,
+  ALargeSmall,
+  Check,
+  Sparkles,
+  Heart,
+  Flame,
+} from "lucide-react";
 
 const APP_VERSION = "1.0.3";
+const CONTACT_EMAIL = "msalahi536@gmail.com";
 
 export const Route = createFileRoute("/app/settings")({
-  head: () => ({ meta: [{ title: "Settings, Sahih Al-Adhkar" }] }),
+  head: () => ({
+    meta: [
+      { title: "Settings, Sahih Al-Adhkar" },
+      { name: "description", content: "Choose your color, reminders, and reading preferences." },
+      { property: "og:title", content: "Settings, Sahih Al-Adhkar" },
+      { property: "og:description", content: "Choose your color, reminders, and reading preferences." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
+    ],
+  }),
   component: Settings,
 });
 
 function Settings() {
-  const [mode, setModeState] = useState<ThemeMode>("auto");
+  const [presetId, setPresetIdState] = useState<string>(DEFAULT_PRESET_ID);
+  const [modeSetting, setModeSettingState] = useState<ModeSetting>("page");
+  const [suggestOpen, setSuggestOpen] = useState(false);
   const [display, setDisplayState] = useState(getDisplay());
   const [confirmReset, setConfirmReset] = useState(false);
   const [confirmResetAll, setConfirmResetAll] = useState(false);
-  const [notifEnabled, setNotifEnabled] = useState(false);
-  const [notifPrefs, setNotifPrefsState] = useState<NotificationPrefs>(() => getNotificationPrefs());
-  const [commitment, setCommitmentState] = useState<Record<CommitmentSection, boolean>>(() => getCommitment());
-  const [hasCustom, setHasCustom] = useState(false);
-  const [laPrefs, setLaPrefsState] = useState<LiveActivityPrefs>(() => getLiveActivityPrefs());
-  const [adhanPrefs, setAdhanPrefsState] = useState<AdhanPrefs>(() => getAdhanPrefs());
-  const [adhanPlaying, setAdhanPlaying] = useState(false);
-  const nativeAvailable = isNativePlatform();
-  const showLiveActivities = isNativeApp();
+  const [resetNote, setResetNote] = useState<string | null>(null);
 
   useEffect(() => {
-    setModeState(getMode());
+    if (!resetNote) return;
+    const t = setTimeout(() => setResetNote(null), 2500);
+    return () => clearTimeout(t);
+  }, [resetNote]);
+  const [notifEnabled, setNotifEnabled] = useState(false);
+  const [notifChecking, setNotifChecking] = useState(true);
+  const [notifRequesting, setNotifRequesting] = useState(false);
+  const [notifError, setNotifError] = useState<string | null>(null);
+  const [jumuahNotif, setJumuahNotif] = useState(() => getJumuahNotificationEnabled());
+
+  const toggleJumuahNotif = (v: boolean) => {
+    setJumuahNotif(v);
+    setJumuahNotificationEnabled(v);
+    void (v ? scheduleJumuahNotification() : cancelJumuahNotification());
+  };
+
+  const [sunnahNotif, setSunnahNotif] = useState(() => getSunnahNotificationEnabled());
+  const [periodNotif, setPeriodNotif] = useState(() => getPeriodNotificationsEnabled());
+  const toggleSunnahNotif = (v: boolean) => {
+    setSunnahNotif(v);
+    setSunnahNotificationEnabled(v);
+  };
+  const togglePeriodNotif = (v: boolean) => {
+    setPeriodNotif(v);
+    setPeriodNotificationsEnabled(v);
+  };
+  const [streakNotif, setStreakNotif] = useState(() => getStreakNotificationsEnabled());
+  const toggleStreakNotif = (v: boolean) => {
+    setStreakNotif(v);
+    setStreakNotificationsEnabled(v);
+  };
+
+  const [notifPrefs, setNotifPrefsState] = useState<NotificationPrefs>(() => getNotificationPrefs());
+
+  const [nativeAvailable, setNativeAvailable] = useState(false);
+  const [prayerSettings, setPrayerSettingsState] = useState<PrayerSettings>(() =>
+    getPrayerSettings(),
+  );
+  const [cityInput, setCityInput] = useState("");
+  const [cityOpen, setCityOpen] = useState(false);
+  const [cityBusy, setCityBusy] = useState(false);
+  const [cityError, setCityError] = useState<string | null>(null);
+
+  const [locationSaved, setLocationSaved] = useState<string | null>(null);
+  const updatePrayerSettings = (patch: Partial<PrayerSettings>) => {
+    const next = { ...getPrayerSettings(), ...patch };
+    setPrayerSettingsState(next);
+    setPrayerSettings(next);
+    void rescheduleAdhanNotifications(next);
+  };
+
+  useEffect(() => {
+    setPresetIdState(getPresetId());
+    setModeSettingState(getModeSetting());
     setDisplayState(getDisplay());
+    setPrayerSettingsState(getPrayerSettings());
     setNotifPrefsState(getNotificationPrefs());
-    setCommitmentState(getCommitment());
-    setHasCustom(getCustomAdhkarRows().length > 0);
-    setLaPrefsState(getLiveActivityPrefs());
-    setAdhanPrefsState(getAdhanPrefs());
+
+    const savedPrayerSettings = getPrayerSettings();
+    if (!savedPrayerSettings.location) {
+      setCityOpen(true);
+      setCityBusy(true);
+      void resolveLocation(true).then((location) => {
+        setCityBusy(false);
+        if (!location) {
+          setCityError("Location permission is off. Enable it in your phone settings, or type a city instead.");
+          return;
+        }
+        updatePrayerSettings({ location });
+        setCityOpen(false);
+        setLocationSaved(`Location saved: ${location.label}`);
+      });
+    }
+
+    setNativeAvailable(isNativePlatform());
     let cancelled = false;
-    checkNotificationPermission().then((v) => {
-      if (!cancelled) setNotifEnabled(v);
-    });
-    // Check if adhan is currently playing
-    isAdhanPlaying().then((v) => {
-      if (!cancelled) setAdhanPlaying(v);
-    });
+    const refresh = () => {
+      checkNotificationPermission().then((v) => {
+        if (!cancelled) {
+          setNotifEnabled(v);
+          setNotifChecking(false);
+          // Re-arm reminders on the device (they can be lost after reinstall or reboot).
+          if (v) void applyReminders(getNotificationPrefs());
+        }
+      });
+    };
+    refresh();
+    // Safety net: never leave the UI stuck on "Checking...".
+    const t = setTimeout(() => {
+      if (!cancelled) setNotifChecking(false);
+    }, 5000);
+    const onVisible = () => {
+      if (document.visibilityState === "visible") refresh();
+    };
+    document.addEventListener("visibilitychange", onVisible);
     return () => {
       cancelled = true;
+      clearTimeout(t);
+      document.removeEventListener("visibilitychange", onVisible);
     };
   }, []);
 
-  // Listen for external Live Activity pref changes
-  useEffect(() => {
-    const handler = () => setLaPrefsState(getLiveActivityPrefs());
-    window.addEventListener("adhkar:la-prefs-update", handler);
-    return () => window.removeEventListener("adhkar:la-prefs-update", handler);
-  }, []);
-
-  // Listen for adhan playing events (from native tap handler)
-  useEffect(() => {
-    const cleanup = onAdhanPlaying(() => {
-      setAdhanPlaying(true);
-    });
-    return cleanup;
-  }, []);
 
   const handleEnableNotifications = async () => {
-    const granted = await requestNotificationPermission();
-    setNotifEnabled(granted);
-    if (granted) {
-      await applyReminders(notifPrefs);
+    setNotifRequesting(true);
+    setNotifError(null);
+    try {
+      const result = await requestNotificationPermission();
+      if (result.granted) {
+        setNotifEnabled(true);
+        await applyReminders(notifPrefs);
+        if (getJumuahNotificationEnabled()) await scheduleJumuahNotification();
+      } else {
+        setNotifEnabled(false);
+        if (result.reason === "denied") {
+          setNotifError("Notification permission denied. Please enable in device settings.");
+        } else if (result.reason === "unavailable") {
+          setNotifError("Notifications are not available on this device.");
+        } else {
+          setNotifError(
+            `Could not request notification permission. ${result.error ?? "Please check your device settings."}`,
+          );
+        }
+      }
+    } catch (error) {
+      console.error("Notification permission error:", error);
+      setNotifError("Could not request notification permission. Please check your device settings.");
+    } finally {
+      setNotifRequesting(false);
     }
   };
 
-  const updateReminder = async (
-    id: ReminderId,
-    patch: Partial<NotificationPrefs["morning"]>,
-  ) => {
-    const next: NotificationPrefs = {
-      ...notifPrefs,
-      [id]: { ...notifPrefs[id], ...patch },
-    };
+  const persistPrefs = (next: NotificationPrefs) => {
     setNotifPrefsState(next);
     setNotificationPrefs(next);
-    const r = next[id];
+  };
+
+  const updateReminder = async (id: number, patch: Partial<Reminder>) => {
+    const next: NotificationPrefs = {
+      ...notifPrefs,
+      reminders: notifPrefs.reminders.map((r) => (r.id === id ? { ...r, ...patch } : r)),
+    };
+    persistPrefs(next);
+    const r = next.reminders.find((x) => x.id === id);
+    if (!r) return;
     if (r.enabled && notifEnabled) {
-      await scheduleReminder(id, r.hour, r.minute);
+      const res = await scheduleReminder(r);
+      if (!res.ok) setNotifError(`Could not schedule "${r.label}". ${res.error}`);
     } else {
-      await cancelReminder(id);
+      await cancelReminder(r.id);
     }
+  };
+
+  const addReminder = () => {
+    const now = new Date();
+    const newReminder: Reminder = {
+      id: notifPrefs.nextId,
+      label: "New reminder",
+      hour: now.getHours(),
+      minute: 0,
+      enabled: true,
+    };
+    const next: NotificationPrefs = {
+      reminders: [...notifPrefs.reminders, newReminder],
+      nextId: notifPrefs.nextId + 1,
+    };
+    persistPrefs(next);
+    if (notifEnabled) {
+      void scheduleReminder(newReminder);
+    }
+  };
+
+
+  const removeReminder = async (id: number) => {
+    await cancelReminder(id);
+    const next: NotificationPrefs = {
+      ...notifPrefs,
+      reminders: notifPrefs.reminders.filter((r) => r.id !== id),
+    };
+    persistPrefs(next);
   };
 
   const parseTime = (v: string): { hour: number; minute: number } => {
@@ -144,11 +297,21 @@ function Settings() {
   const formatTime = (hour: number, minute: number) =>
     `${String(hour).padStart(2, "0")}:${String(minute).padStart(2, "0")}`;
 
-  const choose = (m: ThemeMode) => {
-    setModeState(m);
-    setMode(m);
-    applyTheme(resolveTheme(m, "/app/settings"));
+  const choosePreset = (p: { id: string; seed: string }) => {
+    setPresetIdState(p.id);
+    setPresetId(p.id);
+    setSeed(p.seed);
+    setCustomTriplet({});
+    window.dispatchEvent(new Event("adhkar:theme-change"));
   };
+
+  const chooseMode = (mode: ModeSetting) => {
+    setModeSettingState(mode);
+    setModeSetting(mode);
+    window.dispatchEvent(new Event("adhkar:visual-phase-change"));
+  };
+
+
 
   const updateDisplay = (patch: Partial<typeof display>) => {
     const d = { ...display, ...patch };
@@ -157,474 +320,683 @@ function Settings() {
     window.dispatchEvent(new Event("adhkar:display-update"));
   };
 
-  const handleLaToggle = (key: keyof LiveActivityPrefs, enabled: boolean) => {
-    onLiveActivityToggle(key, enabled);
-    setLaPrefsState(getLiveActivityPrefs());
-  };
-
-  // Adhan pref handlers
-  const handlePrayerToggle = async (prayer: string, enabled: boolean) => {
-    const next: AdhanPrefs = {
-      ...adhanPrefs,
-      enabledPrayers: { ...adhanPrefs.enabledPrayers, [prayer]: enabled },
-    };
-    setAdhanPrefsState(next);
-    await setAdhanPrefs(next);
-    await scheduleAdhanNotifications();
-  };
-
-  const handleSoundModeChange = async (soundMode: "adhan" | "silent" | "default") => {
-    const next: AdhanPrefs = { ...adhanPrefs, soundMode };
-    setAdhanPrefsState(next);
-    await setAdhanPrefs(next);
-    await scheduleAdhanNotifications();
-  };
-
-  const handleReciterChange = async (reciterId: string) => {
-    const next: AdhanPrefs = { ...adhanPrefs, reciterId };
-    setAdhanPrefsState(next);
-    await setAdhanPrefs(next);
-    await scheduleAdhanNotifications();
-  };
-
-  const handleStopAdhan = async () => {
-    await stopAdhan();
-    setAdhanPlaying(false);
-  };
-
-  const themePreview = (variant: "morning" | "evening") => {
-    const isMorning = variant === "morning";
-    const bg = isMorning ? "#faf6ec" : "#eef2f8";
-    const card = isMorning ? "#fffcf4" : "#f5f8fc";
-    const border = isMorning ? "rgba(184,146,58,0.25)" : "rgba(74,107,154,0.25)";
-    const text = isMorning ? "#2d1f00" : "#1f3a5c";
-    const accent = isMorning ? "#c9a84c" : "#4a6b9a";
-    const translit = isMorning ? "#b8923a" : "#4a6b9a";
-    return (
-      <div
-        className="flex h-24 items-center justify-center rounded-2xl p-3"
-        style={{ background: bg }}
-      >
-        <div
-          className="flex w-full max-w-[180px] flex-col items-center gap-1 rounded-xl px-3 py-2"
-          style={{ background: card, border: `1px solid ${border}`, color: text }}
-        >
-          <div className="text-[14px] font-bold" style={{ fontFamily: "Scheherazade New, serif" }}>
-            ٱ
-          </div>
-          <div className="text-[9px] italic" style={{ color: translit }}>
-            bismillah
-          </div>
-          <div className="h-1 w-6 rounded-full" style={{ background: accent }} />
-        </div>
-      </div>
-    );
-  };
-
   return (
     <>
       <header
         className="page-header relative overflow-hidden"
         style={{ background: "var(--background)", color: "var(--foreground)" }}
       >
-        <ConcentricCirclesPattern />
         <HeaderBackButton />
         <div
-          className="relative mx-auto max-w-md px-4 pb-5 pt-4"
+          className="relative mx-auto max-w-md px-16 pb-6 pt-9 text-center"
           style={{ paddingLeft: 60, paddingRight: 60 }}
         >
           <div className="label-caps">Preferences</div>
-          <h1 className="mt-1 text-3xl font-bold">Settings</h1>
+          <h1 className="app-page-title mt-2">Settings</h1>
         </div>
       </header>
 
-      <main className="scroll-area">
-        <div className="mx-auto max-w-md px-4 py-4">
+      <main className="scroll-area settings-scroll-area">
+        <div className="mx-auto max-w-md px-5 py-3">
           {/* APPEARANCE */}
           <section className="mb-6">
-            <h2 className="label-caps mb-3">Appearance</h2>
-            <div className="space-y-3">
-              {themes.map((t) => {
-                const active = mode === t.id;
-                return (
-                  <button
-                    key={t.id}
-                    onClick={() => choose(t.id)}
-                    className="w-full overflow-hidden rounded-[24px] p-3 text-left transition"
-                    style={{
-                      background: "var(--surface)",
-                      border: active ? "2px solid #c9a84c" : "1px solid var(--border)",
-                    }}
-                  >
-                    {t.id === "auto" ? (
-                      <div className="mb-2 grid grid-cols-2 gap-2">
-                        {themePreview("morning")}
-                        {themePreview("evening")}
-                      </div>
-                    ) : (
-                      <div className="mb-2">{themePreview("morning")}</div>
-                    )}
-                    <div className="px-1">
-                      <div className="text-sm font-semibold">{t.name}</div>
-                      <div className="text-xs opacity-70">{t.description}</div>
+            <h2 className="label-caps mb-3 text-center">Appearance</h2>
+
+            {/* Preview */}
+            <div className="mb-4 flex justify-center">
+              <div className="flex items-end gap-3">
+                {(["morning", "evening"] as const).map((k) => (
+                  <div key={k} className="flex flex-col items-center gap-1.5">
+                    <div
+                      style={{
+                        width: 116,
+                        height: 236,
+                        borderRadius: 22,
+                        padding: 4,
+                        background: "linear-gradient(180deg,#2a2a2c 0%,#141416 100%)",
+                        boxShadow: "0 14px 30px -18px rgba(0,0,0,0.5)",
+                      }}
+                    >
+                      <div
+                        style={{
+                          width: "100%",
+                          height: "100%",
+                          borderRadius: 18,
+                          backgroundImage: `url(${backgroundsForPreset(presetId)[k]})`,
+                          backgroundSize: "cover",
+                          backgroundPosition: "center top",
+                        }}
+                      />
                     </div>
-                  </button>
-                );
-              })}
+                    <span className="text-[10px] font-semibold opacity-70">
+                      {k === "morning" ? "Morning" : "Evening"}
+                    </span>
+                  </div>
+                ))}
+              </div>
             </div>
-            <div className="mt-3 space-y-3">
+
+            <div className="settings-group mb-3 p-4">
+              <div className="settings-row-title">Display style</div>
+              <div className="settings-row-desc mb-3">
+                Choose which artwork and colors the whole app uses.
+              </div>
+              <div className="settings-phase-options" role="radiogroup" aria-label="Display style">
+                {themes.map((theme) => {
+                  const active = modeSetting === theme.id;
+                  return (
+                    <button
+                      key={theme.id}
+                      type="button"
+                      role="radio"
+                      aria-checked={active}
+                      className="settings-phase-option"
+                      data-active={active ? "true" : "false"}
+                      onClick={() => chooseMode(theme.id)}
+                    >
+                      {theme.id === "morning" ? <Sun size={17} /> : theme.id === "evening" ? <Moon size={17} /> : <Sprout size={17} />}
+                      <span>{theme.name}</span>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            <div className="settings-group mb-3 p-4">
+              <div className="settings-row-title">Theme</div>
+              <div className="settings-row-desc mb-3">
+                Choose a theme that matches your preference.
+              </div>
+              <div className="settings-theme-grid grid grid-cols-4 gap-2">
+                {PRESETS.map((p) => {
+                  const active = presetId === p.id;
+                  const morningSeed = sectionSeedFor(p.id, p.seed, "morning");
+                  const eveningSeed = sectionSeedFor(p.id, p.seed, "evening");
+                  const art = PRESET_BACKGROUNDS[p.id];
+                  return (
+                    <button
+                      key={p.id}
+                      onClick={() => choosePreset(p)}
+                      className="settings-theme-option flex flex-col items-center gap-1 rounded-2xl p-2 transition"
+                      style={{
+                        background: "var(--surface)",
+                        border: "1px solid var(--border)",
+                      }}
+                      aria-label={p.name}
+                    >
+                      <div
+                        style={{
+                          position: "relative",
+                          width: "100%",
+                          height: 40,
+                          borderRadius: 10,
+                          overflow: "hidden",
+                          display: "flex",
+                          background: `linear-gradient(135deg, ${morningSeed} 0%, ${eveningSeed} 100%)`,
+                        }}
+                      >
+                        {art && (
+                          <>
+                            <div
+                              style={{
+                                flex: 1,
+                                backgroundImage: `url(${art.morning})`,
+                                backgroundSize: "cover",
+                                backgroundPosition: "center top",
+                              }}
+                            />
+                            <div
+                              style={{
+                                flex: 1,
+                                backgroundImage: `url(${art.evening})`,
+                                backgroundSize: "cover",
+                                backgroundPosition: "center top",
+                              }}
+                            />
+                          </>
+                        )}
+                        {active && (
+                          <div
+                            className="settings-theme-check"
+                            style={{
+                              position: "absolute",
+                              top: 3,
+                              right: 3,
+                              width: 16,
+                              height: 16,
+                              borderRadius: "50%",
+                              background: "var(--accent)",
+                              display: "flex",
+                              alignItems: "center",
+                              justifyContent: "center",
+                              boxShadow: "0 1px 3px rgba(0,0,0,0.3)",
+                            }}
+                          >
+                            <Check
+                              size={11}
+                              strokeWidth={3.5}
+                              style={{ color: "var(--accent-foreground)" }}
+                            />
+                          </div>
+                        )}
+                      </div>
+                      <span className="text-[10px] font-semibold">{p.name}</span>
+                    </button>
+                  );
+                })}
+              </div>
+              <button
+                onClick={() => setSuggestOpen(true)}
+                className="settings-suggest-row"
+              >
+                <span className="settings-suggest-plus">+</span>
+                <span>Suggest a theme</span>
+              </button>
+            </div>
+
+            <div className="settings-group">
               <Toggle
+                icon={<Type size={17} strokeWidth={1.8} />}
                 label="Show transliteration"
+                description="Show Arabic transliteration below dhikrs."
                 value={display.showTransliteration}
                 onChange={(v) => updateDisplay({ showTransliteration: v })}
               />
               <Toggle
+                icon={<ALargeSmall size={17} strokeWidth={1.8} />}
                 label="Large Arabic text"
+                description="Increase Arabic text size."
                 value={display.arabicLarge}
                 onChange={(v) => updateDisplay({ arabicLarge: v })}
               />
             </div>
           </section>
 
-          {/* MY DAILY COMMITMENT */}
+          <SuggestColorSheet open={suggestOpen} onClose={() => setSuggestOpen(false)} />
+
+          {/* PRAYER TIMES */}
           <section className="mb-6">
-            <h2 className="label-caps mb-1">My Daily Commitment</h2>
-            <p className="mb-3 text-xs opacity-70">
-              Choose what counts as a complete day. Only what you select is tracked.
-            </p>
-            <div className="space-y-2">
-              {(
-                [
-                  { id: "morning", label: "Morning Adhkar" },
-                  { id: "evening", label: "Evening Adhkar" },
-                  { id: "salah", label: "After Salah" },
-                  { id: "sleep", label: "Sleep Adhkar" },
-                  { id: "wake", label: "Wake Adhkar" },
-                  ...(hasCustom ? [{ id: "custom" as CommitmentSection, label: "My Adhkar" }] : []),
-                ] as { id: CommitmentSection; label: string }[]
-              ).map(({ id, label }) => (
-                <Toggle
-                  key={id}
-                  label={label}
-                  value={commitment[id]}
-                  onChange={(v) => {
-                    const next = { ...commitment, [id]: v };
-                    setCommitmentState(next);
-                    setCommitment(next);
-                  }}
-                />
-              ))}
+            <h2 className="label-caps mb-3">Prayer Times</h2>
+            <div className="settings-group">
+              <div className="settings-row">
+                <span className="settings-icon">
+                  <BookOpen size={17} strokeWidth={1.8} />
+                </span>
+                <div className="min-w-0 flex-1">
+                  <div className="settings-row-title">Calculation method</div>
+                  <div className="settings-row-desc">
+                    Select the method used for prayer times.
+                  </div>
+                  <select
+                    value={prayerSettings.method}
+                    onChange={(e) => updatePrayerSettings({ method: parseInt(e.target.value, 10) })}
+                    className="settings-select"
+                  >
+                    {CALC_METHODS.map((m) => (
+                      <option key={m.id} value={m.id}>
+                        {m.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+
+              <Toggle
+                icon={<Scale size={17} strokeWidth={1.8} />}
+                label="Hanafi Asr"
+                description="Calculate Asr time at double shadow length."
+                value={prayerSettings.hanafi}
+                onChange={(v) => updatePrayerSettings({ hanafi: v })}
+              />
+
+              <div className="settings-row">
+                <span className="settings-icon">
+                  <MapPin size={17} strokeWidth={1.8} />
+                </span>
+                <div className="min-w-0 flex-1">
+                  <div className="flex items-center justify-between gap-3">
+                    <div className="min-w-0">
+                      <div className="settings-row-title">Location</div>
+                      <div className="settings-row-desc truncate">
+                        {prayerSettings.location ? prayerSettings.location.label : "Not set"}
+                      </div>
+                    </div>
+                    <button
+                      onClick={() => setCityOpen((v) => !v)}
+                      className="shrink-0 rounded-full px-3.5 py-1.5 text-xs font-semibold"
+                      style={{ background: "var(--muted)", color: "var(--foreground)" }}
+                    >
+                      Change
+                    </button>
+                  </div>
+                  {locationSaved && !cityOpen && (
+                    <div
+                      className="mt-2 rounded-xl px-3 py-2 text-xs font-semibold"
+                      style={{
+                        background: "color-mix(in oklab, var(--accent) 14%, transparent)",
+                        color: "var(--foreground)",
+                      }}
+                    >
+                      {locationSaved}
+                    </div>
+                  )}
+                  {cityOpen && (
+                    <div className="mt-3 space-y-2">
+                      <div className="flex gap-2">
+                        <input
+                          value={cityInput}
+                          onChange={(e) => setCityInput(e.target.value)}
+                          placeholder="City, country"
+                          className="min-w-0 flex-1 rounded-full px-3 py-2 outline-none"
+                          style={{
+                            fontSize: 16,
+                            background: "var(--background)",
+                            color: "var(--foreground)",
+                            border: "1px solid var(--border)",
+                          }}
+                        />
+                        <button
+                          onClick={async () => {
+                            setCityBusy(true);
+                            setCityError(null);
+                            const loc = await lookupCity(cityInput);
+                            setCityBusy(false);
+                            if (!loc) {
+                              setCityError("We could not find that place. Try a city and country.");
+                              return;
+                            }
+                            updatePrayerSettings({ location: loc });
+                            setCityInput("");
+                            setCityOpen(false);
+                            setLocationSaved(`Location saved: ${loc.label}`);
+                          }}
+                          disabled={cityBusy}
+                          className="shrink-0 rounded-full px-4 text-sm font-bold"
+                          style={{ background: "var(--accent)", color: "var(--accent-foreground)" }}
+                        >
+                          {cityBusy ? "..." : "Set"}
+                        </button>
+                      </div>
+                      <button
+                        onClick={async () => {
+                          setCityBusy(true);
+                          setCityError(null);
+                          const loc = await resolveLocation(true);
+                          setCityBusy(false);
+                          if (!loc) {
+                            setCityError("We could not get your location. Type a city instead.");
+                            return;
+                          }
+                          updatePrayerSettings({ location: loc });
+                          setCityOpen(false);
+                          setLocationSaved(`Location saved: ${loc.label}`);
+                        }}
+                        className="w-full rounded-full py-2 text-xs font-semibold"
+                        style={{ background: "var(--muted)", color: "var(--foreground)" }}
+                      >
+                        Use my current location
+                      </button>
+                      {cityError && <div className="text-[11px] opacity-70">{cityError}</div>}
+                    </div>
+                  )}
+                </div>
+              </div>
             </div>
           </section>
-
-
 
           {/* REMINDERS */}
           <section className="mb-6">
             <h2 className="label-caps mb-3">Reminders</h2>
-            <div
-              className="rounded-[24px] p-4"
-              style={{ background: "var(--surface)", border: "1px solid var(--border)" }}
-            >
+            <div className="settings-group">
               {!nativeAvailable ? (
-                <>
-                  <div className="text-sm" style={{ fontWeight: 600 }}>
-                    Daily Adhkar Reminders
+                <div className="settings-row">
+                  <span className="settings-icon">
+                    <Bell size={17} strokeWidth={1.8} />
+                  </span>
+                  <div className="min-w-0 flex-1">
+                    <div className="settings-row-title">Daily Adhkar Reminders</div>
+                    <div className="settings-row-desc">
+                      Reminders are unavailable on the web. Install the mobile app to
+                      get local device notifications at your chosen times.
+                    </div>
                   </div>
-                  <div className="mt-1 text-xs opacity-70">
-                    Reminders are unavailable on the web. Install the mobile app to
-                    get local device notifications at your chosen times.
+                </div>
+              ) : notifChecking ? (
+                <div className="settings-row">
+                  <span className="settings-icon">
+                    <Bell size={17} strokeWidth={1.8} />
+                  </span>
+                  <div className="min-w-0 flex-1 py-1 text-xs opacity-60">
+                    Checking notification permission...
                   </div>
-                </>
+                </div>
               ) : !notifEnabled ? (
-                <>
-                  <div className="text-sm" style={{ fontWeight: 600 }}>
-                    Daily Adhkar Reminders
-                  </div>
-                  <div className="mt-1 text-xs opacity-70">
-                    Get a local notification on your device every morning and
-                    evening. No internet needed.
-                  </div>
-                  <button
-                    onClick={handleEnableNotifications}
-                    className="mt-3 w-full rounded-full py-2 text-sm font-semibold"
-                    style={{ background: "#c9a84c", color: "#ffffff" }}
-                  >
-                    Enable Reminders
-                  </button>
-                </>
-              ) : (
-                <div className="space-y-3">
-                  {(["morning", "evening", "nudge"] as ReminderId[]).map((id) => {
-                    const r = notifPrefs[id];
-                    const label =
-                      id === "morning"
-                        ? "Morning reminder"
-                        : id === "evening"
-                        ? "Evening reminder"
-                        : "Gentle nudge if the day is incomplete";
-                    return (
+                <div className="settings-row">
+                  <span className="settings-icon">
+                    <Bell size={17} strokeWidth={1.8} />
+                  </span>
+                  <div className="min-w-0 flex-1">
+                    <div className="settings-row-title">Daily Adhkar Reminders</div>
+                    <div className="settings-row-desc">
+                      Get local notifications on your device at times you choose. No internet needed.
+                    </div>
+                    <button
+                      onClick={handleEnableNotifications}
+                      disabled={notifRequesting}
+                      className="mt-3 w-full rounded-full py-2 text-sm font-semibold disabled:opacity-70"
+                      style={{ background: "var(--accent)", color: "var(--accent-foreground)" }}
+                    >
+                      {notifRequesting ? "Requesting..." : "Enable Reminders"}
+                    </button>
+                    {notifError && (
                       <div
-                        key={id}
-                        className="flex items-center justify-between gap-3 rounded-2xl px-3 py-2.5"
+                        className="mt-2 rounded-lg px-3 py-2 text-xs"
                         style={{
-                          background: "var(--background)",
-                          border: "1px solid var(--border)",
+                          background: "rgba(220, 38, 38, 0.1)",
+                          color: "#b91c1c",
+                          border: "1px solid rgba(220, 38, 38, 0.3)",
                         }}
                       >
-                        <div className="flex min-w-0 flex-col">
-                          <span className="text-sm font-semibold">{label}</span>
-                          <input
-                            type="time"
-                            value={formatTime(r.hour, r.minute)}
-                            onChange={(e) => {
-                              const { hour, minute } = parseTime(e.target.value);
-                              void updateReminder(id, { hour, minute });
-                            }}
-                            disabled={!r.enabled}
-                            className="mt-1 rounded-md bg-transparent text-sm font-semibold outline-none"
-                            style={{
-                              color: "var(--foreground)",
-                              opacity: r.enabled ? 1 : 0.5,
-                            }}
-                          />
+                        {notifError}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              ) : (
+                <>
+                  <div className="settings-row">
+                    <span className="settings-icon">
+                      <Sun size={17} strokeWidth={1.8} />
+                    </span>
+                    <div className="min-w-0 flex-1">
+                      <div className="settings-row-title">Jumu'ah Reminder</div>
+                      <div className="settings-row-desc">
+                        A Friday morning notification so you can learn the sunnahs of Jumu'ah.
+                      </div>
+                    </div>
+                    <button
+                      onClick={() => toggleJumuahNotif(!jumuahNotif)}
+                      className="settings-switch"
+                      style={{
+                        background: jumuahNotif
+                          ? "var(--accent)"
+                          : "color-mix(in oklab, var(--foreground) 20%, transparent)",
+                      }}
+                      aria-label="Toggle Jumu'ah reminder"
+                    >
+                      <span className="settings-switch-knob" style={{ left: jumuahNotif ? 22 : 2 }} />
+                    </button>
+                  </div>
+                  <div className="settings-row">
+                    <span className="settings-icon">
+                      <Sparkles size={17} strokeWidth={1.8} />
+                    </span>
+                    <div className="min-w-0 flex-1">
+                      <div className="settings-row-title">Sunnah of the Day</div>
+                      <div className="settings-row-desc">A gentle morning notification with a new Sunnah to revive each day.</div>
+                    </div>
+                    <button
+                      onClick={() => toggleSunnahNotif(!sunnahNotif)}
+                      className="settings-switch"
+                      style={{
+                        background: sunnahNotif
+                          ? "var(--accent)"
+                          : "color-mix(in oklab, var(--foreground) 20%, transparent)",
+                      }}
+                      aria-label="Toggle Sunnah of the day reminder"
+                    >
+                      <span className="settings-switch-knob" style={{ left: sunnahNotif ? 22 : 2 }} />
+                    </button>
+                  </div>
+                  <div className="settings-row">
+                    <span className="settings-icon">
+                      <Heart size={17} strokeWidth={1.8} />
+                    </span>
+                    <div className="min-w-0 flex-1">
+                      <div className="settings-row-title">Period Companion</div>
+                      <div className="settings-row-desc">Private, gentle reminders around your cycle, only if you use the Period Companion.</div>
+                    </div>
+                    <button
+                      onClick={() => togglePeriodNotif(!periodNotif)}
+                      className="settings-switch"
+                      style={{
+                        background: periodNotif
+                          ? "var(--accent)"
+                          : "color-mix(in oklab, var(--foreground) 20%, transparent)",
+                      }}
+                      aria-label="Toggle Period Companion reminders"
+                    >
+                      <span className="settings-switch-knob" style={{ left: periodNotif ? 22 : 2 }} />
+                    </button>
+                  </div>
+                  <div className="settings-row">
+                    <span className="settings-icon">
+                      <Flame size={17} strokeWidth={1.8} />
+                    </span>
+                    <div className="min-w-0 flex-1">
+                      <div className="settings-row-title">Streak Reminders</div>
+                      <div className="settings-row-desc">An evening nudge if your streak is at risk, and a celebration when you hit a milestone.</div>
+                    </div>
+                    <button
+                      onClick={() => toggleStreakNotif(!streakNotif)}
+                      className="settings-switch"
+                      style={{
+                        background: streakNotif
+                          ? "var(--accent)"
+                          : "color-mix(in oklab, var(--foreground) 20%, transparent)",
+                      }}
+                      aria-label="Toggle streak reminders"
+                    >
+                      <span className="settings-switch-knob" style={{ left: streakNotif ? 22 : 2 }} />
+                    </button>
+                  </div>
+                  {notifPrefs.reminders.length === 0 && (
+                    <div className="settings-row">
+                      <div className="text-xs opacity-70">
+                        No reminders yet. Add one below to get a daily notification at your chosen time.
+                      </div>
+                    </div>
+                  )}
+                  {notifPrefs.reminders.map((r, i) => {
+                    const isSmart = r.id === 1 || r.id === 2;
+                    const followsPrayer = isSmart && !r.customTime && !!prayerSettings.location;
+                    const prayerLabel = r.id === 1 ? "5 mins after Fajr" : "5 mins after Asr";
+                    return (
+                      <div key={r.id} className="settings-row">
+                        <span className="settings-icon">
+                          {i % 2 === 0 ? (
+                            <Sun size={17} strokeWidth={1.8} />
+                          ) : (
+                            <Moon size={17} strokeWidth={1.8} />
+                          )}
+                        </span>
+                        <div className="flex min-w-0 flex-1 flex-col gap-1">
+                          <div className="flex min-w-0 items-center gap-2">
+                            {isSmart ? (
+                              <div
+                                className="min-w-0 flex-1 font-semibold"
+                                style={{ color: "var(--foreground)", opacity: r.enabled ? 1 : 0.6, fontSize: 16 }}
+                              >
+                                {r.label}
+                              </div>
+                            ) : (
+                              <input
+                                type="text"
+                                value={r.label}
+                                onChange={(e) => void updateReminder(r.id, { label: e.target.value })}
+                                placeholder="Reminder"
+                                className="min-w-0 flex-1 rounded-md bg-transparent font-semibold outline-none"
+                                style={{
+                                  color: "var(--foreground)",
+                                  opacity: r.enabled ? 1 : 0.6,
+                                  fontSize: 16,
+                                }}
+                              />
+                            )}
+                            {!followsPrayer && (
+                              <input
+                                type="time"
+                                value={formatTime(r.hour, r.minute)}
+                                onChange={(e) => {
+                                  const { hour, minute } = parseTime(e.target.value);
+                                  void updateReminder(r.id, { hour, minute });
+                                }}
+                                disabled={!r.enabled}
+                                className="shrink-0 rounded-md px-2 py-1 font-semibold outline-none"
+                                style={{
+                                  background: "var(--surface)",
+                                  border: "1px solid var(--border)",
+                                  color: "var(--foreground)",
+                                  opacity: r.enabled ? 1 : 0.5,
+                                  fontSize: 16,
+                                }}
+                              />
+                            )}
+                            <button
+                              onClick={() => void updateReminder(r.id, { enabled: !r.enabled })}
+                              className="settings-switch"
+                              style={{
+                                background: r.enabled
+                                  ? "var(--accent)"
+                                  : "color-mix(in oklab, var(--foreground) 20%, transparent)",
+                              }}
+                              aria-label={`Toggle ${r.label}`}
+                            >
+                              <span
+                                className="settings-switch-knob"
+                                style={{ left: r.enabled ? 22 : 2 }}
+                              />
+                            </button>
+                            {!isSmart && (
+                              <button
+                                onClick={() => void removeReminder(r.id)}
+                                className="shrink-0 rounded-full text-lg leading-none opacity-50 hover:opacity-100"
+                                style={{ color: "var(--foreground)", padding: "2px 6px" }}
+                                aria-label={`Remove ${r.label}`}
+                              >
+                                ×
+                              </button>
+                            )}
+                          </div>
+                          {isSmart && (
+                            <div className="flex items-center gap-2 text-xs" style={{ color: "var(--muted-foreground)" }}>
+                              <span>{followsPrayer ? prayerLabel : "Fixed time"}</span>
+                              {prayerSettings.location && (
+                                <button
+                                  onClick={() => void updateReminder(r.id, { customTime: !r.customTime })}
+                                  className="font-semibold"
+                                  style={{ color: "var(--accent)" }}
+                                >
+                                  {followsPrayer ? "Set custom time" : "Follow prayer times"}
+                                </button>
+                              )}
+                            </div>
+                          )}
                         </div>
-                        <button
-                          onClick={() => void updateReminder(id, { enabled: !r.enabled })}
-                          className="relative inline-block h-6 w-11 shrink-0 rounded-full transition"
-                          style={{
-                            background: r.enabled
-                              ? "var(--accent)"
-                              : "color-mix(in oklab, var(--foreground) 20%, transparent)",
-                          }}
-                          aria-label={`Toggle ${label}`}
-                        >
-                          <span
-                            className="absolute top-0.5 h-5 w-5 rounded-full bg-white transition-all"
-                            style={{ left: r.enabled ? 22 : 2 }}
-                          />
-                        </button>
                       </div>
                     );
                   })}
-                  <div className="text-[11px] opacity-60">
-                    Reminders fire on your device using your local time.
+                  <div className="settings-row">
+                    <button
+                      onClick={addReminder}
+                      className="w-full rounded-full py-2 text-sm font-semibold"
+                      style={{
+                        background: "var(--background)",
+                        border: "1px dashed var(--border)",
+                        color: "var(--foreground)",
+                      }}
+                    >
+                      + Add reminder
+                    </button>
                   </div>
-                </div>
+                  <div className="settings-row">
+                    <div className="text-[11px] opacity-60">
+                      Reminders fire on your device using your local time. Set as many as you like at any times that suit your schedule.
+                    </div>
+                  </div>
+                </>
               )}
             </div>
           </section>
 
-          {/* ADHAN NOTIFICATIONS — only visible on native iOS */}
-          {nativeAvailable && notifEnabled && (
-            <section className="mb-6">
-              <h2 className="label-caps mb-1">Adhan Notifications</h2>
-              <p className="mb-3 text-xs opacity-70">
-                Get notified at prayer time with the adhan of your choice.
-              </p>
-
-              {/* Per-prayer toggles */}
-              <div className="space-y-2">
-                {(["Fajr", "Dhuhr", "Asr", "Maghrib", "Isha"] as const).map((prayer) => (
-                  <Toggle
-                    key={prayer}
-                    label={prayer}
-                    value={adhanPrefs.enabledPrayers[prayer] ?? false}
-                    onChange={(v) => handlePrayerToggle(prayer, v)}
-                  />
-                ))}
-              </div>
-
-              {/* Sound mode selector */}
-              <div className="mt-4">
-                <div className="mb-2 text-xs font-semibold opacity-80">Notification Sound</div>
-                <div
-                  className="flex gap-2 rounded-2xl p-1"
-                  style={{ background: "var(--surface)", border: "1px solid var(--border)" }}
-                >
-                  {([
-                    { id: "adhan" as const, label: "Adhan" },
-                    { id: "silent" as const, label: "Silent" },
-                    { id: "default" as const, label: "Default" },
-                  ]).map(({ id, label }) => (
-                    <button
-                      key={id}
-                      onClick={() => handleSoundModeChange(id)}
-                      className="flex-1 rounded-xl py-2 text-center text-sm font-semibold transition"
-                      style={{
-                        background: adhanPrefs.soundMode === id ? "var(--accent)" : "transparent",
-                        color: adhanPrefs.soundMode === id ? "var(--accent-foreground)" : "var(--foreground)",
-                        opacity: adhanPrefs.soundMode === id ? 1 : 0.7,
-                      }}
-                    >
-                      {label}
-                    </button>
-                  ))}
-                </div>
-                <div className="mt-1 text-[11px] opacity-50">
-                  {adhanPrefs.soundMode === "adhan"
-                    ? "Plays a 30s adhan clip. Tap the notification to hear the full adhan."
-                    : adhanPrefs.soundMode === "silent"
-                    ? "No sound — notification banner only."
-                    : "Uses your device's default notification sound."}
-                </div>
-              </div>
-
-              {/* Reciter picker — only shown when adhan mode is selected */}
-              {adhanPrefs.soundMode === "adhan" && (
-                <div className="mt-4">
-                  <div className="mb-2 text-xs font-semibold opacity-80">Reciter</div>
-                  <div className="space-y-2">
-                    {RECITERS.map((reciter) => {
-                      const selected = adhanPrefs.reciterId === reciter.id;
-                      return (
-                        <button
-                          key={reciter.id}
-                          onClick={() => handleReciterChange(reciter.id)}
-                          className="flex w-full items-center gap-3 rounded-2xl px-4 py-3 text-left transition"
-                          style={{
-                            background: "var(--surface)",
-                            border: selected
-                              ? "2px solid var(--accent)"
-                              : "1px solid var(--border)",
-                          }}
-                        >
-                          <div
-                            className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full"
-                            style={{
-                              border: selected
-                                ? "none"
-                                : "2px solid color-mix(in oklab, var(--foreground) 30%, transparent)",
-                              background: selected ? "var(--accent)" : "transparent",
-                            }}
-                          >
-                            {selected && (
-                              <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
-                                <path
-                                  d="M2.5 6L5 8.5L9.5 4"
-                                  stroke="var(--accent-foreground)"
-                                  strokeWidth="1.5"
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
-                                />
-                              </svg>
-                            )}
-                          </div>
-                          <div className="flex min-w-0 flex-col">
-                            <span className="text-sm font-semibold">{reciter.name}</span>
-                            <span className="text-xs opacity-60">{reciter.origin}</span>
-                          </div>
-                        </button>
-                      );
-                    })}
-                  </div>
-                </div>
-              )}
-
-              {/* Stop adhan button — shown when adhan is playing */}
-              {adhanPlaying && (
-                <button
-                  onClick={handleStopAdhan}
-                  className="mt-4 flex w-full items-center justify-center gap-2 rounded-full py-3 text-sm font-semibold"
-                  style={{
-                    background: "rgba(220, 38, 38, 0.1)",
-                    color: "#dc2626",
-                    border: "1px solid rgba(220, 38, 38, 0.3)",
-                  }}
-                >
-                  <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
-                    <rect x="3" y="3" width="10" height="10" rx="2" />
-                  </svg>
-                  Stop Adhan
-                </button>
-              )}
-            </section>
-          )}
-
-          {/* LIVE ACTIVITIES — only visible on native iOS */}
-          {showLiveActivities && (
-            <section className="mb-6">
-              <h2 className="label-caps mb-1">Live Activities</h2>
-              <p className="mb-3 text-xs opacity-70">
-                Show live updates on your Lock Screen and Dynamic Island.
-              </p>
-              <div className="space-y-2">
-                <Toggle
-                  label="Prayer Countdown"
-                  description="Show a countdown to the next prayer on your Lock Screen."
-                  value={laPrefs.prayerCountdown}
-                  onChange={(v) => handleLaToggle("prayerCountdown", v)}
-                />
-                <Toggle
-                  label="Tasbih Counter"
-                  description="Show your tasbih count while counting."
-                  value={laPrefs.tasbihSession}
-                  onChange={(v) => handleLaToggle("tasbihSession", v)}
-                />
-                <Toggle
-                  label="Fasting Timer"
-                  description="Show a countdown to Iftar or Suhoor."
-                  value={laPrefs.fastingTimer}
-                  onChange={(v) => handleLaToggle("fastingTimer", v)}
-                />
-              </div>
-            </section>
-          )}
-
           {/* FEEDBACK */}
-          <section className="mb-6 space-y-3">
-            <h2 className="label-caps mb-1">Feedback</h2>
-            <Toggle
-              label="Vibration on tap"
-              description="Vibrate when tapping counters and the tasbih."
-              value={display.haptics}
-              onChange={(v) => updateDisplay({ haptics: v })}
-            />
+          <section className="mb-6">
+            <h2 className="label-caps mb-3">Feedback</h2>
+            <div className="settings-group">
+              <Toggle
+                icon={<Vibrate size={17} strokeWidth={1.8} />}
+                label="Vibration on tap"
+                description="Vibrate when tapping counters and the tasbih."
+                value={display.haptics}
+                onChange={(v) => updateDisplay({ haptics: v })}
+              />
+            </div>
           </section>
 
           {/* DATA */}
-          <section className="mb-6 space-y-3">
-            <h2 className="label-caps mb-1">Data</h2>
-            {confirmReset ? (
+          <section className="mb-6">
+            <h2 className="label-caps mb-3">Data</h2>
+            {resetNote && (
               <div
-                className="rounded-2xl p-4"
-                style={{ background: "var(--surface)", border: "1px solid var(--border)" }}
+                className="mb-3 rounded-2xl px-4 py-3 text-sm font-medium"
+                style={{
+                  background: "color-mix(in oklab, var(--accent) 16%, var(--surface))",
+                  border: "1px solid var(--border)",
+                  color: "var(--foreground)",
+                }}
               >
-                <p className="mb-3 text-sm">Reset all counts for today?</p>
-                <div className="flex gap-2">
-                  <button
-                    onClick={() => {
-                      resetToday();
-                      setConfirmReset(false);
-                      window.location.reload();
-                    }}
-                    className="flex-1 rounded-full py-2 text-sm font-semibold"
-                    style={{ background: "var(--accent)", color: "var(--accent-foreground)" }}
-                  >
-                    Yes, reset
-                  </button>
-                  <button
-                    onClick={() => setConfirmReset(false)}
-                    className="flex-1 rounded-full py-2 text-sm font-semibold"
-                    style={{ background: "var(--muted)", color: "var(--foreground)" }}
-                  >
-                    Cancel
-                  </button>
-                </div>
+                {resetNote}
               </div>
-            ) : (
-              <button
-                onClick={() => setConfirmReset(true)}
-                className="w-full rounded-full py-3 text-sm font-semibold"
-                style={{ background: "var(--surface)", border: "1px solid var(--border)" }}
-              >
-                Reset today's progress
-              </button>
             )}
+            <div className="settings-group mb-3">
+              {confirmReset ? (
+                <div className="settings-row">
+                  <div className="min-w-0 flex-1">
+                    <p className="mb-3 text-sm">Reset all counts for today?</p>
+                    <div className="flex gap-2">
+                      <button
+                        onClick={() => {
+                          resetToday();
+                          setConfirmReset(false);
+                          window.dispatchEvent(new Event("adhkar:streak-update"));
+                          setResetNote("Today's progress has been reset.");
+                        }}
+                        className="flex-1 rounded-full py-2 text-sm font-semibold"
+                        style={{ background: "var(--accent)", color: "var(--accent-foreground)" }}
+                      >
+                        Yes, reset
+                      </button>
+                      <button
+                        onClick={() => setConfirmReset(false)}
+                        className="flex-1 rounded-full py-2 text-sm font-semibold"
+                        style={{ background: "var(--muted)", color: "var(--foreground)" }}
+                      >
+                        Cancel
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                <button
+                  onClick={() => setConfirmReset(true)}
+                  className="settings-row w-full text-left"
+                >
+                  <span className="settings-icon">
+                    <Database size={17} strokeWidth={1.8} />
+                  </span>
+                  <div className="min-w-0 flex-1">
+                    <div className="settings-row-title">Reset today's progress</div>
+                    <div className="settings-row-desc">
+                      Clear today's dhikr, tasbih and checklist progress.
+                    </div>
+                  </div>
+                </button>
+              )}
+            </div>
 
             {confirmResetAll ? (
               <div
-                className="rounded-2xl p-4"
+                className="rounded-[24px] p-4"
                 style={{
                   background: "rgba(220, 38, 38, 0.08)",
                   border: "1px solid rgba(220, 38, 38, 0.3)",
@@ -642,7 +1014,7 @@ function Settings() {
                     onClick={() => {
                       resetAllProgress();
                       setConfirmResetAll(false);
-                      window.location.reload();
+                      setResetNote("All progress has been reset.");
                     }}
                     className="flex-1 rounded-full py-2 text-sm font-semibold text-white"
                     style={{ background: "#dc2626" }}
@@ -659,55 +1031,138 @@ function Settings() {
                 </div>
               </div>
             ) : (
-              <button
-                onClick={() => setConfirmResetAll(true)}
-                className="w-full rounded-full py-3 text-sm font-semibold text-white"
-                style={{ background: "#dc2626" }}
-              >
-                Reset all progress
-              </button>
+              <div className="settings-group settings-danger">
+                <button
+                  onClick={() => setConfirmResetAll(true)}
+                  className="settings-row w-full text-left"
+                >
+                  <span className="settings-icon settings-icon-danger">
+                    <Trash2 size={17} strokeWidth={1.8} />
+                  </span>
+                  <div className="min-w-0 flex-1">
+                    <div className="settings-row-title" style={{ color: "#b91c1c" }}>
+                      Reset all progress
+                    </div>
+                    <div className="settings-row-desc" style={{ color: "#b91c1c", opacity: 0.8 }}>
+                      This will clear all your data, including history.
+                    </div>
+                  </div>
+                </button>
+              </div>
             )}
           </section>
 
           {/* ABOUT */}
-          <section className="mb-6 space-y-3">
-            <h2 className="label-caps mb-1">About</h2>
-            <div
-              className="flex items-center justify-between rounded-2xl px-4 py-3 text-sm"
-              style={{ background: "var(--surface)", border: "1px solid var(--border)" }}
-            >
-              <span className="font-semibold">Version</span>
-              <span className="opacity-70">{APP_VERSION}</span>
+          <section className="mb-6">
+            <h2 className="label-caps mb-3">About</h2>
+            <div className="settings-group">
+              <button
+                type="button"
+                onClick={() => void requestAppReview()}
+                className="settings-row w-full text-left"
+              >
+                <span className="settings-icon">
+                  <Star size={17} strokeWidth={1.8} />
+                </span>
+                <div className="min-w-0 flex-1">
+                  <div className="settings-row-title">Rate This App</div>
+                  <div className="settings-row-desc">
+                    If you find this app beneficial, please consider leaving a review.
+                  </div>
+                </div>
+                <span className="settings-chevron">›</span>
+              </button>
+              <div className="settings-row">
+                <span className="settings-icon">
+                  <Info size={17} strokeWidth={1.8} />
+                </span>
+                <div className="min-w-0 flex-1">
+                  <div className="settings-row-title">Version</div>
+                </div>
+                <span className="text-sm opacity-70">{APP_VERSION}</span>
+              </div>
+              <Link to="/app/privacy" className="settings-row">
+                <span className="settings-icon">
+                  <FileText size={17} strokeWidth={1.8} />
+                </span>
+                <div className="min-w-0 flex-1">
+                  <div className="settings-row-title">Privacy Policy</div>
+                </div>
+                <span className="settings-chevron">›</span>
+              </Link>
+              <Link to="/app/terms" className="settings-row">
+                <span className="settings-icon">
+                  <FileText size={17} strokeWidth={1.8} />
+                </span>
+                <div className="min-w-0 flex-1">
+                  <div className="settings-row-title">Terms of Service</div>
+                </div>
+                <span className="settings-chevron">›</span>
+              </Link>
             </div>
-            <Link
-              to="/privacy"
-              className="flex w-full items-center justify-between rounded-2xl px-4 py-3 text-sm font-semibold"
-              style={{ background: "var(--surface)", border: "1px solid var(--border)" }}
-            >
-              <span>Privacy Policy</span>
-              <span className="opacity-40">›</span>
-            </Link>
-            <Link
-              to="/terms"
-              className="flex w-full items-center justify-between rounded-2xl px-4 py-3 text-sm font-semibold"
-              style={{ background: "var(--surface)", border: "1px solid var(--border)" }}
-            >
-              <span>Terms of Service</span>
-              <span className="opacity-40">›</span>
-            </Link>
           </section>
+
+          {/* SUPPORT */}
+          <section className="mb-6">
+            <h2 className="label-caps mb-3">Support</h2>
+            <div className="settings-group">
+              <div className="settings-row">
+                <span className="settings-icon">
+                  <Mail size={17} strokeWidth={1.8} />
+                </span>
+                <div className="min-w-0 flex-1">
+                  <div className="settings-row-title">Contact &amp; Feedback</div>
+                  <div className="settings-row-desc">
+                    Found a mistake in an adhkar? Have an idea for a feature? I'd love to hear from you.
+                  </div>
+                  <a
+                    href={`mailto:${CONTACT_EMAIL}`}
+                    className="settings-contact-button"
+                  >
+                    <Mail size={14} strokeWidth={2} />
+                    <span>{CONTACT_EMAIL}</span>
+                  </a>
+                  <div className="mt-2 text-center text-[11px] opacity-60">
+                    Mohammad Salahi
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          {/* ABOUT THE PROJECT */}
+          <section className="mb-6">
+            <h2 className="label-caps mb-3">About the Project</h2>
+            <div className="settings-group">
+              <div className="settings-row items-start">
+                <span className="settings-icon">
+                  <Sprout size={17} strokeWidth={1.8} />
+                </span>
+                <p className="min-w-0 flex-1 text-[13px] leading-relaxed opacity-80">
+                  Sahih Al-Adhkar is a simple companion for the
+                  daily remembrance of Allah. Every dhikr and du'a in this app is
+                  taken from authentic narrations, with the source listed on each
+                  card so you can verify it yourself.
+                </p>
+              </div>
+            </div>
+          </section>
+
         </div>
       </main>
     </>
   );
 }
 
+
 function Toggle({
+  icon,
   label,
   description,
   value,
   onChange,
 }: {
+  icon?: ReactNode;
   label: string;
   description?: string;
   value: boolean;
@@ -716,17 +1171,15 @@ function Toggle({
   return (
     <button
       onClick={() => onChange(!value)}
-      className="flex w-full items-center justify-between gap-3 rounded-2xl px-4 py-3 text-left text-sm font-semibold"
-      style={{ background: "var(--surface)", border: "1px solid var(--border)" }}
+      className="settings-row w-full text-left"
     >
-      <span className="flex min-w-0 flex-col">
-        <span>{label}</span>
-        {description && (
-          <span className="mt-0.5 text-xs font-normal opacity-70">{description}</span>
-        )}
+      {icon && <span className="settings-icon">{icon}</span>}
+      <span className="min-w-0 flex-1">
+        <span className="settings-row-title block">{label}</span>
+        {description && <span className="settings-row-desc block">{description}</span>}
       </span>
       <span
-        className="relative inline-block h-6 w-11 shrink-0 rounded-full transition"
+        className="settings-switch"
         style={{
           background: value
             ? "var(--accent)"
@@ -734,7 +1187,7 @@ function Toggle({
         }}
       >
         <span
-          className="absolute top-0.5 h-5 w-5 rounded-full bg-white transition-all"
+          className="settings-switch-knob"
           style={{ left: value ? 22 : 2 }}
         />
       </span>

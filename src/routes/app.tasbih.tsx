@@ -1,15 +1,22 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { RotateCcw, Undo2 } from "lucide-react";
-import { ProgressRing } from "@/components/ProgressRing";
-import { HeaderSettingsButton } from "@/components/HeaderSettingsButton";
-import { MuqarnasPattern } from "@/components/HeaderPatterns";
 import { triggerHaptic } from "@/lib/theme";
 import { bumpLifetime } from "@/lib/storage";
-import { startTasbihSession, updateTasbihSession, endTasbihSession } from "@/lib/native-bridge";
+import { ProgressRing } from "@/components/ProgressRing";
+import { syncTasbihToWidget } from "@/lib/native-bridge";
 
 export const Route = createFileRoute("/app/tasbih")({
-  head: () => ({ meta: [{ title: "Tasbih, Sahih Al-Adhkar" }] }),
+  head: () => ({
+    meta: [
+      { title: "Tasbih, Sahih Al-Adhkar" },
+      { name: "description", content: "A calm digital tasbih with selectable remembrance goals." },
+      { property: "og:title", content: "Tasbih, Sahih Al-Adhkar" },
+      { property: "og:description", content: "A calm digital tasbih with selectable remembrance goals." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
+    ],
+  }),
   component: Tasbih,
 });
 
@@ -24,8 +31,9 @@ function Tasbih() {
   const [toast, setToast] = useState<string | null>(null);
   const [pressed, setPressed] = useState(false);
   const [tapped, setTapped] = useState(false);
-  const resetTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const sessionStarted = useRef(false);
+  const [confirmReset, setConfirmReset] = useState(false);
+
+  const [loaded, setLoaded] = useState(false);
 
   useEffect(() => {
     try {
@@ -35,28 +43,20 @@ function Tasbih() {
     } catch {
       // Ignore malformed saved tasbih state.
     }
+    setLoaded(true);
   }, []);
 
   useEffect(() => {
+    if (!loaded) return;
     localStorage.setItem(STORAGE, JSON.stringify({ total, milestone }));
-  }, [total, milestone]);
-
-  // End Live Activity when leaving the tasbih page
-  useEffect(() => {
-    return () => {
-      if (sessionStarted.current) {
-        endTasbihSession();
-        sessionStarted.current = false;
-      }
-    };
-  }, []);
+    // Keep the home screen widget in sync on every change (load, tap, undo, reset, target switch).
+    void syncTasbihToWidget(total, milestone);
+  }, [total, milestone, loaded]);
 
   const hasMilestone = milestone > 0;
-  const cycleCount = hasMilestone ? total % milestone : 0;
   const cycleNum = hasMilestone ? Math.floor(total / milestone) + 1 : 1;
-  const ringMax = hasMilestone ? milestone : 100;
-  const ringValue = hasMilestone ? cycleCount : total % 100;
-  const complete = hasMilestone && cycleCount === 0 && total > 0;
+  const ringMax = hasMilestone ? milestone : 1;
+  const ringValue = hasMilestone ? total % milestone : 0;
 
   const showToast = (msg: string) => {
     setToast(msg);
@@ -64,96 +64,50 @@ function Tasbih() {
   };
 
   const tap = () => {
-    triggerHaptic("light");
+    triggerHaptic("heavy");
     bumpLifetime("tasbih", 1);
     setTapped(true);
     setTimeout(() => setTapped(false), 200);
     setTotal((n) => {
       const next = n + 1;
       if (hasMilestone && next % milestone === 0) {
-        triggerHaptic("medium");
+        triggerHaptic("double");
         setFlash(true);
         setTimeout(() => setFlash(false), 260);
       }
-
-      // Update Live Activity
-      const target = hasMilestone ? milestone : 0;
-      if (!sessionStarted.current) {
-        startTasbihSession(next, target);
-        sessionStarted.current = true;
-      } else {
-        updateTasbihSession(next, target);
-      }
-
       return next;
     });
   };
 
   const undo = (e: React.MouseEvent) => {
     e.stopPropagation();
-    triggerHaptic("light");
-    setTotal((n) => {
-      const next = Math.max(0, n - 1);
-      if (sessionStarted.current) {
-        const target = hasMilestone ? milestone : 0;
-        updateTasbihSession(next, target);
-      }
-      return next;
-    });
+    triggerHaptic("heavy");
+    setTotal((n) => Math.max(0, n - 1));
   };
 
-  const onResetStart = (e: React.PointerEvent | React.TouchEvent | React.MouseEvent) => {
+  const onResetPress = (e: React.MouseEvent) => {
     e.stopPropagation();
-    resetTimer.current = setTimeout(() => {
-      triggerHaptic("heavy");
-      setTotal(0);
-      showToast("Count reset ✓");
-      // End the Live Activity on reset
-      if (sessionStarted.current) {
-        endTasbihSession();
-        sessionStarted.current = false;
-      }
-    }, 2500);
+    triggerHaptic("light");
+    setConfirmReset(true);
   };
-  const onResetEnd = (e?: React.SyntheticEvent) => {
-    e?.stopPropagation();
-    if (resetTimer.current) clearTimeout(resetTimer.current);
+  const doReset = () => {
+    triggerHaptic("heavy");
+    setTotal(0);
+    setConfirmReset(false);
+    showToast("Count reset");
   };
 
   return (
     <>
-      <header
-        className="page-header relative overflow-hidden"
-        style={{ background: "var(--grad-header)", color: "var(--header-fg)" }}
-      >
-        {/* Soft radial glow (kept for depth) */}
-        <div
-          aria-hidden
-          className="pointer-events-none absolute inset-0"
-          style={{
-            background:
-              "radial-gradient(120% 80% at 100% 0%, color-mix(in oklab, var(--header-fg) 12%, transparent) 0%, transparent 55%)",
-            opacity: 0.5,
-          }}
-        />
-        <MuqarnasPattern />
-        <HeaderSettingsButton />
-        <div className="relative mx-auto max-w-md px-5 pb-5 pt-6 text-center">
-          <div
-            className="label-caps"
-            style={{ color: "var(--header-sub)", opacity: 1, letterSpacing: "0.2em" }}
-          >
+      <header className="tasbih-header">
+        <div className="tasbih-header-inner">
+          <div className="tasbih-eyebrow">
             Dhikr Counter
           </div>
-          <h1
-            className="mt-1.5 font-bold tracking-tight"
-            style={{ fontSize: 34, lineHeight: 1.1 }}
-          >
-            Tasbih
-          </h1>
+          <h1 className="tasbih-title">Tasbih</h1>
 
           {/* Cycle target selector, centered, all four fit */}
-          <div className="mt-4 flex items-center justify-center gap-2">
+          <div className="tasbih-targets">
             {MILESTONES.map((t) => {
               const active = milestone === t;
               const label = t === 0 ? "∞" : String(t);
@@ -161,19 +115,7 @@ function Tasbih() {
                 <button
                   key={t}
                   onClick={() => setMilestone(t)}
-                  className="flex shrink-0 items-center justify-center font-bold transition-all active:scale-95"
-                  style={{
-                    flex: "1 1 0",
-                    maxWidth: 78,
-                    height: 36,
-                    borderRadius: 18,
-                    fontSize: 13,
-                    background: active
-                      ? "var(--accent)"
-                      : "color-mix(in oklab, var(--header-fg) 15%, transparent)",
-                    color: active ? "var(--accent-foreground)" : "var(--header-fg)",
-                    border: "none",
-                  }}
+                  className={`tasbih-target ${active ? "is-active" : ""}`}
                 >
                   {label}
                 </button>
@@ -183,8 +125,8 @@ function Tasbih() {
         </div>
       </header>
 
-      <main className="scroll-area flex flex-col">
-        <div className="mx-auto flex min-h-0 w-full max-w-md flex-1 flex-col px-4 pt-4">
+      <main className="tasbih-main">
+        <div className="tasbih-card-wrap">
           <div
             role="button"
             tabIndex={0}
@@ -197,110 +139,61 @@ function Tasbih() {
             onPointerUp={() => setPressed(false)}
             onPointerLeave={() => setPressed(false)}
             onPointerCancel={() => setPressed(false)}
-            className="relative flex w-full flex-1 flex-col items-center justify-center overflow-hidden rounded-[24px] outline-none"
-            style={{
-              background: "var(--card)",
-              color: "var(--card-foreground)",
-              border: "1px solid var(--border)",
-              boxShadow: "var(--card-shadow, 0 4px 16px rgba(0,0,0,0.08))",
-              transform: pressed ? "scale(0.985)" : "scale(1)",
-              transition: "transform 120ms ease",
-              padding: "28px 20px 32px",
-              touchAction: "manipulation",
-              cursor: "pointer",
-              userSelect: "none",
-            }}
+            className={`tasbih-card ${pressed ? "is-pressed" : ""}`}
             aria-label="tap to count"
           >
             {/* Top corner controls */}
             <div
-              className="absolute left-3 top-3 z-10"
+              className="tasbih-corner-control left"
               onPointerDown={(e) => e.stopPropagation()}
             >
               <button
                 onClick={undo}
-                className="flex h-9 w-9 items-center justify-center rounded-full transition-transform active:scale-90"
-                style={{
-                  background: "var(--btn-surface)",
-                  color: "var(--btn-fg)",
-                }}
+                className="tasbih-control"
                 aria-label="undo"
               >
                 <Undo2 size={16} />
               </button>
             </div>
             <div
-              className="absolute right-3 top-3 z-10"
+              className="tasbih-corner-control right"
               onPointerDown={(e) => e.stopPropagation()}
             >
               <button
-                onMouseDown={onResetStart}
-                onMouseUp={onResetEnd}
-                onMouseLeave={onResetEnd}
-                onTouchStart={onResetStart}
-                onTouchEnd={onResetEnd}
-                className="flex h-9 w-9 items-center justify-center rounded-full transition-transform active:scale-90"
-                style={{
-                  background: "var(--btn-surface)",
-                  color: "var(--btn-fg)",
-                }}
-                aria-label="hold to reset"
+                onClick={onResetPress}
+                className="tasbih-control"
+                aria-label="reset counter"
               >
                 <RotateCcw size={16} />
               </button>
             </div>
 
             {/* Big progress ring with count */}
-            <div className={`relative flex items-center justify-center ${tapped ? "tap-pulse" : ""}`}>
-              <ProgressRing
-                value={ringValue}
-                max={ringMax}
-                size={240}
-                stroke={14}
-                complete={complete}
-              />
-              <div className="absolute inset-0 flex flex-col items-center justify-center">
-                <span
-                  className="font-bold leading-none"
-                  style={{
-                    fontSize: 64,
-                    color: "var(--count-fg, var(--card-foreground))",
-                    fontVariantNumeric: "tabular-nums",
-                    transition: "color 200ms",
-                  }}
-                >
+            <div className={`tasbih-disc ${tapped ? "tasbih-disc-tapped" : ""}`}>
+              <span
+                className="tasbih-ring"
+                style={{ ["--ring-track" as string]: "transparent" }}
+              >
+                <ProgressRing value={ringValue} max={ringMax} size={280} stroke={8} />
+              </span>
+              <div className="tasbih-disc-content">
+                <span className="tasbih-count">
                   {total}
                 </span>
-                <span
-                  className="mt-2 text-[12px]"
-                  style={{ color: "var(--muted-foreground)", letterSpacing: "0.05em" }}
-                >
-                  {hasMilestone
-                    ? `cycle ${cycleNum} · ${cycleCount}/${milestone}`
-                    : "∞ continuous"}
-                </span>
+                {hasMilestone && <span className="tasbih-cycle">Cycle {cycleNum} of {milestone}</span>}
               </div>
               {flash && (
                 <span
-                  className="radial-pulse pointer-events-none absolute inset-0 rounded-full"
+                    className="radial-pulse pointer-events-none absolute inset-0 rounded-full"
                   style={{ background: "color-mix(in oklab, var(--accent) 45%, transparent)" }}
                 />
               )}
             </div>
 
             {/* Helper text */}
-            <div className="mt-8 text-center">
-              <div
-                className="label-caps"
-                style={{ color: "var(--muted-foreground)", opacity: 0.85 }}
-              >
+            <div className="tasbih-helper">
+              <div className="tasbih-helper-primary">
                 Tap anywhere to count
-              </div>
-              <div
-                className="mt-1 text-[11px]"
-                style={{ color: "var(--muted-foreground)", opacity: 0.7 }}
-              >
-                Hold reset 2.5s to clear
               </div>
             </div>
           </div>
@@ -312,6 +205,36 @@ function Tasbih() {
             style={{ background: "var(--accent)", color: "var(--accent-foreground)" }}
           >
             {toast}
+          </div>
+        )}
+
+        {confirmReset && (
+          <div
+            className="tasbih-confirm-overlay"
+            onClick={() => setConfirmReset(false)}
+          >
+            <div
+              className="tasbih-confirm pop-in"
+              role="alertdialog"
+              aria-label="reset counter confirmation"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <p className="tasbih-confirm-title">Reset counter?</p>
+              <p className="tasbih-confirm-sub">
+                Are you sure you want to reset? Your current count will be cleared.
+              </p>
+              <div className="tasbih-confirm-actions">
+                <button
+                  className="tasbih-confirm-btn ghost"
+                  onClick={() => setConfirmReset(false)}
+                >
+                  Cancel
+                </button>
+                <button className="tasbih-confirm-btn solid" onClick={doReset}>
+                  Reset
+                </button>
+              </div>
+            </div>
           </div>
         )}
       </main>

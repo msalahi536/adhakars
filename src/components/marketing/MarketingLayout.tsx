@@ -1,15 +1,26 @@
 import { useEffect, useState, type ReactNode } from "react";
 import { Link, useRouterState } from "@tanstack/react-router";
 import { Menu, X } from "lucide-react";
+import logoAsset from "@/assets/logo-mark.png.asset.json";
+import appScreenshot from "@/assets/app-screenshot.png.asset.json";
+import { Button } from "@/components/ui/button";
+
 
 const NAV = [
   { to: "/", label: "Home" },
   { to: "/about", label: "About" },
   { to: "/download", label: "Download" },
-  { to: "/donate", label: "Donate" },
+  
 ] as const;
 
-export function MarketingLayout({ children }: { children: ReactNode }) {
+const HOME_NAV = [
+  { href: "#home", label: "Home" },
+  { href: "#features", label: "Features" },
+  { href: "#about", label: "About" },
+  { href: "#download", label: "Download" },
+] as const;
+
+export function MarketingLayout({ children, onePage = false }: { children: ReactNode; onePage?: boolean }) {
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const pathname = useRouterState({ select: (s) => s.location.pathname });
@@ -31,16 +42,16 @@ export function MarketingLayout({ children }: { children: ReactNode }) {
       style={{
         background: "#FAF6EC",
         color: "#1F3D2B",
-        fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif",
+        fontFamily: "'Hanken Grotesk', 'Plus Jakarta Sans', system-ui, sans-serif",
       }}
     >
       <header
-        className="fixed inset-x-0 top-0 z-50 transition-all"
+        className={`fixed inset-x-0 top-0 z-50 transition-all ${onePage ? "marketing-floating-header" : ""}`}
         style={{
-          background: scrolled ? "rgba(250, 246, 236, 0.92)" : "rgba(250, 246, 236, 0.6)",
-          backdropFilter: "blur(14px) saturate(180%)",
-          WebkitBackdropFilter: "blur(14px) saturate(180%)",
-          borderBottom: scrolled ? "1px solid rgba(31, 61, 43, 0.08)" : "1px solid transparent",
+          background: scrolled ? "rgba(250, 246, 236, 0.82)" : onePage ? "transparent" : "rgba(250, 246, 236, 0.6)",
+          backdropFilter: scrolled || !onePage ? "blur(14px) saturate(180%)" : "none",
+          borderBottom: "none",
+          boxShadow: scrolled ? "0 10px 30px rgba(31, 61, 43, 0.06)" : "none",
         }}
       >
         <div className="mx-auto flex max-w-6xl items-center justify-between px-5 py-4 md:px-10 md:py-5">
@@ -59,7 +70,16 @@ export function MarketingLayout({ children }: { children: ReactNode }) {
           </Link>
 
           <nav className="hidden items-center gap-8 md:flex">
-            {NAV.map((n) => (
+            {onePage ? HOME_NAV.map((n) => (
+              <a
+                key={n.href}
+                href={n.href}
+                className="text-sm font-medium transition-opacity hover:opacity-100"
+                style={{ color: "#1F3D2B", opacity: 0.72 }}
+              >
+                {n.label}
+              </a>
+            )) : NAV.map((n) => (
               <Link
                 key={n.to}
                 to={n.to}
@@ -71,24 +91,22 @@ export function MarketingLayout({ children }: { children: ReactNode }) {
                 {n.label}
               </Link>
             ))}
-            <Link
-              to="/app"
-              className="rounded-full px-5 py-2.5 text-sm font-semibold transition-transform active:scale-95"
-              style={{ background: "#1F3D2B", color: "#FAF6EC" }}
-            >
-              Open app
-            </Link>
+            <Button asChild className="marketing-header-button h-10 rounded-full px-5 text-sm font-semibold">
+              <Link to="/app">Open app</Link>
+            </Button>
           </nav>
 
-          <button
+          <Button
             type="button"
+            variant="ghost"
+            size="icon"
             aria-label="Menu"
             onClick={() => setOpen((v) => !v)}
             className="flex h-10 w-10 items-center justify-center rounded-full md:hidden"
             style={{ background: "rgba(31, 61, 43, 0.08)", color: "#1F3D2B" }}
           >
             {open ? <X size={20} /> : <Menu size={20} />}
-          </button>
+          </Button>
         </div>
 
         {open && (
@@ -100,7 +118,17 @@ export function MarketingLayout({ children }: { children: ReactNode }) {
             }}
           >
             <div className="mx-auto flex max-w-6xl flex-col gap-1 px-5 py-4">
-              {NAV.map((n) => (
+              {onePage ? HOME_NAV.map((n) => (
+                <a
+                  key={n.href}
+                  href={n.href}
+                  onClick={() => setOpen(false)}
+                  className="rounded-xl px-3 py-3 text-base font-medium"
+                  style={{ color: "#1F3D2B" }}
+                >
+                  {n.label}
+                </a>
+              )) : NAV.map((n) => (
                 <Link
                   key={n.to}
                   to={n.to}
@@ -110,19 +138,15 @@ export function MarketingLayout({ children }: { children: ReactNode }) {
                   {n.label}
                 </Link>
               ))}
-              <Link
-                to="/app"
-                className="mt-2 rounded-full px-5 py-3 text-center text-base font-semibold"
-                style={{ background: "#1F3D2B", color: "#FAF6EC" }}
-              >
-                Open app
-              </Link>
+              <Button asChild className="marketing-header-button mt-2 h-12 rounded-full px-5 text-base font-semibold">
+                <Link to="/app">Open app</Link>
+              </Button>
             </div>
           </div>
         )}
       </header>
 
-      <main style={{ paddingTop: 72 }}>{children}</main>
+      <main style={{ paddingTop: onePage ? 0 : 72 }}>{children}</main>
 
       <Footer />
     </div>
@@ -152,7 +176,7 @@ function Footer() {
               style={{ color: "rgba(31, 61, 43, 0.72)" }}
             >
               Authentic daily remembrance of Allah, sourced from the Sunnah.
-              Free, offline friendly, and private by design.
+              Free and private by design.
             </p>
           </div>
           <div>
@@ -166,7 +190,7 @@ function Footer() {
               <li><Link to="/" style={{ color: "#1F3D2B" }}>Home</Link></li>
               <li><Link to="/about" style={{ color: "#1F3D2B" }}>About</Link></li>
               <li><Link to="/download" style={{ color: "#1F3D2B" }}>Download</Link></li>
-              <li><Link to="/donate" style={{ color: "#1F3D2B" }}>Donate</Link></li>
+              
               <li><Link to="/app" style={{ color: "#1F3D2B" }}>Open app</Link></li>
             </ul>
           </div>
@@ -201,21 +225,14 @@ function Footer() {
 
 function BrandMark() {
   return (
-    <span
-      className="grid h-8 w-8 place-items-center rounded-lg"
-      style={{
-        background: "linear-gradient(135deg, #1F3D2B 0%, #2E5A3F 100%)",
-        color: "#C9A84C",
-        boxShadow: "0 6px 18px rgba(31, 61, 43, 0.22)",
-      }}
-    >
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-        <path
-          d="M12 2 L14.5 8.5 L21.5 9 L16 13.5 L17.8 20.5 L12 16.8 L6.2 20.5 L8 13.5 L2.5 9 L9.5 8.5 Z"
-          fill="currentColor"
-        />
-      </svg>
-    </span>
+    <img
+      src={logoAsset.url}
+      alt="Sahih Al-Adhkar logo"
+      width={32}
+      height={32}
+      className="h-8 w-8 rounded-lg"
+      style={{ boxShadow: "0 6px 18px rgba(31, 61, 43, 0.22)" }}
+    />
   );
 }
 
@@ -254,3 +271,125 @@ export function ArcsTexture({
     </svg>
   );
 }
+
+/**
+ * iPhone-style frame wrapping the app screenshot. Used across marketing pages
+ * so hero/product visuals stay perfectly consistent with the home page.
+ */
+export function IPhoneFrame({
+  src = appScreenshot.url,
+  width = "min(340px, 82vw)",
+  alt = "Sahih Al-Adhkar app screenshot",
+}: {
+  src?: string;
+  width?: string;
+  alt?: string;
+}) {
+  const INK = "#1F3D2B";
+  const CREAM = "#FAF6EC";
+  return (
+    <div
+      className="relative"
+      style={{
+        width,
+        aspectRatio: "393 / 852",
+        filter:
+          "drop-shadow(0 40px 60px rgba(31,61,43,0.28)) drop-shadow(0 12px 24px rgba(31,61,43,0.16))",
+      }}
+    >
+      <div
+        className="absolute inset-0"
+        style={{
+          borderRadius: 52,
+          background:
+            "linear-gradient(160deg, #1c1c1e 0%, #0a0a0b 45%, #1c1c1e 100%)",
+          padding: 5,
+          boxShadow:
+            "inset 0 0 0 1px rgba(255,255,255,0.14), inset 0 1px 0 rgba(255,255,255,0.18), inset 0 -1px 0 rgba(0,0,0,0.7)",
+        }}
+      >
+        <div
+          aria-hidden
+          className="pointer-events-none absolute inset-0"
+          style={{
+            borderRadius: 52,
+            background:
+              "linear-gradient(120deg, transparent 0%, rgba(255,255,255,0.06) 30%, transparent 55%, rgba(255,255,255,0.04) 78%, transparent 100%)",
+            zIndex: 3,
+          }}
+        />
+        <div
+          className="relative h-full w-full overflow-hidden"
+          style={{
+            borderRadius: 44,
+            background: CREAM,
+            boxShadow: "inset 0 0 0 1px rgba(0,0,0,0.6)",
+          }}
+        >
+          <img
+            src={src}
+            alt={alt}
+            style={{
+              position: "absolute",
+              inset: 0,
+              width: "100%",
+              height: "100%",
+              objectFit: "cover",
+              objectPosition: "top center",
+            }}
+          />
+          <div
+            className="relative flex items-center justify-between"
+            style={{
+              padding: "11px 19px 4px",
+              color: INK,
+              fontSize: 11,
+              fontWeight: 650,
+              fontFamily: "-apple-system, BlinkMacSystemFont, 'Hanken Grotesk', system-ui, sans-serif",
+              zIndex: 2,
+            }}
+          >
+            <span>9:41</span>
+            <div
+              style={{
+                position: "absolute",
+                left: "50%",
+                top: 7,
+                transform: "translateX(-50%)",
+                width: 72,
+                height: 21,
+                borderRadius: 999,
+                background: "#0a0a0b",
+                boxShadow: "inset 0 0 0 1px rgba(255,255,255,0.025), 0 1px 2px rgba(0,0,0,0.24)",
+              }}
+            />
+            <div className="flex items-center" style={{ gap: 5 }}>
+              <svg width="13" height="9" viewBox="0 0 14 10" aria-hidden="true">
+                <rect x="0" y="7" width="2.2" height="3" rx="0.55" fill={INK} />
+                <rect x="3.6" y="5" width="2.2" height="5" rx="0.55" fill={INK} />
+                <rect x="7.2" y="3" width="2.2" height="7" rx="0.55" fill={INK} />
+                <rect x="10.8" y="1" width="2.2" height="9" rx="0.55" fill={INK} />
+              </svg>
+              <svg width="13" height="9" viewBox="0 0 13 10" fill="none" aria-hidden="true">
+                <path d="M6.5 8.7a1 1 0 100-2 1 1 0 000 2z" fill={INK} />
+                <path
+                  d="M1.6 4.2a7.3 7.3 0 019.8 0M3.5 6.1a4.6 4.6 0 016 0"
+                  stroke={INK}
+                  strokeWidth="1.2"
+                  strokeLinecap="round"
+                  fill="none"
+                />
+              </svg>
+              <svg width="20" height="9" viewBox="0 0 22 10" aria-hidden="true">
+                <rect x="0.5" y="0.5" width="18" height="9" rx="2.4" fill="none" stroke={INK} strokeWidth="1" strokeOpacity="0.72" />
+                <rect x="2" y="2" width="14" height="6" rx="1.3" fill={INK} />
+                <path d="M20 3.2v3.6c.8-.2 1.3-.8 1.3-1.8S20.8 3.4 20 3.2Z" fill={INK} opacity="0.55" />
+              </svg>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+

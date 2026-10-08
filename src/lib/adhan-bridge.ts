@@ -1,57 +1,28 @@
-/**
- * adhan-bridge.ts
- * Bridges the web app to the native AdhanPlugin (Capacitor) for iOS.
- * Handles per-salah adhan notifications: scheduling, preferences, audio control.
- * Auto-detects Capacitor and silently no-ops on web.
- */
+import misharyAsset from "@/assets/adhan/mishary.mp3.asset.json";
+import basitAsset from "@/assets/adhan/basit.mp3.asset.json";
+import makkahAsset from "@/assets/adhan/makkah.mp3.asset.json";
+import madinahAsset from "@/assets/adhan/madinah.mp3.asset.json";
+import zailiAsset from "@/assets/adhan/zaili.mp3.asset.json";
+import majaleAsset from "@/assets/adhan/majale.mp3.asset.json";
+import qatamiAsset from "@/assets/adhan/qatami.mp3.asset.json";
+import fajrMisharyAsset from "@/assets/adhan/fajr-mishary.mp3.asset.json";
+import fajrMadinahAsset from "@/assets/adhan/fajr-madinah.mp3.asset.json";
+// adhan-bridge.ts
+// Bridges the web app to native adhan playback (Capacitor).
+// Native iOS plays the full adhan when a prayer notification is tapped
+// (notification sounds are capped at 30 seconds) and dispatches the
+// "adhan:playing" event so the app can show the floating player.
+// Silently no-ops on web.
 
-// --------------- Types ---------------
+import { isNativeApp } from "@/lib/native-bridge";
 
-export interface AdhanPrefs {
-  soundMode: "adhan" | "silent" | "default";
-  reciterId: string;
-  fajrReciterId: string;
-  enabledPrayers: Record<string, boolean>;
-}
-
-export interface AdhanDiagnostics {
-  enabledPrayers: Record<string, boolean>;
-  soundMode: string;
-  reciterId: string;
-  pendingNotifications: Array<{
-    id: string;
-    title: string;
-    prayer: string;
-    triggerType?: string;
-    triggerDate?: string;
-    triggerInterval?: number;
-  }>;
-  pendingCount: number;
-  authorizationStatus: string;
-  alertSetting: string;
-  soundSetting: string;
-  notificationCenterSetting: string;
-  lockScreenSetting: string;
-}
-
-interface AdhanPluginInterface {
-  schedulePrayerNotifications(opts: {
-    prayerTimes: { name: string; time: number; test?: boolean }[];
-  }): Promise<{ scheduled: string[]; skipped?: Array<{ prayer: string; reason: string }> }>;
-  cancelAllPrayerNotifications(): Promise<void>;
-  updatePreferences(opts: Partial<AdhanPrefs>): Promise<AdhanPrefs>;
-  getPreferences(): Promise<AdhanPrefs>;
-  stopAdhan(): Promise<void>;
-  isAdhanPlaying(): Promise<{ playing: boolean }>;
-}
+export const ADHAN_PLAYING_EVENT = "adhan:playing";
 
 export interface Reciter {
   id: string;
   name: string;
   origin: string;
 }
-
-// --------------- Available Reciters ---------------
 
 export const RECITERS: Reciter[] = [
   { id: "mishary", name: "Mishary Rashid Al Afasy", origin: "Kuwait" },
@@ -61,43 +32,81 @@ export const RECITERS: Reciter[] = [
   { id: "zaili", name: "Abdullah Al Zaili", origin: "Saudi Arabia" },
   { id: "majale", name: "Hamza Al Majale", origin: "Saudi Arabia" },
   { id: "qatami", name: "Nasir Al-Qatami", origin: "Saudi Arabia" },
+  { id: "silent", name: "Silent", origin: "Notification only, no sound" },
 ];
 
+/** Reciter id meaning "show the notification with no sound and no adhan". */
+export const SILENT_RECITER_ID = "silent";
+
+/** Fajr has its own melody, so it gets a dedicated reciter list. */
 export const FAJR_RECITERS: Reciter[] = [
   { id: "fajr-mishary", name: "Mishary Rashid Alafasy", origin: "Kuwait" },
   { id: "fajr-madinah", name: "Madinah Fajr Adhan", origin: "Masjid an-Nabawi" },
+  { id: "silent", name: "Silent", origin: "Notification only, no sound" },
 ];
+const DEFAULT_FAJR_RECITER_ID = FAJR_RECITERS[0].id;
+// Only Mishary and Madinah have Fajr recordings; anything else (e.g. an old
+// "abdulbasit" save) resets to Mishary.
+const validFajrReciter = (id: unknown): string => {
+  if (id === "mishary" || id === "afasy") return "fajr-mishary";
+  if (id === "madinah") return "fajr-madinah";
+  return typeof id === "string" && FAJR_RECITERS.some((r) => r.id === id) ? id : DEFAULT_FAJR_RECITER_ID;
+};
 
-const PRAYER_NAMES = ["Fajr", "Dhuhr", "Asr", "Maghrib", "Isha"] as const;
+/**
+ * Native audio file naming:
+ * - notification (30s) sound: `adhan-{reciterId}-30.caf`
+ * - full playback file:       `adhan-{reciterId}-full.mp3`
+ */
+export const notificationSoundFile = (reciterId: string): string =>
+  `adhan-${reciterId}-30.caf`;
 
-// --------------- Local Storage ---------------
+export const fullAdhanFile = (reciterId: string): string =>
+  `adhan-${reciterId}-full.mp3`;
 
-const ADHAN_PREFS_KEY = "adhkar:adhanPrefs";
+const RECITER_KEY = "adhkar:adhan-reciter";
+const ADHAN_PREFS_KEY = "adhkar:adhan-prefs";
+const DEFAULT_RECITER_ID = RECITERS[0].id;
+
+export interface AdhanPrefs {
+  soundMode: "adhan" | "silent" | "default";
+  reciterId: string;
+  fajrReciterId: string;
+  reciterPerPrayer: Record<string, string>;
+  enabledPrayers: Record<string, boolean>;
+}
 
 const DEFAULT_PREFS: AdhanPrefs = {
   soundMode: "adhan",
-  reciterId: "mishary",
-  fajrReciterId: "fajr-mishary",
-  enabledPrayers: {
-    Fajr: false,
-    Dhuhr: false,
-    Asr: false,
-    Maghrib: false,
-    Isha: false,
+  reciterId: DEFAULT_RECITER_ID,
+  fajrReciterId: DEFAULT_FAJR_RECITER_ID,
+  reciterPerPrayer: {
+    Fajr: DEFAULT_RECITER_ID,
+    Dhuhr: DEFAULT_RECITER_ID,
+    Asr: DEFAULT_RECITER_ID,
+    Maghrib: DEFAULT_RECITER_ID,
+    Isha: DEFAULT_RECITER_ID,
   },
+  enabledPrayers: { Fajr: false, Dhuhr: false, Asr: false, Maghrib: false, Isha: false },
 };
 
-/** Get adhan prefs from localStorage (mirrors native UserDefaults) */
+const validReciter = (id: unknown): string =>
+  typeof id === "string" && RECITERS.some((r) => r.id === id) ? id : DEFAULT_RECITER_ID;
+
 export function getAdhanPrefs(): AdhanPrefs {
   if (typeof window === "undefined") return { ...DEFAULT_PREFS };
   try {
-    const raw = localStorage.getItem(ADHAN_PREFS_KEY);
-    if (!raw) return { ...DEFAULT_PREFS };
-    const parsed = JSON.parse(raw);
+    const parsed = JSON.parse(window.localStorage.getItem(ADHAN_PREFS_KEY) || "{}") as Partial<AdhanPrefs>;
+    const legacy = validReciter(parsed.reciterId ?? window.localStorage.getItem(RECITER_KEY));
+    const reciterPerPrayer = Object.fromEntries(
+      Object.entries({ ...DEFAULT_PREFS.reciterPerPrayer, ...(parsed.reciterPerPrayer ?? {}) })
+        .map(([prayer, id]) => [prayer, validReciter(id)]),
+    );
     return {
       soundMode: parsed.soundMode ?? DEFAULT_PREFS.soundMode,
-      reciterId: parsed.reciterId ?? DEFAULT_PREFS.reciterId,
-      fajrReciterId: parsed.fajrReciterId ?? DEFAULT_PREFS.fajrReciterId,
+      reciterId: legacy,
+      fajrReciterId: validFajrReciter(parsed.fajrReciterId),
+      reciterPerPrayer,
       enabledPrayers: { ...DEFAULT_PREFS.enabledPrayers, ...(parsed.enabledPrayers ?? {}) },
     };
   } catch {
@@ -105,315 +114,432 @@ export function getAdhanPrefs(): AdhanPrefs {
   }
 }
 
-/** Save adhan prefs to localStorage and sync to native plugin */
-export async function setAdhanPrefs(prefs: AdhanPrefs): Promise<void> {
+export function setAdhanPrefs(prefs: AdhanPrefs): void {
   if (typeof window === "undefined") return;
-  localStorage.setItem(ADHAN_PREFS_KEY, JSON.stringify(prefs));
-  window.dispatchEvent(new Event("adhkar:adhan-prefs-update"));
+  console.log("[AdhanReciter] Saved reciter for", "fajr", ":", prefs.fajrReciterId);
+  for (const [prayer, reciterId] of Object.entries(prefs.reciterPerPrayer ?? {})) {
+    console.log("[AdhanReciter] Saved reciter for", prayer.toLowerCase(), ":", reciterId);
+  }
+  try {
+    window.localStorage.setItem(ADHAN_PREFS_KEY, JSON.stringify(prefs));
+    window.localStorage.setItem(RECITER_KEY, prefs.reciterId);
+  } catch {
+    // ignore
+  }
+  void syncAdhanPrefsToNative(prefs);
+}
 
-  // Sync to native
-  const plugin = getAdhanPlugin();
-  if (plugin) {
-    try {
-      await plugin.updatePreferences(prefs);
-    } catch (err) {
-      console.warn("[AdhanBridge] Failed to sync prefs to native:", err);
-    }
+/** Pushes reciter/enabled-prayer choices into the native plugin's preferences. */
+/** Turns on alerts for all five prayers (used once, when permission is first granted). */
+export async function enableAllPrayerAlerts(): Promise<void> {
+  if (typeof window === "undefined") return;
+  const prefs = getAdhanPrefs();
+  setAdhanPrefs({ ...prefs, enabledPrayers: { Fajr: true, Dhuhr: true, Asr: true, Maghrib: true, Isha: true } });
+  const { getPrayerSettings, setPrayerSettings } = await import("@/lib/prayer-times");
+  const { rescheduleAdhanNotifications } = await import("@/lib/adhan-notifications");
+  const next = { ...getPrayerSettings(), adhanEnabled: true, perPrayer: { fajr: true, dhuhr: true, asr: true, maghrib: true, isha: true } };
+  setPrayerSettings(next);
+  await rescheduleAdhanNotifications(next);
+}
+
+export async function syncAdhanPrefsToNative(prefs: AdhanPrefs = getAdhanPrefs()): Promise<void> {
+  const cap = typeof window !== "undefined" ? (window as any).Capacitor : null;
+  if (!cap?.isNativePlatform?.()) return;
+  const plugin = cap.Plugins?.AdhanNotifications;
+  if (!plugin) return;
+  try {
+    await plugin.updatePreferences({
+      soundMode: prefs.soundMode,
+      reciterId: prefs.reciterId,
+      fajrReciterId: prefs.fajrReciterId,
+      reciterPerPrayer: prefs.reciterPerPrayer,
+      enabledPrayers: prefs.enabledPrayers,
+    });
+  } catch (e) {
+    console.error("[adhan] native prefs sync failed", e);
   }
 }
 
-// --------------- Capacitor Plugin Access ---------------
-
-function isCapacitor(): boolean {
-  return typeof window !== "undefined" && !!(window as any).Capacitor?.isNativePlatform?.();
+export function getReciterForPrayer(prayer: string): string {
+  const prefs = getAdhanPrefs();
+  const label = `${prayer.charAt(0).toUpperCase()}${prayer.slice(1).toLowerCase()}`;
+  if (label === "Fajr") return validFajrReciter(prefs.fajrReciterId);
+  return validReciter(prefs.reciterPerPrayer[label] ?? prefs.reciterId);
 }
 
-function getAdhanPlugin(): AdhanPluginInterface | null {
-  if (!isCapacitor()) return null;
+export const reciterNameFor = (id: string): string =>
+  [...RECITERS, ...FAJR_RECITERS].find((r) => r.id === id)?.name ?? RECITERS[0].name;
+
+export interface AdhanProgress {
+  currentTime: number;
+  duration: number;
+  progress: number;
+  isPlaying: boolean;
+  hasSession: boolean;
+  prayer: string;
+  reciterId: string;
+}
+
+export interface AdhanStatus {
+  playing: boolean;
+  hasSession: boolean;
+  prayer: string;
+  reciterId: string;
+}
+
+export interface AdhanPlayingInfo {
+  prayer: string;
+  reciterId: string;
+}
+
+interface AdhanPlugin {
+  stopAdhan?(): Promise<unknown>;
+  pauseAdhan?(): Promise<unknown>;
+  resumeAdhan?(): Promise<unknown>;
+  seekAdhan?(opts: { progress: number }): Promise<unknown>;
+  getAdhanProgress?(): Promise<unknown>;
+  isAdhanPlaying?(): Promise<unknown>;
+  playAdhanPreview?(opts: { reciterId: string; file: string }): Promise<unknown>;
+  stopAdhanPreview?(): Promise<unknown>;
+  schedulePrayerNotifications?(opts: { prayerTimes: NativePrayerTime[] }): Promise<unknown>;
+  getDiagnostics?(): Promise<unknown>;
+  addListener?(event: string, cb: (info: unknown) => void): Promise<unknown> | unknown;
+}
+
+/**
+ * Capacitor plugins are Proxy objects: their methods aren't enumerable, so
+ * never probe for methods — just check the plugin exists and call it.
+ */
+function getAdhanPlugin(): AdhanPlugin | null {
+  if (typeof window === "undefined") return null;
+  const cap = (window as any).Capacitor;
+  if (!cap?.isNativePlatform?.()) return null;
   try {
-    return (window as any).Capacitor.Plugins.AdhanNotifications as AdhanPluginInterface;
+    return (cap.Plugins?.AdhanNotifications as AdhanPlugin) ?? null;
   } catch {
     return null;
   }
 }
-
-// --------------- Prayer Time Fetching ---------------
-
-/** Parse "HH:mm" or "HH:mm (TZName)" into a Date for a given base date */
-function parseTimeForDate(timeStr: string, baseDate: Date): Date {
-  const clean = timeStr.replace(/\s*\(.*?\)/, "").trim();
-  const [h, m] = clean.split(":").map(Number);
-  const d = new Date(baseDate);
-  d.setHours(h, m, 0, 0);
-  return d;
-}
-
-interface PrayerTimesResponse {
-  data: {
-    timings: Record<string, string>;
-  };
-}
+const getPlugin = getAdhanPlugin;
 
 /**
- * Fetch prayer times for a specific date from Al-Adhan API and return as
- * { name, time } with `time` as ms-since-epoch timestamps.
+ * The native plugin expects exactly { name, time } per entry — it reads
+ * reciter, sound mode and enabled prayers from its own native preferences
+ * and assigns notification IDs internally (Fajr=100 … Isha=104, Test=199).
  */
-async function fetchPrayerTimesForDate(
-  date: Date,
-  lat: number,
-  lon: number,
-  method = 2,
-): Promise<{ name: string; time: number }[]> {
-  try {
-    const dd = String(date.getDate()).padStart(2, "0");
-    const mm = String(date.getMonth() + 1).padStart(2, "0");
-    const yyyy = date.getFullYear();
-    const url = `https://api.aladhan.com/v1/timings/${dd}-${mm}-${yyyy}?latitude=${lat}&longitude=${lon}&method=${method}`;
-    const res = await fetch(url);
-    const json: PrayerTimesResponse = await res.json();
-    const timings = json.data.timings;
-
-    return PRAYER_NAMES.map((name) => ({
-      name,
-      time: parseTimeForDate(timings[name], date).getTime(), // ms since epoch
-    }));
-  } catch (err) {
-    console.warn("[AdhanBridge] Failed to fetch prayer times:", err);
-    return [];
-  }
+export interface NativePrayerTime {
+  name: string;
+  time: number;
 }
+
+/** True when the custom AdhanNotifications plugin is registered. */
+export const hasNativeAdhanScheduler = (): boolean => !!getAdhanPlugin();
 
 /**
- * Fetch today's AND tomorrow's prayer times.
- * The native plugin skips times that already passed, so including tomorrow
- * ensures prayers like Fajr get scheduled even if the app opens in the afternoon.
+ * Schedules prayer notifications through the custom native plugin so iOS
+ * AppDelegate receives the tap and continues the full adhan. An empty list
+ * clears them. Never falls back to the standard notification plugin.
  */
-async function fetchPrayerTimestamps(
-  lat: number,
-  lon: number,
-  method = 2,
-): Promise<{ name: string; time: number }[]> {
-  const today = new Date();
-  const tomorrow = new Date(today);
-  tomorrow.setDate(tomorrow.getDate() + 1);
-
-  const [todayTimes, tomorrowTimes] = await Promise.all([
-    fetchPrayerTimesForDate(today, lat, lon, method),
-    fetchPrayerTimesForDate(tomorrow, lat, lon, method),
-  ]);
-
-  // Combine: today's future prayers + all of tomorrow's prayers.
-  // The native plugin filters out past times, so duplicates are safe.
-  const now = Date.now();
-  const futureTodayTimes = todayTimes.filter((p) => p.time > now);
-
-  console.log(`[AdhanBridge] Today future prayers: ${futureTodayTimes.map(p => p.name).join(", ") || "none"}`);
-  console.log(`[AdhanBridge] Tomorrow prayers: ${tomorrowTimes.map(p => p.name).join(", ")}`);
-
-  return [...futureTodayTimes, ...tomorrowTimes];
-}
-
-// --------------- Public API ---------------
-
-/**
- * Schedule today's adhan notifications based on current prefs and location.
- * Call this after prefs change, on app init, and when the app returns to foreground.
- */
-export async function scheduleAdhanNotifications(): Promise<string[]> {
-  const plugin = getAdhanPlugin();
-  if (!plugin) return [];
-
-  const prefs = getAdhanPrefs();
-
-  // Check if any prayer is enabled
-  const anyEnabled = Object.values(prefs.enabledPrayers).some((v) => v);
-  if (!anyEnabled) {
-    // Cancel any existing ones
-    try {
-      await plugin.cancelAllPrayerNotifications();
-    } catch {}
-    return [];
-  }
-
-  // Get location
-  const { lat, lon } = await getLocation();
-
-  // Get calculation method
-  let method = 2;
-  try {
-    const stored = localStorage.getItem("prayerCalcMethod");
-    if (stored) method = parseInt(stored, 10) || 2;
-  } catch {}
-
-  // Fetch prayer times
-  const prayerTimes = await fetchPrayerTimestamps(lat, lon, method);
-  if (prayerTimes.length === 0) return [];
-
-  try {
-    const result = await plugin.schedulePrayerNotifications({ prayerTimes });
-    console.log("[AdhanBridge] Scheduled:", result.scheduled);
-    return result.scheduled;
-  } catch (err) {
-    console.warn("[AdhanBridge] Schedule error:", err);
-    return [];
-  }
-}
-
-/** Cancel all prayer notifications */
-export async function cancelAdhanNotifications(): Promise<void> {
-  const plugin = getAdhanPlugin();
-  if (!plugin) return;
-  try {
-    await plugin.cancelAllPrayerNotifications();
-  } catch (err) {
-    console.warn("[AdhanBridge] Cancel error:", err);
-  }
-}
-
-/** Stop currently playing adhan audio */
-export async function stopAdhan(): Promise<void> {
-  const plugin = getAdhanPlugin();
-  if (!plugin) return;
-  try {
-    await plugin.stopAdhan();
-  } catch (err) {
-    console.warn("[AdhanBridge] Stop adhan error:", err);
-  }
-}
-
-/** Check if adhan is currently playing */
-export async function isAdhanPlaying(): Promise<boolean> {
-  const plugin = getAdhanPlugin();
+export const scheduleNativeAdhan = async (prayerTimes: NativePrayerTime[]): Promise<boolean> => {
+  const plugin = getAdhanPlugin() as any;
   if (!plugin) return false;
   try {
-    const result = await plugin.isAdhanPlaying();
-    return result.playing;
-  } catch {
+    await plugin.schedulePrayerNotifications({
+      prayerTimes: prayerTimes.map(({ name, time }) => ({ name, time })),
+    });
+    return true;
+  } catch (e) {
+    console.error("[adhan] native schedule failed", e);
     return false;
   }
-}
+};
 
-/**
- * Toggle a specific prayer's notification on/off.
- * Saves prefs and reschedules.
- */
-export async function togglePrayerNotification(prayer: string, enabled: boolean): Promise<void> {
-  const prefs = getAdhanPrefs();
-  prefs.enabledPrayers[prayer] = enabled;
-  await setAdhanPrefs(prefs);
-  await scheduleAdhanNotifications();
-}
 
-/** Change the sound mode and reschedule */
-export async function setSoundMode(mode: "adhan" | "silent" | "default"): Promise<void> {
-  const prefs = getAdhanPrefs();
-  prefs.soundMode = mode;
-  await setAdhanPrefs(prefs);
-  await scheduleAdhanNotifications();
-}
-
-/** Change the reciter and reschedule */
-export async function setReciter(reciterId: string): Promise<void> {
-  const prefs = getAdhanPrefs();
-  prefs.reciterId = reciterId;
-  await setAdhanPrefs(prefs);
-  await scheduleAdhanNotifications();
-}
-
-// --------------- Location Helper ---------------
-
-async function getLocation(): Promise<{ lat: number; lon: number }> {
-  return new Promise((resolve) => {
-    if (typeof navigator === "undefined" || !navigator.geolocation) {
-      resolve({ lat: 21.4225, lon: 39.8262 }); // Makkah fallback
-      return;
-    }
-    navigator.geolocation.getCurrentPosition(
-      (pos) => resolve({ lat: pos.coords.latitude, lon: pos.coords.longitude }),
-      () => resolve({ lat: 21.4225, lon: 39.8262 }),
-      { timeout: 10000, enableHighAccuracy: false },
-    );
-  });
-}
-
-// --------------- Test & Diagnostics ---------------
-
-/**
- * Test a SPECIFIC prayer's adhan notification (e.g., "Fajr", "Dhuhr").
- * Fires in 5 seconds, bypasses the enabledPrayers check.
- * Uses the current reciter and sound mode settings.
- */
-export async function testPrayerNotification(prayer: string): Promise<{
-  success: boolean;
-  prayer?: string;
-  error?: string;
-}> {
-  const plugin = getAdhanPlugin();
-  if (!plugin) return { success: false, error: "Plugin not available" };
-  try {
-    const result = await plugin.testPrayerNotification({ prayer });
-    console.log(`[AdhanBridge] Test ${prayer} result:`, result);
-    return result;
-  } catch (err) {
-    console.warn(`[AdhanBridge] Test ${prayer} error:`, err);
-    return { success: false, error: String(err) };
-  }
-}
-
-/**
- * Get full diagnostics from the native plugin.
- */
-export async function getDiagnostics(): Promise<AdhanDiagnostics | null> {
-  const plugin = getAdhanPlugin();
+/** Native diagnostics: enabled prayers, pending notifications, permissions. */
+export const getDiagnostics = async (): Promise<unknown> => {
+  const plugin = getPlugin() as any;
   if (!plugin) return null;
   try {
-    const diag = await plugin.getDiagnostics();
-    console.log("[AdhanBridge] Diagnostics:", JSON.stringify(diag, null, 2));
-    return diag;
-  } catch (err) {
-    console.warn("[AdhanBridge] Diagnostics error:", err);
+    return await plugin.getDiagnostics();
+  } catch (e) {
+    console.error("[adhan] diagnostics failed", e);
     return null;
   }
-}
+};
 
-// --------------- Adhan Playing Listener ---------------
+export const buildNativePrayerTime = (prayer: string, at: Date): NativePrayerTime => ({
+  name: `${prayer.charAt(0).toUpperCase()}${prayer.slice(1).toLowerCase()}`,
+  time: at.getTime(),
+});
+
+const str = (v: unknown): string => (typeof v === "string" ? v : "");
+const num = (v: unknown): number => (typeof v === "number" && Number.isFinite(v) ? v : 0);
+
+const EMPTY_STATUS: AdhanStatus = { playing: false, hasSession: false, prayer: "", reciterId: "" };
+
+/** Current native playback status. */
+export const isAdhanPlaying = async (): Promise<AdhanStatus> => {
+  const plugin = getPlugin() as any;
+  if (!plugin) return EMPTY_STATUS;
+  try {
+    const r = await plugin.isAdhanPlaying();
+    if (typeof r === "boolean") return { ...EMPTY_STATUS, playing: r, hasSession: r };
+    const o = (r ?? {}) as Record<string, unknown>;
+    const playing = !!o.playing;
+    return {
+      playing,
+      hasSession: o.hasSession === undefined ? playing : !!o.hasSession,
+      prayer: str(o.prayer),
+      reciterId: str(o.reciterId),
+    };
+  } catch {
+    return EMPTY_STATUS;
+  }
+};
+
+/** Playback progress from the native side (null on web / failure). */
+export const getAdhanProgress = async (): Promise<AdhanProgress | null> => {
+  const web = webProgress();
+  if (web) return web;
+  const plugin = getPlugin() as any;
+  if (!plugin) return null;
+  try {
+    const o = ((await plugin.getAdhanProgress()) ?? {}) as Record<string, unknown>;
+    const duration = num(o.duration);
+    const currentTime = num(o.currentTime);
+    return {
+      currentTime,
+      duration,
+      progress: o.progress !== undefined ? num(o.progress) : duration ? currentTime / duration : 0,
+      isPlaying: !!o.isPlaying,
+      hasSession: !!o.hasSession,
+      prayer: str(o.prayer),
+      reciterId: str(o.reciterId),
+    };
+  } catch {
+    return null;
+  }
+};
+
+// ---- In-app fallback session (iPhone silent alerts) ----
+// A silent notification has no adhan file natively, so tapping it plays
+// Mishary (his Fajr recording for Fajr) from zero inside the app instead.
+let webAdhan: { audio: HTMLAudioElement; prayer: string; reciterId: string; userPaused: boolean } | null = null;
+
+export const isSilentReciter = (id: string | undefined | null): boolean => !id || id === SILENT_RECITER_ID;
+
+export const startSilentFallbackAdhan = async (prayer: string): Promise<string> => {
+  const label = `${prayer.charAt(0).toUpperCase()}${prayer.slice(1).toLowerCase()}` || "Fajr";
+  const reciterId = label === "Fajr" ? "fajr-mishary" : "mishary";
+  console.log("[adhan-silent] tap on silent", label, "alert → playing", reciterId, "from zero");
+  if (webAdhan && webAdhan.prayer === label) {
+    void ensureWebAdhanPlaying();
+    return webAdhan.reciterId;
+  }
+  stopWebAdhan();
+  if (typeof Audio === "undefined") return reciterId;
+  const audio = preloaded[reciterId] ?? new Audio(PREVIEW_URLS[reciterId]);
+  preloaded[reciterId] = audio;
+  audio.preload = "auto";
+  audio.currentTime = 0;
+  audio.onended = () => { if (webAdhan?.audio === audio) webAdhan = null; };
+  webAdhan = { audio, prayer: label, reciterId, userPaused: false };
+  void ensureWebAdhanPlaying();
+  return reciterId;
+};
 
 /**
- * Listen for the native 'adhan:playing' event dispatched by AppDelegate
- * when the user taps a notification and the full adhan starts playing.
+ * iPhone may refuse to start audio while the app is still waking from the
+ * notification tap, so keep retrying until it plays (or the user pauses),
+ * including when the app becomes active and on the first touch.
  */
-export function onAdhanPlaying(callback: (prayer: string) => void): () => void {
-  const handler = (e: Event) => {
-    const detail = (e as CustomEvent).detail;
-    callback(detail?.prayer ?? "");
-  };
-  window.addEventListener("adhan:playing", handler);
-  return () => window.removeEventListener("adhan:playing", handler);
-}
-
-// --------------- Init ---------------
-
-/**
- * Initialize adhan notifications. Call from initNativeBridge() or app init.
- * Schedules today's notifications if any prayers are enabled.
- */
-export function initAdhanBridge(): void {
-  if (!isCapacitor()) return;
-
-  console.log("[AdhanBridge] Initializing");
-
-  // Schedule on init
-  scheduleAdhanNotifications();
-
-  // Re-schedule when app comes back to foreground (prayer times may have changed)
-  document.addEventListener("visibilitychange", () => {
-    if (document.visibilityState === "visible") {
-      scheduleAdhanNotifications();
+const ensureWebAdhanPlaying = async (): Promise<void> => {
+  const session = webAdhan;
+  if (!session) return;
+  const tryPlay = async (why: string) => {
+    if (webAdhan !== session || session.userPaused || !session.audio.paused) return true;
+    try {
+      await session.audio.play();
+      console.log("[adhan-silent] playing (", why, ")");
+      return true;
+    } catch (e) {
+      console.warn("[adhan-silent] play blocked (", why, ")", e);
+      return false;
     }
-  });
+  };
+  if (await tryPlay("start")) return;
+  const cleanup = () => {
+    document.removeEventListener("visibilitychange", onVisible);
+    window.removeEventListener("focus", onFocus);
+    window.removeEventListener("touchend", onTouch, true);
+    window.removeEventListener("click", onTouch, true);
+    timers.forEach((t) => window.clearTimeout(t));
+  };
+  const attempt = (why: string) => void tryPlay(why).then((ok) => ok && cleanup());
+  const onVisible = () => document.visibilityState === "visible" && attempt("visible");
+  const onFocus = () => attempt("focus");
+  const onTouch = () => attempt("touch");
+  document.addEventListener("visibilitychange", onVisible);
+  window.addEventListener("focus", onFocus);
+  window.addEventListener("touchend", onTouch, true);
+  window.addEventListener("click", onTouch, true);
+  const timers = [300, 800, 1500, 2500, 4000, 6000].map((ms) => window.setTimeout(() => attempt(`retry ${ms}ms`), ms));
+  window.setTimeout(cleanup, 60000);
+};
 
-  // Listen for pref changes from other parts of the app
-  window.addEventListener("adhkar:adhan-prefs-update", () => {
-    scheduleAdhanNotifications();
-  });
-}
+const stopWebAdhan = () => {
+  if (!webAdhan) return;
+  webAdhan.audio.pause();
+  webAdhan = null;
+};
+
+const webProgress = (): AdhanProgress | null => {
+  if (!webAdhan) return null;
+  const { audio, prayer, reciterId } = webAdhan;
+  const duration = Number.isFinite(audio.duration) ? audio.duration : 0;
+  return {
+    currentTime: audio.currentTime,
+    duration,
+    progress: duration ? audio.currentTime / duration : 0,
+    isPlaying: !audio.paused || !webAdhan.userPaused && audio.currentTime === 0,
+    hasSession: true,
+    prayer,
+    reciterId,
+  };
+};
+
+const call = async (fn: keyof AdhanPlugin, arg?: unknown): Promise<void> => {
+  const plugin = getPlugin() as any;
+  if (!plugin) return;
+  try {
+    await plugin[fn](arg);
+  } catch {
+    // ignore
+  }
+};
+
+export const stopAdhan = () => (webAdhan ? Promise.resolve(stopWebAdhan()) : call("stopAdhan"));
+export const pauseAdhan = () => {
+  if (!webAdhan) return call("pauseAdhan");
+  webAdhan.userPaused = true;
+  webAdhan.audio.pause();
+  return Promise.resolve();
+};
+export const resumeAdhan = () => {
+  if (!webAdhan) return call("resumeAdhan");
+  webAdhan.userPaused = false;
+  return webAdhan.audio.play().then(() => {}, (e) => console.warn("[adhan-silent] resume failed", e));
+};
+export const seekAdhan = (progress: number) => {
+  const f = Math.min(1, Math.max(0, progress));
+  if (webAdhan) {
+    const d = webAdhan.audio.duration;
+    if (Number.isFinite(d)) webAdhan.audio.currentTime = f * d;
+    return Promise.resolve();
+  }
+  return call("seekAdhan", { progress: f });
+};
+
+
+const PREVIEW_URLS: Record<string, string> = {
+  mishary: misharyAsset.url,
+  basit: basitAsset.url,
+  makkah: makkahAsset.url,
+  madinah: madinahAsset.url,
+  zaili: zailiAsset.url,
+  majale: majaleAsset.url,
+  qatami: qatamiAsset.url,
+  "fajr-mishary": fajrMisharyAsset.url,
+  "fajr-madinah": fajrMadinahAsset.url,
+};
+const validPreview = (id: string): string => (PREVIEW_URLS[id] ? id : DEFAULT_RECITER_ID);
+
+let previewAudio: HTMLAudioElement | null = null;
+const preloaded: Record<string, HTMLAudioElement> = {};
+
+/** Starts buffering every preview so taps play instantly. */
+export const preloadAdhanPreviews = () => {
+  if (typeof Audio === "undefined") return;
+  for (const [id, url] of Object.entries(PREVIEW_URLS)) {
+    if (preloaded[id]) continue;
+    const a = new Audio();
+    a.preload = "auto";
+    a.src = url;
+    a.load();
+    preloaded[id] = a;
+  }
+};
+
+/** Plays the reciter's full recording as an in-app preview (web + native). */
+export const playAdhanPreview = async (reciterId: string, onEnded?: () => void): Promise<boolean> => {
+  stopAdhanPreview();
+  const url = PREVIEW_URLS[validPreview(reciterId)];
+  if (!url || typeof Audio === "undefined") return false;
+  try {
+    const id = validPreview(reciterId);
+    const audio = preloaded[id] ?? new Audio(url);
+    preloaded[id] = audio;
+    audio.currentTime = 0;
+    audio.onended = () => {
+      if (previewAudio === audio) previewAudio = null;
+      onEnded?.();
+    };
+    previewAudio = audio;
+    await audio.play();
+    return true;
+  } catch {
+    previewAudio = null;
+    return false;
+  }
+};
+
+export const stopAdhanPreview = () => {
+  if (previewAudio) {
+    previewAudio.pause();
+    previewAudio.currentTime = 0;
+    previewAudio = null;
+  }
+};
+
+const toInfo = (v: unknown): AdhanPlayingInfo => {
+  if (typeof v === "string") return { prayer: v, reciterId: getReciterForPrayer(v) };
+  const o = (v ?? {}) as Record<string, unknown>;
+  const prayer = str(o.prayer);
+  return { prayer, reciterId: str(o.reciterId) || getReciterForPrayer(prayer) };
+};
+
+/**
+ * Fires when the native side starts playing the adhan: listens for the
+ * "adhan:playing" CustomEvent and the native plugin event.
+ */
+export const onAdhanPlaying = (handler: (info: AdhanPlayingInfo) => void): (() => void) => {
+  if (typeof window === "undefined") return () => {};
+  const onEvent = (event: Event) => handler(toInfo((event as CustomEvent).detail));
+  window.addEventListener(ADHAN_PLAYING_EVENT, onEvent);
+
+  let cancelled = false;
+  const removers: Array<() => void> = [];
+  const plugin = getPlugin() as any;
+  if (plugin) {
+    try {
+      const handle = plugin.addListener("adhanPlaying", (info: unknown) => handler(toInfo(info)));
+      if (handle && typeof (handle as Promise<unknown>).then === "function") {
+        (handle as Promise<{ remove?: () => void }>)
+          .then((h) => {
+            if (cancelled) h?.remove?.();
+            else removers.push(() => h?.remove?.());
+          })
+          .catch(() => {});
+      }
+    } catch {
+      // ignore
+    }
+  }
+
+  return () => {
+    if (cancelled) return;
+    cancelled = true;
+    window.removeEventListener(ADHAN_PLAYING_EVENT, onEvent);
+    for (const off of removers) off();
+  };
+};

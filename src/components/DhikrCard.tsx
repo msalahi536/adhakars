@@ -1,8 +1,11 @@
 import { useEffect, useRef, useState } from "react";
+import { AlertTriangle } from "lucide-react";
 import type { Dhikr } from "@/data/adhkar";
-import { ProgressRing } from "./ProgressRing";
 import { ListenButton } from "./ListenButton";
+import { ArabicText, OrnamentalDivider, RepeatCounter, SourceBadge, Transliteration } from "./AdhkarPrimitives";
 import { getDisplay, triggerHaptic } from "@/lib/theme";
+import { HadithDetailsDrawer } from "./HadithDetailsDrawer";
+import { noteDhikrSessionComplete } from "@/lib/rate-app";
 
 type Props = {
   dhikr: Dhikr;
@@ -13,13 +16,16 @@ type Props = {
   isSpecial?: boolean;
   specialLabel?: string;
   isPersonalDua?: boolean;
+  referenceLayout?: boolean;
 };
 
-export function DhikrCard({ dhikr, count, onIncrement, isSpecial, specialLabel, isPersonalDua }: Props) {
+export function DhikrCard({ dhikr, count, onIncrement, isSpecial, specialLabel, isPersonalDua, referenceLayout = false }: Props) {
   const [tapped, setTapped] = useState(false);
   const [bursts, setBursts] = useState<number[]>([]);
+  const [justCompleted, setJustCompleted] = useState(false);
   const [display, setDisplay] = useState(getDisplay());
   const [showBottomFade, setShowBottomFade] = useState(true);
+  const [showHadithDetails, setShowHadithDetails] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
   const complete = count >= dhikr.target;
 
@@ -45,36 +51,32 @@ export function DhikrCard({ dhikr, count, onIncrement, isSpecial, specialLabel, 
   const handleTap = () => {
     if (complete) return;
     const willComplete = count + 1 >= dhikr.target;
-    triggerHaptic(willComplete ? "medium" : "light");
+    triggerHaptic(willComplete ? "medium" : "heavy");
     setTapped(true);
     setTimeout(() => setTapped(false), 260);
     if (willComplete) {
-      const id = Date.now();
-      setBursts((b) => [...b, id]);
-      setTimeout(() => setBursts((b) => b.filter((x) => x !== id)), 900);
+      setJustCompleted(true);
+      setTimeout(() => setJustCompleted(false), 500);
+      noteDhikrSessionComplete();
     }
     onIncrement();
   };
 
-  const totalArabicLen = dhikr.arabicMulti
-    ? dhikr.arabicMulti.reduce((s, p) => s + p.arabic.length, 0)
-    : dhikr.arabic.length;
-  const baseArabic = display.arabicLarge ? 34 : 30;
-  const arabicSize = totalArabicLen > 200 ? (display.arabicLarge ? 26 : 22) : baseArabic;
+  const arabicSize = display.arabicLarge ? 30 : 24;
 
   const hasTranslation = !!(dhikr.translation || dhikr.arabicMulti);
   const hasCommentary = !!dhikr.commentary;
 
   return (
     <div
-      className="relative flex h-full w-full flex-col overflow-hidden rounded-[24px]"
+      className={`dhikr-card relative flex w-full flex-col overflow-hidden ${referenceLayout ? "adhkar-reference-card" : "h-full"}`}
       style={{ background: "var(--card)", color: "var(--card-foreground)", border: "1px solid var(--border)", boxShadow: "var(--card-shadow, 0 4px 16px rgba(0,0,0,0.08))" }}
     >
-      <div className="flex items-center gap-3 px-5 pt-5">
-        <ListenButton dhikrId={dhikr.id} size={32} />
+      <div className="adhkar-card-heading grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-4">
+        <ListenButton dhikrId={dhikr.id} size={34} />
         <h3
-          className="flex-1 text-[12px] font-semibold uppercase"
-          style={{ letterSpacing: "0.12em", color: "var(--card-foreground)", opacity: 0.85 }}
+          className="min-w-0 uppercase"
+          style={{ letterSpacing: "0.16em", color: "var(--accent)", opacity: 1 }}
         >
           {dhikr.title}
         </h3>
@@ -90,12 +92,11 @@ export function DhikrCard({ dhikr, count, onIncrement, isSpecial, specialLabel, 
       )}
 
       {/* Scrollable content area */}
-      <div className="relative min-h-0 flex-1">
+      <div className={`relative min-h-0 flex-1 ${referenceLayout ? "adhkar-reference-body" : ""}`}>
         <div
           ref={scrollRef}
           onScroll={handleScroll}
-          data-no-swipe
-          className="hide-scrollbar h-full overflow-y-auto px-5 pb-4 pt-3"
+          className={`hide-scrollbar px-7 pb-4 pt-5 ${referenceLayout ? "adhkar-reference-content" : "h-full overflow-y-auto"}`}
           style={{ scrollbarWidth: "none", WebkitOverflowScrolling: "touch" }}
         >
           {dhikr.arabicMulti ? (
@@ -103,22 +104,14 @@ export function DhikrCard({ dhikr, count, onIncrement, isSpecial, specialLabel, 
               {dhikr.arabicMulti.map((part) => (
                 <div key={part.label}>
                   <div className="label-caps mb-1.5 text-center">{part.label}</div>
-                  <p
-                    className="arabic font-bold"
-                    style={{ fontSize: arabicSize, lineHeight: 1.75, color: "var(--card-foreground)" }}
-                  >
-                    {part.arabic}
-                  </p>
-                  {display.showTransliteration && part.transliteration && (
-                    <p
-                      className="mt-2 text-center italic"
-                      style={{ fontSize: 13, color: "var(--translit)", lineHeight: 1.55 }}
-                    >
+                    <ArabicText size={arabicSize} large={display.arabicLarge}>{part.arabic}</ArabicText>
+                   {display.showTransliteration && part.transliteration && (
+                     <p className="adhkar-transliteration">
                       {part.transliteration}
                     </p>
                   )}
                   {part.translation && (
-                    <p className="mt-2 text-[13px] opacity-90" style={{ lineHeight: 1.55 }}>
+                     <p className="adhkar-translation">
                       {part.translation}
                     </p>
                   )}
@@ -128,21 +121,13 @@ export function DhikrCard({ dhikr, count, onIncrement, isSpecial, specialLabel, 
           ) : (
             <>
               {dhikr.arabic && (
-                <p
-                  className="arabic font-bold"
-                  style={{ fontSize: arabicSize, lineHeight: 1.8, color: "var(--card-foreground)" }}
-                >
-                  {dhikr.arabic}
-                </p>
+                <ArabicText size={arabicSize} large={display.arabicLarge}>{dhikr.arabic}</ArabicText>
               )}
-              {display.showTransliteration && dhikr.transliteration && (
-                <p
-                  className="mt-3 text-center italic"
-                  style={{ fontSize: 13, color: "var(--translit)", lineHeight: 1.55 }}
-                >
-                  {dhikr.transliteration}
-                </p>
+              {dhikr.arabic && (dhikr.translation || (display.showTransliteration && dhikr.transliteration)) && <OrnamentalDivider />}
+               {display.showTransliteration && dhikr.transliteration && (
+                <Transliteration>{dhikr.transliteration}</Transliteration>
               )}
+               {dhikr.translation && <p className="adhkar-translation">{dhikr.translation}</p>}
             </>
           )}
 
@@ -157,7 +142,7 @@ export function DhikrCard({ dhikr, count, onIncrement, isSpecial, specialLabel, 
             </div>
           )}
 
-          {hasTranslation && dhikr.translation && !dhikr.arabicMulti && (
+          {!referenceLayout && hasTranslation && dhikr.translation && !dhikr.arabicMulti && (
             <div className="mt-4">
               <div className="label-caps mb-1">Translation</div>
               <p className="text-[13px] opacity-90" style={{ lineHeight: 1.55 }}>
@@ -166,7 +151,7 @@ export function DhikrCard({ dhikr, count, onIncrement, isSpecial, specialLabel, 
             </div>
           )}
 
-          {hasCommentary && (
+          {!referenceLayout && hasCommentary && (
             <div className="mt-4">
               <div className="label-caps mb-1">Commentary</div>
               <p className="text-[13px] opacity-90" style={{ lineHeight: 1.55 }}>
@@ -174,10 +159,20 @@ export function DhikrCard({ dhikr, count, onIncrement, isSpecial, specialLabel, 
               </p>
             </div>
           )}
+          {referenceLayout && hasCommentary && (
+            <details className="adhkar-commentary">
+              <summary>
+                <span>Commentary</span>
+                {dhikr.details?.weak && <AlertTriangle aria-label="Weak or disputed narration" size={13} strokeWidth={1.8} />}
+              </summary>
+              <p>{dhikr.commentary}</p>
+              <p className="adhkar-commentary-hint">Press the reference pill below to open the full hadith, grading, reward, and notes.</p>
+            </details>
+          )}
         </div>
 
         {/* Bottom fade hint */}
-        <div
+        {!referenceLayout && <div
           aria-hidden
           className="pointer-events-none absolute bottom-0 left-0 right-0 h-10 transition-opacity duration-200"
           style={{
@@ -185,25 +180,19 @@ export function DhikrCard({ dhikr, count, onIncrement, isSpecial, specialLabel, 
             background:
               "linear-gradient(to bottom, color-mix(in oklab, var(--card) 0%, transparent), var(--card))",
           }}
-        />
+        />}
       </div>
 
       {/* Sticky footer */}
-      <div className="flex items-end justify-between gap-3 px-5 pb-5 pt-2">
-        <div className="flex flex-col gap-1.5">
-          <span
-            className="self-start rounded-full px-2.5 py-1 text-[11px] font-semibold"
-            style={{
-              background: "var(--source-bg, color-mix(in oklab, var(--card-foreground) 12%, transparent))",
-              color: "var(--source-fg, var(--card-foreground))",
-            }}
-          >
-            {dhikr.source}
-          </span>
-          <div className="text-[12px] opacity-70">
-            Target · <span className="font-semibold opacity-100">{dhikr.target}×</span>
-          </div>
-        </div>
+       <div className="adhkar-card-footer flex items-end justify-between gap-3">
+           <div className="adhkar-source-column flex min-w-0 flex-col">
+            {dhikr.source && (
+              <SourceBadge
+                source={dhikr.source}
+                onClick={() => setShowHadithDetails(true)}
+              />
+            )}
+         </div>
 
         {isPersonalDua ? (
           <button
@@ -217,37 +206,19 @@ export function DhikrCard({ dhikr, count, onIncrement, isSpecial, specialLabel, 
             }}
             aria-label="mark done"
           >
-            {complete ? "✓ Done" : "Done"}
+            Done
           </button>
         ) : (
-          <button
-            onClick={handleTap}
-            disabled={complete}
-            className={`relative flex h-[104px] w-[104px] shrink-0 items-center justify-center rounded-full ${tapped ? "tap-pulse" : ""}`}
-            style={{ touchAction: "manipulation" }}
-            aria-label="increment counter"
-          >
-            <ProgressRing value={count} max={dhikr.target} size={104} stroke={9} complete={complete} />
-            <div className="absolute inset-0 flex flex-col items-center justify-center">
-              {complete ? (
-                <span className="text-3xl" style={{ color: "var(--accent)" }}>✓</span>
-              ) : (
-                <>
-                  <span className="text-3xl font-bold leading-none" style={{ color: "var(--count-fg, var(--card-foreground))" }}>{count}</span>
-                  <span className="mt-1 text-[10px] opacity-70">/ {dhikr.target}</span>
-                </>
-              )}
-            </div>
-            {bursts.map((b) => (
-              <span
-                key={b}
-                className="radial-pulse pointer-events-none absolute inset-0 rounded-full"
-                style={{ background: "color-mix(in oklab, var(--accent) 50%, transparent)" }}
-              />
-            ))}
-          </button>
+           <RepeatCounter count={count} target={dhikr.target} complete={complete} tapped={tapped && !justCompleted} bursts={bursts} justCompleted={justCompleted} onClick={handleTap} size={referenceLayout ? 84 : 88} />
         )}
       </div>
+      {dhikr.source && (
+        <HadithDetailsDrawer
+          dhikr={dhikr}
+          open={showHadithDetails}
+          onOpenChange={setShowHadithDetails}
+        />
+      )}
     </div>
   );
 }

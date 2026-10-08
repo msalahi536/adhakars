@@ -1,11 +1,22 @@
 import { useEffect, useRef, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
-import { HeaderSettingsButton } from "@/components/HeaderSettingsButton";
+import { Check, Crosshair, Lightbulb, Navigation } from "lucide-react";
 import { HeaderBackButton } from "@/components/HeaderBackButton";
 import { CompassCalibrationCard } from "@/components/CompassCalibrationCard";
+import {
+  getPosition,
+  hasStoredPermission,
+  needsGesturePermission,
+  normalizeHeading,
+  requestOrientationPermission,
+  storePermissionGranted,
+  subscribeOrientation,
+  watchPosition,
+} from "@/lib/compass";
 
-const CAL_OPEN_COUNT_KEY = "qibla-open-count";
-const CAL_AUTO_LIMIT = 3;
+
+
+
 
 
 export const Route = createFileRoute("/app/qibla")({
@@ -13,6 +24,10 @@ export const Route = createFileRoute("/app/qibla")({
     meta: [
       { title: "Qibla Finder, Sahih Al-Adhkar" },
       { name: "description", content: "Find the direction of the Qibla from your location." },
+      { property: "og:title", content: "Qibla Finder, Sahih Al-Adhkar" },
+      { property: "og:description", content: "Find the direction of the Qibla from your location." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
     ],
   }),
   component: Qibla,
@@ -48,173 +63,221 @@ function distanceKm(lat: number, lng: number): number {
   return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 }
 
-type DeviceOrientationEventStatic = typeof DeviceOrientationEvent & {
-  requestPermission?: () => Promise<"granted" | "denied">;
-};
+const CAL_DONE_KEY = "qibla-calibrated";
 
 function Qibla() {
-  const [permState, setPermState] = useState<"idle" | "requesting" | "granted" | "denied">("idle");
+  const [phase, setPhase] = useState<"intro" | "requesting" | "ready" | "error">("requesting");
+  const [step, setStep] = useState<string>("");
   const [error, setError] = useState<string | null>(null);
+  const [absolute, setAbsolute] = useState<boolean | null>(null);
   const [coords, setCoords] = useState<{ lat: number; lng: number } | null>(null);
-  const [heading, setHeading] = useState<number | null>(null); // device compass heading (0 = N)
+  const [lostSensor, setLostSensor] = useState(false);
+  const [heading, setHeading] = useState<number | null>(null);
   const [qiblaBearing, setQiblaBearing] = useState<number | null>(null);
-  const [showCalibration, setShowCalibration] = useState<boolean>(false);
-  const lowAccuracyShownRef = useRef(false);
-  const listenerRef = useRef<((e: DeviceOrientationEvent) => void) | null>(null);
+  const [showCalibration, setShowCalibration] = useState(false);
+  const unsubRef = useRef<(() => void) | null>(null);
+  const smoothRef = useRef<number | null>(null);
+  // Continuous (unwrapped) rotation so the arrow never spins the long way
+  // around when the heading crosses 360 back to 0.
+  const contRef = useRef(0);
+  const [arrowAngle, setArrowAngle] = useState(0);
 
-  // Auto-show calibration card the first N opens.
   useEffect(() => {
-    if (typeof window === "undefined") return;
+    return () => {
+      unsubRef.current?.();
+      cancelAnimationFrame(rafRef.current);
+    };
+  }, []);
+
+  // Live location: keep the bearing and distance tracking the real position
+  // the whole time the page is open. No cached fixes, no refresh button.
+  useEffect(() => {
+    if (phase !== "ready") return;
+    const stop = watchPosition((c) => {
+      setCoords(c);
+      setQiblaBearing(bearingToKaaba(c.lat, c.lng));
+    });
+    return stop;
+  }, [phase]);
+
+  // Lock the page in place: no pinch zoom, no dragging the layout around.
+  useEffect(() => {
+    const stop = (e: Event) => e.preventDefault();
+    document.addEventListener("gesturestart", stop, { passive: false });
+    document.addEventListener("gesturechange", stop, { passive: false });
+    const onTouch = (e: TouchEvent) => {
+      if (e.touches.length > 1) e.preventDefault();
+    };
+    document.addEventListener("touchmove", onTouch, { passive: false });
+    return () => {
+      document.removeEventListener("gesturestart", stop);
+      document.removeEventListener("gesturechange", stop);
+      document.removeEventListener("touchmove", onTouch);
+    };
+  }, []);
+
+  const markCalibrated = () => {
     try {
-      const raw = localStorage.getItem(CAL_OPEN_COUNT_KEY);
-      const n = raw ? parseInt(raw, 10) || 0 : 0;
-      if (n < CAL_AUTO_LIMIT) {
-        setShowCalibration(true);
-      }
-      localStorage.setItem(CAL_OPEN_COUNT_KEY, String(n + 1));
+      localStorage.setItem(CAL_DONE_KEY, "1");
     } catch {
       // ignore
     }
-  }, []);
+    setShowCalibration(false);
+  };
 
-  useEffect(() => {
-    // Auto-start only when the platform does NOT require a per-session user
-    // gesture for motion access.
-    const DOE = DeviceOrientationEvent as DeviceOrientationEventStatic;
-    const needsGesture = typeof DOE?.requestPermission === "function";
-    if (
-      typeof window !== "undefined" &&
-      !needsGesture &&
-      localStorage.getItem("qibla-perm-granted") === "1"
-    ) {
-      void start(true);
-    }
-    return () => {
-      if (listenerRef.current) {
-        window.removeEventListener("deviceorientationabsolute", listenerRef.current as EventListener);
-        window.removeEventListener("deviceorientation", listenerRef.current as EventListener);
+  const rafRef = useRef(0);
+  const pendingRef = useRef<number | null>(null);
+
+  const attachCompass = () => {
+    unsubRef.current?.();
+    cancelAnimationFrame(rafRef.current);
+    pendingRef.current = null;
+    let got = false;
+    unsubRef.current = subscribeOrientation((r) => {
+      if (r.heading === null) return;
+      got = true;
+      setAbsolute(r.absolute);
+      const prev = smoothRef.current;
+      let next = r.heading;
+      if (prev !== null) {
+        const delta = ((r.heading - prev + 540) % 360) - 180;
+        // Dead zone: ignore sensor noise below ~0.8° so a still phone
+        // shows a still needle.
+        if (Math.abs(delta) < 0.8) return;
+        // Exponential smoothing: small moves get heavy damping, big turns
+        // follow faster, so the needle glides instead of twitching.
+        const strength = Math.min(1, Math.abs(delta) / 45);
+        const alpha = 0.08 + strength * 0.22;
+        next = normalizeHeading(prev + delta * alpha);
       }
-    };
+      smoothRef.current = next;
+      pendingRef.current = next;
+      // Push to state at most once per animation frame — sensor events fire
+      // far more often than the screen refreshes.
+      if (!rafRef.current) {
+        rafRef.current = requestAnimationFrame(() => {
+          rafRef.current = 0;
+          if (pendingRef.current !== null) {
+            setHeading(Math.round(pendingRef.current * 10) / 10);
+            pendingRef.current = null;
+          }
+        });
+      }
+    });
+    setTimeout(() => {
+      if (!got && needsGesturePermission()) {
+        // The sensor stayed quiet this session — iOS can reset its motion
+        // permission per launch. Show the button again, but KEEP the stored
+        // flag so the compass reconnects with one tap instead of nagging.
+        unsubRef.current?.();
+        setLostSensor(true);
+        setPhase("intro");
+        return;
+      }
+      if (!got) {
+        setError(
+          "No compass readings from this device. Try calibrating, or open the app on a phone.",
+        );
+      }
+    }, 4000);
+  };
+
+  // Permissions first, then calibration. Runs from a real user gesture.
+  const start = async (skipPrompt = false) => {
+    setPhase("requesting");
+    setError(null);
+    setLostSensor(false);
+
+    setStep("Requesting motion access…");
+    // Permission was already granted before: don't re-prompt (iOS would reject
+    // a prompt that isn't triggered by a tap). Just attach to the sensor.
+    const sensor = skipPrompt ? "granted" : await requestOrientationPermission();
+    if (sensor === "denied") {
+      setError(
+        "Motion and orientation access was denied. Allow it for this app in your device settings, then try again.",
+      );
+      setPhase("error");
+      return;
+    }
+    if (sensor === "granted") storePermissionGranted();
+
+    setStep("Getting your location…");
+    // Always take a fresh fix here; the watcher keeps it live afterwards.
+    const pos = await getPosition({ force: true });
+    if (!pos.ok) {
+      setError(pos.error);
+      setPhase("error");
+      return;
+    }
+    setCoords(pos.coords);
+    setQiblaBearing(bearingToKaaba(pos.coords.lat, pos.coords.lng));
+
+    setStep("");
+    if (sensor === "unsupported") {
+      setError("This device has no compass sensor, so only the bearing is shown.");
+    } else {
+      attachCompass();
+    }
+    setPhase("ready");
+  };
+
+  // Auto start when opening the page. iOS only allows the motion prompt from a
+  // real tap, so the button is kept for that first run; once granted (or on
+  // platforms with no prompt) the compass comes up on its own.
+  const autoRef = useRef(false);
+  useEffect(() => {
+    if (autoRef.current) return;
+    autoRef.current = true;
+    if (!needsGesturePermission()) void start();
+    else if (hasStoredPermission()) void start(true);
+    else setPhase("intro");
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const start = async (auto = false) => {
-    setError(null);
-    setPermState("requesting");
+  const permState = phase;
 
-    // 1) Geolocation
-    if (!("geolocation" in navigator)) {
-      setError("Geolocation not supported on this device.");
-      setPermState("denied");
-      return;
-    }
 
-    navigator.geolocation.getCurrentPosition(
-      (pos) => {
-        const lat = pos.coords.latitude;
-        const lng = pos.coords.longitude;
-        setCoords({ lat, lng });
-        setQiblaBearing(bearingToKaaba(lat, lng));
-      },
-      (err) => {
-        setError(`Location error: ${err.message}. Please enable location.`);
-        setPermState("denied");
-      },
-      { enableHighAccuracy: true, timeout: 10000, maximumAge: 60000 },
-    );
-
-    // 2) Motion / orientation permission (iOS 13+)
-    // On auto-start (previously granted), skip requestPermission — it requires a
-    // fresh user gesture and would throw. Just attach listeners directly.
-    const DOE = DeviceOrientationEvent as DeviceOrientationEventStatic;
-    if (!auto) {
-      try {
-        if (typeof DOE?.requestPermission === "function") {
-          const resp = await DOE.requestPermission();
-          if (resp !== "granted") {
-            setError("Motion access denied. Enable in iOS Settings → Safari → Motion & Orientation.");
-            setPermState("denied");
-            return;
-          }
-        }
-      } catch {
-        setError("Motion access blocked. Enable in iOS Settings → Safari → Motion & Orientation.");
-        setPermState("denied");
-        return;
-      }
-    }
-
-    const handler = (e: DeviceOrientationEvent) => {
-      const anyE = e as DeviceOrientationEvent & {
-        webkitCompassHeading?: number;
-        webkitCompassAccuracy?: number;
-      };
-      if (typeof anyE.webkitCompassHeading === "number") {
-        setHeading(anyE.webkitCompassHeading);
-      } else if (typeof e.alpha === "number") {
-        const h = (360 - e.alpha) % 360;
-        setHeading(h);
-      }
-      // Low compass accuracy: iOS reports -1 for invalid, or a degree value
-      // where larger = worse. Anything > 30° or -1 is treated as low accuracy.
-      const acc = anyE.webkitCompassAccuracy;
-      if (
-        typeof acc === "number" &&
-        (acc < 0 || acc > 30) &&
-        !lowAccuracyShownRef.current
-      ) {
-        lowAccuracyShownRef.current = true;
-        setShowCalibration(true);
-      }
-    };
-    listenerRef.current = handler;
-    window.addEventListener("deviceorientationabsolute", handler as EventListener, true);
-    window.addEventListener("deviceorientation", handler as EventListener, true);
-
-    try {
-      localStorage.setItem("qibla-perm-granted", "1");
-    } catch {
-      // ignore
-    }
-    setPermState("granted");
-  };
-
-  // Rotation to apply to the qibla arrow: bearing - heading
-  const arrowRotation =
+  // Rotation to apply to the qibla arrow: bearing - heading, unwrapped.
+  const targetRotation =
     qiblaBearing !== null && heading !== null ? (qiblaBearing - heading + 360) % 360 : null;
-  const aligned = arrowRotation !== null && (arrowRotation < 5 || arrowRotation > 355);
+
+  useEffect(() => {
+    if (targetRotation === null) return;
+    const current = contRef.current;
+    const delta = ((targetRotation - (((current % 360) + 360) % 360) + 540) % 360) - 180;
+    contRef.current = current + delta;
+    setArrowAngle(contRef.current);
+  }, [targetRotation]);
+
+  const aligned = targetRotation !== null && (targetRotation < 5 || targetRotation > 355);
+
 
   return (
     <>
       <header
-        className="page-header relative overflow-hidden"
+        className="page-header qibla-header relative overflow-hidden"
         style={{ background: "var(--grad-header)", color: "var(--header-fg)" }}
       >
         <HeaderBackButton />
-        <HeaderSettingsButton />
-        <div className="mx-auto max-w-md px-5 pb-4 pt-5" style={{ paddingLeft: 60, paddingRight: 60 }}>
+        <div className="qibla-header-content mx-auto max-w-md px-16 text-center">
           <div className="label-caps" style={{ color: "var(--header-sub)", opacity: 1 }}>
             Direction of Prayer
           </div>
-          <h1 className="mt-1 text-2xl font-bold tracking-tight">Qibla Finder</h1>
-          <p className="mt-2 text-xs" style={{ color: "var(--header-sub)" }}>
-            Point your phone flat. The arrow will point toward the Kaaba.
-          </p>
+          <h1 className="app-page-title mt-2">Qibla Finder</h1>
         </div>
       </header>
 
-      <main className="scroll-area">
+      <main className="scroll-area qb-main">
         <div
-          className="mx-auto flex w-full max-w-md flex-col items-center px-5 py-6"
+          className="qibla-page mx-auto flex min-h-full w-full max-w-md flex-col items-center"
           style={{ color: "var(--foreground)" }}
         >
           {showCalibration && (
-            <div className="mb-5 w-full">
-              <CompassCalibrationCard onDismiss={() => setShowCalibration(false)} />
-            </div>
+            <CompassCalibrationCard onDone={markCalibrated} onSkip={() => setShowCalibration(false)} />
           )}
-          {permState !== "granted" && (
-            <div className="mt-6 flex w-full flex-col items-center gap-4">
+
+          {permState !== "ready" && (
+            <div className="flex w-full flex-1 flex-col items-center justify-center gap-4 pb-10">
               <p
                 className="text-center text-sm"
                 style={{ color: "var(--muted-foreground)" }}
@@ -223,165 +286,120 @@ function Qibla() {
                 leaves your device.
               </p>
               <button
-                onClick={() => start()}
-                className="rounded-full px-6 py-3 text-sm font-bold"
+                onClick={() => void start(false)}
+                disabled={permState === "requesting"}
+                className="rounded-full px-6 py-3 text-sm font-bold disabled:opacity-70"
                 style={{
                   background: "var(--accent)",
                   color: "var(--accent-foreground)",
                   boxShadow: "var(--card-shadow)",
                 }}
               >
-                {permState === "requesting" ? "Requesting…" : "Enable Compass"}
+                {permState === "requesting" ? (step || "Requesting…") : permState === "error" ? "Try again" : "Enable Compass"}
               </button>
               {error && (
                 <p className="text-center text-xs" style={{ color: "#c0392b" }}>
                   {error}
                 </p>
               )}
+              {lostSensor && !error && (
+                <p className="text-center text-xs" style={{ color: "var(--muted-foreground)" }}>
+                  The compass didn't respond on its own — tap to reconnect it.
+                </p>
+              )}
             </div>
           )}
 
-          {permState === "granted" && (
-            <>
-              <div
-                className="relative mt-4 flex items-center justify-center"
-                style={{ width: 280, height: 280 }}
-              >
-                {/* Compass ring */}
+
+
+
+          {permState === "ready" && (
+            <div className="qibla-ready">
+              <div className="qb-dial" data-aligned={aligned || undefined}>
                 <div
-                  className="absolute inset-0 rounded-full"
+                  className="qb-rose"
                   style={{
-                    background:
-                      "radial-gradient(circle, var(--card) 0%, var(--muted) 75%)",
-                    border: "2px solid color-mix(in oklab, var(--accent) 45%, transparent)",
-                    boxShadow: "var(--card-shadow)",
-                  }}
-                />
-                {/* Cardinal marks rotate with device so N always points to true North */}
-                <div
-                  className="absolute inset-0"
-                  style={{
-                    transform: `rotate(${heading !== null ? -heading : 0}deg)`,
-                    transition: "transform 120ms linear",
+                    transform: `rotate(${qiblaBearing !== null && heading !== null ? arrowAngle - qiblaBearing : 0}deg)`,
                   }}
                 >
+                  {Array.from({ length: 72 }).map((_, i) => (
+                    <span
+                      key={i}
+                      className={`qb-tick ${i % 18 === 0 ? "is-major" : i % 6 === 0 ? "is-mid" : ""}`}
+                      style={{ transform: `rotate(${i * 5}deg)` }}
+                    />
+                  ))}
                   {(["N", "E", "S", "W"] as const).map((label, i) => (
-                    <div
+                    <span
                       key={label}
-                      className="absolute left-1/2 top-1/2 text-xs font-bold"
-                      style={{
-                        color:
-                          label === "N"
-                            ? "var(--accent)"
-                            : "color-mix(in oklab, var(--foreground) 55%, transparent)",
-                        transform: `translate(-50%, -50%) rotate(${i * 90}deg) translateY(-118px) rotate(${-i * 90}deg)`,
-                      }}
+                      className="qb-cardinal"
+                      style={{ transform: `translate(-50%, -50%) rotate(${i * 90}deg) translateY(calc(var(--qb-r) * -0.78)) rotate(${-i * 90}deg)` }}
                     >
                       {label}
-                    </div>
+                    </span>
                   ))}
                 </div>
-                {/* Qibla arrow */}
-                {arrowRotation !== null && (
-                  <div
-                    className="absolute inset-0 flex items-center justify-center"
-                    style={{
-                      transform: `rotate(${arrowRotation}deg)`,
-                      transition: "transform 200ms ease-out",
-                    }}
-                  >
-                    <div className="flex flex-col items-center" style={{ transform: "translateY(-40px)" }}>
-                      <div
-                        style={{
-                          width: 0,
-                          height: 0,
-                          borderLeft: "18px solid transparent",
-                          borderRight: "18px solid transparent",
-                          borderBottom: `40px solid ${aligned ? "#3d8f5c" : "var(--accent)"}`,
-                          filter: aligned
-                            ? "drop-shadow(0 0 12px color-mix(in oklab, #3d8f5c 60%, transparent))"
-                            : "none",
-                        }}
-                      />
-                      <div
-                        className="mt-1 text-[10px] font-bold tracking-wide"
-                        style={{ color: aligned ? "#3d8f5c" : "var(--accent)" }}
-                      >
-                        KAABA
-                      </div>
-                    </div>
+                <div className="qb-inner" aria-hidden="true">
+                  <svg viewBox="0 0 100 100" className="qb-star">
+                    {Array.from({ length: 8 }).map((_, i) => (
+                      <rect key={i} x="30" y="30" width="40" height="40" rx="2" transform={`rotate(${i * 11.25} 50 50)`} />
+                    ))}
+                  </svg>
+                </div>
+                {targetRotation !== null && (
+                  <div className="qb-needle" style={{ transform: `rotate(${arrowAngle}deg)` }}>
+                    <svg viewBox="0 0 40 90" aria-hidden="true">
+                      <path d="M20 2 L34 62 L20 54 Z" className="qb-needle-dark" />
+                      <path d="M20 2 L6 62 L20 54 Z" className="qb-needle-light" />
+                    </svg>
                   </div>
                 )}
-                {/* Center dot */}
-                <div
-                  className="absolute rounded-full"
-                  style={{
-                    width: 12,
-                    height: 12,
-                    background: "var(--accent)",
-                    boxShadow:
-                      "0 0 0 4px color-mix(in oklab, var(--accent) 20%, transparent)",
-                  }}
-                />
+                <span className="qb-hub" />
               </div>
 
-              {!showCalibration && (
-                <button
-                  onClick={() => setShowCalibration(true)}
-                  className="mt-4 rounded-full px-4 py-2 text-xs font-bold"
-                  style={{
-                    background: "var(--btn-surface)",
-                    color: "var(--btn-fg)",
-                    border:
-                      "1px solid color-mix(in oklab, var(--accent) 40%, transparent)",
-                  }}
-                >
-                  Calibrate compass
-                </button>
+              {aligned && (
+                <div className="mt-3 flex items-center gap-1.5 text-sm font-bold text-primary">
+                  <Check aria-hidden size={16} strokeWidth={2} />
+                  <span>You are facing the Qibla</span>
+                </div>
               )}
 
-              <div
-                className="mt-6 w-full space-y-1.5 text-center text-xs"
-                style={{ color: "var(--muted-foreground)" }}
-              >
-                {qiblaBearing !== null && (
+              <button onClick={() => setShowCalibration(true)} className="qb-cal-btn">
+                <Crosshair size={16} strokeWidth={1.8} aria-hidden />
+                Calibrate compass
+              </button>
+
+              {absolute === false && (
+                <p className="mt-2 text-center text-[11px] text-destructive">
+                  This device reports a relative compass, so the direction may drift. Calibrate to improve it.
+                </p>
+              )}
+
+              <div className="qb-stats">
+                <div className="qb-stat">
+                  <span className="qb-stat-icon"><Navigation size={16} strokeWidth={1.8} /></span>
                   <div>
-                    Qibla bearing:{" "}
-                    <span className="font-bold" style={{ color: "var(--foreground)" }}>
-                      {qiblaBearing.toFixed(1)}°
-                    </span>
+                    <div className="qb-stat-label">Qibla bearing</div>
+                    <div className="qb-stat-value">{qiblaBearing !== null ? `${qiblaBearing.toFixed(1)}°` : "--"}</div>
                   </div>
-                )}
-                {heading !== null && (
+                </div>
+                <div className="qb-stat-divider" />
+                <div className="qb-stat">
+                  <span className="qb-stat-icon">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden><path d="M4 7l8-4 8 4v10l-8 4-8-4z" /><path d="M4 10l8 4 8-4" /></svg>
+                  </span>
                   <div>
-                    Your heading:{" "}
-                    <span className="font-bold" style={{ color: "var(--foreground)" }}>
-                      {heading.toFixed(1)}°
-                    </span>
+                    <div className="qb-stat-label">Distance to Kaaba</div>
+                    <div className="qb-stat-value">{coords ? `${Math.round(distanceKm(coords.lat, coords.lng)).toLocaleString()} km` : "--"}</div>
                   </div>
-                )}
-                {coords && (
-                  <div>
-                    Distance to Kaaba:{" "}
-                    <span className="font-bold" style={{ color: "var(--foreground)" }}>
-                      {distanceKm(coords.lat, coords.lng).toFixed(0)} km
-                    </span>
-                  </div>
-                )}
-                {aligned && (
-                  <div className="pt-2 text-sm font-bold" style={{ color: "#3d8f5c" }}>
-                    ✓ You are facing the Qibla
-                  </div>
-                )}
+                </div>
               </div>
 
-              <p
-                className="mt-6 text-center text-[10px]"
-                style={{ color: "var(--muted-foreground)", opacity: 0.8 }}
-              >
-                Tip: Keep phone flat and away from metal or magnets for best accuracy.
-              </p>
-            </>
+              <div className="qb-tip">
+                <Lightbulb size={18} strokeWidth={1.6} aria-hidden />
+                <p>Tip: Keep your phone flat and away from metal or magnets for best accuracy.</p>
+              </div>
+            </div>
           )}
         </div>
       </main>

@@ -1,219 +1,157 @@
 import { useEffect, useRef, useState } from "react";
+import { Check } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { subscribeOrientation } from "@/lib/compass";
 
 type Props = {
-  onDismiss: () => void;
+  onDone: () => void;
+  onSkip: () => void;
 };
 
-type DeviceOrientationEventStatic = typeof DeviceOrientationEvent & {
-  requestPermission?: () => Promise<"granted" | "denied">;
-};
+const SECTORS = 12; // ring segments the dot fills in by drifting around
+const SIZE = 220;
+const R = 92;
 
-type DeviceMotionEventStatic = typeof DeviceMotionEvent & {
-  requestPermission?: () => Promise<"granted" | "denied">;
-};
+/**
+ * Calm calibration: a dot drifts with your phone's tilt, and the ring fills
+ * in wherever the dot travels. Gently tilt in circles until the ring closes.
+ */
+export function CompassCalibrationCard({ onDone, onSkip }: Props) {
+  const [mode, setMode] = useState<"waiting" | "live" | "nosensor">("waiting");
+  const [tilt, setTilt] = useState({ x: 0, y: 0 });
+  const [sectors, setSectors] = useState<boolean[]>(() => Array(SECTORS).fill(false));
+  const gotRef = useRef(false);
+  const targetRef = useRef({ x: 0, y: 0 });
+  // Rolling ball: light, springy marble that follows tilt eagerly.
+  const [ball, setBall] = useState({ x: 0, y: 0 });
+  useEffect(() => {
+    let raf = 0;
+    let last = performance.now();
+    const st = { x: 0, y: 0, vx: 0, vy: 0 };
+    const loop = (now: number) => {
+      const dt = Math.min((now - last) / 1000, 0.05);
+      last = now;
+      const t = targetRef.current;
+      // Strong spring, light damping → responds fast with a bit of overshoot.
+      st.vx += (t.x - st.x) * 120 * dt;
+      st.vy += (t.y - st.y) * 120 * dt;
+      const damp = Math.exp(-6 * dt);
+      st.vx *= damp;
+      st.vy *= damp;
+      st.x += st.vx * dt;
+      st.y += st.vy * dt;
+      const d = Math.hypot(st.x, st.y);
+      if (d > 1) { st.x /= d; st.y /= d; st.vx *= 0.5; st.vy *= 0.5; }
+      setBall({ x: st.x, y: st.y });
+      raf = requestAnimationFrame(loop);
+    };
+    raf = requestAnimationFrame(loop);
+    return () => cancelAnimationFrame(raf);
+  }, []);
 
-// Track orientation spread across alpha/beta/gamma. When the accumulated
-// spread crosses the threshold we consider calibration complete. This is
-// intentionally forgiving, not a real figure-8 shape detector.
-const TARGET_SPREAD = 360; // total degrees of variety across the three axes
-
-export function CompassCalibrationCard({ onDismiss }: Props) {
-  const [progress, setProgress] = useState(0); // 0..1
-  const [complete, setComplete] = useState(false);
-  const [sensorMode, setSensorMode] = useState<"pending" | "live" | "fallback">("pending");
-  const rangesRef = useRef({
-    aMin: Infinity, aMax: -Infinity,
-    bMin: Infinity, bMax: -Infinity,
-    gMin: Infinity, gMax: -Infinity,
-  });
-  const gotEventRef = useRef(false);
+  const sectorCount = sectors.filter(Boolean).length;
+  const progress = Math.round((sectorCount / SECTORS) * 100);
+  const complete = progress >= 100;
 
   useEffect(() => {
-    let cancelled = false;
-    let handler: ((e: DeviceOrientationEvent) => void) | null = null;
-
-    const attach = () => {
-      handler = (e: DeviceOrientationEvent) => {
-        if (cancelled) return;
-        gotEventRef.current = true;
-        if (sensorMode !== "live") setSensorMode("live");
-        const r = rangesRef.current;
-        if (typeof e.alpha === "number") {
-          r.aMin = Math.min(r.aMin, e.alpha);
-          r.aMax = Math.max(r.aMax, e.alpha);
+    const unsubscribe = subscribeOrientation((r) => {
+      gotRef.current = true;
+      setMode("live");
+      if (r.beta !== null && r.gamma !== null) {
+        const x = Math.max(-1, Math.min(1, r.gamma / 40));
+        const y = Math.max(-1, Math.min(1, r.beta / 40));
+        setTilt({ x, y });
+        targetRef.current = { x, y };
+        if (Math.hypot(x, y) > 0.3) {
+          const ang = (Math.atan2(y, x) * 180) / Math.PI + 360;
+          const s = Math.floor(((ang + 180 / SECTORS) % 360) / (360 / SECTORS)) % SECTORS;
+          setSectors((p) => (p[s] ? p : p.map((v, i) => (i === s ? true : v))));
         }
-        if (typeof e.beta === "number") {
-          r.bMin = Math.min(r.bMin, e.beta);
-          r.bMax = Math.max(r.bMax, e.beta);
-        }
-        if (typeof e.gamma === "number") {
-          r.gMin = Math.min(r.gMin, e.gamma);
-          r.gMax = Math.max(r.gMax, e.gamma);
-        }
-        const spread =
-          Math.max(0, r.aMax - r.aMin) +
-          Math.max(0, r.bMax - r.bMin) +
-          Math.max(0, r.gMax - r.gMin);
-        const p = Math.min(1, spread / TARGET_SPREAD);
-        setProgress(p);
-        if (p >= 1) setComplete(true);
-      };
-      window.addEventListener("deviceorientation", handler as EventListener, true);
-      window.addEventListener("deviceorientationabsolute", handler as EventListener, true);
-    };
-
-    const init = async () => {
-      const DOE = DeviceOrientationEvent as DeviceOrientationEventStatic | undefined;
-      const DME = DeviceMotionEvent as DeviceMotionEventStatic | undefined;
-      // On iOS motion permission may already have been granted this session.
-      // We do NOT force a fresh requestPermission here (that requires a user
-      // gesture); if events do not arrive within ~1.5s we fall back to the
-      // static guide.
-      if (typeof window === "undefined" || !DOE) {
-        setSensorMode("fallback");
-        return;
       }
-      try {
-        attach();
-      } catch {
-        setSensorMode("fallback");
-        return;
-      }
-      // Fallback if no events after 1500ms
-      setTimeout(() => {
-        if (!cancelled && !gotEventRef.current) setSensorMode("fallback");
-      }, 1500);
-      // Reference DME to keep TS from tree-shaking (some browsers gate motion
-      // permission through DeviceMotionEvent instead).
-      void DME;
-    };
-
-    void init();
-
+    });
+    const t = window.setTimeout(() => {
+      if (!gotRef.current) setMode("nosensor");
+    }, 4000);
     return () => {
-      cancelled = true;
-      if (handler) {
-        window.removeEventListener("deviceorientation", handler as EventListener, true);
-        window.removeEventListener("deviceorientationabsolute", handler as EventListener, true);
-      }
+      unsubscribe();
+      window.clearTimeout(t);
     };
-  }, [sensorMode]);
+  }, []);
 
-  const showProgress = sensorMode === "live";
-  const showFallback = sensorMode === "fallback";
+  useEffect(() => {
+    if (complete && typeof navigator !== "undefined" && "vibrate" in navigator) navigator.vibrate?.(30);
+  }, [complete]);
+
+  const c = SIZE / 2;
+  const arc = (i: number) => {
+    const a0 = ((i * 360) / SECTORS - 90 + 2) * (Math.PI / 180);
+    const a1 = (((i + 1) * 360) / SECTORS - 90 - 2) * (Math.PI / 180);
+    return `M ${c + R * Math.cos(a0)} ${c + R * Math.sin(a0)} A ${R} ${R} 0 0 1 ${c + R * Math.cos(a1)} ${c + R * Math.sin(a1)}`;
+  };
+
+  const status =
+    mode === "waiting"
+      ? "Waiting for motion…"
+      : complete
+        ? "Calibration complete"
+        : "Gently tilt your phone in circles";
 
   return (
-    <div
-      className="w-full rounded-2xl p-5"
-      style={{
-        background: "var(--card)",
-        border: "1px solid color-mix(in oklab, var(--accent) 35%, transparent)",
-        boxShadow: "var(--card-shadow)",
-        color: "var(--foreground)",
-      }}
-    >
-      <h2 className="text-base font-bold">Calibrate your compass</h2>
-      <p className="mt-2 text-sm" style={{ color: "var(--muted-foreground)" }}>
-        Move your phone in a figure 8 motion. Tilt and rotate it as you go.
-      </p>
-
-      <div className="mt-4 flex items-center justify-center">
-        <Figure8Animation />
-      </div>
-
-      {showProgress && (
-        <div className="mt-4">
-          <div
-            className="h-2 w-full overflow-hidden rounded-full"
-            style={{
-              background: "color-mix(in oklab, var(--foreground) 10%, transparent)",
-            }}
-          >
-            <div
-              style={{
-                width: `${Math.round(progress * 100)}%`,
-                height: "100%",
-                background: complete ? "#3d8f5c" : "var(--accent)",
-                transition: "width 200ms linear, background 200ms linear",
-              }}
-            />
-          </div>
-          <div
-            className="mt-1 text-center text-[11px] font-semibold"
-            style={{
-              color: complete ? "#3d8f5c" : "var(--muted-foreground)",
-            }}
-          >
-            {complete ? "Calibrated" : "Calibrating"}
-          </div>
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-foreground/45 px-5 backdrop-blur-sm" role="dialog" aria-modal="true" aria-labelledby="calibration-title">
+      <div className="w-full max-w-sm overflow-hidden rounded-3xl border border-border bg-card text-card-foreground shadow-2xl">
+        <div className="px-6 pb-2 pt-5 text-center">
+          <p className="label-caps text-accent">Compass calibration</p>
+          <h2 id="calibration-title" className="mt-1 font-display text-2xl font-semibold">{status}</h2>
+          <p className="mt-1 text-xs leading-5 text-muted-foreground">
+            {complete ? "Your compass is ready." : "Let the dot drift around the ring — no turning around needed."}
+          </p>
         </div>
-      )}
 
-      <p className="mt-4 text-[11px]" style={{ color: "var(--muted-foreground)" }}>
-        Keep away from magnets, metal, and magnetic phone cases, as these affect accuracy.
-      </p>
-
-      <div className="mt-4 flex justify-end gap-2">
-        {showFallback ? (
-          <button
-            onClick={onDismiss}
-            className="rounded-full px-5 py-2 text-sm font-bold"
-            style={{
-              background: "var(--accent)",
-              color: "var(--accent-foreground)",
-            }}
-          >
-            Got it
-          </button>
-        ) : (
-          <>
-            <button
-              onClick={onDismiss}
-              className="rounded-full px-5 py-2 text-sm font-bold"
-              style={{
-                background: "var(--btn-surface)",
-                color: "var(--btn-fg)",
-                border:
-                  "1px solid color-mix(in oklab, var(--foreground) 12%, transparent)",
-              }}
-            >
-              Skip
-            </button>
+        <div className="flex justify-center px-6 py-3">
+          <svg width={SIZE} height={SIZE} viewBox={`0 0 ${SIZE} ${SIZE}`} aria-hidden="true">
+            {sectors.map((on, i) => (
+              <path key={i} d={arc(i)} fill="none" strokeWidth={9} strokeLinecap="round"
+                stroke={on ? "var(--accent)" : "color-mix(in oklab, var(--muted-foreground) 25%, transparent)"} style={{ transition: "stroke 250ms" }} />
+            ))}
+            <circle cx={c} cy={c} r={76} fill="color-mix(in oklab, var(--muted) 55%, transparent)" />
+            <circle cx={c} cy={c} r={24} fill="none" strokeDasharray="3 4" stroke="color-mix(in oklab, var(--muted-foreground) 30%, transparent)" />
+            <g transform={`translate(${c + ball.x * 62} ${c + ball.y * 62})`}>
+              {/* Flat circle — a simple solid dot, no 3D shading. */}
+              <circle r={11} fill="var(--accent)" />
+              <circle r={11} fill="none" stroke="color-mix(in oklab, var(--accent) 70%, var(--card))" strokeWidth={2} />
+            </g>
             {complete && (
-              <button
-                onClick={onDismiss}
-                className="rounded-full px-5 py-2 text-sm font-bold"
-                style={{
-                  background: "var(--accent)",
-                  color: "var(--accent-foreground)",
-                }}
-              >
-                Done
-              </button>
+              <g transform={`translate(${c - 14} ${c - 14})`}>
+                <circle cx={14} cy={14} r={18} fill="var(--card)" />
+                <Check x={2} y={2} width={24} height={24} color="var(--accent)" strokeWidth={2.4} />
+              </g>
             )}
-          </>
-        )}
+          </svg>
+        </div>
+
+        <div className="px-6">
+          {mode === "nosensor" ? (
+            <p className="text-center text-xs leading-5 text-muted-foreground">
+              Motion readings are unavailable on this device.
+            </p>
+          ) : (
+            <>
+              <div className="mb-1.5 flex justify-between text-[11px] font-semibold text-muted-foreground">
+                <span>&nbsp;</span>
+                <span>{progress}%</span>
+              </div>
+              <div className="h-1.5 overflow-hidden rounded-full bg-muted">
+                <div className="h-full rounded-full bg-accent transition-[width] duration-200" style={{ width: `${progress}%` }} />
+              </div>
+            </>
+          )}
+        </div>
+
+        <div className="mt-4 flex items-center justify-between gap-3 border-t border-border px-5 py-4">
+          <Button variant="ghost" className="rounded-full text-muted-foreground" onClick={onSkip}>Close</Button>
+          <Button className="rounded-full px-6" onClick={onDone}>{complete ? "Done" : "Finish"}</Button>
+        </div>
       </div>
     </div>
-  );
-}
-
-function Figure8Animation() {
-  // SVG figure-8 (lemniscate-like) path with a dot moving along it.
-  return (
-    <svg width={140} height={70} viewBox="0 0 140 70" fill="none" aria-hidden>
-      <path
-        id="fig8-path"
-        d="M20,35 C20,10 55,10 70,35 C85,60 120,60 120,35 C120,10 85,10 70,35 C55,60 20,60 20,35 Z"
-        stroke="color-mix(in oklab, var(--accent) 55%, transparent)"
-        strokeWidth={2}
-        fill="none"
-      />
-      <circle r={5} fill="var(--accent)">
-        <animateMotion dur="2.2s" repeatCount="indefinite">
-          <mpath href="#fig8-path" />
-        </animateMotion>
-      </circle>
-    </svg>
   );
 }

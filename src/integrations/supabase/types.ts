@@ -14,47 +14,159 @@ export type Database = {
   }
   public: {
     Tables: {
-      custom_adhkar: {
+      dhikr_recitations: {
         Row: {
-          arabic_text: string
+          dhikr_id: string
+          file_id: string
+          updated_at: string
+        }
+        Insert: {
+          dhikr_id: string
+          file_id: string
+          updated_at?: string
+        }
+        Update: {
+          dhikr_id?: string
+          file_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "dhikr_recitations_file_id_fkey"
+            columns: ["file_id"]
+            isOneToOne: false
+            referencedRelation: "recitation_files"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      recitation_files: {
+        Row: {
           created_at: string
           id: string
-          sort_order: number
-          source_reference: string | null
-          target_count: number
-          title: string
-          translation: string | null
+          name: string
+          path: string
+          size: number | null
+          url: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          name: string
+          path: string
+          size?: number | null
+          url: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          name?: string
+          path?: string
+          size?: number | null
+          url?: string
+        }
+        Relationships: []
+      }
+      suggestions: {
+        Row: {
+          body: string
+          contact: string | null
+          created_at: string
+          id: string
+          kind: string
+          meta: Json
+        }
+        Insert: {
+          body: string
+          contact?: string | null
+          created_at?: string
+          id?: string
+          kind?: string
+          meta?: Json
+        }
+        Update: {
+          body?: string
+          contact?: string | null
+          created_at?: string
+          id?: string
+          kind?: string
+          meta?: Json
+        }
+        Relationships: []
+      }
+      widget_content: {
+        Row: {
+          arabic_text: string
+          category: string
+          created_at: string
+          display_order: number | null
+          id: string
+          is_active: boolean
+          reference: string | null
+          reward_note: string | null
+          translation: string
           transliteration: string | null
           updated_at: string
-          user_id: string
         }
         Insert: {
           arabic_text: string
+          category: string
           created_at?: string
+          display_order?: number | null
           id?: string
-          sort_order?: number
-          source_reference?: string | null
-          target_count?: number
-          title?: string
-          translation?: string | null
+          is_active?: boolean
+          reference?: string | null
+          reward_note?: string | null
+          translation: string
           transliteration?: string | null
           updated_at?: string
-          user_id: string
         }
         Update: {
           arabic_text?: string
+          category?: string
           created_at?: string
+          display_order?: number | null
           id?: string
-          sort_order?: number
-          source_reference?: string | null
-          target_count?: number
-          title?: string
-          translation?: string | null
+          is_active?: boolean
+          reference?: string | null
+          reward_note?: string | null
+          translation?: string
           transliteration?: string | null
           updated_at?: string
-          user_id?: string
         }
         Relationships: []
+      }
+      widget_schedule: {
+        Row: {
+          current_content_id: string | null
+          id: string
+          rotation_mode: string
+          updated_at: string
+          widget_type: string
+        }
+        Insert: {
+          current_content_id?: string | null
+          id?: string
+          rotation_mode?: string
+          updated_at?: string
+          widget_type: string
+        }
+        Update: {
+          current_content_id?: string | null
+          id?: string
+          rotation_mode?: string
+          updated_at?: string
+          widget_type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "widget_schedule_current_content_id_fkey"
+            columns: ["current_content_id"]
+            isOneToOne: false
+            referencedRelation: "widget_content"
+            referencedColumns: ["id"]
+          },
+        ]
       }
     }
     Views: {
@@ -80,12 +192,12 @@ export type Tables<
   DefaultSchemaTableNameOrOptions extends
     | keyof (DefaultSchema["Tables"] & DefaultSchema["Views"])
     | { schema: keyof DatabaseWithoutInternals },
-  TableName extends DefaultSchemaTableNameOrOptions extends {
+  TableName extends (DefaultSchemaTableNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
     ? keyof (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
         DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])
-    : never = never,
+    : never) = never,
 > = DefaultSchemaTableNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
@@ -109,11 +221,11 @@ export type TablesInsert<
   DefaultSchemaTableNameOrOptions extends
     | keyof DefaultSchema["Tables"]
     | { schema: keyof DatabaseWithoutInternals },
-  TableName extends DefaultSchemaTableNameOrOptions extends {
+  TableName extends (DefaultSchemaTableNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
     ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
-    : never = never,
+    : never) = never,
 > = DefaultSchemaTableNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
@@ -134,11 +246,11 @@ export type TablesUpdate<
   DefaultSchemaTableNameOrOptions extends
     | keyof DefaultSchema["Tables"]
     | { schema: keyof DatabaseWithoutInternals },
-  TableName extends DefaultSchemaTableNameOrOptions extends {
+  TableName extends (DefaultSchemaTableNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
     ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
-    : never = never,
+    : never) = never,
 > = DefaultSchemaTableNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
@@ -159,11 +271,11 @@ export type Enums<
   DefaultSchemaEnumNameOrOptions extends
     | keyof DefaultSchema["Enums"]
     | { schema: keyof DatabaseWithoutInternals },
-  EnumName extends DefaultSchemaEnumNameOrOptions extends {
+  EnumName extends (DefaultSchemaEnumNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
     ? keyof DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"]
-    : never = never,
+    : never) = never,
 > = DefaultSchemaEnumNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
@@ -176,11 +288,11 @@ export type CompositeTypes<
   PublicCompositeTypeNameOrOptions extends
     | keyof DefaultSchema["CompositeTypes"]
     | { schema: keyof DatabaseWithoutInternals },
-  CompositeTypeName extends PublicCompositeTypeNameOrOptions extends {
+  CompositeTypeName extends (PublicCompositeTypeNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
     ? keyof DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"]
-    : never = never,
+    : never) = never,
 > = PublicCompositeTypeNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
