@@ -3848,7 +3848,7 @@ html { scroll-behavior: smooth; }
 .store-badge.is-soon:hover { transform: none; }
 .store-badge.is-soon .store-badge-img { opacity: 0.5; filter: grayscale(0.4); }
 .soon-orbit { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; overflow: visible; }
-.soon-orbit-chip text {
+.soon-orbit-chip text, .soon-orbit-chip.soon-orbit-static {
   fill: var(--download-gold, var(--marketing-gold));
   font-size: 10.5px;
   font-weight: 700;
@@ -3859,7 +3859,7 @@ html { scroll-behavior: smooth; }
   stroke-linejoin: round;
 }
 @media (max-width: 600px) {
-  .soon-orbit-chip text {
+  .soon-orbit-chip text, .soon-orbit-chip.soon-orbit-static {
     font-size: 12px;
     letter-spacing: 1.2px;
     stroke-width: 2.6;
