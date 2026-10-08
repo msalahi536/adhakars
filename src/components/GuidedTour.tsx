@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "@tanstack/react-router";
 import { ArrowLeft, ArrowRight } from "lucide-react";
 import { Portal } from "@/components/Portal";
+import { Button } from "@/components/ui/button";
 
 type TourStep = { route: string; target: string; title: string; body: string };
 
@@ -21,32 +22,49 @@ type Rect = { top: number; left: number; width: number; height: number };
 export function GuidedTour({ onDone, onSkip }: { onDone: () => void; onSkip: () => void }) {
   const router = useRouter();
   const [i, setI] = useState(0);
-  const [rect, setRect] = useState<Rect | null>(null);
+  const [position, setPosition] = useState<{ index: number; rect: Rect } | null>(null);
+  const rect = position?.index === i ? position.rect : null;
   const step = TOUR_STEPS[i];
 
   useEffect(() => {
     let cancelled = false;
     let raf = 0;
-    setRect(null);
-    if (window.location.pathname.replace(/\/$/, "") !== step.route) void router.navigate({ to: step.route as "/app" });
-    const startedAt = performance.now();
+    setPosition(null);
+    let previous: Rect | null = null;
+    let stableSince = performance.now();
+    let ready = false;
     const measure = () => {
       if (cancelled) return;
       const el = document.querySelector(step.target);
-      if (el) {
+      if (el && window.location.pathname.replace(/\/$/, "") === step.route) {
         const r = el.getBoundingClientRect();
-        if (r.width > 0) {
+        if (r.width > 0 && r.height > 0 && r.bottom > 0 && r.top < window.innerHeight) {
           const pad = 6;
-          setRect({ top: r.top - pad, left: r.left - pad, width: r.width + pad * 2, height: r.height + pad * 2 });
+          const next = { top: r.top - pad, left: r.left - pad, width: r.width + pad * 2, height: r.height + pad * 2 };
+          const changed = !previous || Object.keys(next).some((key) => Math.abs(next[key as keyof Rect] - (previous?.[key as keyof Rect] ?? 0)) > 0.5);
+          if (changed) {
+            stableSince = performance.now();
+            previous = next;
+            if (ready) { ready = false; setPosition(null); }
+          }
+          if (!ready && performance.now() - stableSince >= 220) {
+            ready = true;
+            setPosition({ index: i, rect: next });
+          }
+        } else {
+          stableSince = performance.now();
         }
+      } else {
+        stableSince = performance.now();
       }
-      if (performance.now() - startedAt < 1500 || !el) raf = requestAnimationFrame(measure);
+      raf = requestAnimationFrame(measure);
     };
-    raf = requestAnimationFrame(measure);
-    const onResize = () => { startedAtReset(); };
-    const startedAtReset = () => { cancelAnimationFrame(raf); raf = requestAnimationFrame(measure); };
-    window.addEventListener("resize", onResize);
-    return () => { cancelled = true; cancelAnimationFrame(raf); window.removeEventListener("resize", onResize); };
+    const start = async () => {
+      if (window.location.pathname.replace(/\/$/, "") !== step.route) await router.navigate({ to: step.route as "/app" });
+      if (!cancelled) raf = requestAnimationFrame(measure);
+    };
+    void start().catch(() => { if (!cancelled) raf = requestAnimationFrame(measure); });
+    return () => { cancelled = true; cancelAnimationFrame(raf); };
   }, [i, step.route, step.target, router]);
 
   const last = i === TOUR_STEPS.length - 1;
@@ -61,25 +79,23 @@ export function GuidedTour({ onDone, onSkip }: { onDone: () => void; onSkip: () 
     <Portal>
       <div className="tour-root" role="dialog" aria-modal="true" aria-labelledby="tour-title">
         {rect ? (
-          <div className="tour-spotlight" style={{ top: rect.top, left: rect.left, width: rect.width, height: rect.height }} aria-hidden="true">
-            <span className="tour-pulse" />
-          </div>
+          <div key={i} className="tour-spotlight" style={{ top: rect.top, left: rect.left, width: rect.width, height: rect.height }} aria-hidden="true" />
         ) : <div className="tour-dim" aria-hidden="true" />}
-        <div key={i} className="tour-tip" style={tipStyle}>
+        {rect && <div key={i} className="tour-tip" style={tipStyle}>
           <div className="tour-tip-head">
             <span className="tour-count">{i + 1} of {TOUR_STEPS.length}</span>
-            <button type="button" className="tour-skip" onClick={onSkip}>Skip</button>
+            <Button variant="ghost" className="tour-skip" onClick={onSkip}>Skip</Button>
           </div>
           <h2 id="tour-title">{step.title}</h2>
           <p>{step.body}</p>
           <div className="tour-actions">
-            <button type="button" className="tour-back" disabled={i === 0} onClick={() => setI(i - 1)} aria-label="Back"><ArrowLeft size={16} /></button>
+            <Button variant="outline" className="tour-back" disabled={i === 0} onClick={() => setI(i - 1)} aria-label="Back"><ArrowLeft size={16} /></Button>
             <div className="tour-dots">{TOUR_STEPS.map((_, d) => <span key={d} data-on={d === i} />)}</div>
-            <button type="button" className="tour-next" onClick={() => last ? onDone() : setI(i + 1)}>
+            <Button className="tour-next" onClick={() => last ? onDone() : setI(i + 1)}>
               {last ? "Finish" : "Next"} <ArrowRight size={16} />
-            </button>
+            </Button>
           </div>
-        </div>
+        </div>}
       </div>
     </Portal>
   );
