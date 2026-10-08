@@ -38,7 +38,6 @@ const TRUST = [
   { Icon: Heart2Icon, label: "Free forever" },
   { Icon: Ban, label: "No ads" },
   { Icon: Lock, label: "No tracking" },
-  { Icon: WifiOff, label: "Works offline" },
 ];
 
 function Heart2Icon(props: { size?: number }) {
@@ -55,7 +54,7 @@ export const Route = createFileRoute("/download")({
           "Use Sahih Al-Adhkar right in your browser today, or install it to your home screen. Native apps for iPhone and Android are on the way.",
       },
       { property: "og:title", content: "Get Sahih Al-Adhkar" },
-      { property: "og:description", content: "Free, offline friendly, no accounts." },
+      { property: "og:description", content: "Free, private, no accounts." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
     ],
@@ -443,8 +442,7 @@ function DownloadPage() {
               style={{ color: "rgba(31,61,43,0.68)", fontSize: "1.0625rem", lineHeight: 1.65 }}
             >
               Two taps and the app lives on your home screen. It opens
-              fullscreen, works offline, and feels the same as the native
-              version.
+              fullscreen and feels the same as the native version.
             </p>
           </div>
 
@@ -493,7 +491,7 @@ function DownloadPage() {
                 textTransform: "uppercase",
               }}
             >
-              Free, offline, private
+              Free, private, no ads
             </div>
             <h2
               className="mt-5"
