@@ -1,5 +1,8 @@
 # Architecture Decisions
 
+- Native prayer widgets read the shared prayer settings accessor and resync on its change event, so saved location, calculation method, and Asr school cannot drift from Salah settings.
+- Widget bridge and content rotation regression tests run with Bun next to their modules, so native handoff rules and UTC daily selection stay independently verifiable.
+
 - Website branding and installable home-screen icons use CDN asset pointers derived from the same supplied logo; the favicon remains a downscaled public file so browser icon discovery works.
 - Homepage sections use native fragment links inside the shared marketing shell so navigation remains accessible and smoothly scrolls without client state.
 - Homepage download content groups its actions with the copy and reuses the actual app-screen mockup, so the section stays coherent without fabricated screens.

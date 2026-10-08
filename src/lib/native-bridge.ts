@@ -9,6 +9,7 @@
  */
 
 import { registerPlugin } from "@capacitor/core";
+import { getPrayerSettings } from "@/lib/prayer-times";
 
 export interface AdhanPluginInterface {
   playFullAdhan(options: { reciterId: string; prayer: string }): Promise<void>;
@@ -30,7 +31,7 @@ export interface AdhanPluginInterface {
 export const AdhanPlugin = registerPlugin<AdhanPluginInterface>("AdhanPlugin");
 
 interface CapacitorPlugin {
-  updateLocation(opts: { latitude: number; longitude: number; method: number }): Promise<void>;
+  updateLocation(opts: { latitude: number; longitude: number; method: number; school: 0 | 1 }): Promise<void>;
   updateTasbih(opts: { count: number; target: number; phrase: string }): Promise<void>;
   updateTheme(opts: { theme: string }): Promise<void>;
   reloadWidgets(): Promise<void>;
@@ -81,22 +82,29 @@ async function getLocation(): Promise<{ lat: number; lon: number } | null> {
 
 // --------------- Widget Data Sync ---------------
 
-async function syncLocationToWidgets() {
+let locationSyncVersion = 0;
+
+export async function syncLocationToWidgets() {
   const plugin = getPlugin();
   if (!plugin) return;
 
-  const location = await getLocation();
-  if (!location) return;
+  const version = ++locationSyncVersion;
+  const settings = getPrayerSettings();
+  const saved = settings.location;
+  const location = saved
+    ? { lat: saved.lat, lon: saved.lng }
+    : await getLocation();
+  // A settings change during a GPS request must not restore the older fix.
+  if (!location || version !== locationSyncVersion) return;
   const { lat, lon } = location;
 
-  let method = 2;
   try {
-    const stored = localStorage.getItem("prayerCalcMethod");
-    if (stored) method = parseInt(stored, 10) || 2;
-  } catch {}
-
-  try {
-    await plugin.updateLocation({ latitude: lat, longitude: lon, method });
+    await plugin.updateLocation({
+      latitude: lat,
+      longitude: lon,
+      method: settings.method,
+      school: settings.hanafi ? 1 : 0,
+    });
     await plugin.reloadWidgets();
   } catch (err) {
     console.warn("[NativeBridge] Location sync error:", err);
@@ -138,8 +146,16 @@ export function initNativeBridge() {
   syncLocationToWidgets();
   syncThemeToWidgets();
 
+  // setPrayerSettings emits this after persisting every Salah settings change.
+  window.addEventListener("adhkar:prayer-settings", () => {
+    void syncLocationToWidgets();
+  });
+
   window.addEventListener("storage", (e) => {
     if (e.key === "theme") syncThemeToWidgets();
+    if (e.key === "adhkar:prayer-settings" || e.key === null) {
+      void syncLocationToWidgets();
+    }
   });
 
   document.addEventListener("visibilitychange", () => {
