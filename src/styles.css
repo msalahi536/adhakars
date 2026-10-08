@@ -4338,3 +4338,67 @@ html[data-preset="midnight"][data-visual-phase="evening"][data-section="salah"] 
   .marketing-download-copy > p:last-of-type { font-size: 15px; }
   .marketing-download-panel .store-badge-img { width: 140px; }
 }
+
+/* Welcome tour: the frame and controls never move between steps. */
+:root {
+  --onboarding-overlay: color-mix(in oklab, var(--background) 62%, transparent);
+  --onboarding-panel: color-mix(in oklab, var(--surface) 96%, transparent);
+  --onboarding-preview: color-mix(in oklab, var(--background) 90%, var(--surface));
+  --onboarding-soft: color-mix(in oklab, var(--accent) 9%, transparent);
+  --onboarding-shadow: 0 32px 64px -16px color-mix(in oklab, var(--foreground) 18%, transparent);
+}
+.onboarding-overlay { position: fixed; inset: 0; z-index: 300; display: flex; align-items: center; justify-content: center; padding: max(16px, env(safe-area-inset-top)) 16px max(16px, env(safe-area-inset-bottom)); background: var(--onboarding-overlay); backdrop-filter: blur(10px); color: var(--foreground); font-family: var(--font-sans); letter-spacing: 0; }
+.onboarding-panel { width: 100%; max-width: 420px; height: 640px; max-height: 100%; display: flex; flex-direction: column; overflow: hidden; border-radius: 40px; background: var(--onboarding-panel); border: 1px solid var(--border); box-shadow: var(--onboarding-shadow); backdrop-filter: blur(24px); outline: none; }
+.onboarding-progress { display: flex; gap: 5px; padding: 20px 28px 0; flex-shrink: 0; }
+.onboarding-progress span { height: 3px; flex: 1; border-radius: 2px; background: var(--onboarding-soft); transition: background 250ms ease; }
+.onboarding-progress span[data-complete="true"] { background: var(--accent); }
+.onboarding-content { flex: 1; min-height: 0; overflow-y: auto; overscroll-behavior: contain; padding: 24px 28px 8px; touch-action: pan-y; }
+.onboarding-step { animation: onboarding-reveal 320ms ease both; }
+.onboarding-visual { height: 226px; width: 100%; border-radius: 16px; border: 1px solid var(--border); background: var(--onboarding-preview); display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden; }
+.onboarding-visual-0 { flex-direction: column; gap: 14px; }
+.onboarding-logo { width: 146px; height: 146px; object-fit: cover; border-radius: 24px; box-shadow: var(--card-shadow); }
+.onboarding-welcome-icons { display: flex; gap: 24px; color: var(--accent); }
+.onboarding-welcome-icons svg { width: 19px; height: 19px; }
+.onboarding-reading-screen { height: 210px; width: auto; object-fit: contain; }
+.onboarding-reading-tools { display: flex; flex-direction: column; align-items: center; gap: 8px; color: var(--accent); font-size: 11px; margin-left: 18px; }
+.onboarding-reading-tools svg { width: 20px; height: 20px; }
+.onboarding-reading-tools span { margin-bottom: 8px; }
+.onboarding-tools { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); width: 100%; padding: 14px; gap: 16px 10px; }
+.onboarding-tools > div { display: grid; grid-template-columns: 22px minmax(0,1fr); gap: 3px 8px; }
+.onboarding-tools svg { width: 19px; height: 19px; color: var(--accent); grid-row: span 2; }
+.onboarding-tools strong { font-size: 12px; font-weight: 600; line-height: 1.3; }
+.onboarding-tools span { font-size: 10px; color: var(--muted-foreground); line-height: 1.4; }
+.onboarding-visual-3 { flex-direction: column; gap: 10px; }
+.onboarding-theme-screens { width: 94%; height: 165px; object-fit: contain; }
+.onboarding-path { display: flex; align-items: center; justify-content: center; gap: 4px; color: var(--accent); font-size: 11px; }
+.onboarding-reminder { width: 85%; display: flex; flex-direction: column; align-items: center; gap: 16px; color: var(--accent); }
+.onboarding-reminder > div { width: 100%; display: flex; align-items: center; gap: 10px; border-bottom: 1px solid var(--border); padding: 10px 0; font-size: 13px; color: var(--foreground); }
+.onboarding-reminder > div svg { width: 18px; height: 18px; color: var(--accent); }
+.onboarding-reminder > div svg:last-child { margin-left: auto; }
+.onboarding-copy { text-align: center; margin-top: 22px; }
+.onboarding-copy .onboarding-eyebrow { color: var(--accent); font-size: 10px; font-weight: 700; text-transform: uppercase; margin: 0 0 8px; line-height: 1.4; }
+.onboarding-copy h2 { font-family: var(--font-display); font-size: 30px; font-weight: 600; line-height: 1.15; margin: 0 0 12px; letter-spacing: 0; }
+.onboarding-copy > p:last-child { font-size: 14px; line-height: 1.6; color: var(--muted-foreground); margin: 0; }
+.onboarding-assurance, .onboarding-status { font-size: 11px; line-height: 1.5; color: var(--muted-foreground); text-align: center; margin: 14px 0 0; }
+.onboarding-assurance { display: flex; align-items: center; justify-content: center; gap: 5px; }
+.onboarding-actions { flex-shrink: 0; padding: 14px 28px 12px; }
+.onboarding-primary { width: 100%; height: 50px; border-radius: 16px; background: var(--accent); color: var(--accent-foreground); font-family: inherit; font-size: 14px; font-weight: 600; box-shadow: var(--card-shadow); }
+.onboarding-primary:hover { background: var(--accent); opacity: .9; }
+.onboarding-secondary { display: grid; grid-template-columns: 1fr 40px 1fr; align-items: center; margin-top: 10px; }
+.onboarding-secondary > span { text-align: center; color: var(--muted-foreground); font-size: 11px; }
+.onboarding-text-button { color: var(--muted-foreground); font-size: 12px; height: 36px; padding: 0 8px; }
+.onboarding-text-button:hover { color: var(--foreground); background: var(--onboarding-soft); }
+.onboarding-brand { flex-shrink: 0; background: var(--onboarding-soft); border-top: 1px solid var(--border); text-align: center; padding: 12px; font-size: 10px; font-weight: 600; color: var(--accent); }
+@keyframes onboarding-reveal { from { opacity: 0; } to { opacity: 1; } }
+@media (max-height: 720px) {
+  .onboarding-content { padding-top: 16px; }
+  .onboarding-visual { height: 178px; }
+  .onboarding-logo { width: 110px; height: 110px; }
+  .onboarding-reading-screen { height: 170px; }
+  .onboarding-theme-screens { height: 125px; }
+  .onboarding-copy { margin-top: 16px; }
+  .onboarding-copy h2 { font-size: 27px; }
+  .onboarding-tools { gap: 10px; padding: 12px; }
+}
+@media (max-width: 360px) { .onboarding-content { padding-left: 20px; padding-right: 20px; } .onboarding-actions { padding-left: 20px; padding-right: 20px; } .onboarding-tools strong { font-size: 11px; } }
+@media (prefers-reduced-motion: reduce) { .onboarding-step { animation: none; } .onboarding-progress span { transition: none; } }

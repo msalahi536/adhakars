@@ -1,355 +1,136 @@
 import React, { useEffect, useRef, useState } from "react";
-import { BookOpen, Hand, Compass, Bell } from "lucide-react";
-import { BenefitsList } from "@/components/BenefitsList";
-import {
-  requestNotificationPermission,
-  checkNotificationPermission,
-  isNativePlatform,
-  getNotificationPrefs,
-  setNotificationPrefs,
-  applyReminders,
-} from "@/lib/notifications";
+import { ArrowLeft, ArrowRight, Bell, BookOpen, Check, ChevronRight, Compass, Hand, HeartHandshake, Moon, Settings, ShieldCheck, Sunrise, Volume2, CalendarHeart } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Portal } from "@/components/Portal";
+import logo from "@/assets/logo-mark.png.asset.json";
+import morningScreen from "@/assets/experience-morning.png.asset.json";
+import themeScreens from "@/assets/themes-phones.png.asset.json";
+import { requestNotificationPermission, checkNotificationPermission, isNativePlatform, getNotificationPrefs, setNotificationPrefs, applyReminders } from "@/lib/notifications";
 
 const FLAG_KEY = "adhkar:onboarded";
-
 export const hasOnboarded = (): boolean => {
   if (typeof window === "undefined") return true;
-  try {
-    return localStorage.getItem(FLAG_KEY) === "1";
-  } catch {
-    return true;
-  }
+  try { return localStorage.getItem(FLAG_KEY) === "1"; } catch { return true; }
 };
-
-const markOnboarded = () => {
-  try {
-    localStorage.setItem(FLAG_KEY, "1");
-  } catch {
-    // ignore
-  }
-};
-
-type Slide = {
-  Icon: typeof BookOpen;
-  label: string;
-  title: string;
-  body: string | React.ReactNode;
-};
-
-const SLIDES: Slide[] = [
-  {
-    Icon: BookOpen,
-    label: "Welcome",
-    title: "How Adhkar Benefits You",
-    body: <BenefitsList scroll />,
-  },
-  {
-    Icon: Hand,
-    label: "How it works",
-    title: "Tap to count, build streaks",
-    body: "Tap the counter to record each dhikr. Hit daily targets and build streaks with consistency.",
-  },
-  {
-    Icon: Compass,
-    label: "Finding your way",
-    title: "Five tabs, one More hub",
-    body: "Morning · Evening · Salah · Tasbih · More. Sleep, Wake, Qibla and the companions live under More.",
-  },
-  {
-    Icon: Bell,
-    label: "Reminders",
-    title: "Never miss a session",
-    body: "Enable daily reminders scheduled on your device. Morning and evening, right on time.",
-  },
+const STEPS = [
+  { label: "Welcome", title: "Sahih Al-Adhkar", body: "A little remembrance, woven into every day. Authentic adhkar, prayer times, and companions for the moments that matter." },
+  { label: "Your daily remembrance", title: "Read. Listen. Remember.", body: "Swipe between adhkar and tap the counter as you recite. Use the speaker to listen, and open the source for the reference." },
+  { label: "Explore More", title: "More for every part of life", body: "Salah brings prayer times and after-salah adhkar; Tasbih keeps your count. Open More for your library and companions." },
+  { label: "Make it yours", title: "Find your focus", body: "Open Settings, then Appearance → Theme to choose your colors. Display style lets you follow each page, or keep morning or evening throughout." },
+  { label: "At your own pace", title: "A gentle reminder", body: "Allow notifications for daily reminders. Choose your times in Settings, and your prayer alerts and reciters in Salah → Adhan Settings." },
+];
+const TOOLS = [
+  { Icon: BookOpen, name: "Dua Library", detail: "50 authentic duas" },
+  { Icon: Moon, name: "Sleep & Wake", detail: "End and begin your day" },
+  { Icon: Compass, name: "Qibla", detail: "Find your direction" },
+  { Icon: ShieldCheck, name: "Ruqyah", detail: "Protection & guidance" },
+  { Icon: CalendarHeart, name: "Period", detail: "Your cycle companion" },
+  { Icon: HeartHandshake, name: "Hajj & Umrah", detail: "Guidance for your journey" },
 ];
 
 export function Onboarding({ onDone }: { onDone: () => void }) {
   const [index, setIndex] = useState(0);
   const [notifBusy, setNotifBusy] = useState(false);
-  const [notifStatus, setNotifStatus] = useState<
-    "idle" | "granted" | "denied" | "unavailable" | "error"
-  >("idle");
-  const startX = useRef<number | null>(null);
-  const deltaX = useRef(0);
-
+  const [notifStatus, setNotifStatus] = useState<"idle" | "granted" | "denied" | "unavailable" | "error">("idle");
+  const [native, setNative] = useState(false);
+  const dialogRef = useRef<HTMLDivElement>(null);
+  const start = useRef<{ x: number; y: number } | null>(null);
   const finish = () => {
-    markOnboarded();
+    try { localStorage.setItem(FLAG_KEY, "1"); } catch { /* Storage can be unavailable. */ }
     onDone();
   };
-
-  const goTo = (i: number) => {
-    setIndex(Math.max(0, Math.min(SLIDES.length - 1, i)));
+  const goTo = (i: number) => setIndex(Math.max(0, Math.min(STEPS.length - 1, i)));
+  const next = () => index === STEPS.length - 1 ? finish() : goTo(index + 1);
+  useEffect(() => {
+    setNative(isNativePlatform());
+    const previous = document.activeElement;
+    const overflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    const timer = window.setTimeout(() => dialogRef.current?.focus(), 0);
+    return () => {
+      window.clearTimeout(timer);
+      document.body.style.overflow = overflow;
+      if (previous instanceof HTMLElement && previous.isConnected) previous.focus();
+    };
+  }, []);
+  useEffect(() => { dialogRef.current?.querySelector(".onboarding-content")?.scrollTo(0, 0); }, [index]);
+  const withTimeout = async <T,>(promise: Promise<T>, ms: number): Promise<T | "timeout"> => {
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    try { return await Promise.race([promise, new Promise<"timeout">((resolve) => { timer = setTimeout(() => resolve("timeout"), ms); })]); }
+    finally { if (timer !== undefined) clearTimeout(timer); }
   };
-
-  const next = () => {
-    if (index >= SLIDES.length - 1) finish();
-    else goTo(index + 1);
-  };
-
-  const onTouchStart = (e: React.TouchEvent) => {
-    startX.current = e.touches[0].clientX;
-    deltaX.current = 0;
-  };
-  const onTouchMove = (e: React.TouchEvent) => {
-    if (startX.current == null) return;
-    deltaX.current = e.touches[0].clientX - startX.current;
-  };
-  const onTouchEnd = () => {
-    const dx = deltaX.current;
-    startX.current = null;
-    deltaX.current = 0;
-    if (Math.abs(dx) < 40) return;
-    if (dx < 0) goTo(index + 1);
-    else goTo(index - 1);
-  };
-
-  const withTimeout = async <T,>(p: Promise<T>, ms: number): Promise<T | "timeout"> => {
-    let t: ReturnType<typeof setTimeout>;
-    return Promise.race([
-      p,
-      new Promise<"timeout">((res) => {
-        t = setTimeout(() => res("timeout"), ms);
-      }),
-    ]).finally(() => clearTimeout(t!)) as Promise<T | "timeout">;
-  };
-
   const enableReminders = async () => {
     setNotifBusy(true);
     try {
-      if (!isNativePlatform()) {
-        setNotifStatus("unavailable");
-        return;
-      }
-      const raced = await withTimeout(requestNotificationPermission(), 12000);
-      let granted = false;
-      let reason: string | undefined;
-      if (raced === "timeout") {
-        // The native dialog may resolve late; fall back to reading the state.
-        granted = await withTimeout(checkNotificationPermission(), 4000).then(
-          (r) => r === true,
-        );
-        reason = granted ? undefined : "denied";
-      } else if (raced.granted) {
-        granted = true;
-      } else {
-        reason = raced.reason;
-      }
-
-
+      if (!isNativePlatform()) { setNotifStatus("unavailable"); return; }
+      const result = await withTimeout(requestNotificationPermission(), 12000);
+      const granted = result === "timeout" ? (await withTimeout(checkNotificationPermission(), 4000)) === true : result.granted;
       if (granted) {
         const prefs = getNotificationPrefs();
-        const updated = {
-          ...prefs,
-          reminders: prefs.reminders.map((r) => ({ ...r, enabled: true })),
-        };
+        const updated = { ...prefs, reminders: prefs.reminders.map((r) => ({ ...r, enabled: true })) };
         setNotificationPrefs(updated);
         setNotifStatus("granted");
-        // Never block the UI on scheduling.
         void applyReminders(updated).catch(() => {});
-
-      } else if (reason === "denied") {
-        setNotifStatus("denied");
-      } else {
-        setNotifStatus("unavailable");
-      }
-
-    } catch {
-      setNotifStatus("error");
-    } finally {
-      setNotifBusy(false);
-    }
+      } else setNotifStatus(result === "timeout" || (result.granted === false && result.reason === "denied") ? "denied" : "unavailable");
+    } catch { setNotifStatus("error"); }
+    finally { setNotifBusy(false); }
   };
-
-
-  const notifMessage: Record<string, string> = {
-    granted:
-      "Reminders are on. Morning and evening, right on time. You can change the times in Settings.",
-    denied:
-      "Notifications are turned off for this app. You can allow them later in your device settings, then enable reminders in Settings.",
-    unavailable:
-      "Reminders are available in the mobile app. Everything else works right here.",
-    error: "Something went wrong. You can try again from Settings at any time.",
+  const messages = {
+    idle: native ? "Optional. You can change your choices at any time." : "Device reminders are available in the mobile app. You can start using everything else here.",
+    granted: "Reminders are enabled. You can adjust them in Settings.",
+    denied: "Notifications are off. Allow them in your device settings whenever you're ready.",
+    unavailable: "Device reminders are available in the mobile app.",
+    error: "Couldn't enable reminders. You can try again in Settings.",
   };
-
-  useEffect(() => {
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === "ArrowRight") goTo(index + 1);
-      if (e.key === "ArrowLeft") goTo(index - 1);
-      if (e.key === "Escape") finish();
-    };
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [index]);
-
-  const isLast = index === SLIDES.length - 1;
-  const slide = SLIDES[index];
-  const Icon = slide.Icon;
-
+  const step = STEPS[index];
   return (
-    <div
-      className="fixed inset-0 z-[100] flex flex-col justify-center"
-      style={{
-        background: "color-mix(in oklab, var(--background) 45%, transparent)",
-        backdropFilter: "blur(6px) saturate(120%)",
-        color: "var(--foreground)",
-      }}
-      onTouchStart={onTouchStart}
-      onTouchMove={onTouchMove}
-      onTouchEnd={onTouchEnd}
-    >
-      {/* Popup card, centered */}
-      <div className="px-4">
-
-        <div
-          key={index}
-          className="mx-auto w-full max-w-md rounded-[24px] p-5"
-          style={{
-            background: "color-mix(in oklab, var(--card) 88%, transparent)",
-            border: "1px solid color-mix(in oklab, var(--border) 80%, transparent)",
-            boxShadow: "0 18px 50px rgba(0,0,0,0.22)",
-            backdropFilter: "blur(18px) saturate(140%)",
-            color: "var(--foreground)",
-            animation: "onb-pop 260ms ease-out",
-          }}
-        >
-          <div className="flex items-start gap-3">
-            <div
-              className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl"
-              style={{
-                background: "color-mix(in oklab, var(--accent) 18%, transparent)",
-                color: "var(--accent)",
-              }}
-            >
-              <Icon size={22} strokeWidth={2.2} />
-            </div>
-            <div className="min-w-0">
-              <div className="label-caps" style={{ color: "var(--accent)" }}>
-                {slide.label}
+    <Portal>
+      <div className="onboarding-overlay">
+        <div ref={dialogRef} className="onboarding-panel" role="dialog" aria-modal="true" aria-labelledby="onboarding-title" tabIndex={-1}
+          onKeyDown={(event) => {
+            if (event.key === "Escape") { event.preventDefault(); finish(); }
+            if (event.key === "ArrowRight") { event.preventDefault(); goTo(index + 1); }
+            if (event.key === "ArrowLeft") { event.preventDefault(); goTo(index - 1); }
+            if (event.key === "Tab") {
+              const controls = Array.from(dialogRef.current?.querySelectorAll<HTMLElement>('button:not([disabled]), [href], [tabindex="0"]') ?? []);
+              const first = controls[0]; const last = controls[controls.length - 1];
+              if (event.shiftKey && (document.activeElement === first || document.activeElement === dialogRef.current)) { event.preventDefault(); last?.focus(); }
+              else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first?.focus(); }
+            }
+          }}>
+          <div className="onboarding-progress" aria-label={`Step ${index + 1} of ${STEPS.length}`}>
+            {STEPS.map((s, i) => <span key={s.label} data-complete={i <= index} />)}
+          </div>
+          <div className="onboarding-content" onTouchStart={(e) => { start.current = { x: e.touches[0].clientX, y: e.touches[0].clientY }; }}
+            onTouchEnd={(e) => {
+              const origin = start.current; start.current = null;
+              if (!origin || !e.changedTouches[0]) return;
+              const dx = e.changedTouches[0].clientX - origin.x; const dy = e.changedTouches[0].clientY - origin.y;
+              if (Math.abs(dx) > 65 && Math.abs(dx) > Math.abs(dy) * 1.5) goTo(index + (dx < 0 ? 1 : -1));
+            }}>
+            <div key={index} className="onboarding-step">
+              <div className={`onboarding-visual onboarding-visual-${index}`}>
+                {index === 0 && <><img className="onboarding-logo" src={logo.url} alt="Sahih Al-Adhkar Arabic calligraphy over sunrise" /><div className="onboarding-welcome-icons"><Sunrise /><BookOpen /><Moon /></div></>}
+                {index === 1 && <><img className="onboarding-reading-screen" src={morningScreen.url} alt="Morning Adhkar with Arabic, translation, and a counter" /><div className="onboarding-reading-tools"><Volume2 /><span>Listen</span><Hand /><span>Count</span></div></>}
+                {index === 2 && <div className="onboarding-tools">{TOOLS.map(({ Icon, name, detail }) => <div key={name}><Icon /><strong>{name}</strong><span>{detail}</span></div>)}</div>}
+                {index === 3 && <><img className="onboarding-theme-screens" src={themeScreens.url} alt="Ocean, Rose, Midnight, and Sand app theme previews" /><div className="onboarding-path"><Settings size={14} /><span>Settings</span><ChevronRight size={12} /><span>Appearance</span><ChevronRight size={12} /><span>Theme</span></div></>}
+                {index === 4 && <div className="onboarding-reminder"><Bell size={34} /><div><Sunrise /><span>Morning Adhkar</span><Check /></div><div><Moon /><span>Evening Adhkar</span><Check /></div></div>}
               </div>
-              <h2 className="mt-0.5 text-lg font-bold leading-tight">
-                {slide.title}
-              </h2>
+              <div className="onboarding-copy" aria-live="polite" aria-atomic="true"><p className="onboarding-eyebrow">{step.label}</p><h2 id="onboarding-title">{step.title}</h2><p>{step.body}</p></div>
+              {index === 0 && <p className="onboarding-assurance"><ShieldCheck size={14} /> Authentic sources · Free · No accounts</p>}
+              {index === 4 && <p className="onboarding-status" role="status">{messages[notifStatus]}</p>}
             </div>
           </div>
-          {typeof slide.body === "string" ? (
-            <p
-              className="mt-3 text-[14px] leading-relaxed"
-              style={{ color: "var(--muted-foreground)" }}
-            >
-              {slide.body}
-            </p>
-          ) : (
-            <div className="mt-2">{slide.body}</div>
-          )}
-
-          {isLast ? (
-            <div className="mt-4 space-y-2">
-              <button
-                type="button"
-                onClick={enableReminders}
-                disabled={notifBusy || notifStatus === "granted"}
-                className="w-full rounded-full px-5 py-3 text-sm font-semibold disabled:opacity-70"
-                style={{
-                  background: "var(--accent)",
-                  color: "var(--accent-foreground)",
-                }}
-              >
-                {notifBusy
-                  ? "Requesting permission..."
-                  : notifStatus === "granted"
-                    ? "Reminders enabled"
-                    : notifStatus === "idle"
-                      ? "Enable Reminders"
-                      : "Try again"}
-              </button>
-              {notifStatus !== "idle" && !notifBusy && (
-                <p
-                  className="px-1 text-[13px] leading-snug"
-                  style={{
-                    color:
-                      notifStatus === "granted"
-                        ? "var(--accent)"
-                        : "var(--muted-foreground)",
-                  }}
-                >
-                  {notifMessage[notifStatus]}
-                </p>
-              )}
-              <button
-                type="button"
-                onClick={finish}
-                className="w-full rounded-full px-5 py-2.5 text-sm font-semibold"
-                style={
-                  notifStatus === "granted"
-                    ? {
-                        background: "color-mix(in oklab, var(--accent) 16%, transparent)",
-                        color: "var(--foreground)",
-                        border: "1px solid color-mix(in oklab, var(--accent) 45%, transparent)",
-                      }
-                    : { background: "transparent", color: "var(--foreground)" }
-                }
-              >
-                {notifStatus === "idle"
-                  ? "Maybe later"
-                  : notifStatus === "granted"
-                    ? "Continue to app"
-                    : "Continue"}
-              </button>
-
-            </div>
-          ) : (
-            <button
-              type="button"
-              onClick={next}
-              className="mt-4 w-full rounded-full px-5 py-3 text-sm font-semibold"
-              style={{
-                background: "var(--accent)",
-                color: "var(--accent-foreground)",
-              }}
-            >
-              Continue
-            </button>
-          )}
-
-          <div className="mt-4 flex items-center justify-center gap-2">
-            {SLIDES.map((_, i) => (
-              <button
-                key={i}
-                type="button"
-                aria-label={`Go to slide ${i + 1}`}
-                onClick={() => goTo(i)}
-                className="h-1.5 rounded-full transition-all"
-                style={{
-                  width: i === index ? 20 : 6,
-                  background:
-                    i === index
-                      ? "var(--accent)"
-                      : "color-mix(in oklab, var(--foreground) 20%, transparent)",
-                }}
-              />
-            ))}
+          <div className="onboarding-actions">
+            <Button className="onboarding-primary" disabled={notifBusy} onClick={index === 4 && native && notifStatus !== "granted" ? enableReminders : next}>
+              {notifBusy ? "Requesting permission…" : index !== 4 ? "Continue" : native && notifStatus !== "granted" ? notifStatus === "idle" ? "Enable reminders" : "Try again" : "Start my day"}
+              {!notifBusy && (index === 4 && native && notifStatus !== "granted" ? <Bell /> : <ArrowRight />)}
+            </Button>
+            <div className="onboarding-secondary"><Button variant="ghost" className="onboarding-text-button" disabled={index === 0} onClick={() => goTo(index - 1)}><ArrowLeft />Back</Button><span>{index + 1} / {STEPS.length}</span><Button variant="ghost" className="onboarding-text-button" onClick={finish}>{index === 4 ? "Not now" : "Skip tour"}</Button></div>
           </div>
-        </div>
-
-        <div className="mx-auto mt-4 flex w-full max-w-md items-center justify-center">
-          <button
-            type="button"
-            onClick={finish}
-            className="rounded-full px-4 py-2 text-xs font-semibold"
-            style={{
-              background: "color-mix(in oklab, var(--foreground) 8%, transparent)",
-              color: "var(--foreground)",
-            }}
-          >
-            Skip onboarding
-          </button>
+          <div className="onboarding-brand">Discover Sahih Al-Adhkar</div>
         </div>
       </div>
-
-
-      <style>{`@keyframes onb-pop{from{opacity:0;transform:translateY(10px) scale(.98)}to{opacity:1;transform:none}}`}</style>
-    </div>
+    </Portal>
   );
 }
-
