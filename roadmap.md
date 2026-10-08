@@ -1,7 +1,7 @@
 # Roadmap
 
-- [ ] Correct widget prayer settings, saved location, and immediate sync; test all four rules
-- [ ] Verify populated widget content, daily rotation, and live endpoint freshness
+- [x] Correct widget prayer settings, saved location, and immediate sync; test all four rules
+- [x] Verify populated widget content, daily rotation, and live endpoint freshness
 
 - [x] Qibla compass jitter fix (smoothing + removed CSS transition)
 - [x] Adhan player: keep minimized state across page navigation
