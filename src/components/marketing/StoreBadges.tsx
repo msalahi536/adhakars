@@ -5,12 +5,12 @@ import googlePlayBadge from "@/assets/badge-googleplay.png.asset.json";
 export const APP_STORE_URL =
   "https://apps.apple.com/us/app/sahih-al-adhkar/id6791834420";
 
-/** A single "Coming soon" label — plain gold text, no pill and no
- *  border line — gliding slowly around the Google Play badge. The
- *  travel path sits just outside the badge so the words ride in the
- *  empty space above and below it rather than across the artwork. */
+/** "Coming soon" as plain gold text — no pill, no border line. Two
+ *  copies drift slowly past the badge, one above and one below, each
+ *  fading in and out. They stay inside the badge's own width so they
+ *  never collide with the App Store badge or the panel edge. */
 function SoonOrbit() {
-  const trackId = `soon-track-${useId().replace(/[^a-zA-Z0-9]/g, "")}`;
+  const id = useId().replace(/[^a-zA-Z0-9]/g, "");
   return (
     <svg
       className="soon-orbit"
@@ -19,21 +19,53 @@ function SoonOrbit() {
       aria-hidden="true"
       focusable="false"
     >
-      <defs>
-        <path
-          id={trackId}
-          d="M 16 -11 H 175 Q 193 -11 193 7 V 93 Q 193 111 175 111 H 16 Q -2 111 -2 93 V 7 Q -2 -11 16 -11 Z"
-          fill="none"
-        />
-      </defs>
-      <g className="soon-orbit-chip">
+      <g className="soon-orbit-chip" key={`top-${id}`}>
         <text textAnchor="middle" dominantBaseline="central">
           COMING SOON
         </text>
-        <animateMotion dur="18s" repeatCount="indefinite" rotate="0">
-          <mpath href={`#${trackId}`} />
-        </animateMotion>
+        <animateMotion
+          path="M 45 -11 L 155 -11"
+          dur="14s"
+          repeatCount="indefinite"
+          rotate="0"
+        />
+        <animate
+          attributeName="opacity"
+          dur="14s"
+          repeatCount="indefinite"
+          values="0;1;1;0"
+          keyTimes="0;0.3;0.7;1"
+        />
       </g>
+      <g className="soon-orbit-chip" key={`bottom-${id}`}>
+        <text textAnchor="middle" dominantBaseline="central">
+          COMING SOON
+        </text>
+        <animateMotion
+          path="M 45 111 L 155 111"
+          dur="14s"
+          begin="-7s"
+          repeatCount="indefinite"
+          rotate="0"
+        />
+        <animate
+          attributeName="opacity"
+          dur="14s"
+          begin="-7s"
+          repeatCount="indefinite"
+          values="0;1;1;0"
+          keyTimes="0;0.3;0.7;1"
+        />
+      </g>
+      <text
+        className="soon-orbit-chip soon-orbit-static"
+        x="100"
+        y="-11"
+        textAnchor="middle"
+        dominantBaseline="central"
+      >
+        COMING SOON
+      </text>
     </svg>
   );
 }
