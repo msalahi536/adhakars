@@ -4402,3 +4402,33 @@ html[data-preset="midnight"][data-visual-phase="evening"][data-section="salah"] 
 }
 @media (max-width: 360px) { .onboarding-content { padding-left: 20px; padding-right: 20px; } .onboarding-actions { padding-left: 20px; padding-right: 20px; } .onboarding-tools strong { font-size: 11px; } }
 @media (prefers-reduced-motion: reduce) { .onboarding-step { animation: none; } .onboarding-progress span { transition: none; } }
+
+/* Guided live tour */
+.tour-root { position: fixed; inset: 0; z-index: 2000; font-family: var(--font-sans); }
+.tour-dim { position: absolute; inset: 0; background: color-mix(in oklab, var(--foreground) 55%, transparent); }
+.tour-spotlight {
+  position: fixed; border-radius: 18px; pointer-events: none;
+  box-shadow: 0 0 0 9999px color-mix(in oklab, var(--foreground) 55%, transparent), 0 0 0 2px var(--accent), 0 0 28px color-mix(in oklab, var(--accent) 70%, transparent);
+  transition: top .45s cubic-bezier(.22,1,.36,1), left .45s cubic-bezier(.22,1,.36,1), width .45s cubic-bezier(.22,1,.36,1), height .45s cubic-bezier(.22,1,.36,1);
+}
+.tour-pulse { position: absolute; inset: -2px; border-radius: inherit; border: 2px solid var(--accent); animation: tour-pulse 1.8s ease-out infinite; }
+@keyframes tour-pulse { 0% { opacity: .9; transform: scale(1); } 100% { opacity: 0; transform: scale(1.18); } }
+.tour-tip {
+  position: fixed; left: 50%; transform: translateX(-50%); width: min(340px, calc(100vw - 32px));
+  background: var(--surface); color: var(--foreground); border: 1px solid var(--border); border-radius: 22px;
+  padding: 18px 18px 14px; box-shadow: 0 20px 50px -18px color-mix(in oklab, var(--foreground) 60%, transparent);
+  animation: tour-in .35s cubic-bezier(.22,1,.36,1);
+}
+@keyframes tour-in { from { opacity: 0; transform: translate(-50%, 8px); } to { opacity: 1; transform: translate(-50%, 0); } }
+.tour-tip-head { display: flex; justify-content: space-between; align-items: center; font-size: 12px; letter-spacing: .08em; text-transform: uppercase; color: var(--accent); }
+.tour-skip { background: none; border: 0; color: color-mix(in oklab, var(--foreground) 60%, transparent); font-size: 13px; text-transform: none; letter-spacing: 0; cursor: pointer; }
+.tour-tip h2 { font-family: var(--font-display); font-size: 24px; margin: 8px 0 4px; line-height: 1.15; }
+.tour-tip p { font-size: 15px; line-height: 1.5; margin: 0 0 14px; color: color-mix(in oklab, var(--foreground) 80%, transparent); }
+.tour-actions { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.tour-back { width: 40px; height: 40px; border-radius: 999px; border: 1px solid var(--border); background: transparent; color: var(--foreground); display: grid; place-items: center; cursor: pointer; }
+.tour-back:disabled { opacity: .3; }
+.tour-next { height: 40px; padding: 0 18px; border-radius: 999px; border: 0; background: var(--accent); color: var(--background); font-weight: 600; display: inline-flex; align-items: center; gap: 6px; cursor: pointer; }
+.tour-dots { display: flex; gap: 5px; }
+.tour-dots span { width: 6px; height: 6px; border-radius: 999px; background: var(--border); transition: all .3s; }
+.tour-dots span[data-on="true"] { width: 18px; background: var(--accent); }
+@media (prefers-reduced-motion: reduce) { .tour-pulse, .tour-tip { animation: none; } .tour-spotlight { transition: none; } }
