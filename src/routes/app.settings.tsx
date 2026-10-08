@@ -46,7 +46,7 @@ import {
   CALC_METHODS,
   type PrayerSettings,
 } from "@/lib/prayer-times";
-import { rescheduleAdhanNotifications } from "@/lib/adhan-notifications";
+import { PRAYER_NOTIF_IDS, rescheduleAdhanNotifications } from "@/lib/adhan-notifications";
 import {
   getPeriodNotificationsEnabled,
   getSunnahNotificationEnabled,
