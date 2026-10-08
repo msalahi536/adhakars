@@ -9,6 +9,8 @@ import {
   androidPauseAdhan,
   androidResumeAdhan,
   androidSeekAdhan,
+  androidStartAdhan,
+  displayReciterId,
   fromNativeReciterId,
   isAndroidPlatform,
 } from "@/lib/android-adhan";
@@ -113,10 +115,18 @@ export function AdhanPlayer({ visible, prayer, reciterId, onClose }: Props) {
   const current = duration * progress;
   const playing = p?.isPlaying ?? true;
   const name = labelFor(p?.prayer || prayer);
-  const reciter = reciterNameFor(fromNativeReciterId(p?.reciterId || reciterId) || getReciterForPrayer(name));
   const android = isAndroidPlatform();
+  const rawReciter = fromNativeReciterId(p?.reciterId || reciterId) || getReciterForPrayer(name);
+  const reciter = reciterNameFor(android ? displayReciterId(rawReciter, name) : rawReciter);
 
   const togglePlay = () => {
+    // No adhan running (e.g. a silent alert): start it from zero with Mishary.
+    if (android && p && !p.hasSession) {
+      openedAt.current = Date.now();
+      setP({ ...p, isPlaying: true, progress: 0, currentTime: 0 });
+      void androidStartAdhan(name);
+      return;
+    }
     setP((prev) => (prev ? { ...prev, isPlaying: !playing } : prev));
     void (android ? (playing ? androidPauseAdhan() : androidResumeAdhan()) : playing ? pauseAdhan() : resumeAdhan());
   };

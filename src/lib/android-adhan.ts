@@ -53,6 +53,25 @@ export async function ensureAndroidAdhanChannel(plugin: any): Promise<void> {
   }
 }
 
+/** Reciter used when a silent prayer notification is tapped. */
+export const silentFallbackReciter = (prayer: string): string =>
+  prayer.trim().toLowerCase() === "fajr" ? "fajr-mishary" : "mishary";
+
+/** Shows Mishary instead of "Silent" — a silent alert that's tapped plays Mishary. */
+export const displayReciterId = (id: string, prayer: string): string =>
+  !id || toNativeReciterId(id) === "silent" ? silentFallbackReciter(prayer) : id;
+
+/** Starts the full adhan from zero with Mishary (native picks the Fajr file for Fajr). */
+export async function androidStartAdhan(prayer: string): Promise<void> {
+  try {
+    const { AdhanPlugin } = await import("./native-bridge");
+    await AdhanPlugin.playFullAdhan({ reciterId: "mishary", prayer: prayer.toLowerCase() });
+    console.log("[android-adhan] silent tap: playing full adhan from zero, prayer =", prayer);
+  } catch (err) {
+    console.error("[android-adhan] silent tap playback failed", err);
+  }
+}
+
 type TapHandler = (info: { prayer: string; reciterId: string }) => void;
 let registered = false;
 
@@ -80,20 +99,17 @@ export async function registerAndroidAdhanListener(onTap?: TapHandler): Promise<
     });
     await LocalNotifications.addListener("localNotificationActionPerformed", async (e) => {
       const extra = (e?.notification?.extra ?? {}) as Record<string, unknown>;
-      if (extra.soundMode !== "adhan") return;
-      const prayer = typeof extra.prayer === "string" ? extra.prayer : "fajr";
+      // Prayer notifications carry soundMode "adhan" or "silent".
+      if (extra.soundMode !== "adhan" && extra.soundMode !== "silent") return;
+      const prayer = typeof extra.prayer === "string" && extra.prayer ? extra.prayer : "fajr";
       let reciterId = typeof extra.reciterId === "string" ? extra.reciterId : "";
-      // Silent prayer: nothing played when the notification fired, so tapping
-      // starts the full adhan from zero with the default reciter.
-      if (!reciterId || toNativeReciterId(reciterId) === "silent") {
-        reciterId = "mishary";
-        try {
-          const { AdhanPlugin } = await import("./native-bridge");
-          await AdhanPlugin.playFullAdhan({ reciterId: toNativeReciterId(reciterId), prayer });
-          console.log("[android-adhan] silent tap: playing full adhan from zero, reciter =", reciterId);
-        } catch (err) {
-          console.error("[android-adhan] silent tap playback failed", err);
-        }
+      const silent = extra.soundMode === "silent" || !reciterId || toNativeReciterId(reciterId) === "silent";
+      if (silent) {
+        // Nothing played when the notification fired, so the tap starts the
+        // full adhan from zero with Mishary (Fajr uses his Fajr recording).
+        reciterId = silentFallbackReciter(prayer);
+        const status = await androidGetAdhanProgress().catch(() => null);
+        if (!status?.hasSession) await androidStartAdhan(prayer);
       }
       onTap?.({ prayer, reciterId });
     });
