@@ -193,16 +193,19 @@ function HomePage() {
 
         <section id="download" className="marketing-download">
           <div className="marketing-shell marketing-download-panel">
-            <div>
+            <div className="marketing-download-copy">
               <p className="marketing-eyebrow">Available now</p>
-              <h2>Open it today,<br />right in your browser.</h2>
+              <h2>Open it today,<br />right in your <span>browser.</span></h2>
               <p>Use Sahih Al-Adhkar on iPhone, iPad, Android, or desktop. No account needed.</p>
+              <div className="marketing-download-actions">
+                <Button asChild className="marketing-download-button">
+                  <Link to="/app">Open the app <ArrowRight /></Link>
+                </Button>
+                <StoreBadges />
+              </div>
             </div>
-            <div className="marketing-download-actions">
-              <Button asChild className="marketing-download-button">
-                <Link to="/app">Open the app <ArrowRight /></Link>
-              </Button>
-              <StoreBadges />
+            <div className="marketing-download-visual">
+              <img src={heroPhones.url} alt="Sahih Al-Adhkar morning, evening, and prayer screens" width={1879} height={1920} loading="lazy" />
             </div>
           </div>
         </section>
