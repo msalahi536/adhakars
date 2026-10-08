@@ -9,7 +9,7 @@
  */
 
 import { registerPlugin } from "@capacitor/core";
-import { getPrayerSettings, fetchDay, dateKey } from "@/lib/prayer-times";
+import { getPrayerSettings, fetchDay } from "@/lib/prayer-times";
 
 export interface AdhanPluginInterface {
   playFullAdhan(options: { reciterId: string; prayer: string }): Promise<void>;
@@ -106,11 +106,14 @@ export async function syncLocationToWidgets() {
       method: settings.method,
       school: settings.hanafi ? 1 : 0,
     });
-    await plugin.reloadWidgets();
-    // After syncing location, also sync today's prayer times so widgets
-    // always show the exact values the app calculated.
+    // Do NOT call reloadWidgets() here — updateLocation clears cached
+    // times, so a reload now would force the widget into its API fallback.
     const today = await fetchDay(new Date(), settings);
-    if (today) await syncPrayerTimesToWidgets(today.times);
+    if (today) {
+      await syncPrayerTimesToWidgets(today.times);
+    } else {
+      await plugin.reloadWidgets();
+    }
   } catch (err) {
     console.warn("[NativeBridge] Location sync error:", err);
   }
