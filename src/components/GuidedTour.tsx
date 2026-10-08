@@ -79,9 +79,9 @@ export function GuidedTour({ onDone, onSkip }: { onDone: () => void; onSkip: () 
     <Portal>
       <div className="tour-root" role="dialog" aria-modal="true" aria-labelledby="tour-title">
         {rect ? (
-          <div key={i} className="tour-spotlight" style={{ top: rect.top, left: rect.left, width: rect.width, height: rect.height }} aria-hidden="true" />
+          <div key={`spotlight-${i}`} className="tour-spotlight" style={{ top: rect.top, left: rect.left, width: rect.width, height: rect.height }} aria-hidden="true" />
         ) : <div className="tour-dim" aria-hidden="true" />}
-        {rect && <div key={i} className="tour-tip" style={tipStyle}>
+        {rect && <div key={`tip-${i}`} className="tour-tip" style={tipStyle}>
           <div className="tour-tip-head">
             <span className="tour-count">{i + 1} of {TOUR_STEPS.length}</span>
             <Button variant="ghost" className="tour-skip" onClick={onSkip}>Skip</Button>
