@@ -13,4 +13,4 @@
 - [x] Add an All Duas entry with the complete library in one swipe reader
 - [x] Restore reliable real-time Salah alerts and period-start encouragement
 
-- [ ] Polish onboarding with stable transitions, feature previews, and theme guidance
+- [x] Polish onboarding with stable transitions, feature previews, and theme guidance
