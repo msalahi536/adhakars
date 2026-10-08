@@ -19,6 +19,20 @@ const settings: PrayerSettings = {
   location: { lat: 51.5, lng: -0.12, label: "London", verified: true },
 };
 
+// native-bridge registers its plugin at import time, so the mock has to be
+// installed before the module is loaded.
+mock.module("@capacitor/core", () => ({
+  registerPlugin: () => ({
+    updateLocation,
+    reloadWidgets,
+    updateTheme: async () => {},
+    syncPrayerTimes: async () => {},
+    updateTasbih: async () => {},
+  }),
+}));
+
+const { initNativeBridge, syncLocationToWidgets } = await import("./native-bridge");
+
 beforeEach(() => {
   store.clear();
   updateLocation.mockClear();
