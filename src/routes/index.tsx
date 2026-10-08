@@ -26,9 +26,7 @@ import morningAsset from "@/assets/morning-landscape.webp.asset.json";
 import eveningAsset from "@/assets/evening-landscape.webp.asset.json";
 import roseAsset from "@/assets/rose-morning.webp.asset.json";
 import oceanAsset from "@/assets/ocean-morning.webp.asset.json";
-import heroEveningScreen from "@/assets/homepage-evening.png.asset.json";
-import heroMorningScreen from "@/assets/homepage-morning.png.asset.json";
-import heroSalahScreen from "@/assets/homepage-salah.png.asset.json";
+import heroPhones from "@/assets/homepage-phones.png.asset.json";
 
 export const Route = createFileRoute("/")({
   head: () => ({
