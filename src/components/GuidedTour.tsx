@@ -8,7 +8,7 @@ type TourStep = { route: string; target: string; title: string; body: string };
 const NAV = (n: number) => `.bottom-nav .nav-item:nth-child(${n})`;
 
 export const TOUR_STEPS: TourStep[] = [
-  { route: "/app", target: ".adhkar-counter-target", title: "Morning adhkar", body: "Tap the counter each time you recite. Swipe the card left or right to move on." },
+  { route: "/app", target: ".adhkar-card-stage", title: "Morning adhkar", body: "Tap the counter each time you recite. Swipe the card left or right to move on." },
   { route: "/app", target: NAV(2), title: "Evening adhkar", body: "Your evening remembrance lives here, ready after Asr." },
   { route: "/app/salah", target: NAV(3), title: "Salah", body: "Prayer times for your location, a live countdown, and adhan alerts." },
   { route: "/app/tasbih", target: NAV(4), title: "Tasbih", body: "A simple counter for your dhikr. Just tap anywhere." },
@@ -52,7 +52,8 @@ export function GuidedTour({ onDone, onSkip }: { onDone: () => void; onSkip: () 
   const last = i === TOUR_STEPS.length - 1;
   const vh = typeof window !== "undefined" ? window.innerHeight : 800;
   const below = rect ? rect.top + rect.height / 2 < vh / 2 : true;
-  const tipStyle: React.CSSProperties = rect
+  const tall = rect ? rect.height > vh * 0.45 : false;
+  const tipStyle: React.CSSProperties = rect && tall ? { bottom: 104 } : rect
     ? below ? { top: Math.min(rect.top + rect.height + 18, vh - 220) } : { bottom: Math.min(Math.max(vh - rect.top + 18, 16), vh - 240) }
     : { top: "40%" };
 
