@@ -28,13 +28,16 @@ function SoonOrbit() {
           dur="14s"
           repeatCount="indefinite"
           rotate="0"
+          calcMode="linear"
+          keyPoints="0;1;1"
+          keyTimes="0;0.46;1"
         />
         <animate
           attributeName="opacity"
           dur="14s"
           repeatCount="indefinite"
-          values="0;1;1;0"
-          keyTimes="0;0.3;0.7;1"
+          values="0;1;1;0;0"
+          keyTimes="0;0.08;0.34;0.46;1"
         />
       </g>
       <g className="soon-orbit-chip" key={`bottom-${id}`}>
@@ -47,14 +50,17 @@ function SoonOrbit() {
           begin="-7s"
           repeatCount="indefinite"
           rotate="0"
+          calcMode="linear"
+          keyPoints="0;1;1"
+          keyTimes="0;0.46;1"
         />
         <animate
           attributeName="opacity"
           dur="14s"
           begin="-7s"
           repeatCount="indefinite"
-          values="0;1;1;0"
-          keyTimes="0;0.3;0.7;1"
+          values="0;1;1;0;0"
+          keyTimes="0;0.08;0.34;0.46;1"
         />
       </g>
       <text
