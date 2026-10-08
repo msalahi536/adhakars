@@ -175,6 +175,12 @@ function Salah() {
     }
   };
 
+  const reciterTestId = useMemo(
+    () => (reciterPrayer ? (Object.keys(PRAYER_LABELS) as Array<keyof typeof PRAYER_LABELS>).find((k) => PRAYER_LABELS[k] === reciterPrayer) ?? null : null),
+    [reciterPrayer],
+  );
+
+
 
   const autoSelected = useRef(false);
 
