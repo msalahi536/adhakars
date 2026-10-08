@@ -1,5 +1,3 @@
-import { getReciterForPrayer } from "@/lib/adhan-bridge";
-import { ANDROID_ADHAN_CHANNEL, ensureAndroidAdhanChannel, toNativeReciterId } from "@/lib/android-adhan";
 import { useEffect, useState, type ReactNode } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { HeaderBackButton } from "@/components/HeaderBackButton";
@@ -46,7 +44,7 @@ import {
   CALC_METHODS,
   type PrayerSettings,
 } from "@/lib/prayer-times";
-import { PRAYER_NOTIF_IDS, rescheduleAdhanNotifications } from "@/lib/adhan-notifications";
+import { rescheduleAdhanNotifications } from "@/lib/adhan-notifications";
 import {
   getPeriodNotificationsEnabled,
   getSunnahNotificationEnabled,
@@ -1150,110 +1148,12 @@ function Settings() {
             </div>
           </section>
 
-          <AndroidNotificationTests />
         </div>
       </main>
     </>
   );
 }
 
-type TestNotifConfig = {
-  id: number;
-  title: string;
-  body: string;
-  extra: Record<string, unknown>;
-};
-
-async function scheduleTestNotification(config: TestNotifConfig) {
-  if (config.extra.soundMode === "adhan") console.log("[adhan-test] extra.reciterId =", config.extra.reciterId);
-  try {
-    const { LocalNotifications } = await import("@capacitor/local-notifications");
-    const perm = await LocalNotifications.checkPermissions();
-    if (perm.display !== "granted") {
-      const req = await LocalNotifications.requestPermissions();
-      if (req.display !== "granted") {
-        alert("Notification permission not granted");
-        return;
-      }
-    }
-    const fireAt = new Date(Date.now() + 5000);
-    const isAdhan = config.extra.soundMode === "adhan" || config.extra.soundMode === "silent";
-    if (isAdhan) await ensureAndroidAdhanChannel(LocalNotifications);
-    await LocalNotifications.schedule({
-      notifications: [
-        {
-          id: config.id,
-          title: config.title,
-          body: config.body,
-          extra: isAdhan
-            ? { ...config.extra, firedAt: Math.floor(fireAt.getTime() / 1000) }
-            : config.extra,
-          schedule: { at: fireAt, allowWhileIdle: true },
-          ...(isAdhan ? { channelId: ANDROID_ADHAN_CHANNEL } : {}),
-        },
-      ],
-    });
-  } catch (e) {
-    alert(`Test notification failed: ${e instanceof Error ? e.message : String(e)}`);
-  }
-}
-
-function AndroidNotificationTests() {
-  const [isAndroid, setIsAndroid] = useState(false);
-  const [sent, setSent] = useState<number | null>(null);
-  useEffect(() => {
-    import("@capacitor/core")
-      .then(({ Capacitor }) => setIsAndroid(Capacitor.getPlatform() === "android"))
-      .catch(() => setIsAndroid(false));
-  }, []);
-  if (!isAndroid) return null;
-
-  const tests: { label: string; build: () => TestNotifConfig }[] = [
-    { label: "Test Morning Adhkar Notif", build: () => ({ id: 901, title: "Morning Adhkar", body: "Test - Time for your morning adhkar.", extra: { route: "/app/" } }) },
-    { label: "Test Evening Adhkar Notif", build: () => ({ id: 902, title: "Evening Adhkar", body: "Test - Time for your evening adhkar.", extra: { route: "/app/evening" } }) },
-    { label: "Test Nudge/Streak Notif", build: () => ({ id: 903, title: "Sahih Al-Adhkar", body: "Test - Your adhkar are still waiting.", extra: { route: "/app/more" } }) },
-    { label: "🔊 Test Adhan (Real Fajr Notif)", build: () => {
-      // Identical to the real Fajr alert: same id, title, body, channel, extras.
-      const storedReciter = getReciterForPrayer("fajr");
-      const androidReciterId = toNativeReciterId(storedReciter);
-      console.log("[adhan-debug] Stored reciter:", storedReciter, "→ Android ID:", androidReciterId);
-      return { id: PRAYER_NOTIF_IDS.fajr, title: "Time for Fajr", body: "The adhan is now playing.", extra: { prayer: "fajr", reciterId: androidReciterId, soundMode: storedReciter === "silent" ? "silent" : "adhan" } };
-    } },
-    { label: "Test Deep Link (Tasbih)", build: () => ({ id: 905, title: "Tasbih", body: "Test deep link", extra: { route: "/app/tasbih" } }) },
-  ];
-
-  return (
-    <section
-      style={{
-        border: "1.5px dashed rgba(180,120,20,0.6)",
-        background: "rgba(255,200,80,0.12)",
-        borderRadius: 16,
-        padding: 16,
-        marginTop: 20,
-      }}
-    >
-      <h2 className="mb-1 text-[15px] font-semibold">🧪 Android Notification Tests</h2>
-      <p className="mb-3 text-[12px] opacity-70">Each fires 5 seconds after tapping.</p>
-      <div className="flex flex-col gap-2">
-        {tests.map((t, i) => (
-          <button
-            key={t.label}
-            type="button"
-            onClick={async () => {
-              await scheduleTestNotification(t.build());
-              setSent(i);
-              setTimeout(() => setSent((s) => (s === i ? null : s)), 2500);
-            }}
-            style={{ border: "1px solid rgba(180,120,20,0.4)", borderRadius: 12, padding: "10px 12px", textAlign: "left", fontSize: 14 }}
-          >
-            {t.label}
-            {sent === i ? " — scheduled ✓" : ""}
-          </button>
-        ))}
-      </div>
-    </section>
-  );
-}
 
 function Toggle({
   icon,
