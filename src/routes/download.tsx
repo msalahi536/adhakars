@@ -33,6 +33,9 @@ const SHADOW_CARD =
 const SHADOW_CARD_HOVER =
   "0 1px 0 rgba(31,61,43,0.05), 0 12px 32px -14px rgba(31,61,43,0.14), 0 32px 60px -32px rgba(31,61,43,0.20)";
 
+const APP_STORE_URL =
+  "https://apps.apple.com/us/app/sahih-al-adhkar/id6791834420";
+
 const TRUST = [
   { Icon: Heart2Icon, label: "Free forever" },
   { Icon: Ban, label: "No ads" },
@@ -50,7 +53,7 @@ export const Route = createFileRoute("/download")({
       {
         name: "description",
         content:
-          "Use Sahih Al-Adhkar right in your browser today, or install it to your home screen. Native apps for iPhone and Android are on the way.",
+          "Use Sahih Al-Adhkar right in your browser today, or install it to your home screen. Now on the App Store for iPhone, with Android coming soon.",
       },
       { property: "og:title", content: "Get Sahih Al-Adhkar" },
       { property: "og:description", content: "Free, private, no accounts." },
@@ -124,8 +127,8 @@ function DownloadPage() {
               }}
             >
               Open the app now on any modern phone or computer. Nothing to
-              install, no account needed. Native apps for iPhone and Android
-              are on the way.
+              install, no account needed. The iPhone app is live on the App
+              Store, and Android is coming soon.
             </p>
 
             <div className="mt-9 flex flex-wrap items-center gap-3">
@@ -174,6 +177,10 @@ function DownloadPage() {
                 </span>
               ))}
             </div>
+
+            <div className="mt-9">
+              <StoreBadges />
+            </div>
           </div>
 
           <div className="mt-14 flex items-center justify-center lg:mt-0">
@@ -208,7 +215,7 @@ function DownloadPage() {
                 color: INK,
               }}
             >
-              Coming to the App Store
+              Now on the App Store
               <br />
               <span style={{ fontStyle: "italic", color: GREEN_SOFT }}>
                 and Google Play.
@@ -218,9 +225,9 @@ function DownloadPage() {
               className="mt-5 max-w-xl"
               style={{ color: "rgba(31,61,43,0.68)", fontSize: "1.0625rem", lineHeight: 1.65 }}
             >
-              Native builds are in review. Until they land, the web app runs
-              the same on every device, and installs to your home screen with
-              the same feel.
+              The iPhone app is live. Android is still in the works — until it
+              lands, the web app runs the same on every device and installs to
+              your home screen with the same feel.
             </p>
           </div>
 

@@ -3825,6 +3825,21 @@ html { scroll-behavior: smooth; }
 .marketing-download-panel > div > p:last-child { color: color-mix(in oklab, var(--marketing-paper) 74%, transparent); }
 .marketing-download-button { background: var(--marketing-gold); color: var(--marketing-ink); }
 .marketing-download-button:hover { background: var(--marketing-gold-soft); }
+.marketing-header-button { background: var(--marketing-ink); color: var(--marketing-paper); box-shadow: 0 8px 20px -10px color-mix(in oklab, var(--marketing-ink) 45%, transparent); }
+.marketing-header-button:hover { background: var(--marketing-ink-soft); color: var(--marketing-paper); }
+
+/* ===== Store badges (App Store / Google Play) ===== */
+.store-badges { display: flex; flex-wrap: wrap; align-items: center; gap: 14px; }
+.store-badge { position: relative; display: inline-flex; align-items: center; gap: 11px; min-width: 178px; padding: 9px 18px; border-radius: 13px; background: #0d1210; border: 1px solid rgba(250, 246, 236, 0.2); color: var(--marketing-paper); box-shadow: 0 12px 26px -14px rgba(31, 61, 43, 0.5); transition: transform 160ms ease, box-shadow 220ms ease; }
+.store-badge:hover { transform: translateY(-2px); box-shadow: 0 18px 34px -16px rgba(31, 61, 43, 0.62); }
+.store-badge > svg { width: 25px; height: 25px; flex-shrink: 0; }
+.store-badge-text { display: flex; flex-direction: column; gap: 3px; line-height: 1; text-align: left; }
+.store-badge-eyebrow { font-size: 10px; font-weight: 500; letter-spacing: 0.04em; opacity: 0.78; }
+.store-badge-name { font-size: 17px; font-weight: 600; letter-spacing: -0.01em; }
+.store-badge.is-soon { opacity: 0.45; box-shadow: none; cursor: default; }
+.store-badge.is-soon:hover { transform: none; box-shadow: none; }
+.store-badge.is-soon::after { content: ""; position: absolute; left: -5%; right: -5%; top: 50%; height: 1.5px; border-radius: 2px; background: rgba(250, 246, 236, 0.9); transform: rotate(-13deg); }
+.store-badge-soon { display: inline-flex; align-items: center; padding: 6px 13px; border-radius: 999px; background: color-mix(in oklab, var(--marketing-gold) 16%, transparent); border: 1px solid color-mix(in oklab, var(--marketing-gold) 34%, transparent); color: var(--marketing-ink); font-size: 11px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; }
 
 @media (max-width: 900px) {
   .marketing-hero { min-height: auto; }
@@ -3832,7 +3847,7 @@ html { scroll-behavior: smooth; }
   .marketing-hero-grid { min-height: auto; grid-template-columns: 1fr; padding-block: 122px 0; }
   .marketing-hero-copy { text-align: center; margin-inline: auto; }
   .marketing-lead { margin-inline: auto; }
-  .marketing-actions, .marketing-quick-trust { justify-content: center; }
+  .marketing-actions, .marketing-quick-trust, .store-badges { justify-content: center; }
   .marketing-hero-phones { width: min(100%, 590px); align-self: auto; }
   .marketing-feature-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .marketing-showcase { grid-template-columns: 1fr; justify-items: center; gap: 34px; }
