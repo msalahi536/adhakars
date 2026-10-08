@@ -4274,3 +4274,14 @@ html[data-preset="midnight"][data-visual-phase="evening"][data-section="salah"] 
 .rec-pop-all:active { transform: scale(.97); }
 .rec-eq { display: inline-flex; align-items: flex-end; gap: 2px; height: 12px; }
 .rec-eq i { width: 2.5px; min-height: 2px; background: currentColor; border-radius: 2px; transition: height 80ms linear; }
+
+/* Store badges inside the dark download panel */
+.marketing-download-actions { display: flex; flex-direction: column; align-items: flex-start; gap: 18px; }
+.marketing-download-panel .store-badge { background: color-mix(in oklab, var(--marketing-paper) 10%, transparent); border: 1px solid color-mix(in oklab, var(--marketing-paper) 22%, transparent); }
+.marketing-download-panel .store-badge-name { color: var(--marketing-paper); }
+.marketing-download-panel .store-badge-eyebrow { color: color-mix(in oklab, var(--marketing-paper) 66%, transparent); }
+.marketing-download-panel .store-badge-soon { border-color: color-mix(in oklab, var(--marketing-gold) 55%, transparent); color: var(--marketing-gold); background: transparent; }
+@media (max-width: 900px) {
+  .marketing-download-actions { align-items: stretch; }
+  .marketing-download-actions .store-badges { justify-content: flex-start; }
+}
