@@ -4299,6 +4299,12 @@ html[data-preset="midnight"][data-visual-phase="evening"][data-section="salah"] 
 .marketing-download-actions { display: flex; flex-direction: column; align-items: flex-start; gap: 20px; margin-top: 32px; }
 .marketing-download-panel .store-badges { display: grid; grid-template-columns: max-content max-content; gap: 14px 12px; justify-content: start; align-items: center; }
 .marketing-download-panel .soon-orbit-track { stroke: color-mix(in oklab, var(--download-gold) 45%, transparent); }
+@media (max-width: 1180px) {
+  .marketing-download-panel { padding: 44px 46px; gap: 30px; }
+  .marketing-download h2 { font-size: 46px; }
+  /* Keep the phone mockup fully inside the panel on tablets. */
+  .marketing-download-visual img { right: 0; height: 100%; }
+}
 @media (max-width: 900px) {
   .marketing-download h2 { font-size: 40px; }
 }
