@@ -123,7 +123,7 @@ function Salah() {
    */
   const sendTestPrayerNotification = async (prayerId: string) => {
     if (!isNativeApp() || testingNotif) return;
-    const label = SALAH_PRAYERS.find((p) => p.id === prayerId)?.label ?? prayerId;
+    const label = PRAYER_LABELS[prayerId as keyof typeof PRAYER_LABELS] ?? prayerId;
     try {
       const { LocalNotifications } = await import("@capacitor/local-notifications");
       const perm = await LocalNotifications.checkPermissions();
