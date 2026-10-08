@@ -22,7 +22,7 @@ function SoonOrbit() {
       <defs>
         <path
           id={trackId}
-          d="M 12 -12 H 188 Q 208 -12 208 8 V 92 Q 208 112 188 112 H 12 Q -8 112 -8 92 V 8 Q -8 -12 12 -12 Z"
+          d="M 16 -11 H 175 Q 193 -11 193 7 V 93 Q 193 111 175 111 H 16 Q -2 111 -2 93 V 7 Q -2 -11 16 -11 Z"
           fill="none"
         />
       </defs>
