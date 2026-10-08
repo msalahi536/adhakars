@@ -3830,15 +3830,12 @@ html { scroll-behavior: smooth; }
 
 /* ===== Store badges (App Store / Google Play) ===== */
 .store-badges { display: flex; flex-wrap: wrap; align-items: center; gap: 14px; }
-.store-badge { position: relative; display: inline-flex; align-items: center; gap: 11px; min-width: 178px; padding: 9px 18px; border-radius: 13px; background: #0d1210; border: 1px solid rgba(250, 246, 236, 0.2); color: var(--marketing-paper); box-shadow: 0 12px 26px -14px rgba(31, 61, 43, 0.5); transition: transform 160ms ease, box-shadow 220ms ease; }
-.store-badge:hover { transform: translateY(-2px); box-shadow: 0 18px 34px -16px rgba(31, 61, 43, 0.62); }
-.store-badge > svg { width: 25px; height: 25px; flex-shrink: 0; }
-.store-badge-text { display: flex; flex-direction: column; gap: 3px; line-height: 1; text-align: left; }
-.store-badge-eyebrow { font-size: 10px; font-weight: 500; letter-spacing: 0.04em; opacity: 0.78; }
-.store-badge-name { font-size: 17px; font-weight: 600; letter-spacing: -0.01em; }
-.store-badge.is-soon { opacity: 0.45; box-shadow: none; cursor: default; }
-.store-badge.is-soon:hover { transform: none; box-shadow: none; }
-.store-badge.is-soon::after { content: ""; position: absolute; left: -5%; right: -5%; top: 50%; height: 1.5px; border-radius: 2px; background: rgba(250, 246, 236, 0.9); transform: rotate(-13deg); }
+.store-badge { position: relative; display: inline-flex; align-items: center; transition: transform 160ms ease; }
+.store-badge:hover { transform: translateY(-2px); }
+.store-badge-img { display: block; width: 178px; height: auto; filter: drop-shadow(0 12px 22px rgba(31, 61, 43, 0.28)); }
+.store-badge.is-soon { opacity: 0.55; cursor: default; }
+.store-badge.is-soon:hover { transform: none; }
+.store-badge.is-soon .store-badge-img { filter: grayscale(0.35); }
 .store-badge-soon { display: inline-flex; align-items: center; padding: 6px 13px; border-radius: 999px; background: color-mix(in oklab, var(--marketing-gold) 16%, transparent); border: 1px solid color-mix(in oklab, var(--marketing-gold) 34%, transparent); color: var(--marketing-ink); font-size: 11px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; }
 
 @media (max-width: 900px) {
@@ -4277,9 +4274,6 @@ html[data-preset="midnight"][data-visual-phase="evening"][data-section="salah"] 
 
 /* Store badges inside the dark download panel */
 .marketing-download-actions { display: flex; flex-direction: column; align-items: flex-start; gap: 18px; }
-.marketing-download-panel .store-badge { background: color-mix(in oklab, var(--marketing-paper) 10%, transparent); border: 1px solid color-mix(in oklab, var(--marketing-paper) 22%, transparent); }
-.marketing-download-panel .store-badge-name { color: var(--marketing-paper); }
-.marketing-download-panel .store-badge-eyebrow { color: color-mix(in oklab, var(--marketing-paper) 66%, transparent); }
 .marketing-download-panel .store-badge-soon { border-color: color-mix(in oklab, var(--marketing-gold) 55%, transparent); color: var(--marketing-gold); background: transparent; }
 @media (max-width: 900px) {
   .marketing-download-actions { align-items: stretch; }
