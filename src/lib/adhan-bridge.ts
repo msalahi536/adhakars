@@ -299,6 +299,8 @@ export const isAdhanPlaying = async (): Promise<AdhanStatus> => {
 
 /** Playback progress from the native side (null on web / failure). */
 export const getAdhanProgress = async (): Promise<AdhanProgress | null> => {
+  const web = webProgress();
+  if (web) return web;
   const plugin = getPlugin() as any;
   if (!plugin) return null;
   try {
@@ -319,6 +321,49 @@ export const getAdhanProgress = async (): Promise<AdhanProgress | null> => {
   }
 };
 
+// ---- In-app fallback session (iPhone silent alerts) ----
+// A silent notification has no adhan file natively, so tapping it plays
+// Mishary (his Fajr recording for Fajr) from zero inside the app instead.
+let webAdhan: { audio: HTMLAudioElement; prayer: string; reciterId: string } | null = null;
+
+export const isSilentReciter = (id: string | undefined | null): boolean => !id || id === SILENT_RECITER_ID;
+
+export const startSilentFallbackAdhan = async (prayer: string): Promise<string> => {
+  const label = `${prayer.charAt(0).toUpperCase()}${prayer.slice(1).toLowerCase()}` || "Fajr";
+  const reciterId = label === "Fajr" ? "fajr-mishary" : "mishary";
+  if (webAdhan && webAdhan.prayer === label) return webAdhan.reciterId;
+  stopWebAdhan();
+  const plugin = getPlugin() as any;
+  try { await plugin?.stopAdhan?.(); } catch { /* ignore */ }
+  if (typeof Audio === "undefined") return reciterId;
+  const audio = new Audio(PREVIEW_URLS[reciterId]);
+  audio.onended = () => { if (webAdhan?.audio === audio) webAdhan = null; };
+  webAdhan = { audio, prayer: label, reciterId };
+  try { await audio.play(); } catch (e) { console.error("[adhan] silent fallback play failed", e); }
+  return reciterId;
+};
+
+const stopWebAdhan = () => {
+  if (!webAdhan) return;
+  webAdhan.audio.pause();
+  webAdhan = null;
+};
+
+const webProgress = (): AdhanProgress | null => {
+  if (!webAdhan) return null;
+  const { audio, prayer, reciterId } = webAdhan;
+  const duration = Number.isFinite(audio.duration) ? audio.duration : 0;
+  return {
+    currentTime: audio.currentTime,
+    duration,
+    progress: duration ? audio.currentTime / duration : 0,
+    isPlaying: !audio.paused,
+    hasSession: true,
+    prayer,
+    reciterId,
+  };
+};
+
 const call = async (fn: keyof AdhanPlugin, arg?: unknown): Promise<void> => {
   const plugin = getPlugin() as any;
   if (!plugin) return;
@@ -329,11 +374,18 @@ const call = async (fn: keyof AdhanPlugin, arg?: unknown): Promise<void> => {
   }
 };
 
-export const stopAdhan = () => call("stopAdhan");
-export const pauseAdhan = () => call("pauseAdhan");
-export const resumeAdhan = () => call("resumeAdhan");
-export const seekAdhan = (progress: number) =>
-  call("seekAdhan", { progress: Math.min(1, Math.max(0, progress)) });
+export const stopAdhan = () => (webAdhan ? Promise.resolve(stopWebAdhan()) : call("stopAdhan"));
+export const pauseAdhan = () => (webAdhan ? Promise.resolve(webAdhan.audio.pause()) : call("pauseAdhan"));
+export const resumeAdhan = () => (webAdhan ? webAdhan.audio.play().then(() => {}, () => {}) : call("resumeAdhan"));
+export const seekAdhan = (progress: number) => {
+  const f = Math.min(1, Math.max(0, progress));
+  if (webAdhan) {
+    const d = webAdhan.audio.duration;
+    if (Number.isFinite(d)) webAdhan.audio.currentTime = f * d;
+    return Promise.resolve();
+  }
+  return call("seekAdhan", { progress: f });
+};
 
 
 const PREVIEW_URLS: Record<string, string> = {
