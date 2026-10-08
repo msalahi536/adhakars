@@ -3804,17 +3804,14 @@ html { scroll-behavior: smooth; }
 .marketing-showcase { display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); align-items: center; gap: 60px; margin-top: 54px; }
 .marketing-showcase-note { display: grid; gap: 10px; max-width: 240px; }
 .marketing-showcase-note-right { justify-self: end; }
-.marketing-showcase-note > svg { width: 26px; color: var(--marketing-gold); }
+.marketing-experience-phone { display: block; width: min(330px, 78vw); height: auto; }
 .marketing-showcase-note strong { font-family: "Fraunces", Georgia, serif; font-size: 23px; font-weight: 600; }
 .marketing-showcase-note span { color: var(--marketing-ink-soft); font-size: 14px; line-height: 1.65; }
 
 .marketing-themes { background: var(--marketing-paper-deep); }
 .marketing-theme-panel { display: grid; grid-template-columns: minmax(250px, .8fr) minmax(0, 1.2fr); align-items: center; gap: 60px; border: 1px solid var(--marketing-line); border-radius: 8px; background: color-mix(in oklab, var(--marketing-card) 64%, transparent); padding: 42px; }
 .marketing-theme-copy p:last-child { max-width: 390px; }
-.marketing-theme-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px; }
-.marketing-theme-grid figure { margin: 0; text-align: center; }
-.marketing-theme-preview { aspect-ratio: 9 / 17; border: 5px solid var(--marketing-ink); border-radius: 18px; background-position: center; background-size: cover; box-shadow: var(--marketing-shadow); }
-.marketing-theme-grid figcaption { margin-top: 10px; font-family: "Fraunces", Georgia, serif; font-size: 14px; }
+.marketing-theme-phones { display: block; width: 100%; height: auto; }
 
 .marketing-trust { background: var(--marketing-paper); }
 .marketing-trust-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); margin-top: 46px; }
@@ -3860,7 +3857,6 @@ html { scroll-behavior: smooth; }
   .marketing-feature-grid { grid-template-columns: 1fr; }
   .marketing-feature-card { min-height: 0; }
   .marketing-theme-panel { gap: 34px; padding: 28px 20px; }
-  .marketing-theme-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 22px; }
   .marketing-trust-grid { grid-template-columns: 1fr; }
   .marketing-trust-grid article { border-left: 0; border-top: 1px solid var(--marketing-line); padding: 24px 6px 0; }
   .marketing-trust-grid article:first-child { border-top: 0; }

@@ -6,7 +6,6 @@ import {
   BellRing,
   BookOpen,
   CalendarHeart,
-  Check,
   CircleDot,
   Compass,
   Hand,
@@ -15,18 +14,15 @@ import {
   Moon,
   Palette,
   ShieldCheck,
-  Sparkles,
   Sunrise,
   WifiOff,
 } from "lucide-react";
-import { MarketingLayout, IPhoneFrame } from "@/components/marketing/MarketingLayout";
+import { MarketingLayout } from "@/components/marketing/MarketingLayout";
 import { Button } from "@/components/ui/button";
 import heroAsset from "@/assets/homepage-hero.png.asset.json";
-import morningAsset from "@/assets/morning-landscape.webp.asset.json";
-import eveningAsset from "@/assets/evening-landscape.webp.asset.json";
-import roseAsset from "@/assets/rose-morning.webp.asset.json";
-import oceanAsset from "@/assets/ocean-morning.webp.asset.json";
 import heroPhones from "@/assets/homepage-phones.png.asset.json";
+import experiencePhone from "@/assets/experience-morning.png.asset.json";
+import themePhones from "@/assets/themes-phones.png.asset.json";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -71,12 +67,6 @@ const TRUST = [
   { Icon: WifiOff, label: "Works offline", body: "All content stays available wherever you are." },
 ] as const;
 
-const THEMES = [
-  { name: "Morning", image: morningAsset.url },
-  { name: "Evening", image: eveningAsset.url },
-  { name: "Rose", image: roseAsset.url },
-  { name: "Ocean", image: oceanAsset.url },
-] as const;
 
 function HomePage() {
   return (
@@ -149,14 +139,18 @@ function HomePage() {
               <p>Clean, distraction-free design with everything you need, right at your fingertips.</p>
             </div>
             <div className="marketing-showcase">
-              <div className="marketing-showcase-note marketing-showcase-note-left">
-                <Sparkles />
+              <div className="marketing-showcase-note">
                 <strong>Made for focus</strong>
                 <span>Clear Arabic, translation, references, and counters without clutter.</span>
               </div>
-              <IPhoneFrame width="min(330px, 78vw)" />
+              <img
+                src={experiencePhone.url}
+                alt="Morning Adhkar screen in Sahih Al-Adhkar"
+                className="marketing-experience-phone"
+                width={1030}
+                height={1920}
+              />
               <div className="marketing-showcase-note marketing-showcase-note-right">
-                <Check />
                 <strong>Your daily rhythm</strong>
                 <span>Move naturally from morning adhkar to salah, evening, and sleep.</span>
               </div>
@@ -171,14 +165,13 @@ function HomePage() {
               <h2>Beautiful themes<br />for every moment.</h2>
               <p>Choose morning, evening, or a color theme that feels right to you.</p>
             </div>
-            <div className="marketing-theme-grid">
-              {THEMES.map((theme) => (
-                <figure key={theme.name}>
-                  <div className="marketing-theme-preview" style={{ backgroundImage: `url(${theme.image})` }} />
-                  <figcaption>{theme.name}</figcaption>
-                </figure>
-              ))}
-            </div>
+            <img
+              src={themePhones.url}
+              alt="Sahih Al-Adhkar theme previews: ocean, rose, midnight, and sand"
+              className="marketing-theme-phones"
+              width={1920}
+              height={979}
+            />
           </div>
         </section>
 
