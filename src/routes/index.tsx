@@ -15,7 +15,6 @@ import {
   Palette,
   ShieldCheck,
   Sunrise,
-  WifiOff,
 } from "lucide-react";
 import { MarketingLayout } from "@/components/marketing/MarketingLayout";
 import { Button } from "@/components/ui/button";
@@ -31,7 +30,7 @@ export const Route = createFileRoute("/")({
       {
         name: "description",
         content:
-          "Authentic daily adhkar, prayer times, duas, and gentle Islamic companions in one private, offline-friendly app.",
+          "Authentic daily adhkar, prayer times, duas, and gentle Islamic companions in one private app.",
       },
       { property: "og:title", content: "Sahih Al-Adhkar — A calm companion for every day" },
       {
@@ -64,7 +63,6 @@ const TRUST = [
   { Icon: ShieldCheck, label: "Built on authentic sources", body: "Every dhikr is referenced from trusted hadith collections." },
   { Icon: Lock, label: "Completely private", body: "Your data stays only on your device. No accounts." },
   { Icon: Ban, label: "Free, no ads", body: "A clean, distraction-free experience." },
-  { Icon: WifiOff, label: "Works offline", body: "All content stays available wherever you are." },
 ] as const;
 
 
@@ -83,7 +81,7 @@ function HomePage() {
                 <em>for every day.</em>
               </h1>
               <p className="marketing-lead">
-                Sahih Al-Adhkar brings authentic daily remembrances, prayer times, and essential tools together in one beautiful, offline app.
+                Sahih Al-Adhkar brings authentic daily remembrances, prayer times, and essential tools together in one beautiful app.
               </p>
               <div className="marketing-actions">
                 <Button asChild className="marketing-primary-button">
@@ -97,7 +95,6 @@ function HomePage() {
                 <span><ShieldCheck />Free forever</span>
                 <span><Ban />No ads</span>
                 <span><Lock />No accounts</span>
-                <span><WifiOff />Works offline</span>
               </div>
             </div>
             <div className="marketing-hero-phones animate-fade-in" aria-label="Sahih Al-Adhkar app screens">

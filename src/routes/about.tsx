@@ -8,7 +8,6 @@ import {
   BookOpen,
   ShieldCheck,
   Lock,
-  WifiOff,
   Heart,
   Mail,
   ArrowRight,
@@ -38,7 +37,6 @@ const SOURCES = ["Bukhari", "Muslim", "Abu Dawud", "Tirmidhi", "Nasa'i", "Ibn Ma
 const PROMISE = [
   { Icon: ShieldCheck, title: "Authentic", body: "Every dhikr is traced to a hadith or verse, with the reference shown." },
   { Icon: Lock, title: "Private", body: "Your counts and streaks live only on your device. Nothing is uploaded." },
-  { Icon: WifiOff, title: "Offline", body: "Open it anywhere. No signal needed, no interruptions." },
   { Icon: Heart, title: "Free", body: "No ads, no upsells, no accounts. It always will be." },
 ];
 
@@ -49,7 +47,7 @@ export const Route = createFileRoute("/about")({
       {
         name: "description",
         content:
-          "A calm, offline friendly companion for the daily remembrance of Allah, sourced from authentic narrations.",
+          "A calm companion for the daily remembrance of Allah, sourced from authentic narrations.",
       },
       { property: "og:title", content: "About Sahih Al-Adhkar" },
       {

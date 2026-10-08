@@ -16,7 +16,7 @@ export const PRIVACY_SECTIONS: LegalSection[] = [
   },
   {
     heading: "PERIOD AND MENSTRUAL HEALTH DATA",
-    body: "The Period Companion is designed as a private, offline, on-device tool. The dates you log, your cycle history, predictions, and any related notes are stored only in your device's local storage. This health information is never uploaded to a server, never synced to a cloud account, never backed up by us, never shared with third parties, and never used for advertising, profiling, research, or any commercial purpose. No one but you, and anyone with physical access to your unlocked device, can see it. If your device is shared, please protect it with a passcode.",
+    body: "The Period Companion is designed as a private, on-device tool. The dates you log, your cycle history, predictions, and any related notes are stored only in your device's local storage. This health information is never uploaded to a server, never synced to a cloud account, never backed up by us, never shared with third parties, and never used for advertising, profiling, research, or any commercial purpose. No one but you, and anyone with physical access to your unlocked device, can see it. If your device is shared, please protect it with a passcode.",
   },
   {
     heading: "HEALTH AND MEDICAL INFORMATION DISCLAIMER",
@@ -36,7 +36,7 @@ export const PRIVACY_SECTIONS: LegalSection[] = [
   },
   {
     heading: "NETWORK REQUESTS",
-    body: "The app is designed to work offline. Where an internet connection is used, it is only to load the app itself, to fetch prayer time calculation data where you have enabled it, or to open a link you have tapped. These requests do not carry your personal content, your health data, or your progress.",
+    body: "The app needs an internet connection to load. A connection is used to load the app itself, to fetch prayer time calculation data where you have enabled it, or to open a link you have tapped. These requests do not carry your personal content, your health data, or your progress.",
   },
   {
     heading: "THIRD PARTIES AND APP STORES",
