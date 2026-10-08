@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { ArrowLeft, ArrowRight, Bell, BookOpen, Check, ChevronRight, Compass, Hand, HeartHandshake, Moon, Settings, ShieldCheck, Sunrise, Volume2, CalendarHeart } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Portal } from "@/components/Portal";
+import { GuidedTour } from "@/components/GuidedTour";
 import logo from "@/assets/logo-mark.png.asset.json";
 import morningScreen from "@/assets/experience-morning.png.asset.json";
 import themeScreens from "@/assets/themes-phones.png.asset.json";
@@ -30,6 +31,7 @@ const TOOLS = [
 
 export function Onboarding({ onDone }: { onDone: () => void }) {
   const [index, setIndex] = useState(0);
+  const [touring, setTouring] = useState(false);
   const [notifBusy, setNotifBusy] = useState(false);
   const [notifStatus, setNotifStatus] = useState<"idle" | "granted" | "denied" | "unavailable" | "error">("idle");
   const [native, setNative] = useState(false);
@@ -40,7 +42,8 @@ export function Onboarding({ onDone }: { onDone: () => void }) {
     onDone();
   };
   const goTo = (i: number) => setIndex(Math.max(0, Math.min(STEPS.length - 1, i)));
-  const next = () => index === STEPS.length - 1 ? finish() : goTo(index + 1);
+  const finishTo = () => { finish(); };
+  const next = () => index === STEPS.length - 1 ? finishTo() : index === 0 ? setTouring(true) : goTo(index + 1);
   useEffect(() => {
     setNative(isNativePlatform());
     const previous = document.activeElement;
@@ -83,14 +86,14 @@ export function Onboarding({ onDone }: { onDone: () => void }) {
     error: "Couldn't enable reminders. You can try again in Settings.",
   };
   const step = STEPS[index];
+  if (touring) return <GuidedTour onSkip={finish} onDone={() => { setTouring(false); setIndex(4); }} />;
   return (
     <Portal>
       <div className="onboarding-overlay">
         <div ref={dialogRef} className="onboarding-panel" role="dialog" aria-modal="true" aria-labelledby="onboarding-title" tabIndex={-1}
           onKeyDown={(event) => {
             if (event.key === "Escape") { event.preventDefault(); finish(); }
-            if (event.key === "ArrowRight") { event.preventDefault(); goTo(index + 1); }
-            if (event.key === "ArrowLeft") { event.preventDefault(); goTo(index - 1); }
+
             if (event.key === "Tab") {
               const controls = Array.from(dialogRef.current?.querySelectorAll<HTMLElement>('button:not([disabled]), [href], [tabindex="0"]') ?? []);
               const first = controls[0]; const last = controls[controls.length - 1];
@@ -99,14 +102,14 @@ export function Onboarding({ onDone }: { onDone: () => void }) {
             }
           }}>
           <div className="onboarding-progress" aria-label={`Step ${index + 1} of ${STEPS.length}`}>
-            {STEPS.map((s, i) => <span key={s.label} data-complete={i <= index} />)}
+            {[0, 1, 2].map((i) => <span key={i} data-complete={i <= (index === 0 ? 0 : 2)} />)}
           </div>
           <div className="onboarding-content" onTouchStart={(e) => { start.current = { x: e.touches[0].clientX, y: e.touches[0].clientY }; }}
             onTouchEnd={(e) => {
               const origin = start.current; start.current = null;
               if (!origin || !e.changedTouches[0]) return;
               const dx = e.changedTouches[0].clientX - origin.x; const dy = e.changedTouches[0].clientY - origin.y;
-              if (Math.abs(dx) > 65 && Math.abs(dx) > Math.abs(dy) * 1.5) goTo(index + (dx < 0 ? 1 : -1));
+              if (Math.abs(dx) > 65 && Math.abs(dx) > Math.abs(dy) * 1.5 && dx < 0 && index === 0) setTouring(true);
             }}>
             <div key={index} className="onboarding-step">
               <div className={`onboarding-visual onboarding-visual-${index}`}>
@@ -123,10 +126,10 @@ export function Onboarding({ onDone }: { onDone: () => void }) {
           </div>
           <div className="onboarding-actions">
             <Button className="onboarding-primary" disabled={notifBusy} onClick={index === 4 && native && notifStatus !== "granted" ? enableReminders : next}>
-              {notifBusy ? "Requesting permission…" : index !== 4 ? "Continue" : native && notifStatus !== "granted" ? notifStatus === "idle" ? "Enable reminders" : "Try again" : "Start my day"}
+              {notifBusy ? "Requesting permission…" : index === 0 ? "Show me around" : index !== 4 ? "Continue" : native && notifStatus !== "granted" ? notifStatus === "idle" ? "Enable reminders" : "Try again" : "Start my day"}
               {!notifBusy && (index === 4 && native && notifStatus !== "granted" ? <Bell /> : <ArrowRight />)}
             </Button>
-            <div className="onboarding-secondary"><Button variant="ghost" className="onboarding-text-button" disabled={index === 0} onClick={() => goTo(index - 1)}><ArrowLeft />Back</Button><span>{index + 1} / {STEPS.length}</span><Button variant="ghost" className="onboarding-text-button" onClick={finish}>{index === 4 ? "Not now" : "Skip tour"}</Button></div>
+            <div className="onboarding-secondary"><Button variant="ghost" className="onboarding-text-button" disabled={index === 0} onClick={() => index === 4 ? setTouring(true) : goTo(index - 1)}><ArrowLeft />Back</Button><span>{index === 0 ? 1 : 3} / 3</span><Button variant="ghost" className="onboarding-text-button" onClick={finish}>{index === 4 ? "Not now" : "Skip tour"}</Button></div>
           </div>
           <div className="onboarding-brand">Discover Sahih Al-Adhkar</div>
         </div>
