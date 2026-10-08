@@ -74,7 +74,7 @@ test("saved city coordinates take precedence over GPS", async () => {
   await syncLocationToWidgets();
   expect(gps).not.toHaveBeenCalled();
   expect(updateLocation).toHaveBeenCalledWith({ latitude: 51.5, longitude: -0.12, method: 3, school: 0 });
-  expect(reloadWidgets).toHaveBeenCalledTimes(1);
+  expect(reloadWidgets).not.toHaveBeenCalled();
 });
 
 test("GPS is used when there is no saved prayer location", async () => {
