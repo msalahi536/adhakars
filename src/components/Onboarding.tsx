@@ -3,7 +3,6 @@ import { ArrowLeft, ArrowRight, Bell, BookOpen, Check, ChevronRight, Compass, Ha
 import { Button } from "@/components/ui/button";
 import { Portal } from "@/components/Portal";
 import { GuidedTour } from "@/components/GuidedTour";
-import logo from "@/assets/logo-mark.png.asset.json";
 import morningScreen from "@/assets/experience-morning.png.asset.json";
 import themeScreens from "@/assets/themes-phones.png.asset.json";
 import { requestNotificationPermission, checkNotificationPermission, isNativePlatform, getNotificationPrefs, setNotificationPrefs, applyReminders } from "@/lib/notifications";
@@ -14,7 +13,7 @@ export const hasOnboarded = (): boolean => {
   try { return localStorage.getItem(FLAG_KEY) === "1"; } catch { return true; }
 };
 const STEPS = [
-  { label: "Welcome", title: "Sahih Al-Adhkar", body: "A little remembrance, woven into every day. Authentic adhkar, prayer times, and companions for the moments that matter." },
+  { label: "Welcome", title: "Sahih Al-Adhkar", body: "A quick look around your daily adhkar, prayer times, and settings." },
   { label: "Your daily remembrance", title: "Read. Listen. Remember.", body: "Swipe between adhkar and tap the counter as you recite. Use the speaker to listen, and open the source for the reference." },
   { label: "Explore More", title: "More for every part of life", body: "Salah brings prayer times and after-salah adhkar; Tasbih keeps your count. Open More for your library and companions." },
   { label: "Make it yours", title: "Find your focus", body: "Open Settings, then Appearance → Theme to choose your colors. Display style lets you follow each page, or keep morning or evening throughout." },
@@ -90,7 +89,7 @@ export function Onboarding({ onDone }: { onDone: () => void }) {
   return (
     <Portal>
       <div className="onboarding-overlay">
-        <div ref={dialogRef} className="onboarding-panel" role="dialog" aria-modal="true" aria-labelledby="onboarding-title" tabIndex={-1}
+        <div ref={dialogRef} className={`onboarding-panel${index === 0 ? " onboarding-welcome" : ""}`} role="dialog" aria-modal="true" aria-labelledby="onboarding-title" tabIndex={-1}
           onKeyDown={(event) => {
             if (event.key === "Escape") { event.preventDefault(); finish(); }
 
@@ -112,13 +111,12 @@ export function Onboarding({ onDone }: { onDone: () => void }) {
               if (Math.abs(dx) > 65 && Math.abs(dx) > Math.abs(dy) * 1.5 && dx < 0 && index === 0) setTouring(true);
             }}>
             <div key={index} className="onboarding-step">
-              <div className={`onboarding-visual onboarding-visual-${index}`}>
-                {index === 0 && <><img className="onboarding-logo" src={logo.url} alt="Sahih Al-Adhkar Arabic calligraphy over sunrise" /><div className="onboarding-welcome-icons"><Sunrise /><BookOpen /><Moon /></div></>}
+              {index !== 0 && <div className={`onboarding-visual onboarding-visual-${index}`}>
                 {index === 1 && <><img className="onboarding-reading-screen" src={morningScreen.url} alt="Morning Adhkar with Arabic, translation, and a counter" /><div className="onboarding-reading-tools"><Volume2 /><span>Listen</span><Hand /><span>Count</span></div></>}
                 {index === 2 && <div className="onboarding-tools">{TOOLS.map(({ Icon, name, detail }) => <div key={name}><Icon /><strong>{name}</strong><span>{detail}</span></div>)}</div>}
                 {index === 3 && <><img className="onboarding-theme-screens" src={themeScreens.url} alt="Ocean, Rose, Midnight, and Sand app theme previews" /><div className="onboarding-path"><Settings size={14} /><span>Settings</span><ChevronRight size={12} /><span>Appearance</span><ChevronRight size={12} /><span>Theme</span></div></>}
                 {index === 4 && <div className="onboarding-reminder"><Bell size={34} /><div><Sunrise /><span>Morning Adhkar</span><Check /></div><div><Moon /><span>Evening Adhkar</span><Check /></div></div>}
-              </div>
+              </div>}
               <div className="onboarding-copy" aria-live="polite" aria-atomic="true"><p className="onboarding-eyebrow">{step.label}</p><h2 id="onboarding-title">{step.title}</h2><p>{step.body}</p></div>
               {index === 0 && <p className="onboarding-assurance"><ShieldCheck size={14} /> Authentic sources · Free · No accounts</p>}
               {index === 4 && <p className="onboarding-status" role="status">{messages[notifStatus]}</p>}
@@ -131,7 +129,6 @@ export function Onboarding({ onDone }: { onDone: () => void }) {
             </Button>
             <div className="onboarding-secondary"><Button variant="ghost" className="onboarding-text-button" disabled={index === 0} onClick={() => index === 4 ? setTouring(true) : goTo(index - 1)}><ArrowLeft />Back</Button><span>{index === 0 ? 1 : 3} / 3</span><Button variant="ghost" className="onboarding-text-button" onClick={finish}>{index === 4 ? "Not now" : "Skip tour"}</Button></div>
           </div>
-          <div className="onboarding-brand">Discover Sahih Al-Adhkar</div>
         </div>
       </div>
     </Portal>

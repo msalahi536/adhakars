@@ -14,3 +14,4 @@
 - [x] Restore reliable real-time Salah alerts and period-start encouragement
 
 - [x] Polish onboarding with stable transitions, feature previews, and theme guidance
+- [x] Compact the welcome, remove spotlight pulses, and stabilize live walkthrough transitions
