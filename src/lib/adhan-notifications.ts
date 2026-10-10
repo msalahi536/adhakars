@@ -132,6 +132,9 @@ export const rescheduleAdhanNotifications = async (
   }
 
   if (native) {
+    // iPhone uses only the native scheduler ("Tap for the full adhan"). Clear
+    // any leftover plugin-scheduled alerts so both never fire for one prayer.
+    await cancelAdhanNotifications();
     // The test button bypasses enabled-prayer checks, while real alerts use
     // native preferences. Keep those preferences synchronized before planning.
     const prefs = getAdhanPrefs();
