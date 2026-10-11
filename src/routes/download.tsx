@@ -55,7 +55,7 @@ export const Route = createFileRoute("/download")({
       {
         name: "description",
         content:
-          "Use Sahih Al-Adhkar right in your browser today, or install it to your home screen. Now on the App Store for iPhone, with Android coming soon.",
+          "Use Sahih Al-Adhkar right in your browser today, or install it to your home screen. Now on the App Store for iPhone and Google Play for Android.",
       },
       { property: "og:title", content: "Get Sahih Al-Adhkar" },
       { property: "og:description", content: "Free, private, no accounts." },
@@ -130,7 +130,7 @@ function DownloadPage() {
             >
               Open the app now on any modern phone or computer. Nothing to
               install, no account needed. The iPhone app is live on the App
-              Store, and Android is coming soon.
+              Store, and Android is live on Google Play.
             </p>
 
             <div className="mt-9 flex flex-wrap items-center gap-3">
@@ -227,9 +227,9 @@ function DownloadPage() {
               className="mt-5 max-w-xl"
               style={{ color: "rgba(31,61,43,0.68)", fontSize: "1.0625rem", lineHeight: 1.65 }}
             >
-              The iPhone app is live. Android is still in the works — until it
-              lands, the web app runs the same on every device and installs to
-              your home screen with the same feel.
+              The iPhone app is live on the App Store and the Android app is
+              live on Google Play. The web app also runs the same on every
+              device and installs to your home screen with the same feel.
             </p>
           </div>
 
