@@ -156,7 +156,7 @@ export function MarketingLayout({ children, onePage = false, flushFooter = false
 function Footer({ flush = false }: { flush?: boolean }) {
   return (
     <footer
-      className={`border-t ${flush ? "mt-0" : "mt-24"}`}
+      className={flush ? "mt-0" : "mt-24 border-t"}
       style={{ borderColor: "rgba(31, 61, 43, 0.1)", background: "#F3EEDC" }}
     >
       <div className="mx-auto max-w-6xl px-5 py-14 md:px-10">
