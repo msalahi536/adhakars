@@ -3884,7 +3884,9 @@ html { scroll-behavior: smooth; }
 .download-hero-badges .store-badge-img { width: 212px; }
 .download-browser-link { min-height: 40px; padding-inline: 18px; font-size: 13px; }
 @media (max-width: 600px) {
-  /* Stack the two badges and keep each at full size on phones. */
+  /* The shared actions row is a two-column grid on phones; the badges need
+     the full width so they can stack at their real size. */
+  .marketing-actions.download-hero-badges { grid-template-columns: 1fr; }
   .download-hero-badges .store-badges { flex-direction: column; align-items: center; width: 100%; max-width: 100%; }
   .download-hero-badges .store-badge { flex: 0 0 auto; }
   .download-hero-badges .store-badge-img { width: min(246px, 82vw); }
