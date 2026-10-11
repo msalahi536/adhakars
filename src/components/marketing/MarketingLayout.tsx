@@ -160,7 +160,7 @@ function Footer({ flush = false }: { flush?: boolean }) {
       style={{ borderColor: "rgba(31, 61, 43, 0.1)", background: "#F3EEDC" }}
     >
       <div className="mx-auto max-w-6xl px-5 py-14 md:px-10">
-        <div className="grid gap-10 md:grid-cols-[1.4fr,1fr,1fr]">
+        <div className="grid gap-10 md:grid-cols-[1.4fr_1fr_1fr]">
           <div>
             <div className="flex items-center gap-2">
               <BrandMark />
