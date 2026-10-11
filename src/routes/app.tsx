@@ -298,7 +298,7 @@ function AppLayout() {
   }, []);
 
   return (
-    <div className={`app-shell ${visualPhase === "evening" ? "is-evening" : ""} ${isAdhkar ? "is-adhkar" : ""} ${isSettings ? "is-settings" : ""}`}>
+    <div className={`app-shell ${shownPhase === "evening" ? "is-evening" : ""} ${isAdhkar ? "is-adhkar" : ""} ${isSettings ? "is-settings" : ""}`}>
       <div
         className="app-background app-background-morning"
         style={{ "--screen-background": `url(${backgrounds.morning})` } as React.CSSProperties}
