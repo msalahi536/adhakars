@@ -41,6 +41,37 @@ function AppLayout() {
   const backgrounds = backgroundsForPreset(activePresetId);
   const visualPhase = activeVisualPhase;
 
+  // Android WebView glitch fix: the morning/evening artwork lives on the CDN,
+  // so the first switch faded against an image that was still downloading —
+  // the screen flashed through blank/partial frames. Preload and decode both
+  // images, and only allow the crossfade once the incoming one is ready.
+  const [decodedBackgrounds, setDecodedBackgrounds] = useState<Record<string, boolean>>({});
+  useEffect(() => {
+    let cancelled = false;
+    [backgrounds.morning, backgrounds.evening].forEach((url) => {
+      if (decodedBackgrounds[url]) return;
+      const img = new Image();
+      img.src = url;
+      const mark = () => {
+        if (!cancelled) setDecodedBackgrounds((prev) => (prev[url] ? prev : { ...prev, [url]: true }));
+      };
+      if (typeof img.decode === "function") {
+        img.decode().then(mark).catch(mark);
+      } else {
+        img.onload = mark;
+        img.onerror = mark;
+      }
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [backgrounds.morning, backgrounds.evening, decodedBackgrounds]);
+
+  // Hold the current artwork until the incoming one has decoded, so the
+  // 400ms crossfade always runs between two fully rendered images.
+  const eveningHold = visualPhase === "evening" && !decodedBackgrounds[backgrounds.evening];
+  const shownPhase: VisualPhase = eveningHold ? "morning" : visualPhase;
+
   const [adhan, setAdhan] = useState({ visible: false, prayer: "", reciterId: "" });
 
   useEffect(() => {
@@ -267,7 +298,7 @@ function AppLayout() {
   }, []);
 
   return (
-    <div className={`app-shell ${visualPhase === "evening" ? "is-evening" : ""} ${isAdhkar ? "is-adhkar" : ""} ${isSettings ? "is-settings" : ""}`}>
+    <div className={`app-shell ${shownPhase === "evening" ? "is-evening" : ""} ${eveningHold ? "is-evening-hold" : ""} ${isAdhkar ? "is-adhkar" : ""} ${isSettings ? "is-settings" : ""}`}>
       <div
         className="app-background app-background-morning"
         style={{ "--screen-background": `url(${backgrounds.morning})` } as React.CSSProperties}
