@@ -58,7 +58,7 @@ function DownloadPage() {
           />
           <div className="marketing-hero-shade" />
           <div
-            className="marketing-shell"
+            className="marketing-shell marketing-hero-copy"
             style={{
               position: "relative",
               display: "flex",
@@ -67,17 +67,13 @@ function DownloadPage() {
               justifyContent: "center",
               textAlign: "center",
               minHeight: "92vh",
+              maxWidth: 900,
               paddingTop: 96,
               paddingBottom: 72,
             }}
           >
             <p className="marketing-eyebrow">Download</p>
-            <h1
-              style={{
-                maxWidth: 820,
-                margin: "0 auto",
-              }}
-            >
+            <h1>
               Your daily adhkar,
               <em>one tap away.</em>
             </h1>
