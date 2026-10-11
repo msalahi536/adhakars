@@ -127,7 +127,6 @@ async function syncThemeToWidgets() {
   }
 }
 
-
 export async function syncTasbihToWidget(count: number, target: number, phrase = "SubhanAllah") {
   const plugin = getPlugin();
   if (!plugin) return;
