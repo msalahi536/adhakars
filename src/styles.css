@@ -4364,6 +4364,9 @@ html[data-preset="midnight"][data-visual-phase="evening"][data-section="salah"] 
   .marketing-download h2 { font-size: 36px; }
   .marketing-download-copy > p:last-of-type { font-size: 15px; }
   .marketing-download-panel .store-badge-img { width: 140px; }
+  /* The App Store artwork carries more empty space around its pill, so it
+     needs a slightly wider box for the two pills to render the same height. */
+  .marketing-download-panel .store-badge:first-child .store-badge-img { width: 145px; }
   /* The badges span the copy column and centre themselves, so the pair sits
      symmetrically under the text instead of drifting toward the right edge. */
   .marketing-download-panel .store-badges { width: 100%; justify-content: center; }
