@@ -6,6 +6,7 @@ import {
 } from "@/components/marketing/MarketingLayout";
 import {
   APP_STORE_URL,
+  GOOGLE_PLAY_URL,
   StoreBadges,
 } from "@/components/marketing/StoreBadges";
 import {
@@ -18,7 +19,6 @@ import {
   ShieldCheck,
   Lock,
   Ban,
-  Bell,
 } from "lucide-react";
 
 const GREEN = "#1F3D2B";
