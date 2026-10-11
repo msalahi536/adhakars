@@ -114,10 +114,10 @@ function DownloadPage() {
                 color: INK,
               }}
             >
-              Available today,
+              Your daily adhkar,
               <br />
               <span style={{ fontStyle: "italic", color: GREEN_SOFT }}>
-                right in your browser.
+                one tap away.
               </span>
             </h1>
             <p
