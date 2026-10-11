@@ -4347,8 +4347,12 @@ html[data-preset="midnight"][data-visual-phase="evening"][data-section="salah"] 
 /* Store badges inside the dark download panel */
 .marketing-download-actions { display: flex; flex-direction: column; align-items: flex-start; gap: 20px; margin-top: 32px; }
 .marketing-download-panel .store-badges { display: grid; grid-template-columns: max-content max-content; gap: 14px 12px; justify-content: start; align-items: center; }
-@media (max-width: 1180px) {
+/* Tablet-only padding: an unguarded max-width here would beat the phone rules
+   written earlier in the file and leave 46px gutters on a real phone. */
+@media (min-width: 601px) and (max-width: 1180px) {
   .marketing-download-panel { padding: 44px 46px; gap: 30px; }
+}
+@media (max-width: 1180px) {
   .marketing-download h2 { font-size: 46px; }
   /* Keep the phone mockup fully inside the panel on tablets. */
   .marketing-download-visual img { right: 0; height: 100%; }
@@ -4360,6 +4364,12 @@ html[data-preset="midnight"][data-visual-phase="evening"][data-section="salah"] 
   .marketing-download h2 { font-size: 36px; }
   .marketing-download-copy > p:last-of-type { font-size: 15px; }
   .marketing-download-panel .store-badge-img { width: 140px; }
+  /* The App Store artwork carries more empty space around its pill, so it
+     needs a slightly wider box for the two pills to render the same height. */
+  .marketing-download-panel .store-badge:first-child .store-badge-img { width: 145px; }
+  /* The badges span the copy column and centre themselves, so the pair sits
+     symmetrically under the text instead of drifting toward the right edge. */
+  .marketing-download-panel .store-badges { width: 100%; justify-content: center; }
 }
 
 /* Welcome tour: the frame and controls never move between steps. */
