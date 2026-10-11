@@ -20,3 +20,4 @@
 - [x] Compact the welcome, remove spotlight pulses, and stabilize live walkthrough transitions
 - [x] Remove "Available now" eyebrow from homepage download section
 - [x] Polish /download page for masjid QR-code visitors (store badges front and center)
+- [x] Drop the JS prayer-times handoff; native widgets fetch times from the Al-Adhan API themselves

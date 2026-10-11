@@ -26,7 +26,6 @@ mock.module("@capacitor/core", () => ({
     updateLocation,
     reloadWidgets,
     updateTheme: async () => {},
-    syncPrayerTimes: async () => {},
     updateTasbih: async () => {},
   }),
 }));
@@ -87,7 +86,7 @@ test("saved city coordinates take precedence over GPS", async () => {
   await syncLocationToWidgets();
   expect(gps).not.toHaveBeenCalled();
   expect(updateLocation).toHaveBeenCalledWith({ latitude: 51.5, longitude: -0.12, method: 3, school: 0 });
-  expect(reloadWidgets).not.toHaveBeenCalled();
+  expect(reloadWidgets).toHaveBeenCalled();
 });
 
 test("GPS is used when there is no saved prayer location", async () => {
