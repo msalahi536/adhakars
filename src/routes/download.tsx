@@ -71,7 +71,7 @@ function DownloadPage() {
             </p>
 
             <div
-              className="marketing-actions"
+              className="marketing-actions download-hero-badges"
               style={{ justifyContent: "center", marginTop: 36 }}
             >
               <StoreBadges />
@@ -79,7 +79,7 @@ function DownloadPage() {
 
             <Link
               to="/app"
-              className="marketing-secondary-button"
+              className="marketing-secondary-button download-browser-link"
               style={{
                 marginTop: 18,
                 display: "inline-flex",

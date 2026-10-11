@@ -70,7 +70,7 @@ export function MarketingLayout({ children, onePage = false }: { children: React
           </Link>
 
           <nav className="hidden items-center gap-8 md:flex">
-            {onePage ? HOME_NAV.map((n) => (
+            {onePage && pathname === "/" ? HOME_NAV.map((n) => (
               <a
                 key={n.href}
                 href={n.href}
@@ -118,7 +118,7 @@ export function MarketingLayout({ children, onePage = false }: { children: React
             }}
           >
             <div className="mx-auto flex max-w-6xl flex-col gap-1 px-5 py-4">
-              {onePage ? HOME_NAV.map((n) => (
+              {onePage && pathname === "/" ? HOME_NAV.map((n) => (
                 <a
                   key={n.href}
                   href={n.href}
