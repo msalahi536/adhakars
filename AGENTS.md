@@ -1,6 +1,6 @@
 # Architecture Decisions
 
-- Native prayer widgets read the shared prayer settings accessor and resync on its change event, so saved location, calculation method, and Asr school cannot drift from Salah settings.
+- Native prayer widgets source their own times from the Al-Adhan API; the web bridge only hands over location, calculation method and Asr school, read from the shared prayer settings accessor and resynced on its change event, so settings cannot drift and no prayer-time handoff exists.
 - Widget bridge and content rotation regression tests run with Bun next to their modules, so native handoff rules and UTC daily selection stay independently verifiable.
 
 - Website branding and installable home-screen icons use CDN asset pointers derived from the same supplied logo; the favicon remains a downscaled public file so browser icon discovery works.

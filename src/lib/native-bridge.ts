@@ -9,7 +9,7 @@
  */
 
 import { registerPlugin } from "@capacitor/core";
-import { getPrayerSettings, fetchDay } from "@/lib/prayer-times";
+import { getPrayerSettings } from "@/lib/prayer-times";
 
 export interface AdhanPluginInterface {
   playFullAdhan(options: { reciterId: string; prayer: string }): Promise<void>;
@@ -32,7 +32,6 @@ export const AdhanPlugin = registerPlugin<AdhanPluginInterface>("AdhanPlugin");
 
 interface CapacitorPlugin {
   updateLocation(opts: { latitude: number; longitude: number; method: number; school: 0 | 1 }): Promise<void>;
-  syncPrayerTimes(opts: { times: { id: string; hour: number; minute: number }[] }): Promise<void>;
   updateTasbih(opts: { count: number; target: number; phrase: string }): Promise<void>;
   updateTheme(opts: { theme: string }): Promise<void>;
   reloadWidgets(): Promise<void>;
@@ -104,14 +103,9 @@ export async function syncLocationToWidgets() {
       method: settings.method,
       school: settings.hanafi ? 1 : 0,
     });
-    // Do NOT call reloadWidgets() here — updateLocation clears cached
-    // times, so a reload now would force the widget into its API fallback.
-    const today = await fetchDay(new Date(), settings);
-    if (today) {
-      await syncPrayerTimesToWidgets(today.times);
-    } else {
-      await plugin.reloadWidgets();
-    }
+    // Widgets fetch their own times from the Al-Adhan API for the location
+    // just handed over, so they only need a refresh nudge here.
+    await plugin.reloadWidgets();
   } catch (err) {
     console.warn("[NativeBridge] Location sync error:", err);
   }
@@ -133,29 +127,6 @@ async function syncThemeToWidgets() {
   }
 }
 
-/**
- * Syncs the exact prayer times the app calculated to the native widget layer.
- * Call this after prayer times are fetched so widgets show identical times.
- * Accepts times as minutes-from-midnight (the format fetchDay returns).
- */
-export async function syncPrayerTimesToWidgets(times: Record<string, number>) {
-  const plugin = getPlugin();
-  if (!plugin) return;
-
-  const entries = Object.entries(times)
-    .filter(([id]) => id !== "sunrise") // widgets don't show sunrise
-    .map(([id, mins]) => ({
-      id: id.charAt(0).toUpperCase() + id.slice(1), // "fajr" → "Fajr"
-      hour: Math.floor(mins / 60) % 24,
-      minute: mins % 60,
-    }));
-
-  try {
-    await plugin.syncPrayerTimes({ times: entries });
-  } catch (err) {
-    console.warn("[NativeBridge] Prayer times sync error:", err);
-  }
-}
 
 export async function syncTasbihToWidget(count: number, target: number, phrase = "SubhanAllah") {
   const plugin = getPlugin();
