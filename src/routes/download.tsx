@@ -133,39 +133,27 @@ function DownloadPage() {
               Store, and Android is live on Google Play.
             </p>
 
-            <div className="mt-9 flex flex-wrap items-center gap-3">
+            <div className="mt-9">
+              <StoreBadges />
+            </div>
+
+            <div className="mt-7 flex flex-wrap items-center gap-3">
               <Link
                 to="/app"
-                className="btn-primary inline-flex items-center gap-2"
-                style={{
-                  background: GREEN,
-                  color: CREAM,
-                  padding: "16px 26px",
-                  borderRadius: RADIUS.pill,
-                  fontWeight: 600,
-                  fontSize: 15,
-                  boxShadow:
-                    "0 10px 24px -10px rgba(31,61,43,0.36), 0 2px 6px rgba(31,61,43,0.12)",
-                }}
-              >
-                Open the app now
-                <ArrowRight size={16} />
-              </Link>
-              <a
-                href="#install"
                 className="btn-ghost inline-flex items-center gap-2"
                 style={{
                   border: "1px solid rgba(31,61,43,0.2)",
                   background: "rgba(255,255,255,0.6)",
                   color: INK,
-                  padding: "15px 24px",
+                  padding: "14px 22px",
                   borderRadius: RADIUS.pill,
                   fontWeight: 600,
-                  fontSize: 15,
+                  fontSize: 14,
                 }}
               >
-                Install to home screen
-              </a>
+                Or open it right in your browser
+                <ArrowRight size={15} />
+              </Link>
             </div>
 
             <div
@@ -178,10 +166,6 @@ function DownloadPage() {
                   {label}
                 </span>
               ))}
-            </div>
-
-            <div className="mt-9">
-              <StoreBadges />
             </div>
           </div>
 
