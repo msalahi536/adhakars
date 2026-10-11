@@ -3880,6 +3880,13 @@ html { scroll-behavior: smooth; }
 }
 .store-badge-soon { display: inline-flex; align-items: center; padding: 6px 13px; border-radius: 999px; background: color-mix(in oklab, var(--marketing-gold) 16%, transparent); border: 1px solid color-mix(in oklab, var(--marketing-gold) 34%, transparent); color: var(--marketing-ink); font-size: 11px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; }
 
+/* Download page hero: store badges lead, browser link stays quiet. */
+.download-hero-badges .store-badge-img { width: 212px; }
+.download-browser-link { min-height: 40px; padding-inline: 18px; font-size: 13px; }
+@media (max-width: 600px) {
+  .download-hero-badges .store-badge-img { width: min(246px, 82vw); }
+}
+
 @media (max-width: 900px) {
   .marketing-hero { min-height: auto; }
   .marketing-hero-shade { background: linear-gradient(180deg, color-mix(in oklab, var(--marketing-paper) 68%, transparent) 0%, color-mix(in oklab, var(--marketing-paper) 42%, transparent) 55%, color-mix(in oklab, var(--marketing-paper) 18%, transparent) 100%); }
