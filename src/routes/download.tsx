@@ -79,7 +79,7 @@ function DownloadPage() {
             </h1>
             <p
               className="marketing-lead"
-              style={{ maxWidth: 560, margin: "0 auto" }}
+              style={{ maxWidth: 560, marginLeft: "auto", marginRight: "auto" }}
             >
               Free, private, and authentic. Get the app for your phone, or open
               it right here in your browser — nothing to install.
