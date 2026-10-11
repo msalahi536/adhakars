@@ -20,7 +20,7 @@ const HOME_NAV = [
   { href: "#download", label: "Download" },
 ] as const;
 
-export function MarketingLayout({ children, onePage = false }: { children: ReactNode; onePage?: boolean }) {
+export function MarketingLayout({ children, onePage = false, flushFooter = false }: { children: ReactNode; onePage?: boolean; flushFooter?: boolean }) {
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const pathname = useRouterState({ select: (s) => s.location.pathname });
@@ -148,15 +148,15 @@ export function MarketingLayout({ children, onePage = false }: { children: React
 
       <main style={{ paddingTop: onePage ? 0 : 72 }}>{children}</main>
 
-      <Footer />
+      <Footer flush={flushFooter} />
     </div>
   );
 }
 
-function Footer() {
+function Footer({ flush = false }: { flush?: boolean }) {
   return (
     <footer
-      className="mt-24 border-t"
+      className={`border-t ${flush ? "mt-0" : "mt-24"}`}
       style={{ borderColor: "rgba(31, 61, 43, 0.1)", background: "#F3EEDC" }}
     >
       <div className="mx-auto max-w-6xl px-5 py-14 md:px-10">
