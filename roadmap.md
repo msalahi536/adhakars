@@ -18,5 +18,5 @@
 
 - [x] Polish onboarding with stable transitions, feature previews, and theme guidance
 - [x] Compact the welcome, remove spotlight pulses, and stabilize live walkthrough transitions
-- [ ] Remove "Available now" eyebrow from homepage download section
-- [ ] Polish /download page for masjid QR-code visitors (store badges front and center)
+- [x] Remove "Available now" eyebrow from homepage download section
+- [x] Polish /download page for masjid QR-code visitors (store badges front and center)
