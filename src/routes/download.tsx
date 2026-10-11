@@ -1,9 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import {
-  ArcsTexture,
-  IPhoneFrame,
-  MarketingLayout,
-} from "@/components/marketing/MarketingLayout";
+import { MarketingLayout } from "@/components/marketing/MarketingLayout";
 import {
   APP_STORE_URL,
   GOOGLE_PLAY_URL,
@@ -19,46 +15,24 @@ import {
   ShieldCheck,
   Lock,
   Ban,
+  Smartphone,
 } from "lucide-react";
-
-const GREEN = "#1F3D2B";
-const GREEN_DEEP = "#183020";
-const GREEN_SOFT = "#2E5A3F";
-const CREAM = "#FAF6EC";
-const CREAM_CARD = "#FFFFFF";
-const CREAM_DEEP = "#F3EEDC";
-const GOLD = "#C9A84C";
-const GOLD_DEEP = "#8B7326";
-const INK = "#1F3D2B";
-const SERIF = "'Fraunces', Georgia, serif";
-const RADIUS = { pill: "999px", card: "20px", block: "28px", cta: "32px" };
-const SHADOW_CARD =
-  "0 1px 0 rgba(31,61,43,0.04), 0 8px 24px -12px rgba(31,61,43,0.10), 0 24px 48px -28px rgba(31,61,43,0.14)";
-const SHADOW_CARD_HOVER =
-  "0 1px 0 rgba(31,61,43,0.05), 0 12px 32px -14px rgba(31,61,43,0.14), 0 32px 60px -32px rgba(31,61,43,0.20)";
-
-
-const TRUST = [
-  { Icon: Heart2Icon, label: "Free forever" },
-  { Icon: Ban, label: "No ads" },
-  { Icon: Lock, label: "No tracking" },
-];
-
-function Heart2Icon(props: { size?: number }) {
-  return <ShieldCheck size={props.size} />;
-}
+import heroAsset from "@/assets/homepage-hero.png.asset.json";
 
 export const Route = createFileRoute("/download")({
   head: () => ({
     meta: [
-      { title: "Download, Sahih Al-Adhkar" },
+      { title: "Download — Sahih Al-Adhkar" },
       {
         name: "description",
         content:
-          "Use Sahih Al-Adhkar right in your browser today, or install it to your home screen. Now on the App Store for iPhone and Google Play for Android.",
+          "Get Sahih Al-Adhkar on the App Store for iPhone and Google Play for Android — or open it right in your browser. Free, private, no accounts.",
       },
       { property: "og:title", content: "Get Sahih Al-Adhkar" },
-      { property: "og:description", content: "Free, private, no accounts." },
+      {
+        property: "og:description",
+        content: "Free, private, no accounts. Now on the App Store and Google Play.",
+      },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
     ],
@@ -66,444 +40,242 @@ export const Route = createFileRoute("/download")({
   component: DownloadPage,
 });
 
+const TRUST = [
+  { Icon: ShieldCheck, label: "Free forever" },
+  { Icon: Ban, label: "No ads" },
+  { Icon: Lock, label: "No accounts" },
+];
+
 function DownloadPage() {
   return (
-    <MarketingLayout>
-      <style>{`
-        .lift { transition: transform 220ms cubic-bezier(0.22, 1, 0.36, 1), box-shadow 220ms ease; }
-        .lift:hover { transform: translateY(-3px); box-shadow: ${SHADOW_CARD_HOVER}; }
-        .btn-primary { transition: transform 160ms ease, box-shadow 220ms ease; }
-        .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 14px 32px -12px rgba(31,61,43,0.42), 0 4px 10px rgba(31,61,43,0.16); }
-        .btn-ghost { transition: transform 160ms ease, border-color 220ms ease, background 220ms ease; }
-        .btn-ghost:hover { transform: translateY(-1px); border-color: rgba(31,61,43,0.38); background: #FFFFFF; }
-      `}</style>
-
-      {/* ================= HERO ================= */}
-      <section className="relative overflow-hidden">
-        <ArcsTexture opacity={0.05} />
-        <div
-          aria-hidden
-          className="pointer-events-none absolute inset-0"
-          style={{
-            background:
-              "radial-gradient(1100px 460px at 85% -10%, rgba(201,168,76,0.14), transparent 60%), radial-gradient(800px 380px at 10% 110%, rgba(31,61,43,0.06), transparent 60%)",
-          }}
-        />
-        <div className="relative mx-auto max-w-[1200px] px-6 pb-20 pt-16 md:px-10 md:pb-24 md:pt-24 lg:grid lg:grid-cols-[1.15fr,1fr] lg:items-center lg:gap-16">
-          <div>
-            <div
-              style={{
-                color: GOLD_DEEP,
-                fontSize: 11,
-                fontWeight: 700,
-                letterSpacing: "0.22em",
-                textTransform: "uppercase",
-              }}
-            >
-              Download
-            </div>
+    <MarketingLayout onePage>
+      <div className="marketing-home">
+        {/* ================= HERO ================= */}
+        <section className="marketing-hero" style={{ minHeight: "92vh" }}>
+          <div
+            className="marketing-hero-image"
+            style={{ backgroundImage: `url(${heroAsset.url})` }}
+          />
+          <div className="marketing-hero-shade" />
+          <div
+            className="marketing-shell"
+            style={{
+              position: "relative",
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              justifyContent: "center",
+              textAlign: "center",
+              minHeight: "92vh",
+              paddingTop: 96,
+              paddingBottom: 72,
+            }}
+          >
+            <p className="marketing-eyebrow">Download</p>
             <h1
-              className="mt-5"
               style={{
-                fontFamily: SERIF,
-                fontWeight: 500,
-                fontVariationSettings: "'opsz' 144",
-                fontSize: "clamp(2.75rem, 6.4vw, 5rem)",
-                lineHeight: 1.02,
-                letterSpacing: "-0.025em",
-                color: INK,
+                maxWidth: 820,
+                margin: "0 auto",
               }}
             >
               Your daily adhkar,
-              <br />
-              <span style={{ fontStyle: "italic", color: GREEN_SOFT }}>
-                one tap away.
-              </span>
+              <em>one tap away.</em>
             </h1>
             <p
-              className="mt-7 max-w-[36rem]"
-              style={{
-                color: "rgba(31,61,43,0.72)",
-                fontSize: "1.125rem",
-                lineHeight: 1.6,
-              }}
+              className="marketing-lead"
+              style={{ maxWidth: 560, margin: "0 auto" }}
             >
-              Open the app now on any modern phone or computer. Nothing to
-              install, no account needed. The iPhone app is live on the App
-              Store, and Android is live on Google Play.
+              Free, private, and authentic. Get the app for your phone, or open
+              it right here in your browser — nothing to install.
             </p>
 
-            <div className="mt-9">
+            <div
+              className="marketing-actions"
+              style={{ justifyContent: "center", marginTop: 36 }}
+            >
               <StoreBadges />
             </div>
 
-            <div className="mt-7 flex flex-wrap items-center gap-3">
-              <Link
-                to="/app"
-                className="btn-ghost inline-flex items-center gap-2"
-                style={{
-                  border: "1px solid rgba(31,61,43,0.2)",
-                  background: "rgba(255,255,255,0.6)",
-                  color: INK,
-                  padding: "14px 22px",
-                  borderRadius: RADIUS.pill,
-                  fontWeight: 600,
-                  fontSize: 14,
-                }}
-              >
-                Or open it right in your browser
-                <ArrowRight size={15} />
-              </Link>
-            </div>
+            <Link
+              to="/app"
+              className="marketing-secondary-button"
+              style={{
+                marginTop: 18,
+                display: "inline-flex",
+                alignItems: "center",
+                gap: 8,
+                textDecoration: "none",
+              }}
+            >
+              Or open it right in your browser
+              <ArrowRight size={15} />
+            </Link>
 
             <div
-              className="mt-9 flex flex-wrap items-center gap-x-6 gap-y-3 text-xs"
-              style={{ color: "rgba(31,61,43,0.6)", letterSpacing: "0.02em" }}
+              className="marketing-quick-trust"
+              aria-label="App benefits"
+              style={{ justifyContent: "center", marginTop: 34 }}
             >
               {TRUST.map(({ Icon, label }) => (
-                <span key={label} className="inline-flex items-center gap-1.5">
-                  <Icon size={14} />
+                <span key={label}>
+                  <Icon />
                   {label}
                 </span>
               ))}
             </div>
           </div>
+        </section>
 
-          <div className="mt-14 flex items-center justify-center lg:mt-0">
-            <IPhoneFrame />
-          </div>
-        </div>
-      </section>
-
-      {/* ================= NATIVE APPS (coming) ================= */}
-      <section className="relative" style={{ background: CREAM_DEEP }}>
-        <div className="mx-auto max-w-[1200px] px-6 py-24 md:px-10 md:py-28">
-          <div className="max-w-2xl">
-            <div
-              style={{
-                color: GOLD_DEEP,
-                fontSize: 11,
-                fontWeight: 700,
-                letterSpacing: "0.22em",
-                textTransform: "uppercase",
-              }}
-            >
-              Native apps
-            </div>
-            <h2
-              className="mt-4"
-              style={{
-                fontFamily: SERIF,
-                fontWeight: 500,
-                fontSize: "clamp(1.9rem, 4vw, 2.75rem)",
-                lineHeight: 1.08,
-                letterSpacing: "-0.02em",
-                color: INK,
-              }}
-            >
-              Now on the App Store
-              <br />
-              <span style={{ fontStyle: "italic", color: GREEN_SOFT }}>
-                and Google Play.
-              </span>
-            </h2>
-            <p
-              className="mt-5 max-w-xl"
-              style={{ color: "rgba(31,61,43,0.68)", fontSize: "1.0625rem", lineHeight: 1.65 }}
-            >
-              The iPhone app is live on the App Store and the Android app is
-              live on Google Play. The web app also runs the same on every
-              device and installs to your home screen with the same feel.
-            </p>
-          </div>
-
-          <div className="mt-12 grid gap-5 md:grid-cols-2">
-            {/* iOS */}
-            <div
-              className="lift relative flex flex-col justify-between overflow-hidden"
-              style={{
-                background: `linear-gradient(135deg, ${GREEN_DEEP} 0%, ${GREEN_SOFT} 100%)`,
-                color: CREAM,
-                minHeight: 260,
-                borderRadius: RADIUS.block,
-                padding: "34px",
-                boxShadow: SHADOW_CARD,
-              }}
-            >
-              <ArcsTexture opacity={0.07} color={GOLD} />
-              <div className="relative flex items-center gap-3">
-                <div
-                  className="grid h-12 w-12 place-items-center rounded-2xl"
-                  style={{ background: "rgba(250,246,236,0.14)", border: "1px solid rgba(201,168,76,0.28)" }}
-                >
-                  <Apple size={24} />
-                </div>
-                <div
-                  style={{
-                    color: GOLD,
-                    fontSize: 11,
-                    fontWeight: 700,
-                    letterSpacing: "0.22em",
-                    textTransform: "uppercase",
-                  }}
-                >
-                  iPhone and iPad
-                </div>
-              </div>
-              <div className="relative mt-8">
-                <div
-                  style={{
-                    fontFamily: SERIF,
-                    fontWeight: 500,
-                    fontSize: "1.7rem",
-                    lineHeight: 1.15,
-                    letterSpacing: "-0.015em",
-                  }}
-                >
-                  Now on the App Store.
-                </div>
-                <p
-                  className="mt-3 max-w-md"
-                  style={{ color: "rgba(250,246,236,0.72)", fontSize: "0.95rem", lineHeight: 1.6 }}
-                >
-                  Download the iPhone and iPad app, or add the web app to your
-                  home screen for the same one tap experience.
-                </p>
-                <div className="mt-6 flex flex-wrap items-center gap-3">
-                  <a
-                    className="store-badge"
-                    href={APP_STORE_URL}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    <Apple size={25} />
-                    <span className="store-badge-text">
-                      <span className="store-badge-eyebrow">Download on the</span>
-                      <span className="store-badge-name">App Store</span>
-                    </span>
-                  </a>
-                  <a
-                    href="#install"
-                    className="inline-flex items-center gap-2"
-                    style={{
-                      color: "rgba(250,246,236,0.85)",
-                      fontSize: 13,
-                      fontWeight: 600,
-                      textDecoration: "underline",
-                      textUnderlineOffset: 4,
-                    }}
-                  >
-                    Or add to home screen
-                  </a>
-                </div>
-              </div>
+        {/* ================= PLATFORMS ================= */}
+        <section className="marketing-section">
+          <div className="marketing-shell">
+            <div className="marketing-heading marketing-heading-centered">
+              <p className="marketing-eyebrow">Choose your device</p>
+              <h2>
+                Made for iPhone<em>and Android.</em>
+              </h2>
+              <p>
+                Native apps with prayer alerts, the adhan, and home-screen
+                widgets — the same calm experience everywhere.
+              </p>
             </div>
 
-            {/* Android */}
-            <div
-              className="lift relative flex flex-col justify-between overflow-hidden"
-              style={{
-                background: CREAM_CARD,
-                color: INK,
-                minHeight: 260,
-                borderRadius: RADIUS.block,
-                padding: "34px",
-                boxShadow: SHADOW_CARD,
-                border: "1px solid rgba(31,61,43,0.08)",
-              }}
-            >
-              <div className="flex items-center gap-3">
-                <div
-                  className="grid h-12 w-12 place-items-center rounded-2xl"
-                  style={{
-                    background:
-                      "linear-gradient(135deg, rgba(201,168,76,0.22) 0%, rgba(201,168,76,0.10) 100%)",
-                    border: "1px solid rgba(201,168,76,0.22)",
-                    color: GOLD_DEEP,
-                  }}
-                >
-                  <Play size={22} />
-                </div>
-                <div
-                  style={{
-                    color: GOLD_DEEP,
-                    fontSize: 11,
-                    fontWeight: 700,
-                    letterSpacing: "0.22em",
-                    textTransform: "uppercase",
-                  }}
-                >
-                  Android
-                </div>
-              </div>
-              <div className="mt-8">
-                <div
-                  style={{
-                    fontFamily: SERIF,
-                    fontWeight: 500,
-                    fontSize: "1.7rem",
-                    lineHeight: 1.15,
-                    letterSpacing: "-0.015em",
-                    color: INK,
-                  }}
-                >
-                  Now on Google Play.
-                </div>
-                <p
-                  className="mt-3 max-w-md"
-                  style={{ color: "rgba(31,61,43,0.68)", fontSize: "0.95rem", lineHeight: 1.6 }}
-                >
-                  The Android app is live. Get it on Google Play, or install
-                  the web app straight from Chrome for a proper icon on the
-                  home screen.
-                </p>
-                <div className="mt-6 flex flex-wrap items-center gap-3">
-                  <a
-                    className="store-badge"
-                    href={GOOGLE_PLAY_URL}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    aria-label="Get it on Google Play"
-                  >
-                    <Play size={25} />
-                    <span className="store-badge-text">
-                      <span className="store-badge-eyebrow">GET IT ON</span>
-                      <span className="store-badge-name">Google Play</span>
-                    </span>
-                  </a>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* ================= INSTALL AS APP ================= */}
-      <section id="install">
-        <div className="mx-auto max-w-[1200px] px-6 py-24 md:px-10 md:py-32">
-          <div className="max-w-2xl">
             <div
               style={{
-                color: GOLD_DEEP,
-                fontSize: 11,
-                fontWeight: 700,
-                letterSpacing: "0.22em",
-                textTransform: "uppercase",
+                display: "grid",
+                gap: 20,
+                gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))",
+                maxWidth: 880,
+                margin: "0 auto",
               }}
             >
-              Install as an app
-            </div>
-            <h2
-              className="mt-4"
-              style={{
-                fontFamily: SERIF,
-                fontWeight: 500,
-                fontSize: "clamp(1.9rem, 4vw, 2.75rem)",
-                lineHeight: 1.08,
-                letterSpacing: "-0.02em",
-                color: INK,
-              }}
-            >
-              A real app icon,
-              <br />
-              <span style={{ fontStyle: "italic", color: GREEN_SOFT }}>
-                without the wait.
-              </span>
-            </h2>
-            <p
-              className="mt-5 max-w-xl"
-              style={{ color: "rgba(31,61,43,0.68)", fontSize: "1.0625rem", lineHeight: 1.65 }}
-            >
-              Two taps and the app lives on your home screen. It opens
-              fullscreen and feels the same as the native version.
-            </p>
-          </div>
-
-          <div className="mt-12 grid gap-5 md:grid-cols-2">
-            <InstallCard
-              badge="iPhone and iPad"
-              title="Add to Home Screen"
-              steps={[
-                { Icon: Share, text: "Open the app in Safari, then tap the Share icon." },
-                { Icon: Plus, text: "Choose \"Add to Home Screen\", then tap Add." },
-              ]}
-            />
-            <InstallCard
-              badge="Android"
-              title="Install app"
-              steps={[
-                { Icon: MoreVertical, text: "Open the app in Chrome, then tap the menu." },
-                { Icon: Plus, text: "Choose \"Install app\" and confirm." },
-              ]}
-            />
-          </div>
-        </div>
-      </section>
-
-      {/* ================= TRUST STRIP + FINAL CTA ================= */}
-      <section className="px-6 pb-28 md:px-10">
-        <div
-          className="relative mx-auto max-w-[1200px] overflow-hidden text-center"
-          style={{
-            borderRadius: RADIUS.cta,
-            background: `linear-gradient(135deg, ${GREEN_DEEP} 0%, ${GREEN_SOFT} 100%)`,
-            color: CREAM,
-            padding: "68px 24px",
-            boxShadow:
-              "0 40px 80px -30px rgba(31,61,43,0.5), 0 12px 30px -8px rgba(31,61,43,0.28)",
-          }}
-        >
-          <ArcsTexture opacity={0.07} color={GOLD} />
-          <div className="relative mx-auto max-w-3xl">
-            <div
-              style={{
-                color: GOLD,
-                fontSize: 11,
-                fontWeight: 700,
-                letterSpacing: "0.22em",
-                textTransform: "uppercase",
-              }}
-            >
-              Free, private, no ads
-            </div>
-            <h2
-              className="mt-5"
-              style={{
-                fontFamily: SERIF,
-                fontWeight: 500,
-                fontSize: "clamp(2rem, 4.6vw, 3.25rem)",
-                lineHeight: 1.05,
-                letterSpacing: "-0.02em",
-              }}
-            >
-              Open it now, in sha' Allah,
-              <br />
-              <span style={{ fontStyle: "italic", color: "rgba(250,246,236,0.85)" }}>
-                let today be a day of dhikr.
-              </span>
-            </h2>
-            <div className="mt-10 flex flex-wrap justify-center gap-3">
-              <Link
-                to="/app"
-                className="btn-primary inline-flex items-center gap-2"
+              {/* iOS card */}
+              <a
+                href={APP_STORE_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="marketing-feature-card"
                 style={{
-                  background: GOLD,
-                  color: GREEN_DEEP,
-                  padding: "16px 28px",
-                  borderRadius: RADIUS.pill,
-                  fontWeight: 700,
-                  fontSize: 15,
-                  boxShadow:
-                    "0 12px 28px -12px rgba(201,168,76,0.55), 0 2px 6px rgba(0,0,0,0.15)",
+                  textDecoration: "none",
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "flex-start",
+                  gap: 14,
                 }}
               >
-                Open the app
-                <ArrowRight size={16} />
-              </Link>
+                <span className="marketing-icon">
+                  <Apple />
+                </span>
+                <h3>iPhone &amp; iPad</h3>
+                <p>
+                  Prayer alerts, the full adhan, and lock-screen widgets —
+                  download it free on the App Store.
+                </p>
+                <span
+                  style={{
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: 6,
+                    fontWeight: 700,
+                    fontSize: 14,
+                    color: "#1F3D2B",
+                  }}
+                >
+                  Download on the App Store <ArrowRight size={15} />
+                </span>
+              </a>
+
+              {/* Android card */}
+              <a
+                href={GOOGLE_PLAY_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="marketing-feature-card"
+                style={{
+                  textDecoration: "none",
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "flex-start",
+                  gap: 14,
+                }}
+              >
+                <span className="marketing-icon">
+                  <Play />
+                </span>
+                <h3>Android</h3>
+                <p>
+                  Adhan notifications, home-screen widgets, and the same
+                  authentic content — get it on Google Play.
+                </p>
+                <span
+                  style={{
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: 6,
+                    fontWeight: 700,
+                    fontSize: 14,
+                    color: "#1F3D2B",
+                  }}
+                >
+                  Get it on Google Play <ArrowRight size={15} />
+                </span>
+              </a>
             </div>
           </div>
-        </div>
-      </section>
+        </section>
+
+        {/* ================= INSTALL FROM BROWSER ================= */}
+        <section className="marketing-section" style={{ paddingTop: 0 }}>
+          <div className="marketing-shell">
+            <div className="marketing-heading marketing-heading-centered">
+              <p className="marketing-eyebrow">No store needed</p>
+              <h2>
+                A real app icon,<em>straight from the browser.</em>
+              </h2>
+              <p>
+                Two taps and the app lives on your home screen — fullscreen,
+                with the same feel as the native version.
+              </p>
+            </div>
+
+            <div
+              style={{
+                display: "grid",
+                gap: 20,
+                gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))",
+                maxWidth: 880,
+                margin: "0 auto",
+              }}
+            >
+              <InstallCard
+                badge="iPhone & iPad"
+                title="Add to Home Screen"
+                steps={[
+                  {
+                    Icon: Share,
+                    text: "Open the app in Safari, then tap the Share icon.",
+                  },
+                  {
+                    Icon: Plus,
+                    text: 'Choose "Add to Home Screen", then tap Add.',
+                  },
+                ]}
+              />
+              <InstallCard
+                badge="Android"
+                title="Install app"
+                steps={[
+                  {
+                    Icon: MoreVertical,
+                    text: "Open the app in Chrome, then tap the menu.",
+                  },
+                  { Icon: Smartphone, text: 'Choose "Install app" and confirm.' },
+                ]}
+              />
+            </div>
+          </div>
+        </section>
+      </div>
     </MarketingLayout>
   );
 }
@@ -515,77 +287,56 @@ function InstallCard({
 }: {
   badge: string;
   title: string;
-  steps: { Icon: React.ComponentType<{ size?: number }>; text: string }[];
+  steps: { Icon: typeof Share; text: string }[];
 }) {
   return (
     <div
-      className="lift"
-      style={{
-        background: CREAM_CARD,
-        border: "1px solid rgba(31,61,43,0.08)",
-        borderRadius: RADIUS.block,
-        padding: "30px",
-        boxShadow: SHADOW_CARD,
-      }}
+      className="marketing-feature-card"
+      style={{ display: "flex", flexDirection: "column", gap: 14 }}
     >
-      <div
+      <span
         style={{
-          color: GOLD_DEEP,
           fontSize: 11,
           fontWeight: 700,
-          letterSpacing: "0.22em",
+          letterSpacing: "0.18em",
           textTransform: "uppercase",
+          color: "#8B7326",
         }}
       >
         {badge}
-      </div>
-      <div
-        className="mt-3"
+      </span>
+      <h3>{title}</h3>
+      <ol
         style={{
-          fontFamily: SERIF,
-          fontWeight: 600,
-          fontSize: "1.4rem",
-          letterSpacing: "-0.01em",
-          color: INK,
+          listStyle: "none",
+          margin: 0,
+          padding: 0,
+          display: "flex",
+          flexDirection: "column",
+          gap: 12,
         }}
       >
-        {title}
-      </div>
-      <ol className="mt-6 space-y-4">
-        {steps.map((s, i) => (
-          <li key={i} className="flex items-start gap-4">
-            <div
-              className="grid place-items-center"
+        {steps.map(({ Icon, text }, i) => (
+          <li
+            key={i}
+            style={{ display: "flex", alignItems: "flex-start", gap: 10 }}
+          >
+            <span className="marketing-icon" style={{ width: 34, height: 34 }}>
+              <Icon size={16} />
+            </span>
+            <span
               style={{
-                width: 36,
-                height: 36,
-                borderRadius: 10,
-                background: "rgba(201,168,76,0.14)",
-                border: "1px solid rgba(201,168,76,0.22)",
-                color: GOLD_DEEP,
-                flexShrink: 0,
+                fontSize: 14,
+                lineHeight: 1.55,
+                color: "rgba(31,61,43,0.72)",
+                paddingTop: 6,
               }}
             >
-              <s.Icon size={16} />
-            </div>
-            <div className="flex-1">
-              <div
-                className="text-xs font-semibold"
-                style={{ color: GOLD_DEEP, letterSpacing: "0.14em" }}
-              >
-                STEP {i + 1}
-              </div>
-              <div
-                className="mt-1"
-                style={{ color: "rgba(31,61,43,0.78)", fontSize: "0.95rem", lineHeight: 1.55 }}
-              >
-                {s.text}
-              </div>
-            </div>
+              {text}
+            </span>
           </li>
         ))}
       </ol>
     </div>
   );
 }
-
