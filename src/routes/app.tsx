@@ -69,8 +69,8 @@ function AppLayout() {
 
   // Hold the current artwork until the incoming one has decoded, so the
   // 400ms crossfade always runs between two fully rendered images.
-  const shownPhase: VisualPhase =
-    visualPhase === "evening" && !decodedBackgrounds[backgrounds.evening] ? "morning" : visualPhase;
+  const eveningHold = visualPhase === "evening" && !decodedBackgrounds[backgrounds.evening];
+  const shownPhase: VisualPhase = eveningHold ? "morning" : visualPhase;
 
   const [adhan, setAdhan] = useState({ visible: false, prayer: "", reciterId: "" });
 
