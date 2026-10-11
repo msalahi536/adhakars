@@ -33,10 +33,10 @@ const TRUST = [
 
 function DownloadPage() {
   return (
-    <MarketingLayout onePage>
+    <MarketingLayout onePage flushFooter>
       <div className="marketing-home">
         {/* ================= HERO ================= */}
-        <section className="marketing-hero" style={{ minHeight: "92vh" }}>
+        <section className="marketing-hero download-hero" style={{ minHeight: "92vh" }}>
           <div
             className="marketing-hero-image"
             style={{ backgroundImage: `url(${heroAsset.url})` }}
@@ -93,7 +93,7 @@ function DownloadPage() {
             </Link>
 
             <div
-              className="marketing-quick-trust"
+              className="marketing-quick-trust download-trust"
               aria-label="App benefits"
               style={{ justifyContent: "center", marginTop: 34 }}
             >
