@@ -6,6 +6,7 @@ import {
 } from "@/components/marketing/MarketingLayout";
 import {
   APP_STORE_URL,
+  GOOGLE_PLAY_URL,
   StoreBadges,
 } from "@/components/marketing/StoreBadges";
 import {
@@ -18,7 +19,6 @@ import {
   ShieldCheck,
   Lock,
   Ban,
-  Bell,
 } from "lucide-react";
 
 const GREEN = "#1F3D2B";
@@ -55,7 +55,7 @@ export const Route = createFileRoute("/download")({
       {
         name: "description",
         content:
-          "Use Sahih Al-Adhkar right in your browser today, or install it to your home screen. Now on the App Store for iPhone, with Android coming soon.",
+          "Use Sahih Al-Adhkar right in your browser today, or install it to your home screen. Now on the App Store for iPhone and Google Play for Android.",
       },
       { property: "og:title", content: "Get Sahih Al-Adhkar" },
       { property: "og:description", content: "Free, private, no accounts." },
@@ -114,10 +114,10 @@ function DownloadPage() {
                 color: INK,
               }}
             >
-              Available today,
+              Your daily adhkar,
               <br />
               <span style={{ fontStyle: "italic", color: GREEN_SOFT }}>
-                right in your browser.
+                one tap away.
               </span>
             </h1>
             <p
@@ -130,42 +130,30 @@ function DownloadPage() {
             >
               Open the app now on any modern phone or computer. Nothing to
               install, no account needed. The iPhone app is live on the App
-              Store, and Android is coming soon.
+              Store, and Android is live on Google Play.
             </p>
 
-            <div className="mt-9 flex flex-wrap items-center gap-3">
+            <div className="mt-9">
+              <StoreBadges />
+            </div>
+
+            <div className="mt-7 flex flex-wrap items-center gap-3">
               <Link
                 to="/app"
-                className="btn-primary inline-flex items-center gap-2"
-                style={{
-                  background: GREEN,
-                  color: CREAM,
-                  padding: "16px 26px",
-                  borderRadius: RADIUS.pill,
-                  fontWeight: 600,
-                  fontSize: 15,
-                  boxShadow:
-                    "0 10px 24px -10px rgba(31,61,43,0.36), 0 2px 6px rgba(31,61,43,0.12)",
-                }}
-              >
-                Open the app now
-                <ArrowRight size={16} />
-              </Link>
-              <a
-                href="#install"
                 className="btn-ghost inline-flex items-center gap-2"
                 style={{
                   border: "1px solid rgba(31,61,43,0.2)",
                   background: "rgba(255,255,255,0.6)",
                   color: INK,
-                  padding: "15px 24px",
+                  padding: "14px 22px",
                   borderRadius: RADIUS.pill,
                   fontWeight: 600,
-                  fontSize: 15,
+                  fontSize: 14,
                 }}
               >
-                Install to home screen
-              </a>
+                Or open it right in your browser
+                <ArrowRight size={15} />
+              </Link>
             </div>
 
             <div
@@ -178,10 +166,6 @@ function DownloadPage() {
                   {label}
                 </span>
               ))}
-            </div>
-
-            <div className="mt-9">
-              <StoreBadges />
             </div>
           </div>
 
@@ -227,9 +211,9 @@ function DownloadPage() {
               className="mt-5 max-w-xl"
               style={{ color: "rgba(31,61,43,0.68)", fontSize: "1.0625rem", lineHeight: 1.65 }}
             >
-              The iPhone app is live. Android is still in the works — until it
-              lands, the web app runs the same on every device and installs to
-              your home screen with the same feel.
+              The iPhone app is live on the App Store and the Android app is
+              live on Google Play. The web app also runs the same on every
+              device and installs to your home screen with the same feel.
             </p>
           </div>
 
@@ -363,37 +347,29 @@ function DownloadPage() {
                     color: INK,
                   }}
                 >
-                  Coming to Google Play.
+                  Now on Google Play.
                 </div>
                 <p
                   className="mt-3 max-w-md"
                   style={{ color: "rgba(31,61,43,0.68)", fontSize: "0.95rem", lineHeight: 1.6 }}
                 >
-                  Android is in the works. Until then, install the web app
-                  straight from Chrome and get a proper icon on the home screen.
+                  The Android app is live. Get it on Google Play, or install
+                  the web app straight from Chrome for a proper icon on the
+                  home screen.
                 </p>
                 <div className="mt-6 flex flex-wrap items-center gap-3">
-                  <span className="store-badge is-soon" aria-disabled="true">
+                  <a
+                    className="store-badge"
+                    href={GOOGLE_PLAY_URL}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label="Get it on Google Play"
+                  >
                     <Play size={25} />
                     <span className="store-badge-text">
                       <span className="store-badge-eyebrow">GET IT ON</span>
                       <span className="store-badge-name">Google Play</span>
                     </span>
-                  </span>
-                  <span className="store-badge-soon">Coming soon</span>
-                  <a
-                    href="mailto:msalahi536@gmail.com?subject=Notify%20me%20when%20Android%20is%20live"
-                    className="inline-flex items-center gap-2"
-                    style={{
-                      color: "rgba(31,61,43,0.7)",
-                      fontSize: 13,
-                      fontWeight: 600,
-                      textDecoration: "underline",
-                      textUnderlineOffset: 4,
-                    }}
-                  >
-                    <Bell size={13} />
-                    Notify me at launch
                   </a>
                 </div>
               </div>

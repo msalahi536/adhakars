@@ -203,7 +203,6 @@ function HomePage() {
         <section id="download" className="marketing-download">
           <div className="marketing-shell marketing-download-panel">
             <div className="marketing-download-copy">
-              <p className="marketing-eyebrow">Available now</p>
               <h2>Open it today,<br />right in your <span>browser.</span></h2>
               <p>Use Sahih Al-Adhkar on iPhone, iPad, Android, or desktop. No account needed.</p>
               <div className="marketing-download-actions">
