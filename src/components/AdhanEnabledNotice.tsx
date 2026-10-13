@@ -33,7 +33,7 @@ export function AdhanEnabledNotice() {
     void router.navigate({ to: "/app/salah" });
   };
   return <Portal>
-    <div className="fixed inset-0 z-[230] flex items-center justify-center bg-background/70 p-6 backdrop-blur-sm motion-safe:animate-in motion-safe:fade-in">
+    <div className="pointer-events-auto fixed inset-0 z-[230] flex items-center justify-center bg-background/70 p-6 backdrop-blur-sm motion-safe:animate-in motion-safe:fade-in">
       <div role="dialog" aria-modal="true" aria-labelledby="adhan-ask-title" className="w-full max-w-[340px] rounded-3xl border border-border bg-card p-6 text-center text-card-foreground shadow-lg">
         <BellRing size={28} className="mx-auto text-accent" />
         <h2 id="adhan-ask-title" className="mt-3 text-lg font-semibold">Turn on adhan?</h2>
