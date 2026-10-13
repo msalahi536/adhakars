@@ -427,7 +427,7 @@ function Salah() {
         <button
           onClick={toggleDismissNext}
           disabled={!nextSalah}
-          style={dismissWidths ? { width: nextIsDismissed ? dismissWidths.dismissed : dismissWidths.active } : undefined}
+          style={settings.location && dismissWidths ? { width: nextIsDismissed ? dismissWidths.dismissed : dismissWidths.active } : undefined}
           className={`salah-dismiss active:scale-95 ${nextIsDismissed ? "is-dismissed" : ""}`}
         >
           {!settings.location ? "Sample countdown" : nextIsDismissed ? `Dismissed until after ${nextSalah?.label ?? ""}` : "Tap to dismiss"}
