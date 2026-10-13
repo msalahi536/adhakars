@@ -1,5 +1,7 @@
 # Architecture Decisions
 
+- Homepage and download share-image metadata use one CDN-backed homepage capture in their leaf heads, never a root screenshot, so link previews stay deliberate and unrelated pages cannot inherit stale artwork.
+
 - Prayer calculation controls live only in main Settings and use shared prayer settings, so Salah times and alerts stay aligned.
 - Salah's no-location countdown is display-only state, never prayer slots or notification input; the main content owns scrolling and setup cards cannot shrink, so location controls remain accessible.
 

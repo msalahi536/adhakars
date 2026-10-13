@@ -23,6 +23,7 @@ import heroAsset from "@/assets/homepage-hero.png.asset.json";
 import heroPhones from "@/assets/homepage-phones.png.asset.json";
 import experiencePhone from "@/assets/experience-morning.png.asset.json";
 import themePhones from "@/assets/themes-phones.png.asset.json";
+import { homepageShareImageMeta } from "@/lib/share-preview";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -40,6 +41,7 @@ export const Route = createFileRoute("/")({
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
+      ...homepageShareImageMeta,
     ],
   }),
   component: HomePage,
