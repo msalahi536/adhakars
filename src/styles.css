@@ -4372,3 +4372,47 @@ html[data-preset="midnight"][data-visual-phase="evening"][data-section="salah"] 
      symmetrically under the text instead of drifting toward the right edge. */
   .marketing-download-panel .store-badges { width: 100%; justify-content: center; }
 }
+
+/* Personal appearance editor: preview tokens are scoped, never applied until saved. */
+.personal-appearance-sheet { z-index:250; width:min(520px,calc(100% - 24px)); max-height:calc(100dvh - 32px); grid-template-rows:auto minmax(0,1fr) auto; gap:0; padding:0; overflow:hidden; border-radius:8px; background:var(--surface); color:var(--card-foreground); }
+.personal-appearance-heading { padding:22px 40px 16px 20px; border-bottom:1px solid var(--border); }
+.personal-appearance-heading h2 { font-size:19px; line-height:1.3; letter-spacing:0; }
+.personal-appearance-heading p { margin-top:4px; }
+.personal-appearance-scroll { padding:16px 20px 20px; overflow:auto; overscroll-behavior:contain; min-height:0; }
+.personal-phase { display:grid; grid-template-columns:1fr 1fr; gap:4px; background:var(--muted); border:1px solid var(--border); padding:4px; border-radius:8px; margin-bottom:14px; }
+.personal-phase .is-selected { background:var(--accent); color:var(--accent-foreground); }
+.personal-label { display:block; font-size:12px; font-weight:600; margin:14px 0 7px; }
+.personal-preview { width:100%; max-width:310px; height:290px; margin:18px auto 14px; display:flex; flex-direction:column; background-image:var(--personal-photo); background-size:cover; background-position:center; border-radius:8px; overflow:hidden; padding:16px 22px 0; font-family:var(--font-sans); }
+.personal-preview-title { text-align:center; font-size:24px; font-weight:600; color:var(--title); text-shadow:0 1px 8px var(--background); }
+.personal-preview-title small { display:block; font-family:var(--font-arabic); font-size:16px; }
+.personal-preview-card { margin:12px 0; border:1px solid var(--border); border-radius:8px; background:var(--card); color:var(--card-foreground); text-align:center; padding:14px 8px 10px; }
+.personal-preview-arabic { font-family:var(--font-arabic); font-size:25px; line-height:1.6; }
+.personal-preview-card em { color:var(--translit); display:block; font-size:11px; }
+.personal-preview-card p { color:var(--muted-foreground); font-size:11px; margin:4px 0 8px; }
+.personal-preview-counter { display:grid; place-items:center; width:40px; height:40px; margin:auto; border:2px solid var(--accent); border-radius:50%; color:var(--count-fg); font-size:18px; }
+.personal-preview-nav { display:flex; flex-shrink:0; margin-top:auto; margin-inline:-22px; justify-content:space-around; align-items:center; min-height:36px; background:var(--nav-bg); color:var(--nav-inactive); font-size:12px; }
+.personal-preview-nav svg { width:15px; height:15px; }.personal-preview-nav svg:first-child{color:var(--nav-active)}
+.personal-photo-actions { display:flex; gap:8px; }.personal-photo-actions>button:first-child { flex:1; }
+.personal-auto-match { display:flex; align-items:flex-start; gap:9px; font-size:12px; line-height:1.5; margin-top:14px; }.personal-auto-match input { margin-top:3px; accent-color:var(--accent); }
+.personal-privacy { font-size:11px; color:var(--muted-foreground); line-height:1.5; margin:6px 0 12px; }
+.personal-match { width:100%; }.personal-colors-heading { display:flex; justify-content:space-between; align-items:center; margin:18px 0 8px; }.personal-colors-heading h3{font-size:15px;font-weight:600}
+.personal-color-grid{display:grid;grid-template-columns:1fr 1fr;gap:0 16px}.personal-color-row{display:flex;min-width:0;gap:6px;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border);font-size:12px}.personal-color-row input{width:30px;height:30px;flex:0 0 30px;cursor:pointer;border:1px solid var(--border);border-radius:50%;padding:0;overflow:hidden;background:var(--surface)}.personal-color-row input::-webkit-color-swatch-wrapper{padding:0}.personal-color-row input::-webkit-color-swatch{border:0;border-radius:50%}
+.personal-footer{display:flex;gap:10px;padding:14px 20px calc(14px + env(safe-area-inset-bottom));border-top:1px solid var(--border)}.personal-footer button{flex:1;min-width:0;height:42px}.personal-status,.personal-warning,.personal-error{font-size:12px;line-height:1.5;margin-top:10px}.personal-status{color:var(--accent)}.personal-error{color:var(--destructive)}.personal-warning{color:var(--muted-foreground)}.personal-settings-entry{width:100%;height:auto;justify-content:flex-start;white-space:normal;text-align:left;margin-top:12px}
+
+/* Scope legacy hand-picked surfaces to the saved personal token roles. */
+html[data-preset="personal"] .dhikr-card,
+html[data-preset="personal"] .tasbih-card,
+html[data-preset="personal"] .tasbih-disc,
+html[data-preset="personal"] .salah-adhan-card,
+html[data-preset="personal"] .salah-upcoming-card { background:var(--card)!important; color:var(--card-foreground)!important; border-color:var(--border)!important; }
+html[data-preset="personal"] .bottom-nav-row { background:var(--nav-bg)!important; border-color:var(--nav-border)!important; }
+html[data-preset="personal"] .adhkar-arabic { color:var(--card-foreground)!important; }
+html[data-preset="personal"] .tasbih-title,
+html[data-preset="personal"] .salah-next-label,
+html[data-preset="personal"] .tasbih-eyebrow { color:var(--title)!important; font-family:var(--font-display); }
+html[data-preset="personal"] .tasbih-count,
+html[data-preset="personal"] .tasbih-cycle { color:var(--count-fg)!important; }
+html[data-preset="personal"] .tasbih-helper-primary,
+html[data-preset="personal"] .salah-adhan-title { color:var(--card-foreground)!important; }
+html[data-preset="personal"] .tasbih-target { background:var(--card)!important;color:var(--card-foreground)!important;border-color:var(--border)!important; }
+html[data-preset="personal"] .tasbih-target.is-active { background:var(--accent)!important;color:var(--accent-foreground)!important; }

@@ -1,5 +1,8 @@
 # Roadmap
 
+- [x] Add device-photo backgrounds and independent Morning/Evening per-page colors above Suggest a theme
+- [x] Connect Gemini palette suggestions with manual editing and verify persistence and page isolation
+
 - [x] Replace stale shared-link image with the current homepage and verify homepage/download previews
 
 - [x] Defer automatic location permission to Salah and prevent repeated prompts
