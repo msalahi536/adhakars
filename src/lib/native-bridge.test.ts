@@ -70,22 +70,22 @@ afterEach(() => {
 test("Hanafi sends school 1 and Shafi sends school 0", async () => {
   store.set("adhkar:prayer-settings", JSON.stringify({ ...settings, hanafi: true }));
   await syncLocationToWidgets();
-  expect(updateLocation).toHaveBeenLastCalledWith({ latitude: 51.5, longitude: -0.12, method: 3, school: 1 });
+  expect(updateLocation).toHaveBeenLastCalledWith({ latitude: 51.5, longitude: -0.12, method: 3, school: 1, source: "aladhan" });
   store.set("adhkar:prayer-settings", JSON.stringify(settings));
   await syncLocationToWidgets();
-  expect(updateLocation).toHaveBeenLastCalledWith({ latitude: 51.5, longitude: -0.12, method: 3, school: 0 });
+  expect(updateLocation).toHaveBeenLastCalledWith({ latitude: 51.5, longitude: -0.12, method: 3, school: 0, source: "aladhan" });
 });
 
 test("method comes from prayer settings JSON, not the legacy key", async () => {
   store.set("prayerCalcMethod", "2");
   await syncLocationToWidgets();
-  expect(updateLocation).toHaveBeenCalledWith({ latitude: 51.5, longitude: -0.12, method: 3, school: 0 });
+  expect(updateLocation).toHaveBeenCalledWith({ latitude: 51.5, longitude: -0.12, method: 3, school: 0, source: "aladhan" });
 });
 
 test("saved city coordinates take precedence over GPS", async () => {
   await syncLocationToWidgets();
   expect(gps).not.toHaveBeenCalled();
-  expect(updateLocation).toHaveBeenCalledWith({ latitude: 51.5, longitude: -0.12, method: 3, school: 0 });
+  expect(updateLocation).toHaveBeenCalledWith({ latitude: 51.5, longitude: -0.12, method: 3, school: 0, source: "aladhan" });
   expect(reloadWidgets).toHaveBeenCalled();
 });
 
@@ -93,7 +93,7 @@ test("GPS is used when there is no saved prayer location", async () => {
   store.set("adhkar:prayer-settings", JSON.stringify({ ...settings, location: null }));
   await syncLocationToWidgets();
   expect(gps).toHaveBeenCalledTimes(1);
-  expect(updateLocation).toHaveBeenCalledWith({ latitude: 32.72, longitude: -117.16, method: 3, school: 0 });
+  expect(updateLocation).toHaveBeenCalledWith({ latitude: 32.72, longitude: -117.16, method: 3, school: 0, source: "aladhan" });
 });
 
 test("Salah settings changes immediately resync method, school, and location", async () => {
@@ -101,9 +101,14 @@ test("Salah settings changes immediately resync method, school, and location", a
   await Promise.resolve();
   updateLocation.mockClear();
   setPrayerSettings({ ...settings, method: 5 });
-  expect(updateLocation).toHaveBeenLastCalledWith({ latitude: 51.5, longitude: -0.12, method: 5, school: 0 });
+  expect(updateLocation).toHaveBeenLastCalledWith({ latitude: 51.5, longitude: -0.12, method: 5, school: 0, source: "aladhan" });
   setPrayerSettings({ ...settings, hanafi: true });
-  expect(updateLocation).toHaveBeenLastCalledWith({ latitude: 51.5, longitude: -0.12, method: 3, school: 1 });
+  expect(updateLocation).toHaveBeenLastCalledWith({ latitude: 51.5, longitude: -0.12, method: 3, school: 1, source: "aladhan" });
   setPrayerSettings({ ...settings, location: { lat: 40.71, lng: -74.01, label: "New York" } });
-  expect(updateLocation).toHaveBeenLastCalledWith({ latitude: 40.71, longitude: -74.01, method: 3, school: 0 });
+  expect(updateLocation).toHaveBeenLastCalledWith({ latitude: 40.71, longitude: -74.01, method: 3, school: 0, source: "aladhan" });
+});
+ test("JAKIM source reaches native widgets without a prayer-time handoff", async () => {
+  store.set("adhkar:prayer-settings", JSON.stringify({ ...settings, source: "jakim" }));
+  await syncLocationToWidgets();
+  expect(updateLocation).toHaveBeenLastCalledWith({ latitude: 51.5, longitude: -0.12, method: 3, school: 0, source: "jakim" });
 });

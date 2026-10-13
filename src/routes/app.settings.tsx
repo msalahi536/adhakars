@@ -45,6 +45,7 @@ import {
   type PrayerSettings,
 } from "@/lib/prayer-times";
 import { rescheduleAdhanNotifications } from "@/lib/adhan-notifications";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import {
   getPeriodNotificationsEnabled,
   getSunnahNotificationEnabled,
@@ -523,31 +524,27 @@ function Settings() {
                   <BookOpen size={17} strokeWidth={1.8} />
                 </span>
                 <div className="min-w-0 flex-1">
-                  <div className="settings-row-title">Calculation method</div>
+                  <label htmlFor="prayer-calculation-method" className="settings-row-title">Calculation method</label>
                   <div className="settings-row-desc">
-                    Select the method used for prayer times.
+                    {prayerSettings.source === "jakim" ? "Official JAKIM times · Malaysian zone from your saved location." : "Select the method used for prayer times."}
                   </div>
-                  <select
-                    value={prayerSettings.method}
-                    onChange={(e) => updatePrayerSettings({ method: parseInt(e.target.value, 10) })}
-                    className="settings-select"
-                  >
-                    {CALC_METHODS.map((m) => (
-                      <option key={m.id} value={m.id}>
-                        {m.name}
-                      </option>
-                    ))}
-                  </select>
+                  <Select value={prayerSettings.source === "jakim" ? "jakim" : String(prayerSettings.method)} onValueChange={(value) => updatePrayerSettings(value === "jakim" ? { source: "jakim" } : { source: "aladhan", method: Number(value) })}>
+                    <SelectTrigger id="prayer-calculation-method" className="mt-2 h-11 bg-card text-card-foreground"><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      {CALC_METHODS.map((method) => <SelectItem key={method.id} value={String(method.id)}>{method.name}</SelectItem>)}
+                      <SelectItem value="jakim">JAKIM — Malaysia</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
               </div>
 
-              <Toggle
+              {prayerSettings.source !== "jakim" && <Toggle
                 icon={<Scale size={17} strokeWidth={1.8} />}
                 label="Hanafi Asr"
                 description="Calculate Asr time at double shadow length."
                 value={prayerSettings.hanafi}
                 onChange={(v) => updatePrayerSettings({ hanafi: v })}
-              />
+              />}
 
               <div className="settings-row">
                 <span className="settings-icon">

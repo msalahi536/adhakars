@@ -23,6 +23,7 @@ struct WidgetDataKeys {
     static let latitude         = "widget_latitude"
     static let longitude        = "widget_longitude"
     static let calcMethod       = "widget_calc_method"
+    static let prayerSource     = "widget_prayer_source"
     static let school          = "widget_school"           // 0 = Shafi, 1 = Hanafi
     static let userTheme        = "widget_user_theme"
     static let lastUpdated      = "widget_last_updated"
