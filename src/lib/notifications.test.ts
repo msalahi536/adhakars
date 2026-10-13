@@ -61,3 +61,11 @@ test("denying notification permission does not ask about adhan", async () => {
   expect((await requestNotificationPermission()).granted).toBe(false);
   expect(asks).toBe(0);
 });
+
+test("saving a Salah location offers the adhan prompt once", async () => {
+  const { offerAdhanPrompt } = await import("./notifications");
+  await offerAdhanPrompt();
+  await offerAdhanPrompt();
+  expect(asks).toBe(1);
+  expect(store.get("adhkar:adhan-prompt-pending")).toBe("1");
+});

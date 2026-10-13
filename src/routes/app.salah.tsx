@@ -33,7 +33,7 @@ import {
   type Slot,
 } from "@/lib/prayer-times";
 import { rescheduleAdhanNotifications } from "@/lib/adhan-notifications";
-import { checkNotificationPermission, requestNotificationPermission } from "@/lib/notifications";
+import { checkNotificationPermission, offerAdhanPrompt, requestNotificationPermission } from "@/lib/notifications";
 import { getAdhanPrefs, playAdhanPreview, preloadAdhanPreviews, RECITERS, FAJR_RECITERS, SILENT_RECITER_ID, setAdhanPrefs, stopAdhanPreview, type AdhanPrefs } from "@/lib/adhan-bridge";
 import { Button } from "@/components/ui/button";
 
@@ -159,6 +159,7 @@ function Salah() {
         if (loc) {
           s = { ...getPrayerSettings(), location: getPrayerSettings().location ?? loc };
           setPrayerSettings(s);
+          void offerAdhanPrompt();
         } else {
           setCityError("Location permission is off. Enable it in your phone settings, or type a city instead.");
         }
@@ -332,6 +333,7 @@ function Salah() {
     setPrayerSettings(s);
     setSettingsState(s);
     void load(s);
+    void offerAdhanPrompt();
   };
 
   const submitCity = async () => {
@@ -348,6 +350,7 @@ function Salah() {
     setSettingsState(s);
     setCityInput("");
     void load(s);
+    void offerAdhanPrompt();
   };
 
   /* ---------------- adhkar ---------------- */

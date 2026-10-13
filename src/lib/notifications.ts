@@ -173,6 +173,17 @@ const ADHAN_PERMISSION_SYNC_KEY = "adhkar:notification-adhan-prompted:v2";
 export const ADHAN_PROMPT_PENDING_KEY = "adhkar:adhan-prompt-pending";
 export const ADHAN_PROMPT_EVENT = "adhkar:ask-enable-adhan";
 
+/** Offered once as soon as a prayer location is saved on Salah. */
+export const offerAdhanPrompt = async (): Promise<void> => {
+  if (typeof window === "undefined") return;
+  if (window.localStorage.getItem(ADHAN_PERMISSION_SYNC_KEY) === "1") return;
+  window.localStorage.setItem(ADHAN_PERMISSION_SYNC_KEY, "1");
+  const { getAdhanPrefs } = await import("@/lib/adhan-bridge");
+  if (Object.values(getAdhanPrefs().enabledPrayers).every(Boolean)) return;
+  window.localStorage.setItem(ADHAN_PROMPT_PENDING_KEY, "1");
+  window.dispatchEvent(new Event(ADHAN_PROMPT_EVENT));
+};
+
 /** First observed grant asks once whether to turn on adhan; nothing is auto-enabled. */
 const syncGrantedPrayerAlerts = async (): Promise<boolean> => {
   if (window.localStorage.getItem(ADHAN_PERMISSION_SYNC_KEY) === "1") return false;
