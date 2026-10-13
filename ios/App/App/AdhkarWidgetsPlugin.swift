@@ -27,7 +27,8 @@ public class AdhkarWidgetsPlugin: CAPPlugin, CAPBridgedPlugin {
         let lon = call.getDouble("longitude") ?? 0
         let method = call.getInt("method") ?? 2
         let school = call.getInt("school") ?? 0
-        bridge_helper.updateLocation(latitude: lat, longitude: lon, calcMethod: method, school: school)
+        let source = call.getString("source") == "jakim" ? "jakim" : "aladhan"
+        bridge_helper.updateLocation(latitude: lat, longitude: lon, calcMethod: method, school: school, source: source)
         call.resolve()
     }
 

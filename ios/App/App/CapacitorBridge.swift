@@ -11,17 +11,16 @@ class AdhkarWidgetBridge {
 
     // MARK: - Location (for prayer time widgets)
 
-    func updateLocation(latitude: Double, longitude: Double, calcMethod: Int = 2, school: Int = 0) {
+    func updateLocation(latitude: Double, longitude: Double, calcMethod: Int = 2, school: Int = 0, source: String = "aladhan") {
         defaults?.set(latitude, forKey: WidgetDataKeys.latitude)
         defaults?.set(longitude, forKey: WidgetDataKeys.longitude)
         defaults?.set(calcMethod, forKey: WidgetDataKeys.calcMethod)
         defaults?.set(school, forKey: WidgetDataKeys.school)
+        defaults?.set(source, forKey: WidgetDataKeys.prayerSource)
         // Clear cached prayer times so widgets re-fetch with new settings
         defaults?.removeObject(forKey: WidgetDataKeys.prayerTimes)
         defaults?.removeObject(forKey: WidgetDataKeys.prayerTimesDate)
-        // Do NOT reload widgets here. syncPrayerTimes() will reload after
-        // writing the correct app-calculated times. Reloading now (with the
-        // cache cleared) would force the widget into its API fallback.
+        // JavaScript requests a reload after the selected source and location are saved.
     }
 
     // MARK: - Prayer Times Sync (from web app)

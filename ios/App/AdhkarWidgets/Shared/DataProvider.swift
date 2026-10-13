@@ -47,6 +47,9 @@ class WidgetDataProvider: NSObject {
     // MARK: - Prayer Times (Al-Adhan API)
 
     func fetchPrayerTimes() async -> [PrayerTime] {
+        if UserDefaults(suiteName: appGroupID)?.string(forKey: WidgetDataKeys.prayerSource) == "jakim" {
+            return await fetchJakimPrayerTimes(for: Date())
+        }
         // Primary: use the exact times the app synced via the Capacitor bridge.
         // This guarantees widgets show the same times as the Salah page.
         if let synced = SharedData.shared.loadPrayerTimes() {
@@ -92,6 +95,10 @@ class WidgetDataProvider: NSObject {
 
     /// Fetches prayer times for tomorrow (for wraparound into next day)
     func fetchTomorrowPrayerTimes() async -> [PrayerTime] {
+        if UserDefaults(suiteName: appGroupID)?.string(forKey: WidgetDataKeys.prayerSource) == "jakim" {
+            let tomorrow = Calendar.current.date(byAdding: .day, value: 1, to: Date()) ?? Date()
+            return await fetchJakimPrayerTimes(for: tomorrow)
+        }
         guard let loc = await getLocation() else { return [] }
 
         let defaults = UserDefaults(suiteName: appGroupID)
@@ -122,6 +129,40 @@ class WidgetDataProvider: NSObject {
             ].compactMap { $0 }
         } catch {
             return []
+        }
+    }
+
+    private struct JakimMonth: Decodable {
+        let prayers: [JakimDay]
+    }
+
+    private struct JakimDay: Decodable {
+        let day: Int
+        let fajr: Double
+        let dhuhr: Double
+        let asr: Double
+        let maghrib: Double
+        let isha: Double
+    }
+
+    private func fetchJakimPrayerTimes(for date: Date) async -> [PrayerTime] {
+        guard let loc = await getLocation() else { return [] }
+        let components = Calendar.current.dateComponents([.year, .month, .day], from: date)
+        guard let year = components.year, let month = components.month, let day = components.day,
+              let url = URL(string: "https://api.waktusolat.app/v2/solat/gps/\(loc.lat)/\(loc.lon)?year=\(year)&month=\(month)") else { return [] }
+        do {
+            let (data, response) = try await URLSession.shared.data(from: url)
+            guard let http = response as? HTTPURLResponse, http.statusCode == 200 else { return [] }
+            let result = try JSONDecoder().decode(JakimMonth.self, from: data)
+            guard let row = result.prayers.first(where: { $0.day == day }) else { return [] }
+            let entries: [(String, Double)] = [("Fajr", row.fajr), ("Dhuhr", row.dhuhr), ("Asr", row.asr), ("Maghrib", row.maghrib), ("Isha", row.isha)]
+            return entries.compactMap { id, timestamp in
+                guard timestamp.isFinite, timestamp > 0 else { return nil }
+                let at = Date(timeIntervalSince1970: timestamp)
+                return PrayerTime(id: id, name: id, abbreviation: PrayerTime.abbreviations[id] ?? id, time: at, timeString: DateFormatter.timeOnly.string(from: at))
+            }
+        } catch {
+            return [] // Do not silently replace official JAKIM times with another source.
         }
     }
 

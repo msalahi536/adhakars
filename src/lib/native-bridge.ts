@@ -31,7 +31,7 @@ export interface AdhanPluginInterface {
 export const AdhanPlugin = registerPlugin<AdhanPluginInterface>("AdhanPlugin");
 
 interface CapacitorPlugin {
-  updateLocation(opts: { latitude: number; longitude: number; method: number; school: 0 | 1 }): Promise<void>;
+  updateLocation(opts: { latitude: number; longitude: number; method: number; school: 0 | 1; source: "aladhan" | "jakim" }): Promise<void>;
   updateTasbih(opts: { count: number; target: number; phrase: string }): Promise<void>;
   updateTheme(opts: { theme: string }): Promise<void>;
   reloadWidgets(): Promise<void>;
@@ -102,8 +102,9 @@ export async function syncLocationToWidgets() {
       longitude: lon,
       method: settings.method,
       school: settings.hanafi ? 1 : 0,
+      source: settings.source ?? "aladhan",
     });
-    // Widgets fetch their own times from the Al-Adhan API for the location
+    // Widgets fetch their own times from the selected API for the location
     // just handed over, so they only need a refresh nudge here.
     await plugin.reloadWidgets();
   } catch (err) {
