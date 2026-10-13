@@ -3,10 +3,12 @@ import { createFileRoute, Outlet, useRouter, useRouterState } from "@tanstack/re
 import { BottomNav } from "@/components/BottomNav";
 import { SettingsButton } from "@/components/SettingsButton";
 import { WhatsNewDialog } from "@/components/WhatsNewDialog";
+import { AdhanEnabledNotice } from "@/components/AdhanEnabledNotice";
+import { UPDATE_NOTICE_KEY, shouldShowUpdateNotice } from "@/lib/update-notice";
 import { RatePrompt } from "@/components/RatePrompt";
 import { backgroundsForPreset } from "@/lib/backgrounds";
 import { JUMUAH_NOTIF_ID, registerNotificationTapHandler } from "@/lib/notifications";
-import { DEFAULT_PRESET_ID, getPresetId, resetTheme, resolveVisualPhase, type VisualPhase } from "@/lib/theme-store";
+import { DEFAULT_PRESET_ID, getPresetId, resolveVisualPhase, type VisualPhase } from "@/lib/theme-store";
 import { rememberMoreDestination } from "@/lib/more-navigation";
 import { isPeriodNotifId, isSmartAdhkarId, smartAdhkarKind, SUNNAH_NOTIF_ID } from "@/lib/smart-notifications";
 import { FULL_ADHAN_URL, isPrayerNotifId, rescheduleAdhanNotifications } from "@/lib/adhan-notifications";
@@ -15,8 +17,6 @@ import { getPrayerSettings, resolveLocation, setPrayerSettings } from "@/lib/pra
 import { initNativeBridge } from "@/lib/native-bridge";
 import { getReciterForPrayer, isAdhanPlaying, isSilentReciter, onAdhanPlaying, startSilentFallbackAdhan } from "@/lib/adhan-bridge";
 import { PRAYER_NOTIF_IDS } from "@/lib/adhan-notifications";
-
-const UPDATE_WELCOME_KEY = "adhkar:update-welcome:2026-09";
 
 export const Route = createFileRoute("/app")({
   component: AppLayout,
@@ -164,15 +164,7 @@ function AppLayout() {
   }, []);
 
   useEffect(() => {
-    // Preserve the old update notice for existing users, never show it on a fresh install.
-    if (window.localStorage.getItem("adhkar:onboarded") !== "1") {
-      window.localStorage.setItem(UPDATE_WELCOME_KEY, "seen");
-      return;
-    }
-    if (window.localStorage.getItem(UPDATE_WELCOME_KEY) !== "seen") {
-      resetTheme();
-      window.localStorage.setItem(UPDATE_WELCOME_KEY, "seen");
-      window.dispatchEvent(new Event("adhkar:theme-change"));
+    if (shouldShowUpdateNotice(Date.now(), window.localStorage.getItem(UPDATE_NOTICE_KEY))) {
       setShowWhatsNew(true);
     }
   }, []);
@@ -318,7 +310,11 @@ function AppLayout() {
         reciterId={adhan.reciterId}
         onClose={() => setAdhan((a) => ({ ...a, visible: false }))}
       />
-      <WhatsNewDialog open={showWhatsNew} onClose={() => setShowWhatsNew(false)} />
+      <WhatsNewDialog open={showWhatsNew} onClose={() => {
+        window.localStorage.setItem(UPDATE_NOTICE_KEY, "seen");
+        setShowWhatsNew(false);
+      }} />
+      <AdhanEnabledNotice />
       <RatePrompt />
     </div>
   );

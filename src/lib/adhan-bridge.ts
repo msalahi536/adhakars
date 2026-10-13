@@ -17,6 +17,7 @@ import fajrMadinahAsset from "@/assets/adhan/fajr-madinah.mp3.asset.json";
 import { isNativeApp } from "@/lib/native-bridge";
 
 export const ADHAN_PLAYING_EVENT = "adhan:playing";
+export const ADHAN_ENABLED_EVENT = "adhkar:all-adhan-enabled";
 
 export interface Reciter {
   id: string;
@@ -129,8 +130,7 @@ export function setAdhanPrefs(prefs: AdhanPrefs): void {
   void syncAdhanPrefsToNative(prefs);
 }
 
-/** Pushes reciter/enabled-prayer choices into the native plugin's preferences. */
-/** Turns on alerts for all five prayers (used once, when permission is first granted). */
+/** Turns on all five prayers when notification permission is newly granted. */
 export async function enableAllPrayerAlerts(): Promise<void> {
   if (typeof window === "undefined") return;
   const prefs = getAdhanPrefs();
@@ -139,6 +139,7 @@ export async function enableAllPrayerAlerts(): Promise<void> {
   const { rescheduleAdhanNotifications } = await import("@/lib/adhan-notifications");
   const next = { ...getPrayerSettings(), adhanEnabled: true, perPrayer: { fajr: true, dhuhr: true, asr: true, maghrib: true, isha: true } };
   setPrayerSettings(next);
+  window.dispatchEvent(new Event(ADHAN_ENABLED_EVENT));
   await rescheduleAdhanNotifications(next);
 }
 

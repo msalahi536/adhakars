@@ -31,10 +31,9 @@ import {
   type PrayerSettings,
   type Slot,
 } from "@/lib/prayer-times";
-import { isNativeApp } from "@/lib/native-bridge";
 import { rescheduleAdhanNotifications } from "@/lib/adhan-notifications";
 import { checkNotificationPermission, requestNotificationPermission } from "@/lib/notifications";
-import { getAdhanPrefs, playAdhanPreview, preloadAdhanPreviews, RECITERS, FAJR_RECITERS, SILENT_RECITER_ID, setAdhanPrefs, stopAdhanPreview, getDiagnostics, type AdhanPrefs } from "@/lib/adhan-bridge";
+import { getAdhanPrefs, playAdhanPreview, preloadAdhanPreviews, RECITERS, FAJR_RECITERS, SILENT_RECITER_ID, setAdhanPrefs, stopAdhanPreview, type AdhanPrefs } from "@/lib/adhan-bridge";
 import { Button } from "@/components/ui/button";
 
 export const Route = createFileRoute("/app/salah")({
@@ -106,14 +105,18 @@ function Salah() {
   const [reciterPrayer, setReciterPrayer] = useState<string | null>(null);
   const [previewingReciter, setPreviewingReciter] = useState<string | null>(null);
 
-  const runDiagnostics = async () => {
-    try {
-      const diag = await getDiagnostics();
-      window.alert(JSON.stringify(diag, null, 2));
-    } catch (err) {
-      window.alert(err instanceof Error ? err.message : "Diagnostics unavailable.");
-    }
-  };
+  useEffect(() => {
+    const open = () => {
+      if (window.localStorage.getItem("adhkar:open-adhan-settings") !== "1") return;
+      window.localStorage.removeItem("adhkar:open-adhan-settings");
+      setAdhanPrefsState(getAdhanPrefs());
+      setSettingsState(getPrayerSettings());
+      setAdhanSettingsOpen(true);
+    };
+    open();
+    window.addEventListener("adhkar:open-adhan-settings", open);
+    return () => window.removeEventListener("adhkar:open-adhan-settings", open);
+  }, []);
 
   const autoSelected = useRef(false);
 
@@ -173,6 +176,7 @@ function Salah() {
     const onSettings = () => {
       const s = getPrayerSettings();
       setSettingsState(s);
+      setAdhanPrefsState(getAdhanPrefs());
       void load(s);
     };
     window.addEventListener("adhkar:prayer-settings", onSettings);
@@ -258,12 +262,18 @@ function Salah() {
         setAdhanError("Enable notifications in your phone settings to receive adhan alerts.");
         return;
       }
+      if (result.enabledAllPrayers) {
+        setSettingsState(getPrayerSettings());
+        setAdhanPrefsState(getAdhanPrefs());
+        return;
+      }
     }
-    const nextPerPrayer = { ...settings.perPrayer, [id]: enabled };
+    const latestPrefs = getAdhanPrefs();
+    const nextPerPrayer = { ...getPrayerSettings().perPrayer, [id]: enabled };
     const label = SALAH_PRAYERS.find((p) => p.id === id)?.label ?? id;
     const nextPrefs = {
-      ...adhanPrefs,
-      enabledPrayers: { ...adhanPrefs.enabledPrayers, [label]: enabled },
+      ...latestPrefs,
+      enabledPrayers: { ...latestPrefs.enabledPrayers, [label]: enabled },
     };
     setAdhanPrefsState(nextPrefs);
     setAdhanPrefs(nextPrefs);
@@ -672,11 +682,6 @@ function Salah() {
                  </div>
                  <p className="adhan-settings-note">Tap the notification to continue the full adhan after the 30-second alert.</p>
                </>}
-              {!reciterPrayer && isNativeApp() && (
-                <button type="button" className="adhan-diag-btn" onClick={() => void runDiagnostics()}>
-                  Run Diagnostics
-                </button>
-              )}
               {adhanError && <p className="adhan-settings-error">{adhanError}</p>}
             </section>
           </div>

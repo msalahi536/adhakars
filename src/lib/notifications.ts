@@ -166,7 +166,7 @@ export const NOTIFICATION_CHANNEL = ANDROID_CHANNEL;
 
 
 export type PermissionResult =
-  | { granted: true }
+  | { granted: true; enabledAllPrayers?: boolean }
   | { granted: false; reason: "unavailable" | "denied" | "error"; error?: string };
 
 export const requestNotificationPermission = async (): Promise<PermissionResult> => {
@@ -184,8 +184,8 @@ export const requestNotificationPermission = async (): Promise<PermissionResult>
     if (res?.display === "granted") {
       // First time permission is granted: switch on adhan alerts for all five prayers.
       const { enableAllPrayerAlerts } = await import("@/lib/adhan-bridge");
-      await enableAllPrayerAlerts().catch(() => {});
-      return { granted: true };
+      await enableAllPrayerAlerts();
+      return { granted: true, enabledAllPrayers: true };
     }
     return { granted: false, reason: "denied", error: `Permission ${res?.display ?? "unknown"}` };
   } catch (e) {
