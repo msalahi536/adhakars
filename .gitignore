@@ -37,3 +37,4 @@ dist-ssr
 
 # Assets directory (managed outside git)
 assets/
+!src/assets/
