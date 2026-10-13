@@ -301,7 +301,7 @@ function AppLayout() {
         window.localStorage.setItem(UPDATE_NOTICE_KEY, "seen");
         setShowWhatsNew(false);
       }} />
-      <AdhanEnabledNotice />
+      {!showWhatsNew && <AdhanEnabledNotice />}
       <RatePrompt />
     </div>
   );
