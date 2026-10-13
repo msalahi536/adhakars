@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
-import { Bell, BellOff, ChevronDown, ChevronLeft, ChevronRight, Pause, Play, Volume2, X } from "lucide-react";
+import { Bell, BellOff, BookOpen, ChevronDown, ChevronLeft, ChevronRight, Pause, Play, Scale, Volume2, X } from "lucide-react";
 import { PrayerTimeline } from "@/components/prayer/PrayerTimeline";
 import { AfterSalahSheet } from "@/components/prayer/AfterSalahSheet";
 import { PrayerPicker } from "@/components/prayer/PrayerPicker";
@@ -10,6 +10,7 @@ import { getCounts } from "@/lib/storage";
 
 import {
   DEFAULT_PRAYER_SETTINGS,
+  CALC_METHODS,
   addDays,
   currentPrayer,
   dateKey,
@@ -36,6 +37,8 @@ import { rescheduleAdhanNotifications } from "@/lib/adhan-notifications";
 import { checkNotificationPermission, requestNotificationPermission } from "@/lib/notifications";
 import { getAdhanPrefs, playAdhanPreview, preloadAdhanPreviews, RECITERS, FAJR_RECITERS, SILENT_RECITER_ID, setAdhanPrefs, stopAdhanPreview, getDiagnostics, type AdhanPrefs } from "@/lib/adhan-bridge";
 import { Button } from "@/components/ui/button";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Switch } from "@/components/ui/switch";
 
 export const Route = createFileRoute("/app/salah")({
   head: () => ({
@@ -666,6 +669,31 @@ function Salah() {
                    })}
                  </div>
                  <p className="adhan-settings-note">Tap the notification to continue the full adhan after the 30-second alert.</p>
+                  <div className="mt-5 border-t border-border pt-4">
+                    <h3 className="label-caps mb-3 text-muted-foreground">Prayer calculation</h3>
+                    <div className="flex items-start gap-3">
+                      <span className="adhan-settings-icon shrink-0" aria-hidden="true"><BookOpen size={17} /></span>
+                      <div className="min-w-0 flex-1">
+                        <label htmlFor="adhan-calculation-method" className="mb-2 block text-sm font-semibold">Calculation method</label>
+                        <Select value={String(settings.method)} onValueChange={(value) => void updateAdhanSettings({ method: Number(value) })}>
+                          <SelectTrigger id="adhan-calculation-method" className="h-11 bg-card text-card-foreground shadow-none">
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent className="z-[230]">
+                            {CALC_METHODS.map((method) => <SelectItem key={method.id} value={String(method.id)} className="py-3">{method.name}</SelectItem>)}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    </div>
+                    <div className="mt-4 flex items-center gap-3">
+                      <span className="adhan-settings-icon shrink-0" aria-hidden="true"><Scale size={17} /></span>
+                      <div className="min-w-0 flex-1">
+                        <label htmlFor="adhan-hanafi-asr" className="block text-sm font-semibold">Hanafi Asr</label>
+                        <p id="adhan-hanafi-description" className="mt-1 text-xs text-muted-foreground">Asr at double shadow length</p>
+                      </div>
+                      <Switch id="adhan-hanafi-asr" aria-describedby="adhan-hanafi-description" checked={settings.hanafi} onCheckedChange={(hanafi) => void updateAdhanSettings({ hanafi })} className="data-[state=checked]:bg-accent" />
+                    </div>
+                  </div>
                </>}
               {!reciterPrayer && isNativeApp() && (
                 <button type="button" className="adhan-diag-btn" onClick={() => void runDiagnostics()}>

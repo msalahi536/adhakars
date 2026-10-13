@@ -1,5 +1,7 @@
 # Architecture Decisions
 
+- Adhan calculation controls reuse the shared prayer settings and calculation-method list, so Salah times, alerts, general settings, and widgets stay aligned.
+
 - Native prayer widgets source their own times from the Al-Adhan API; the web bridge only hands over location, calculation method and Asr school, read from the shared prayer settings accessor and resynced on its change event, so settings cannot drift and no prayer-time handoff exists.
 - Widget bridge and content rotation regression tests run with Bun next to their modules, so native handoff rules and UTC daily selection stay independently verifiable.
 
