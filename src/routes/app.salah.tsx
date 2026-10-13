@@ -12,6 +12,7 @@ import {
   DEFAULT_PRAYER_SETTINGS,
   addDays,
   currentPrayer,
+  claimSalahLocationRequest,
   dateKey,
   fetchDay,
   formatCountdown,
@@ -153,23 +154,24 @@ function Salah() {
     let cancelled = false;
     (async () => {
       let s = getPrayerSettings();
-      if (!s.location) {
+      if (!s.location && claimSalahLocationRequest()) {
         const loc = await resolveLocation();
         if (loc) {
-          s = { ...s, location: loc };
+          s = { ...getPrayerSettings(), location: getPrayerSettings().location ?? loc };
           setPrayerSettings(s);
         } else {
           setCityError("Location permission is off. Enable it in your phone settings, or type a city instead.");
         }
-      } else {
+      } else if (s.location) {
         // One time repair for city coordinates saved by an older build.
         const fixed = await repairLocation(s.location);
         if (fixed) {
-          s = { ...s, location: fixed };
+          s = { ...getPrayerSettings(), location: fixed };
           setPrayerSettings(s);
         }
       }
       if (cancelled) return;
+      s = getPrayerSettings();
       setSettingsState(s);
       await load(s);
     })();

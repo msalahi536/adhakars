@@ -89,11 +89,11 @@ test("saved city coordinates take precedence over GPS", async () => {
   expect(reloadWidgets).toHaveBeenCalled();
 });
 
-test("GPS is used when there is no saved prayer location", async () => {
+test("widget sync never requests location before Salah has saved a location", async () => {
   store.set("adhkar:prayer-settings", JSON.stringify({ ...settings, location: null }));
   await syncLocationToWidgets();
-  expect(gps).toHaveBeenCalledTimes(1);
-  expect(updateLocation).toHaveBeenCalledWith({ latitude: 32.72, longitude: -117.16, method: 3, school: 0, source: "aladhan" });
+  expect(gps).not.toHaveBeenCalled();
+  expect(updateLocation).not.toHaveBeenCalled();
 });
 
 test("Salah settings changes immediately resync method, school, and location", async () => {
