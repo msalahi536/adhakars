@@ -17,5 +17,6 @@
 - Android prayer location uses `navigator.geolocation`, persists the fix for offline use, and every adhan schedule derives from the selected prayer source for that saved coordinate.
 - More keeps its feature tools first; detailed consistency and lifetime statistics open from one compact summary so they never obscure feature discovery.
 
-- App launch has no onboarding or guided tour; the legacy onboarded flag is read only to distinguish existing users eligible for the old update notice from fresh installs.
+- App launch has no onboarding or guided tour; release notices use a versioned acknowledgment and bounded release window without resetting appearance or progress.
+- Notification permission grants enable all prayers through the shared Adhan bridge and emit a global actionable notice; Salah reloads saved preferences to avoid overwriting that enablement with stale state.
 - Explicit rating actions synchronously open the store review destination rather than requesting the optional native review popup, because Apple can silently suppress it and browser plugin implementations can be no-ops.
