@@ -1,5 +1,9 @@
 # Roadmap
 
+- [ ] Remove Run diagnostics from Adhan Settings
+- [ ] Enable all five adhans on notification permission grant and show an actionable themed notice
+- [ ] Show the themed release notice once during update week for new and current users
+
 - [x] Fix the explicit Rate app action so it opens the review destination instead of silently closing
 - [x] Remove the entire onboarding process and verify fresh launch
 
