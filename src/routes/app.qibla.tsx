@@ -230,7 +230,20 @@ function Qibla() {
     autoRef.current = true;
     if (!needsGesturePermission()) void start();
     else if (hasStoredPermission()) void start(true);
-    else setPhase("intro");
+    else {
+      setPhase("intro");
+      // Location granted on Salah carries over: fetch it silently so only the
+      // iPhone motion-sensor tap (which iOS requires) remains.
+      void navigator.permissions?.query({ name: "geolocation" as PermissionName })
+        .then(async (status) => {
+          if (status.state !== "granted") return;
+          const pos = await getPosition();
+          if (!pos.ok) return;
+          setCoords(pos.coords);
+          setQiblaBearing(bearingToKaaba(pos.coords.lat, pos.coords.lng));
+        })
+        .catch(() => {});
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -282,8 +295,9 @@ function Qibla() {
                 className="text-center text-sm"
                 style={{ color: "var(--muted-foreground)" }}
               >
-                We need your location and motion sensors to compute the Qibla direction. Nothing
-                leaves your device.
+                {qiblaBearing !== null
+                  ? `Location found — Qibla is ${Math.round(qiblaBearing)}° from north. Tap once to turn on the compass so the arrow follows your phone.`
+                  : "We need your location and motion sensors to compute the Qibla direction. Nothing leaves your device."}
               </p>
               <button
                 onClick={() => void start(false)}
@@ -295,7 +309,7 @@ function Qibla() {
                   boxShadow: "var(--card-shadow)",
                 }}
               >
-                {permState === "requesting" ? (step || "Requesting…") : permState === "error" ? "Try again" : "Enable Compass"}
+                {permState === "requesting" ? (step || "Requesting…") : permState === "error" ? "Try again" : qiblaBearing !== null ? "Turn on compass" : "Enable Compass"}
               </button>
               {error && (
                 <p className="text-center text-xs" style={{ color: "#c0392b" }}>
