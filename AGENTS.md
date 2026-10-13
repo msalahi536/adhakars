@@ -18,3 +18,4 @@
 - More keeps its feature tools first; detailed consistency and lifetime statistics open from one compact summary so they never obscure feature discovery.
 
 - App launch has no onboarding or guided tour; the legacy onboarded flag is read only to distinguish existing users eligible for the old update notice from fresh installs.
+- Explicit rating actions synchronously open the store review destination rather than requesting the optional native review popup, because Apple can silently suppress it and browser plugin implementations can be no-ops.

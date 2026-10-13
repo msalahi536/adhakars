@@ -1,21 +1,19 @@
 // ============ Rate This App ============
-// Native in-app review when the Capacitor plugin is present,
-// otherwise falls back to the store page in the browser.
+// Explicit rating actions open the store review destination synchronously.
+// Apple's in-app request may silently do nothing, even when its promise resolves.
 
-export async function requestAppReview() {
-  try {
-    // Try native Capacitor in-app review first (works when plugin is installed)
-    const { RateApp } = await import("capacitor-rate-app");
-    await RateApp.requestReview();
-  } catch {
-    // Fallback to opening store link in browser
-    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
-    if (isIOS) {
-      window.open("https://apps.apple.com/us/app/sahih-al-adhkar/id6791834420");
-    } else {
-      window.open("https://play.google.com/store/apps/details?id=com.mindcastmedia.adhkar");
-    }
-  }
+export function requestAppReview() {
+  if (typeof window === "undefined") return;
+  const platform = (window as Window & { Capacitor?: { getPlatform?: () => string } }).Capacitor?.getPlatform?.();
+  const isIOS = platform === "ios" || (platform !== "android" && (
+    /iPad|iPhone|iPod/.test(navigator.userAgent) ||
+    (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1)
+  ));
+  const url = isIOS
+    ? "https://apps.apple.com/app/id6791834420?action=write-review"
+    : "https://play.google.com/store/apps/details?id=com.mindcastmedia.adhkar";
+  // Stay inside the click gesture: async plugin imports can lose popup permission.
+  window.open(url, "_blank", "noopener,noreferrer");
 }
 
 // ============ Smart prompt state ============
