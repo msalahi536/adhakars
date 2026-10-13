@@ -264,11 +264,6 @@ function Salah() {
         setAdhanError("Enable notifications in your phone settings to receive adhan alerts.");
         return;
       }
-      if (result.enabledAllPrayers) {
-        setSettingsState(getPrayerSettings());
-        setAdhanPrefsState(getAdhanPrefs());
-        return;
-      }
     }
     const latestPrefs = getAdhanPrefs();
     const nextPerPrayer = { ...getPrayerSettings().perPrayer, [id]: enabled };

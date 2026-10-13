@@ -166,23 +166,22 @@ export const NOTIFICATION_CHANNEL = ANDROID_CHANNEL;
 
 
 export type PermissionResult =
-  | { granted: true; enabledAllPrayers?: boolean }
+  | { granted: true; adhanPrompted?: boolean }
   | { granted: false; reason: "unavailable" | "denied" | "error"; error?: string };
 
-const ADHAN_PERMISSION_SYNC_KEY = "adhkar:notification-adhan-enabled:v1";
-let permissionSync: Promise<boolean> | null = null;
+const ADHAN_PERMISSION_SYNC_KEY = "adhkar:notification-adhan-prompted:v2";
+export const ADHAN_PROMPT_PENDING_KEY = "adhkar:adhan-prompt-pending";
+export const ADHAN_PROMPT_EVENT = "adhkar:ask-enable-adhan";
 
-/** Also repairs permission granted outside this screen or by an older app. */
-const syncGrantedPrayerAlerts = (): Promise<boolean> => {
-  if (window.localStorage.getItem(ADHAN_PERMISSION_SYNC_KEY) === "1") return Promise.resolve(false);
-  if (permissionSync) return permissionSync;
-  permissionSync = (async () => {
-    const { enableAllPrayerAlerts } = await import("@/lib/adhan-bridge");
-    await enableAllPrayerAlerts();
-    window.localStorage.setItem(ADHAN_PERMISSION_SYNC_KEY, "1");
-    return true;
-  })().finally(() => { permissionSync = null; });
-  return permissionSync;
+/** First observed grant asks once whether to turn on adhan; nothing is auto-enabled. */
+const syncGrantedPrayerAlerts = async (): Promise<boolean> => {
+  if (window.localStorage.getItem(ADHAN_PERMISSION_SYNC_KEY) === "1") return false;
+  window.localStorage.setItem(ADHAN_PERMISSION_SYNC_KEY, "1");
+  const { getAdhanPrefs } = await import("@/lib/adhan-bridge");
+  if (Object.values(getAdhanPrefs().enabledPrayers).every(Boolean)) return false;
+  window.localStorage.setItem(ADHAN_PROMPT_PENDING_KEY, "1");
+  window.dispatchEvent(new Event(ADHAN_PROMPT_EVENT));
+  return true;
 };
 
 export const requestNotificationPermission = async (): Promise<PermissionResult> => {
@@ -196,14 +195,14 @@ export const requestNotificationPermission = async (): Promise<PermissionResult>
   try {
     const current = await plugin.checkPermissions?.().catch(() => null);
     if (current?.display === "granted") {
-      const enabledAllPrayers = await syncGrantedPrayerAlerts();
-      return enabledAllPrayers ? { granted: true, enabledAllPrayers: true } : { granted: true };
+      const adhanPrompted = await syncGrantedPrayerAlerts();
+      return adhanPrompted ? { granted: true, adhanPrompted: true } : { granted: true };
     }
     if (current?.display) window.localStorage.removeItem(ADHAN_PERMISSION_SYNC_KEY);
     const res = await plugin.requestPermissions();
     if (res?.display === "granted") {
-      await syncGrantedPrayerAlerts();
-      return { granted: true, enabledAllPrayers: true };
+      const adhanPrompted = await syncGrantedPrayerAlerts();
+      return adhanPrompted ? { granted: true, adhanPrompted: true } : { granted: true };
     }
     return { granted: false, reason: "denied", error: `Permission ${res?.display ?? "unknown"}` };
   } catch (e) {
