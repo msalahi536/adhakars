@@ -1,5 +1,8 @@
 # Roadmap
 
+- [ ] Add JAKIM prayer times using the Waktu Solat API and verify settings and times
+- [ ] Remove calculation method and Hanafi Asr from Adhan Settings; retain in main Settings
+
 - [x] Correct widget prayer settings, saved location, and immediate sync; test all four rules
 - [x] Verify populated widget content, daily rotation, and live endpoint freshness
 
