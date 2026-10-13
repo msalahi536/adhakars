@@ -4,7 +4,7 @@ import { BellRing } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Portal } from "@/components/Portal";
 import { enableAllPrayerAlerts } from "@/lib/adhan-bridge";
-import { ADHAN_PROMPT_EVENT, ADHAN_PROMPT_PENDING_KEY } from "@/lib/notifications";
+import { ADHAN_PROMPT_EVENT, ADHAN_PROMPT_PENDING_KEY, requestNotificationPermission } from "@/lib/notifications";
 
 /** Asks once, after notifications are first allowed, whether to turn on adhan. */
 export function AdhanEnabledNotice() {
@@ -25,6 +25,8 @@ export function AdhanEnabledNotice() {
   };
   const yes = async () => {
     close();
+    // Yes is the explicit consent: ask for notification access here, then enable.
+    await requestNotificationPermission().catch(() => null);
     await enableAllPrayerAlerts();
     window.localStorage.setItem("adhkar:open-adhan-settings", "1");
     window.dispatchEvent(new Event("adhkar:open-adhan-settings"));
