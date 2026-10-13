@@ -1,5 +1,7 @@
 # Roadmap
 
+- [ ] Replace stale shared-link image with the current homepage and verify homepage/download previews
+
 - [x] Defer automatic location permission to Salah and prevent repeated prompts
 - [x] Repair notification enablement for already-granted permissions and verify all five adhans plus the modify notice
 
