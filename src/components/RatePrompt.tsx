@@ -28,9 +28,9 @@ export function RatePrompt() {
 
   const handleRate = () => {
     void triggerHaptic("medium");
+    requestAppReview();
     markRated();
     setOpen(false);
-    void requestAppReview();
   };
 
   const handleNotNow = () => {
