@@ -1,6 +1,7 @@
 # Architecture Decisions
 
 - Prayer calculation controls live only in main Settings and use shared prayer settings, so Salah times and alerts stay aligned.
+- Salah's no-location countdown is display-only state, never prayer slots or notification input; the main content owns scrolling and setup cards cannot shrink, so location controls remain accessible.
 
 - Native prayer widgets fetch their selected source directly; the bridge passes only location, source, calculation method and Asr school from shared prayer settings on changes, with no prayer-time handoff.
 - JAKIM uses Waktu Solat monthly GPS-zone timetables with cached days and preserved Unix timestamps; no fallback to Aladhan is permitted for official times, so alerts remain exact across timezones.

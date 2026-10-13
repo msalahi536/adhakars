@@ -1060,7 +1060,8 @@ html[data-visual-phase="evening"] .adhkar-card-heading button { background: rgba
 .salah-content { flex: 1; min-height: 0; overflow-x: hidden; overflow-y: auto; padding-bottom: 24px; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
 .salah-content::-webkit-scrollbar { display: none; }
 .salah-content-inner { display: grid; grid-template-rows: 148px 62px 242px; gap: 10px; width: 100%; max-width: 390px; height: 472px; margin: 10px auto 0; padding: 0 28px; box-sizing: border-box; }
-.salah-content-inner.no-location { display: flex; flex-direction: column; height: auto; max-height: 100%; overflow-y: auto; -webkit-overflow-scrolling: touch; padding-bottom: 24px; }
+.salah-content-inner.no-location { display: flex; flex-direction: column; height: auto; max-height: none; overflow: visible; padding-bottom: 24px; }
+.salah-content-inner.no-location > * { flex-shrink: 0; }
 .salah-location-card { position: relative; z-index: 5; width: 100%; box-sizing: border-box; border-radius: 18px; }
 .salah-recommended-card { box-sizing: border-box; height: 148px; padding: 12px 18px; border: 1px solid rgba(255, 255, 255, 0.8); border-radius: 18px; background: rgba(250, 247, 240, 0.92); box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06); backdrop-filter: blur(20px); }
 .salah-recommended-top { height: 24px; }

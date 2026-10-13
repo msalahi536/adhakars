@@ -93,6 +93,7 @@ function Salah() {
   const [settings, setSettingsState] = useState<PrayerSettings>(DEFAULT_PRAYER_SETTINGS);
   const [days, setDays] = useState<DayTimes[]>([]);
   const [now, setNow] = useState(() => new Date());
+  const [sampleSeconds, setSampleSeconds] = useState(2 * 3600 + 24 * 60 + 36);
   const [loading, setLoading] = useState(true);
   const [cityInput, setCityInput] = useState("");
   const [cityError, setCityError] = useState<string | null>(null);
@@ -117,7 +118,10 @@ function Salah() {
   const autoSelected = useRef(false);
 
   useEffect(() => {
-    const t = setInterval(() => setNow(new Date()), 1000);
+    const t = setInterval(() => {
+      setNow(new Date());
+      setSampleSeconds((seconds) => Math.max(0, seconds - 1));
+    }, 1000);
     return () => clearInterval(t);
   }, []);
 
@@ -405,7 +409,7 @@ function Salah() {
       <header className="salah-hero">
         <div className="salah-next-label">
           {!settings.location
-            ? "Prayer times"
+             ? "Fajr in:"
             : next
               ? `${next.label} in`
               : loading
@@ -414,17 +418,19 @@ function Salah() {
         </div>
         <div
           className="salah-countdown"
-          style={{ color: urgencyColor ?? undefined, opacity: settings.location ? 1 : 0.55 }}
+          style={{ color: urgencyColor ?? undefined }}
         >
-          {next ? formatCountdown(next.at.getTime() - now.getTime()) : "--:--:--"}
+          {!settings.location
+            ? formatCountdown(sampleSeconds * 1000)
+            : next ? formatCountdown(next.at.getTime() - now.getTime()) : "--:--:--"}
         </div>
         <button
           onClick={toggleDismissNext}
           disabled={!nextSalah}
-          style={dismissWidths ? { width: nextIsDismissed ? dismissWidths.dismissed : dismissWidths.active } : undefined}
+          style={settings.location && dismissWidths ? { width: nextIsDismissed ? dismissWidths.dismissed : dismissWidths.active } : undefined}
           className={`salah-dismiss active:scale-95 ${nextIsDismissed ? "is-dismissed" : ""}`}
         >
-          {nextIsDismissed ? `Dismissed until after ${nextSalah?.label ?? ""}` : "Tap to dismiss"}
+          {!settings.location ? "Sample countdown" : nextIsDismissed ? `Dismissed until after ${nextSalah?.label ?? ""}` : "Tap to dismiss"}
         </button>
       </header>
 
@@ -448,14 +454,13 @@ function Salah() {
                 We use it only to calculate your prayer times. Nothing leaves your device except
                 the coordinates used to look up the times.
               </p>
-              <button
+               <Button
                 onClick={() => void useMyLocation()}
                 disabled={locating}
-                className="mt-4 w-full rounded-full py-3 text-sm font-bold active:scale-[0.99]"
-                style={{ background: "var(--accent)", color: "var(--accent-foreground)" }}
+                 className="mt-4 h-12 w-full rounded-full bg-accent text-accent-foreground text-sm font-bold hover:bg-accent/90 active:scale-[0.99]"
               >
                 {locating ? "Locating..." : "Use my location"}
-              </button>
+               </Button>
               <div className="mt-2 flex gap-2">
                 <input
                   value={cityInput}
