@@ -1,5 +1,7 @@
 # Roadmap
 
+- [x] Keep empty-location Salah controls fully visible and show a ticking sample Fajr countdown
+
 - [x] Add JAKIM prayer times using the Waktu Solat API and verify settings and times
 - [x] Remove calculation method and Hanafi Asr from Adhan Settings; retain in main Settings
 
