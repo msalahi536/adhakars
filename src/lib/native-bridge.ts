@@ -52,32 +52,6 @@ function getPlugin(): CapacitorPlugin | null {
   return AdhkarWidgetsPlugin;
 }
 
-// --------------- Location ---------------
-
-let cachedLat = 0;
-let cachedLon = 0;
-
-async function getLocation(): Promise<{ lat: number; lon: number } | null> {
-  if (cachedLat !== 0 && cachedLon !== 0) {
-    return { lat: cachedLat, lon: cachedLon };
-  }
-  return new Promise((resolve) => {
-    if (!navigator.geolocation) {
-      resolve(null);
-      return;
-    }
-    navigator.geolocation.getCurrentPosition(
-      (pos) => {
-        cachedLat = pos.coords.latitude;
-        cachedLon = pos.coords.longitude;
-        resolve({ lat: cachedLat, lon: cachedLon });
-      },
-      () => resolve(null),
-      { timeout: 10000, enableHighAccuracy: false },
-    );
-  });
-}
-
 // --------------- Widget Data Sync ---------------
 
 let locationSyncVersion = 0;
@@ -89,12 +63,9 @@ export async function syncLocationToWidgets() {
   const version = ++locationSyncVersion;
   const settings = getPrayerSettings();
   const saved = settings.location;
-  const location = saved
-    ? { lat: saved.lat, lon: saved.lng }
-    : await getLocation();
-  // A settings change during a GPS request must not restore the older fix.
-  if (!location || version !== locationSyncVersion) return;
-  const { lat, lon } = location;
+  // Never acquire GPS here: Salah owns permission and persists its fix.
+  if (!saved || version !== locationSyncVersion) return;
+  const { lat, lng: lon } = saved;
 
   try {
     await plugin.updateLocation({

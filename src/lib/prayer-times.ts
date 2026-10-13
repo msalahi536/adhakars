@@ -364,6 +364,14 @@ export const reverseGeocode = async (c: Coords): Promise<string> => {
 };
 
 /** Resolve a device location, reusing the cached Qibla fix when possible. */
+export const claimSalahLocationRequest = (): boolean => {
+  if (typeof window === "undefined" || getPrayerSettings().location) return false;
+  const key = "adhkar:salah-location-requested";
+  if (readLS(key) === "1") return false;
+  writeLS(key, "1");
+  return true;
+};
+
 export const resolveLocation = async (force = false): Promise<PrayerLocation | null> => {
   const cached: Coords | null = force ? null : getCachedPosition();
   const coords = cached ?? (await (async () => {

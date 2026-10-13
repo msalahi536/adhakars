@@ -130,17 +130,19 @@ export function setAdhanPrefs(prefs: AdhanPrefs): void {
   void syncAdhanPrefsToNative(prefs);
 }
 
-/** Turns on all five prayers when notification permission is newly granted. */
+/** Persists and announces enablement independently of network scheduling. */
 export async function enableAllPrayerAlerts(): Promise<void> {
   if (typeof window === "undefined") return;
   const prefs = getAdhanPrefs();
   setAdhanPrefs({ ...prefs, enabledPrayers: { Fajr: true, Dhuhr: true, Asr: true, Maghrib: true, Isha: true } });
   const { getPrayerSettings, setPrayerSettings } = await import("@/lib/prayer-times");
-  const { rescheduleAdhanNotifications } = await import("@/lib/adhan-notifications");
   const next = { ...getPrayerSettings(), adhanEnabled: true, perPrayer: { fajr: true, dhuhr: true, asr: true, maghrib: true, isha: true } };
   setPrayerSettings(next);
   window.dispatchEvent(new Event(ADHAN_ENABLED_EVENT));
-  await rescheduleAdhanNotifications(next);
+  // Missing location or a failed schedule must not suppress permission success.
+  void import("@/lib/adhan-notifications")
+    .then(({ rescheduleAdhanNotifications }) => rescheduleAdhanNotifications(getPrayerSettings()))
+    .catch((error) => console.warn("[adhan] Scheduling will retry on app resume", error));
 }
 
 export async function syncAdhanPrefsToNative(prefs: AdhanPrefs = getAdhanPrefs()): Promise<void> {
