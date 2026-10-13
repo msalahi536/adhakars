@@ -1,5 +1,8 @@
 # Roadmap
 
+- [ ] Fix the explicit Rate app action so it opens the review destination instead of silently closing
+- [ ] Remove the entire onboarding process and verify fresh launch
+
 - [x] Keep empty-location Salah controls fully visible and show a ticking sample Fajr countdown
 
 - [x] Add JAKIM prayer times using the Waktu Solat API and verify settings and times

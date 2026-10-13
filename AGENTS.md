@@ -17,4 +17,4 @@
 - Android prayer location uses `navigator.geolocation`, persists the fix for offline use, and every adhan schedule derives from the selected prayer source for that saved coordinate.
 - More keeps its feature tools first; detailed consistency and lifetime statistics open from one compact summary so they never obscure feature discovery.
 
-- Onboarding renders through the shared body portal; live tour spotlights wait for navigation and stable target measurements, then appear without geometry transitions so they cannot drift through screen corners.
+- App launch has no onboarding or guided tour; the legacy onboarded flag is read only to distinguish existing users eligible for the old update notice from fresh installs.

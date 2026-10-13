@@ -2,7 +2,6 @@ import { useEffect, useLayoutEffect, useState } from "react";
 import { createFileRoute, Outlet, useRouter, useRouterState } from "@tanstack/react-router";
 import { BottomNav } from "@/components/BottomNav";
 import { SettingsButton } from "@/components/SettingsButton";
-import { Onboarding, hasOnboarded } from "@/components/Onboarding";
 import { WhatsNewDialog } from "@/components/WhatsNewDialog";
 import { RatePrompt } from "@/components/RatePrompt";
 import { backgroundsForPreset } from "@/lib/backgrounds";
@@ -24,7 +23,6 @@ export const Route = createFileRoute("/app")({
 });
 
 function AppLayout() {
-  const [showOnboarding, setShowOnboarding] = useState(false);
   const [showWhatsNew, setShowWhatsNew] = useState(false);
   // Keep the server and first browser render identical, then restore the saved
   // artwork before paint. Reading localStorage during render causes React to
@@ -166,8 +164,8 @@ function AppLayout() {
   }, []);
 
   useEffect(() => {
-    if (!hasOnboarded()) {
-      setShowOnboarding(true);
+    // Preserve the old update notice for existing users, never show it on a fresh install.
+    if (window.localStorage.getItem("adhkar:onboarded") !== "1") {
       window.localStorage.setItem(UPDATE_WELCOME_KEY, "seen");
       return;
     }
@@ -320,7 +318,6 @@ function AppLayout() {
         reciterId={adhan.reciterId}
         onClose={() => setAdhan((a) => ({ ...a, visible: false }))}
       />
-      {showOnboarding && <Onboarding onDone={() => setShowOnboarding(false)} />}
       <WhatsNewDialog open={showWhatsNew} onClose={() => setShowWhatsNew(false)} />
       <RatePrompt />
     </div>
