@@ -1,5 +1,8 @@
 # Roadmap
 
+- [ ] Defer automatic location permission to Salah and prevent repeated prompts
+- [ ] Repair notification enablement for already-granted permissions and verify all five adhans plus the modify notice
+
 - [x] Remove Run diagnostics from Adhan Settings
 - [x] Enable all five adhans on notification permission grant and show an actionable themed notice
 - [x] Show the themed release notice once during October 13–19 for new and current users
