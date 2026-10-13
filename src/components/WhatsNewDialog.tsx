@@ -39,8 +39,8 @@ export function WhatsNewDialog({ open, onClose }: Props) {
   return (
     <Dialog open={open} onOpenChange={(next) => !next && onClose()}>
       <DialogContent className="update-dialog grid max-h-[82dvh] w-[calc(100%_-_32px)] max-w-[410px] grid-rows-[auto_minmax(0,1fr)_auto] gap-0 overflow-hidden rounded-2xl border-border bg-card p-0 text-card-foreground shadow-2xl [&>button:last-child]:hidden">
-        <DialogHeader className="border-b border-border px-6 pb-5 pt-6 text-left">
-          <img src={logo.url} alt="Sahih Al-Adhkar logo" className="mb-3 h-14 w-14 rounded-xl object-cover" />
+        <DialogHeader className="border-b border-border px-6 pb-4 pt-5 text-left">
+          <img src={logo.url} alt="Sahih Al-Adhkar logo" className="mb-2 h-11 w-11 rounded-xl object-cover" />
           <p className="label-caps text-accent">Latest update</p>
           <DialogTitle className="font-display text-[30px] font-semibold leading-tight">What’s new</DialogTitle>
           <DialogDescription className="pt-1 text-sm leading-6 text-muted-foreground">
@@ -50,8 +50,8 @@ export function WhatsNewDialog({ open, onClose }: Props) {
 
         <div className="min-h-0 space-y-1 overflow-y-auto overscroll-contain px-4 py-3" style={{ WebkitOverflowScrolling: "touch" }}>
           {updates.map(({ icon: Icon, title }) => (
-            <div key={title} className="flex items-center gap-3 px-2 py-2">
-              <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-muted text-accent">
+            <div key={title} className="flex items-center gap-3 px-2 py-1.5">
+              <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-muted text-accent">
                 <Icon size={17} strokeWidth={1.7} />
               </span>
               <div className="min-w-0">

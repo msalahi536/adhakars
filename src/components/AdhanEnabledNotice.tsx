@@ -26,7 +26,7 @@ export function AdhanEnabledNotice() {
     void router.navigate({ to: "/app/salah" });
   };
   return <Portal>
-    <aside role="status" aria-live="polite" className="fixed bottom-[calc(var(--bottom-nav-height)_+_16px)] right-4 z-[100] w-[calc(100%_-_32px)] max-w-[340px] rounded-2xl border border-border bg-card p-4 text-card-foreground shadow-lg motion-safe:animate-in motion-safe:slide-in-from-right-4 motion-safe:fade-in">
+    <aside role="status" aria-live="polite" className="fixed bottom-[calc(var(--bottom-nav-height)_+_16px)] right-4 z-[230] w-[calc(100%_-_32px)] max-w-[340px] rounded-2xl border border-border bg-card p-4 text-card-foreground shadow-lg motion-safe:animate-in motion-safe:slide-in-from-right-4 motion-safe:fade-in">
       <div className="flex items-start gap-3">
         <BellRing size={20} className="mt-1 shrink-0 text-accent" />
         <div className="min-w-0 flex-1">
