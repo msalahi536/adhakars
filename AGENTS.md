@@ -1,5 +1,8 @@
 # Architecture Decisions
 
+- Personal appearance stores independent phase defaults and page overrides in device storage, with compressed photos in IndexedDB; explicit Gemini matching uses a server function and never exposes gateway credentials.
+- Personal palettes map editable roles onto shared semantic tokens with scoped priority over legacy preset CSS; clearing tracked personal tokens restores standard presets without changing their designs.
+
 - Homepage and download share-image metadata use one CDN-backed homepage capture in their leaf heads, never a root screenshot, so link previews stay deliberate and unrelated pages cannot inherit stale artwork.
 
 - Prayer calculation controls live only in main Settings and use shared prayer settings, so Salah times and alerts stay aligned.

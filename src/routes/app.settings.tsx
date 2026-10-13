@@ -16,6 +16,8 @@ import {
 import { sectionSeedFor } from "@/lib/theming";
 import { backgroundsForPreset, PRESET_BACKGROUNDS } from "@/lib/backgrounds";
 import { SuggestColorSheet } from "@/components/theme/SuggestColorSheet";
+import { PersonalAppearanceSheet } from '@/components/theme/PersonalAppearanceSheet';
+import { Button } from '@/components/ui/button';
 import {
   resetToday,
   resetAllProgress,
@@ -99,6 +101,7 @@ function Settings() {
   const [presetId, setPresetIdState] = useState<string>(DEFAULT_PRESET_ID);
   const [modeSetting, setModeSettingState] = useState<ModeSetting>("page");
   const [suggestOpen, setSuggestOpen] = useState(false);
+  const [personalOpen, setPersonalOpen] = useState(false);
   const [display, setDisplayState] = useState(getDisplay());
   const [confirmReset, setConfirmReset] = useState(false);
   const [confirmResetAll, setConfirmResetAll] = useState(false);
@@ -470,6 +473,10 @@ function Settings() {
                   );
                 })}
               </div>
+              <Button variant="ghost" className="settings-suggest-row personal-settings-entry" onClick={() => setPersonalOpen(true)}>
+                <Sparkles size={17} /><span>Custom background and colors</span>
+                {presetId === 'personal' && <Check size={16} />}
+              </Button>
               <button
                 onClick={() => setSuggestOpen(true)}
                 className="settings-suggest-row"
@@ -498,6 +505,7 @@ function Settings() {
           </section>
 
           <SuggestColorSheet open={suggestOpen} onClose={() => setSuggestOpen(false)} />
+          <PersonalAppearanceSheet open={personalOpen} onClose={() => setPersonalOpen(false)} onApply={() => setPresetIdState(getPresetId())} />
 
           {/* PRAYER TIMES */}
           <section className="mb-6">

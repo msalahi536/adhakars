@@ -1,6 +1,7 @@
 // Persistent theme store: seed, mode, section overrides, preset id, custom triplet.
 
 import type { Mode, SectionKey, CustomOverrides } from "./theming";
+import { PERSONAL_PRESET, readAppearance, resolveAppearance, pageForAppearance, normalizePalette, paletteTokens } from './custom-appearance';
 import {
   applyTokens,
   deriveSectionSeed,
@@ -101,6 +102,12 @@ export const sectionForRoute = (pathname: string): SectionKey => {
 };
 
 export const applyThemeForRoute = (pathname: string, sectionKey?: SectionKey) => {
+  if (typeof document !== 'undefined') {
+    const element = document.documentElement;
+    const oldKeys = element.dataset.personalTokenKeys?.split(',') ?? [];
+    oldKeys.forEach(key => element.style.removeProperty(key));
+    delete element.dataset.personalTokenKeys;
+  }
   const visualPhase = resolveVisualPhase(pathname);
   const mode: Mode = visualPhase === "evening" ? "dark" : "light";
   const base = getSeed();
@@ -134,6 +141,12 @@ export const applyThemeForRoute = (pathname: string, sectionKey?: SectionKey) =>
 
   const tokens = deriveTokens({ seed, mode, custom });
   applyTokens(tokens, mode);
+  if (presetId === PERSONAL_PRESET && pathname.startsWith('/app') && typeof document !== 'undefined') {
+    const appearance = resolveAppearance(readAppearance(), visualPhase, pageForAppearance(pathname));
+    const personal = paletteTokens(normalizePalette(appearance.colors ?? {}, visualPhase), visualPhase);
+    document.documentElement.dataset.personalTokenKeys = Object.keys(personal).join(',');
+    for (const [key, value] of Object.entries(personal)) document.documentElement.style.setProperty(key, value, 'important');
+  }
 };
 
 export const resetTheme = () => {

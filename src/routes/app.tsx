@@ -7,6 +7,7 @@ import { AdhanEnabledNotice } from "@/components/AdhanEnabledNotice";
 import { UPDATE_NOTICE_KEY, shouldShowUpdateNotice } from "@/lib/update-notice";
 import { RatePrompt } from "@/components/RatePrompt";
 import { backgroundsForPreset } from "@/lib/backgrounds";
+import { PERSONAL_PRESET, cachedPhoto, loadAppearancePhotos, readAppearance, resolveAppearance, pageForAppearance } from '@/lib/custom-appearance';
 import { JUMUAH_NOTIF_ID, registerNotificationTapHandler } from "@/lib/notifications";
 import { DEFAULT_PRESET_ID, getPresetId, resolveVisualPhase, type VisualPhase } from "@/lib/theme-store";
 import { rememberMoreDestination } from "@/lib/more-navigation";
@@ -29,6 +30,7 @@ function AppLayout() {
   // preserve the server's default background during hydration.
   const [activePresetId, setActivePresetId] = useState(DEFAULT_PRESET_ID);
   const [activeVisualPhase, setActiveVisualPhase] = useState<VisualPhase>("morning");
+  const [personalBackgrounds, setPersonalBackgrounds] = useState<Partial<Record<VisualPhase, string>>>({});
   const pathname = useRouterState({ select: (state) => state.location.pathname });
   
   const isAdhkar = ["/app", "/app/", "/app/evening"].includes(pathname);
@@ -36,7 +38,7 @@ function AppLayout() {
   const showSettings = !pathname.startsWith("/app/settings");
 
   // Derive phase and backgrounds directly during render to prevent transition flashes
-  const backgrounds = backgroundsForPreset(activePresetId);
+  const backgrounds = { ...backgroundsForPreset(activePresetId), ...(activePresetId === PERSONAL_PRESET ? personalBackgrounds : {}) };
   const visualPhase = activeVisualPhase;
 
   // Android WebView glitch fix: the morning/evening artwork lives on the CDN,
@@ -250,12 +252,19 @@ function AppLayout() {
     const sync = () => {
       setActivePresetId(getPresetId());
       setActiveVisualPhase(resolveVisualPhase(window.location.pathname));
+      const config = readAppearance();
+      const page = pageForAppearance(window.location.pathname);
+      setPersonalBackgrounds({ morning: cachedPhoto(resolveAppearance(config, 'morning', page).photo) ?? backgroundsForPreset('original').morning,
+        evening: cachedPhoto(resolveAppearance(config, 'evening', page).photo) ?? backgroundsForPreset('original').evening });
     };
     sync();
+    let cancelled = false;
+    void loadAppearancePhotos().then(() => { if (!cancelled) sync(); }).catch(() => {});
     window.addEventListener("adhkar:theme-change", sync);
     window.addEventListener("storage", sync);
     window.addEventListener("adhkar:visual-phase-change", sync);
     return () => {
+      cancelled = true;
       window.removeEventListener("adhkar:theme-change", sync);
       window.removeEventListener("storage", sync);
       window.removeEventListener("adhkar:visual-phase-change", sync);
