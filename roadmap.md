@@ -1,7 +1,7 @@
 # Roadmap
 
-- [ ] Fix the explicit Rate app action so it opens the review destination instead of silently closing
-- [ ] Remove the entire onboarding process and verify fresh launch
+- [x] Fix the explicit Rate app action so it opens the review destination instead of silently closing
+- [x] Remove the entire onboarding process and verify fresh launch
 
 - [x] Keep empty-location Salah controls fully visible and show a ticking sample Fajr countdown
 
