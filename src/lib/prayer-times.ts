@@ -2,6 +2,7 @@
 // Everything here is browser safe and never throws.
 
 import { getPosition, getCachedPosition, type Coords } from "@/lib/compass";
+import { fetchJakimMonth } from "@/lib/jakim-prayer-times";
 
 export type PrayerId = "fajr" | "sunrise" | "dhuhr" | "asr" | "maghrib" | "isha";
 
@@ -51,6 +52,7 @@ export type PrayerLocation = {
 };
 
 export type PrayerSettings = {
+  source?: "aladhan" | "jakim";
   method: number;
   hanafi: boolean;
   adhanEnabled: boolean;
@@ -143,6 +145,8 @@ export type DayTimes = {
   key: string;
   /** minutes from midnight for each entry */
   times: Record<PrayerId, number>;
+  /** JAKIM supplies absolute Unix times; preserve them for alerts and travel. */
+  timestamps?: Record<PrayerId, number>;
 };
 
 const parseHm = (raw: string): number | null => {
@@ -158,24 +162,24 @@ const sig = (s: PrayerSettings): string => {
   const loc = s.location;
   const lat = loc ? loc.lat.toFixed(2) : "0";
   const lng = loc ? loc.lng.toFixed(2) : "0";
-  return `${lat},${lng},${s.method},${s.hanafi ? 1 : 0},${deviceTimeZone()}`;
+  return `${lat},${lng},${s.source ?? "aladhan"},${s.method},${s.hanafi ? 1 : 0},${deviceTimeZone()}`;
 };
 
 const readCache = (key: string, s: PrayerSettings): DayTimes | null => {
   const raw = readLS(`${CACHE_PREFIX}${key}`);
   if (!raw) return null;
   try {
-    const parsed = JSON.parse(raw) as { sig: string; times: Record<PrayerId, number> };
+    const parsed = JSON.parse(raw) as { sig: string; times: Record<PrayerId, number>; timestamps?: Record<PrayerId, number> };
     if (parsed.sig !== sig(s)) return null;
     if (!parsed.times || typeof parsed.times.fajr !== "number") return null;
-    return { key, times: parsed.times };
+    return { key, times: parsed.times, timestamps: parsed.timestamps };
   } catch {
     return null;
   }
 };
 
 const writeCache = (day: DayTimes, s: PrayerSettings) => {
-  writeLS(`${CACHE_PREFIX}${day.key}`, JSON.stringify({ sig: sig(s), times: day.times }));
+  writeLS(`${CACHE_PREFIX}${day.key}`, JSON.stringify({ sig: sig(s), times: day.times, timestamps: day.timestamps }));
   if (typeof window !== "undefined" && day.key === dateKey(new Date())) {
     window.dispatchEvent(new Event("adhkar:theme-change"));
   }
@@ -238,6 +242,22 @@ export const fetchDay = async (
   if (cached) return cached;
   const loc = settings.location;
   if (!loc) return null;
+  if (settings.source === "jakim") {
+    const month = await fetchJakimMonth(date, loc.lat, loc.lng);
+    if (!month) return null; // Never substitute calculated times for official JAKIM times.
+    for (const row of month.prayers) {
+      const timestamps: Record<PrayerId, number> = {
+        fajr: row.fajr * 1000, sunrise: row.syuruk * 1000, dhuhr: row.dhuhr * 1000,
+        asr: row.asr * 1000, maghrib: row.maghrib * 1000, isha: row.isha * 1000,
+      };
+      const times = Object.fromEntries(PRAYER_ORDER.map((id) => {
+        const at = new Date(timestamps[id]);
+        return [id, at.getHours() * 60 + at.getMinutes()];
+      })) as Record<PrayerId, number>;
+      writeCache({ key: dateKey(new Date(date.getFullYear(), date.getMonth(), row.day)), times, timestamps }, settings);
+    }
+    return readCache(key, settings);
+  }
   const tz = deviceTimeZone();
   const url =
     `https://api.aladhan.com/v1/timings/${apiDate(date)}` +
@@ -384,8 +404,9 @@ export const slotsForDay = (day: DayTimes): Slot[] => {
     // Isha can fall after midnight: keep the sequence moving forward.
     const adjusted = mins < prev ? mins + 24 * 60 : mins;
     prev = adjusted;
-    const at = new Date(y, m - 1, d, 0, 0, 0, 0);
-    at.setMinutes(adjusted);
+    const timestamp = day.timestamps?.[id];
+    const at = timestamp !== undefined ? new Date(timestamp) : new Date(y, m - 1, d, 0, 0, 0, 0);
+    if (timestamp === undefined) at.setMinutes(adjusted);
     return { id, label: PRAYER_LABELS[id], at, dayKey: day.key, minutes: mins };
   });
 };
