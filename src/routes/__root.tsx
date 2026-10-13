@@ -82,16 +82,6 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "twitter:title", content: "Sahih Al-Adhkar" },
       { property: "og:description", content: "Personal daily Islamic adhkar and tasbih." },
       { name: "twitter:description", content: "Personal daily Islamic adhkar and tasbih." },
-      {
-        property: "og:image",
-        content:
-          "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/ca909766-1cfc-4956-ae39-1a1b7af04e7a/id-preview-656ea870--52d629f3-34a0-4e01-bea4-f2b3af1922d0.lovable.app-1779660312907.png",
-      },
-      {
-        name: "twitter:image",
-        content:
-          "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/ca909766-1cfc-4956-ae39-1a1b7af04e7a/id-preview-656ea870--52d629f3-34a0-4e01-bea4-f2b3af1922d0.lovable.app-1779660312907.png",
-      },
       { name: "twitter:card", content: "summary_large_image" },
       { property: "og:type", content: "website" },
     ],

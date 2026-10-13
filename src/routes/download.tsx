@@ -3,6 +3,7 @@ import { MarketingLayout } from "@/components/marketing/MarketingLayout";
 import { StoreBadges } from "@/components/marketing/StoreBadges";
 import { ArrowRight, ShieldCheck, Lock, Ban } from "lucide-react";
 import heroAsset from "@/assets/homepage-hero.png.asset.json";
+import { homepageShareImageMeta } from "@/lib/share-preview";
 
 export const Route = createFileRoute("/download")({
   head: () => ({
@@ -19,7 +20,8 @@ export const Route = createFileRoute("/download")({
         content: "Free, private, no accounts. Now on the App Store and Google Play.",
       },
       { property: "og:type", content: "website" },
-      { name: "twitter:card", content: "summary" },
+      { name: "twitter:card", content: "summary_large_image" },
+      ...homepageShareImageMeta,
     ],
   }),
   component: DownloadPage,
