@@ -1,5 +1,8 @@
 # Roadmap
 
+- [x] Remove Gemini appearance matching and simplify the popup
+- [x] Add an accurate live home-screen preview and verify photo/color saving
+
 - [x] Add device-photo backgrounds and independent Morning/Evening per-page colors above Suggest a theme
 - [x] Connect Gemini palette suggestions with manual editing and verify persistence and page isolation
 
