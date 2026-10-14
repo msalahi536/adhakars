@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { ImagePlus, Sun, Moon, RotateCcw, Trash2, LoaderCircle } from 'lucide-react';
+import { ImagePlus, Sun, Moon, RotateCcw, LoaderCircle } from 'lucide-react';
 import { Dialog, DialogContent, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -8,8 +8,8 @@ import { APPEARANCE_PAGES, COLOR_ROLES, FONT_OPTIONS, cachedPhoto, defaultPalett
 import { DEFAULT_BACKGROUNDS } from '@/lib/backgrounds';
 import { setPresetId } from '@/lib/theme-store';
 
-const BASIC_COLORS: ColorRole[] = ['card', 'text', 'accent'];
-const LABELS: Partial<Record<ColorRole, string>> = { text: 'Reading text', title: 'Page title', accent: 'Buttons', nav: 'Bottom bar' };
+const BASIC_COLORS: ColorRole[] = ['background', 'text', 'card'];
+const LABELS: Partial<Record<ColorRole, string>> = { background: 'Background', card: 'Cards', text: 'Text', title: 'Page title', accent: 'Buttons', nav: 'Bottom bar' };
 
 export function PersonalAppearanceSheet({ open, onClose, onApply }: { open: boolean; onClose: () => void; onApply: () => void }) {
   const [draft, setDraft] = useState<CustomAppearance>(emptyAppearance);
@@ -51,18 +51,19 @@ export function PersonalAppearanceSheet({ open, onClose, onApply }: { open: bool
   const colorControl = (role: ColorRole) => <label key={role} className="personal-color-row"><span>{LABELS[role] ?? COLOR_ROLES.find(([key]) => key === role)?.[1]}</span><input type="color" aria-label={LABELS[role] ?? COLOR_ROLES.find(([key]) => key === role)?.[1]} value={palette[role]} disabled={busy} onChange={event => update({ colors: { [role]: event.target.value } })} /></label>;
   return <Dialog open={open} onOpenChange={value => { if (!value && !busy) onClose(); }}>
     <DialogContent className="personal-appearance-sheet" aria-describedby="personal-appearance-description">
-      <div className="personal-appearance-heading"><DialogTitle>Your look</DialogTitle><DialogDescription id="personal-appearance-description">A little more personal.</DialogDescription></div>
+      <div className="personal-appearance-heading"><DialogTitle>Your look</DialogTitle><DialogDescription id="personal-appearance-description">Make it feel like yours.</DialogDescription></div>
       <div className="personal-appearance-scroll">
+        <div className="personal-preview-wrap"><HomeAppearancePreview palette={palette} phase={phase} image={image} /></div>
         <div className="personal-phase" role="group" aria-label="Appearance phase">{(['morning', 'evening'] as const).map(value => <Button key={value} variant="ghost" disabled={busy} aria-pressed={phase === value} onClick={() => { setPhase(value); setError(''); }} className={phase === value ? 'is-selected' : ''}>{value === 'morning' ? <Sun /> : <Moon />}{value === 'morning' ? 'Morning' : 'Evening'}</Button>)}</div>
-        <div className="personal-editor-columns"><HomeAppearancePreview palette={palette} phase={phase} image={image} /><div className="personal-simple-controls"><h3>Colors</h3>{BASIC_COLORS.map(colorControl)}<Button variant="ghost" size="sm" className="personal-reset-simple" disabled={busy} onClick={() => update({ colors: defaultPalette(phase) })}><RotateCcw />Reset</Button></div></div>
         <input ref={fileInput} className="sr-only" type="file" accept="image/*" aria-label="Choose background photo" onChange={event => void upload(event.target.files?.[0])} />
-        <div className="personal-photo-actions"><Button variant="outline" disabled={busy || loading} onClick={() => fileInput.current?.click()}>{busy ? <LoaderCircle className="animate-spin" /> : <ImagePlus />}{busy ? 'Opening photo…' : appearance.photo ? 'Change background photo' : 'Choose background photo'}</Button>{appearance.photo && <Button variant="ghost" size="icon" title="Remove photo" aria-label="Remove photo" disabled={busy} onClick={() => update({ photo: null })}><Trash2 /></Button>}</div>
+        <section className="personal-section"><h3>Background</h3><div className="personal-photo-actions"><Button variant="outline" disabled={busy || loading} onClick={() => fileInput.current?.click()}>{busy ? <LoaderCircle className="animate-spin" /> : <ImagePlus />}{busy ? 'Opening…' : appearance.photo ? 'Change photo' : 'Choose photo'}</Button><Button variant="outline" disabled={busy || loading} onClick={() => update({ photo: null })}><RotateCcw />Reset</Button></div></section>
+        <section className="personal-section"><h3>Colors</h3><div className="personal-basic-colors">{BASIC_COLORS.map(colorControl)}</div></section>
         <div className="personal-font-section"><h3>Text style</h3><div className="personal-font-choices" role="group" aria-label="Text style">{FONT_OPTIONS.map((font, index) => <Button key={font} variant="outline" disabled={busy} aria-pressed={palette.font === font} className={`personal-font-choice personal-font-${index} ${palette.font === font ? 'is-selected' : ''}`} onClick={() => update({ colors: { font } })}>{['Classic', 'Clean', 'Soft', 'Modern'][index]}</Button>)}</div></div>
         {error && <p className="personal-error" role="alert">{error}</p>}
-        <details className="personal-more-colors"><summary>More options{page !== 'all' ? ` · ${APPEARANCE_PAGES.find(([id]) => id === page)?.[1]}` : ''}</summary><div className="personal-page-row"><label htmlFor="personal-page">Apply to</label><Select value={page} onValueChange={setPage} disabled={busy}><SelectTrigger id="personal-page"><SelectValue /></SelectTrigger><SelectContent className="z-[260]">{APPEARANCE_PAGES.map(([id, label]) => <SelectItem value={id} key={id}>{label}</SelectItem>)}</SelectContent></Select></div><div className="personal-color-grid">{COLOR_ROLES.filter(([role]) => !BASIC_COLORS.includes(role)).map(([role]) => colorControl(role))}</div>{warnings.length > 0 && <p className="personal-warning">Some text may be hard to read: {warnings.join(', ')}</p>}</details>
+        <details className="personal-more-colors"><summary>More options{page !== 'all' ? ` · ${APPEARANCE_PAGES.find(([id]) => id === page)?.[1]}` : ''}</summary><div className="personal-page-row"><label htmlFor="personal-page">Apply to</label><Select value={page} onValueChange={setPage} disabled={busy}><SelectTrigger id="personal-page"><SelectValue /></SelectTrigger><SelectContent className="z-[260]">{APPEARANCE_PAGES.map(([id, label]) => <SelectItem value={id} key={id}>{label}</SelectItem>)}</SelectContent></Select></div><div className="personal-color-grid">{COLOR_ROLES.filter(([role]) => !BASIC_COLORS.includes(role)).map(([role]) => colorControl(role))}</div><Button variant="ghost" size="sm" disabled={busy} onClick={() => update({ colors: defaultPalette(phase) })}><RotateCcw />Reset colors</Button>{warnings.length > 0 && <p className="personal-warning">Some text may be hard to read: {warnings.join(', ')}</p>}</details>
         {page !== 'all' && <Button className="personal-inherit" variant="ghost" disabled={busy} onClick={() => setDraft(previous => { const next = { ...previous[phase] }; delete next[page]; return { ...previous, [phase]: next }; })}><RotateCcw />Use all-page appearance</Button>}
       </div>
-      <div className="personal-footer"><Button variant="outline" disabled={busy} onClick={onClose}>Cancel</Button><Button disabled={busy || loading} onClick={save}>Save</Button></div>
+      <div className="personal-footer"><Button variant="outline" disabled={busy} onClick={onClose}>Cancel</Button><Button disabled={busy || loading} onClick={save}>Save changes</Button></div>
     </DialogContent>
   </Dialog>;
 }
