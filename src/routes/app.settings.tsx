@@ -75,7 +75,7 @@ import {
   Type,
   ALargeSmall,
   Check,
-  Sparkles,
+  Palette,
   Heart,
   Flame,
 } from "lucide-react";
@@ -474,7 +474,7 @@ function Settings() {
                 })}
               </div>
               <Button variant="ghost" className="settings-suggest-row personal-settings-entry" onClick={() => setPersonalOpen(true)}>
-                <Sparkles size={17} /><span>Custom background and colors</span>
+                <Palette size={17} strokeWidth={1.8} /><span>Custom background and colors</span>
                 {presetId === 'personal' && <Check size={16} />}
               </Button>
               <button
