@@ -76,6 +76,7 @@ import {
   ALargeSmall,
   Check,
   Palette,
+  Sparkles,
   Heart,
   Flame,
 } from "lucide-react";
