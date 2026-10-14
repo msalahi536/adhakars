@@ -3,6 +3,7 @@ import { ImagePlus, Sun, Moon, RotateCcw, LoaderCircle } from 'lucide-react';
 import { Dialog, DialogContent, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Switch } from '@/components/ui/switch';
 import { HomeAppearancePreview } from './HomeAppearancePreview';
 import { APPEARANCE_PAGES, COLOR_ROLES, FONT_OPTIONS, cachedPhoto, defaultPalette, devicePhoto, emptyAppearance, loadAppearancePhotos, normalizePalette, paletteWarnings, readAppearance, resolveAppearance, saveAppearancePhoto, writeAppearance, pruneAppearancePhotos, PERSONAL_PRESET, type AppearancePhase, type CustomAppearance, type Palette, type ColorRole } from '@/lib/custom-appearance';
 import { DEFAULT_BACKGROUNDS } from '@/lib/backgrounds';
@@ -15,6 +16,7 @@ export function PersonalAppearanceSheet({ open, onClose, onApply }: { open: bool
   const [draft, setDraft] = useState<CustomAppearance>(emptyAppearance);
   const [phase, setPhase] = useState<AppearancePhase>('morning');
   const [page, setPage] = useState('all');
+  const [applyBoth, setApplyBoth] = useState(false);
   const [busy, setBusy] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
