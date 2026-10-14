@@ -1,5 +1,7 @@
 # Roadmap
 
+- [ ] Match the custom appearance popup reference and verify the fixed non-interactive preview
+
 - [x] Remove Gemini appearance matching and simplify the popup
 - [x] Add an accurate live home-screen preview and verify photo/color saving
 
