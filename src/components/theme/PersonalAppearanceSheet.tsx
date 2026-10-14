@@ -35,8 +35,22 @@ export function PersonalAppearanceSheet({ open, onClose, onApply }: { open: bool
   const image = cachedPhoto(appearance.photo) ?? DEFAULT_BACKGROUNDS[phase];
   const warnings = paletteWarnings(palette);
   const update = (patch: { colors?: Partial<Palette>; photo?: string | null }) => {
-    setDraft(previous => ({ ...previous, [phase]: { ...previous[phase], [page]: { ...previous[phase][page], ...patch,
-      ...(patch.colors ? { colors: { ...previous[phase][page]?.colors, ...patch.colors } } : {}) } } }));
+    const phases: AppearancePhase[] = applyBoth ? ['morning', 'evening'] : [phase];
+    setDraft(previous => {
+      const next = { ...previous };
+      for (const target of phases) next[target] = { ...next[target], [page]: { ...next[target][page], ...patch,
+        ...(patch.colors ? { colors: { ...next[target][page]?.colors, ...patch.colors } } : {}) } };
+      return next;
+    });
+  };
+  const resetScope = () => {
+    const phases: AppearancePhase[] = applyBoth ? ['morning', 'evening'] : [phase];
+    setDraft(previous => {
+      const next = { ...previous };
+      for (const target of phases) { const entries = { ...next[target] }; delete entries[page]; next[target] = entries; }
+      return next;
+    });
+    setError('');
   };
   const upload = async (file?: File) => {
     if (!file) return;
