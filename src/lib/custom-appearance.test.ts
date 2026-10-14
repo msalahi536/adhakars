@@ -27,7 +27,7 @@ describe('Personal appearance rules', () => {
     expect(tokens['--card']).toBe('#123456'); expect(tokens['--card-foreground']).toBe('#fedcba');
     expect(tokens['--primary']).toBe('#234567'); expect(tokens['--font-sans']).toContain('Outfit');
   });
-  test('Invalid AI values cannot become CSS values', () => {
+  test('Invalid stored values cannot become CSS values', () => {
     const p = normalizePalette({ accent: 'url(https://invalid)', font: 'bad font' }, 'morning');
     expect(p.accent).toBe(defaultPalette('morning').accent); expect(p.font).toBe('Jost');
   });
