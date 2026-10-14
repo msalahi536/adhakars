@@ -93,7 +93,7 @@ export function writeAppearance(config: CustomAppearance) {
   localStorage.setItem(APPEARANCE_KEY, JSON.stringify(config));
 }
 
-// Photos stay on this device; only a resized copy is sent on explicit Gemini matching.
+// Custom photos stay on this device and are never sent for remote analysis.
 let photoCache: Record<string, string> = {};
 async function photoDatabase() {
   return new Promise<IDBDatabase>((resolve, reject) => {

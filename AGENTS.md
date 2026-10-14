@@ -1,6 +1,7 @@
 # Architecture Decisions
 
-- Personal appearance stores independent phase defaults and page overrides in device storage, with compressed photos in IndexedDB; explicit Gemini matching uses a server function and never exposes gateway credentials.
+- Personal appearance is manual and device-only, with independent phase defaults and page overrides in local storage and compressed photos in IndexedDB; no remote photo analysis is permitted.
+- The appearance popup uses a read-only home-screen composition with real adhkar data and shared palette tokens, so draft edits preview immediately without affecting progress or the saved theme.
 - Personal palettes map editable roles onto shared semantic tokens with scoped priority over legacy preset CSS; clearing tracked personal tokens restores standard presets without changing their designs.
 
 - Homepage and download share-image metadata use one CDN-backed homepage capture in their leaf heads, never a root screenshot, so link previews stay deliberate and unrelated pages cannot inherit stale artwork.
