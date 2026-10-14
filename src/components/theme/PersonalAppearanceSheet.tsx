@@ -3,6 +3,7 @@ import { ImagePlus, Sun, Moon, RotateCcw, LoaderCircle } from 'lucide-react';
 import { Dialog, DialogContent, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Switch } from '@/components/ui/switch';
 import { HomeAppearancePreview } from './HomeAppearancePreview';
 import { APPEARANCE_PAGES, COLOR_ROLES, FONT_OPTIONS, cachedPhoto, defaultPalette, devicePhoto, emptyAppearance, loadAppearancePhotos, normalizePalette, paletteWarnings, readAppearance, resolveAppearance, saveAppearancePhoto, writeAppearance, pruneAppearancePhotos, PERSONAL_PRESET, type AppearancePhase, type CustomAppearance, type Palette, type ColorRole } from '@/lib/custom-appearance';
 import { DEFAULT_BACKGROUNDS } from '@/lib/backgrounds';
@@ -15,6 +16,7 @@ export function PersonalAppearanceSheet({ open, onClose, onApply }: { open: bool
   const [draft, setDraft] = useState<CustomAppearance>(emptyAppearance);
   const [phase, setPhase] = useState<AppearancePhase>('morning');
   const [page, setPage] = useState('all');
+  const [applyBoth, setApplyBoth] = useState(false);
   const [busy, setBusy] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -33,8 +35,22 @@ export function PersonalAppearanceSheet({ open, onClose, onApply }: { open: bool
   const image = cachedPhoto(appearance.photo) ?? DEFAULT_BACKGROUNDS[phase];
   const warnings = paletteWarnings(palette);
   const update = (patch: { colors?: Partial<Palette>; photo?: string | null }) => {
-    setDraft(previous => ({ ...previous, [phase]: { ...previous[phase], [page]: { ...previous[phase][page], ...patch,
-      ...(patch.colors ? { colors: { ...previous[phase][page]?.colors, ...patch.colors } } : {}) } } }));
+    const phases: AppearancePhase[] = applyBoth ? ['morning', 'evening'] : [phase];
+    setDraft(previous => {
+      const next = { ...previous };
+      for (const target of phases) next[target] = { ...next[target], [page]: { ...next[target][page], ...patch,
+        ...(patch.colors ? { colors: { ...next[target][page]?.colors, ...patch.colors } } : {}) } };
+      return next;
+    });
+  };
+  const resetScope = () => {
+    const phases: AppearancePhase[] = applyBoth ? ['morning', 'evening'] : [phase];
+    setDraft(previous => {
+      const next = { ...previous };
+      for (const target of phases) { const entries = { ...next[target] }; delete entries[page]; next[target] = entries; }
+      return next;
+    });
+    setError('');
   };
   const upload = async (file?: File) => {
     if (!file) return;
@@ -55,6 +71,7 @@ export function PersonalAppearanceSheet({ open, onClose, onApply }: { open: bool
       <div className="personal-appearance-scroll">
         <div className="personal-preview-wrap"><HomeAppearancePreview palette={palette} phase={phase} image={image} /></div>
         <div className="personal-phase" role="group" aria-label="Appearance phase">{(['morning', 'evening'] as const).map(value => <Button key={value} variant="ghost" disabled={busy} aria-pressed={phase === value} onClick={() => { setPhase(value); setError(''); }} className={phase === value ? 'is-selected' : ''}>{value === 'morning' ? <Sun /> : <Moon />}{value === 'morning' ? 'Morning' : 'Evening'}</Button>)}</div>
+        <label className="personal-apply-both"><Switch checked={applyBoth} disabled={busy} onCheckedChange={setApplyBoth} aria-label="Apply to morning and evening" /><span>Apply to morning &amp; evening</span></label>
         <input ref={fileInput} className="sr-only" type="file" accept="image/*" aria-label="Choose background photo" onChange={event => void upload(event.target.files?.[0])} />
         <section className="personal-section"><h3>Background</h3><div className="personal-photo-actions"><Button variant="outline" disabled={busy || loading} onClick={() => fileInput.current?.click()}>{busy ? <LoaderCircle className="animate-spin" /> : <ImagePlus />}{busy ? 'Opening…' : appearance.photo ? 'Change photo' : 'Choose photo'}</Button><Button variant="outline" disabled={busy || loading} onClick={() => update({ photo: null })}><RotateCcw />Reset</Button></div></section>
         <section className="personal-section"><h3>Colors</h3><div className="personal-basic-colors">{BASIC_COLORS.map(colorControl)}</div></section>
@@ -63,7 +80,7 @@ export function PersonalAppearanceSheet({ open, onClose, onApply }: { open: bool
         <details className="personal-more-colors"><summary>More options{page !== 'all' ? ` · ${APPEARANCE_PAGES.find(([id]) => id === page)?.[1]}` : ''}</summary><div className="personal-page-row"><label htmlFor="personal-page">Apply to</label><Select value={page} onValueChange={setPage} disabled={busy}><SelectTrigger id="personal-page"><SelectValue /></SelectTrigger><SelectContent className="z-[260]">{APPEARANCE_PAGES.map(([id, label]) => <SelectItem value={id} key={id}>{label}</SelectItem>)}</SelectContent></Select></div><div className="personal-color-grid">{COLOR_ROLES.filter(([role]) => !BASIC_COLORS.includes(role)).map(([role]) => colorControl(role))}</div><Button variant="ghost" size="sm" disabled={busy} onClick={() => update({ colors: defaultPalette(phase) })}><RotateCcw />Reset colors</Button>{warnings.length > 0 && <p className="personal-warning">Some text may be hard to read: {warnings.join(', ')}</p>}</details>
         {page !== 'all' && <Button className="personal-inherit" variant="ghost" disabled={busy} onClick={() => setDraft(previous => { const next = { ...previous[phase] }; delete next[page]; return { ...previous, [phase]: next }; })}><RotateCcw />Use all-page appearance</Button>}
       </div>
-      <div className="personal-footer"><Button variant="outline" disabled={busy} onClick={onClose}>Cancel</Button><Button disabled={busy || loading} onClick={save}>Save changes</Button></div>
+      <div className="personal-footer"><Button variant="ghost" disabled={busy || loading} onClick={resetScope}><RotateCcw />Reset to default</Button><div className="personal-footer-actions"><Button variant="outline" disabled={busy} onClick={onClose}>Cancel</Button><Button disabled={busy || loading} onClick={save}>Save changes</Button></div></div>
     </DialogContent>
   </Dialog>;
 }
