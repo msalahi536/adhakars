@@ -6,7 +6,7 @@
 
 - Homepage and download share-image metadata use one CDN-backed homepage capture in their leaf heads, never a root screenshot, so link previews stay deliberate and unrelated pages cannot inherit stale artwork.
 
-- Prayer calculation controls live only in main Settings and use shared prayer settings, so Salah times and alerts stay aligned.
+- Main Settings and the Adhan Settings calculation popup use shared prayer settings, so location, Salah times, alerts, and widgets stay aligned.
 - Salah's no-location countdown is display-only state, never prayer slots or notification input; the main content owns scrolling and setup cards cannot shrink, so location controls remain accessible.
 
 - Native prayer widgets fetch their selected source directly; the bridge passes only location, source, calculation method and Asr school from shared prayer settings on changes, with no prayer-time handoff.
