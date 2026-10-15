@@ -496,6 +496,13 @@ function Settings() {
                 onChange={(v) => updateDisplay({ showTransliteration: v })}
               />
               <Toggle
+                icon={<Languages size={17} strokeWidth={1.8} />}
+                label="Show translation"
+                description="Show the English translation below dhikrs."
+                value={display.showTranslation}
+                onChange={(v) => updateDisplay({ showTranslation: v })}
+              />
+              <Toggle
                 icon={<ALargeSmall size={17} strokeWidth={1.8} />}
                 label="Large Arabic text"
                 description="Increase Arabic text size."
