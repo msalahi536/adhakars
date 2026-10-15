@@ -1,6 +1,6 @@
 # Roadmap
 
-- [ ] Add the Adhan Settings prayer calculation pill and themed popup; verify shared method, Asr, and location saving.
+- [x] Add the Adhan Settings prayer calculation pill and themed popup; verify shared method, Asr, and location saving.
 
 - [x] Match the custom appearance popup reference and verify the fixed non-interactive preview
 
