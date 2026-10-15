@@ -5,6 +5,7 @@ import { SettingsButton } from "@/components/SettingsButton";
 import { WhatsNewDialog } from "@/components/WhatsNewDialog";
 import { AdhanEnabledNotice } from "@/components/AdhanEnabledNotice";
 import { UPDATE_NOTICE_KEY, shouldShowUpdateNotice } from "@/lib/update-notice";
+import { prefetchSunnah } from "@/components/SunnahOfTheDay";
 import { RatePrompt } from "@/components/RatePrompt";
 import { backgroundsForPreset } from "@/lib/backgrounds";
 import { PERSONAL_PRESET, cachedPhoto, loadAppearancePhotos, readAppearance, resolveAppearance, pageForAppearance } from '@/lib/custom-appearance';

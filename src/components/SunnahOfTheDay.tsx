@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useLayoutEffect, useState } from "react";
 import { BookOpen, ChevronRight } from "lucide-react";
 import { Portal } from "@/components/Portal";
 import { triggerHaptic } from "@/lib/theme";
@@ -10,6 +10,17 @@ const today = () => {
   const d = new Date();
   return `${d.getFullYear()}-${d.getMonth() + 1}-${d.getDate()}`;
 };
+
+let inflight: Promise<Sunnah | null> | null = null;
+/** Warm the daily Sunnah cache at app launch so More renders it instantly. */
+export function prefetchSunnah() {
+  if (!inflight) inflight = loadSunnah().finally(() => { inflight = null; });
+  return inflight;
+}
+
+function cachedSunnah(): Sunnah | null {
+  try { return JSON.parse(localStorage.getItem(K_CACHE) || "null")?.item ?? null; } catch { return null; }
+}
 
 async function loadSunnah(): Promise<Sunnah | null> {
   try {
@@ -40,10 +51,15 @@ export function SunnahOfTheDay() {
   const [item, setItem] = useState<Sunnah | null>(null);
   const [open, setOpen] = useState(false);
 
+  useLayoutEffect(() => {
+    const cached = cachedSunnah();
+    if (cached) setItem(cached);
+  }, []);
+
   useEffect(() => {
     let alive = true;
     const onOpen = () => {
-      void loadSunnah().then((s) => {
+      void prefetchSunnah().then((s) => {
         if (!alive || !s) return;
         setItem(s);
         setOpen(true);
@@ -54,7 +70,7 @@ export function SunnahOfTheDay() {
       localStorage.removeItem("adhkar:open-sunnah");
       onOpen();
     } else {
-      void loadSunnah().then((s) => {
+      void prefetchSunnah().then((s) => {
         if (!alive || !s) return;
         setItem(s);
       });
