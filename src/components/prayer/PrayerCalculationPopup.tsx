@@ -33,12 +33,14 @@ export function PrayerCalculationPopup({ settings, onChange, onClose, onUseLocat
           <SelectItem value="jakim">JAKIM — Malaysia</SelectItem>
         </SelectContent>
       </Select>
-      {settings.source === "jakim" ? <p className="mt-3 text-xs text-muted-foreground">Official JAKIM times for your Malaysian location.</p> : (
-        <div className="mt-5 flex items-center justify-between gap-3 rounded-2xl border border-border bg-card px-4 py-3">
+      {settings.source === "jakim" && <p className="mt-3 text-xs text-muted-foreground">Official JAKIM times for your Malaysian location.</p>}
+      <div className="mt-5 flex items-center justify-between gap-3 rounded-2xl border border-border bg-card px-4 py-3">
+        <div className="min-w-0">
           <label htmlFor="adhan-hanafi-asr" className="text-sm font-medium">Hanafi Asr</label>
-          <Switch id="adhan-hanafi-asr" className="prayer-hanafi-switch" checked={settings.hanafi} onCheckedChange={(hanafi) => onChange({ hanafi })} />
+          {settings.source === "jakim" && <p className="mt-0.5 text-xs text-muted-foreground">JAKIM sets its own official Asr time.</p>}
         </div>
-      )}
+        <Switch id="adhan-hanafi-asr" className="prayer-hanafi-switch shrink-0" disabled={settings.source === "jakim"} checked={settings.source !== "jakim" && settings.hanafi} onCheckedChange={(hanafi) => onChange({ hanafi })} />
+      </div>
       <div className="mt-5 border-t border-border pt-4">
         <div className="flex items-center justify-between gap-3">
           <div className="min-w-0"><p className="text-sm font-medium">Location</p><p className="mt-1 break-words text-xs text-muted-foreground">{settings.location?.label ?? "Not set"}</p></div>
