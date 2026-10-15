@@ -161,6 +161,20 @@ function AppLayout() {
 
   const router = useRouter();
 
+  // Warm the most-used tab pages and the daily Sunnah right after launch so
+  // the first tap on Settings, Tasbih or More opens instantly.
+  useEffect(() => {
+    void prefetchSunnah();
+    const warm = () => {
+      for (const to of ["/app/settings", "/app/tasbih", "/app/more", "/app/salah", "/app/evening"] as const) {
+        void router.preloadRoute({ to }).catch(() => {});
+      }
+    };
+    const w = window as Window & { requestIdleCallback?: (cb: () => void, o?: { timeout: number }) => number };
+    if (w.requestIdleCallback) w.requestIdleCallback(warm, { timeout: 1500 });
+    else window.setTimeout(warm, 600);
+  }, [router]);
+
   useEffect(() => {
     rememberMoreDestination(pathname);
   }, [pathname]);
