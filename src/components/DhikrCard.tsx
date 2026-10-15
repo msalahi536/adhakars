@@ -110,7 +110,7 @@ export function DhikrCard({ dhikr, count, onIncrement, isSpecial, specialLabel, 
                       {part.transliteration}
                     </p>
                   )}
-                  {part.translation && (
+                  {display.showTranslation && part.translation && (
                      <p className="adhkar-translation">
                       {part.translation}
                     </p>
@@ -123,11 +123,11 @@ export function DhikrCard({ dhikr, count, onIncrement, isSpecial, specialLabel, 
               {dhikr.arabic && (
                 <ArabicText size={arabicSize} large={display.arabicLarge}>{dhikr.arabic}</ArabicText>
               )}
-              {dhikr.arabic && (dhikr.translation || (display.showTransliteration && dhikr.transliteration)) && <OrnamentalDivider />}
+              {dhikr.arabic && ((display.showTranslation && dhikr.translation) || (display.showTransliteration && dhikr.transliteration)) && <OrnamentalDivider />}
                {display.showTransliteration && dhikr.transliteration && (
                 <Transliteration>{dhikr.transliteration}</Transliteration>
               )}
-               {dhikr.translation && <p className="adhkar-translation">{dhikr.translation}</p>}
+               {display.showTranslation && dhikr.translation && <p className="adhkar-translation">{dhikr.translation}</p>}
             </>
           )}
 
@@ -142,7 +142,7 @@ export function DhikrCard({ dhikr, count, onIncrement, isSpecial, specialLabel, 
             </div>
           )}
 
-          {!referenceLayout && hasTranslation && dhikr.translation && !dhikr.arabicMulti && (
+          {!referenceLayout && hasTranslation && display.showTranslation && dhikr.translation && !dhikr.arabicMulti && (
             <div className="mt-4">
               <div className="label-caps mb-1">Translation</div>
               <p className="text-[13px] opacity-90" style={{ lineHeight: 1.55 }}>
