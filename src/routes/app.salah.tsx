@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
-import { Bell, BellOff, ChevronDown, ChevronLeft, ChevronRight, Pause, Play, SlidersHorizontal, Volume2, X } from "lucide-react";
+import { Bell, BellOff, ChevronDown, ChevronLeft, ChevronRight, Pause, Play, Volume2, X } from "lucide-react";
 import { PrayerTimeline } from "@/components/prayer/PrayerTimeline";
 import { AfterSalahSheet } from "@/components/prayer/AfterSalahSheet";
 import { PrayerPicker } from "@/components/prayer/PrayerPicker";
