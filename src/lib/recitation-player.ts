@@ -56,17 +56,64 @@ function canAnalyse() {
   return !/iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
 }
 
+// Phones: decode the recording separately (never touching playback) into a
+// loudness envelope, then drive the bars from the real audio at currentTime.
+const ENV_STEP = 0.03; // seconds per envelope frame
+const envelopes = new Map<string, Float32Array | null>();
+const envelopeLoads = new Map<string, Promise<void>>();
+
+function loadEnvelope(url: string) {
+  if (envelopes.has(url) || envelopeLoads.has(url)) return;
+  const job = (async () => {
+    try {
+      const Ctx = window.AudioContext || (window as unknown as { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
+      if (!Ctx) throw new Error("no audio");
+      const buf = await (await fetch(url)).arrayBuffer();
+      const ctx = new Ctx();
+      const decoded = await new Promise<AudioBuffer>((res, rej) => ctx.decodeAudioData(buf, res, rej));
+      void ctx.close?.();
+      const data = decoded.getChannelData(0);
+      const win = Math.max(1, Math.floor(decoded.sampleRate * ENV_STEP));
+      const frames = Math.ceil(data.length / win);
+      const env = new Float32Array(frames);
+      let peak = 0;
+      for (let f = 0; f < frames; f += 1) {
+        let sum = 0;
+        const end = Math.min(data.length, (f + 1) * win);
+        for (let i = f * win; i < end; i += 4) sum += data[i] * data[i];
+        env[f] = Math.sqrt(sum / Math.max(1, (end - f * win) / 4));
+        if (env[f] > peak) peak = env[f];
+      }
+      if (peak > 0) for (let f = 0; f < frames; f += 1) env[f] /= peak;
+      envelopes.set(url, env);
+    } catch {
+      envelopes.set(url, null);
+    } finally {
+      envelopeLoads.delete(url);
+    }
+  })();
+  envelopeLoads.set(url, job);
+}
+
 function runSynthMeter() {
   if (!audio || audio.paused) return;
-  const t = performance.now() / 1000;
-  const lv = (f: number, p: number) => 0.3 + 0.7 * Math.abs(Math.sin(t * f + p) * Math.sin(t * f * 0.37 + p * 2));
-  set({ levels: [lv(5.1, 0), lv(6.3, 1.3), lv(4.4, 2.6)] });
+  const env = state.track ? envelopes.get(state.track.url) : undefined;
+  if (env) {
+    const at = (offset: number) => {
+      const f = Math.floor((audio!.currentTime + offset) / ENV_STEP);
+      return Math.max(0.18, Math.min(1, (env[Math.max(0, Math.min(env.length - 1, f))] ?? 0) * 1.15));
+    };
+    set({ levels: [at(-0.06), at(0), at(0.06)] });
+  } else {
+    set({ levels: [0.28, 0.28, 0.28] });
+  }
   meterFrame = requestAnimationFrame(runSynthMeter);
 }
 
 function startMeter() {
   if (!audio) return;
   if (!canAnalyse()) {
+    if (state.track) loadEnvelope(state.track.url);
     if (meterFrame == null) meterFrame = requestAnimationFrame(runSynthMeter);
     return;
   }
