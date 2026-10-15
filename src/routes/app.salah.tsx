@@ -21,6 +21,7 @@ import {
   getDismissed,
   getPrayerSettings,
   lookupCity,
+  CALC_METHODS,
   PRAYER_LABELS,
   prunePrayerCache,
   repairLocation,
@@ -695,9 +696,11 @@ function Salah() {
                    })}
                  </div>
                  <div className="mt-4 flex justify-center">
-                   <Button variant="secondary" size="sm" className="rounded-full px-4" onClick={() => { setCityError(null); setCalculationOpen(true); }}>
-                     <SlidersHorizontal size={14} /> Prayer time settings <ChevronRight size={14} />
-                   </Button>
+                   <button type="button" className="prayer-settings-pill" onClick={() => { setCityError(null); setCalculationOpen(true); }}>
+                     <strong>Prayer Times</strong>
+                     <span>{pillSummary}</span>
+                     <ChevronRight size={17} aria-hidden="true" />
+                   </button>
                  </div>
                  <p className="adhan-settings-note">Tap the notification to continue the full adhan after the 30-second alert.</p>
                </>}
