@@ -542,7 +542,7 @@ function DateField({ label, value, onChange, disabled = false, min }: { label: s
             <CalendarIcon size={15} /> {selected.toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" })}
           </Button>
         </PopoverTrigger>
-        <PopoverContent className="pointer-events-auto w-auto p-0" align="center">
+        <PopoverContent className="pointer-events-auto z-[160] w-auto p-0" align="center">
           <Calendar mode="single" selected={selected} defaultMonth={selected} captionLayout="dropdown" startMonth={new Date(new Date().getFullYear() - 10, 0)} endMonth={new Date()}
             disabled={(date) => date > new Date() || Boolean(minDate && date < minDate)} onSelect={(date) => { if (date) onChange(keyOf(date)); }} className="pointer-events-auto p-3" />
         </PopoverContent>
