@@ -73,6 +73,7 @@ import {
   Mail,
   Sprout,
   Type,
+  Languages,
   ALargeSmall,
   Check,
   Palette,
