@@ -1,9 +1,10 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
-import { Bell, BellOff, ChevronDown, ChevronLeft, ChevronRight, Pause, Play, Volume2, X } from "lucide-react";
+import { Bell, BellOff, ChevronDown, ChevronLeft, ChevronRight, Pause, Play, SlidersHorizontal, Volume2, X } from "lucide-react";
 import { PrayerTimeline } from "@/components/prayer/PrayerTimeline";
 import { AfterSalahSheet } from "@/components/prayer/AfterSalahSheet";
 import { PrayerPicker } from "@/components/prayer/PrayerPicker";
+import { PrayerCalculationPopup } from "@/components/prayer/PrayerCalculationPopup";
 import { Portal } from "@/components/Portal";
 import { SALAH_PRAYERS, getSalahItems, isItemComplete, type SalahPrayer } from "@/data/salah";
 import { getCounts } from "@/lib/storage";
@@ -101,6 +102,7 @@ function Salah() {
   const [dismissed, setDismissedState] = useState<ReturnType<typeof getDismissed>>(null);
 
   const [adhanSettingsOpen, setAdhanSettingsOpen] = useState(false);
+  const [calculationOpen, setCalculationOpen] = useState(false);
   const [adhanPrefs, setAdhanPrefsState] = useState<AdhanPrefs>(() => getAdhanPrefs());
   const [adhanError, setAdhanError] = useState<string | null>(null);
   const [reciterPrayer, setReciterPrayer] = useState<string | null>(null);
@@ -317,6 +319,7 @@ function Salah() {
     void stopAdhanPreview();
     setPreviewingReciter(null);
     setReciterPrayer(null);
+    setCalculationOpen(false);
     setAdhanSettingsOpen(false);
   };
 
@@ -629,7 +632,18 @@ function Salah() {
 
       {adhanSettingsOpen && (
         <Portal>
-          <div className="adhan-settings-backdrop" role="presentation" onClick={closeAdhanSettings}>
+          <div className={`adhan-settings-backdrop ${calculationOpen ? "!items-center px-5" : ""}`} role="presentation" onClick={calculationOpen ? () => setCalculationOpen(false) : closeAdhanSettings}>
+            {calculationOpen ? <PrayerCalculationPopup
+              settings={settings}
+              onChange={(patch) => { void updateAdhanSettings(patch).catch(() => setAdhanError("Could not refresh alerts. Please try again.")); }}
+              onClose={() => setCalculationOpen(false)}
+              onUseLocation={useMyLocation}
+              onCity={submitCity}
+              city={cityInput}
+              onCityChange={setCityInput}
+              busy={locating}
+              error={cityError}
+            /> : (
             <section className="adhan-settings-sheet" role="dialog" aria-modal="true" aria-label="Adhan settings" onClick={(event) => event.stopPropagation()}>
               <header className="adhan-settings-head">
                 {reciterPrayer ? <Button type="button" variant="ghost" size="icon" className="adhan-settings-close" onClick={() => { void stopAdhanPreview(); setPreviewingReciter(null); setReciterPrayer(null); }} aria-label="Back to prayers"><ChevronLeft size={20} /></Button> : <span className="adhan-head-spacer" />}
@@ -680,10 +694,16 @@ function Salah() {
                      </div>;
                    })}
                  </div>
+                 <div className="mt-4 flex justify-center">
+                   <Button variant="secondary" size="sm" className="rounded-full px-4" onClick={() => { setCityError(null); setCalculationOpen(true); }}>
+                     <SlidersHorizontal size={14} /> Prayer time settings <ChevronRight size={14} />
+                   </Button>
+                 </div>
                  <p className="adhan-settings-note">Tap the notification to continue the full adhan after the 30-second alert.</p>
                </>}
               {adhanError && <p className="adhan-settings-error">{adhanError}</p>}
             </section>
+            )}
           </div>
         </Portal>
       )}
