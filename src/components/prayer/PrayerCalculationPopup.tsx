@@ -34,9 +34,9 @@ export function PrayerCalculationPopup({ settings, onChange, onClose, onUseLocat
         </SelectContent>
       </Select>
       {settings.source === "jakim" ? <p className="mt-3 text-xs text-muted-foreground">Official JAKIM times for your Malaysian location.</p> : (
-        <div className="mt-5 flex items-center justify-between gap-3">
+        <div className="mt-5 flex items-center justify-between gap-3 rounded-2xl border border-border bg-card px-4 py-3">
           <label htmlFor="adhan-hanafi-asr" className="text-sm font-medium">Hanafi Asr</label>
-          <Switch id="adhan-hanafi-asr" checked={settings.hanafi} onCheckedChange={(hanafi) => onChange({ hanafi })} />
+          <Switch id="adhan-hanafi-asr" className="prayer-hanafi-switch" checked={settings.hanafi} onCheckedChange={(hanafi) => onChange({ hanafi })} />
         </div>
       )}
       <div className="mt-5 border-t border-border pt-4">

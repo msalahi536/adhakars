@@ -93,6 +93,11 @@ const DAY_LABELS = ["Yesterday", "Today", "Tomorrow", "Day after"];
 function Salah() {
   /* ---------------- prayer times ---------------- */
   const [settings, setSettingsState] = useState<PrayerSettings>(DEFAULT_PRAYER_SETTINGS);
+  const pillSummary = useMemo(() => {
+    const methodLabel = settings.source === "jakim" ? "JAKIM Method" : `${CALC_METHODS.find((m) => m.id === settings.method)?.name ?? "ISNA"} Method`;
+    const hanafi = settings.source === "jakim" ? null : settings.hanafi ? "Hanafi Asr" : null;
+    return [settings.location?.label ?? "No location", methodLabel, hanafi].filter(Boolean).join(" · ");
+  }, [settings]);
   const [days, setDays] = useState<DayTimes[]>([]);
   const [now, setNow] = useState(() => new Date());
   const [sampleSeconds, setSampleSeconds] = useState(2 * 3600 + 24 * 60 + 36);
