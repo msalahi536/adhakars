@@ -1,4 +1,4 @@
-import { AudioLines, BellRing, BookOpen, Grid2X2, ShieldCheck, Sparkles } from "lucide-react";
+import { AudioLines, BellRing, BookOpen, Grid2X2, MoonStar, ShieldCheck } from "lucide-react";
 import logo from "@/assets/logo-mark.png.asset.json";
 import { Button } from "@/components/ui/button";
 import {
@@ -28,7 +28,7 @@ const updates = [
     title: "Adhan added",
   },
   {
-    icon: Sparkles,
+    icon: MoonStar,
     title: "New logo",
   },
   { icon: BookOpen, title: "New adhkars" },
