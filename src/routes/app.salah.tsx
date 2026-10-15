@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
-import { Bell, BellOff, ChevronDown, ChevronLeft, ChevronRight, Pause, Play, SlidersHorizontal, Volume2, X } from "lucide-react";
+import { Bell, BellOff, ChevronDown, ChevronLeft, ChevronRight, Pause, Play, Volume2, X } from "lucide-react";
 import { PrayerTimeline } from "@/components/prayer/PrayerTimeline";
 import { AfterSalahSheet } from "@/components/prayer/AfterSalahSheet";
 import { PrayerPicker } from "@/components/prayer/PrayerPicker";
@@ -21,6 +21,7 @@ import {
   getDismissed,
   getPrayerSettings,
   lookupCity,
+  CALC_METHODS,
   PRAYER_LABELS,
   prunePrayerCache,
   repairLocation,
@@ -92,6 +93,11 @@ const DAY_LABELS = ["Yesterday", "Today", "Tomorrow", "Day after"];
 function Salah() {
   /* ---------------- prayer times ---------------- */
   const [settings, setSettingsState] = useState<PrayerSettings>(DEFAULT_PRAYER_SETTINGS);
+  const pillSummary = useMemo(() => {
+    const methodLabel = settings.source === "jakim" ? "JAKIM Method" : `${CALC_METHODS.find((m) => m.id === settings.method)?.name ?? "ISNA"} Method`;
+    const hanafi = settings.source === "jakim" ? null : settings.hanafi ? "Hanafi Asr" : null;
+    return [settings.location?.label ?? "No location", methodLabel, hanafi].filter(Boolean).join(" · ");
+  }, [settings]);
   const [days, setDays] = useState<DayTimes[]>([]);
   const [now, setNow] = useState(() => new Date());
   const [sampleSeconds, setSampleSeconds] = useState(2 * 3600 + 24 * 60 + 36);
@@ -695,9 +701,11 @@ function Salah() {
                    })}
                  </div>
                  <div className="mt-4 flex justify-center">
-                   <Button variant="secondary" size="sm" className="rounded-full px-4" onClick={() => { setCityError(null); setCalculationOpen(true); }}>
-                     <SlidersHorizontal size={14} /> Prayer time settings <ChevronRight size={14} />
-                   </Button>
+                   <button type="button" className="prayer-settings-pill" onClick={() => { setCityError(null); setCalculationOpen(true); }}>
+                     <strong>Prayer Times</strong>
+                     <span>{pillSummary}</span>
+                     <ChevronRight size={17} aria-hidden="true" />
+                   </button>
                  </div>
                  <p className="adhan-settings-note">Tap the notification to continue the full adhan after the 30-second alert.</p>
                </>}
