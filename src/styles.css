@@ -4563,7 +4563,12 @@ html { --ayah-active: var(--accent); }
 .quran-toggles { display: flex; gap: 8px; justify-content: center; }
 .quran-toggles button { height: 38px; flex: 1; max-width: 150px; padding: 0 14px; border-radius: 999px; border: 1px solid var(--border); background: var(--surface, var(--card)); color: var(--foreground); font-size: 13px; font-weight: 500; }
 .quran-toggles button.is-on { background: var(--accent); color: var(--accent-foreground); border-color: transparent; }
-.quran-bismillah { padding: 8px 0 4px; text-align: center; font-family: var(--font-arabic); font-size: 26px; color: var(--foreground); }
+/* Bismillah sits in its own card above the verses, not floating in the gap. */
+.quran-bismillah-card { padding: 15px 18px 14px; text-align: center; background: color-mix(in oklab, var(--accent) 7%, var(--surface, var(--card))); }
+.quran-bismillah-ar { font-family: var(--font-arabic); font-size: 27px; line-height: 2; color: var(--foreground); }
+.quran-bismillah-rule { display: block; width: 44px; height: 1px; margin: 6px auto 8px; background: color-mix(in oklab, var(--border) 85%, transparent); }
+.quran-bismillah-en { font-size: 12.5px; line-height: 1.6; color: var(--muted-foreground); }
+
 .quran-verse { position: relative; display: flex; gap: 10px; padding: 16px 14px 14px; border-radius: 22px; background: var(--surface, var(--card)); border: 1px solid var(--border); color: var(--foreground); transition: background .4s ease; }
 .quran-verse.is-active { background: color-mix(in oklab, var(--accent) 9%, var(--surface, var(--card))); }
 .quran-verse-side { display: flex; flex-direction: column; align-items: center; gap: 14px; padding-top: 2px; }
