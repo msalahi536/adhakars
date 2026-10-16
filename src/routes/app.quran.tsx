@@ -7,7 +7,7 @@ import {
 } from "@/lib/quran";
 import { triggerHaptic } from "@/lib/theme";
 
-type Search = { s?: number; view?: "reciters" };
+type Search = { s?: number; view?: "reciters"; tab?: "all" };
 
 export const Route = createFileRoute("/app/quran")({
   validateSearch: (q: Record<string, unknown>): Search => {
@@ -15,6 +15,7 @@ export const Route = createFileRoute("/app/quran")({
     const n = Number(q.s);
     if (Number.isInteger(n) && n >= 1 && n <= 114) out.s = n;
     if (q.view === "reciters") out.view = "reciters";
+    if (q.tab === "all") out.tab = "all";
     return out;
   },
   head: () => ({
@@ -71,8 +72,8 @@ function useFavs() {
 type Last = { s: number; v: number };
 
 function QuranPage() {
-  const { s, view } = Route.useSearch();
-  if (view === "reciters") return <ReciterPicker back={s} />;
+  const { s, view, tab } = Route.useSearch();
+  if (view === "reciters") return <ReciterPicker back={s} tab={tab} />;
   return s ? <Reader chapterId={s} /> : <Home />;
 }
 
@@ -196,7 +197,7 @@ function Home() {
             <section>
               <div className="flex items-center justify-between">
                 <h2 className="quran-section-title">Choose a Reciter</h2>
-                <button className="quran-see-all" onClick={() => navigate({ to: "/app/quran", search: { view: "reciters" } })}>See All <ChevronRight size={14} /></button>
+                <button className="quran-see-all" onClick={() => navigate({ to: "/app/quran", search: { view: "reciters", tab: "all" } })}>See All <ChevronRight size={14} /></button>
               </div>
               <div className="quran-reciter-strip">
                 {popular.map((r) => (
@@ -234,11 +235,11 @@ function Home() {
 type RFilter = "popular" | "all" | "madinah" | "makkah" | "other";
 const RFILTERS: [RFilter, string][] = [["popular", "Popular"], ["all", "All Reciters"], ["madinah", "Madinah"], ["makkah", "Makkah"], ["other", "More"]];
 
-function ReciterPicker({ back }: { back?: number }) {
+function ReciterPicker({ back, tab }: { back?: number; tab?: "all" }) {
   const navigate = useNavigate();
   const [prefs, setPrefs] = usePrefs();
   const [q, setQ] = useState("");
-  const [filter, setFilter] = useState<RFilter>("popular");
+  const [filter, setFilter] = useState<RFilter>(tab === "all" ? "all" : "popular");
   const [preview, setPreview] = useState<number | null>(null);
   const audio = useRef<HTMLAudioElement | null>(null);
   useEffect(() => () => audio.current?.pause(), []);
@@ -251,7 +252,15 @@ function ReciterPicker({ back }: { back?: number }) {
     if (filter === "makkah") return r.group === 2 && /makkah|quba/i.test(r.name);
     return r.group === 3 || r.group === 4 || (r.group === 2 && !/madinah|makkah|quba/i.test(r.name));
   }));
-  const sorted = filter === "popular" && !t ? POPULAR_RECITERS.map(findReciter) : list;
+  const sorted = useMemo(() => {
+    if (filter === "popular" && !t) return POPULAR_RECITERS.map(findReciter);
+    if (filter === "all") {
+      const popIds = new Set(POPULAR_RECITERS);
+      const pop = list.filter((r) => popIds.has(r.id));
+      return [...pop, ...list.filter((r) => !popIds.has(r.id))];
+    }
+    return list;
+  }, [filter, t, list]);
 
   const goBack = () => { audio.current?.pause(); void navigate({ to: "/app/quran", search: back ? { s: back } : {} }); };
   const choose = (r: Reciter) => { setPrefs({ reciter: r.id }); void triggerHaptic("medium"); goBack(); };
