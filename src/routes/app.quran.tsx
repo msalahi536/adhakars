@@ -1,4 +1,4 @@
-import { memo, useEffect, useMemo, useRef, useState } from "react";
+import { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { ChevronLeft, Pause, Play, Search, SkipBack, SkipForward, Loader2 } from "lucide-react";
 import { getChapterAudio, getChapters, getVerses, locate, RECITERS, type Chapter, type ChapterAudio, type Verse } from "@/lib/quran";
@@ -165,6 +165,9 @@ function Reader({ chapterId }: { chapterId: number }) {
     void el.play().catch(() => setLoadingAudio(false));
     void triggerHaptic("light");
   };
+  const playRef = useRef(playFrom);
+  playRef.current = playFrom;
+  const onPlayVerse = useCallback((key: string) => playRef.current(key), []);
   const toggle = () => {
     const el = ensureAudio(); if (!el) return;
     void triggerHaptic("light");
@@ -212,7 +215,7 @@ function Reader({ chapterId }: { chapterId: number }) {
           {!verses && !error && <div className="flex justify-center py-10"><Loader2 className="animate-spin" /></div>}
           {verses?.map((v) => (
             <VerseCard key={v.key} verse={v} active={pos.key === v.key} word={pos.key === v.key ? pos.word : null}
-              translit={prefs.translit} translation={prefs.translation} onPlay={playFrom} />
+              translit={prefs.translit} translation={prefs.translation} onPlay={onPlayVerse} />
           ))}
           {verses && <p className="quran-muted pt-2 text-center text-[10px]">Text, translation (Saheeh International) and recitations via Quran.com</p>}
         </div>
