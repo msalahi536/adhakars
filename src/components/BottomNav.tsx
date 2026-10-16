@@ -5,6 +5,8 @@ import {
   getLastMoreDestination, MORE_DESTINATION_EVENT, MORE_DESTINATIONS, type MoreDestination,
 } from "@/lib/more-navigation";
 
+import { isQuranLaunchWindow } from "@/lib/update-notice";
+
 type NavIconProps = { size?: number; strokeWidth?: number; style?: CSSProperties };
 
 const QURAN_HINT_KEY = "adhkar:quran-nav-hint";
@@ -61,7 +63,7 @@ export function BottomNav() {
         localStorage.setItem(QURAN_HINT_KEY, "seen");
         setShowQuranHint(false);
       } else {
-        setShowQuranHint(localStorage.getItem(QURAN_HINT_KEY) !== "seen");
+        setShowQuranHint(isQuranLaunchWindow(Date.now()) && localStorage.getItem(QURAN_HINT_KEY) !== "seen");
       }
     } catch { setShowQuranHint(false); }
   }, [pathname]);
