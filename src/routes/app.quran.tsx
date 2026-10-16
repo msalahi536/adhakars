@@ -361,14 +361,28 @@ function Reader({ chapterId }: { chapterId: number }) {
   }, [chapterId]);
 
   // Prepare this surah unless a different one is already playing (that keeps going).
+  // A fresh mount must never restart audio already loaded for this surah: usePrefs
+  // hydrates from localStorage a tick late, so a reciter "change" seen on the first
+  // run is a race, not a real pick. Real picks happen while this page stays mounted.
+  const prevChapter = useRef<number | null>(null);
+  const prevReciter = useRef<number | null>(null);
   useEffect(() => {
     const s = quranPlayer.get();
-    const reciterChanged = s.reciterId !== prefs.reciter;
-    // Reopening a surah that's already loaded must never reload or restart it.
-    if (s.chapter === chapterId && (s.audio || s.loading) && !reciterChanged) { if (chapter?.name_simple) quranPlayer.setName(chapter.name_simple); return; }
+    const fresh = prevChapter.current !== chapterId;
+    const reciterPicked = !fresh && prevReciter.current !== null && prevReciter.current !== prefs.reciter;
+    prevChapter.current = chapterId;
+    prevReciter.current = prefs.reciter;
+
+    if (s.chapter === chapterId && (s.audio || s.loading)) {
+      if (reciterPicked && s.reciterId !== prefs.reciter) {
+        void quranPlayer.select(prefs.reciter, chapterId, chapter?.name_simple ?? s.chapterName, s.playing);
+      } else if (chapter?.name_simple) {
+        quranPlayer.setName(chapter.name_simple);
+      }
+      return;
+    }
     if ((s.playing || s.loading) && s.chapter !== chapterId) return;
-    const wasPlaying = s.playing && reciterChanged;
-    void quranPlayer.select(prefs.reciter, chapterId, chapter?.name_simple ?? s.chapterName, wasPlaying);
+    void quranPlayer.select(prefs.reciter, chapterId, chapter?.name_simple ?? s.chapterName, false);
   }, [prefs.reciter, chapterId, chapter?.name_simple]);
 
   const pos = here ? player.pos : { key: null, word: null };
