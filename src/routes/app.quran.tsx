@@ -328,7 +328,7 @@ function Reader({ chapterId }: { chapterId: number }) {
   const [prefs] = usePrefs();
   const [favs, toggleFav] = useFavs();
   const [display, setDisplayState] = useState({ translit: true, translation: true, trOn: true, arabic: true, page: false, follow: true, words: true });
-  useEffect(() => { const d = getDisplay(); setDisplayState({ translit: d.showTransliteration, translation: d.showTranslation || !d.showArabic, trOn: d.showTranslation, arabic: d.showArabic, page: d.quranPageView, follow: d.quranAutoScroll, words: d.quranWordHighlight }); }, []);
+  useEffect(() => { const d = getDisplay(); setDisplayState({ translit: d.showTransliteration, translation: d.showTranslation || (!d.showArabic && !d.showTransliteration), trOn: d.showTranslation, arabic: d.showArabic, page: d.quranPageView, follow: d.quranAutoScroll, words: d.quranWordHighlight }); }, []);
   const [chapter, setChapter] = useState<Chapter | null>(null);
   const [verses, setVerses] = useState<Verse[] | null>(null);
   const [error, setError] = useState(false);
@@ -564,7 +564,7 @@ const VerseCard = memo(function VerseCard({ verse: v, active, word, translit, tr
             return <Fragment key={w.position}><span className={state}>{w.text}</span>{" "}</Fragment>;
           })}
         </p>}
-        {translit && v.transliteration && <p className="quran-translit">{v.transliteration}</p>}
+        {translit && v.transliteration && <p className={`quran-translit ${!arabic && !translation ? "is-big" : ""}`} onClick={!arabic && !translation ? () => onPlay(v.key) : undefined}>{v.transliteration}</p>}
         {translation && <p className={`quran-tr ${arabic ? "" : "is-big"}`} onClick={arabic ? undefined : () => onPlay(v.key)}>{v.translation}</p>}
       </div>
       <button className={`quran-heart ${fav ? "is-on" : ""}`} aria-label={fav ? "Remove from favorites" : "Save verse"} aria-pressed={fav} onClick={() => onFav(v.key)}>
