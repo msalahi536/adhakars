@@ -1,6 +1,6 @@
 # Architecture Decisions
 
-- Recitation meters share a pure loudness-to-shape mapper for browser analysis and device envelopes, so motion remains consistent and independently testable without altering playback.
+- Recitation meters share six independent frequency bands and a center-weighted smoothing mapper for live browser spectra and FFT-decoded device envelopes, so each line follows actual tone without altering phone playback.
 
 - Personal appearance is manual and device-only, with independent phase defaults and page overrides in local storage and compressed photos in IndexedDB; no remote photo analysis is permitted.
 - The appearance popup uses a fixed, non-interactive and non-scrollable home-screen composition with real adhkar data and shared palette tokens, so draft edits preview immediately without affecting progress or the saved theme.
