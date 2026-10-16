@@ -2,6 +2,7 @@
 // Compact adhan player shown while the native side plays the adhan.
 // Closing minimizes to a floating pill so playback remains easy to reopen.
 
+import { triggerHapticPattern } from "@/lib/theme";
 import { useEffect, useRef, useState } from "react";
 import { Pause, Play, RotateCcw, RotateCw, X } from "lucide-react";
 import {
