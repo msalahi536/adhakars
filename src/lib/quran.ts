@@ -46,7 +46,6 @@ export const RECITERS: Reciter[] = [
   { id: 173, name: "Mishary Rashid Alafasy (Streaming)", sync: "word", group: 1 },
   { id: 10, name: "Sa'ud ash-Shuraim", sync: "word", group: 1 },
   { id: 174, name: "Yasser ad-Dossari", sync: "word", group: 1 },
-  { id: 97, name: "Yasser ad-Dussary", sync: "word", group: 1 },
   { id: 158, name: "Abdullah Ali Jabir", sync: "verse", group: 1 },
   { id: 162, name: "Abdullah Awad al-Juhani", sync: "verse", group: 1 },
   { id: 163, name: "Abdullah Basfar", sync: "verse", group: 1 },
