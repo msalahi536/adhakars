@@ -10,6 +10,7 @@ import {
 } from "@/lib/storage";
 import { SunnahOfTheDay } from "@/components/SunnahOfTheDay";
 import { Portal } from "@/components/Portal";
+import { TasbihIcon } from "@/components/BottomNav";
 
 // Completed days follow the active palette accent.
 const DONE = "color-mix(in oklab, var(--surface-deep-fg) 88%, transparent)";
@@ -36,13 +37,14 @@ export const Route = createFileRoute("/app/more")({
 });
 
 type Tile = {
-  to: "/app/sleep" | "/app/qibla" | "/app/about" | "/app/period" | "/app/ruqyah" | "/app/hajj" | "/app/fasting" | "/app/duas";
+  to: "/app/sleep" | "/app/qibla" | "/app/about" | "/app/period" | "/app/ruqyah" | "/app/hajj" | "/app/fasting" | "/app/duas" | "/app/tasbih";
   title: string;
   subtitle: string;
-  Icon: typeof BedDouble;
+  Icon: (props: { size?: number; strokeWidth?: number }) => React.ReactNode;
 };
 
 const tiles: Tile[] = [
+  { to: "/app/tasbih", title: "Tasbih", subtitle: "A calm digital counter", Icon: TasbihIcon },
   { to: "/app/duas", title: "Dua Library", subtitle: "50 authentic duas for every feeling", Icon: BookOpen },
   { to: "/app/qibla", title: "Qibla Finder", subtitle: "Find the direction of the Ka'bah", Icon: Compass },
   { to: "/app/period", title: "Period Companion", subtitle: "Private cycle tracker and guidance", Icon: Moon },
