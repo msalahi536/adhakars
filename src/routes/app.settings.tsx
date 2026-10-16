@@ -498,6 +498,13 @@ function Settings() {
               />
               <Toggle
                 icon={<Languages size={17} strokeWidth={1.8} />}
+                label="Show Arabic"
+                description="Turn off to read in English only — the English shows large instead, in adhkar and the Quran."
+                value={display.showArabic}
+                onChange={(v) => updateDisplay({ showArabic: v })}
+              />
+              <Toggle
+                icon={<Languages size={17} strokeWidth={1.8} />}
                 label="Show translation"
                 description="Shows the English translation in adhkar, the Quran and across the whole app."
                 value={display.showTranslation}

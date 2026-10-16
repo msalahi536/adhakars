@@ -325,8 +325,8 @@ function Reader({ chapterId }: { chapterId: number }) {
   const navigate = useNavigate();
   const [prefs] = usePrefs();
   const [favs, toggleFav] = useFavs();
-  const [display, setDisplayState] = useState({ translit: true, translation: true });
-  useEffect(() => { const d = getDisplay(); setDisplayState({ translit: d.showTransliteration, translation: d.showTranslation }); }, []);
+  const [display, setDisplayState] = useState({ translit: true, translation: true, arabic: true });
+  useEffect(() => { const d = getDisplay(); setDisplayState({ translit: d.showTransliteration, translation: d.showTranslation || !d.showArabic, arabic: d.showArabic }); }, []);
   const [chapter, setChapter] = useState<Chapter | null>(null);
   const [verses, setVerses] = useState<Verse[] | null>(null);
   const [error, setError] = useState(false);
@@ -391,7 +391,7 @@ function Reader({ chapterId }: { chapterId: number }) {
           {!verses && !error && <div className="flex justify-center py-10"><Loader2 className="animate-spin" /></div>}
           {verses?.map((v) => (
             <VerseCard key={v.key} verse={v} active={pos.key === v.key} word={pos.key === v.key ? pos.word : null}
-              translit={display.translit} translation={display.translation} fav={favSet.has(v.key)}
+              translit={display.translit} translation={display.translation} arabic={display.arabic} fav={favSet.has(v.key)}
               onPlay={onPlayVerse} onFav={toggleFav} />
           ))}
           {verses && <p className="quran-muted pt-2 text-center text-[10px]">Text, translation (Saheeh International) and recitations via Quran.com</p>}
@@ -407,18 +407,22 @@ const toArabicDigits = (n: number) => String(n).replace(/\d/g, (d) => AR_DIGITS[
 
 /** Traditional mushaf ayah-end marker: ornamental rosette framing the verse number in Arabic numerals. */
 function AyahMarker({ n }: { n: number }) {
-  const petals = Array.from({ length: 6 }, (_, i) => i * 60);
+  const lobes: [number, number][] = [[14.6, 22.5], [25.4, 22.5], [14.6, 33.5], [25.4, 33.5]];
+  const dashes: [number, number, number][] = [[9.5, 16, -38], [30.5, 16, 38], [9.5, 40, 38], [30.5, 40, -38], [5.6, 28, 90], [34.4, 28, 90]];
   return (
     <span className="quran-ayah" aria-label={`Verse ${n}`}>
-      <svg viewBox="0 0 48 48" aria-hidden="true">
-        <polygon points="24,3 42,13.5 42,34.5 24,45 6,34.5 6,13.5" fill="none" stroke="currentColor" strokeWidth="1.6" />
-        <circle cx="24" cy="24" r="13.5" fill="none" stroke="currentColor" strokeWidth="1.3" />
-        <circle cx="24" cy="24" r="11.2" fill="none" stroke="currentColor" strokeWidth="0.7" opacity="0.7" />
-        {petals.map((a) => (
-          <g key={a} transform={`rotate(${a} 24 24)`}>
-            <path d="M24 5.5 L26 9.5 L24 10.8 L22 9.5 Z" fill="currentColor" />
-          </g>
-        ))}
+      <svg viewBox="0 0 40 56" aria-hidden="true">
+        <path d="M20 1.5C23.5 6.5 30.5 9 35.8 12.6C39.4 21.5 39.4 34.5 35.8 43.4C30.5 47 23.5 49.5 20 54.5C16.5 49.5 9.5 47 4.2 43.4C0.6 34.5 0.6 21.5 4.2 12.6C9.5 9 16.5 6.5 20 1.5Z"
+          fill="var(--ayah-frame)" stroke="var(--ayah-ink)" strokeWidth="1.3" strokeLinejoin="round" />
+        <ellipse cx="20" cy="28" rx="15.2" ry="17.6" fill="var(--ayah-ink)" />
+        <g fill="var(--ayah-fill)">
+          {lobes.map(([x, y]) => <circle key={`${x}${y}`} cx={x} cy={y} r="7.4" />)}
+          <rect x="9" y="22.5" width="22" height="11" />
+          <rect x="14.6" y="17" width="10.8" height="22" />
+        </g>
+        <circle cx="20" cy="8.6" r="1.9" fill="var(--ayah-ink)" />
+        <circle cx="20" cy="47.4" r="1.9" fill="var(--ayah-ink)" />
+        {dashes.map(([x, y, r]) => <rect key={`${x}-${y}`} x={x - 2.2} y={y - 0.7} width="4.4" height="1.4" rx="0.7" fill="var(--ayah-ink)" transform={`rotate(${r} ${x} ${y})`} />)}
       </svg>
       <span className="quran-ayah-n" lang="ar">{toArabicDigits(n)}</span>
     </span>
@@ -498,8 +502,8 @@ function QuranPlayerPanel() {
 }
 
 // Memoized so only the verse being recited re-renders while audio plays.
-const VerseCard = memo(function VerseCard({ verse: v, active, word, translit, translation, fav, onPlay, onFav }: {
-  verse: Verse; active: boolean; word: number | null; translit: boolean; translation: boolean; fav: boolean;
+const VerseCard = memo(function VerseCard({ verse: v, active, word, translit, translation, arabic, fav, onPlay, onFav }: {
+  verse: Verse; active: boolean; word: number | null; translit: boolean; translation: boolean; arabic: boolean; fav: boolean;
   onPlay: (key: string) => void; onFav: (key: string) => void;
 }) {
   const wordMode = active && word !== null;
@@ -510,14 +514,14 @@ const VerseCard = memo(function VerseCard({ verse: v, active, word, translit, tr
         <button className="quran-play-sm" aria-label={`Play verse ${v.number}`} onClick={() => onPlay(v.key)}><Play size={13} fill="currentColor" style={{ marginLeft: 2 }} /></button>
       </div>
       <div className="min-w-0 flex-1">
-        <p className="quran-ar" dir="rtl" lang="ar" onClick={() => onPlay(v.key)}>
+        {arabic && <p className="quran-ar" dir="rtl" lang="ar" onClick={() => onPlay(v.key)}>
           {v.words.map((w) => {
             const state = w.isEnd ? "quran-end" : !wordMode ? "quran-word" : w.position < word! ? "quran-word is-done" : w.position === word ? "quran-word is-now" : "quran-word";
             return <Fragment key={w.position}><span className={state}>{w.text}</span>{" "}</Fragment>;
           })}
-        </p>
+        </p>}
         {translit && v.transliteration && <p className="quran-translit">{v.transliteration}</p>}
-        {translation && <p className="quran-tr">{v.translation}</p>}
+        {translation && <p className={`quran-tr ${arabic ? "" : "is-big"}`} onClick={arabic ? undefined : () => onPlay(v.key)}>{v.translation}</p>}
       </div>
       <button className={`quran-heart ${fav ? "is-on" : ""}`} aria-label={fav ? "Remove from favorites" : "Save verse"} aria-pressed={fav} onClick={() => onFav(v.key)}>
         <Heart size={18} fill={fav ? "currentColor" : "none"} />
