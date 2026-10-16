@@ -18,3 +18,12 @@ describe("quran karaoke sync", () => {
     expect(stripTags("In the name of Allāh,<sup foot_note=1>1</sup> the Merciful")).toBe("In the name of Allāh, the Merciful");
   });
 });
+
+test("mp3quran reciters only add people Quran.com lacks and keep Quran.com first", async () => {
+  const { RECITERS } = await import("./quran");
+  const ids = RECITERS.map((r) => r.id);
+  expect(new Set(ids).size).toBe(ids.length);
+  const firstExtra = RECITERS.findIndex((r) => r.server);
+  expect(RECITERS.slice(firstExtra).every((r) => r.server)).toBe(true);
+  expect(RECITERS.some((r) => r.server && /alafas|minshawi|husary|sudaes|ghamdi/i.test(r.name))).toBe(false);
+});

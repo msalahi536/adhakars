@@ -1,3 +1,4 @@
+import { MP3_RECITERS } from "./mp3quran-reciters";
 import { localReciterPhoto } from "@/lib/reciter-photos";
 // Quran content from the public Quran.com API (v4). Fetched in the browser
 // and cached in memory per session.
@@ -27,8 +28,12 @@ export type ChapterAudio = { url: string; timings: Timing[] };
 // Every recitation Quran.com serves. sync: word = word-by-word timings,
 // verse = verse timings only, none = audio only. group: 1 Hafs,
 // 2 Haramain Taraweeh, 3 Non-Hafs, 4 with translation.
-export type Reciter = { id: number; name: string; sync: "word" | "verse" | "none"; group: 1 | 2 | 3 | 4 };
-export const RECITERS: Reciter[] = [
+export type Reciter = {
+  id: number; name: string; sync: "word" | "verse" | "none"; group: 1 | 2 | 3 | 4;
+  /** mp3quran.net extras: surah folder, verse-timing read id, available surahs. */
+  server?: string; read?: number; surahs?: string;
+};
+const QURAN_COM_RECITERS: Reciter[] = [
   { id: 1, name: "AbdulBaset AbdulSamad (Mujawwad)", sync: "word", group: 1 },
   { id: 2, name: "AbdulBaset AbdulSamad (Murattal)", sync: "word", group: 1 },
   { id: 3, name: "Abdur-Rahman as-Sudais", sync: "word", group: 1 },
@@ -181,6 +186,8 @@ export const RECITERS: Reciter[] = [
   { id: 36, name: "Sudais and Shuraym with Aslam Athar [Pickthall Translation]", sync: "none", group: 4 },
   { id: 48, name: "Sudais and Shuraym with Naeem Sultan [Pickthall Translation]", sync: "none", group: 4 },
 ];
+/** Quran.com first; mp3quran.net only adds reciters Quran.com doesn't have. */
+export const RECITERS: Reciter[] = [...QURAN_COM_RECITERS, ...MP3_RECITERS];
 
 export const RECITER_GROUPS: { label: string; match: (r: Reciter) => boolean }[] = [
   { label: "Word-by-word highlighting", match: (r) => r.group === 1 && r.sync === "word" },
@@ -234,6 +241,8 @@ export async function getVerses(chapter: number): Promise<Verse[]> {
 }
 
 export async function getChapterAudio(reciter: number, chapter: number): Promise<ChapterAudio> {
+  const extra = RECITERS.find((r) => r.id === reciter && r.server);
+  if (extra?.server) return getMp3QuranAudio(extra, chapter);
   type Raw = { audio_file: { audio_url: string; timestamps: { verse_key: string; timestamp_from: number; timestamp_to: number; segments: number[][] }[] } };
   const r = await get<Raw>(`/chapter_recitations/${reciter}/${chapter}?segments=true`);
   return {
@@ -245,6 +254,28 @@ export async function getChapterAudio(reciter: number, chapter: number): Promise
       segments: (t.segments ?? []).filter((s) => s.length >= 3).map((s) => [s[0], s[1], s[2]] as [number, number, number]),
     })),
   };
+}
+
+export function reciterHasSurah(r: Reciter, chapter: number): boolean {
+  return !r.surahs || r.surahs.split(",").includes(String(chapter));
+}
+
+async function getMp3QuranAudio(r: Reciter, chapter: number): Promise<ChapterAudio> {
+  if (!reciterHasSurah(r, chapter)) throw new Error("This reciter hasn't recorded this surah");
+  const url = `${r.server}${String(chapter).padStart(3, "0")}.mp3`;
+  if (!r.read) return { url, timings: [] };
+  const key = `mp3q:${r.read}:${chapter}`;
+  if (!cache.has(key)) {
+    const p = fetch(`https://www.mp3quran.net/api/v3/ayat_timing?surah=${chapter}&read=${r.read}`)
+      .then((res) => (res.ok ? res.json() : []));
+    p.catch(() => cache.delete(key));
+    cache.set(key, p);
+  }
+  const raw = (await (cache.get(key) as Promise<{ ayah: number; start_time: number; end_time: number }[]>).catch(() => [])) ?? [];
+  const timings = (Array.isArray(raw) ? raw : [])
+    .filter((t) => t.ayah > 0 && t.end_time > t.start_time)
+    .map((t) => ({ key: `${chapter}:${t.ayah}`, from: t.start_time, to: t.end_time, segments: [] }));
+  return { url, timings };
 }
 
 /** Which verse and word are being recited at `ms` into the chapter audio. */
