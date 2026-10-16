@@ -73,7 +73,7 @@ function useFavs() {
   return [favs, toggle] as const;
 }
 
-type Last = { s: number; v: number };
+type Last = { s: number; v: number; t?: number; r?: number; mode?: "read" | "listen" };
 
 function QuranPage() {
   const { s, view, tab } = Route.useSearch();
@@ -149,6 +149,21 @@ function Home() {
   const reciterHits = useMemo(() => searchReciters(q), [q]);
   const lastChapter = last && chapters?.find((c) => c.id === last.s);
   const open = (id: number) => { void triggerHaptic("light"); void navigate({ to: "/app/quran", search: { s: id } }); };
+  // Resume where they left off: listening position if they last listened, otherwise the verse they read to.
+  const resume = async () => {
+    if (!last) return;
+    void triggerHaptic("light");
+    const name = chapters?.find((c) => c.id === last.s)?.name_simple ?? "";
+    quranPlayer.setPanel(true);
+    const reciter = last.mode === "listen" && last.r ? last.r : prefs.reciter;
+    void navigate({ to: "/app/quran", search: { s: last.s } });
+    if (last.mode === "listen" && last.t) {
+      await quranPlayer.select(reciter, last.s, name, false);
+      quranPlayer.playAt(last.t);
+    } else {
+      await quranPlayer.select(reciter, last.s, name, true, `${last.s}:${last.v}`);
+    }
+  };
   const home = HOME_RECITER_IDS.map(findReciter);
   const lastY = useRef(0);
   const [searchShown, setSearchShown] = useState(true);
@@ -210,7 +225,7 @@ function Home() {
                 <span className="quran-continue-meta">Surah {lastChapter.id} · Verse {last!.v} of {lastChapter.verses_count}</span>
                 <span className="quran-progress"><i style={{ width: `${Math.max(4, (last!.v / lastChapter.verses_count) * 100)}%` }} /></span>
               </span>
-              <span className="quran-continue-play"><Play size={20} strokeWidth={1.6} strokeLinejoin="round" style={{ marginLeft: 2 }} /></span>
+              <span className="quran-continue-play" role="button" aria-label="Resume" onClick={(e) => { e.stopPropagation(); void resume(); }}><Play size={20} strokeWidth={1.6} strokeLinejoin="round" style={{ marginLeft: 2 }} /></span>
             </button>
           )}
 
@@ -339,6 +354,7 @@ function Reader({ chapterId }: { chapterId: number }) {
   const here = player.chapter === chapterId;
   const shownReciter = findReciter(here ? player.reciterId : prefs.reciter);
   const lastKey = useRef<string | null>(null);
+  const restoreTo = useRef<string | null>(null);
   const [sheet, setSheet] = useState(false);
   const missingKey = `${shownReciter.id}:${chapterId}`;
   const [missingClosed, setMissingClosed] = useState<string | null>(null);
@@ -361,10 +377,31 @@ function Reader({ chapterId }: { chapterId: number }) {
     getChapters().then((cs) => setChapter(cs.find((c) => c.id === chapterId) ?? null)).catch(() => {});
     getVerses(chapterId).then(setVerses).catch(() => setError(true));
     const last = readJSON<Last | null>(LAST, null);
-    if (!last || last.s !== chapterId) localStorage.setItem(LAST, JSON.stringify({ s: chapterId, v: 1 }));
+    if (!last || last.s !== chapterId) localStorage.setItem(LAST, JSON.stringify({ s: chapterId, v: 1, mode: "read" }));
+    restoreTo.current = last && last.s === chapterId && last.v > 1 ? `${chapterId}:${last.v}` : null;
     document.querySelector(".scroll-area")?.scrollTo({ top: 0 });
     quranPlayer.setPanel(true);
   }, [chapterId]);
+
+  // Jump back to the saved verse once the verses are on the page.
+  useEffect(() => {
+    if (!verses || !restoreTo.current) return;
+    const key = restoreTo.current; restoreTo.current = null;
+    requestAnimationFrame(() => document.getElementById(`v-${key}`)?.scrollIntoView({ block: "start" }));
+  }, [verses]);
+  // Reading progress: remember the top verse on screen while not listening.
+  const saveRead = useRef(0);
+  const onReadScroll = (e: React.UIEvent<HTMLElement>) => {
+    const now = Date.now();
+    if (now - saveRead.current < 400 || restoreTo.current) return;
+    saveRead.current = now;
+    const s = quranPlayer.get();
+    if (s.playing && s.chapter === chapterId) return;
+    const top = e.currentTarget.getBoundingClientRect().top + 8;
+    const el = Array.from(e.currentTarget.querySelectorAll<HTMLElement>('[id^="v-"]')).find((n) => n.getBoundingClientRect().bottom > top);
+    const v = el ? Number(el.id.split(":")[1]) : 1;
+    if (v) localStorage.setItem(LAST, JSON.stringify({ s: chapterId, v, mode: "read" }));
+  };
 
   // Prepare this surah unless a different one is already playing (that keeps going).
   // A fresh mount must never restart audio already loaded for this surah: usePrefs
@@ -413,7 +450,7 @@ function Reader({ chapterId }: { chapterId: number }) {
   return (
     <>
       <Header kicker={`Surah ${chapterId}${chapter ? ` · ${chapter.translated_name.name}` : ""}`} title={chapter?.name_simple ?? "…"} sub={chapter?.name_arabic} onBack={back} />
-      <main className="scroll-area">
+      <main className="scroll-area" onScroll={onReadScroll}>
         <div className={`mx-auto max-w-md space-y-3 px-5 pt-4 ${player.panelOpen ? "pb-64" : "pb-28"}`}>
           <button className="quran-card quran-reciter-select" onClick={() => { void triggerHaptic("light"); setSheet((o) => !o); }}>
             <Avatar r={shownReciter} size={46} />

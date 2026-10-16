@@ -35,6 +35,33 @@ const set = (p: Partial<QuranPlayerState>) => { state = { ...state, ...p }; list
 let el: HTMLAudioElement | null = null;
 let raf = 0;
 let reqId = 0;
+// True while the listener wants audio playing; lets us recover from stops the
+// listener didn't ask for (phone dropping the stream, network stalls, interruptions).
+let wanted = false;
+let retries = 0;
+let lastSave = 0;
+let resumeAt: number | null = null;
+
+function saveListen(force = false) {
+  if (!el || !state.chapter || !state.audio) return;
+  const now = Date.now();
+  if (!force && now - lastSave < 2000) return;
+  lastSave = now;
+  const v = state.pos.key ? Number(state.pos.key.split(":")[1]) : 1;
+  try { localStorage.setItem(LAST, JSON.stringify({ s: state.chapter, v, t: el.currentTime, r: state.reciterId, mode: "listen" })); } catch { /* ignore */ }
+}
+
+function recover() {
+  if (!wanted || !el || !state.audio || retries > 5) return;
+  retries += 1;
+  const t = el.currentTime;
+  const a = el;
+  setTimeout(() => {
+    if (!wanted || a !== el || !state.audio) return;
+    if (a.error || a.networkState === 3) { resumeAt = t; a.src = state.audio.url; a.load(); }
+    void a.play().catch(() => {});
+  }, 800 * retries);
+}
 
 function tick() {
   if (el && state.audio) {
@@ -42,7 +69,7 @@ function tick() {
     const next = found.key ? found : state.pos;
     if (next.key !== state.pos.key || next.word !== state.pos.word) {
       set({ pos: next });
-      if (next.key && state.chapter) localStorage.setItem(LAST, JSON.stringify({ s: state.chapter, v: Number(next.key.split(":")[1]) }));
+      if (next.key) saveListen(true);
     }
   }
   raf = requestAnimationFrame(tick);
@@ -53,17 +80,31 @@ function audioEl(): HTMLAudioElement {
   el = new Audio();
   el.preload = "auto";
   el.setAttribute("playsinline", "");
-  el.onplaying = () => { set({ playing: true, loading: false }); cancelAnimationFrame(raf); raf = requestAnimationFrame(tick); setMediaState("playing"); };
+  el.onplaying = () => { retries = 0; set({ playing: true, loading: false }); cancelAnimationFrame(raf); raf = requestAnimationFrame(tick); setMediaState("playing"); };
   el.onwaiting = () => set({ loading: true });
-  el.onpause = () => { set({ playing: false }); cancelAnimationFrame(raf); setMediaState("paused"); };
-  el.ontimeupdate = () => { if (el) set({ cur: el.currentTime, dur: el.duration || 0 }); updatePosition(); };
-  el.onloadedmetadata = () => { if (el) { el.playbackRate = state.rate; set({ cur: el.currentTime, dur: el.duration || 0 }); } };
-  el.onended = () => { void onEnded(); };
+  el.onpause = () => {
+    saveListen(true);
+    // Not asked for by the listener and not the end of the surah: try to carry on.
+    if (wanted && el && !el.ended) { recover(); return; }
+    set({ playing: false }); cancelAnimationFrame(raf); setMediaState("paused");
+  };
+  el.onerror = () => recover();
+  el.onstalled = () => { if (wanted && el?.paused) recover(); };
+  el.ontimeupdate = () => { if (el) set({ cur: el.currentTime, dur: el.duration || 0 }); updatePosition(); saveListen(); };
+  el.onloadedmetadata = () => {
+    if (!el) return;
+    el.playbackRate = state.rate;
+    if (resumeAt != null) { el.currentTime = Math.min(resumeAt, (el.duration || resumeAt) - 0.5); resumeAt = null; }
+    set({ cur: el.currentTime, dur: el.duration || 0 });
+  };
+  el.onended = () => { wanted = state.repeat || state.shuffle; void onEnded(); };
+  // Coming back to the app: if playback was dropped behind our back, pick it up again.
+  document.addEventListener("visibilitychange", () => { if (wanted && el?.paused && !el.ended) { retries = 0; recover(); } });
   const ms = navigator.mediaSession;
   if (ms) {
     const h = (a: MediaSessionAction, f: MediaSessionActionHandler) => { try { ms.setActionHandler(a, f); } catch { /* unsupported */ } };
     h("play", () => void quranPlayer.toggle(true));
-    h("pause", () => el?.pause());
+    h("pause", () => quranPlayer.pause());
     h("previoustrack", () => quranPlayer.step(-1));
     h("nexttrack", () => quranPlayer.step(1));
     h("seekto", (d) => { if (d.seekTime != null && el) el.currentTime = d.seekTime; });
@@ -121,6 +162,7 @@ export const quranPlayer = {
     }
     if (state.chapter === chapter && state.reciterId === reciterId && state.loading && !autoplay) return;
     const id = ++reqId;
+    wanted = false; resumeAt = null;
     el?.pause();
     set({ chapter, chapterName, reciterId, audio: null, cur: 0, dur: 0, playing: false, loading: autoplay, pos: { key: null, word: null } });
     try {
@@ -140,13 +182,14 @@ export const quranPlayer = {
     const t = fromKey ? state.audio.timings.find((x) => x.key === fromKey) : null;
     if (t) a.currentTime = t.from / 1000;
     a.playbackRate = state.rate;
+    wanted = true; retries = 0;
     set({ loading: true });
     setMetadata();
     void a.play().catch(() => set({ loading: false }));
   },
   toggle(forcePlay = false) {
     if (!state.audio) return;
-    if (state.playing && !forcePlay) el?.pause(); else quranPlayer.play();
+    if (state.playing && !forcePlay) quranPlayer.pause(); else quranPlayer.play();
   },
   step(dir: 1 | -1) {
     if (!state.audio || !el) return;
@@ -170,8 +213,16 @@ export const quranPlayer = {
   toggleShuffle() { set({ shuffle: !state.shuffle, repeat: state.shuffle ? state.repeat : false }); },
   setPanel(panelOpen: boolean) { set({ panelOpen }); },
   setName(chapterName: string) { if (chapterName !== state.chapterName) { set({ chapterName }); setMetadata(); } },
-  pause() { el?.pause(); },
+  /** Play from a saved second (listening progress). */
+  playAt(seconds: number) {
+    if (!state.audio) return;
+    const a = audioEl();
+    if (a.readyState >= 1) a.currentTime = seconds; else resumeAt = seconds;
+    quranPlayer.play();
+  },
+  pause() { wanted = false; el?.pause(); },
   stop() {
+    wanted = false;
     el?.pause();
     set({ chapter: null, audio: null, playing: false, cur: 0, dur: 0, pos: { key: null, word: null } });
     try { if (navigator.mediaSession) navigator.mediaSession.metadata = null; } catch { /* ignore */ }
