@@ -1,4 +1,4 @@
-import { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { Fragment, memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { ChevronLeft, Pause, Play, Search, SkipBack, SkipForward, Loader2 } from "lucide-react";
 import { getChapterAudio, getChapters, getVerses, locate, RECITERS, type Chapter, type ChapterAudio, type Verse } from "@/lib/quran";
@@ -242,7 +242,7 @@ const VerseCard = memo(function VerseCard({ verse: v, active, word, translit, tr
       <p className="quran-ar" dir="rtl" lang="ar">
         {v.words.map((w) => {
           const state = w.isEnd ? "quran-end" : !wordMode ? "quran-word" : w.position < word! ? "quran-word is-done" : w.position === word ? "quran-word is-now" : "quran-word";
-          return <span key={w.position} className={state}>{w.text} </span>;
+          return <Fragment key={w.position}><span className={state}>{w.text}</span>{" "}</Fragment>;
         })}
       </p>
       {translit && v.transliteration && <p className="quran-translit">{v.transliteration}</p>}
