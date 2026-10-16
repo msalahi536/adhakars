@@ -6,3 +6,8 @@ const END = START + 7 * 24 * 60 * 60 * 1000;
 export function shouldShowUpdateNotice(now: number, seen: string | null): boolean {
   return now >= START && now < END && seen !== "seen";
 }
+
+/** The Quran launch hint in the tab bar retires with the release notice on Oct 23, 2026. */
+export function isQuranLaunchWindow(now: number): boolean {
+  return now < END;
+}

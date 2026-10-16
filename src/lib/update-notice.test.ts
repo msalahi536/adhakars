@@ -14,3 +14,9 @@ test("everyone sees it once, including people who dismissed the previous notice"
   expect(shouldShowUpdateNotice(now, null)).toBe(true);
   expect(shouldShowUpdateNotice(now, "seen")).toBe(false);
 });
+
+test("Quran tab hint disappears on October 23, 2026", async () => {
+  const { isQuranLaunchWindow } = await import("./update-notice");
+  expect(isQuranLaunchWindow(Date.UTC(2026, 9, 22, 23, 59))).toBe(true);
+  expect(isQuranLaunchWindow(Date.UTC(2026, 9, 23))).toBe(false);
+});
