@@ -2,7 +2,7 @@
 // keeps playing when the page changes or the app goes to the background.
 import { useSyncExternalStore } from "react";
 import { getRecitations } from "./recitations.functions";
-import { restingLevels, shapeMeter, type MeterLevels } from "./recitation-meter";
+import { createBandSampler, METER_FFT_SIZE, spectrumBands, restingLevels, shapeMeter, type MeterLevels } from "./recitation-meter";
 
 export type Track = { dhikrId: string; title: string; url: string };
 export type PlayerState = {
@@ -23,14 +23,14 @@ const set = (p: Partial<PlayerState>) => { state = { ...state, ...p }; subs.forE
 let audio: HTMLAudioElement | null = null;
 let audioContext: AudioContext | null = null;
 let analyser: AnalyserNode | null = null;
-let analyserData: Uint8Array<ArrayBuffer> | null = null;
+let analyserData: Float32Array<ArrayBuffer> | null = null;
 let meterFrame: number | null = null;
 let lastMeterTime: number | null = null;
 
-function updateMeter(loudness: number, now: number) {
+function updateMeter(bands: MeterLevels, now: number) {
   const elapsed = lastMeterTime === null ? 16 : Math.min(64, now - lastMeterTime);
   lastMeterTime = now;
-  set({ levels: shapeMeter(loudness, state.levels, elapsed) });
+  set({ levels: shapeMeter(bands, state.levels, elapsed) });
 }
 
 function stopMeter() {
@@ -42,10 +42,8 @@ function stopMeter() {
 
 function runMeter(now: number) {
   if (!analyser || !analyserData || !audio || audio.paused) return;
-  analyser.getByteTimeDomainData(analyserData);
-  let sum = 0;
-  for (const sample of analyserData) sum += ((sample - 128) / 128) ** 2;
-  updateMeter(Math.sqrt(sum / analyserData.length) * 3.5, now);
+  analyser.getFloatFrequencyData(analyserData);
+  updateMeter(spectrumBands(analyserData, audioContext?.sampleRate ?? 48000, analyser.fftSize), now);
   meterFrame = requestAnimationFrame(runMeter);
 }
 
@@ -59,7 +57,7 @@ function canAnalyse() {
 }
 
 // Phones: decode the recording separately (never touching playback) into a
-// loudness envelope, then drive the bars from the real audio at currentTime.
+// six-band spectral envelope, then drive each bar at playback's currentTime.
 const ENV_STEP = 0.03; // seconds per envelope frame
 const envelopes = new Map<string, Float32Array | null>();
 const envelopeLoads = new Map<string, Promise<void>>();
@@ -77,16 +75,13 @@ function loadEnvelope(url: string) {
       const data = decoded.getChannelData(0);
       const win = Math.max(1, Math.floor(decoded.sampleRate * ENV_STEP));
       const frames = Math.ceil(data.length / win);
-      const env = new Float32Array(frames);
-      let peak = 0;
+      const env = new Float32Array(frames * 6);
+      const sampleBands = createBandSampler(decoded.sampleRate);
       for (let f = 0; f < frames; f += 1) {
-        let sum = 0;
-        const end = Math.min(data.length, (f + 1) * win);
-        for (let i = f * win; i < end; i += 4) sum += data[i] * data[i];
-        env[f] = Math.sqrt(sum / Math.max(1, (end - f * win) / 4));
-        if (env[f] > peak) peak = env[f];
+        env.set(sampleBands(data, Math.max(0, f * win - METER_FFT_SIZE / 2)), f * 6);
+        // Keep navigation and playback responsive during separate analysis.
+        if (f % 100 === 99) await new Promise<void>((resolve) => setTimeout(resolve, 0));
       }
-      if (peak > 0) for (let f = 0; f < frames; f += 1) env[f] /= peak;
       envelopes.set(url, env);
     } catch {
       envelopes.set(url, null);
@@ -104,11 +99,11 @@ function runSynthMeter(now: number) {
   if (env) {
     const position = currentTime / ENV_STEP;
     const frame = Math.floor(position);
-    const at = (index: number) => env[Math.max(0, Math.min(env.length - 1, index))] ?? 0;
-    const loudness = at(frame) + (at(frame + 1) - at(frame)) * (position - frame);
-    updateMeter(loudness * 1.15, now);
+    const at = (index: number, band: number) => env[Math.max(0, Math.min(env.length / 6 - 1, index)) * 6 + band] ?? 0;
+    const bands = Array.from({ length: 6 }, (_, band) => at(frame, band) + (at(frame + 1, band) - at(frame, band)) * (position - frame)) as MeterLevels;
+    updateMeter(bands, now);
   } else {
-    updateMeter(0, now);
+    updateMeter([0, 0, 0, 0, 0, 0], now);
   }
   meterFrame = requestAnimationFrame(runSynthMeter);
 }
@@ -124,12 +119,12 @@ function startMeter() {
     if (!audioContext) {
       audioContext = new AudioContext();
       analyser = audioContext.createAnalyser();
-      analyser.fftSize = 1024;
-      analyser.smoothingTimeConstant = 0.72;
+      analyser.fftSize = METER_FFT_SIZE;
+      analyser.smoothingTimeConstant = 0.15;
       const source = audioContext.createMediaElementSource(audio);
       source.connect(analyser);
       analyser.connect(audioContext.destination);
-      analyserData = new Uint8Array(analyser.fftSize);
+      analyserData = new Float32Array(analyser.frequencyBinCount);
     }
     void audioContext.resume();
     if (meterFrame == null) meterFrame = requestAnimationFrame(runMeter);
@@ -144,8 +139,8 @@ function el() {
   audio.crossOrigin = "anonymous";
   audio.preload = "auto";
   audio.setAttribute("playsinline", "");
-  audio.addEventListener("timeupdate", () => set({ current: audio!.currentTime }));
-  audio.addEventListener("loadedmetadata", () => set({ duration: audio!.duration || 0 }));
+  audio.addEventListener("timeupdate", () => set({ current: audio?.currentTime ?? 0 }));
+  audio.addEventListener("loadedmetadata", () => set({ duration: audio?.duration || 0 }));
   audio.addEventListener("play", () => { set({ playing: true }); startMeter(); });
   audio.addEventListener("pause", () => { set({ playing: false }); stopMeter(); });
   audio.addEventListener("ended", () => {
@@ -154,11 +149,11 @@ function el() {
   });
   const ms = typeof navigator !== "undefined" ? navigator.mediaSession : undefined;
   if (ms) {
-    ms.setActionHandler("play", () => void audio!.play());
-    ms.setActionHandler("pause", () => audio!.pause());
+    ms.setActionHandler("play", () => void audio?.play());
+    ms.setActionHandler("pause", () => audio?.pause());
     ms.setActionHandler("nexttrack", () => { if (state.queueIndex < state.queue.length - 1) load(state.queueIndex + 1); });
     ms.setActionHandler("previoustrack", () => { if (state.queueIndex > 0) load(state.queueIndex - 1); });
-    ms.setActionHandler("seekto", (d) => { if (d.seekTime != null) audio!.currentTime = d.seekTime; });
+    ms.setActionHandler("seekto", (d) => { if (d.seekTime != null && audio) audio.currentTime = d.seekTime; });
   }
   return audio;
 }
