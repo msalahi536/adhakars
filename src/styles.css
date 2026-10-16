@@ -4751,4 +4751,4 @@ body.quran-fs-on .quran-mini:not(.quran-fs .quran-mini) { display: none; }
 .quran-fs-sheet, .quran-fs-band, .quran-fs .quran-mushaf { border: 0 !important; box-shadow: none !important; background: none !important; outline: 0 !important; }
 .quran-fs-foot, .quran-fs-sub { display: none; }
 /* Full screen reading: plain solid colour from the selected theme, no background art */
-.quran-fs { background: color-mix(in oklab, var(--accent) 9%, var(--card)) !important; }
+.quran-fs { background: linear-gradient(color-mix(in oklab, var(--accent) 10%, transparent), color-mix(in oklab, var(--accent) 10%, transparent)), var(--background) !important; }
