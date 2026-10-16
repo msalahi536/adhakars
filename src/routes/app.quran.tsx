@@ -419,9 +419,6 @@ function AyahMarker({ n }: { n: number }) {
             <path d="M24 5.5 L26 9.5 L24 10.8 L22 9.5 Z" fill="currentColor" />
           </g>
         ))}
-        {petals.map((a) => (
-          <circle key={`d${a}`} cx="24" cy="2.6" r="1.3" fill="currentColor" transform={`rotate(${a + 30} 24 24)`} opacity="0" />
-        ))}
       </svg>
       <span className="quran-ayah-n" lang="ar">{toArabicDigits(n)}</span>
     </span>
