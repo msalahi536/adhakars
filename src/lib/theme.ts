@@ -40,9 +40,17 @@ export const resolveTheme = (_mode: ThemeMode, _route: string): ThemeId => {
 
 // ============= Display + haptics prefs (unchanged) =============
 
-export type DisplayPrefs = { showTransliteration: boolean; showTranslation: boolean; showArabic: boolean; arabicLarge: boolean; haptics: boolean };
+export type DisplayPrefs = {
+  showTransliteration: boolean; showTranslation: boolean; showArabic: boolean; arabicLarge: boolean; haptics: boolean;
+  /** Quran reader: full continuous page like a mushaf instead of verse cards. */
+  quranPageView: boolean;
+  /** Quran reader: scroll to the verse being recited. */
+  quranAutoScroll: boolean;
+  /** Quran reader: light up each word as it is recited. */
+  quranWordHighlight: boolean;
+};
 const DISPLAY_KEY = "adhkar:display";
-const defaults: DisplayPrefs = { showTransliteration: true, showTranslation: true, showArabic: true, arabicLarge: false, haptics: true };
+const defaults: DisplayPrefs = { showTransliteration: true, showTranslation: true, showArabic: true, arabicLarge: false, haptics: true, quranPageView: false, quranAutoScroll: true, quranWordHighlight: true };
 
 export const getDisplay = (): DisplayPrefs => {
   if (typeof window === "undefined") return defaults;
