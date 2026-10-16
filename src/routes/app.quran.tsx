@@ -428,7 +428,7 @@ function Reader({ chapterId }: { chapterId: number }) {
 
           {!reciterHasSurah(shownReciter, chapterId) && (
             <button type="button" className="quran-card quran-missing-note" onClick={() => setSheet(true)}>
-              <strong>{reciterName(shownReciter)} hasn't recorded {chapter?.name_simple ?? "this surah"} yet.</strong>
+              <strong>{reciterName(shownReciter).replace(/\s*\[[^\]]*\]$/, "")} hasn't recorded {chapter?.name_simple ?? "this surah"} yet.</strong>
               <span>You can still read it here. Tap to choose another reciter to listen.</span>
             </button>
           )}
