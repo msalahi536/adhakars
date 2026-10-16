@@ -384,6 +384,9 @@ export function reciterScore(r: Reciter, q: string): number {
   return 0;
 }
 
+/** Popular first, then Quran.com, then mp3quran extras. */
+const rank = (r: Reciter) => (POPULAR_RECITERS.includes(r.id) ? 0 : r.server ? 2 : 1);
+
 export function searchReciters(q: string, limit = 5): Reciter[] {
   const n = normalizeQuery(q);
   if (n.length < 2 || /^\d+$/.test(q.trim())) return [];
@@ -391,6 +394,6 @@ export function searchReciters(q: string, limit = 5): Reciter[] {
   return RECITERS.map((r) => {
     const name = normalizeQuery(reciterName(r));
     return [r, reciterScore(r, q), name] as const;
-  }).filter(([, s]) => s > 0).sort((a, b) => b[1] - a[1] || a[0].group - b[0].group || a[0].name.length - b[0].name.length)
+  }).filter(([, s]) => s > 0).sort((a, b) => b[1] - a[1] || rank(a[0]) - rank(b[0]) || a[0].group - b[0].group || a[0].name.length - b[0].name.length)
     .filter(([, , name]) => (seen.has(name) ? false : (seen.add(name), true))).slice(0, limit).map(([r]) => r);
 }
