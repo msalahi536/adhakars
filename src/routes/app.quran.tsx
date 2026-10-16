@@ -106,28 +106,21 @@ function Header({ kicker, title, sub, onBack }: { kicker: string; title: string;
 }
 
 /* ---------- home ---------- */
-type Filter = "all" | "makkah" | "madinah" | "favs";
 
 function Home() {
   const navigate = useNavigate();
   const [prefs, setPrefs] = usePrefs();
-  const [favs] = useFavs();
   const [chapters, setChapters] = useState<Chapter[] | null>(null);
   const [error, setError] = useState(false);
   const [q, setQ] = useState("");
-  const [filter, setFilter] = useState<Filter>("all");
   const [last, setLast] = useState<Last | null>(null);
   useEffect(() => {
     getChapters().then(setChapters).catch(() => setError(true));
     setLast(readJSON<Last | null>(LAST, null));
   }, []);
 
-  const favSurahs = useMemo(() => new Set(favs.map((k) => Number(k.split(":")[0]))), [favs]);
   const t = q.trim().toLowerCase();
   const list = (chapters ?? []).filter((c) => {
-    if (filter === "makkah" && c.revelation_place !== "makkah") return false;
-    if (filter === "madinah" && c.revelation_place !== "madinah") return false;
-    if (filter === "favs" && !favSurahs.has(c.id)) return false;
     return !t || String(c.id) === t || c.name_simple.toLowerCase().includes(t) || c.translated_name.name.toLowerCase().includes(t) || c.name_arabic.includes(q.trim());
   });
   const reciterHits = t.length > 1 ? RECITERS.filter((r) => r.name.toLowerCase().includes(t)).slice(0, 4) : [];
@@ -158,18 +151,16 @@ function Home() {
           )}
 
           {lastChapter && !t && (
-            <section>
-              <h2 className="quran-section-title">Continue Reading</h2>
-              <button className="quran-card quran-continue" onClick={() => open(lastChapter.id)}>
-                <span className="quran-continue-art" dir="rtl">{lastChapter.name_arabic}</span>
-                <span className="min-w-0 flex-1 text-left">
-                  <span className="block text-[16px] font-semibold">{lastChapter.name_simple}</span>
-                  <span className="quran-muted block text-[11px]">Surah {lastChapter.id} · Verse {last!.v} of {lastChapter.verses_count}</span>
-                  <span className="quran-progress"><i style={{ width: `${Math.max(4, (last!.v / lastChapter.verses_count) * 100)}%` }} /></span>
-                </span>
-                <span className="quran-play-sm"><Play size={16} style={{ marginLeft: 2 }} /></span>
-              </button>
-            </section>
+            <button className="quran-card quran-continue" onClick={() => open(lastChapter.id)}>
+              <span className="quran-continue-art" dir="rtl">{lastChapter.name_arabic}</span>
+              <span className="min-w-0 flex-1 text-left">
+                <span className="quran-continue-kicker">Continue Reading</span>
+                <span className="quran-continue-title">{lastChapter.name_simple}</span>
+                <span className="quran-continue-meta">Surah {lastChapter.id} · Verse {last!.v} of {lastChapter.verses_count}</span>
+                <span className="quran-progress"><i style={{ width: `${Math.max(4, (last!.v / lastChapter.verses_count) * 100)}%` }} /></span>
+              </span>
+              <span className="quran-continue-play"><Play size={22} fill="currentColor" strokeWidth={0} style={{ marginLeft: 3 }} /></span>
+            </button>
           )}
 
           {!t && (
@@ -181,23 +172,16 @@ function Home() {
               <div className="quran-reciter-strip">
                 {popular.map((r) => (
                   <button key={r.id} className={`quran-reciter-tile ${prefs.reciter === r.id ? "is-on" : ""}`} onClick={() => { setPrefs({ reciter: r.id }); void triggerHaptic("light"); }}>
-                    <Avatar r={r} size={58} />
-                    <span>{reciterName(r)}</span>
+                    <span className="quran-reciter-ring"><Avatar r={r} size={60} /></span>
+                    <span className="quran-reciter-name">{reciterName(r)}</span>
                   </button>
                 ))}
               </div>
             </section>
           )}
 
-          <div className="quran-chips">
-            {([["all", "All Surahs"], ["makkah", "Makki"], ["madinah", "Madani"], ["favs", "Favorites"]] as const).map(([k, l]) => (
-              <button key={k} className={filter === k ? "is-on" : ""} onClick={() => setFilter(k)}>{l}</button>
-            ))}
-          </div>
-
           {error && <p className="quran-muted text-center text-sm">Couldn't load the Quran. Check your connection and try again.</p>}
           {!chapters && !error && <div className="flex justify-center py-10"><Loader2 className="animate-spin" /></div>}
-          {chapters && filter === "favs" && list.length === 0 && <p className="quran-muted py-6 text-center text-sm">Tap the heart on any verse to save it here.</p>}
           <div className="space-y-2.5">
             {list.map((c) => (
               <button key={c.id} className="quran-chapter" onClick={() => open(c.id)}>
