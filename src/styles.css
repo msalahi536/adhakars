@@ -4614,8 +4614,8 @@ html[data-preset][data-visual-phase="evening"] .tasbih-confirm-btn.ghost {
 .quran-see-all { gap: 6px; font-size: 14px; font-weight: 500; color: color-mix(in oklab, var(--foreground) 65%, transparent); }
 .quran-reciter-strip { margin: 0; padding: 4px 4px 6px; scroll-padding-left: 4px; }
 .quran-reciter-tile, .quran-reciter-tile.is-on { width: 80px; }
-.quran-reciter-ring { padding: 3px; border-radius: 22px; }
-.quran-reciter-ring .quran-avatar { border-radius: 18px; }
+.quran-reciter-ring { padding: 3px; border-radius: 27px; }
+.quran-reciter-ring .quran-avatar { border-radius: 23px; }
 .quran-continue { border-radius: 26px; padding: 16px 18px; }
 .quran-continue-art { width: 70px; height: 70px; border-radius: 8px; }
 .quran-continue-kicker { font-size: 11px; letter-spacing: .18em; font-weight: 500; }
