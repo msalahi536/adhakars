@@ -1,4 +1,5 @@
 // Legacy shim + display / haptic prefs.
+import { Haptics, ImpactStyle } from "@capacitor/haptics";
 // Theming now lives in `./theming.ts` (engine) and `./theme-store.ts` (persistence).
 
 import {
@@ -60,28 +61,39 @@ export const vibrateIfEnabled = (pattern: number | number[]) => {
 };
 
 export type HapticStrength = "light" | "medium" | "heavy" | "double";
+
+const isNative = () =>
+  !!(window as unknown as { Capacitor?: { isNativePlatform?: () => boolean } }).Capacitor?.isNativePlatform?.();
+const wait = (ms: number) => new Promise((r) => setTimeout(r, ms));
+
 /**
- * Plays a custom vibration pattern (web/Android) so actions can carry a
- * signature feel. iOS has no raw pattern API, so it falls back to the closest
- * native impact style. Respects the haptics preference.
+ * Plays a custom vibration pattern so actions carry a signature feel.
+ * On iOS (no raw pattern API) the pattern is replayed as a sequence of native
+ * impacts: each "on" segment becomes an impact whose weight follows its length,
+ * "off" segments become pauses. Respects the haptics preference.
  */
-export const triggerHapticPattern = async (pattern: number[], fallback: HapticStrength = "light") => {
+export const triggerHapticPattern = async (pattern: number[], _fallback: HapticStrength = "light") => {
   if (typeof window === "undefined" || !getDisplay().haptics) return;
-  const cap = (window as unknown as { Capacitor?: { isNativePlatform?: () => boolean } }).Capacitor;
-  if (cap?.isNativePlatform?.()) {
-    await triggerHaptic(fallback);
-    return;
+  if (isNative()) {
+    try {
+      for (let i = 0; i < pattern.length; i++) {
+        const ms = pattern[i];
+        if (i % 2 === 1) { await wait(ms); continue; }
+        const style = ms >= 20 ? ImpactStyle.Heavy : ms >= 12 ? ImpactStyle.Medium : ImpactStyle.Light;
+        await Haptics.impact({ style });
+      }
+      return;
+    } catch {
+      // fall through
+    }
   }
   if (typeof navigator !== "undefined" && navigator.vibrate) navigator.vibrate(pattern);
 };
 export const triggerHaptic = async (strength: HapticStrength = "heavy") => {
   if (typeof window === "undefined") return;
   if (!getDisplay().haptics) return;
-  const cap = (window as unknown as { Capacitor?: { isNativePlatform?: () => boolean } }).Capacitor;
-  if (cap?.isNativePlatform?.()) {
+  if (isNative()) {
     try {
-      const mod: any = await import(/* @vite-ignore */ "@capacitor/haptics");
-      const { Haptics, ImpactStyle } = mod;
       const style =
         strength === "heavy" || strength === "double"
           ? ImpactStyle.Heavy
@@ -90,7 +102,7 @@ export const triggerHaptic = async (strength: HapticStrength = "heavy") => {
             : ImpactStyle.Light;
       if (strength === "double") {
         await Haptics.impact({ style });
-        await new Promise((r) => setTimeout(r, 120));
+        await wait(120);
         await Haptics.impact({ style });
       } else {
         await Haptics.impact({ style });
