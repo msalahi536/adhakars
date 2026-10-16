@@ -33,3 +33,10 @@ test("Mohammed Al-Lohaidan is fifth among popular reciters", async () => {
   const { POPULAR_RECITERS, findReciter } = await import("./quran");
   expect(findReciter(POPULAR_RECITERS[4]).name).toBe("Mohammed Al-Lohaidan");
 });
+
+test("home strip swaps Saad al-Ghamdi for Mohammed Al-Luhaidan", async () => {
+  const { HOME_RECITER_IDS, POPULAR_RECITERS, findReciter } = await import("./quran");
+  expect(HOME_RECITER_IDS).not.toContain(13);
+  expect(findReciter(HOME_RECITER_IDS[2]).name).toBe("Mohammed Al-Lohaidan");
+  expect(POPULAR_RECITERS).toContain(13);
+});
