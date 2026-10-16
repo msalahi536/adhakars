@@ -20,7 +20,7 @@ describe("quran karaoke sync", () => {
 });
 
 test("mp3quran reciters only add people Quran.com lacks and keep Quran.com first", async () => {
-  const { RECITERS } = await import("./quran");
+  const { RECITERS, reciterHasPhoto } = await import("./quran");
   const ids = RECITERS.map((r) => r.id);
   expect(new Set(ids).size).toBe(ids.length);
   const firstNoPhoto = RECITERS.findIndex((r) => !reciterHasPhoto(r));
