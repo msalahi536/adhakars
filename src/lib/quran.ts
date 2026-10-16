@@ -269,7 +269,10 @@ const PHOTOS: [RegExp, string][] = [
   [/tunaiji/i, "11/khalifa-al-tunaiji-profile.jpeg"],
 ];
 export function reciterPhoto(r: Reciter): string | null {
-  if (r.group === 2 || /&| and | with /i.test(r.name)) return null;
+  if (r.group === 2) return null;
+  const local = localReciterPhoto(r.name);
+  if (local) return local;
+  if (/&| and | with /i.test(r.name)) return null;
   const hit = PHOTOS.find(([re]) => re.test(r.name));
   return hit ? PHOTO_BASE + hit[1] : null;
 }
