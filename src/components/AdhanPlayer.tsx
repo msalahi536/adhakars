@@ -148,6 +148,8 @@ export function AdhanPlayer({ visible, prayer, reciterId, onClose }: Props) {
     commitSeek((current + delta) / duration);
   };
   const close = () => {
+    // Dismiss signature: a soft tap that settles away, like something closing.
+    void triggerHapticPattern([14, 90, 8], "light");
     setMinimized(true);
   };
 
