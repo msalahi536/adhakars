@@ -374,14 +374,13 @@ export function reciterScore(r: Reciter, q: string): number {
   const n = normalizeQuery(q);
   if (n.length < 2) return n ? 0 : 1;
   const name = normalizeQuery(reciterName(r));
-  if (name.startsWith(n)) return 6;
-  if (name.includes(n)) return 5;
-  const words = reciterName(r).split(/[\s-]+/).map(normalizeQuery).filter(Boolean);
+  const words = reciterName(r).split(/[\s-]+/).map(normalizeQuery).filter((w) => w.length > 1);
   const sq = skeleton(n);
-  if (n.length >= 3 && words.some((w) => w.length > 1 && skeleton(w).startsWith(sq))) return 4;
-  if (n.length >= 3 && skeleton(name).includes(sq.slice(1)) && sq.length >= 3) return 3;
+  if (name === n || words.includes(n)) return 7;
+  if (words.some((w) => w.startsWith(n))) return 6;
+  if (name.startsWith(n) || name.includes(n)) return 5;
+  if (n.length >= 3 && words.some((w) => skeleton(w).startsWith(sq))) return 4;
   if (nearMatch(n, name)) return 2;
-  if (sq.length >= 4 && nearMatch(sq, skeleton(name))) return 1;
   return 0;
 }
 
@@ -392,6 +391,6 @@ export function searchReciters(q: string, limit = 5): Reciter[] {
   return RECITERS.map((r) => {
     const name = normalizeQuery(reciterName(r));
     return [r, reciterScore(r, q), name] as const;
-  }).filter(([, s]) => s > 0).sort((a, b) => b[1] - a[1] || a[0].group - b[0].group)
+  }).filter(([, s]) => s > 0).sort((a, b) => b[1] - a[1] || a[0].group - b[0].group || a[0].name.length - b[0].name.length)
     .filter(([, , name]) => (seen.has(name) ? false : (seen.add(name), true))).slice(0, limit).map(([r]) => r);
 }
