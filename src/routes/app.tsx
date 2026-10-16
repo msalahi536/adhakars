@@ -166,7 +166,7 @@ function AppLayout() {
   useEffect(() => {
     void prefetchSunnah();
     const warm = () => {
-      for (const to of ["/app/settings", "/app/tasbih", "/app/more", "/app/salah", "/app/evening"] as const) {
+      for (const to of ["/app/settings", "/app/quran", "/app/more", "/app/salah", "/app/evening"] as const) {
         void router.preloadRoute({ to }).catch(() => {});
       }
     };
