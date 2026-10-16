@@ -492,14 +492,14 @@ function Settings() {
               <Toggle
                 icon={<Type size={17} strokeWidth={1.8} />}
                 label="Show transliteration"
-                description="Show Arabic transliteration below dhikrs."
+                description="Shows transliteration in adhkar, the Quran and across the whole app."
                 value={display.showTransliteration}
                 onChange={(v) => updateDisplay({ showTransliteration: v })}
               />
               <Toggle
                 icon={<Languages size={17} strokeWidth={1.8} />}
                 label="Show translation"
-                description="Show the English translation below dhikrs."
+                description="Shows the English translation in adhkar, the Quran and across the whole app."
                 value={display.showTranslation}
                 onChange={(v) => updateDisplay({ showTranslation: v })}
               />

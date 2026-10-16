@@ -1,11 +1,12 @@
 import { Fragment, memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { ChevronDown, ChevronLeft, ChevronRight, Heart, Loader2, Pause, Play, Repeat, Search, SkipBack, SkipForward } from "lucide-react";
+import { ChevronDown, ChevronLeft, ChevronRight, Heart, Loader2, Pause, Play, Repeat, Search, Shuffle, SkipBack, SkipForward, X } from "lucide-react";
 import {
-  findReciter, getChapterAudio, getChapters, getVerses, locate, POPULAR_RECITERS, RECITERS,
-  reciterName, reciterPhoto, reciterSubtitle, searchChapters, searchReciters, type Chapter, type ChapterAudio, type Reciter, type Verse,
+  findReciter, getChapterAudio, getChapters, getVerses, POPULAR_RECITERS, RECITERS,
+  reciterName, reciterPhoto, reciterSubtitle, searchChapters, searchReciters, type Chapter, type Reciter, type Verse,
 } from "@/lib/quran";
-import { triggerHaptic } from "@/lib/theme";
+import { getDisplay, triggerHaptic } from "@/lib/theme";
+import { quranPlayer, useQuranPlayer } from "@/lib/quran-player";
 
 type Search = { s?: number; view?: "reciters"; tab?: "all" };
 
@@ -267,7 +268,7 @@ function ReciterPicker({ back, tab }: { back?: number; tab?: "all" }) {
   const togglePreview = async (r: Reciter) => {
     void triggerHaptic("light");
     if (preview === r.id) { audio.current?.pause(); setPreview(null); return; }
-    audio.current?.pause();
+    audio.current?.pause(); quranPlayer.pause();
     setPreview(r.id);
     try {
       const a = await getChapterAudio(r.id, 1);
@@ -322,168 +323,111 @@ const fmt = (s: number) => (Number.isFinite(s) ? `${Math.floor(s / 60)}:${String
 
 function Reader({ chapterId }: { chapterId: number }) {
   const navigate = useNavigate();
-  const [prefs, setPrefs] = usePrefs();
+  const [prefs] = usePrefs();
   const [favs, toggleFav] = useFavs();
-  const reciter = findReciter(prefs.reciter);
+  const [display, setDisplayState] = useState({ translit: true, translation: true });
+  useEffect(() => { const d = getDisplay(); setDisplayState({ translit: d.showTransliteration, translation: d.showTranslation }); }, []);
   const [chapter, setChapter] = useState<Chapter | null>(null);
   const [verses, setVerses] = useState<Verse[] | null>(null);
-  const [audio, setAudio] = useState<ChapterAudio | null>(null);
   const [error, setError] = useState(false);
-  const [playing, setPlaying] = useState(false);
-  const [loadingAudio, setLoadingAudio] = useState(false);
-  const [repeat, setRepeat] = useState(false);
-  const [time, setTime] = useState({ cur: 0, dur: 0 });
-  const [pos, setPos] = useState<{ key: string | null; word: number | null }>({ key: null, word: null });
-  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const player = useQuranPlayer();
+  const here = player.chapter === chapterId;
+  const shownReciter = findReciter(here ? player.reciterId : prefs.reciter);
   const lastKey = useRef<string | null>(null);
 
   useEffect(() => {
-    setVerses(null); setError(false); setPos({ key: null, word: null });
+    setVerses(null); setError(false);
     getChapters().then((cs) => setChapter(cs.find((c) => c.id === chapterId) ?? null)).catch(() => {});
     getVerses(chapterId).then(setVerses).catch(() => setError(true));
     const last = readJSON<Last | null>(LAST, null);
     if (!last || last.s !== chapterId) localStorage.setItem(LAST, JSON.stringify({ s: chapterId, v: 1 }));
     document.querySelector(".scroll-area")?.scrollTo({ top: 0 });
+    quranPlayer.setPanel(true);
   }, [chapterId]);
 
+  // Prepare this surah unless a different one is already playing (that keeps going).
   useEffect(() => {
-    let cancelled = false;
-    setAudio(null); setPlaying(false); setTime({ cur: 0, dur: 0 });
-    audioRef.current?.pause();
-    getChapterAudio(prefs.reciter, chapterId).then((a) => { if (!cancelled) setAudio(a); }).catch(() => {});
-    return () => { cancelled = true; };
-  }, [prefs.reciter, chapterId]);
+    const s = quranPlayer.get();
+    const reciterChanged = s.reciterId !== prefs.reciter;
+    // Reopening a surah that's already loaded must never reload or restart it.
+    if (s.chapter === chapterId && (s.audio || s.loading) && !reciterChanged) return;
+    if ((s.playing || s.loading) && s.chapter !== chapterId) return;
+    const wasPlaying = s.playing && reciterChanged;
+    void quranPlayer.select(prefs.reciter, chapterId, chapter?.name_simple ?? s.chapterName, wasPlaying);
+  }, [prefs.reciter, chapterId, chapter?.name_simple]);
 
-  useEffect(() => () => audioRef.current?.pause(), []);
-  useEffect(() => { if (audioRef.current) audioRef.current.loop = repeat; }, [repeat]);
-
-  useEffect(() => {
-    if (!playing || !audio) return;
-    let raf = 0;
-    const tick = () => {
-      const el = audioRef.current;
-      if (el) {
-        const found = locate(audio.timings, el.currentTime * 1000);
-        setPos((p) => {
-          const next = found.key ? found : { key: p.key, word: p.word };
-          return p.key === next.key && p.word === next.word ? p : next;
-        });
-      }
-      raf = requestAnimationFrame(tick);
-    };
-    raf = requestAnimationFrame(tick);
-    return () => cancelAnimationFrame(raf);
-  }, [playing, audio]);
-
+  const pos = here ? player.pos : { key: null, word: null };
   useEffect(() => {
     if (!pos.key || pos.key === lastKey.current) return;
     lastKey.current = pos.key;
-    localStorage.setItem(LAST, JSON.stringify({ s: chapterId, v: Number(pos.key.split(":")[1]) }));
     document.getElementById(`v-${pos.key}`)?.scrollIntoView({ behavior: "smooth", block: "center" });
-  }, [pos.key, chapterId]);
+  }, [pos.key]);
 
-  const ensureAudio = () => {
-    if (!audio) return null;
-    if (!audioRef.current || audioRef.current.dataset.src !== audio.url) {
-      audioRef.current?.pause();
-      const el = new Audio(audio.url);
-      el.dataset.src = audio.url;
-      el.preload = "auto";
-      el.loop = repeat;
-      el.onplaying = () => { setPlaying(true); setLoadingAudio(false); };
-      el.onwaiting = () => setLoadingAudio(true);
-      el.onpause = () => setPlaying(false);
-      el.ontimeupdate = () => setTime({ cur: el.currentTime, dur: el.duration });
-      el.onloadedmetadata = () => setTime({ cur: el.currentTime, dur: el.duration });
-      el.onended = () => { setPlaying(false); setPos({ key: null, word: null }); };
-      audioRef.current = el;
-    }
-    return audioRef.current;
-  };
-
-  const playFrom = (key: string) => {
-    const el = ensureAudio(); const t = audio?.timings.find((x) => x.key === key);
-    if (!el) return;
-    if (t) el.currentTime = t.from / 1000;
-    setLoadingAudio(true);
-    void el.play().catch(() => setLoadingAudio(false));
+  const nameRef = useRef(""); nameRef.current = chapter?.name_simple ?? "";
+  const onPlayVerse = useCallback((key: string) => {
     void triggerHaptic("light");
-  };
-  const playRef = useRef(playFrom);
-  playRef.current = playFrom;
-  const onPlayVerse = useCallback((key: string) => playRef.current(key), []);
-  const toggle = () => {
-    const el = ensureAudio(); if (!el) return;
-    void triggerHaptic("light");
-    if (playing) { el.pause(); return; }
-    setLoadingAudio(true);
-    void el.play().catch(() => setLoadingAudio(false));
-  };
-  const step = (dir: 1 | -1) => {
-    if (!audio?.timings.length) {
-      const el = audioRef.current; if (el) el.currentTime = Math.max(0, el.currentTime + dir * 10);
-      return;
-    }
-    const i = audio.timings.findIndex((t) => t.key === pos.key);
-    const n = audio.timings[Math.min(audio.timings.length - 1, Math.max(0, (i < 0 ? 0 : i) + dir))];
-    if (n) playFrom(n.key);
-  };
-  const seek = (ratio: number) => {
-    const el = ensureAudio(); if (!el || !Number.isFinite(el.duration)) return;
-    el.currentTime = ratio * el.duration;
-    setTime({ cur: el.currentTime, dur: el.duration });
-  };
+    quranPlayer.setPanel(true);
+    void quranPlayer.select(readJSON(PREF, DEFAULT_PREFS).reciter, chapterId, nameRef.current, true, key);
+  }, [chapterId]);
 
   const showBismillah = chapter?.bismillah_pre && chapterId !== 1 && chapterId !== 9;
   const favSet = useMemo(() => new Set(favs), [favs]);
-  const back = () => { audioRef.current?.pause(); void navigate({ to: "/app/quran", search: {} }); };
+  const back = () => { void navigate({ to: "/app/quran", search: {} }); };
 
   return (
     <>
       <Header kicker={`Surah ${chapterId}${chapter ? ` · ${chapter.translated_name.name}` : ""}`} title={chapter?.name_simple ?? "…"} sub={chapter?.name_arabic} onBack={back} />
       <main className="scroll-area">
-        <div className="mx-auto max-w-md space-y-3 px-5 pb-56 pt-4">
-          <button className="quran-card quran-reciter-select" onClick={() => { audioRef.current?.pause(); void navigate({ to: "/app/quran", search: { s: chapterId, view: "reciters" } }); }}>
-            <Avatar r={reciter} size={46} />
-            <span className="min-w-0 flex-1 text-left"><span className="block truncate text-[15px] font-semibold">{reciterName(reciter)}</span><span className="quran-muted block truncate text-[11.5px]">{reciterSubtitle(reciter)}</span></span>
+        <div className={`mx-auto max-w-md space-y-3 px-5 pt-4 ${player.panelOpen ? "pb-64" : "pb-28"}`}>
+          <button className="quran-card quran-reciter-select" onClick={() => { void navigate({ to: "/app/quran", search: { s: chapterId, view: "reciters" } }); }}>
+            <Avatar r={shownReciter} size={46} />
+            <span className="min-w-0 flex-1 text-left"><span className="block truncate text-[15px] font-semibold">{reciterName(shownReciter)}</span><span className="quran-muted block truncate text-[11.5px]">{reciterSubtitle(shownReciter)}</span></span>
             <ChevronDown size={18} className="opacity-60" />
           </button>
-          <div className="quran-toggles">
-            <button className={prefs.translit ? "is-on" : ""} onClick={() => setPrefs({ translit: !prefs.translit })}>Transliteration</button>
-            <button className={prefs.translation ? "is-on" : ""} onClick={() => setPrefs({ translation: !prefs.translation })}>Translation</button>
-          </div>
           {showBismillah && <div className="quran-bismillah" dir="rtl">بِسْمِ ٱللَّهِ ٱلرَّحْمَـٰنِ ٱلرَّحِيمِ</div>}
           {error && <p className="quran-muted text-center text-sm">Couldn't load this surah. Check your connection.</p>}
           {!verses && !error && <div className="flex justify-center py-10"><Loader2 className="animate-spin" /></div>}
           {verses?.map((v) => (
             <VerseCard key={v.key} verse={v} active={pos.key === v.key} word={pos.key === v.key ? pos.word : null}
-              translit={prefs.translit} translation={prefs.translation} fav={favSet.has(v.key)}
+              translit={display.translit} translation={display.translation} fav={favSet.has(v.key)}
               onPlay={onPlayVerse} onFav={toggleFav} />
           ))}
           {verses && <p className="quran-muted pt-2 text-center text-[10px]">Text, translation (Saheeh International) and recitations via Quran.com</p>}
         </div>
       </main>
-      <div className="quran-player" role="group" aria-label="Recitation controls">
-        <div className="flex items-center gap-3">
-          <Avatar r={reciter} size={38} />
-          <span className="min-w-0 flex-1"><span className="block truncate text-[14px] font-semibold" style={{ color: "var(--accent)" }}>{chapter?.name_simple ?? ""}</span><span className="quran-muted block truncate text-[11px]">{reciterName(reciter)}</span></span>
-        </div>
-        <input className="quran-seek" type="range" min={0} max={1000} aria-label="Seek"
-          value={time.dur ? Math.round((time.cur / time.dur) * 1000) : 0}
-          style={{ ["--p" as string]: `${time.dur ? (time.cur / time.dur) * 100 : 0}%` }}
-          onChange={(e) => seek(Number(e.target.value) / 1000)} disabled={!audio} />
-        <div className="quran-times"><span>{fmt(time.cur)}</span><span>{fmt(time.dur)}</span></div>
-        <div className="quran-controls">
-          <span style={{ width: 36 }} />
-          <button aria-label="Previous verse" onClick={() => step(-1)} disabled={!audio}><SkipBack size={22} fill="currentColor" /></button>
-          <button className="quran-play" aria-label={playing ? "Pause" : "Play"} onClick={toggle} disabled={!audio}>
-            {loadingAudio && !playing ? <Loader2 size={24} className="animate-spin" /> : playing ? <Pause size={24} fill="currentColor" /> : <Play size={24} fill="currentColor" style={{ marginLeft: 3 }} />}
-          </button>
-          <button aria-label="Next verse" onClick={() => step(1)} disabled={!audio}><SkipForward size={22} fill="currentColor" /></button>
-          <button aria-label="Repeat surah" aria-pressed={repeat} className={repeat ? "is-on" : ""} onClick={() => setRepeat((r) => !r)}><Repeat size={18} /></button>
-        </div>
-      </div>
+      {player.panelOpen && <QuranPlayerPanel />}
     </>
+  );
+}
+
+function QuranPlayerPanel() {
+  const p = useQuranPlayer();
+  const r = findReciter(p.reciterId);
+  const ready = !!p.audio;
+  const tap = (f: () => void) => () => { void triggerHaptic("light"); f(); };
+  return (
+    <div className="quran-player" role="group" aria-label="Recitation controls">
+      <div className="flex items-center gap-3">
+        <Avatar r={r} size={44} />
+        <span className="min-w-0 flex-1"><span className="block truncate text-[16px] font-semibold">{p.chapterName}</span><span className="quran-muted block truncate text-[12.5px]">{reciterName(r)}</span></span>
+        <button className="quran-speed" aria-label={`Playback speed ${p.rate}x`} onClick={tap(quranPlayer.cycleRate)}>{p.rate}x</button>
+        <button className="quran-player-x" aria-label="Hide player" onClick={() => quranPlayer.setPanel(false)}><X size={16} /></button>
+      </div>
+      <input className="quran-seek" type="range" min={0} max={1000} aria-label="Seek"
+        value={p.dur ? Math.round((p.cur / p.dur) * 1000) : 0}
+        style={{ ["--p" as string]: `${p.dur ? (p.cur / p.dur) * 100 : 0}%` }}
+        onChange={(e) => quranPlayer.seek(Number(e.target.value) / 1000)} disabled={!ready} />
+      <div className="quran-times"><span>{fmt(p.cur)}</span><span>{fmt(p.dur)}</span></div>
+      <div className="quran-controls">
+        <button aria-label="Shuffle surahs" aria-pressed={p.shuffle} className={p.shuffle ? "is-on" : ""} onClick={tap(quranPlayer.toggleShuffle)}><Shuffle size={19} /></button>
+        <button aria-label="Previous verse" onClick={tap(() => quranPlayer.step(-1))} disabled={!ready}><SkipBack size={24} fill="currentColor" /></button>
+        <button className="quran-play" aria-label={p.playing ? "Pause" : "Play"} onClick={tap(() => quranPlayer.toggle())} disabled={!ready}>
+          {p.loading && !p.playing ? <Loader2 size={24} className="animate-spin" /> : p.playing ? <Pause size={24} fill="currentColor" /> : <Play size={24} fill="currentColor" style={{ marginLeft: 3 }} />}
+        </button>
+        <button aria-label="Next verse" onClick={tap(() => quranPlayer.step(1))} disabled={!ready}><SkipForward size={24} fill="currentColor" /></button>
+        <button aria-label="Repeat surah" aria-pressed={p.repeat} className={p.repeat ? "is-on" : ""} onClick={tap(quranPlayer.toggleRepeat)}><Repeat size={19} /></button>
+      </div>
+    </div>
   );
 }
 
