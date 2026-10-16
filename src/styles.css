@@ -4750,6 +4750,5 @@ body.quran-fs-on .quran-mini:not(.quran-fs .quran-mini) { display: none; }
 .quran-verse.is-active .quran-translit.is-big { opacity: 1; color: var(--ayah-active); }
 .quran-fs-sheet, .quran-fs-band, .quran-fs .quran-mushaf { border: 0 !important; box-shadow: none !important; background: none !important; outline: 0 !important; }
 .quran-fs-foot, .quran-fs-sub { display: none; }
-/* Full screen reading sits over the active theme's own background */
-.quran-fs { background: transparent !important; }
-body.quran-fs-on .app-shell main, body.quran-fs-on .app-shell header, body.quran-fs-on .app-shell .scroll-area { visibility: hidden; }
+/* Full screen reading: plain solid colour from the selected theme, no background art */
+.quran-fs { background: color-mix(in oklab, var(--accent) 9%, var(--card)) !important; }
