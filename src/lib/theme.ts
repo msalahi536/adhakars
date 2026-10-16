@@ -60,6 +60,20 @@ export const vibrateIfEnabled = (pattern: number | number[]) => {
 };
 
 export type HapticStrength = "light" | "medium" | "heavy" | "double";
+/**
+ * Plays a custom vibration pattern (web/Android) so actions can carry a
+ * signature feel. iOS has no raw pattern API, so it falls back to the closest
+ * native impact style. Respects the haptics preference.
+ */
+export const triggerHapticPattern = async (pattern: number[], fallback: HapticStrength = "light") => {
+  if (typeof window === "undefined" || !getDisplay().haptics) return;
+  const cap = (window as unknown as { Capacitor?: { isNativePlatform?: () => boolean } }).Capacitor;
+  if (cap?.isNativePlatform?.()) {
+    await triggerHaptic(fallback);
+    return;
+  }
+  if (typeof navigator !== "undefined" && navigator.vibrate) navigator.vibrate(pattern);
+};
 export const triggerHaptic = async (strength: HapticStrength = "heavy") => {
   if (typeof window === "undefined") return;
   if (!getDisplay().haptics) return;
