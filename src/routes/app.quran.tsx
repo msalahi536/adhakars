@@ -105,6 +105,26 @@ function Header({ kicker, title, sub, onBack }: { kicker: string; title: string;
   );
 }
 
+function Flourish({ flip }: { flip?: boolean }) {
+  return (
+    <svg className="quran-art-orn" viewBox="0 0 60 12" style={flip ? { transform: "scaleY(-1)" } : undefined} aria-hidden>
+      <path d="M2 8 C14 8 18 3 24 6 M58 8 C46 8 42 3 36 6" fill="none" stroke="currentColor" strokeWidth=".8" strokeLinecap="round" />
+      <path d="M30 1.5 L33.5 6 L30 10.5 L26.5 6 Z" fill="none" stroke="currentColor" strokeWidth=".8" />
+      <circle cx="30" cy="6" r="1.1" fill="currentColor" />
+    </svg>
+  );
+}
+
+function SurahArt({ name }: { name: string }) {
+  return (
+    <span className="quran-continue-art" aria-hidden>
+      <Flourish />
+      <span className="quran-art-name" dir="rtl">{name}</span>
+      <Flourish flip />
+    </span>
+  );
+}
+
 /* ---------- home ---------- */
 
 function Home() {
@@ -125,13 +145,22 @@ function Home() {
   const lastChapter = last && chapters?.find((c) => c.id === last.s);
   const open = (id: number) => { void triggerHaptic("light"); void navigate({ to: "/app/quran", search: { s: id } }); };
   const popular = POPULAR_RECITERS.map(findReciter);
+  const lastY = useRef(0);
+  const [searchShown, setSearchShown] = useState(true);
+  const [searchFloat, setSearchFloat] = useState(false);
+  const onScroll = (e: React.UIEvent<HTMLElement>) => {
+    const y = e.currentTarget.scrollTop;
+    const d = y - lastY.current;
+    if (Math.abs(d) > 4) { setSearchShown(d < 0 || y < 80); lastY.current = y; }
+    setSearchFloat(y > 80);
+  };
 
   return (
     <>
       <Header kicker="The Noble Quran" title="Read & Listen" />
-      <main className="scroll-area">
+      <main className="scroll-area" onScroll={onScroll}>
         <div className="mx-auto max-w-md space-y-4 px-5 pb-8 pt-4">
-          <label className="quran-search">
+          <label className={`quran-search quran-search-sticky${searchFloat ? " is-float" : ""}${searchShown ? "" : " is-hidden"}`}>
             <Search size={16} />
             <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search surah by name, number, or reciter…" />
           </label>
@@ -150,7 +179,7 @@ function Home() {
 
           {lastChapter && !t && (
             <button className="quran-card quran-continue" onClick={() => open(lastChapter.id)}>
-              <span className="quran-continue-art" dir="rtl">{lastChapter.name_arabic}</span>
+              <SurahArt name={lastChapter.name_arabic} />
               <span className="min-w-0 flex-1 text-left">
                 <span className="quran-continue-kicker">Continue Reading</span>
                 <span className="quran-continue-title">{lastChapter.name_simple}</span>
