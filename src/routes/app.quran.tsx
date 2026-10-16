@@ -7,7 +7,7 @@ import {
 } from "@/lib/quran";
 import { triggerHaptic } from "@/lib/theme";
 
-type Search = { s?: number; view?: "reciters" };
+type Search = { s?: number; view?: "reciters"; tab?: "all" };
 
 export const Route = createFileRoute("/app/quran")({
   validateSearch: (q: Record<string, unknown>): Search => {
