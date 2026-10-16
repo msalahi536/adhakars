@@ -263,7 +263,7 @@ function ReciterPicker({ back, tab }: { back?: number; tab?: "all" }) {
   }, [filter, t, list]);
 
   const goBack = () => { audio.current?.pause(); void navigate({ to: "/app/quran", search: back ? { s: back } : {} }); };
-  const choose = (r: Reciter) => { setPrefs({ reciter: r.id }); void triggerHaptic("medium"); goBack(); };
+  const choose = (r: Reciter) => { setPrefs({ reciter: r.id }); void triggerHaptic("medium"); };
   const togglePreview = async (r: Reciter) => {
     void triggerHaptic("light");
     if (preview === r.id) { audio.current?.pause(); setPreview(null); return; }
@@ -310,7 +310,7 @@ function ReciterPicker({ back, tab }: { back?: number; tab?: "all" }) {
             })}
             {sorted.length === 0 && <p className="quran-muted p-6 text-center text-sm">No reciters found.</p>}
           </div>
-          <p className="quran-muted text-center text-[10px]">Preview plays Al-Fatihah. Tap a name to choose.</p>
+          <p className="quran-muted text-center text-[10px]">Preview plays Al-Fatihah. Tap a name to choose — it saves right away.</p>
         </div>
       </main>
     </>
