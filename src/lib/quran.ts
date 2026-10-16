@@ -284,3 +284,62 @@ export function reciterSubtitle(r: Reciter): string {
 export const reciterName = (r: Reciter) => r.name.replace(/\s*\([^)]*\)\s*$/, "");
 export const POPULAR_RECITERS = [7, 1, 13, 174, 159, 3, 10, 104, 158, 19];
 export const findReciter = (id: number) => RECITERS.find((r) => r.id === id) ?? RECITERS[0];
+
+/* ---------- smart search ---------- */
+/** Lowercase, strip diacritics, apostrophes, hyphens and Arabic article variants. */
+export function normalizeQuery(s: string): string {
+  return s.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+    .replace(/[`'’‘ʿʾ.\-_]/g, " ")
+    .replace(/\b(surah|surat|sura|sheikh|shaykh|al|an|ar|as|ash|ad|at|az|adh|ath)\b/g, " ")
+    .replace(/(.)\1+/g, "$1") // collapse doubled letters: Baqarah/Baqara, Muzzammil
+    .replace(/ah\b/g, "a").replace(/ee/g, "i").replace(/oo/g, "u").replace(/y/g, "i")
+    .replace(/\s+/g, "").trim();
+}
+
+/** Small edit distance check for typos on longer queries. */
+function nearMatch(a: string, b: string): boolean {
+  if (a.length < 4) return false;
+  for (let i = 0; i + a.length - 1 <= b.length; i++) {
+    const w = b.slice(i, i + a.length);
+    let diff = 0;
+    for (let j = 0; j < a.length && diff <= 1; j++) if (a[j] !== w[j]) diff++;
+    if (diff <= 1) return true;
+  }
+  return false;
+}
+
+/** Score 0 = no match; higher is better. */
+export function chapterScore(c: Pick<Chapter, "id" | "name_simple" | "name_arabic" | "translated_name">, raw: string): number {
+  const q = raw.trim();
+  if (!q) return 1;
+  const num = q.match(/^(\d{1,3})(?::\d+)?$/);
+  if (num) return Number(num[1]) === c.id ? 100 : 0;
+  if (/[\u0600-\u06ff]/.test(q)) return c.name_arabic.replace(/[\u064b-\u0652]/g, "").includes(q.replace(/[\u064b-\u0652]/g, "")) ? 90 : 0;
+  const n = normalizeQuery(q);
+  if (!n) return 0;
+  const name = normalizeQuery(c.name_simple);
+  const meaning = normalizeQuery(c.translated_name.name);
+  if (name === n) return 95;
+  if (name.startsWith(n)) return 80;
+  if (name.includes(n)) return 60;
+  if (meaning.includes(n)) return 50;
+  if (nearMatch(n, name)) return 30;
+  return 0;
+}
+
+export function searchChapters<T extends Pick<Chapter, "id" | "name_simple" | "name_arabic" | "translated_name">>(list: T[], q: string): T[] {
+  if (!q.trim()) return list;
+  return list.map((c) => [c, chapterScore(c, q)] as const).filter(([, s]) => s > 0).sort((a, b) => b[1] - a[1] || a[0].id - b[0].id).map(([c]) => c);
+}
+
+export function searchReciters(q: string, limit = 5): Reciter[] {
+  const n = normalizeQuery(q);
+  if (n.length < 2 || /^\d+$/.test(q.trim())) return [];
+  const seen = new Set<string>();
+  return RECITERS.map((r) => {
+    const name = normalizeQuery(reciterName(r));
+    const s = name.startsWith(n) ? 3 : name.includes(n) ? 2 : nearMatch(n, name) ? 1 : 0;
+    return [r, s, name] as const;
+  }).filter(([, s]) => s > 0).sort((a, b) => b[1] - a[1] || a[0].group - b[0].group)
+    .filter(([, , name]) => (seen.has(name) ? false : (seen.add(name), true))).slice(0, limit).map(([r]) => r);
+}
