@@ -4672,3 +4672,9 @@ html[data-preset][data-visual-phase="evening"] .tasbih-confirm-btn.ghost {
 .quran-sheet-grip { width: 40px; height: 5px; border-radius: 99px; margin: 10px auto 8px; background: color-mix(in oklab, var(--foreground) 22%, transparent); }
 .quran-sheet-list { overflow-y: auto; overscroll-behavior: contain; padding: 0 8px 16px; }
 @keyframes quran-sheet-up { from { transform: translateY(100%); } to { transform: none; } }
+.quran-dropdown { overflow: hidden; animation: quran-drop .22s ease-out; }
+.quran-dropdown .quran-sheet-list { max-height: 300px; padding: 0 6px 8px; }
+@keyframes quran-drop { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: none; } }
+.quran-surah-nav { display: flex; justify-content: space-between; gap: 8px; margin-top: 2px; }
+.quran-surah-nav button { display: inline-flex; align-items: center; gap: 4px; font-size: 12px; font-weight: 600; padding: 6px 12px; border-radius: 99px; color: var(--foreground); background: color-mix(in oklab, var(--foreground) 7%, transparent); }
+.quran-surah-nav button:disabled { opacity: .35; }

@@ -380,11 +380,12 @@ function Reader({ chapterId }: { chapterId: number }) {
       <Header kicker={`Surah ${chapterId}${chapter ? ` · ${chapter.translated_name.name}` : ""}`} title={chapter?.name_simple ?? "…"} sub={chapter?.name_arabic} onBack={back} />
       <main className="scroll-area">
         <div className={`mx-auto max-w-md space-y-3 px-5 pt-4 ${player.panelOpen ? "pb-64" : "pb-28"}`}>
-          <button className="quran-card quran-reciter-select" onClick={() => { void triggerHaptic("light"); setSheet(true); }}>
+          <button className="quran-card quran-reciter-select" onClick={() => { void triggerHaptic("light"); setSheet((o) => !o); }}>
             <Avatar r={shownReciter} size={46} />
             <span className="min-w-0 flex-1 text-left"><span className="block truncate text-[15px] font-semibold">{reciterName(shownReciter)}</span><span className="quran-muted block truncate text-[11.5px]">{reciterSubtitle(shownReciter)}</span></span>
-            <ChevronDown size={18} className="opacity-60" />
+            <ChevronDown size={18} className="opacity-60" style={{ transform: sheet ? "rotate(180deg)" : undefined, transition: "transform .2s" }} />
           </button>
+          {sheet && <ReciterSheet onClose={() => setSheet(false)} onSeeAll={() => { setSheet(false); void navigate({ to: "/app/quran", search: { s: chapterId, view: "reciters", tab: "all" } }); }} />}
           {showBismillah && <div className="quran-bismillah" dir="rtl">بِسْمِ ٱللَّهِ ٱلرَّحْمَـٰنِ ٱلرَّحِيمِ</div>}
           {error && <p className="quran-muted text-center text-sm">Couldn't load this surah. Check your connection.</p>}
           {!verses && !error && <div className="flex justify-center py-10"><Loader2 className="animate-spin" /></div>}
@@ -397,7 +398,6 @@ function Reader({ chapterId }: { chapterId: number }) {
         </div>
       </main>
       {player.panelOpen && <QuranPlayerPanel />}
-      {sheet && <ReciterSheet onClose={() => setSheet(false)} onSeeAll={() => { setSheet(false); void navigate({ to: "/app/quran", search: { s: chapterId, view: "reciters", tab: "all" } }); }} />}
     </>
   );
 }
@@ -429,15 +429,10 @@ function ReciterSheet({ onClose, onSeeAll }: { onClose: () => void; onSeeAll: ()
   const [prefs, setPrefs] = usePrefs();
   const popIds = new Set(POPULAR_RECITERS);
   const list = [...POPULAR_RECITERS.map(findReciter), ...RECITERS.filter((r) => r.group === 1 && !popIds.has(r.id))];
-  useEffect(() => {
-    const k = (e: KeyboardEvent) => { if (e.key === "Escape") onClose(); };
-    window.addEventListener("keydown", k); return () => window.removeEventListener("keydown", k);
-  }, [onClose]);
   return (
-    <div className="quran-sheet-backdrop" onClick={onClose}>
-      <div className="quran-sheet" role="dialog" aria-modal="true" aria-label="Change reciter" onClick={(e) => e.stopPropagation()}>
-        <div className="quran-sheet-grip" />
-        <div className="flex items-center justify-between px-5 pb-2 pt-1">
+    <div className="quran-card quran-dropdown" role="region" aria-label="Change reciter">
+      <div>
+        <div className="flex items-center justify-between px-4 pb-1 pt-3">
           <h2 className="text-[16px] font-semibold">Change reciter</h2>
           <button className="quran-see-all" onClick={onSeeAll}>See All <ChevronRight size={14} /></button>
         </div>
@@ -445,7 +440,7 @@ function ReciterSheet({ onClose, onSeeAll }: { onClose: () => void; onSeeAll: ()
           {list.map((r) => {
             const on = prefs.reciter === r.id;
             return (
-              <button key={r.id} className={`quran-reciter-row w-full text-left ${on ? "is-on" : ""}`} onClick={() => { setPrefs({ reciter: r.id }); void triggerHaptic("medium"); }}>
+              <button key={r.id} className={`quran-reciter-row w-full text-left ${on ? "is-on" : ""}`} onClick={() => { setPrefs({ reciter: r.id }); void triggerHaptic("medium"); onClose(); }}>
                 <Avatar r={r} size={42} />
                 <span className="min-w-0 flex-1"><span className="block truncate text-[14px] font-semibold">{reciterName(r)}</span><span className="quran-muted block truncate text-[11px]">{reciterSubtitle(r)}</span></span>
                 {on && <span className="quran-mini-eq" aria-label="Selected"><i /><i /><i /></span>}
@@ -463,6 +458,15 @@ function QuranPlayerPanel() {
   const r = findReciter(p.reciterId);
   const ready = !!p.audio;
   const tap = (f: () => void) => () => { void triggerHaptic("light"); f(); };
+  const navigate = useNavigate();
+  const goSurah = async (d: number) => {
+    const id = (p.chapter ?? 1) + d;
+    if (id < 1 || id > 114) return;
+    void triggerHaptic("light");
+    const name = (await getChapters().catch(() => [] as Chapter[])).find((c) => c.id === id)?.name_simple ?? `Surah ${id}`;
+    await quranPlayer.select(p.reciterId, id, name, true);
+    void navigate({ to: "/app/quran", search: { s: id } });
+  };
   return (
     <div className="quran-player" role="group" aria-label="Recitation controls">
       <div className="flex items-center gap-3">
@@ -476,6 +480,10 @@ function QuranPlayerPanel() {
         style={{ ["--p" as string]: `${p.dur ? (p.cur / p.dur) * 100 : 0}%` }}
         onChange={(e) => quranPlayer.seek(Number(e.target.value) / 1000)} disabled={!ready} />
       <div className="quran-times"><span>{fmt(p.cur)}</span><span>{fmt(p.dur)}</span></div>
+      <div className="quran-surah-nav">
+        <button onClick={() => void goSurah(-1)} disabled={(p.chapter ?? 1) <= 1}><ChevronLeft size={15} /> Previous surah</button>
+        <button onClick={() => void goSurah(1)} disabled={(p.chapter ?? 114) >= 114}>Next surah <ChevronRight size={15} /></button>
+      </div>
       <div className="quran-controls">
         <button aria-label="Shuffle surahs" aria-pressed={p.shuffle} className={p.shuffle ? "is-on" : ""} onClick={tap(quranPlayer.toggleShuffle)}><Shuffle size={19} /></button>
         <button aria-label="Previous verse" onClick={tap(() => quranPlayer.step(-1))} disabled={!ready}><SkipBack size={24} fill="currentColor" /></button>
