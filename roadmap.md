@@ -1,5 +1,9 @@
 # Roadmap
 
+## Always Evening: complete page walkthrough
+- [x] Remove conflicting route-based day palettes and complete shared evening surface/text tokens.
+- [x] Verify all eight evening presets across sixteen app pages, reading-card transitions, More icons, Tasbih, Settings and prayer popups; verify selection through Settings and preserve page-based mornings.
+
 - [x] Add the Adhan Settings prayer calculation pill and themed popup; verify shared method, Asr, and location saving.
 
 - [x] Match the custom appearance popup reference and verify the fixed non-interactive preview

@@ -413,7 +413,7 @@
 }
 
 /* Shared Morning and Evening recitation layout */
-html:is([data-section="morning"], [data-visual-phase="morning"]) {
+html[data-visual-phase="morning"] {
   --background: #f5efe3;
   --foreground: #70815d;
   --title: #70815d;
@@ -515,12 +515,12 @@ html[data-preset="dark-red"] {
   --eve-ink: #e28f91; --eve-ink-rgb: 226, 143, 145; --eve-title: #fff1ed; --eve-eyebrow: #e4b3ad;
   --eve-nav-active: #ffd8d0; --eve-nav-inactive: #bd8f8c; --eve-muted: #c49a96; --eve-source-fg: #f2c5bf;
 }
-html[data-preset]:is([data-section="morning"], [data-visual-phase="morning"]),
-html[data-preset][data-section="salah"],
-html[data-preset][data-section="tasbih"],
-html[data-preset][data-section="custom"],
-html[data-preset][data-section="wake"],
-html[data-preset][data-section="default"] {
+html[data-preset][data-visual-phase="morning"],
+html[data-preset][data-section="salah"]:not([data-visual-phase="evening"]),
+html[data-preset][data-section="tasbih"]:not([data-visual-phase="evening"]),
+html[data-preset][data-section="custom"]:not([data-visual-phase="evening"]),
+html[data-preset][data-section="wake"]:not([data-visual-phase="evening"]),
+html[data-preset][data-section="default"]:not([data-visual-phase="evening"]) {
   --background: #f5efe3 !important; --foreground: var(--preset-ink) !important; --title: var(--preset-ink) !important; --eyebrow: var(--preset-ink) !important; --accent: var(--preset-ink) !important; --primary: var(--preset-ink) !important; --card: #f9f5f0 !important; --card-foreground: #2a2a2a !important; --surface-card: #f9f5f0 !important; --border: rgba(255, 255, 255, 0.8) !important; --translit: var(--preset-ink) !important; --text-muted: var(--preset-muted) !important; --source-bg: rgba(233, 233, 222, 0.9) !important; --source-fg: var(--preset-ink) !important; --ring-track: rgba(var(--preset-ink-rgb), 0.18) !important; --nav-bg: #fdfcf4 !important; --nav-active: var(--preset-ink) !important; --nav-inactive: var(--preset-muted) !important; --dot-active: var(--preset-ink) !important; --dot-inactive: rgba(var(--preset-ink-rgb), 0.4) !important; --index-badge-bg: var(--preset-ink) !important; --index-badge-fg: #fff !important; --count-fg: var(--preset-ink) !important; --btn-fg: var(--preset-ink) !important; --arrow-fg: var(--preset-ink) !important;
   --surface-deep: var(--preset-ink-strong) !important;
   --surface-deep-gradient: linear-gradient(135deg, var(--preset-ink) 0%, var(--preset-ink-strong) 100%) !important;
@@ -534,11 +534,11 @@ html[data-preset][data-section="default"] {
 }
 
 /* Rose morning: blush card/nav/arrows, deeper pink source pill */
-html[data-preset="rose"]:is([data-section="morning"], [data-visual-phase="morning"]),
-html[data-preset="rose"][data-section="salah"],
-html[data-preset="rose"][data-section="tasbih"],
-html[data-preset="rose"][data-section="custom"],
-html[data-preset="rose"][data-section="default"] {
+html[data-preset="rose"][data-visual-phase="morning"],
+html[data-preset="rose"][data-section="salah"]:not([data-visual-phase="evening"]),
+html[data-preset="rose"][data-section="tasbih"]:not([data-visual-phase="evening"]),
+html[data-preset="rose"][data-section="custom"]:not([data-visual-phase="evening"]),
+html[data-preset="rose"][data-section="default"]:not([data-visual-phase="evening"]) {
   --card: #f9e8e6 !important;
   --surface-card: #f9e8e6 !important;
   --nav-bg: #f9e8e6 !important;
@@ -627,12 +627,12 @@ html[data-preset="rose"][data-visual-phase="evening"] .daily-swipe-stack .adhkar
 }
 
 /* Twilight morning: lilac card/nav, deeper violet ink for readability */
-html[data-preset="lavender"]:is([data-section="morning"], [data-visual-phase="morning"]),
-html[data-preset="lavender"][data-section="salah"],
-html[data-preset="lavender"][data-section="tasbih"],
-html[data-preset="lavender"][data-section="custom"],
-html[data-preset="lavender"][data-section="wake"],
-html[data-preset="lavender"][data-section="default"] {
+html[data-preset="lavender"][data-visual-phase="morning"],
+html[data-preset="lavender"][data-section="salah"]:not([data-visual-phase="evening"]),
+html[data-preset="lavender"][data-section="tasbih"]:not([data-visual-phase="evening"]),
+html[data-preset="lavender"][data-section="custom"]:not([data-visual-phase="evening"]),
+html[data-preset="lavender"][data-section="wake"]:not([data-visual-phase="evening"]),
+html[data-preset="lavender"][data-section="default"]:not([data-visual-phase="evening"]) {
   --card: #e4dce8 !important;
   --surface-card: #e4dce8 !important;
   --nav-bg: #d5c9df !important;
@@ -704,12 +704,12 @@ html[data-preset="lavender"][data-visual-phase="evening"] .daily-swipe-stack .ad
 }
 
 /* Ocean morning: pale sky-blue card, softer blue nav */
-html[data-preset="ocean"]:is([data-section="morning"], [data-visual-phase="morning"]),
-html[data-preset="ocean"][data-section="salah"],
-html[data-preset="ocean"][data-section="tasbih"],
-html[data-preset="ocean"][data-section="custom"],
-html[data-preset="ocean"][data-section="wake"],
-html[data-preset="ocean"][data-section="default"] {
+html[data-preset="ocean"][data-visual-phase="morning"],
+html[data-preset="ocean"][data-section="salah"]:not([data-visual-phase="evening"]),
+html[data-preset="ocean"][data-section="tasbih"]:not([data-visual-phase="evening"]),
+html[data-preset="ocean"][data-section="custom"]:not([data-visual-phase="evening"]),
+html[data-preset="ocean"][data-section="wake"]:not([data-visual-phase="evening"]),
+html[data-preset="ocean"][data-section="default"]:not([data-visual-phase="evening"]) {
   --card: #def0f4 !important;
   --surface-card: #def0f4 !important;
   --nav-bg: #d6ebf0 !important;
@@ -782,7 +782,7 @@ html[data-preset="ocean"][data-visual-phase="evening"] .daily-swipe-stack .adhka
 
 
 
-html:is([data-section="morning"], [data-visual-phase="morning"]) .app-shell { background: linear-gradient(180deg, #f5efe3 0%, #efe4d1 45%, #e6dccb 100%); }
+html[data-visual-phase="morning"] .app-shell { background: linear-gradient(180deg, #f5efe3 0%, #efe4d1 45%, #e6dccb 100%); }
 html[data-visual-phase="evening"] .app-shell { background: radial-gradient(circle at 85% 95%, rgba(214,130,90,0.28), transparent 45%), linear-gradient(180deg, #0e0f22 0%, #17163a 45%, #2b2242 80%, #3a2c46 100%); }
 .app-background { background-position: center top; opacity: 0; }
 .app-background-morning { opacity: 1; }
@@ -826,8 +826,8 @@ html[data-visual-phase="evening"] .app-shell:not(.is-evening-hold) .app-backgrou
   white-space: nowrap;
 }
 
-html:is([data-section="morning"], [data-visual-phase="morning"]) .adhkar-header .label-caps,
-html:is([data-section="morning"], [data-visual-phase="morning"]) .adhkar-header .app-page-title {
+html[data-visual-phase="morning"] .adhkar-header .label-caps,
+html[data-visual-phase="morning"] .adhkar-header .app-page-title {
   color: var(--preset-ink-strong);
 }
 
@@ -1706,78 +1706,78 @@ html[data-preset][data-section="tasbih"] {
 }
 
 /* Unify nav bar on salah/tasbih with the light morning style */
-html[data-section="salah"],
-html[data-section="tasbih"] {
+html[data-section="salah"]:not([data-visual-phase="evening"]),
+html[data-section="tasbih"]:not([data-visual-phase="evening"]) {
   --nav-bg: #fdfcf4 !important;
   --nav-border: rgba(45, 31, 0, 0.08) !important;
   --nav-active: var(--preset-ink) !important;
   --nav-inactive: #6b6f64 !important;
 }
-html[data-section="salah"] .bottom-nav-row,
-html[data-section="tasbih"] .bottom-nav-row {
+html[data-section="salah"]:not([data-visual-phase="evening"]) .bottom-nav-row,
+html[data-section="tasbih"]:not([data-visual-phase="evening"]) .bottom-nav-row {
   background: #fdfcf4;
   border-color: rgba(45, 31, 0, 0.08);
 }
-html[data-section="salah"] .app-shell { background: transparent; }
+html[data-section="salah"]:not([data-visual-phase="evening"]) .app-shell { background: transparent; }
 
 /* ===== Salah / Tasbih / More: follow the active preset palette ===== */
-html[data-section="salah"],
-html[data-section="tasbih"],
-html[data-section="default"],
-html[data-section="custom"] {
+html[data-section="salah"]:not([data-visual-phase="evening"]),
+html[data-section="tasbih"]:not([data-visual-phase="evening"]),
+html[data-section="default"]:not([data-visual-phase="evening"]),
+html[data-section="custom"]:not([data-visual-phase="evening"]) {
   --nav-bg: #fdfcf4 !important;
   --nav-border: rgba(45, 31, 0, 0.08) !important;
   --nav-active: var(--preset-ink) !important;
   --nav-inactive: var(--preset-muted) !important;
 }
 
-html[data-section="salah"] .salah-next-label,
-html[data-section="salah"] .salah-countdown,
-html[data-section="salah"] .salah-dismiss,
-html[data-section="salah"] .salah-recommended-title,
-html[data-section="salah"] .salah-action-label,
-html[data-section="salah"] .salah-change,
-html[data-section="salah"] .salah-adhan-card,
-html[data-section="salah"] .salah-adhan-title {
+html[data-section="salah"]:not([data-visual-phase="evening"]) .salah-next-label,
+html[data-section="salah"]:not([data-visual-phase="evening"]) .salah-countdown,
+html[data-section="salah"]:not([data-visual-phase="evening"]) .salah-dismiss,
+html[data-section="salah"]:not([data-visual-phase="evening"]) .salah-recommended-title,
+html[data-section="salah"]:not([data-visual-phase="evening"]) .salah-action-label,
+html[data-section="salah"]:not([data-visual-phase="evening"]) .salah-change,
+html[data-section="salah"]:not([data-visual-phase="evening"]) .salah-adhan-card,
+html[data-section="salah"]:not([data-visual-phase="evening"]) .salah-adhan-title {
   color: var(--preset-ink-strong);
 }
-html[data-section="salah"] .salah-location,
-html[data-section="salah"] .salah-recommended-progress,
-html[data-section="salah"] .salah-kicker,
-html[data-section="salah"] .salah-adhan-subtitle,
-html[data-section="salah"] .salah-adhan-chevron {
+html[data-section="salah"]:not([data-visual-phase="evening"]) .salah-location,
+html[data-section="salah"]:not([data-visual-phase="evening"]) .salah-recommended-progress,
+html[data-section="salah"]:not([data-visual-phase="evening"]) .salah-kicker,
+html[data-section="salah"]:not([data-visual-phase="evening"]) .salah-adhan-subtitle,
+html[data-section="salah"]:not([data-visual-phase="evening"]) .salah-adhan-chevron {
   color: var(--preset-muted);
 }
-html[data-section="salah"] .salah-change {
+html[data-section="salah"]:not([data-visual-phase="evening"]) .salah-change {
   background: rgba(var(--preset-ink-rgb), 0.12);
 }
-html[data-section="salah"] .salah-adhan-icon {
+html[data-section="salah"]:not([data-visual-phase="evening"]) .salah-adhan-icon {
   background: rgba(var(--preset-ink-rgb), 0.14);
   color: var(--preset-ink);
 }
 
-html[data-section="tasbih"] .tasbih-title,
-html[data-section="tasbih"] .tasbih-card,
-html[data-section="tasbih"] .tasbih-count,
-html[data-section="tasbih"] .tasbih-cycle,
-html[data-section="tasbih"] .tasbih-helper-primary,
-html[data-section="tasbih"] .tasbih-control,
-html[data-section="tasbih"] .tasbih-confirm-title,
-html[data-section="tasbih"] .tasbih-confirm-btn.ghost {
+html[data-section="tasbih"]:not([data-visual-phase="evening"]) .tasbih-title,
+html[data-section="tasbih"]:not([data-visual-phase="evening"]) .tasbih-card,
+html[data-section="tasbih"]:not([data-visual-phase="evening"]) .tasbih-count,
+html[data-section="tasbih"]:not([data-visual-phase="evening"]) .tasbih-cycle,
+html[data-section="tasbih"]:not([data-visual-phase="evening"]) .tasbih-helper-primary,
+html[data-section="tasbih"]:not([data-visual-phase="evening"]) .tasbih-control,
+html[data-section="tasbih"]:not([data-visual-phase="evening"]) .tasbih-confirm-title,
+html[data-section="tasbih"]:not([data-visual-phase="evening"]) .tasbih-confirm-btn.ghost {
   color: var(--preset-ink-strong);
 }
-html[data-section="tasbih"] .tasbih-eyebrow,
-html[data-section="tasbih"] .tasbih-confirm-sub {
+html[data-section="tasbih"]:not([data-visual-phase="evening"]) .tasbih-eyebrow,
+html[data-section="tasbih"]:not([data-visual-phase="evening"]) .tasbih-confirm-sub {
   color: var(--preset-muted);
 }
-html[data-section="tasbih"] .tasbih-target {
+html[data-section="tasbih"]:not([data-visual-phase="evening"]) .tasbih-target {
   color: var(--preset-ink-strong);
 }
-html[data-section="tasbih"] .tasbih-target.is-active {
+html[data-section="tasbih"]:not([data-visual-phase="evening"]) .tasbih-target.is-active {
   background: var(--preset-ink);
   color: #ffffff;
 }
-html[data-section="tasbih"] .tasbih-confirm-btn.solid {
+html[data-section="tasbih"]:not([data-visual-phase="evening"]) .tasbih-confirm-btn.solid {
   background: var(--preset-ink);
   color: #ffffff;
 }
@@ -1796,29 +1796,29 @@ a[data-settings-card]:active {
 }
 
 /* ---------- Ocean: keep Salah / Tasbih / More on the pale blue palette ---------- */
-html[data-preset="ocean"][data-section="salah"],
-html[data-preset="ocean"][data-section="tasbih"],
-html[data-preset="ocean"][data-section="default"],
-html[data-preset="ocean"][data-section="custom"] {
+html[data-preset="ocean"][data-section="salah"]:not([data-visual-phase="evening"]),
+html[data-preset="ocean"][data-section="tasbih"]:not([data-visual-phase="evening"]),
+html[data-preset="ocean"][data-section="default"]:not([data-visual-phase="evening"]),
+html[data-preset="ocean"][data-section="custom"]:not([data-visual-phase="evening"]) {
   --nav-bg: #d6ebf0 !important;
   --nav-border: rgba(29, 88, 113, 0.1) !important;
   --card: #def0f4 !important;
   --surface-card: #def0f4 !important;
 }
-html[data-preset="ocean"][data-section="salah"] .bottom-nav-row,
-html[data-preset="ocean"][data-section="tasbih"] .bottom-nav-row,
-html[data-preset="ocean"][data-section="default"] .bottom-nav-row {
+html[data-preset="ocean"][data-section="salah"]:not([data-visual-phase="evening"]) .bottom-nav-row,
+html[data-preset="ocean"][data-section="tasbih"]:not([data-visual-phase="evening"]) .bottom-nav-row,
+html[data-preset="ocean"][data-section="default"]:not([data-visual-phase="evening"]) .bottom-nav-row {
   background: #d6ebf0;
   border-color: rgba(29, 88, 113, 0.1);
 }
-html[data-preset="ocean"][data-section="tasbih"] .tasbih-card {
+html[data-preset="ocean"][data-section="tasbih"]:not([data-visual-phase="evening"]) .tasbih-card {
   background: #def0f4;
 }
-html[data-preset="ocean"][data-section="tasbih"] .tasbih-disc {
+html[data-preset="ocean"][data-section="tasbih"]:not([data-visual-phase="evening"]) .tasbih-disc {
   border-color: #eaf5f8;
   background: radial-gradient(circle at 50% 35%, #f7fcfd 0%, #e9f4f7 70%, #dcecf1 100%);
 }
-html[data-preset="ocean"][data-section="tasbih"] .tasbih-target {
+html[data-preset="ocean"][data-section="tasbih"]:not([data-visual-phase="evening"]) .tasbih-target {
   background: rgba(222, 240, 244, 0.9);
 }
 
@@ -1838,12 +1838,12 @@ html[data-preset="emerald"] {
   --eve-source-fg: #c7e8da;
 }
 
-html[data-preset="emerald"]:is([data-section="morning"], [data-visual-phase="morning"]),
-html[data-preset="emerald"][data-section="salah"],
-html[data-preset="emerald"][data-section="tasbih"],
-html[data-preset="emerald"][data-section="custom"],
-html[data-preset="emerald"][data-section="wake"],
-html[data-preset="emerald"][data-section="default"] {
+html[data-preset="emerald"][data-visual-phase="morning"],
+html[data-preset="emerald"][data-section="salah"]:not([data-visual-phase="evening"]),
+html[data-preset="emerald"][data-section="tasbih"]:not([data-visual-phase="evening"]),
+html[data-preset="emerald"][data-section="custom"]:not([data-visual-phase="evening"]),
+html[data-preset="emerald"][data-section="wake"]:not([data-visual-phase="evening"]),
+html[data-preset="emerald"][data-section="default"]:not([data-visual-phase="evening"]) {
   --card: #deebe2 !important;
   --surface-card: #deebe2 !important;
   --surface: #deebe2 !important;
@@ -1857,56 +1857,56 @@ html[data-preset="emerald"][data-section="default"] {
   --card-border: rgba(255, 255, 255, 0.72) !important;
 }
 
-html[data-preset="emerald"]:is([data-section="morning"], [data-visual-phase="morning"]) .dhikr-card {
+html[data-preset="emerald"][data-visual-phase="morning"] .dhikr-card {
   background: rgba(222, 235, 226, 0.94) !important;
   border-color: rgba(255, 255, 255, 0.76) !important;
   box-shadow: 0 12px 30px rgba(24, 79, 61, 0.1) !important;
   backdrop-filter: blur(20px) saturate(110%);
 }
 
-html[data-preset="emerald"]:is([data-section="morning"], [data-visual-phase="morning"]) .bottom-nav-row,
-html[data-preset="emerald"][data-section="salah"] .bottom-nav-row,
-html[data-preset="emerald"][data-section="tasbih"] .bottom-nav-row,
-html[data-preset="emerald"][data-section="default"] .bottom-nav-row {
+html[data-preset="emerald"][data-visual-phase="morning"] .bottom-nav-row,
+html[data-preset="emerald"][data-section="salah"]:not([data-visual-phase="evening"]) .bottom-nav-row,
+html[data-preset="emerald"][data-section="tasbih"]:not([data-visual-phase="evening"]) .bottom-nav-row,
+html[data-preset="emerald"][data-section="default"]:not([data-visual-phase="evening"]) .bottom-nav-row {
   background: rgba(212, 230, 218, 0.94) !important;
   border-color: rgba(255, 255, 255, 0.7) !important;
   box-shadow: 0 8px 24px rgba(24, 79, 61, 0.1) !important;
   backdrop-filter: blur(20px);
 }
 
-html[data-preset="emerald"]:is([data-section="morning"], [data-visual-phase="morning"]) .adhkar-pagination-arrow {
+html[data-preset="emerald"][data-visual-phase="morning"] .adhkar-pagination-arrow {
   border-color: rgba(255, 255, 255, 0.8);
   background: rgba(222, 235, 226, 0.86);
   color: #245f49;
 }
 
-html[data-preset="emerald"][data-section="salah"] .salah-location-card,
-html[data-preset="emerald"][data-section="salah"] .salah-recommended-card,
-html[data-preset="emerald"][data-section="salah"] .salah-adhan-card,
-html[data-preset="emerald"][data-section="salah"] .salah-upcoming-placeholder {
+html[data-preset="emerald"][data-section="salah"]:not([data-visual-phase="evening"]) .salah-location-card,
+html[data-preset="emerald"][data-section="salah"]:not([data-visual-phase="evening"]) .salah-recommended-card,
+html[data-preset="emerald"][data-section="salah"]:not([data-visual-phase="evening"]) .salah-adhan-card,
+html[data-preset="emerald"][data-section="salah"]:not([data-visual-phase="evening"]) .salah-upcoming-placeholder {
   background: rgba(222, 235, 226, 0.94) !important;
   border-color: rgba(255, 255, 255, 0.72) !important;
   box-shadow: 0 10px 28px rgba(24, 79, 61, 0.08) !important;
 }
 
-html[data-preset="emerald"][data-section="tasbih"] .tasbih-card {
+html[data-preset="emerald"][data-section="tasbih"]:not([data-visual-phase="evening"]) .tasbih-card {
   background: rgba(222, 235, 226, 0.94) !important;
   border-color: rgba(255, 255, 255, 0.72) !important;
   box-shadow: 0 12px 30px rgba(24, 79, 61, 0.1) !important;
 }
 
-html[data-preset="emerald"][data-section="tasbih"] .tasbih-disc {
+html[data-preset="emerald"][data-section="tasbih"]:not([data-visual-phase="evening"]) .tasbih-disc {
   border-color: #eaf3ed;
   background: radial-gradient(circle at 50% 35%, #f4faf6 0%, #e5f0e9 70%, #d7e8dd 100%);
   box-shadow: 0 18px 40px rgba(24, 79, 61, 0.1), inset 0 2px 6px rgba(255, 255, 255, 0.85), inset 0 -6px 14px rgba(24, 79, 61, 0.05);
 }
 
-html[data-preset="emerald"][data-section="tasbih"] .tasbih-target {
+html[data-preset="emerald"][data-section="tasbih"]:not([data-visual-phase="evening"]) .tasbih-target {
   background: rgba(222, 235, 226, 0.9);
   border-color: rgba(255, 255, 255, 0.72);
 }
 
-html[data-preset="emerald"][data-section="tasbih"] .tasbih-target.is-active {
+html[data-preset="emerald"][data-section="tasbih"]:not([data-visual-phase="evening"]) .tasbih-target.is-active {
   background: #357c62;
   border-color: transparent;
   color: #ffffff;
@@ -2002,12 +2002,12 @@ html[data-preset="sand"] {
   --eve-source-fg: #f1d2a3;
 }
 
-html[data-preset="sand"]:is([data-section="morning"], [data-visual-phase="morning"]),
-html[data-preset="sand"][data-section="salah"],
-html[data-preset="sand"][data-section="tasbih"],
-html[data-preset="sand"][data-section="custom"],
-html[data-preset="sand"][data-section="wake"],
-html[data-preset="sand"][data-section="default"] {
+html[data-preset="sand"][data-visual-phase="morning"],
+html[data-preset="sand"][data-section="salah"]:not([data-visual-phase="evening"]),
+html[data-preset="sand"][data-section="tasbih"]:not([data-visual-phase="evening"]),
+html[data-preset="sand"][data-section="custom"]:not([data-visual-phase="evening"]),
+html[data-preset="sand"][data-section="wake"]:not([data-visual-phase="evening"]),
+html[data-preset="sand"][data-section="default"]:not([data-visual-phase="evening"]) {
   --card: #f2e5cf !important;
   --surface-card: #f2e5cf !important;
   --surface: #f2e5cf !important;
@@ -2021,45 +2021,45 @@ html[data-preset="sand"][data-section="default"] {
   --card-border: rgba(255, 255, 255, 0.68) !important;
 }
 
-html[data-preset="sand"]:is([data-section="morning"], [data-visual-phase="morning"]) .dhikr-card,
-html[data-preset="sand"][data-section="salah"] .salah-location-card,
-html[data-preset="sand"][data-section="salah"] .salah-recommended-card,
-html[data-preset="sand"][data-section="salah"] .salah-adhan-card,
-html[data-preset="sand"][data-section="salah"] .salah-upcoming-placeholder,
-html[data-preset="sand"][data-section="tasbih"] .tasbih-card {
+html[data-preset="sand"][data-visual-phase="morning"] .dhikr-card,
+html[data-preset="sand"][data-section="salah"]:not([data-visual-phase="evening"]) .salah-location-card,
+html[data-preset="sand"][data-section="salah"]:not([data-visual-phase="evening"]) .salah-recommended-card,
+html[data-preset="sand"][data-section="salah"]:not([data-visual-phase="evening"]) .salah-adhan-card,
+html[data-preset="sand"][data-section="salah"]:not([data-visual-phase="evening"]) .salah-upcoming-placeholder,
+html[data-preset="sand"][data-section="tasbih"]:not([data-visual-phase="evening"]) .tasbih-card {
   background: rgba(242, 229, 207, 0.94) !important;
   border-color: rgba(255, 255, 255, 0.7) !important;
   box-shadow: 0 12px 30px rgba(98, 69, 31, 0.1) !important;
 }
 
-html[data-preset="sand"]:is([data-section="morning"], [data-visual-phase="morning"]) .bottom-nav-row,
-html[data-preset="sand"][data-section="salah"] .bottom-nav-row,
-html[data-preset="sand"][data-section="tasbih"] .bottom-nav-row,
-html[data-preset="sand"][data-section="default"] .bottom-nav-row {
+html[data-preset="sand"][data-visual-phase="morning"] .bottom-nav-row,
+html[data-preset="sand"][data-section="salah"]:not([data-visual-phase="evening"]) .bottom-nav-row,
+html[data-preset="sand"][data-section="tasbih"]:not([data-visual-phase="evening"]) .bottom-nav-row,
+html[data-preset="sand"][data-section="default"]:not([data-visual-phase="evening"]) .bottom-nav-row {
   background: rgba(234, 217, 186, 0.94) !important;
   border-color: rgba(255, 255, 255, 0.62) !important;
   box-shadow: 0 8px 24px rgba(98, 69, 31, 0.1) !important;
   backdrop-filter: blur(20px);
 }
 
-html[data-preset="sand"]:is([data-section="morning"], [data-visual-phase="morning"]) .adhkar-pagination-arrow {
+html[data-preset="sand"][data-visual-phase="morning"] .adhkar-pagination-arrow {
   border-color: rgba(255, 255, 255, 0.72);
   background: rgba(242, 229, 207, 0.88);
   color: #694a24;
 }
 
-html[data-preset="sand"][data-section="tasbih"] .tasbih-disc {
+html[data-preset="sand"][data-section="tasbih"]:not([data-visual-phase="evening"]) .tasbih-disc {
   border-color: #f5ead7;
   background: radial-gradient(circle at 50% 35%, #fffaf0 0%, #f4e8d2 70%, #e9d7b8 100%);
   box-shadow: 0 18px 40px rgba(98, 69, 31, 0.1), inset 0 2px 6px rgba(255, 255, 255, 0.82), inset 0 -6px 14px rgba(98, 69, 31, 0.05);
 }
 
-html[data-preset="sand"][data-section="tasbih"] .tasbih-target {
+html[data-preset="sand"][data-section="tasbih"]:not([data-visual-phase="evening"]) .tasbih-target {
   background: rgba(242, 229, 207, 0.9);
   border-color: rgba(255, 255, 255, 0.68);
 }
 
-html[data-preset="sand"][data-section="tasbih"] .tasbih-target.is-active {
+html[data-preset="sand"][data-section="tasbih"]:not([data-visual-phase="evening"]) .tasbih-target.is-active {
   background: #98703d;
   border-color: transparent;
   color: #ffffff;
@@ -2181,12 +2181,12 @@ html[data-preset="midnight"] {
   --count-fg: #d6e2ff;
 }
 
-html[data-preset="midnight"]:is([data-section="morning"], [data-visual-phase="morning"]),
-html[data-preset="midnight"][data-section="salah"],
-html[data-preset="midnight"][data-section="tasbih"],
-html[data-preset="midnight"][data-section="custom"],
-html[data-preset="midnight"][data-section="wake"],
-html[data-preset="midnight"][data-section="default"] {
+html[data-preset="midnight"][data-visual-phase="morning"],
+html[data-preset="midnight"][data-section="salah"]:not([data-visual-phase="evening"]),
+html[data-preset="midnight"][data-section="tasbih"]:not([data-visual-phase="evening"]),
+html[data-preset="midnight"][data-section="custom"]:not([data-visual-phase="evening"]),
+html[data-preset="midnight"][data-section="wake"]:not([data-visual-phase="evening"]),
+html[data-preset="midnight"][data-section="default"]:not([data-visual-phase="evening"]) {
   --background: #17294f !important;
   --foreground: #dce7ff !important;
   --title: #edf3ff !important;
@@ -2230,57 +2230,57 @@ html[data-preset="midnight"][data-section="default"] {
   --header-sub: #c8d7f7 !important;
 }
 
-html[data-preset="midnight"][data-section="salah"] .salah-location-card .label-caps,
-html[data-preset="midnight"][data-section="salah"] .salah-location-card p,
-html[data-preset="midnight"][data-section="salah"] .salah-location,
-html[data-preset="midnight"][data-section="salah"] .salah-kicker,
-html[data-preset="midnight"][data-section="salah"] .salah-recommended-progress,
-html[data-preset="midnight"][data-section="salah"] .salah-adhan-subtitle,
-html[data-preset="midnight"][data-section="salah"] .salah-adhan-chevron {
+html[data-preset="midnight"][data-section="salah"]:not([data-visual-phase="evening"]) .salah-location-card .label-caps,
+html[data-preset="midnight"][data-section="salah"]:not([data-visual-phase="evening"]) .salah-location-card p,
+html[data-preset="midnight"][data-section="salah"]:not([data-visual-phase="evening"]) .salah-location,
+html[data-preset="midnight"][data-section="salah"]:not([data-visual-phase="evening"]) .salah-kicker,
+html[data-preset="midnight"][data-section="salah"]:not([data-visual-phase="evening"]) .salah-recommended-progress,
+html[data-preset="midnight"][data-section="salah"]:not([data-visual-phase="evening"]) .salah-adhan-subtitle,
+html[data-preset="midnight"][data-section="salah"]:not([data-visual-phase="evening"]) .salah-adhan-chevron {
   color: #b2c2e5 !important;
 }
 
-html[data-preset="midnight"]:is([data-section="morning"], [data-visual-phase="morning"]) .dhikr-card,
-html[data-preset="midnight"][data-section="salah"] .salah-location-card,
-html[data-preset="midnight"][data-section="salah"] .salah-recommended-card,
-html[data-preset="midnight"][data-section="salah"] .salah-adhan-card,
-html[data-preset="midnight"][data-section="salah"] .salah-upcoming-placeholder,
-html[data-preset="midnight"][data-section="tasbih"] .tasbih-card {
+html[data-preset="midnight"][data-visual-phase="morning"] .dhikr-card,
+html[data-preset="midnight"][data-section="salah"]:not([data-visual-phase="evening"]) .salah-location-card,
+html[data-preset="midnight"][data-section="salah"]:not([data-visual-phase="evening"]) .salah-recommended-card,
+html[data-preset="midnight"][data-section="salah"]:not([data-visual-phase="evening"]) .salah-adhan-card,
+html[data-preset="midnight"][data-section="salah"]:not([data-visual-phase="evening"]) .salah-upcoming-placeholder,
+html[data-preset="midnight"][data-section="tasbih"]:not([data-visual-phase="evening"]) .tasbih-card {
   background: rgba(43, 64, 111, 0.88) !important;
   border-color: rgba(169, 193, 247, 0.24) !important;
   box-shadow: 0 12px 32px rgba(10, 25, 57, 0.22) !important;
   backdrop-filter: blur(24px) saturate(120%);
 }
 
-html[data-preset="midnight"]:is([data-section="morning"], [data-visual-phase="morning"]) .bottom-nav-row,
-html[data-preset="midnight"][data-section="salah"] .bottom-nav-row,
-html[data-preset="midnight"][data-section="tasbih"] .bottom-nav-row,
-html[data-preset="midnight"][data-section="default"] .bottom-nav-row {
+html[data-preset="midnight"][data-visual-phase="morning"] .bottom-nav-row,
+html[data-preset="midnight"][data-section="salah"]:not([data-visual-phase="evening"]) .bottom-nav-row,
+html[data-preset="midnight"][data-section="tasbih"]:not([data-visual-phase="evening"]) .bottom-nav-row,
+html[data-preset="midnight"][data-section="default"]:not([data-visual-phase="evening"]) .bottom-nav-row {
   background: rgba(39, 57, 99, 0.92) !important;
   border-color: rgba(169, 193, 247, 0.3) !important;
   box-shadow: 0 0 0 1px rgba(169, 193, 247, 0.07), 0 10px 30px rgba(20, 42, 90, 0.18) !important;
   backdrop-filter: blur(22px);
 }
 
-html[data-preset="midnight"]:is([data-section="morning"], [data-visual-phase="morning"]) .adhkar-pagination-arrow {
+html[data-preset="midnight"][data-visual-phase="morning"] .adhkar-pagination-arrow {
   border-color: rgba(190, 208, 250, 0.4);
   background: rgba(205, 220, 255, 0.14);
   color: #e7eeff;
   backdrop-filter: blur(8px);
 }
 
-html[data-preset="midnight"][data-section="tasbih"] .tasbih-disc {
+html[data-preset="midnight"][data-section="tasbih"]:not([data-visual-phase="evening"]) .tasbih-disc {
   border-color: rgba(190, 208, 250, 0.24);
   background: radial-gradient(circle at 50% 34%, rgba(92, 120, 181, 0.95) 0%, rgba(48, 73, 128, 0.98) 68%, rgba(34, 53, 96, 0.98) 100%);
   box-shadow: 0 18px 40px rgba(10, 25, 57, 0.24), inset 0 2px 6px rgba(210, 225, 255, 0.16), inset 0 -6px 14px rgba(5, 15, 38, 0.14);
 }
 
-html[data-preset="midnight"][data-section="tasbih"] .tasbih-target {
+html[data-preset="midnight"][data-section="tasbih"]:not([data-visual-phase="evening"]) .tasbih-target {
   background: rgba(43, 64, 111, 0.84);
   border-color: rgba(169, 193, 247, 0.28);
 }
 
-html[data-preset="midnight"][data-section="tasbih"] .tasbih-target.is-active {
+html[data-preset="midnight"][data-section="tasbih"]:not([data-visual-phase="evening"]) .tasbih-target.is-active {
   background: #7799e8;
   color: #ffffff;
 }
@@ -2360,20 +2360,20 @@ html[data-preset="midnight"][data-visual-phase="evening"] .daily-swipe-stack .ad
 }
 
 /* Midnight (morning phase): soften the photo's horizon band under the card */
-html[data-preset="midnight"]:is([data-section="morning"], [data-visual-phase="morning"]) .app-shell::after,
-html[data-preset="midnight"][data-section="salah"] .app-shell::after,
-html[data-preset="midnight"][data-section="tasbih"] .app-shell::after,
-html[data-preset="midnight"][data-section="wake"] .app-shell::after,
-html[data-preset="midnight"][data-section="default"] .app-shell::after {
+html[data-preset="midnight"][data-visual-phase="morning"] .app-shell::after,
+html[data-preset="midnight"][data-section="salah"]:not([data-visual-phase="evening"]) .app-shell::after,
+html[data-preset="midnight"][data-section="tasbih"]:not([data-visual-phase="evening"]) .app-shell::after,
+html[data-preset="midnight"][data-section="wake"]:not([data-visual-phase="evening"]) .app-shell::after,
+html[data-preset="midnight"][data-section="default"]:not([data-visual-phase="evening"]) .app-shell::after {
   background: linear-gradient(180deg, rgba(23, 41, 79, 0.08) 0%, rgba(23, 41, 79, 0.05) 55%, rgba(16, 30, 62, 0.34) 78%, rgba(12, 24, 50, 0.5) 92%, rgba(10, 21, 44, 0.58) 100%) !important;
 }
 
 /* Midnight (morning phase): the counter pill and dismiss pill must sit on dark glass */
-html[data-preset="midnight"]:is([data-section="morning"], [data-visual-phase="morning"]) .daily-swipe-stack .adhkar-index-row > span,
-html[data-preset="midnight"][data-section="salah"] .daily-swipe-stack .adhkar-index-row > span,
-html[data-preset="midnight"][data-section="tasbih"] .daily-swipe-stack .adhkar-index-row > span,
-html[data-preset="midnight"][data-section="wake"] .daily-swipe-stack .adhkar-index-row > span,
-html[data-preset="midnight"][data-section="default"] .daily-swipe-stack .adhkar-index-row > span {
+html[data-preset="midnight"][data-visual-phase="morning"] .daily-swipe-stack .adhkar-index-row > span,
+html[data-preset="midnight"][data-section="salah"]:not([data-visual-phase="evening"]) .daily-swipe-stack .adhkar-index-row > span,
+html[data-preset="midnight"][data-section="tasbih"]:not([data-visual-phase="evening"]) .daily-swipe-stack .adhkar-index-row > span,
+html[data-preset="midnight"][data-section="wake"]:not([data-visual-phase="evening"]) .daily-swipe-stack .adhkar-index-row > span,
+html[data-preset="midnight"][data-section="default"]:not([data-visual-phase="evening"]) .daily-swipe-stack .adhkar-index-row > span {
   border: 1px solid rgba(169, 193, 247, 0.32) !important;
   background: rgba(205, 220, 255, 0.12) !important;
   color: #eaf1ff !important;
@@ -2381,8 +2381,8 @@ html[data-preset="midnight"][data-section="default"] .daily-swipe-stack .adhkar-
   backdrop-filter: blur(8px);
 }
 
-html[data-preset="midnight"]:is([data-section="morning"], [data-visual-phase="morning"]) .salah-dismiss,
-html[data-preset="midnight"][data-section="salah"] .salah-dismiss {
+html[data-preset="midnight"][data-visual-phase="morning"] .salah-dismiss,
+html[data-preset="midnight"][data-section="salah"]:not([data-visual-phase="evening"]) .salah-dismiss {
   border-color: rgba(169, 193, 247, 0.32) !important;
   background: rgba(205, 220, 255, 0.12) !important;
   color: #eaf1ff !important;
@@ -2395,12 +2395,12 @@ html[data-preset="midnight"] .dl-private {
 }
 
 /* ---------- Dark Red: translucent oxblood glass from the supplied references ---------- */
-html[data-preset="dark-red"]:is([data-section="morning"], [data-visual-phase="morning"]),
-html[data-preset="dark-red"][data-section="salah"],
-html[data-preset="dark-red"][data-section="tasbih"],
-html[data-preset="dark-red"][data-section="custom"],
-html[data-preset="dark-red"][data-section="wake"],
-html[data-preset="dark-red"][data-section="default"] {
+html[data-preset="dark-red"][data-visual-phase="morning"],
+html[data-preset="dark-red"][data-section="salah"]:not([data-visual-phase="evening"]),
+html[data-preset="dark-red"][data-section="tasbih"]:not([data-visual-phase="evening"]),
+html[data-preset="dark-red"][data-section="custom"]:not([data-visual-phase="evening"]),
+html[data-preset="dark-red"][data-section="wake"]:not([data-visual-phase="evening"]),
+html[data-preset="dark-red"][data-section="default"]:not([data-visual-phase="evening"]) {
   --background: #351416 !important;
   --foreground: #f7dfd8 !important;
   --title: #fff1e9 !important;
@@ -2446,12 +2446,12 @@ html[data-preset="dark-red"][data-section="default"] {
   --header-sub: #dca9a5 !important;
 }
 
-html[data-preset="dark-red"]:is([data-section="morning"], [data-visual-phase="morning"]) .dhikr-card,
-html[data-preset="dark-red"][data-section="salah"] .salah-location-card,
-html[data-preset="dark-red"][data-section="salah"] .salah-recommended-card,
-html[data-preset="dark-red"][data-section="salah"] .salah-adhan-card,
-html[data-preset="dark-red"][data-section="salah"] .salah-upcoming-placeholder,
-html[data-preset="dark-red"][data-section="tasbih"] .tasbih-card {
+html[data-preset="dark-red"][data-visual-phase="morning"] .dhikr-card,
+html[data-preset="dark-red"][data-section="salah"]:not([data-visual-phase="evening"]) .salah-location-card,
+html[data-preset="dark-red"][data-section="salah"]:not([data-visual-phase="evening"]) .salah-recommended-card,
+html[data-preset="dark-red"][data-section="salah"]:not([data-visual-phase="evening"]) .salah-adhan-card,
+html[data-preset="dark-red"][data-section="salah"]:not([data-visual-phase="evening"]) .salah-upcoming-placeholder,
+html[data-preset="dark-red"][data-section="tasbih"]:not([data-visual-phase="evening"]) .tasbih-card {
   background: rgba(74, 35, 35, 0.78) !important;
   border-color: rgba(247, 177, 176, 0.36) !important;
   box-shadow: 0 14px 34px rgba(38, 8, 10, 0.28) !important;
@@ -2574,18 +2574,18 @@ html[data-preset="dark-red"][data-visual-phase="morning"] .adhkar-pagination-arr
   color: #ffd5cf;
 }
 
-html[data-preset="dark-red"][data-section="tasbih"] .tasbih-disc {
+html[data-preset="dark-red"][data-section="tasbih"]:not([data-visual-phase="evening"]) .tasbih-disc {
   border-color: rgba(255, 247, 242, 0.76);
   background: radial-gradient(circle at 50% 34%, #fff5f0 0%, #f1d9d0 70%, #e5c3ba 100%);
   box-shadow: 0 18px 40px rgba(78, 20, 26, 0.13), inset 0 2px 6px rgba(255, 255, 255, 0.8), inset 0 -6px 14px rgba(91, 28, 34, 0.06);
 }
 
-html[data-preset="dark-red"][data-section="tasbih"] .tasbih-target {
+html[data-preset="dark-red"][data-section="tasbih"]:not([data-visual-phase="evening"]) .tasbih-target {
   background: rgba(247, 230, 222, 0.9);
   border-color: rgba(139, 48, 56, 0.16);
 }
 
-html[data-preset="dark-red"][data-section="tasbih"] .tasbih-target.is-active {
+html[data-preset="dark-red"][data-section="tasbih"]:not([data-visual-phase="evening"]) .tasbih-target.is-active {
   background: #8b3038;
   border-color: transparent;
   color: #fff7f3;
@@ -4461,3 +4461,52 @@ html[data-preset="personal"] .tasbih-helper-primary,
 html[data-preset="personal"] .salah-adhan-title { color:var(--card-foreground)!important; }
 html[data-preset="personal"] .tasbih-target { background:var(--card)!important;color:var(--card-foreground)!important;border-color:var(--border)!important; }
 html[data-preset="personal"] .tasbih-target.is-active { background:var(--accent)!important;color:var(--accent-foreground)!important; }
+
+/* Complete the evening semantic palette for every route, including More and Settings.
+   Route-specific day treatments must never decide the selected visual phase. */
+html[data-preset]:not([data-preset="personal"])[data-visual-phase="evening"] {
+  --surface: var(--card) !important;
+  --card-2: var(--card) !important;
+  --popover: var(--card) !important;
+  --popover-foreground: var(--card-foreground) !important;
+  --muted: color-mix(in oklab, var(--card) 88%, var(--accent)) !important;
+  --muted-foreground: var(--text-muted) !important;
+  --secondary: color-mix(in oklab, var(--card) 85%, var(--accent)) !important;
+  --secondary-foreground: var(--card-foreground) !important;
+  --primary-foreground: var(--background) !important;
+  --accent-foreground: var(--background) !important;
+  --text-primary: var(--card-foreground) !important;
+  --text-secondary: var(--text-muted) !important;
+  --text-on-accent: var(--background) !important;
+  --text-on-header: var(--eve-title) !important;
+  --header-fg: var(--eve-title) !important;
+  --header-sub: var(--eve-eyebrow) !important;
+  --btn-surface: var(--source-bg) !important;
+  --btn-fg: var(--source-fg) !important;
+  --arrow-bg: var(--pill-bg) !important;
+  --arrow-fg: var(--source-fg) !important;
+  --ring-fill: var(--accent) !important;
+  --nav-safe-area-bg: var(--background) !important;
+  --surface-deep: color-mix(in oklab, var(--card) 86%, var(--accent)) !important;
+  --surface-deep-gradient: linear-gradient(135deg, color-mix(in oklab, var(--card) 82%, var(--accent)), var(--card)) !important;
+  --surface-deep-fg: var(--card-foreground) !important;
+  --surface-deep-muted: var(--text-muted) !important;
+  --surface-deep-border: var(--card-border) !important;
+  --surface-deep-accent-fg: var(--background) !important;
+}
+html[data-preset][data-visual-phase="evening"] .adhkar-header .app-page-title { color: var(--title); }
+html[data-preset][data-visual-phase="evening"] .adhkar-header .label-caps { color: var(--eyebrow); }
+html[data-preset][data-visual-phase="evening"] .tasbih-target { color: var(--card-foreground); }
+html[data-preset][data-visual-phase="evening"] .tasbih-target.is-active,
+html[data-preset][data-visual-phase="evening"] .tasbih-confirm-btn.solid {
+  background: var(--accent) !important;
+  color: var(--accent-foreground) !important;
+}
+html[data-preset][data-visual-phase="evening"] .tasbih-confirm {
+  background: var(--card); border-color: var(--card-border); color: var(--card-foreground);
+}
+html[data-preset][data-visual-phase="evening"] .tasbih-confirm-title { color: var(--card-foreground); }
+html[data-preset][data-visual-phase="evening"] .tasbih-confirm-sub { color: var(--text-muted); }
+html[data-preset][data-visual-phase="evening"] .tasbih-confirm-btn.ghost {
+  background: var(--secondary); color: var(--secondary-foreground); border-color: var(--card-border);
+}
