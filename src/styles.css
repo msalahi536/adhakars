@@ -4664,9 +4664,9 @@ html[data-preset][data-visual-phase="evening"] .tasbih-confirm-btn.ghost {
 .quran-mini-main { color: var(--foreground); } .quran-mini-main .font-semibold { color: var(--accent); }
 
 /* Mushaf-style ayah marker + reader reciter sheet */
-.quran-ayah { position: relative; display: inline-grid; place-items: center; width: 38px; height: 38px; color: var(--accent); flex-shrink: 0; }
+.quran-ayah { --ayah-frame: oklch(0.56 0.08 60); --ayah-ink: oklch(0.3 0.04 50); --ayah-fill: oklch(0.88 0.06 185); position: relative; display: inline-grid; place-items: center; width: 30px; height: 42px; flex-shrink: 0; }
 .quran-ayah svg { position: absolute; inset: 0; width: 100%; height: 100%; }
-.quran-ayah-n { position: relative; font-family: "Amiri", "Scheherazade New", serif; font-size: 14px; font-weight: 700; line-height: 1; color: var(--foreground); }
+.quran-ayah-n { position: relative; font-family: "Amiri", "Scheherazade New", serif; font-size: 13px; font-weight: 700; line-height: 1; color: oklch(0.3 0.05 160); margin-top: -2px; }
 .quran-sheet-backdrop { position: fixed; inset: 0; z-index: 150; background: color-mix(in oklab, var(--foreground) 28%, transparent); display: flex; align-items: flex-end; justify-content: center; animation: quran-mini-in .2s ease-out; }
 .quran-sheet { width: 100%; max-width: 28rem; max-height: 62vh; display: flex; flex-direction: column; background: var(--card); color: var(--foreground); border-radius: 28px 28px 0 0; box-shadow: 0 -10px 40px color-mix(in oklab, var(--foreground) 18%, transparent); padding-bottom: env(safe-area-inset-bottom); animation: quran-sheet-up .28s cubic-bezier(.2,.8,.2,1); }
 .quran-sheet-grip { width: 40px; height: 5px; border-radius: 99px; margin: 10px auto 8px; background: color-mix(in oklab, var(--foreground) 22%, transparent); }
