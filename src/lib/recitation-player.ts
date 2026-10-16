@@ -12,10 +12,10 @@ export type PlayerState = {
   queue: Track[];
   queueIndex: number;
   queueLabel: string | null;
-  levels: [number, number, number];
+  levels: [number, number, number, number, number, number];
 };
 
-let state: PlayerState = { track: null, playing: false, current: 0, duration: 0, queue: [], queueIndex: -1, queueLabel: null, levels: [0.28, 0.28, 0.28] };
+let state: PlayerState = { track: null, playing: false, current: 0, duration: 0, queue: [], queueIndex: -1, queueLabel: null, levels: [0.18, 0.18, 0.18, 0.18, 0.18, 0.18] };
 const subs = new Set<() => void>();
 const set = (p: Partial<PlayerState>) => { state = { ...state, ...p }; subs.forEach((f) => f()); };
 
@@ -28,18 +28,18 @@ let meterFrame: number | null = null;
 function stopMeter() {
   if (meterFrame != null) cancelAnimationFrame(meterFrame);
   meterFrame = null;
-  set({ levels: [0.28, 0.28, 0.28] });
+  set({ levels: [0.18, 0.18, 0.18, 0.18, 0.18, 0.18] });
 }
 
 function runMeter() {
   if (!analyser || !analyserData || !audio || audio.paused) return;
   analyser.getByteFrequencyData(analyserData);
-  const bands: [number, number, number] = [0, 0, 0];
-  const width = Math.max(1, Math.floor(analyserData.length / 3));
-  for (let band = 0; band < 3; band += 1) {
+  const bands: PlayerState["levels"] = [0, 0, 0, 0, 0, 0];
+  const width = Math.max(1, Math.floor(analyserData.length / bands.length));
+  for (let band = 0; band < bands.length; band += 1) {
     let sum = 0;
     const start = band * width;
-    const end = band === 2 ? analyserData.length : Math.min(analyserData.length, start + width);
+    const end = band === bands.length - 1 ? analyserData.length : Math.min(analyserData.length, start + width);
     for (let i = start; i < end; i += 1) sum += analyserData[i] ?? 0;
     bands[band] = Math.max(0.22, Math.min(1, sum / Math.max(1, end - start) / 150));
   }
@@ -97,15 +97,16 @@ function loadEnvelope(url: string) {
 
 function runSynthMeter() {
   if (!audio || audio.paused) return;
+  const currentTime = audio.currentTime;
   const env = state.track ? envelopes.get(state.track.url) : undefined;
   if (env) {
     const at = (offset: number) => {
-      const f = Math.floor((audio!.currentTime + offset) / ENV_STEP);
+      const f = Math.floor((currentTime + offset) / ENV_STEP);
       return Math.max(0.18, Math.min(1, (env[Math.max(0, Math.min(env.length - 1, f))] ?? 0) * 1.15));
     };
-    set({ levels: [at(-0.06), at(0), at(0.06)] });
+    set({ levels: [at(-0.09), at(-0.06), at(-0.03), at(0), at(0.03), at(0.06)] });
   } else {
-    set({ levels: [0.28, 0.28, 0.28] });
+    set({ levels: [0.18, 0.18, 0.18, 0.18, 0.18, 0.18] });
   }
   meterFrame = requestAnimationFrame(runSynthMeter);
 }

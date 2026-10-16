@@ -4371,8 +4371,9 @@ html[data-preset="midnight"][data-visual-phase="evening"][data-section="salah"] 
 .rec-pop-all-div { width: 1px; height: 14px; background: color-mix(in oklab, var(--foreground) 18%, transparent); flex-shrink: 0; }
 .rec-pop-all-tx { font-size: 11px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .rec-pop-all:active { transform: scale(.97); }
-.rec-eq { display: inline-flex; align-items: flex-end; gap: 2px; height: 12px; }
-.rec-eq i { width: 2.5px; min-height: 2px; background: currentColor; border-radius: 2px; transition: height 80ms linear; }
+.rec-eq { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); align-items: center; gap: 1.5px; width: 64%; height: 58%; flex: none; pointer-events: none; }
+.rec-eq i { display: block; width: 100%; min-height: 2px; background: currentColor; border-radius: 999px; transition: height 80ms linear; }
+@media (prefers-reduced-motion: reduce) { .rec-eq i { transition: none; } }
 
 /* Store badges inside the dark download panel */
 .marketing-download-actions { display: flex; flex-direction: column; align-items: flex-start; gap: 20px; margin-top: 32px; }
