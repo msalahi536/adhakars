@@ -157,7 +157,16 @@ export function AdhanPlayer({ visible, prayer, reciterId, onClose }: Props) {
   if (minimized) {
     return (
       <Portal>
-        <button type="button" className="ap-pill" onClick={() => setMinimized(false)} aria-label={`Open ${name} adhan player`}>
+        <button
+          type="button"
+          className="ap-pill"
+          onClick={() => {
+            // Reopen signature: two crisp rising pops, like something opening.
+            void triggerHapticPattern([9, 55, 24, 45, 24], "medium");
+            setMinimized(false);
+          }}
+          aria-label={`Open ${name} adhan player`}
+        >
           <span className="ap-pill-wave" aria-hidden="true">
             <span /><span /><span />
           </span>
