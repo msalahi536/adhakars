@@ -111,12 +111,6 @@ export function BottomNav() {
                     className="nav-active-mark"
                     style={{ background: active ? activeColor : "transparent" }}
                   />
-                  {t.to === "/app/quran" && showQuranHint && (
-                    <span className="quran-nav-hint" role="status">
-                      <span className="quran-nav-hint-dot" aria-hidden />
-                      New · Read the Quran
-                    </span>
-                  )}
                 </>
               );
             }}
@@ -124,6 +118,14 @@ export function BottomNav() {
           );
         })}
       </div>
+      {showQuranHint && (
+        <div className="quran-nav-hint-wrap mx-auto max-w-md px-2" aria-hidden={false}>
+          <span className="quran-nav-hint" role="status">
+            <span className="quran-nav-hint-dot" aria-hidden />
+            New · Read the Quran
+          </span>
+        </div>
+      )}
     </nav>
   );
 }
