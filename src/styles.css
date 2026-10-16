@@ -4746,3 +4746,7 @@ body.quran-fs-on .quran-mini:not(.quran-fs .quran-mini) { display: none; }
   .quran-fs-x { top: calc(env(safe-area-inset-top, 0px) + 12px); left: calc(env(safe-area-inset-left, 0px) + 10px); right: auto; }
   .quran-fs .quran-player { left: auto; right: calc(env(safe-area-inset-right, 0px) + 12px); transform: none; width: 326px; bottom: calc(env(safe-area-inset-bottom, 0px) + 10px); }
 }
+.quran-translit.is-big { font-size: 17px; line-height: 1.6; color: var(--foreground); opacity: .9; cursor: pointer; transition: color .3s, opacity .3s; }
+.quran-verse.is-active .quran-translit.is-big { opacity: 1; color: var(--ayah-active); }
+.quran-fs-sheet, .quran-fs-band, .quran-fs .quran-mushaf { border: 0 !important; box-shadow: none !important; background: none !important; outline: 0 !important; }
+.quran-fs-foot, .quran-fs-sub { display: none; }
