@@ -48,3 +48,8 @@
 - [x] Remove "Available now" eyebrow from homepage download section
 - [x] Polish /download page for masjid QR-code visitors (store badges front and center)
 - [x] Drop the JS prayer-times handoff; native widgets fetch times from the Al-Adhan API themselves
+
+## Open: Dark Red / always-evening audit (added Oct 16 2026)
+- [x] After-Isha adhkar sheet + Adhan Settings sheet outlined in harsh white on Dark Red — restyled to the muted rose card outline.
+- [x] Full "always evening" diagnosis across every preset: root cause was .salah-page's legacy light tokens (white --card-border, dark-green ink) beating theme tokens. Evening now inherits each theme's own outline on all presets; Dark Red morning text (countdown, card titles, sample pill) switched to the theme's card ink; "Prayer Times" pill border themed. Verified with computed-style audit + screenshots on all eight presets; no stray green text on Evening/Tasbih/More/Settings.
+- [ ] Real-device check on the always-evening Salah page (preview-only fix, not published).
