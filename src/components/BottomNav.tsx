@@ -7,6 +7,8 @@ import {
 
 type NavIconProps = { size?: number; strokeWidth?: number; style?: CSSProperties };
 
+const QURAN_HINT_KEY = "adhkar:quran-nav-hint";
+
 function SalahIcon({ size = 22, strokeWidth = 1.5, style }: NavIconProps) {
   return (
     <svg aria-hidden viewBox="0 0 24 24" width={size} height={size} fill="none" stroke="currentColor" strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round" style={style}>
@@ -51,6 +53,18 @@ export function BottomNav() {
     window.addEventListener(MORE_DESTINATION_EVENT, sync);
     return () => window.removeEventListener(MORE_DESTINATION_EVENT, sync);
   }, []);
+
+  const [showQuranHint, setShowQuranHint] = useState(false);
+  useEffect(() => {
+    try {
+      if (pathname.startsWith("/app/quran")) {
+        localStorage.setItem(QURAN_HINT_KEY, "seen");
+        setShowQuranHint(false);
+      } else {
+        setShowQuranHint(localStorage.getItem(QURAN_HINT_KEY) !== "seen");
+      }
+    } catch { setShowQuranHint(false); }
+  }, [pathname]);
 
   const iconColor = "var(--nav-inactive)";
   const activeColor = "var(--nav-active)";
@@ -104,6 +118,14 @@ export function BottomNav() {
           );
         })}
       </div>
+      {showQuranHint && (
+        <div className="quran-nav-hint-wrap mx-auto max-w-md px-2" aria-hidden={false}>
+          <span className="quran-nav-hint" role="status">
+            <span className="quran-nav-hint-dot" aria-hidden />
+            New · Read the Quran
+          </span>
+        </div>
+      )}
     </nav>
   );
 }
