@@ -5,7 +5,7 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { ChevronDown, ChevronLeft, ChevronRight, Heart, Loader2, Maximize2, Pause, Play, Repeat, Search, Shuffle, SkipBack, SkipForward, X } from "lucide-react";
 import {
   findReciter, getChapterAudio, getChapters, getVerses, POPULAR_RECITERS, RECITERS,
-  reciterName, reciterPhoto, reciterSubtitle, searchChapters, searchReciters, type Chapter, type Reciter, type Verse,
+  reciterHasSurah, reciterName, reciterPhoto, reciterSubtitle, searchChapters, searchReciters, type Chapter, type Reciter, type Verse,
 } from "@/lib/quran";
 import { getDisplay, triggerHaptic } from "@/lib/theme";
 import { quranPlayer, useQuranPlayer } from "@/lib/quran-player";
@@ -426,6 +426,12 @@ function Reader({ chapterId }: { chapterId: number }) {
             </section>
           )}
 
+          {!reciterHasSurah(shownReciter, chapterId) && (
+            <button type="button" className="quran-card quran-missing-note" onClick={() => setSheet(true)}>
+              <strong>{reciterName(shownReciter).replace(/\s*\[[^\]]*\]$/, "")} hasn't recorded {chapter?.name_simple ?? "this surah"} yet.</strong>
+              <span>You can still read it here. Tap to choose another reciter to listen.</span>
+            </button>
+          )}
           {error && <p className="quran-muted text-center text-sm">Couldn't load this surah. Check your connection.</p>}
           {!verses && !error && <div className="flex justify-center py-10"><Loader2 className="animate-spin" /></div>}
           {verses && display.page && !full && (
