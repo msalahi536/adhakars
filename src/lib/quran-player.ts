@@ -169,6 +169,7 @@ export const quranPlayer = {
   toggleRepeat() { set({ repeat: !state.repeat, shuffle: state.repeat ? state.shuffle : false }); },
   toggleShuffle() { set({ shuffle: !state.shuffle, repeat: state.shuffle ? state.repeat : false }); },
   setPanel(panelOpen: boolean) { set({ panelOpen }); },
+  setName(chapterName: string) { if (chapterName !== state.chapterName) { set({ chapterName }); setMetadata(); } },
   pause() { el?.pause(); },
   stop() {
     el?.pause();
