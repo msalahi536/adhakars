@@ -11,6 +11,7 @@ function normalizeQuery(s: string): string {
     .replace(/ah\b/g, "a").replace(/ee/g, "i").replace(/oo/g, "u").replace(/y/g, "i")
     .replace(/\s+/g, "").trim();
 }
+import { NAMED_PHOTOS } from "./reciter-photos-extra";
 import p0 from "@/assets/reciters/abdul-mun-im-abdul-mubdi.png.asset.json";
 import p1 from "@/assets/reciters/abdulazeez-al-ahmad.png.asset.json";
 import p2 from "@/assets/reciters/abdulbari-ath-thubaity.png.asset.json";
@@ -133,9 +134,13 @@ const LOCAL_PHOTOS: [string, string][] = [
   ["iaserdosari", p58.url],
 ];
 
+const NAMED: [string, string][] = NAMED_PHOTOS.map(([nm, u]) => [normalizeQuery(nm), u]);
+
 /** Portrait for a reciter name, or null when none was supplied. */
 export function localReciterPhoto(name: string): string | null {
-  const n = normalizeQuery(name.replace(/\[.*?\]/g, " ").replace(/\(.*?\)/g, " "));
+  const clean = name.replace(/\[.*?\]/g, " ").replace(/\(.*?\)/g, " ");
+  const n = normalizeQuery(clean);
+  for (const [nm, url] of NAMED) if (n === nm) return url;
   for (const [key, url] of LOCAL_PHOTOS) if (n.includes(key)) return url;
   return null;
 }
