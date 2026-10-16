@@ -160,10 +160,12 @@ function Home() {
       <Header kicker="The Noble Quran" title="Read & Listen" />
       <main className="scroll-area" onScroll={onScroll}>
         <div className="mx-auto max-w-md space-y-4 px-5 pb-8 pt-4">
-          <label className={`quran-search quran-search-sticky${searchFloat ? " is-float" : ""}${searchShown ? "" : " is-hidden"}`}>
-            <Search size={16} />
-            <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search surah by name, number, or reciter…" />
-          </label>
+          <div className={`quran-search-sticky${searchFloat ? " is-float" : ""}${searchShown ? "" : " is-hidden"}`}>
+            <label className="quran-search">
+              <Search size={16} />
+              <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search surah by name, number, or reciter…" />
+            </label>
+          </div>
 
           {reciterHits.length > 0 && (
             <div className="quran-card divide-y">
