@@ -274,7 +274,9 @@ function ReciterPicker({ back, tab }: { back?: number; tab?: "all" }) {
     audio.current?.pause(); quranPlayer.pause();
     setPreview(r.id);
     try {
-      const a = await getChapterAudio(r.id, 1);
+      const own = r.surahs?.split(",").map(Number).filter(Boolean) ?? [];
+      const ch = reciterHasSurah(r, 1) || !own.length ? 1 : own[Math.floor(Math.random() * own.length)];
+      const a = await getChapterAudio(r.id, ch);
       const el = new Audio(a.url);
       el.onended = () => setPreview(null);
       audio.current = el;
@@ -453,7 +455,6 @@ function Reader({ chapterId }: { chapterId: number }) {
               translit={display.translit} translation={display.translation} arabic={display.arabic} fav={favSet.has(v.key)}
               onPlay={onPlayVerse} onFav={toggleFav} />
           ))}
-          {verses && <p className="quran-muted pt-2 text-center text-[10px]">Text, translation (Saheeh International) and recitations via Quran.com</p>}
         </div>
       </main>
       {full && typeof document !== "undefined" && createPortal(
