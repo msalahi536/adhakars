@@ -334,6 +334,7 @@ function Reader({ chapterId }: { chapterId: number }) {
   const here = player.chapter === chapterId;
   const shownReciter = findReciter(here ? player.reciterId : prefs.reciter);
   const lastKey = useRef<string | null>(null);
+  const [sheet, setSheet] = useState(false);
 
   useEffect(() => {
     setVerses(null); setError(false);
@@ -379,7 +380,7 @@ function Reader({ chapterId }: { chapterId: number }) {
       <Header kicker={`Surah ${chapterId}${chapter ? ` · ${chapter.translated_name.name}` : ""}`} title={chapter?.name_simple ?? "…"} sub={chapter?.name_arabic} onBack={back} />
       <main className="scroll-area">
         <div className={`mx-auto max-w-md space-y-3 px-5 pt-4 ${player.panelOpen ? "pb-64" : "pb-28"}`}>
-          <button className="quran-card quran-reciter-select" onClick={() => { void navigate({ to: "/app/quran", search: { s: chapterId, view: "reciters" } }); }}>
+          <button className="quran-card quran-reciter-select" onClick={() => { void triggerHaptic("light"); setSheet(true); }}>
             <Avatar r={shownReciter} size={46} />
             <span className="min-w-0 flex-1 text-left"><span className="block truncate text-[15px] font-semibold">{reciterName(shownReciter)}</span><span className="quran-muted block truncate text-[11.5px]">{reciterSubtitle(shownReciter)}</span></span>
             <ChevronDown size={18} className="opacity-60" />
@@ -396,7 +397,64 @@ function Reader({ chapterId }: { chapterId: number }) {
         </div>
       </main>
       {player.panelOpen && <QuranPlayerPanel />}
+      {sheet && <ReciterSheet onClose={() => setSheet(false)} onSeeAll={() => { setSheet(false); void navigate({ to: "/app/quran", search: { s: chapterId, view: "reciters", tab: "all" } }); }} />}
     </>
+  );
+}
+
+const AR_DIGITS = "٠١٢٣٤٥٦٧٨٩";
+const toArabicDigits = (n: number) => String(n).replace(/\d/g, (d) => AR_DIGITS[Number(d)]);
+
+/** Traditional mushaf ayah-end marker: ornamental rosette framing the verse number in Arabic numerals. */
+function AyahMarker({ n }: { n: number }) {
+  const petals = Array.from({ length: 6 }, (_, i) => i * 60);
+  return (
+    <span className="quran-ayah" aria-label={`Verse ${n}`}>
+      <svg viewBox="0 0 48 48" aria-hidden="true">
+        <polygon points="24,3 42,13.5 42,34.5 24,45 6,34.5 6,13.5" fill="none" stroke="currentColor" strokeWidth="1.6" />
+        <circle cx="24" cy="24" r="13.5" fill="none" stroke="currentColor" strokeWidth="1.3" />
+        <circle cx="24" cy="24" r="11.2" fill="none" stroke="currentColor" strokeWidth="0.7" opacity="0.7" />
+        {petals.map((a) => (
+          <g key={a} transform={`rotate(${a} 24 24)`}>
+            <path d="M24 5.5 L26 9.5 L24 10.8 L22 9.5 Z" fill="currentColor" />
+          </g>
+        ))}
+      </svg>
+      <span className="quran-ayah-n" lang="ar">{toArabicDigits(n)}</span>
+    </span>
+  );
+}
+
+function ReciterSheet({ onClose, onSeeAll }: { onClose: () => void; onSeeAll: () => void }) {
+  const [prefs, setPrefs] = usePrefs();
+  const popIds = new Set(POPULAR_RECITERS);
+  const list = [...POPULAR_RECITERS.map(findReciter), ...RECITERS.filter((r) => r.group === 1 && !popIds.has(r.id))];
+  useEffect(() => {
+    const k = (e: KeyboardEvent) => { if (e.key === "Escape") onClose(); };
+    window.addEventListener("keydown", k); return () => window.removeEventListener("keydown", k);
+  }, [onClose]);
+  return (
+    <div className="quran-sheet-backdrop" onClick={onClose}>
+      <div className="quran-sheet" role="dialog" aria-modal="true" aria-label="Change reciter" onClick={(e) => e.stopPropagation()}>
+        <div className="quran-sheet-grip" />
+        <div className="flex items-center justify-between px-5 pb-2 pt-1">
+          <h2 className="text-[16px] font-semibold">Change reciter</h2>
+          <button className="quran-see-all" onClick={onSeeAll}>See All <ChevronRight size={14} /></button>
+        </div>
+        <div className="quran-sheet-list">
+          {list.map((r) => {
+            const on = prefs.reciter === r.id;
+            return (
+              <button key={r.id} className={`quran-reciter-row w-full text-left ${on ? "is-on" : ""}`} onClick={() => { setPrefs({ reciter: r.id }); void triggerHaptic("medium"); }}>
+                <Avatar r={r} size={42} />
+                <span className="min-w-0 flex-1"><span className="block truncate text-[14px] font-semibold">{reciterName(r)}</span><span className="quran-muted block truncate text-[11px]">{reciterSubtitle(r)}</span></span>
+                {on && <span className="quran-mini-eq" aria-label="Selected"><i /><i /><i /></span>}
+              </button>
+            );
+          })}
+        </div>
+      </div>
+    </div>
   );
 }
 
@@ -440,7 +498,7 @@ const VerseCard = memo(function VerseCard({ verse: v, active, word, translit, tr
   return (
     <article id={`v-${v.key}`} className={`quran-verse ${active ? "is-active" : ""} ${wordMode ? "is-word-mode" : ""}`}>
       <div className="quran-verse-side">
-        <NumBadge n={v.number} />
+        <AyahMarker n={v.number} />
         <button className="quran-play-sm" aria-label={`Play verse ${v.number}`} onClick={() => onPlay(v.key)}><Play size={13} fill="currentColor" style={{ marginLeft: 2 }} /></button>
       </div>
       <div className="min-w-0 flex-1">
