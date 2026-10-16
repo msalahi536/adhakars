@@ -350,7 +350,7 @@ function Reader({ chapterId }: { chapterId: number }) {
     const s = quranPlayer.get();
     const reciterChanged = s.reciterId !== prefs.reciter;
     // Reopening a surah that's already loaded must never reload or restart it.
-    if (s.chapter === chapterId && (s.audio || s.loading) && !reciterChanged) return;
+    if (s.chapter === chapterId && (s.audio || s.loading) && !reciterChanged) { if (chapter?.name_simple) quranPlayer.setName(chapter.name_simple); return; }
     if ((s.playing || s.loading) && s.chapter !== chapterId) return;
     const wasPlaying = s.playing && reciterChanged;
     void quranPlayer.select(prefs.reciter, chapterId, chapter?.name_simple ?? s.chapterName, wasPlaying);
