@@ -157,7 +157,7 @@ function Home() {
                 <span className="quran-continue-meta">Surah {lastChapter.id} · Verse {last!.v} of {lastChapter.verses_count}</span>
                 <span className="quran-progress"><i style={{ width: `${Math.max(4, (last!.v / lastChapter.verses_count) * 100)}%` }} /></span>
               </span>
-              <span className="quran-continue-play"><Play size={24} strokeWidth={1.8} strokeLinejoin="round" style={{ marginLeft: 3 }} /></span>
+              <span className="quran-continue-play"><Play size={20} strokeWidth={1.6} strokeLinejoin="round" style={{ marginLeft: 2 }} /></span>
             </button>
           )}
 
