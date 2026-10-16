@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { memo, useEffect, useMemo, useRef, useState } from "react";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { ChevronLeft, Pause, Play, Search, SkipBack, SkipForward, Loader2 } from "lucide-react";
 import { getChapterAudio, getChapters, getVerses, locate, RECITERS, type Chapter, type ChapterAudio, type Verse } from "@/lib/quran";
@@ -119,8 +119,14 @@ function Reader({ chapterId }: { chapterId: number }) {
     const tick = () => {
       const el = audioRef.current;
       if (el) {
-        const next = locate(audio.timings, el.currentTime * 1000);
-        setPos((p) => (p.key === next.key && p.word === next.word ? p : next));
+        const ms = el.currentTime * 1000;
+        const found = locate(audio.timings, ms);
+        // Small silences between verses: keep the previous verse lit instead
+        // of flashing everything off and on again.
+        setPos((p) => {
+          const next = found.key ? found : { key: p.key, word: p.word };
+          return p.key === next.key && p.word === next.word ? p : next;
+        });
       }
       raf = requestAnimationFrame(tick);
     };
@@ -193,27 +199,21 @@ function Reader({ chapterId }: { chapterId: number }) {
             <button className={prefs.translit ? "is-on" : ""} onClick={() => setPrefs({ translit: !prefs.translit })}>Transliteration</button>
             <button className={prefs.translation ? "is-on" : ""} onClick={() => setPrefs({ translation: !prefs.translation })}>Translation</button>
             <select aria-label="Reciter" value={prefs.reciter} onChange={(e) => setPrefs({ reciter: Number(e.target.value) })}>
-              {RECITERS.map((r) => <option key={r.id} value={r.id}>{r.name}</option>)}
+              <optgroup label="Word-by-word highlighting">
+                {RECITERS.filter((r) => r.words).map((r) => <option key={r.id} value={r.id}>{r.name}</option>)}
+              </optgroup>
+              <optgroup label="Verse-by-verse highlighting">
+                {RECITERS.filter((r) => !r.words).map((r) => <option key={r.id} value={r.id}>{r.name}</option>)}
+              </optgroup>
             </select>
           </div>
           {showBismillah && <div className="quran-bismillah" dir="rtl">بِسْمِ ٱللَّهِ ٱلرَّحْمَـٰنِ ٱلرَّحِيمِ</div>}
           {error && <p className="quran-muted text-center text-sm">Couldn't load this surah. Check your connection.</p>}
           {!verses && !error && <div className="flex justify-center py-10"><Loader2 className="animate-spin" /></div>}
-          {verses?.map((v) => {
-            const active = pos.key === v.key;
-            return (
-              <article key={v.key} id={`v-${v.key}`} className={`quran-verse ${active ? "is-active" : ""}`} onClick={() => playFrom(v.key)}>
-                <div className="quran-verse-num">{v.key}</div>
-                <p className="quran-ar" dir="rtl" lang="ar">
-                  {v.words.map((w) => (
-                    <span key={w.position} className={w.isEnd ? "quran-end" : active && pos.word === w.position ? "quran-word is-now" : "quran-word"}>{w.text} </span>
-                  ))}
-                </p>
-                {prefs.translit && v.transliteration && <p className="quran-translit">{v.transliteration}</p>}
-                {prefs.translation && <p className="quran-tr">{v.translation}</p>}
-              </article>
-            );
-          })}
+          {verses?.map((v) => (
+            <VerseCard key={v.key} verse={v} active={pos.key === v.key} word={pos.key === v.key ? pos.word : null}
+              translit={prefs.translit} translation={prefs.translation} onPlay={playFrom} />
+          ))}
           {verses && <p className="quran-muted pt-2 text-center text-[10px]">Text, translation (Saheeh International) and recitations via Quran.com</p>}
         </div>
       </main>
@@ -227,3 +227,23 @@ function Reader({ chapterId }: { chapterId: number }) {
     </>
   );
 }
+
+// Memoized so only the verse being recited re-renders while audio plays.
+const VerseCard = memo(function VerseCard({ verse: v, active, word, translit, translation, onPlay }: {
+  verse: Verse; active: boolean; word: number | null; translit: boolean; translation: boolean; onPlay: (key: string) => void;
+}) {
+  const wordMode = active && word !== null;
+  return (
+    <article id={`v-${v.key}`} className={`quran-verse ${active ? "is-active" : ""} ${wordMode ? "is-word-mode" : ""}`} onClick={() => onPlay(v.key)}>
+      <div className="quran-verse-num">{v.key}</div>
+      <p className="quran-ar" dir="rtl" lang="ar">
+        {v.words.map((w) => {
+          const state = w.isEnd ? "quran-end" : !wordMode ? "quran-word" : w.position < word! ? "quran-word is-done" : w.position === word ? "quran-word is-now" : "quran-word";
+          return <span key={w.position} className={state}>{w.text} </span>;
+        })}
+      </p>
+      {translit && v.transliteration && <p className="quran-translit">{v.transliteration}</p>}
+      {translation && <p className="quran-tr">{v.translation}</p>}
+    </article>
+  );
+});

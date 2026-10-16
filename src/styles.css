@@ -4529,11 +4529,16 @@ html[data-preset][data-visual-phase="evening"] .tasbih-confirm-btn.ghost {
 .quran-toggles select { color: var(--foreground); max-width: 100%; }
 .quran-bismillah { padding: 8px 0 4px; text-align: center; font-family: var(--font-arabic); font-size: 26px; color: var(--foreground); }
 .quran-verse { padding: 16px 16px 14px; border-radius: 22px; background: var(--surface, var(--card)); border: 1px solid var(--border); color: var(--foreground); cursor: pointer; transition: box-shadow .3s ease, border-color .3s ease, background .3s ease; }
-.quran-verse.is-active { border-color: color-mix(in oklab, var(--accent) 55%, transparent); box-shadow: 0 0 0 3px color-mix(in oklab, var(--accent) 16%, transparent); }
+.quran-ar { transition: color .4s ease; }
 .quran-verse-num { font-size: 10px; letter-spacing: .14em; color: var(--muted-foreground); font-weight: 600; }
 .quran-ar { margin: 6px 0 10px; font-family: var(--font-arabic); font-size: 27px; line-height: 2.1; text-align: right; color: var(--foreground); }
-.quran-word { border-radius: 8px; padding: 0 2px; transition: background .18s ease, color .18s ease; }
-.quran-word.is-now { background: color-mix(in oklab, var(--accent) 24%, transparent); color: var(--accent); }
+/* Karaoke: the verse being recited brightens; in word mode upcoming words
+   wait softly, recited words settle in, and the current word glows. */
+.quran-word { display: inline-block; transition: color .25s ease, opacity .25s ease, transform .25s cubic-bezier(.3,.7,.3,1), text-shadow .3s ease; }
+.quran-verse.is-active .quran-ar { color: var(--accent); }
+.quran-verse.is-word-mode .quran-word { opacity: .42; color: var(--foreground); }
+.quran-verse.is-word-mode .quran-word.is-done { opacity: 1; color: var(--foreground); }
+.quran-verse.is-word-mode .quran-word.is-now { opacity: 1; color: var(--accent); transform: translateY(-2px) scale(1.06); text-shadow: 0 0 14px color-mix(in oklab, var(--accent) 55%, transparent), 0 0 2px color-mix(in oklab, var(--accent) 40%, transparent); }
 .quran-end { color: var(--accent); font-size: 0.8em; }
 .quran-translit { margin: 0 0 6px; font-size: 13px; font-style: italic; line-height: 1.5; color: var(--translit, var(--muted-foreground)); }
 .quran-tr { margin: 0; font-size: 13.5px; line-height: 1.55; color: var(--muted-foreground); }
