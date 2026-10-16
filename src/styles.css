@@ -4628,9 +4628,10 @@ html[data-preset][data-visual-phase="evening"] .tasbih-confirm-btn.ghost {
 .quran-continue-play svg { stroke: var(--quran-play-icon); fill: none; }
 
 /* Quran continue card: compact + designed surah art */
-.quran-search-sticky { position: sticky; top: 0; z-index: 20; margin: -16px -20px -12px; padding: 16px 20px 12px; border-radius: 0 0 18px 18px; transition: transform .28s ease, opacity .28s ease, box-shadow .28s ease, background-color .28s ease; }
-.quran-search-sticky.is-float { background: color-mix(in oklab, var(--surface) 82%, transparent); -webkit-backdrop-filter: blur(18px) saturate(1.35); backdrop-filter: blur(18px) saturate(1.35); box-shadow: 0 10px 26px color-mix(in oklab, var(--foreground) 15%, transparent); }
-.quran-search-sticky.is-float.is-hidden { transform: translateY(-140%); opacity: 0; pointer-events: none; }
+.quran-search-sticky { position: sticky; top: 8px; z-index: 20; margin-bottom: 14px; border-radius: 999px; transition: transform .28s ease, opacity .28s ease, box-shadow .28s ease; }
+.quran-search-sticky.is-float { box-shadow: 0 8px 22px color-mix(in oklab, var(--foreground) 16%, transparent); }
+.quran-search-sticky.is-float > * { -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px); }
+.quran-search-sticky.is-float.is-hidden { transform: translateY(-160%); opacity: 0; pointer-events: none; }
 .quran-continue { gap: 12px; padding: 12px 14px; border-radius: 22px; }
 .quran-continue-art { position: relative; flex-direction: column; justify-content: center; gap: 2px; width: 60px; height: 64px; padding: 4px 3px; border-radius: 10px; overflow: hidden;
   color: color-mix(in oklab, #f3e6c4 90%, var(--accent));
