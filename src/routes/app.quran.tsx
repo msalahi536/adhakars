@@ -1,7 +1,7 @@
 import { Fragment, memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { ChevronLeft, Pause, Play, Search, SkipBack, SkipForward, Loader2 } from "lucide-react";
-import { getChapterAudio, getChapters, getVerses, locate, RECITERS, type Chapter, type ChapterAudio, type Verse } from "@/lib/quran";
+import { getChapterAudio, getChapters, getVerses, locate, RECITERS, RECITER_GROUPS, type Chapter, type ChapterAudio, type Verse } from "@/lib/quran";
 import { triggerHaptic } from "@/lib/theme";
 
 export const Route = createFileRoute("/app/quran")({
@@ -159,8 +159,8 @@ function Reader({ chapterId }: { chapterId: number }) {
 
   const playFrom = (key: string) => {
     const el = ensureAudio(); const t = audio?.timings.find((x) => x.key === key);
-    if (!el || !t) return;
-    el.currentTime = t.from / 1000;
+    if (!el) return;
+    if (t) el.currentTime = t.from / 1000;
     setLoadingAudio(true);
     void el.play().catch(() => setLoadingAudio(false));
     void triggerHaptic("light");
@@ -202,12 +202,11 @@ function Reader({ chapterId }: { chapterId: number }) {
             <button className={prefs.translit ? "is-on" : ""} onClick={() => setPrefs({ translit: !prefs.translit })}>Transliteration</button>
             <button className={prefs.translation ? "is-on" : ""} onClick={() => setPrefs({ translation: !prefs.translation })}>Translation</button>
             <select aria-label="Reciter" value={prefs.reciter} onChange={(e) => setPrefs({ reciter: Number(e.target.value) })}>
-              <optgroup label="Word-by-word highlighting">
-                {RECITERS.filter((r) => r.words).map((r) => <option key={r.id} value={r.id}>{r.name}</option>)}
-              </optgroup>
-              <optgroup label="Verse-by-verse highlighting">
-                {RECITERS.filter((r) => !r.words).map((r) => <option key={r.id} value={r.id}>{r.name}</option>)}
-              </optgroup>
+              {RECITER_GROUPS.map((g) => (
+                <optgroup key={g.label} label={g.label}>
+                  {RECITERS.filter(g.match).map((r) => <option key={r.id} value={r.id}>{r.name}</option>)}
+                </optgroup>
+              ))}
             </select>
           </div>
           {showBismillah && <div className="quran-bismillah" dir="rtl">بِسْمِ ٱللَّهِ ٱلرَّحْمَـٰنِ ٱلرَّحِيمِ</div>}
