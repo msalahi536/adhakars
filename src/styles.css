@@ -4606,3 +4606,21 @@ html[data-preset][data-visual-phase="evening"] .tasbih-confirm-btn.ghost {
 .quran-reciter-tile.is-on .quran-reciter-ring { border-color: var(--accent); }
 .quran-reciter-name { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
 .quran-reciter-tile.is-on .quran-reciter-name { color: var(--accent); font-weight: 600; }
+
+/* Quran home v2 */
+.quran-search input::placeholder { color: color-mix(in oklab, var(--foreground) 70%, transparent); }
+.quran-search > svg { color: color-mix(in oklab, var(--foreground) 82%, transparent); }
+.quran-section-title { font-size: 19px; font-weight: 600; letter-spacing: -.005em; }
+.quran-see-all { gap: 6px; font-size: 14px; font-weight: 500; color: color-mix(in oklab, var(--foreground) 65%, transparent); }
+.quran-reciter-strip { margin: 0; padding: 4px 4px 6px; scroll-padding-left: 4px; }
+.quran-reciter-tile, .quran-reciter-tile.is-on { width: 80px; }
+.quran-reciter-ring { padding: 3px; border-radius: 22px; }
+.quran-reciter-ring .quran-avatar { border-radius: 18px; }
+.quran-continue { border-radius: 26px; padding: 16px 18px; }
+.quran-continue-art { width: 70px; height: 70px; border-radius: 8px; }
+.quran-continue-kicker { font-size: 11px; letter-spacing: .18em; font-weight: 500; }
+.quran-continue-title { font-size: 22px; font-weight: 500; }
+.quran-continue-meta { font-size: 13px; color: color-mix(in oklab, var(--foreground) 78%, transparent); }
+.quran-continue .quran-progress { height: 5px; margin-top: 9px; }
+.quran-continue-play { height: 58px; width: 58px; background: color-mix(in oklab, var(--accent) 88%, var(--foreground)); box-shadow: none; }
+.quran-continue-art { color: color-mix(in oklab, #f3e6c4 88%, var(--accent)); background: linear-gradient(145deg, color-mix(in oklab, var(--accent) 80%, black 10%), color-mix(in oklab, var(--accent) 60%, black 30%)); }

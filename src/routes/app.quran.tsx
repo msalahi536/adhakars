@@ -3,7 +3,7 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { ChevronDown, ChevronLeft, ChevronRight, Heart, Loader2, Pause, Play, Repeat, Search, SkipBack, SkipForward } from "lucide-react";
 import {
   findReciter, getChapterAudio, getChapters, getVerses, locate, POPULAR_RECITERS, RECITERS,
-  reciterName, reciterPhoto, reciterSubtitle, type Chapter, type ChapterAudio, type Reciter, type Verse,
+  reciterName, reciterPhoto, reciterSubtitle, searchChapters, searchReciters, type Chapter, type ChapterAudio, type Reciter, type Verse,
 } from "@/lib/quran";
 import { triggerHaptic } from "@/lib/theme";
 
@@ -120,10 +120,8 @@ function Home() {
   }, []);
 
   const t = q.trim().toLowerCase();
-  const list = (chapters ?? []).filter((c) => {
-    return !t || String(c.id) === t || c.name_simple.toLowerCase().includes(t) || c.translated_name.name.toLowerCase().includes(t) || c.name_arabic.includes(q.trim());
-  });
-  const reciterHits = t.length > 1 ? RECITERS.filter((r) => r.name.toLowerCase().includes(t)).slice(0, 4) : [];
+  const list = useMemo(() => searchChapters(chapters ?? [], q), [chapters, q]);
+  const reciterHits = useMemo(() => searchReciters(q), [q]);
   const lastChapter = last && chapters?.find((c) => c.id === last.s);
   const open = (id: number) => { void triggerHaptic("light"); void navigate({ to: "/app/quran", search: { s: id } }); };
   const popular = POPULAR_RECITERS.map(findReciter);
@@ -159,7 +157,7 @@ function Home() {
                 <span className="quran-continue-meta">Surah {lastChapter.id} · Verse {last!.v} of {lastChapter.verses_count}</span>
                 <span className="quran-progress"><i style={{ width: `${Math.max(4, (last!.v / lastChapter.verses_count) * 100)}%` }} /></span>
               </span>
-              <span className="quran-continue-play"><Play size={22} fill="currentColor" strokeWidth={0} style={{ marginLeft: 3 }} /></span>
+              <span className="quran-continue-play"><Play size={24} strokeWidth={1.8} strokeLinejoin="round" style={{ marginLeft: 3 }} /></span>
             </button>
           )}
 
@@ -172,7 +170,7 @@ function Home() {
               <div className="quran-reciter-strip">
                 {popular.map((r) => (
                   <button key={r.id} className={`quran-reciter-tile ${prefs.reciter === r.id ? "is-on" : ""}`} onClick={() => { setPrefs({ reciter: r.id }); void triggerHaptic("light"); }}>
-                    <span className="quran-reciter-ring"><Avatar r={r} size={60} /></span>
+                    <span className="quran-reciter-ring"><Avatar r={r} size={64} /></span>
                     <span className="quran-reciter-name">{reciterName(r)}</span>
                   </button>
                 ))}
