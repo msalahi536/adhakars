@@ -404,7 +404,14 @@ function Reader({ chapterId }: { chapterId: number }) {
             <Maximize2 size={16} /><span>Full screen reading</span>
           </button>
           {sheet && <ReciterSheet onClose={() => setSheet(false)} onSeeAll={() => { setSheet(false); void navigate({ to: "/app/quran", search: { s: chapterId, view: "reciters", tab: "all" } }); }} />}
-          {showBismillah && <div className="quran-bismillah" dir="rtl">بِسْمِ ٱللَّهِ ٱلرَّحْمَـٰنِ ٱلرَّحِيمِ</div>}
+          {showBismillah && (
+            <section className="quran-card quran-bismillah-card">
+              {display.arabic && <p className="quran-bismillah-ar" dir="rtl" lang="ar">بِسْمِ ٱللَّهِ ٱلرَّحْمَـٰنِ ٱلرَّحِيمِ</p>}
+              {display.arabic && display.translation && <span className="quran-bismillah-rule" aria-hidden="true" />}
+              {(display.translation || !display.arabic) && <p className="quran-bismillah-en">In the name of Allah, the Entirely Merciful, the Especially Merciful.</p>}
+            </section>
+          )}
+
           {error && <p className="quran-muted text-center text-sm">Couldn't load this surah. Check your connection.</p>}
           {!verses && !error && <div className="flex justify-center py-10"><Loader2 className="animate-spin" /></div>}
           {verses && display.page && !full && (
