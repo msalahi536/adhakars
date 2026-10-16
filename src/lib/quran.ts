@@ -254,3 +254,33 @@ export function locate(timings: Timing[], ms: number): { key: string | null; wor
   const seg = t.segments.find((s) => ms >= s[1] && ms < s[2]);
   return { key: t.key, word: seg ? seg[0] : null };
 }
+
+// Quran.com only publishes portraits for these reciters; others show initials.
+const PHOTO_BASE = "https://static.qurancdn.com/images/reciters/";
+const PHOTOS: [RegExp, string][] = [
+  [/mishar|afasy/i, "6/mishary-rashid-alafasy-profile.jpeg"],
+  [/abdul ?bas|abdelbas/i, "1/abdelbasset-profile.jpeg"],
+  [/sudais|sodais/i, "2/abdul-rahman-al-sudais-profile.jpeg"],
+  [/shatri/i, "3/abu-bakr-al-shatri-pofile.jpeg"],
+  [/hani ar-rifai/i, "4/hani-ar-rifai-profile.jpeg"],
+  [/husar/i, "5/mahmoud-khalil-al-hussary-profile.png"],
+  [/minshawi/i, "7/mohamed-siddiq-el-minshawi-profile.jpeg"],
+  [/shuraim|shuraym/i, "8/saoud-shuraim-profile.jpeg"],
+  [/tunaiji/i, "11/khalifa-al-tunaiji-profile.jpeg"],
+];
+export function reciterPhoto(r: Reciter): string | null {
+  if (r.group === 2 || /&| and | with /i.test(r.name)) return null;
+  const hit = PHOTOS.find(([re]) => re.test(r.name));
+  return hit ? PHOTO_BASE + hit[1] : null;
+}
+export function reciterSubtitle(r: Reciter): string {
+  if (r.group === 2) return "Haramain Taraweeh";
+  if (r.group === 3) return "Other qira'at";
+  if (r.group === 4) return "With translation";
+  const style = r.name.match(/\(([^)]+)\)/)?.[1];
+  const sync = r.sync === "word" ? "Word-by-word" : r.sync === "verse" ? "Verse by verse" : "Audio only";
+  return style ? `${style} · ${sync}` : sync;
+}
+export const reciterName = (r: Reciter) => r.name.replace(/\s*\([^)]*\)\s*$/, "");
+export const POPULAR_RECITERS = [7, 1, 13, 174, 159, 3, 10, 104, 158, 19];
+export const findReciter = (id: number) => RECITERS.find((r) => r.id === id) ?? RECITERS[0];
