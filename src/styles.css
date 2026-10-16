@@ -1049,6 +1049,26 @@ html[data-visual-phase="evening"] .adhkar-card-heading button { background: rgba
   color: #2f4f34;
   font-family: var(--font-display);
 }
+/* Always-evening + dark presets: the theme owns the Salah outline.
+   The legacy light glass border above must not leak into the sheets, panels or
+   pills (they all resolve var(--card-border, var(--border))). */
+html[data-preset][data-visual-phase="evening"] .salah-page,
+html[data-preset="dark-red"] .salah-page {
+  --card-border: inherit;
+}
+/* Dark Red morning: light-mode ink is unreadable on the dark artwork — use the theme's card ink. */
+html[data-preset="dark-red"]:not([data-visual-phase="evening"]) .salah-next-label,
+html[data-preset="dark-red"]:not([data-visual-phase="evening"]) .salah-countdown,
+html[data-preset="dark-red"]:not([data-visual-phase="evening"]) .salah-recommended-title,
+html[data-preset="dark-red"]:not([data-visual-phase="evening"]) .salah-action-label,
+html[data-preset="dark-red"]:not([data-visual-phase="evening"]) .salah-adhan-title {
+  color: var(--card-foreground) !important;
+}
+html[data-preset="dark-red"]:not([data-visual-phase="evening"]) .salah-recommended-progress,
+html[data-preset="dark-red"]:not([data-visual-phase="evening"]) .salah-adhan-subtitle,
+html[data-preset="dark-red"]:not([data-visual-phase="evening"]) .salah-location {
+  color: var(--text-muted) !important;
+}
 .salah-hero { position: relative; display: flex; flex: 0 0 auto; flex-direction: column; align-items: center; box-sizing: border-box; padding: 44px 24px 10px; text-align: center; }
 .salah-next-label { color: #3f5a3c; font-family: "Outfit", var(--font-sans); font-size: 17px; font-weight: 500; line-height: 22px; letter-spacing: 0.005em; }
 .salah-countdown { margin-top: 3px; color: #2f4f34; font-family: "Outfit", var(--font-sans); font-size: 41px; font-weight: 500; line-height: 41px; letter-spacing: -0.005em; font-variant-numeric: tabular-nums; transition: color 400ms ease; }
