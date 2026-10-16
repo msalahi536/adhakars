@@ -4694,3 +4694,25 @@ html[data-preset][data-visual-phase="evening"] .tasbih-confirm-btn.ghost {
 .quran-mushaf .quran-ayah { width: 24px; height: 34px; vertical-align: middle; margin: 0 2px; }
 .quran-mushaf .quran-ayah-n { font-size: 11px; }
 .quran-mushaf-n { font-size: 10px; color: var(--accent); font-weight: 700; }
+
+/* Full screen Quran reading */
+.quran-fs-toggle { display: flex; width: 100%; align-items: center; justify-content: center; gap: 8px; padding: 10px 14px; font-size: 13px; font-weight: 600; color: var(--accent); }
+.quran-fs { position: fixed; inset: 0; z-index: 70; background: var(--background); color: var(--foreground); overflow-y: auto; -webkit-overflow-scrolling: touch; animation: quran-fs-in .25s ease; }
+@keyframes quran-fs-in { from { opacity: 0; } to { opacity: 1; } }
+.quran-fs-x { position: fixed; top: calc(env(safe-area-inset-top, 0px) + 12px); right: calc(env(safe-area-inset-right, 0px) + 12px); z-index: 72; display: flex; height: 40px; width: 40px; align-items: center; justify-content: center; border-radius: 999px; color: var(--foreground); background: color-mix(in oklab, var(--card) 88%, transparent); border: 1px solid var(--border); -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px); box-shadow: 0 4px 16px rgba(0,0,0,.12); }
+.quran-fs-page { max-width: 760px; margin: 0 auto; padding: calc(env(safe-area-inset-top, 0px) + 60px) calc(env(safe-area-inset-right, 0px) + 20px) calc(env(safe-area-inset-bottom, 0px) + 60px) calc(env(safe-area-inset-left, 0px) + 20px); }
+.quran-fs-page.has-panel { padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 240px); }
+.quran-fs-title { text-align: center; font-family: var(--font-arabic); font-size: 26px; color: var(--accent); margin-bottom: 6px; }
+.quran-fs .quran-mushaf { padding: 10px 0; font-size: 28px; line-height: 2.4; }
+.quran-fs .quran-mushaf.is-en { font-size: 18px; line-height: 1.85; }
+body.quran-fs-on .quran-player { z-index: 75; bottom: calc(env(safe-area-inset-bottom, 0px) + 12px); }
+body.quran-fs-on .quran-mini { z-index: 75; bottom: calc(env(safe-area-inset-bottom, 0px) + 12px); }
+@media (orientation: landscape) and (max-height: 560px) {
+  .quran-fs-page { padding-top: calc(env(safe-area-inset-top, 0px) + 16px); padding-left: calc(env(safe-area-inset-left, 0px) + 64px); padding-right: calc(env(safe-area-inset-right, 0px) + 64px); }
+  .quran-fs-page.has-panel { padding-bottom: 40px; padding-right: calc(env(safe-area-inset-right, 0px) + 360px); }
+  .quran-fs-title { font-size: 22px; }
+  body.quran-fs-on .quran-player { left: auto; right: calc(env(safe-area-inset-right, 0px) + 12px); transform: none; width: 330px; bottom: calc(env(safe-area-inset-bottom, 0px) + 10px); }
+}
+/* Active verse highlight stays visible on every theme (accent can match text) */
+.quran-verse.is-active .quran-tr.is-big { color: var(--foreground); font-weight: 600; background: color-mix(in oklab, var(--accent) 22%, transparent); border-radius: 10px; padding: 4px 8px; margin: 0 -8px; box-shadow: inset 3px 0 0 var(--accent); }
+.quran-mushaf-v.is-active:not(.is-word-mode) { color: var(--foreground); background: color-mix(in oklab, var(--accent) 24%, transparent); border-radius: 6px; box-decoration-break: clone; -webkit-box-decoration-break: clone; }

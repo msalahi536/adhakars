@@ -1,6 +1,6 @@
 import { Fragment, memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { ChevronDown, ChevronLeft, ChevronRight, Heart, Loader2, Pause, Play, Repeat, Search, Shuffle, SkipBack, SkipForward, X } from "lucide-react";
+import { ChevronDown, ChevronLeft, ChevronRight, Heart, Loader2, Maximize2, Pause, Play, Repeat, Search, Shuffle, SkipBack, SkipForward, X } from "lucide-react";
 import {
   findReciter, getChapterAudio, getChapters, getVerses, POPULAR_RECITERS, RECITERS,
   reciterName, reciterPhoto, reciterSubtitle, searchChapters, searchReciters, type Chapter, type Reciter, type Verse,
@@ -335,6 +335,23 @@ function Reader({ chapterId }: { chapterId: number }) {
   const shownReciter = findReciter(here ? player.reciterId : prefs.reciter);
   const lastKey = useRef<string | null>(null);
   const [sheet, setSheet] = useState(false);
+  const [full, setFull] = useState(false);
+  const openFull = () => {
+    void triggerHaptic("light"); setSheet(false); setFull(true);
+    try { void document.documentElement.requestFullscreen?.().catch(() => {}); } catch { /* unsupported */ }
+  };
+  const closeFull = useCallback(() => {
+    setFull(false);
+    try { if (document.fullscreenElement) void document.exitFullscreen().catch(() => {}); } catch { /* unsupported */ }
+  }, []);
+  useEffect(() => {
+    if (!full) return;
+    document.body.classList.add("quran-fs-on");
+    const onFs = () => { if (!document.fullscreenElement) setFull(false); };
+    const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") closeFull(); };
+    document.addEventListener("fullscreenchange", onFs); window.addEventListener("keydown", onKey);
+    return () => { document.body.classList.remove("quran-fs-on"); document.removeEventListener("fullscreenchange", onFs); window.removeEventListener("keydown", onKey); };
+  }, [full, closeFull]);
 
   useEffect(() => {
     setVerses(null); setError(false);
@@ -386,14 +403,17 @@ function Reader({ chapterId }: { chapterId: number }) {
             <span className="min-w-0 flex-1 text-left"><span className="block truncate text-[15px] font-semibold">{reciterName(shownReciter)}</span><span className="quran-muted block truncate text-[11.5px]">{reciterSubtitle(shownReciter)}</span></span>
             <ChevronDown size={18} className="opacity-60" style={{ transform: sheet ? "rotate(180deg)" : undefined, transition: "transform .2s" }} />
           </button>
+          <button className="quran-card quran-fs-toggle" onClick={openFull} aria-label="Read in full screen">
+            <Maximize2 size={16} /><span>Full screen reading</span>
+          </button>
           {sheet && <ReciterSheet onClose={() => setSheet(false)} onSeeAll={() => { setSheet(false); void navigate({ to: "/app/quran", search: { s: chapterId, view: "reciters", tab: "all" } }); }} />}
           {showBismillah && <div className="quran-bismillah" dir="rtl">بِسْمِ ٱللَّهِ ٱلرَّحْمَـٰنِ ٱلرَّحِيمِ</div>}
           {error && <p className="quran-muted text-center text-sm">Couldn't load this surah. Check your connection.</p>}
           {!verses && !error && <div className="flex justify-center py-10"><Loader2 className="animate-spin" /></div>}
-          {verses && display.page && (
+          {verses && display.page && !full && (
             <MushafPage verses={verses} activeKey={pos.key} word={display.words ? pos.word : null} arabic={display.arabic} onPlay={onPlayVerse} />
           )}
-          {!display.page && verses?.map((v) => (
+          {!display.page && !full && verses?.map((v) => (
             <VerseCard key={v.key} verse={v} active={pos.key === v.key} word={pos.key === v.key && display.words ? pos.word : null}
               translit={display.translit} translation={display.translation} arabic={display.arabic} fav={favSet.has(v.key)}
               onPlay={onPlayVerse} onFav={toggleFav} />
@@ -401,6 +421,17 @@ function Reader({ chapterId }: { chapterId: number }) {
           {verses && <p className="quran-muted pt-2 text-center text-[10px]">Text, translation (Saheeh International) and recitations via Quran.com</p>}
         </div>
       </main>
+      {full && (
+        <div className="quran-fs" role="dialog" aria-label={`${chapter?.name_simple ?? "Surah"} full screen`}>
+          <button className="quran-fs-x" onClick={closeFull} aria-label="Exit full screen"><X size={20} /></button>
+          <div className={`quran-fs-page ${player.panelOpen ? "has-panel" : ""}`}>
+            <div className="quran-fs-title">{chapter?.name_arabic ?? chapter?.name_simple}</div>
+            {showBismillah && <div className="quran-bismillah" dir="rtl">بِسْمِ ٱللَّهِ ٱلرَّحْمَـٰنِ ٱلرَّحِيمِ</div>}
+            {verses ? <MushafPage verses={verses} activeKey={pos.key} word={display.words ? pos.word : null} arabic={display.arabic} onPlay={onPlayVerse} />
+              : <div className="flex justify-center py-10"><Loader2 className="animate-spin" /></div>}
+          </div>
+        </div>
+      )}
       {player.panelOpen && <QuranPlayerPanel />}
     </>
   );
