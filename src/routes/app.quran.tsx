@@ -577,12 +577,13 @@ const VerseCard = memo(function VerseCard({ verse: v, active, word, translit, tr
 });
 
 /** Whole surah as one flowing page, like reading from a printed mushaf. */
-const MushafPage = memo(function MushafPage({ verses, activeKey, word, arabic, onPlay }: {
-  verses: Verse[]; activeKey: string | null; word: number | null; arabic: boolean; onPlay: (key: string) => void;
+const MushafPage = memo(function MushafPage({ verses, activeKey, word, arabic, onPlay, bare = false }: {
+  verses: Verse[]; activeKey: string | null; word: number | null; arabic: boolean; onPlay: (key: string) => void; bare?: boolean;
 }) {
+  const box = bare ? "quran-mushaf is-bare" : "quran-card quran-mushaf";
   if (!arabic) {
     return (
-      <article className="quran-card quran-mushaf is-en">
+      <article className={`${box} is-en`}>
         {verses.map((v) => (
           <span key={v.key} id={`v-${v.key}`} className={`quran-mushaf-v ${activeKey === v.key ? "is-active" : ""}`} onClick={() => onPlay(v.key)}>
             {v.translation} <sup className="quran-mushaf-n">{v.number}</sup>{" "}
@@ -592,7 +593,7 @@ const MushafPage = memo(function MushafPage({ verses, activeKey, word, arabic, o
     );
   }
   return (
-    <article className="quran-card quran-mushaf" dir="rtl" lang="ar">
+    <article className={box} dir="rtl" lang="ar">
       {verses.map((v) => {
         const active = activeKey === v.key;
         const wordMode = active && word !== null;
