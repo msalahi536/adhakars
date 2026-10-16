@@ -18,7 +18,7 @@ const updates = [
   { icon: BookOpen, title: "The Holy Quran", body: "All 114 surahs, beautifully laid out to read anywhere." },
   { icon: Sparkles, title: "Word-by-word highlighting", body: "Follow every word as it's recited, verse by verse." },
   { icon: Languages, title: "Translation & transliteration", body: "Read along in English or transliteration as it plays." },
-  { icon: Users, title: "150+ recitations", body: "From the world's most beloved reciters, with more coming soon." },
+  { icon: Users, title: "350+ recitations", body: "From the world's most beloved reciters, with more coming soon." },
   { icon: AudioLines, title: "Listen anywhere", body: "Recitation keeps playing as you move around the app." },
 ];
 
