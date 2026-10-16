@@ -34,3 +34,4 @@
 - The Quran tab reads text, translation, transliteration and word-timed chapter audio directly from the public Quran.com v4 API in the browser; karaoke highlighting is derived only from the audio clock, so no Quran content is stored in the app.
 - Extra reciter portraits are asset pointers matched by normalized name before the Quran.com photo fallback.
 - Quran playback uses one app-wide store outside routes so recitation survives page changes; repeat restarts manually, not audio.loop.
+- Quran reading mode is an in-app overlay portaled to the page body that hides app navigation; it never calls the browser or native fullscreen API, because that left the reader stuck in a broken browser fullscreen state.
