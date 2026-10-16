@@ -1,5 +1,6 @@
 import { Fragment, memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { QuranMiniPlayer } from "@/components/QuranMiniPlayer";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { ChevronDown, ChevronLeft, ChevronRight, Heart, Loader2, Maximize2, Pause, Play, Repeat, Search, Shuffle, SkipBack, SkipForward, X } from "lucide-react";
@@ -337,6 +338,9 @@ function Reader({ chapterId }: { chapterId: number }) {
   const shownReciter = findReciter(here ? player.reciterId : prefs.reciter);
   const lastKey = useRef<string | null>(null);
   const [sheet, setSheet] = useState(false);
+  const missingKey = `${shownReciter.id}:${chapterId}`;
+  const [missingClosed, setMissingClosed] = useState<string | null>(null);
+  const missingOpen = !reciterHasSurah(shownReciter, chapterId) && missingClosed !== missingKey;
   const [full, setFull] = useState(false);
   // In-app reading mode: the surah takes over the whole app screen like a book page.
   // Deliberately NOT the browser/native fullscreen API.
@@ -426,12 +430,19 @@ function Reader({ chapterId }: { chapterId: number }) {
             </section>
           )}
 
-          {!reciterHasSurah(shownReciter, chapterId) && (
-            <button type="button" className="quran-card quran-missing-note" onClick={() => setSheet(true)}>
-              <strong>{reciterName(shownReciter).replace(/\s*\[[^\]]*\]$/, "")} hasn't recorded {chapter?.name_simple ?? "this surah"} yet.</strong>
-              <span>You can still read it here. Tap to choose another reciter to listen.</span>
-            </button>
-          )}
+          <Dialog open={missingOpen} onOpenChange={(o) => { if (!o) setMissingClosed(missingKey); }}>
+            <DialogContent className="w-[calc(100%_-_40px)] max-w-[360px] rounded-3xl border-border/60 bg-card p-6 text-card-foreground">
+              <DialogHeader className="text-left">
+                <DialogTitle className="pr-6 text-lg font-semibold leading-snug">Not recorded yet</DialogTitle>
+                <DialogDescription className="text-sm leading-6 text-muted-foreground">
+                  {reciterName(shownReciter).replace(/\s*\[[^\]]*\]$/, "")} hasn't recorded {chapter?.name_simple ?? "this surah"}. You can still read it here, or choose another reciter to listen.
+                </DialogDescription>
+              </DialogHeader>
+              <button type="button" className="mt-2 h-11 w-full rounded-full bg-primary text-sm font-medium text-primary-foreground" onClick={() => { setMissingClosed(missingKey); setSheet(true); }}>
+                Choose another reciter
+              </button>
+            </DialogContent>
+          </Dialog>
           {error && <p className="quran-muted text-center text-sm">Couldn't load this surah. Check your connection.</p>}
           {!verses && !error && <div className="flex justify-center py-10"><Loader2 className="animate-spin" /></div>}
           {verses && display.page && !full && (

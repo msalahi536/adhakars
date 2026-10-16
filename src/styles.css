@@ -4803,6 +4803,3 @@ body.quran-fs-on .quran-mini:not(.quran-fs .quran-mini) { display: none; }
 .bottom-nav { position: relative; }
 .quran-nav-hint-wrap { position: absolute; inset: 0; pointer-events: none; }
 .quran-nav-hint-wrap .quran-nav-hint { left: 70%; bottom: calc(100% + 8px); }
-.quran-missing-note { display: flex; flex-direction: column; gap: 3px; width: 100%; text-align: left; padding: 12px 14px; border: 1px solid color-mix(in oklab, var(--accent) 30%, transparent); background: color-mix(in oklab, var(--accent) 8%, var(--card)); border-radius: 16px; font-size: 13px; line-height: 1.4; color: var(--foreground); }
-.quran-missing-note strong { font-weight: 600; }
-.quran-missing-note span { color: var(--muted-foreground); font-size: 12px; }
