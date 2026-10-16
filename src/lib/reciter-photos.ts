@@ -1,7 +1,16 @@
 // Local portraits for reciters that Quran.com has no photo for.
 // Keys are normalized name fragments; a reciter matches when their
 // normalized name contains the key. URLs come from Lovable Assets.
-import { normalizeQuery } from "@/lib/quran";
+// Same normalization as normalizeQuery in quran.ts, kept local to avoid a
+// circular import (quran.ts imports this module).
+function normalizeQuery(s: string): string {
+  return s.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+    .replace(/[`'’‘ʿʾ.\-_]/g, " ")
+    .replace(/\b(surah|surat|sura|sheikh|shaykh|al|an|ar|as|ash|ad|at|az|adh|ath)\b/g, " ")
+    .replace(/(.)\1+/g, "$1")
+    .replace(/ah\b/g, "a").replace(/ee/g, "i").replace(/oo/g, "u").replace(/y/g, "i")
+    .replace(/\s+/g, "").trim();
+}
 import p0 from "@/assets/reciters/abdul-mun-im-abdul-mubdi.asset.json";
 import p1 from "@/assets/reciters/abdulazeez-al-ahmad.asset.json";
 import p2 from "@/assets/reciters/abdulbari-ath-thubaity.asset.json";
