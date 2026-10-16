@@ -48,3 +48,7 @@
 - [x] Remove "Available now" eyebrow from homepage download section
 - [x] Polish /download page for masjid QR-code visitors (store badges front and center)
 - [x] Drop the JS prayer-times handoff; native widgets fetch times from the Al-Adhan API themselves
+
+## Open: Dark Red / always-evening audit (added Oct 16 2026)
+- [ ] After-Isha adhkar sheet + Adhan Settings sheet outlined in harsh white on Dark Red — restyle to the muted Tasbih card outline.
+- [ ] Full "always evening" diagnosis across every preset: card/panel borders, sheet borders, text colors (green bleed-through etc.); fix inconsistencies.
