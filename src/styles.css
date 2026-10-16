@@ -4681,3 +4681,16 @@ html[data-preset][data-visual-phase="evening"] .tasbih-confirm-btn.ghost {
 .adhkar-translation.is-big { font-size: 1.2rem; line-height: 1.6; opacity: 1; text-align: center; }
 .quran-tr.is-big { font-size: 17px; line-height: 1.6; color: var(--foreground); opacity: .9; transition: opacity .3s, color .3s; cursor: pointer; }
 .quran-verse.is-active .quran-tr.is-big { opacity: 1; color: var(--accent); }
+
+/* Quran full page (mushaf) view */
+.quran-mushaf { padding: 22px 18px; font-family: var(--font-arabic); font-size: 25px; line-height: 2.3; text-align: justify; text-align-last: center; color: var(--foreground); }
+.quran-mushaf.is-en { font-family: inherit; font-size: 16.5px; line-height: 1.8; text-align: left; text-align-last: auto; }
+.quran-mushaf-v { cursor: pointer; transition: color .4s ease; }
+.quran-mushaf-v.is-active { color: var(--accent); }
+.quran-mushaf-v.is-word-mode { color: var(--foreground); }
+.quran-mushaf-v.is-word-mode .quran-word { opacity: .42; }
+.quran-mushaf-v.is-word-mode .quran-word.is-done { opacity: 1; }
+.quran-mushaf-v.is-word-mode .quran-word.is-now { opacity: 1; color: var(--accent); text-shadow: 0 0 14px color-mix(in oklab, var(--accent) 55%, transparent); }
+.quran-mushaf .quran-ayah { width: 24px; height: 34px; vertical-align: middle; margin: 0 2px; }
+.quran-mushaf .quran-ayah-n { font-size: 11px; }
+.quran-mushaf-n { font-size: 10px; color: var(--accent); font-weight: 700; }

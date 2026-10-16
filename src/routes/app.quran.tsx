@@ -533,3 +533,37 @@ const VerseCard = memo(function VerseCard({ verse: v, active, word, translit, tr
     </article>
   );
 });
+
+/** Whole surah as one flowing page, like reading from a printed mushaf. */
+const MushafPage = memo(function MushafPage({ verses, activeKey, word, arabic, onPlay }: {
+  verses: Verse[]; activeKey: string | null; word: number | null; arabic: boolean; onPlay: (key: string) => void;
+}) {
+  if (!arabic) {
+    return (
+      <article className="quran-card quran-mushaf is-en">
+        {verses.map((v) => (
+          <span key={v.key} id={`v-${v.key}`} className={`quran-mushaf-v ${activeKey === v.key ? "is-active" : ""}`} onClick={() => onPlay(v.key)}>
+            {v.translation} <sup className="quran-mushaf-n">{v.number}</sup>{" "}
+          </span>
+        ))}
+      </article>
+    );
+  }
+  return (
+    <article className="quran-card quran-mushaf" dir="rtl" lang="ar">
+      {verses.map((v) => {
+        const active = activeKey === v.key;
+        const wordMode = active && word !== null;
+        return (
+          <span key={v.key} id={`v-${v.key}`} className={`quran-mushaf-v ${active ? "is-active" : ""} ${wordMode ? "is-word-mode" : ""}`} onClick={() => onPlay(v.key)}>
+            {v.words.filter((w) => !w.isEnd).map((w) => {
+              const cls = !wordMode ? "quran-word" : w.position < word! ? "quran-word is-done" : w.position === word ? "quran-word is-now" : "quran-word";
+              return <Fragment key={w.position}><span className={cls}>{w.text}</span>{" "}</Fragment>;
+            })}
+            <AyahMarker n={v.number} />{" "}
+          </span>
+        );
+      })}
+    </article>
+  );
+});
