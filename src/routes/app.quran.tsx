@@ -72,8 +72,8 @@ function useFavs() {
 type Last = { s: number; v: number };
 
 function QuranPage() {
-  const { s, view } = Route.useSearch();
-  if (view === "reciters") return <ReciterPicker back={s} />;
+  const { s, view, tab } = Route.useSearch();
+  if (view === "reciters") return <ReciterPicker back={s} tab={tab} />;
   return s ? <Reader chapterId={s} /> : <Home />;
 }
 
@@ -197,7 +197,7 @@ function Home() {
             <section>
               <div className="flex items-center justify-between">
                 <h2 className="quran-section-title">Choose a Reciter</h2>
-                <button className="quran-see-all" onClick={() => navigate({ to: "/app/quran", search: { view: "reciters" } })}>See All <ChevronRight size={14} /></button>
+                <button className="quran-see-all" onClick={() => navigate({ to: "/app/quran", search: { view: "reciters", tab: "all" } })}>See All <ChevronRight size={14} /></button>
               </div>
               <div className="quran-reciter-strip">
                 {popular.map((r) => (
