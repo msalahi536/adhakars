@@ -127,7 +127,7 @@ export const SUNNAH_SECTIONS: SunnahSection[] = [
       {
         id: "intercourse",
         title: "Intercourse — paused; everything short of it continues",
-        source: "quran.com 2:222  ·  Qur'an",
+        source: "Qur'an 2:222",
         arabic: `وَيَسْأَلُونَكَ عَنِ الْمَحِيضِ ۖ قُلْ هُوَ أَذًى فَاعْتَزِلُوا النِّسَاءَ فِي الْمَحِيضِ ۖ وَلَا تَقْرَبُوهُنَّ حَتَّىٰ يَطْهُرْنَ ۖ فَإِذَا تَطَهَّرْنَ فَأْتُوهُنَّ مِنْ حَيْثُ أَمَرَكُمُ اللَّهُ ۚ إِنَّ اللَّهُ يُحِبُّ التَّوَّابِينَ وَيُحِبُّ الْمُتَطَهِّرِينَ`,
         transliteration: `Wa yasʾalūnaka ʿani ʾl-maḥīḍ. Qul huwa adhan, fa-ʿtazilu ʾn-nisāʾa fi ʾl-maḥīḍ, wa lā taqrabūhunna ḥattā yaṭhurn…`,
         translation: `And they ask you about menstruation. Say, “It is harm, so keep away from wives during menstruation. And do not approach them until they are pure. And when they have purified themselves, then come to them from where Allah has ordained for you. Indeed, Allah loves those who are constantly repentant and loves those who purify themselves.”`,
