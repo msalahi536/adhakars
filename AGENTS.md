@@ -27,3 +27,5 @@
 - The adhan consent prompt is offered once (persisted acknowledgment) right after Salah saves a location, or on the first notification grant; "Yes" requests notification access, enables all five prayers and opens Adhan Settings — nothing is auto-enabled.
 - Salah owns the once-per-install automatic location request; app launch, Settings entry, and widget synchronization only read saved coordinates so permissions never stack on launch.
 - Explicit rating actions synchronously open the store review destination rather than requesting the optional native review popup, because Apple can silently suppress it and browser plugin implementations can be no-ops.
+
+- Preset day palettes are scoped to the morning visual phase, never a route alone; evening maps all shared surfaces and text roles to its own palette so Settings, tools and reading screens cannot inherit day colors.
