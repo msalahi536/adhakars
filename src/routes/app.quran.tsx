@@ -327,8 +327,8 @@ function Reader({ chapterId }: { chapterId: number }) {
   const navigate = useNavigate();
   const [prefs] = usePrefs();
   const [favs, toggleFav] = useFavs();
-  const [display, setDisplayState] = useState({ translit: true, translation: true, arabic: true, page: false, follow: true, words: true });
-  useEffect(() => { const d = getDisplay(); setDisplayState({ translit: d.showTransliteration, translation: d.showTranslation || !d.showArabic, arabic: d.showArabic, page: d.quranPageView, follow: d.quranAutoScroll, words: d.quranWordHighlight }); }, []);
+  const [display, setDisplayState] = useState({ translit: true, translation: true, trOn: true, arabic: true, page: false, follow: true, words: true });
+  useEffect(() => { const d = getDisplay(); setDisplayState({ translit: d.showTransliteration, translation: d.showTranslation || !d.showArabic, trOn: d.showTranslation, arabic: d.showArabic, page: d.quranPageView, follow: d.quranAutoScroll, words: d.quranWordHighlight }); }, []);
   const [chapter, setChapter] = useState<Chapter | null>(null);
   const [verses, setVerses] = useState<Verse[] | null>(null);
   const [error, setError] = useState(false);
@@ -408,7 +408,7 @@ function Reader({ chapterId }: { chapterId: number }) {
           {error && <p className="quran-muted text-center text-sm">Couldn't load this surah. Check your connection.</p>}
           {!verses && !error && <div className="flex justify-center py-10"><Loader2 className="animate-spin" /></div>}
           {verses && display.page && !full && (
-            <MushafPage verses={verses} activeKey={pos.key} word={display.words ? pos.word : null} arabic={display.arabic} onPlay={onPlayVerse} />
+            <MushafPage verses={verses} activeKey={pos.key} word={display.words ? pos.word : null} arabic={display.arabic} translitOnly={!display.arabic && !display.trOn && display.translit} onPlay={onPlayVerse} />
           )}
           {!display.page && !full && verses?.map((v) => (
             <VerseCard key={v.key} verse={v} active={pos.key === v.key} word={pos.key === v.key && display.words ? pos.word : null}
@@ -423,8 +423,6 @@ function Reader({ chapterId }: { chapterId: number }) {
           <button className="quran-fs-x" onClick={closeFull} aria-label="Close reading mode"><X size={18} /></button>
           <div className={`quran-fs-scroll ${player.panelOpen ? "has-panel" : ""}`}>
             <section className="quran-fs-sheet">
-              <i className="quran-fs-corner is-tl" aria-hidden="true" /><i className="quran-fs-corner is-tr" aria-hidden="true" />
-              <i className="quran-fs-corner is-bl" aria-hidden="true" /><i className="quran-fs-corner is-br" aria-hidden="true" />
               <header className="quran-fs-band">
                 <span className="quran-fs-meta">{chapter ? (chapter.revelation_place === "makkah" ? "Makki" : "Madani") : ""}</span>
                 <span className="quran-fs-name" lang="ar" dir="rtl">{chapter ? `سُورَةُ ${chapter.name_arabic}` : "…"}</span>
@@ -433,7 +431,7 @@ function Reader({ chapterId }: { chapterId: number }) {
               <p className="quran-fs-sub">{chapter ? `${chapter.name_simple} · ${chapter.translated_name.name}` : ""}</p>
               {showBismillah && display.arabic && <div className="quran-fs-bismillah" dir="rtl" lang="ar">بِسْمِ ٱللَّهِ ٱلرَّحْمَـٰنِ ٱلرَّحِيمِ</div>}
               {showBismillah && !display.arabic && <div className="quran-fs-bismillah is-en">In the name of Allah, the Entirely Merciful, the Especially Merciful.</div>}
-              {verses ? <MushafPage bare verses={verses} activeKey={pos.key} word={display.words ? pos.word : null} arabic={display.arabic} onPlay={onPlayVerse} />
+              {verses ? <MushafPage bare verses={verses} activeKey={pos.key} word={display.words ? pos.word : null} arabic={display.arabic} translitOnly={!display.arabic && !display.trOn && display.translit} onPlay={onPlayVerse} />
                 : error ? <p className="quran-muted py-10 text-center text-sm">Couldn't load this surah. Check your connection.</p>
                 : <div className="flex justify-center py-12"><Loader2 className="animate-spin" /></div>}
               <footer className="quran-fs-foot"><span aria-hidden="true">۞</span><span>Surah {chapterId} of 114</span><span aria-hidden="true">۞</span></footer>
@@ -577,16 +575,16 @@ const VerseCard = memo(function VerseCard({ verse: v, active, word, translit, tr
 });
 
 /** Whole surah as one flowing page, like reading from a printed mushaf. */
-const MushafPage = memo(function MushafPage({ verses, activeKey, word, arabic, onPlay, bare = false }: {
-  verses: Verse[]; activeKey: string | null; word: number | null; arabic: boolean; onPlay: (key: string) => void; bare?: boolean;
+const MushafPage = memo(function MushafPage({ verses, activeKey, word, arabic, onPlay, bare = false, translitOnly = false }: {
+  verses: Verse[]; activeKey: string | null; word: number | null; arabic: boolean; onPlay: (key: string) => void; bare?: boolean; translitOnly?: boolean;
 }) {
   const box = bare ? "quran-mushaf is-bare" : "quran-card quran-mushaf";
   if (!arabic) {
     return (
-      <article className={`${box} is-en`}>
+      <article className={`${box} is-en ${activeKey ? "has-active" : ""} ${translitOnly ? "is-translit" : ""}`}>
         {verses.map((v) => (
           <span key={v.key} id={`v-${v.key}`} className={`quran-mushaf-v ${activeKey === v.key ? "is-active" : ""}`} onClick={() => onPlay(v.key)}>
-            {v.translation} <sup className="quran-mushaf-n">{v.number}</sup>{" "}
+            {translitOnly ? v.transliteration : v.translation} <sup className="quran-mushaf-n">{v.number}</sup>{" "}
           </span>
         ))}
       </article>
