@@ -4514,24 +4514,59 @@ html[data-preset][data-visual-phase="evening"] .tasbih-confirm-btn.ghost {
 
 /* Quran reader */
 .quran-muted { color: var(--muted-foreground); }
-.quran-search { display: flex; align-items: center; gap: 8px; padding: 0 14px; height: 44px; border-radius: 999px; background: var(--surface, var(--card)); border: 1px solid var(--border); color: var(--muted-foreground); }
-.quran-search input { flex: 1; background: transparent; outline: none; color: var(--foreground); font-size: 14px; }
-.quran-chapter { display: flex; width: 100%; align-items: center; gap: 12px; padding: 12px 14px; border-radius: 20px; background: var(--surface, var(--card)); border: 1px solid var(--border); color: var(--foreground); transition: transform .15s ease; }
+.quran-card { display: block; width: 100%; border-radius: 22px; background: var(--surface, var(--card)); border: 1px solid var(--border); box-shadow: var(--card-shadow, 0 4px 16px rgba(0,0,0,0.05)); color: var(--foreground); }
+.quran-search { display: flex; align-items: center; gap: 10px; padding: 0 18px; height: 48px; border-radius: 999px; background: var(--surface, var(--card)); border: 1px solid var(--border); color: var(--muted-foreground); }
+.quran-search input { flex: 1; min-width: 0; background: transparent; outline: none; color: var(--foreground); font-size: 14px; }
+.quran-section-title { margin: 4px 2px 8px; font-size: 16px; font-weight: 600; color: var(--foreground); }
+.quran-see-all { display: inline-flex; align-items: center; gap: 2px; font-size: 12px; color: var(--muted-foreground); }
+.quran-continue { display: flex; align-items: center; gap: 12px; padding: 12px 14px; text-align: left; }
+.quran-continue-art { display: flex; height: 62px; width: 62px; flex: none; align-items: center; justify-content: center; border-radius: 14px; background: linear-gradient(145deg, color-mix(in oklab, var(--accent) 85%, black), color-mix(in oklab, var(--accent) 55%, black)); color: color-mix(in oklab, var(--accent-foreground) 85%, gold); font-family: var(--font-arabic); font-size: 15px; line-height: 1.2; text-align: center; padding: 4px; }
+.quran-progress { display: block; margin-top: 8px; height: 4px; border-radius: 99px; background: color-mix(in oklab, var(--foreground) 10%, transparent); overflow: hidden; }
+.quran-progress i { display: block; height: 100%; border-radius: inherit; background: var(--accent); }
+.quran-play-sm { display: flex; height: 34px; width: 34px; flex: none; align-items: center; justify-content: center; border-radius: 999px; background: color-mix(in oklab, var(--accent) 14%, var(--card)); color: var(--accent); transition: transform .15s ease; }
+.quran-play-sm:active { transform: scale(.92); }
+.quran-continue .quran-play-sm { height: 42px; width: 42px; background: var(--accent); color: var(--accent-foreground); }
+.quran-avatar { display: inline-flex; flex: none; align-items: center; justify-content: center; overflow: hidden; border-radius: 999px; background: color-mix(in oklab, var(--accent) 18%, var(--card)); color: var(--accent); font-weight: 700; letter-spacing: .02em; }
+.quran-avatar img { height: 100%; width: 100%; object-fit: cover; }
+.quran-reciter-strip { display: flex; gap: 8px; overflow-x: auto; padding: 2px 2px 6px; scrollbar-width: none; scroll-snap-type: x mandatory; }
+.quran-reciter-strip::-webkit-scrollbar { display: none; }
+.quran-reciter-tile { display: flex; width: 78px; flex: none; flex-direction: column; align-items: center; gap: 6px; padding: 8px 4px; border-radius: 18px; border: 1.5px solid transparent; scroll-snap-align: start; color: var(--foreground); font-size: 11px; font-weight: 500; line-height: 1.2; text-align: center; }
+.quran-reciter-tile.is-on { border-color: var(--accent); background: color-mix(in oklab, var(--accent) 8%, var(--surface, var(--card))); }
+.quran-chips { display: flex; gap: 8px; }
+.quran-chips > button { flex: 1; height: 38px; padding: 0 14px; border-radius: 999px; background: var(--surface, var(--card)); border: 1px solid var(--border); color: var(--foreground); font-size: 13px; white-space: nowrap; }
+.quran-chips > button.is-on { background: var(--accent); color: var(--accent-foreground); border-color: transparent; }
+.quran-chips-scroll { overflow-x: auto; scrollbar-width: none; }
+.quran-chips-scroll > button { flex: none; }
+.quran-chip-sm { font-size: 10px; padding: 3px 8px; border-radius: 99px; background: var(--accent); color: var(--accent-foreground); }
+.quran-chapter { display: flex; width: 100%; align-items: center; gap: 12px; padding: 14px 14px; border-radius: 20px; background: var(--surface, var(--card)); border: 1px solid var(--border); color: var(--foreground); transition: transform .15s ease; }
 .quran-chapter:active { transform: scale(0.985); }
-.quran-num { display: flex; height: 34px; width: 34px; flex: none; align-items: center; justify-content: center; border-radius: 12px; transform: rotate(45deg); background: color-mix(in oklab, var(--accent) 14%, var(--card)); color: var(--accent); font-size: 12px; font-weight: 700; }
-.quran-num { font-variant-numeric: tabular-nums; }
-.quran-chapter-ar { font-family: var(--font-arabic); font-size: 20px; color: var(--accent); }
-.quran-header-ar { margin-top: 4px; font-family: var(--font-arabic); font-size: 22px; color: var(--header-sub); }
-.quran-back { position: absolute; left: 16px; top: 28px; z-index: 2; display: flex; height: 38px; width: 38px; align-items: center; justify-content: center; border-radius: 999px; background: color-mix(in oklab, var(--header-fg) 14%, transparent); color: var(--header-fg); }
-.quran-toggles { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; }
-.quran-toggles button, .quran-toggles select { height: 32px; padding: 0 14px; border-radius: 999px; border: 1px solid var(--border); background: var(--surface, var(--card)); color: var(--muted-foreground); font-size: 12px; font-weight: 500; }
+.quran-num { position: relative; display: flex; height: 38px; width: 38px; flex: none; align-items: center; justify-content: center; color: var(--foreground); font-size: 12px; font-weight: 600; font-variant-numeric: tabular-nums; }
+.quran-num::before, .quran-num::after { content: ""; position: absolute; inset: 5px; border-radius: 7px; border: 1.3px solid color-mix(in oklab, var(--accent) 45%, transparent); background: color-mix(in oklab, var(--accent) 7%, transparent); }
+.quran-num::after { transform: rotate(45deg); }
+.quran-num > span { position: relative; z-index: 1; }
+.quran-chapter-ar { font-family: var(--font-arabic); font-size: 21px; color: var(--foreground); }
+.quran-header-ar { margin-top: 4px; font-family: var(--font-arabic); font-size: 24px; color: var(--header-sub); }
+.quran-back { position: absolute; left: 16px; top: 28px; z-index: 2; display: flex; height: 40px; width: 40px; align-items: center; justify-content: center; border-radius: 999px; background: var(--surface, var(--card)); border: 1px solid var(--border); color: var(--foreground); box-shadow: 0 2px 10px rgba(0,0,0,.06); }
+.quran-reciter-row { display: flex; width: 100%; align-items: center; gap: 12px; padding: 10px 14px; color: var(--foreground); border-bottom: 1px solid color-mix(in oklab, var(--border) 70%, transparent); }
+.quran-reciter-row:last-child { border-bottom: 0; }
+.quran-reciter-row.is-on { background: color-mix(in oklab, var(--accent) 10%, transparent); }
+.quran-mini-eq { display: inline-flex; align-items: flex-end; gap: 2px; height: 14px; }
+.quran-mini-eq i { width: 3px; border-radius: 2px; background: var(--accent); animation: quran-eq 1s ease-in-out infinite; }
+.quran-mini-eq i:nth-child(1) { height: 60%; } .quran-mini-eq i:nth-child(2) { height: 100%; animation-delay: .2s; } .quran-mini-eq i:nth-child(3) { height: 75%; animation-delay: .4s; }
+@keyframes quran-eq { 50% { transform: scaleY(.45); } }
+.quran-mini-eq i { transform-origin: bottom; }
+.quran-reciter-select { display: flex; align-items: center; gap: 12px; padding: 10px 16px 10px 10px; }
+.quran-toggles { display: flex; gap: 8px; justify-content: center; }
+.quran-toggles button { height: 38px; flex: 1; max-width: 150px; padding: 0 14px; border-radius: 999px; border: 1px solid var(--border); background: var(--surface, var(--card)); color: var(--foreground); font-size: 13px; font-weight: 500; }
 .quran-toggles button.is-on { background: var(--accent); color: var(--accent-foreground); border-color: transparent; }
-.quran-toggles select { color: var(--foreground); max-width: 100%; }
 .quran-bismillah { padding: 8px 0 4px; text-align: center; font-family: var(--font-arabic); font-size: 26px; color: var(--foreground); }
-.quran-verse { padding: 16px 16px 14px; border-radius: 22px; background: var(--surface, var(--card)); border: 1px solid var(--border); color: var(--foreground); cursor: pointer; transition: box-shadow .3s ease, border-color .3s ease, background .3s ease; }
-.quran-ar { transition: color .4s ease; }
-.quran-verse-num { font-size: 10px; letter-spacing: .14em; color: var(--muted-foreground); font-weight: 600; }
-.quran-ar { margin: 6px 0 10px; font-family: var(--font-arabic); font-size: 27px; line-height: 2.1; text-align: right; color: var(--foreground); }
+.quran-verse { position: relative; display: flex; gap: 10px; padding: 16px 14px 14px; border-radius: 22px; background: var(--surface, var(--card)); border: 1px solid var(--border); color: var(--foreground); transition: background .4s ease; }
+.quran-verse.is-active { background: color-mix(in oklab, var(--accent) 9%, var(--surface, var(--card))); }
+.quran-verse-side { display: flex; flex-direction: column; align-items: center; gap: 14px; padding-top: 2px; }
+.quran-heart { position: absolute; right: 12px; top: 12px; color: var(--muted-foreground); opacity: .7; transition: transform .15s ease, color .2s ease; }
+.quran-heart.is-on { color: var(--accent); opacity: 1; }
+.quran-heart:active { transform: scale(.85); }
+.quran-ar { margin: 4px 22px 10px 0; font-family: var(--font-arabic); font-size: 27px; line-height: 2.1; text-align: right; color: var(--foreground); cursor: pointer; transition: color .4s ease; }
 /* Karaoke: the verse being recited brightens; in word mode upcoming words
    wait softly, recited words settle in, and the current word glows. */
 .quran-word { display: inline-block; transition: color .25s ease, opacity .25s ease, transform .25s cubic-bezier(.3,.7,.3,1), text-shadow .3s ease; }
@@ -4541,8 +4576,16 @@ html[data-preset][data-visual-phase="evening"] .tasbih-confirm-btn.ghost {
 .quran-verse.is-word-mode .quran-word.is-now { opacity: 1; color: var(--accent); transform: translateY(-2px) scale(1.06); text-shadow: 0 0 14px color-mix(in oklab, var(--accent) 55%, transparent), 0 0 2px color-mix(in oklab, var(--accent) 40%, transparent); }
 .quran-end { color: var(--accent); font-size: 0.8em; }
 .quran-translit { margin: 0 0 6px; font-size: 13px; font-style: italic; line-height: 1.5; color: var(--translit, var(--muted-foreground)); }
-.quran-tr { margin: 0; font-size: 13.5px; line-height: 1.55; color: var(--muted-foreground); }
-.quran-player { position: fixed; left: 50%; bottom: calc(env(safe-area-inset-bottom, 0px) + 84px); z-index: 40; display: flex; align-items: center; gap: 14px; padding: 8px 14px; transform: translateX(-50%); border-radius: 999px; background: color-mix(in oklab, var(--surface, var(--card)) 88%, transparent); -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px); border: 1px solid var(--border); box-shadow: 0 10px 30px rgba(0,0,0,.14); color: var(--foreground); }
-.quran-player button { display: flex; height: 38px; width: 38px; align-items: center; justify-content: center; border-radius: 999px; }
-.quran-player button:disabled { opacity: .4; }
-.quran-player .quran-play { height: 50px; width: 50px; background: var(--accent); color: var(--accent-foreground); }
+.quran-tr { margin: 0; font-size: 13.5px; line-height: 1.55; color: var(--foreground); opacity: .85; }
+.quran-player { position: fixed; left: 50%; bottom: calc(env(safe-area-inset-bottom, 0px) + 84px); z-index: 40; width: min(calc(100% - 24px), 420px); padding: 12px 16px 10px; transform: translateX(-50%); border-radius: 24px; background: color-mix(in oklab, var(--surface, var(--card)) 94%, transparent); -webkit-backdrop-filter: blur(16px); backdrop-filter: blur(16px); border: 1px solid var(--border); box-shadow: 0 -4px 30px rgba(0,0,0,.10); color: var(--foreground); }
+.quran-seek { display: block; width: 100%; margin-top: 10px; height: 18px; appearance: none; -webkit-appearance: none; background: transparent; }
+.quran-seek::-webkit-slider-runnable-track { height: 4px; border-radius: 99px; background: linear-gradient(to right, var(--accent) var(--p), color-mix(in oklab, var(--foreground) 14%, transparent) var(--p)); }
+.quran-seek::-moz-range-track { height: 4px; border-radius: 99px; background: linear-gradient(to right, var(--accent) var(--p), color-mix(in oklab, var(--foreground) 14%, transparent) var(--p)); }
+.quran-seek::-webkit-slider-thumb { -webkit-appearance: none; margin-top: -6px; height: 16px; width: 16px; border-radius: 99px; background: var(--accent); border: 2px solid var(--surface, var(--card)); box-shadow: 0 1px 4px rgba(0,0,0,.2); }
+.quran-seek::-moz-range-thumb { height: 14px; width: 14px; border-radius: 99px; background: var(--accent); border: 2px solid var(--surface, var(--card)); }
+.quran-times { display: flex; justify-content: space-between; font-size: 10.5px; color: var(--muted-foreground); font-variant-numeric: tabular-nums; }
+.quran-controls { display: flex; align-items: center; justify-content: space-between; padding: 2px 6px 0; }
+.quran-controls button { display: flex; height: 40px; width: 40px; align-items: center; justify-content: center; border-radius: 999px; color: var(--foreground); }
+.quran-controls button.is-on { color: var(--accent); background: color-mix(in oklab, var(--accent) 12%, transparent); }
+.quran-controls button:disabled { opacity: .4; }
+.quran-controls .quran-play { height: 56px; width: 56px; background: var(--accent); color: var(--accent-foreground); box-shadow: 0 6px 18px color-mix(in oklab, var(--accent) 35%, transparent); }
