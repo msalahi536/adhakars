@@ -112,8 +112,38 @@ function audioEl(): HTMLAudioElement {
   return el;
 }
 
-function setMediaState(s: MediaSessionPlaybackState) { try { if (navigator.mediaSession) navigator.mediaSession.playbackState = s; } catch { /* ignore */ } }
+// Android app: a native media session runs a foreground service with a
+// "now playing" notification, so Android keeps the surah going with the screen off.
+type NativeMS = typeof import("@jofr/capacitor-media-session").MediaSession;
+let nativeMS: Promise<NativeMS | null> | null = null;
+function isAndroidApp() {
+  if (typeof window === "undefined") return false;
+  const c = (window as unknown as { Capacitor?: { isNativePlatform?: () => boolean; getPlatform?: () => string } }).Capacitor;
+  return !!c?.isNativePlatform?.() && c.getPlatform?.() === "android";
+}
+function native(): Promise<NativeMS | null> {
+  if (!isAndroidApp()) return Promise.resolve(null);
+  if (!nativeMS) nativeMS = import("@jofr/capacitor-media-session").then(async ({ MediaSession: m }) => {
+    const h = (action: MediaSessionAction, f: (d: { seekTime?: number | null }) => void) => m.setActionHandler({ action }, f).catch(() => {});
+    await h("play", () => void quranPlayer.toggle(true));
+    await h("pause", () => quranPlayer.pause());
+    await h("previoustrack", () => quranPlayer.step(-1));
+    await h("nexttrack", () => quranPlayer.step(1));
+    await h("seekto", (d) => { if (d.seekTime != null && el) el.currentTime = d.seekTime; });
+    return m;
+  }).catch(() => null);
+  return nativeMS;
+}
+
+function setMediaState(s: MediaSessionPlaybackState) {
+  void native().then((m) => m?.setPlaybackState({ playbackState: s }).catch(() => {})); try { if (navigator.mediaSession) navigator.mediaSession.playbackState = s; } catch { /* ignore */ } }
+let lastNativePos = 0;
 function updatePosition() {
+  if (el && Number.isFinite(el.duration) && el.duration > 0 && Date.now() - lastNativePos > 5000) {
+    lastNativePos = Date.now();
+    const d = el.duration, p = Math.min(el.currentTime, d), r = el.playbackRate;
+    void native().then((m) => m?.setPositionState({ duration: d, position: p, playbackRate: r }).catch(() => {}));
+  }
   try {
     if (el && navigator.mediaSession?.setPositionState && Number.isFinite(el.duration) && el.duration > 0)
       navigator.mediaSession.setPositionState({ duration: el.duration, position: Math.min(el.currentTime, el.duration), playbackRate: el.playbackRate });
@@ -123,6 +153,8 @@ function setMetadata() {
   if (typeof window === "undefined" || !navigator.mediaSession || !("MediaMetadata" in window) || !state.chapter) return;
   const r = findReciter(state.reciterId);
   const photo = reciterPhoto(r);
+  const meta = { title: `Surah ${state.chapterName || state.chapter}`, artist: reciterName(r), album: "Sahih Al-Adhkar · Quran", artwork: photo ? [{ src: new URL(photo, location.href).href, sizes: "512x512", type: photo.endsWith(".png") ? "image/png" : "image/jpeg" }] : [] };
+  void native().then((m) => m?.setMetadata(meta).catch(() => {}));
   navigator.mediaSession.metadata = new MediaMetadata({
     title: `Surah ${state.chapterName || state.chapter}`,
     artist: reciterName(r),
@@ -226,6 +258,7 @@ export const quranPlayer = {
     el?.pause();
     set({ chapter: null, audio: null, playing: false, cur: 0, dur: 0, pos: { key: null, word: null } });
     try { if (navigator.mediaSession) navigator.mediaSession.metadata = null; } catch { /* ignore */ }
+    setMediaState("none");
   },
 };
 
