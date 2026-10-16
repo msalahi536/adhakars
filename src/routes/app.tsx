@@ -1,4 +1,5 @@
 import { useEffect, useLayoutEffect, useState } from "react";
+import { QuranMiniPlayer } from "@/components/QuranMiniPlayer";
 import { createFileRoute, Outlet, useRouter, useRouterState } from "@tanstack/react-router";
 import { BottomNav } from "@/components/BottomNav";
 import { SettingsButton } from "@/components/SettingsButton";
@@ -314,6 +315,7 @@ function AppLayout() {
         {showSettings && <SettingsButton />}
         <Outlet />
       </div>
+      <QuranMiniPlayer />
       <BottomNav />
       <AdhanPlayer
         visible={adhan.visible}

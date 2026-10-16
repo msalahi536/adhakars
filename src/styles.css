@@ -4646,3 +4646,18 @@ html[data-preset][data-visual-phase="evening"] .tasbih-confirm-btn.ghost {
 .quran-continue .quran-progress { height: 4px; margin-top: 7px; }
 .quran-continue-play { height: 42px; width: 42px; }
 .quran-continue-play svg { width: 17px; height: 17px; }
+
+/* Quran player: speed, close, mini pill */
+.quran-player { padding: 14px 18px 12px; border-radius: 28px; }
+.quran-speed { height: 32px; min-width: 52px; padding: 0 12px; border-radius: 999px; font-size: 13px; font-weight: 600; font-variant-numeric: tabular-nums; color: var(--foreground); background: color-mix(in oklab, var(--foreground) 7%, transparent); }
+.quran-player-x { display: flex; height: 32px; width: 32px; flex: none; align-items: center; justify-content: center; border-radius: 999px; color: var(--muted-foreground); background: color-mix(in oklab, var(--foreground) 5%, transparent); }
+.quran-controls { padding: 4px 2px 0; }
+.quran-controls .quran-play { height: 60px; width: 60px; box-shadow: none; }
+.quran-mini { position: fixed; right: 12px; bottom: calc(env(safe-area-inset-bottom, 0px) + 84px); z-index: 45; display: flex; align-items: center; gap: 4px; max-width: min(calc(100% - 24px), 300px); padding: 6px 6px 6px 6px; border-radius: 999px; background: color-mix(in oklab, var(--surface, var(--card)) 94%, transparent); -webkit-backdrop-filter: blur(16px); backdrop-filter: blur(16px); border: 1px solid var(--border); box-shadow: 0 8px 24px color-mix(in oklab, var(--foreground) 16%, transparent); color: var(--foreground); animation: quran-mini-in .28s ease; }
+.quran-mini-main { display: flex; min-width: 0; align-items: center; gap: 9px; padding-right: 6px; }
+.quran-mini-photo { position: relative; display: flex; height: 38px; width: 38px; flex: none; align-items: center; justify-content: center; border-radius: 999px; overflow: visible; background: color-mix(in oklab, var(--accent) 16%, var(--card)); color: var(--accent); font-weight: 600; }
+.quran-mini-photo img { height: 100%; width: 100%; border-radius: 999px; object-fit: cover; }
+.quran-mini-dot { position: absolute; right: -1px; bottom: -1px; height: 11px; width: 11px; border-radius: 99px; background: var(--accent); border: 2px solid var(--surface, var(--card)); }
+.quran-mini-btn { display: flex; height: 36px; width: 36px; flex: none; align-items: center; justify-content: center; border-radius: 999px; background: var(--accent); color: var(--accent-foreground); }
+.quran-mini-btn.is-ghost { background: transparent; color: var(--muted-foreground); }
+@keyframes quran-mini-in { from { opacity: 0; transform: translateY(10px) scale(.96); } to { opacity: 1; transform: none; } }
