@@ -235,11 +235,11 @@ function Home() {
 type RFilter = "popular" | "all" | "madinah" | "makkah" | "other";
 const RFILTERS: [RFilter, string][] = [["popular", "Popular"], ["all", "All Reciters"], ["madinah", "Madinah"], ["makkah", "Makkah"], ["other", "More"]];
 
-function ReciterPicker({ back }: { back?: number }) {
+function ReciterPicker({ back, tab }: { back?: number; tab?: "all" }) {
   const navigate = useNavigate();
   const [prefs, setPrefs] = usePrefs();
   const [q, setQ] = useState("");
-  const [filter, setFilter] = useState<RFilter>("popular");
+  const [filter, setFilter] = useState<RFilter>(tab === "all" ? "all" : "popular");
   const [preview, setPreview] = useState<number | null>(null);
   const audio = useRef<HTMLAudioElement | null>(null);
   useEffect(() => () => audio.current?.pause(), []);
@@ -252,7 +252,15 @@ function ReciterPicker({ back }: { back?: number }) {
     if (filter === "makkah") return r.group === 2 && /makkah|quba/i.test(r.name);
     return r.group === 3 || r.group === 4 || (r.group === 2 && !/madinah|makkah|quba/i.test(r.name));
   }));
-  const sorted = filter === "popular" && !t ? POPULAR_RECITERS.map(findReciter) : list;
+  const sorted = useMemo(() => {
+    if (filter === "popular" && !t) return POPULAR_RECITERS.map(findReciter);
+    if (filter === "all") {
+      const popIds = new Set(POPULAR_RECITERS);
+      const pop = list.filter((r) => popIds.has(r.id));
+      return [...pop, ...list.filter((r) => !popIds.has(r.id))];
+    }
+    return list;
+  }, [filter, t, list]);
 
   const goBack = () => { audio.current?.pause(); void navigate({ to: "/app/quran", search: back ? { s: back } : {} }); };
   const choose = (r: Reciter) => { setPrefs({ reciter: r.id }); void triggerHaptic("medium"); goBack(); };
