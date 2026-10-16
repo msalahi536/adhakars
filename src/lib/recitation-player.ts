@@ -2,6 +2,7 @@
 // keeps playing when the page changes or the app goes to the background.
 import { useSyncExternalStore } from "react";
 import { getRecitations } from "./recitations.functions";
+import { restingLevels, shapeMeter, type MeterLevels } from "./recitation-meter";
 
 export type Track = { dhikrId: string; title: string; url: string };
 export type PlayerState = {
@@ -12,10 +13,10 @@ export type PlayerState = {
   queue: Track[];
   queueIndex: number;
   queueLabel: string | null;
-  levels: [number, number, number, number, number, number];
+  levels: MeterLevels;
 };
 
-let state: PlayerState = { track: null, playing: false, current: 0, duration: 0, queue: [], queueIndex: -1, queueLabel: null, levels: [0.18, 0.18, 0.18, 0.18, 0.18, 0.18] };
+let state: PlayerState = { track: null, playing: false, current: 0, duration: 0, queue: [], queueIndex: -1, queueLabel: null, levels: restingLevels() };
 const subs = new Set<() => void>();
 const set = (p: Partial<PlayerState>) => { state = { ...state, ...p }; subs.forEach((f) => f()); };
 
@@ -24,26 +25,27 @@ let audioContext: AudioContext | null = null;
 let analyser: AnalyserNode | null = null;
 let analyserData: Uint8Array<ArrayBuffer> | null = null;
 let meterFrame: number | null = null;
+let lastMeterTime: number | null = null;
+
+function updateMeter(loudness: number, now: number) {
+  const elapsed = lastMeterTime === null ? 16 : Math.min(64, now - lastMeterTime);
+  lastMeterTime = now;
+  set({ levels: shapeMeter(loudness, state.levels, elapsed) });
+}
 
 function stopMeter() {
   if (meterFrame != null) cancelAnimationFrame(meterFrame);
   meterFrame = null;
-  set({ levels: [0.18, 0.18, 0.18, 0.18, 0.18, 0.18] });
+  lastMeterTime = null;
+  set({ levels: restingLevels() });
 }
 
-function runMeter() {
+function runMeter(now: number) {
   if (!analyser || !analyserData || !audio || audio.paused) return;
-  analyser.getByteFrequencyData(analyserData);
-  const bands: PlayerState["levels"] = [0, 0, 0, 0, 0, 0];
-  const width = Math.max(1, Math.floor(analyserData.length / bands.length));
-  for (let band = 0; band < bands.length; band += 1) {
-    let sum = 0;
-    const start = band * width;
-    const end = band === bands.length - 1 ? analyserData.length : Math.min(analyserData.length, start + width);
-    for (let i = start; i < end; i += 1) sum += analyserData[i] ?? 0;
-    bands[band] = Math.max(0.22, Math.min(1, sum / Math.max(1, end - start) / 150));
-  }
-  set({ levels: bands });
+  analyser.getByteTimeDomainData(analyserData);
+  let sum = 0;
+  for (const sample of analyserData) sum += ((sample - 128) / 128) ** 2;
+  updateMeter(Math.sqrt(sum / analyserData.length) * 3.5, now);
   meterFrame = requestAnimationFrame(runMeter);
 }
 
@@ -95,18 +97,18 @@ function loadEnvelope(url: string) {
   envelopeLoads.set(url, job);
 }
 
-function runSynthMeter() {
+function runSynthMeter(now: number) {
   if (!audio || audio.paused) return;
   const currentTime = audio.currentTime;
   const env = state.track ? envelopes.get(state.track.url) : undefined;
   if (env) {
-    const at = (offset: number) => {
-      const f = Math.floor((currentTime + offset) / ENV_STEP);
-      return Math.max(0.18, Math.min(1, (env[Math.max(0, Math.min(env.length - 1, f))] ?? 0) * 1.15));
-    };
-    set({ levels: [at(-0.09), at(-0.06), at(-0.03), at(0), at(0.03), at(0.06)] });
+    const position = currentTime / ENV_STEP;
+    const frame = Math.floor(position);
+    const at = (index: number) => env[Math.max(0, Math.min(env.length - 1, index))] ?? 0;
+    const loudness = at(frame) + (at(frame + 1) - at(frame)) * (position - frame);
+    updateMeter(loudness * 1.15, now);
   } else {
-    set({ levels: [0.18, 0.18, 0.18, 0.18, 0.18, 0.18] });
+    updateMeter(0, now);
   }
   meterFrame = requestAnimationFrame(runSynthMeter);
 }
@@ -122,12 +124,12 @@ function startMeter() {
     if (!audioContext) {
       audioContext = new AudioContext();
       analyser = audioContext.createAnalyser();
-      analyser.fftSize = 64;
+      analyser.fftSize = 1024;
       analyser.smoothingTimeConstant = 0.72;
       const source = audioContext.createMediaElementSource(audio);
       source.connect(analyser);
       analyser.connect(audioContext.destination);
-      analyserData = new Uint8Array(analyser.frequencyBinCount);
+      analyserData = new Uint8Array(analyser.fftSize);
     }
     void audioContext.resume();
     if (meterFrame == null) meterFrame = requestAnimationFrame(runMeter);

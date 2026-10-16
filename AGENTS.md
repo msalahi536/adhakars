@@ -1,5 +1,7 @@
 # Architecture Decisions
 
+- Recitation meters share a pure loudness-to-shape mapper for browser analysis and device envelopes, so motion remains consistent and independently testable without altering playback.
+
 - Personal appearance is manual and device-only, with independent phase defaults and page overrides in local storage and compressed photos in IndexedDB; no remote photo analysis is permitted.
 - The appearance popup uses a fixed, non-interactive and non-scrollable home-screen composition with real adhkar data and shared palette tokens, so draft edits preview immediately without affecting progress or the saved theme.
 - Personal palettes map editable roles onto shared semantic tokens with scoped priority over legacy preset CSS; clearing tracked personal tokens restores standard presets without changing their designs.
