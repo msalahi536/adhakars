@@ -23,7 +23,7 @@ test("mp3quran reciters only add people Quran.com lacks and keep Quran.com first
   const { RECITERS } = await import("./quran");
   const ids = RECITERS.map((r) => r.id);
   expect(new Set(ids).size).toBe(ids.length);
-  const firstExtra = RECITERS.findIndex((r) => r.server);
-  expect(RECITERS.slice(firstExtra).every((r) => r.server)).toBe(true);
+  const firstNoPhoto = RECITERS.findIndex((r) => !reciterHasPhoto(r));
+  expect(RECITERS.slice(firstNoPhoto).every((r) => !reciterHasPhoto(r))).toBe(true);
   expect(RECITERS.some((r) => r.server && /alafas|minshawi|husary|sudaes|ghamdi/i.test(r.name))).toBe(false);
 });
