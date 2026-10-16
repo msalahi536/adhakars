@@ -316,7 +316,7 @@ export function reciterSubtitle(r: Reciter): string {
   return style ? `${style} · ${sync}` : sync;
 }
 export const reciterName = (r: Reciter) => r.name.replace(/\s*\([^)]*\)\s*$/, "");
-export const POPULAR_RECITERS = [7, 1, 13, 174, 159, 3, 10, 104, 158, 19];
+export const POPULAR_RECITERS = [7, 1, 13, 174, 100107, 159, 3, 10, 104, 158, 19];
 export const findReciter = (id: number) => RECITERS.find((r) => r.id === id) ?? RECITERS[0];
 
 /* ---------- smart search ---------- */
@@ -366,14 +366,32 @@ export function searchChapters<T extends Pick<Chapter, "id" | "name_simple" | "n
   return list.map((c) => [c, chapterScore(c, q)] as const).filter(([, s]) => s > 0).sort((a, b) => b[1] - a[1] || a[0].id - b[0].id).map(([c]) => c);
 }
 
+/** Spelling-insensitive skeleton: Lohaidan / Luhaidan / Al-Luhaydan all become "lhdn". */
+const skeleton = (n: string) => n[0] + n.slice(1).replace(/[aeiouwh]/g, "").replace(/(.)\1+/g, "$1");
+
+/** How well a reciter matches the search; 0 = no match. Tolerates vowel and transliteration variants. */
+export function reciterScore(r: Reciter, q: string): number {
+  const n = normalizeQuery(q);
+  if (n.length < 2) return n ? 0 : 1;
+  const name = normalizeQuery(reciterName(r));
+  if (name.startsWith(n)) return 6;
+  if (name.includes(n)) return 5;
+  const words = reciterName(r).split(/[\s-]+/).map(normalizeQuery).filter(Boolean);
+  const sq = skeleton(n);
+  if (n.length >= 3 && words.some((w) => w.length > 1 && skeleton(w).startsWith(sq))) return 4;
+  if (n.length >= 3 && skeleton(name).includes(sq.slice(1)) && sq.length >= 3) return 3;
+  if (nearMatch(n, name)) return 2;
+  if (sq.length >= 4 && nearMatch(sq, skeleton(name))) return 1;
+  return 0;
+}
+
 export function searchReciters(q: string, limit = 5): Reciter[] {
   const n = normalizeQuery(q);
   if (n.length < 2 || /^\d+$/.test(q.trim())) return [];
   const seen = new Set<string>();
   return RECITERS.map((r) => {
     const name = normalizeQuery(reciterName(r));
-    const s = name.startsWith(n) ? 3 : name.includes(n) ? 2 : nearMatch(n, name) ? 1 : 0;
-    return [r, s, name] as const;
+    return [r, reciterScore(r, q), name] as const;
   }).filter(([, s]) => s > 0).sort((a, b) => b[1] - a[1] || a[0].group - b[0].group)
     .filter(([, , name]) => (seen.has(name) ? false : (seen.add(name), true))).slice(0, limit).map(([r]) => r);
 }

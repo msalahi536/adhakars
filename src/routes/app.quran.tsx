@@ -5,7 +5,7 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { ChevronDown, ChevronLeft, ChevronRight, Heart, Loader2, Maximize2, Pause, Play, Repeat, Search, Shuffle, SkipBack, SkipForward, X } from "lucide-react";
 import {
   findReciter, getChapterAudio, getChapters, getVerses, POPULAR_RECITERS, RECITERS,
-  reciterHasSurah, reciterName, reciterPhoto, reciterSubtitle, searchChapters, searchReciters, type Chapter, type Reciter, type Verse,
+  reciterHasSurah, reciterName, reciterScore, reciterPhoto, reciterSubtitle, searchChapters, searchReciters, type Chapter, type Reciter, type Verse,
 } from "@/lib/quran";
 import { getDisplay, triggerHaptic } from "@/lib/theme";
 import { quranPlayer, useQuranPlayer } from "@/lib/quran-player";
@@ -248,7 +248,7 @@ function ReciterPicker({ back, tab }: { back?: number; tab?: "all" }) {
   useEffect(() => () => audio.current?.pause(), []);
 
   const t = q.trim().toLowerCase();
-  const list = (t ? RECITERS.filter((r) => r.name.toLowerCase().includes(t)) : RECITERS.filter((r) => {
+  const list = (t ? RECITERS.map((r) => [r, reciterScore(r, t)] as const).filter(([, sc]) => sc > 0).sort((a, b) => b[1] - a[1]).map(([r]) => r) : RECITERS.filter((r) => {
     if (filter === "popular") return POPULAR_RECITERS.includes(r.id);
     if (filter === "all") return r.group === 1;
     if (filter === "madinah") return r.group === 2 && /madinah/i.test(r.name);
