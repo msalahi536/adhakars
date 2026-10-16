@@ -1069,6 +1069,15 @@ html[data-preset="dark-red"]:not([data-visual-phase="evening"]) .salah-adhan-sub
 html[data-preset="dark-red"]:not([data-visual-phase="evening"]) .salah-location {
   color: var(--text-muted) !important;
 }
+html[data-preset="dark-red"]:not([data-visual-phase="evening"]) .salah-dismiss {
+  border-color: color-mix(in oklab, var(--card-foreground) 32%, transparent);
+  background: color-mix(in oklab, var(--card-foreground) 10%, transparent);
+  color: color-mix(in oklab, var(--card-foreground) 88%, transparent);
+}
+html[data-preset="dark-red"]:not([data-visual-phase="evening"]) .salah-dismiss.is-dismissed {
+  border-color: color-mix(in oklab, var(--card-foreground) 20%, transparent);
+  background: color-mix(in oklab, var(--card-foreground) 7%, transparent);
+}
 .salah-hero { position: relative; display: flex; flex: 0 0 auto; flex-direction: column; align-items: center; box-sizing: border-box; padding: 44px 24px 10px; text-align: center; }
 .salah-next-label { color: #3f5a3c; font-family: "Outfit", var(--font-sans); font-size: 17px; font-weight: 500; line-height: 22px; letter-spacing: 0.005em; }
 .salah-countdown { margin-top: 3px; color: #2f4f34; font-family: "Outfit", var(--font-sans); font-size: 41px; font-weight: 500; line-height: 41px; letter-spacing: -0.005em; font-variant-numeric: tabular-nums; transition: color 400ms ease; }
