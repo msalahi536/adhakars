@@ -4589,3 +4589,20 @@ html[data-preset][data-visual-phase="evening"] .tasbih-confirm-btn.ghost {
 .quran-controls button.is-on { color: var(--accent); background: color-mix(in oklab, var(--accent) 12%, transparent); }
 .quran-controls button:disabled { opacity: .4; }
 .quran-controls .quran-play { height: 56px; width: 56px; background: var(--accent); color: var(--accent-foreground); box-shadow: 0 6px 18px color-mix(in oklab, var(--accent) 35%, transparent); }
+
+/* Quran home refinements */
+.quran-search input::placeholder { color: color-mix(in oklab, var(--foreground) 58%, transparent); opacity: 1; }
+.quran-search > svg { color: color-mix(in oklab, var(--foreground) 70%, transparent); }
+.quran-continue { gap: 14px; padding: 14px 16px; border-radius: 24px; }
+.quran-continue-art { height: 70px; width: 64px; border-radius: 10px; border: 1px solid color-mix(in oklab, gold 30%, transparent); box-shadow: inset 0 0 0 3px color-mix(in oklab, var(--accent) 70%, black), inset 0 0 0 4px color-mix(in oklab, gold 35%, transparent), 0 4px 10px color-mix(in oklab, var(--foreground) 12%, transparent); font-size: 16px; }
+.quran-continue-kicker { display: block; font-size: 10px; letter-spacing: .16em; text-transform: uppercase; color: var(--muted-foreground); }
+.quran-continue-title { display: block; margin-top: 2px; font-size: 20px; font-weight: 600; line-height: 1.15; }
+.quran-continue-meta { display: block; margin-top: 3px; font-size: 12px; color: var(--muted-foreground); }
+.quran-continue-play { display: flex; height: 52px; width: 52px; flex: none; align-items: center; justify-content: center; border-radius: 999px; background: var(--accent); color: var(--accent-foreground); box-shadow: 0 6px 14px color-mix(in oklab, var(--accent) 30%, transparent); transition: transform .15s ease; }
+.quran-continue:active .quran-continue-play { transform: scale(.93); }
+.quran-reciter-strip { gap: 12px; margin: 0 -20px; padding: 4px 20px 6px; scroll-snap-type: x proximity; -webkit-overflow-scrolling: touch; overscroll-behavior-x: contain; touch-action: pan-x pan-y; }
+.quran-reciter-tile, .quran-reciter-tile.is-on { width: 76px; padding: 0; border: 0; background: none; gap: 7px; }
+.quran-reciter-ring { display: flex; padding: 3px; border-radius: 999px; border: 2px solid transparent; transition: border-color .2s; }
+.quran-reciter-tile.is-on .quran-reciter-ring { border-color: var(--accent); }
+.quran-reciter-name { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.quran-reciter-tile.is-on .quran-reciter-name { color: var(--accent); font-weight: 600; }
