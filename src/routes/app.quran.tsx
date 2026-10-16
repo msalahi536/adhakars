@@ -15,6 +15,7 @@ export const Route = createFileRoute("/app/quran")({
     const n = Number(q.s);
     if (Number.isInteger(n) && n >= 1 && n <= 114) out.s = n;
     if (q.view === "reciters") out.view = "reciters";
+    if (q.tab === "all") out.tab = "all";
     return out;
   },
   head: () => ({
