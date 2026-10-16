@@ -23,13 +23,39 @@ export type Verse = {
 export type Timing = { key: string; from: number; to: number; segments: [number, number, number][] };
 export type ChapterAudio = { url: string; timings: Timing[] };
 
-export const RECITERS = [
-  { id: 7, name: "Mishary Alafasy" },
-  { id: 3, name: "Abdur-Rahman as-Sudais" },
-  { id: 2, name: "Abdul Basit (Murattal)" },
-  { id: 6, name: "Mahmoud Khalil Al-Husary" },
-  { id: 9, name: "Mohamed Siddiq al-Minshawi" },
-] as const;
+// Every Quran.com reciter with verse timings. `words` = word-by-word timing.
+export const RECITERS: { id: number; name: string; words: boolean }[] = [
+  { id: 7, name: "Mishary Rashid Alafasy", words: true },
+  { id: 3, name: "Abdur-Rahman as-Sudais", words: true },
+  { id: 10, name: "Sa'ud ash-Shuraim", words: true },
+  { id: 174, name: "Yasser ad-Dossari", words: true },
+  { id: 4, name: "Abu Bakr al-Shatri", words: true },
+  { id: 5, name: "Hani ar-Rifai", words: true },
+  { id: 2, name: "Abdul Basit (Murattal)", words: true },
+  { id: 1, name: "Abdul Basit (Mujawwad)", words: true },
+  { id: 6, name: "Mahmoud Khalil al-Husary", words: true },
+  { id: 12, name: "Al-Husary (Teaching)", words: true },
+  { id: 9, name: "Al-Minshawi (Murattal)", words: true },
+  { id: 8, name: "Al-Minshawi (Mujawwad)", words: true },
+  { id: 161, name: "Khalifa al-Tunaiji", words: true },
+  { id: 170, name: "Khalid al-Jalil", words: true },
+  { id: 172, name: "Hadi Toure", words: true },
+  { id: 13, name: "Saad al-Ghamdi", words: false },
+  { id: 159, name: "Maher al-Muaiqly", words: false },
+  { id: 104, name: "Nasser al-Qatami", words: false },
+  { id: 14, name: "Fares Abbad", words: false },
+  { id: 158, name: "Ali Jaber", words: false },
+  { id: 160, name: "Bandar Baleela", words: false },
+  { id: 18, name: "Salah Bukhatir", words: false },
+  { id: 19, name: "Ahmed al-Ajamy", words: false },
+  { id: 43, name: "Salah al-Budair", words: false },
+  { id: 124, name: "Abdullah al-Matrood", words: false },
+  { id: 127, name: "Akram al-Alaqmi", words: false },
+  { id: 162, name: "Abdullah al-Juhany", words: false },
+  { id: 163, name: "Abdullah Basfar", words: false },
+  { id: 11, name: "Abdul Muhsin al-Qasim", words: false },
+  { id: 91, name: "Mohamed al-Tablawi", words: false },
+];
 
 const cache = new Map<string, Promise<unknown>>();
 function get<T>(path: string): Promise<T> {
