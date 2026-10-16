@@ -181,19 +181,6 @@ function Home() {
             </div>
           )}
 
-          {lastChapter && !t && (
-            <button className="quran-card quran-continue" onClick={() => open(lastChapter.id)}>
-              <SurahArt name={lastChapter.name_arabic} />
-              <span className="min-w-0 flex-1 text-left">
-                <span className="quran-continue-kicker">Continue Reading</span>
-                <span className="quran-continue-title">{lastChapter.name_simple}</span>
-                <span className="quran-continue-meta">Surah {lastChapter.id} · Verse {last!.v} of {lastChapter.verses_count}</span>
-                <span className="quran-progress"><i style={{ width: `${Math.max(4, (last!.v / lastChapter.verses_count) * 100)}%` }} /></span>
-              </span>
-              <span className="quran-continue-play"><Play size={20} strokeWidth={1.6} strokeLinejoin="round" style={{ marginLeft: 2 }} /></span>
-            </button>
-          )}
-
           {!t && (
             <section>
               <div className="flex items-center justify-between">
@@ -209,6 +196,19 @@ function Home() {
                 ))}
               </div>
             </section>
+          )}
+
+          {lastChapter && !t && (
+            <button className="quran-card quran-continue" onClick={() => open(lastChapter.id)}>
+              <SurahArt name={lastChapter.name_arabic} />
+              <span className="min-w-0 flex-1 text-left">
+                <span className="quran-continue-kicker">Continue Reading</span>
+                <span className="quran-continue-title">{lastChapter.name_simple}</span>
+                <span className="quran-continue-meta">Surah {lastChapter.id} · Verse {last!.v} of {lastChapter.verses_count}</span>
+                <span className="quran-progress"><i style={{ width: `${Math.max(4, (last!.v / lastChapter.verses_count) * 100)}%` }} /></span>
+              </span>
+              <span className="quran-continue-play"><Play size={20} strokeWidth={1.6} strokeLinejoin="round" style={{ marginLeft: 2 }} /></span>
+            </button>
           )}
 
           {error && <p className="quran-muted text-center text-sm">Couldn't load the Quran. Check your connection and try again.</p>}
