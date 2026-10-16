@@ -317,6 +317,8 @@ export function reciterSubtitle(r: Reciter): string {
 }
 export const reciterName = (r: Reciter) => r.name.replace(/\s*\([^)]*\)\s*$/, "");
 export const POPULAR_RECITERS = [7, 1, 13, 174, 100107, 159, 3, 10, 104, 158, 19];
+/** The "Choose a Reciter" strip on the Quran home: Mohammed Al-Luhaidan takes Saad al-Ghamdi's spot. */
+export const HOME_RECITER_IDS = [7, 1, 100107, 174, 159, 3, 10, 104, 158, 19];
 export const findReciter = (id: number) => RECITERS.find((r) => r.id === id) ?? RECITERS[0];
 
 /* ---------- smart search ---------- */

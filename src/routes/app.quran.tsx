@@ -5,7 +5,7 @@ import { QuranMiniPlayer } from "@/components/QuranMiniPlayer";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { ChevronDown, ChevronLeft, ChevronRight, Heart, Loader2, Maximize2, Pause, Play, Repeat, Search, Shuffle, SkipBack, SkipForward, X } from "lucide-react";
 import {
-  findReciter, getChapterAudio, getChapters, getVerses, POPULAR_RECITERS, RECITERS,
+  findReciter, getChapterAudio, getChapters, getVerses, HOME_RECITER_IDS, POPULAR_RECITERS, RECITERS,
   reciterHasSurah, reciterName, reciterScore, reciterPhoto, reciterSubtitle, searchChapters, searchReciters, type Chapter, type Reciter, type Verse,
 } from "@/lib/quran";
 import { getDisplay, triggerHaptic } from "@/lib/theme";
@@ -149,7 +149,7 @@ function Home() {
   const reciterHits = useMemo(() => searchReciters(q), [q]);
   const lastChapter = last && chapters?.find((c) => c.id === last.s);
   const open = (id: number) => { void triggerHaptic("light"); void navigate({ to: "/app/quran", search: { s: id } }); };
-  const popular = POPULAR_RECITERS.map(findReciter);
+  const home = HOME_RECITER_IDS.map(findReciter);
   const lastY = useRef(0);
   const [searchShown, setSearchShown] = useState(true);
   const [searchFloat, setSearchFloat] = useState(false);
@@ -191,7 +191,7 @@ function Home() {
                 <button className="quran-see-all" onClick={() => navigate({ to: "/app/quran", search: { view: "reciters", tab: "all" } })}>See All <ChevronRight size={14} /></button>
               </div>
               <div className="quran-reciter-strip">
-                {popular.map((r) => (
+                {home.map((r) => (
                   <button key={r.id} className={`quran-reciter-tile ${prefs.reciter === r.id ? "is-on" : ""}`} onClick={() => { setPrefs({ reciter: r.id }); void triggerHaptic("light"); }}>
                     <span className="quran-reciter-ring"><Avatar r={r} size={64} /></span>
                     <span className="quran-reciter-name">{reciterName(r)}</span>
