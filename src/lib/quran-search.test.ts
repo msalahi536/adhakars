@@ -21,3 +21,15 @@ describe("quran smart search", () => {
     expect(searchReciters("dosari")[0].name).toContain("Yasser");
   });
 });
+
+test("reciter spelling variants find each other", () => {
+  const names = (q: string) => searchReciters(q, 10).map((r) => r.name);
+  expect(names("lohaidan").some((n) => /Luhaidan/.test(n))).toBe(true);
+  expect(names("luhaidan").some((n) => /Lohaidan/.test(n))).toBe(true);
+  expect(names("luhaydan").some((n) => /Lohaidan/.test(n))).toBe(true);
+});
+
+test("Mohammed Al-Lohaidan is fifth among popular reciters", async () => {
+  const { POPULAR_RECITERS, findReciter } = await import("./quran");
+  expect(findReciter(POPULAR_RECITERS[4]).name).toBe("Mohammed Al-Lohaidan");
+});
