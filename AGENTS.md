@@ -32,3 +32,4 @@
 
 - Preset day palettes are scoped to the morning visual phase, never a route alone; evening maps all shared surfaces and text roles to its own palette so Settings, tools and reading screens cannot inherit day colors.
 - The Quran tab reads text, translation, transliteration and word-timed chapter audio directly from the public Quran.com v4 API in the browser; karaoke highlighting is derived only from the audio clock, so no Quran content is stored in the app.
+- Reciter portraits beyond Quran.com's nine live as Lovable Assets pointers under `src/assets/reciters/` and are matched to reciters by normalized name in `src/lib/reciter-photos.ts`, checked before the Quran.com photo fallback.
