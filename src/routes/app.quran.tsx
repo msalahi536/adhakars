@@ -325,8 +325,8 @@ function Reader({ chapterId }: { chapterId: number }) {
   const navigate = useNavigate();
   const [prefs] = usePrefs();
   const [favs, toggleFav] = useFavs();
-  const [display, setDisplayState] = useState({ translit: true, translation: true });
-  useEffect(() => { const d = getDisplay(); setDisplayState({ translit: d.showTransliteration, translation: d.showTranslation }); }, []);
+  const [display, setDisplayState] = useState({ translit: true, translation: true, arabic: true });
+  useEffect(() => { const d = getDisplay(); setDisplayState({ translit: d.showTransliteration, translation: d.showTranslation || !d.showArabic, arabic: d.showArabic }); }, []);
   const [chapter, setChapter] = useState<Chapter | null>(null);
   const [verses, setVerses] = useState<Verse[] | null>(null);
   const [error, setError] = useState(false);
@@ -391,7 +391,7 @@ function Reader({ chapterId }: { chapterId: number }) {
           {!verses && !error && <div className="flex justify-center py-10"><Loader2 className="animate-spin" /></div>}
           {verses?.map((v) => (
             <VerseCard key={v.key} verse={v} active={pos.key === v.key} word={pos.key === v.key ? pos.word : null}
-              translit={display.translit} translation={display.translation} fav={favSet.has(v.key)}
+              translit={display.translit} translation={display.translation} arabic={display.arabic} fav={favSet.has(v.key)}
               onPlay={onPlayVerse} onFav={toggleFav} />
           ))}
           {verses && <p className="quran-muted pt-2 text-center text-[10px]">Text, translation (Saheeh International) and recitations via Quran.com</p>}
@@ -502,8 +502,8 @@ function QuranPlayerPanel() {
 }
 
 // Memoized so only the verse being recited re-renders while audio plays.
-const VerseCard = memo(function VerseCard({ verse: v, active, word, translit, translation, fav, onPlay, onFav }: {
-  verse: Verse; active: boolean; word: number | null; translit: boolean; translation: boolean; fav: boolean;
+const VerseCard = memo(function VerseCard({ verse: v, active, word, translit, translation, arabic, fav, onPlay, onFav }: {
+  verse: Verse; active: boolean; word: number | null; translit: boolean; translation: boolean; arabic: boolean; fav: boolean;
   onPlay: (key: string) => void; onFav: (key: string) => void;
 }) {
   const wordMode = active && word !== null;
@@ -514,14 +514,14 @@ const VerseCard = memo(function VerseCard({ verse: v, active, word, translit, tr
         <button className="quran-play-sm" aria-label={`Play verse ${v.number}`} onClick={() => onPlay(v.key)}><Play size={13} fill="currentColor" style={{ marginLeft: 2 }} /></button>
       </div>
       <div className="min-w-0 flex-1">
-        <p className="quran-ar" dir="rtl" lang="ar" onClick={() => onPlay(v.key)}>
+        {arabic && <p className="quran-ar" dir="rtl" lang="ar" onClick={() => onPlay(v.key)}>
           {v.words.map((w) => {
             const state = w.isEnd ? "quran-end" : !wordMode ? "quran-word" : w.position < word! ? "quran-word is-done" : w.position === word ? "quran-word is-now" : "quran-word";
             return <Fragment key={w.position}><span className={state}>{w.text}</span>{" "}</Fragment>;
           })}
-        </p>
+        </p>}
         {translit && v.transliteration && <p className="quran-translit">{v.transliteration}</p>}
-        {translation && <p className="quran-tr">{v.translation}</p>}
+        {translation && <p className={`quran-tr ${arabic ? "" : "is-big"}`} onClick={arabic ? undefined : () => onPlay(v.key)}>{v.translation}</p>}
       </div>
       <button className={`quran-heart ${fav ? "is-on" : ""}`} aria-label={fav ? "Remove from favorites" : "Save verse"} aria-pressed={fav} onClick={() => onFav(v.key)}>
         <Heart size={18} fill={fav ? "currentColor" : "none"} />

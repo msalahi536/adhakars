@@ -104,14 +104,14 @@ export function DhikrCard({ dhikr, count, onIncrement, isSpecial, specialLabel, 
               {dhikr.arabicMulti.map((part) => (
                 <div key={part.label}>
                   <div className="label-caps mb-1.5 text-center">{part.label}</div>
-                    <ArabicText size={arabicSize} large={display.arabicLarge}>{part.arabic}</ArabicText>
+                    {display.showArabic && <ArabicText size={arabicSize} large={display.arabicLarge}>{part.arabic}</ArabicText>}
                    {display.showTransliteration && part.transliteration && (
                      <p className="adhkar-transliteration">
                       {part.transliteration}
                     </p>
                   )}
-                  {display.showTranslation && part.translation && (
-                     <p className="adhkar-translation">
+                  {(display.showTranslation || !display.showArabic) && part.translation && (
+                     <p className={`adhkar-translation ${display.showArabic ? "" : "is-big"}`}>
                       {part.translation}
                     </p>
                   )}
@@ -120,14 +120,14 @@ export function DhikrCard({ dhikr, count, onIncrement, isSpecial, specialLabel, 
             </div>
           ) : (
             <>
-              {dhikr.arabic && (
+              {dhikr.arabic && display.showArabic && (
                 <ArabicText size={arabicSize} large={display.arabicLarge}>{dhikr.arabic}</ArabicText>
               )}
-              {dhikr.arabic && ((display.showTranslation && dhikr.translation) || (display.showTransliteration && dhikr.transliteration)) && <OrnamentalDivider />}
+              {dhikr.arabic && display.showArabic && ((display.showTranslation && dhikr.translation) || (display.showTransliteration && dhikr.transliteration)) && <OrnamentalDivider />}
                {display.showTransliteration && dhikr.transliteration && (
                 <Transliteration>{dhikr.transliteration}</Transliteration>
               )}
-               {display.showTranslation && dhikr.translation && <p className="adhkar-translation">{dhikr.translation}</p>}
+               {(display.showTranslation || !display.showArabic) && dhikr.translation && <p className={`adhkar-translation ${display.showArabic ? "" : "is-big"}`}>{dhikr.translation}</p>}
             </>
           )}
 

@@ -4678,3 +4678,6 @@ html[data-preset][data-visual-phase="evening"] .tasbih-confirm-btn.ghost {
 .quran-surah-nav { display: flex; justify-content: space-between; gap: 8px; margin-top: 2px; }
 .quran-surah-nav button { display: inline-flex; align-items: center; gap: 4px; font-size: 12px; font-weight: 600; padding: 6px 12px; border-radius: 99px; color: var(--foreground); background: color-mix(in oklab, var(--foreground) 7%, transparent); }
 .quran-surah-nav button:disabled { opacity: .35; }
+.adhkar-translation.is-big { font-size: 1.2rem; line-height: 1.6; opacity: 1; text-align: center; }
+.quran-tr.is-big { font-size: 17px; line-height: 1.6; color: var(--foreground); opacity: .55; transition: opacity .3s, color .3s; cursor: pointer; }
+.quran-verse.is-active .quran-tr.is-big { opacity: 1; color: var(--accent); }
