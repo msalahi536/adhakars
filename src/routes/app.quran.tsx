@@ -325,8 +325,8 @@ function Reader({ chapterId }: { chapterId: number }) {
   const navigate = useNavigate();
   const [prefs] = usePrefs();
   const [favs, toggleFav] = useFavs();
-  const [display, setDisplayState] = useState({ translit: true, translation: true, arabic: true });
-  useEffect(() => { const d = getDisplay(); setDisplayState({ translit: d.showTransliteration, translation: d.showTranslation || !d.showArabic, arabic: d.showArabic }); }, []);
+  const [display, setDisplayState] = useState({ translit: true, translation: true, arabic: true, page: false, follow: true, words: true });
+  useEffect(() => { const d = getDisplay(); setDisplayState({ translit: d.showTransliteration, translation: d.showTranslation || !d.showArabic, arabic: d.showArabic, page: d.quranPageView, follow: d.quranAutoScroll, words: d.quranWordHighlight }); }, []);
   const [chapter, setChapter] = useState<Chapter | null>(null);
   const [verses, setVerses] = useState<Verse[] | null>(null);
   const [error, setError] = useState(false);
@@ -361,8 +361,9 @@ function Reader({ chapterId }: { chapterId: number }) {
   useEffect(() => {
     if (!pos.key || pos.key === lastKey.current) return;
     lastKey.current = pos.key;
+    if (!display.follow) return;
     document.getElementById(`v-${pos.key}`)?.scrollIntoView({ behavior: "smooth", block: "center" });
-  }, [pos.key]);
+  }, [pos.key, display.follow]);
 
   const nameRef = useRef(""); nameRef.current = chapter?.name_simple ?? "";
   const onPlayVerse = useCallback((key: string) => {
@@ -389,8 +390,11 @@ function Reader({ chapterId }: { chapterId: number }) {
           {showBismillah && <div className="quran-bismillah" dir="rtl">بِسْمِ ٱللَّهِ ٱلرَّحْمَـٰنِ ٱلرَّحِيمِ</div>}
           {error && <p className="quran-muted text-center text-sm">Couldn't load this surah. Check your connection.</p>}
           {!verses && !error && <div className="flex justify-center py-10"><Loader2 className="animate-spin" /></div>}
-          {verses?.map((v) => (
-            <VerseCard key={v.key} verse={v} active={pos.key === v.key} word={pos.key === v.key ? pos.word : null}
+          {verses && display.page && (
+            <MushafPage verses={verses} activeKey={pos.key} word={display.words ? pos.word : null} arabic={display.arabic} onPlay={onPlayVerse} />
+          )}
+          {!display.page && verses?.map((v) => (
+            <VerseCard key={v.key} verse={v} active={pos.key === v.key} word={pos.key === v.key && display.words ? pos.word : null}
               translit={display.translit} translation={display.translation} arabic={display.arabic} fav={favSet.has(v.key)}
               onPlay={onPlayVerse} onFav={toggleFav} />
           ))}

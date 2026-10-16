@@ -75,7 +75,6 @@ import {
   Type,
   Languages,
   ALargeSmall,
-  BookOpen as BookOpenIcon2,
   ScrollText,
   Highlighter,
   Check,
