@@ -4623,3 +4623,4 @@ html[data-preset][data-visual-phase="evening"] .tasbih-confirm-btn.ghost {
 .quran-continue-meta { font-size: 13px; color: color-mix(in oklab, var(--foreground) 78%, transparent); }
 .quran-continue .quran-progress { height: 5px; margin-top: 9px; }
 .quran-continue-play { height: 58px; width: 58px; background: color-mix(in oklab, var(--accent) 88%, var(--foreground)); box-shadow: none; }
+.quran-continue-art { color: color-mix(in oklab, #f3e6c4 88%, var(--accent)); background: linear-gradient(145deg, color-mix(in oklab, var(--accent) 80%, black 10%), color-mix(in oklab, var(--accent) 60%, black 30%)); }
