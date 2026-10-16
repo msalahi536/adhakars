@@ -18,6 +18,6 @@ describe("quran smart search", () => {
   test("reciters", () => {
     expect(searchReciters("mishary")[0].id).toBe(7);
     expect(searchReciters("ghamdi")[0].id).toBe(13);
-    expect(searchReciters("dosari").length).toBe(1);
+    expect(searchReciters("dosari")[0].name).toContain("Yasser");
   });
 });
