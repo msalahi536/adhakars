@@ -75,6 +75,8 @@ import {
   Type,
   Languages,
   ALargeSmall,
+  ScrollText,
+  Highlighter,
   Check,
   Palette,
   Sparkles,
@@ -516,6 +518,34 @@ function Settings() {
                 description="Increase Arabic text size."
                 value={display.arabicLarge}
                 onChange={(v) => updateDisplay({ arabicLarge: v })}
+              />
+            </div>
+          </section>
+
+          {/* QURAN */}
+          <section className="mb-6">
+            <h2 className="label-caps mb-3">Quran</h2>
+            <div className="settings-group">
+              <Toggle
+                icon={<BookOpen size={17} strokeWidth={1.8} />}
+                label="Full page view"
+                description="Read the whole surah as one flowing page, like a printed Quran, instead of verse by verse cards."
+                value={display.quranPageView}
+                onChange={(v) => updateDisplay({ quranPageView: v })}
+              />
+              <Toggle
+                icon={<ScrollText size={17} strokeWidth={1.8} />}
+                label="Follow recitation"
+                description="The page moves by itself to the verse being recited."
+                value={display.quranAutoScroll}
+                onChange={(v) => updateDisplay({ quranAutoScroll: v })}
+              />
+              <Toggle
+                icon={<Highlighter size={17} strokeWidth={1.8} />}
+                label="Word by word highlight"
+                description="Lights up each word as it's recited."
+                value={display.quranWordHighlight}
+                onChange={(v) => updateDisplay({ quranWordHighlight: v })}
               />
             </div>
           </section>
