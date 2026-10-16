@@ -1,4 +1,6 @@
 import { Fragment, memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { createPortal } from "react-dom";
+import { QuranMiniPlayer } from "@/components/QuranMiniPlayer";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { ChevronDown, ChevronLeft, ChevronRight, Heart, Loader2, Maximize2, Pause, Play, Repeat, Search, Shuffle, SkipBack, SkipForward, X } from "lucide-react";
 import {
@@ -336,21 +338,16 @@ function Reader({ chapterId }: { chapterId: number }) {
   const lastKey = useRef<string | null>(null);
   const [sheet, setSheet] = useState(false);
   const [full, setFull] = useState(false);
-  const openFull = () => {
-    void triggerHaptic("light"); setSheet(false); setFull(true);
-    try { void document.documentElement.requestFullscreen?.().catch(() => {}); } catch { /* unsupported */ }
-  };
-  const closeFull = useCallback(() => {
-    setFull(false);
-    try { if (document.fullscreenElement) void document.exitFullscreen().catch(() => {}); } catch { /* unsupported */ }
-  }, []);
+  // In-app reading mode: the surah takes over the whole app screen like a book page.
+  // Deliberately NOT the browser/native fullscreen API.
+  const openFull = () => { void triggerHaptic("light"); setSheet(false); setFull(true); };
+  const closeFull = useCallback(() => { void triggerHaptic("light"); setFull(false); }, []);
   useEffect(() => {
     if (!full) return;
     document.body.classList.add("quran-fs-on");
-    const onFs = () => { if (!document.fullscreenElement) setFull(false); };
     const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") closeFull(); };
-    document.addEventListener("fullscreenchange", onFs); window.addEventListener("keydown", onKey);
-    return () => { document.body.classList.remove("quran-fs-on"); document.removeEventListener("fullscreenchange", onFs); window.removeEventListener("keydown", onKey); };
+    window.addEventListener("keydown", onKey);
+    return () => { document.body.classList.remove("quran-fs-on"); window.removeEventListener("keydown", onKey); };
   }, [full, closeFull]);
 
   useEffect(() => {
@@ -421,18 +418,32 @@ function Reader({ chapterId }: { chapterId: number }) {
           {verses && <p className="quran-muted pt-2 text-center text-[10px]">Text, translation (Saheeh International) and recitations via Quran.com</p>}
         </div>
       </main>
-      {full && (
-        <div className="quran-fs" role="dialog" aria-label={`${chapter?.name_simple ?? "Surah"} full screen`}>
-          <button className="quran-fs-x" onClick={closeFull} aria-label="Exit full screen"><X size={20} /></button>
-          <div className={`quran-fs-page ${player.panelOpen ? "has-panel" : ""}`}>
-            <div className="quran-fs-title">{chapter?.name_arabic ?? chapter?.name_simple}</div>
-            {showBismillah && <div className="quran-bismillah" dir="rtl">بِسْمِ ٱللَّهِ ٱلرَّحْمَـٰنِ ٱلرَّحِيمِ</div>}
-            {verses ? <MushafPage verses={verses} activeKey={pos.key} word={display.words ? pos.word : null} arabic={display.arabic} onPlay={onPlayVerse} />
-              : <div className="flex justify-center py-10"><Loader2 className="animate-spin" /></div>}
+      {full && typeof document !== "undefined" && createPortal(
+        <div className="quran-fs" role="dialog" aria-modal="true" aria-label={`${chapter?.name_simple ?? "Surah"}, reading mode`}>
+          <button className="quran-fs-x" onClick={closeFull} aria-label="Close reading mode"><X size={18} /></button>
+          <div className={`quran-fs-scroll ${player.panelOpen ? "has-panel" : ""}`}>
+            <section className="quran-fs-sheet">
+              <i className="quran-fs-corner is-tl" aria-hidden="true" /><i className="quran-fs-corner is-tr" aria-hidden="true" />
+              <i className="quran-fs-corner is-bl" aria-hidden="true" /><i className="quran-fs-corner is-br" aria-hidden="true" />
+              <header className="quran-fs-band">
+                <span className="quran-fs-meta">{chapter ? (chapter.revelation_place === "makkah" ? "Makki" : "Madani") : ""}</span>
+                <span className="quran-fs-name" lang="ar" dir="rtl">{chapter ? `سُورَةُ ${chapter.name_arabic}` : "…"}</span>
+                <span className="quran-fs-meta">{chapter ? `${chapter.verses_count} verses` : ""}</span>
+              </header>
+              <p className="quran-fs-sub">{chapter ? `${chapter.name_simple} · ${chapter.translated_name.name}` : ""}</p>
+              {showBismillah && display.arabic && <div className="quran-fs-bismillah" dir="rtl" lang="ar">بِسْمِ ٱللَّهِ ٱلرَّحْمَـٰنِ ٱلرَّحِيمِ</div>}
+              {showBismillah && !display.arabic && <div className="quran-fs-bismillah is-en">In the name of Allah, the Entirely Merciful, the Especially Merciful.</div>}
+              {verses ? <MushafPage bare verses={verses} activeKey={pos.key} word={display.words ? pos.word : null} arabic={display.arabic} onPlay={onPlayVerse} />
+                : error ? <p className="quran-muted py-10 text-center text-sm">Couldn't load this surah. Check your connection.</p>
+                : <div className="flex justify-center py-12"><Loader2 className="animate-spin" /></div>}
+              <footer className="quran-fs-foot"><span aria-hidden="true">۞</span><span>Surah {chapterId} of 114</span><span aria-hidden="true">۞</span></footer>
+            </section>
           </div>
-        </div>
+          {player.panelOpen ? <QuranPlayerPanel /> : <QuranMiniPlayer />}
+        </div>,
+        document.body,
       )}
-      {player.panelOpen && <QuranPlayerPanel />}
+      {!full && player.panelOpen && <QuranPlayerPanel />}
     </>
   );
 }
@@ -566,12 +577,13 @@ const VerseCard = memo(function VerseCard({ verse: v, active, word, translit, tr
 });
 
 /** Whole surah as one flowing page, like reading from a printed mushaf. */
-const MushafPage = memo(function MushafPage({ verses, activeKey, word, arabic, onPlay }: {
-  verses: Verse[]; activeKey: string | null; word: number | null; arabic: boolean; onPlay: (key: string) => void;
+const MushafPage = memo(function MushafPage({ verses, activeKey, word, arabic, onPlay, bare = false }: {
+  verses: Verse[]; activeKey: string | null; word: number | null; arabic: boolean; onPlay: (key: string) => void; bare?: boolean;
 }) {
+  const box = bare ? "quran-mushaf is-bare" : "quran-card quran-mushaf";
   if (!arabic) {
     return (
-      <article className="quran-card quran-mushaf is-en">
+      <article className={`${box} is-en`}>
         {verses.map((v) => (
           <span key={v.key} id={`v-${v.key}`} className={`quran-mushaf-v ${activeKey === v.key ? "is-active" : ""}`} onClick={() => onPlay(v.key)}>
             {v.translation} <sup className="quran-mushaf-n">{v.number}</sup>{" "}
@@ -581,7 +593,7 @@ const MushafPage = memo(function MushafPage({ verses, activeKey, word, arabic, o
     );
   }
   return (
-    <article className="quran-card quran-mushaf" dir="rtl" lang="ar">
+    <article className={box} dir="rtl" lang="ar">
       {verses.map((v) => {
         const active = activeKey === v.key;
         const wordMode = active && word !== null;

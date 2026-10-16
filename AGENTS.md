@@ -1,12 +1,12 @@
 # Architecture Decisions
 
-- Recitation meters share six independent frequency bands and a center-weighted smoothing mapper for live browser spectra and FFT-decoded device envelopes, so each line follows actual tone without altering phone playback.
+- Recitation meters share six frequency bands and one smoothing mapper for live spectra and decoded device envelopes, so lines follow actual tone.
 
 - Personal appearance is manual and device-only, with independent phase defaults and page overrides in local storage and compressed photos in IndexedDB; no remote photo analysis is permitted.
 - The appearance popup uses a fixed, non-interactive and non-scrollable home-screen composition with real adhkar data and shared palette tokens, so draft edits preview immediately without affecting progress or the saved theme.
 - Personal palettes map editable roles onto shared semantic tokens with scoped priority over legacy preset CSS; clearing tracked personal tokens restores standard presets without changing their designs.
 
-- Homepage and download share-image metadata use one CDN-backed homepage capture in their leaf heads, never a root screenshot, so link previews stay deliberate and unrelated pages cannot inherit stale artwork.
+- Homepage and download share images use one CDN homepage capture in their leaf heads, never root, so other pages cannot inherit stale artwork.
 
 - Main Settings and the Adhan Settings calculation popup use shared prayer settings, so location, Salah times, alerts, and widgets stay aligned.
 - Salah's no-location countdown is display-only state, never prayer slots or notification input; the main content owns scrolling and setup cards cannot shrink, so location controls remain accessible.
@@ -28,9 +28,10 @@
 - App launch has no onboarding or guided tour; release notices use a versioned acknowledgment and bounded release window without resetting appearance or progress.
 - The adhan consent prompt is offered once (persisted acknowledgment) right after Salah saves a location, or on the first notification grant; "Yes" requests notification access, enables all five prayers and opens Adhan Settings — nothing is auto-enabled.
 - Salah owns the once-per-install automatic location request; app launch, Settings entry, and widget synchronization only read saved coordinates so permissions never stack on launch.
-- Explicit rating actions synchronously open the store review destination rather than requesting the optional native review popup, because Apple can silently suppress it and browser plugin implementations can be no-ops.
+- Explicit rating actions synchronously open the store review page, not the native review popup, which Apple can silently suppress.
 
 - Preset day palettes are scoped to the morning visual phase, never a route alone; evening maps all shared surfaces and text roles to its own palette so Settings, tools and reading screens cannot inherit day colors.
 - The Quran tab reads text, translation, transliteration and word-timed chapter audio directly from the public Quran.com v4 API in the browser; karaoke highlighting is derived only from the audio clock, so no Quran content is stored in the app.
 - Extra reciter portraits are asset pointers matched by normalized name before the Quran.com photo fallback.
 - Quran playback uses one app-wide store outside routes so recitation survives page changes; repeat restarts manually, not audio.loop.
+- Quran reading mode is an in-app body-portaled overlay, never the browser/native fullscreen API, which broke the reader.
