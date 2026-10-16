@@ -35,3 +35,4 @@
 - Extra reciter portraits are asset pointers matched by normalized name before the Quran.com photo fallback.
 - Quran playback uses one app-wide store outside routes so recitation survives page changes; repeat restarts manually, not audio.loop.
 - Quran reading mode is an in-app body-portaled overlay, never the browser/native fullscreen API, which broke the reader.
+- mp3quran.net only adds reciters missing from Quran.com (audio + verse timings, generated list in `src/lib/mp3quran-reciters.ts`); all Quran text stays from Quran.com.
