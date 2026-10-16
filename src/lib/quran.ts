@@ -307,6 +307,10 @@ export function reciterPhoto(r: Reciter): string | null {
   const hit = PHOTOS.find(([re]) => re.test(r.name));
   return hit ? PHOTO_BASE + hit[1] : null;
 }
+// Reciters with a portrait come first everywhere; stable sort keeps the original order otherwise.
+const hasPhoto = new Map(RECITERS.map((r) => [r.id, !!reciterPhoto(r)]));
+RECITERS.sort((a, b) => Number(!hasPhoto.get(a.id)) - Number(!hasPhoto.get(b.id)));
+export const reciterHasPhoto = (r: Reciter) => !!hasPhoto.get(r.id);
 export function reciterSubtitle(r: Reciter): string {
   if (r.group === 2) return "Haramain Taraweeh";
   if (r.group === 3) return "Other qira'at";
@@ -396,6 +400,6 @@ export function searchReciters(q: string, limit = 5): Reciter[] {
   return RECITERS.map((r) => {
     const name = normalizeQuery(reciterName(r));
     return [r, reciterScore(r, q), name] as const;
-  }).filter(([, s]) => s > 0).sort((a, b) => b[1] - a[1] || rank(a[0]) - rank(b[0]) || a[0].group - b[0].group || a[0].name.length - b[0].name.length)
+  }).filter(([, s]) => s > 0).sort((a, b) => b[1] - a[1] || rank(a[0]) - rank(b[0]) || Number(!reciterHasPhoto(a[0])) - Number(!reciterHasPhoto(b[0])) || a[0].group - b[0].group || a[0].name.length - b[0].name.length)
     .filter(([, , name]) => (seen.has(name) ? false : (seen.add(name), true))).slice(0, limit).map(([r]) => r);
 }

@@ -134,7 +134,7 @@ const LOCAL_PHOTOS: [string, string][] = [
   ["iaserdosari", p58.url],
 ];
 
-const NAMED: [string, string][] = NAMED_PHOTOS.map(([nm, u]) => [normalizeQuery(nm), u]);
+const NAMED: [string, string][] = NAMED_PHOTOS.map(([nm, u]) => [normalizeQuery(nm.replace(/\[.*?\]/g, " ").replace(/\(.*?\)/g, " ")), u]);
 
 /** Portrait for a reciter name, or null when none was supplied. */
 export function localReciterPhoto(name: string): string | null {
