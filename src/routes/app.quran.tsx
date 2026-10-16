@@ -423,8 +423,6 @@ function Reader({ chapterId }: { chapterId: number }) {
           <button className="quran-fs-x" onClick={closeFull} aria-label="Close reading mode"><X size={18} /></button>
           <div className={`quran-fs-scroll ${player.panelOpen ? "has-panel" : ""}`}>
             <section className="quran-fs-sheet">
-              <i className="quran-fs-corner is-tl" aria-hidden="true" /><i className="quran-fs-corner is-tr" aria-hidden="true" />
-              <i className="quran-fs-corner is-bl" aria-hidden="true" /><i className="quran-fs-corner is-br" aria-hidden="true" />
               <header className="quran-fs-band">
                 <span className="quran-fs-meta">{chapter ? (chapter.revelation_place === "makkah" ? "Makki" : "Madani") : ""}</span>
                 <span className="quran-fs-name" lang="ar" dir="rtl">{chapter ? `سُورَةُ ${chapter.name_arabic}` : "…"}</span>
