@@ -259,7 +259,7 @@ function ReciterPicker({ back, tab }: { back?: number; tab?: "all" }) {
     if (filter === "popular" && !t) return POPULAR_RECITERS.map(findReciter);
     if (filter === "all") {
       const popIds = new Set(POPULAR_RECITERS);
-      const pop = list.filter((r) => popIds.has(r.id));
+      const pop = POPULAR_RECITERS.map(findReciter).filter((r) => list.includes(r));
       return [...pop, ...list.filter((r) => !popIds.has(r.id))];
     }
     return list;
