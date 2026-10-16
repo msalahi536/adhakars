@@ -1,3 +1,4 @@
+import { localReciterPhoto } from "@/lib/reciter-photos";
 // Quran content from the public Quran.com API (v4). Fetched in the browser
 // and cached in memory per session.
 const API = "https://api.quran.com/api/v4";
