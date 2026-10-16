@@ -1,4 +1,10 @@
 // Portraits for mp3quran reciters, matched by exact display name (brackets removed).
+import q138 from "@/assets/reciters2/muamar-from-indonesia.png.asset.json";
+import q137 from "@/assets/reciters2/mohammad-saleh-alim-shah.png.asset.json";
+import q136 from "@/assets/reciters2/khalid-almohana.png.asset.json";
+import q135 from "@/assets/reciters2/faisal-al-hajry.png.asset.json";
+import q134 from "@/assets/reciters2/alfateh-alzubair.png.asset.json";
+import q133 from "@/assets/reciters2/ahmad-alhuthaifi.png.asset.json";
 import q0 from "@/assets/reciters2/abdelmoujib-benkirane.png.asset.json";
 import q1 from "@/assets/reciters2/abdulaziz-alasiri.png.asset.json";
 import q2 from "@/assets/reciters2/abdulaziz-alturki.png.asset.json";
@@ -266,4 +272,10 @@ export const NAMED_PHOTOS: [string, string][] = [
   ["Youssef Edghouch", q130.url],
   ["Zakaria Hamamah", q131.url],
   ["Zaki Daghistani", q132.url],
+  ["Ahmad Alhuthaifi", q133.url],
+  ["Alfateh Alzubair", q134.url],
+  ["Faisal Al-Hajry", q135.url],
+  ["Khalid Almohana", q136.url],
+  ["Mohammad Saleh Alim Shah", q137.url],
+  ["Muamar (From Indonesia)", q138.url],
 ];
