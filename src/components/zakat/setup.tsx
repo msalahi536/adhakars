@@ -2,6 +2,7 @@ import { useState } from "react";
 import { CUSTOM_FIELDS, RULES, SCHOLAR_IDS, SCHOOL_IDS, type MadhabId } from "@/lib/zakat/rules";
 import { HIJRI_MONTHS, clearZakat, currentPrices, hijriOf, money, nextDueDate, nisabGrams, type ZakatState } from "@/lib/zakat/store";
 import { rescheduleZakatReminders } from "@/lib/zakat/reminders";
+import { ArrowRight, BookOpen, Info } from "lucide-react";
 import { Card, Choice, Collapsible, GhostButton, Label, Muted, NumberField, PrimaryButton, Sheet, Toggle } from "./ui";
 
 type Update = (fn: (s: ZakatState) => ZakatState) => void;
@@ -12,7 +13,7 @@ export function SchoolPicker({ s, update }: { s: ZakatState; update: Update }) {
     <Choice key={id} value={s.madhab} onChange={pick} options={[{ value: id, label: name, sub: summary }]} />
   );
   return (
-    <div className="space-y-2">
+    <div className="space-y-2.5">
       {SCHOOL_IDS.map((id) => card(id, RULES[id].name, RULES[id].summary))}
       <Collapsible title="I don't follow a specific school">
         <Muted>
@@ -20,7 +21,7 @@ export function SchoolPicker({ s, update }: { s: ZakatState; update: Update }) {
         </Muted>
       </Collapsible>
       <div className="pt-2">
-        <Label>Follow a scholar's preferred view (tarjih)</Label>
+        <div className="mt-2"><Label>Follow a scholar's preferred view (tarjih)</Label></div>
         <Muted className="mt-1 mb-2">
           These scholars weighed the evidence across the schools and chose specific positions. Their rulings are drawn from their published fatwa collections.
         </Muted>
@@ -147,27 +148,45 @@ export function DatePicker({ s, update }: { s: ZakatState; update: Update }) {
 
 export function Setup({ s, update }: { s: ZakatState; update: Update }) {
   const [step, setStep] = useState(0);
-  const titles = ["School of thought", "Nisab for cash", "Zakat date"];
+  const titles = ["School of Thought", "Nisab for Cash", "Zakat Date"];
   const finish = () => {
     update((x) => ({ ...x, setupDone: true }));
     void rescheduleZakatReminders({ ...s, setupDone: true });
   };
   return (
     <Card>
-      <div className="flex items-center justify-between">
-        <Label>Setup {step + 1} of 3: {titles[step]}</Label>
-        <button type="button" className="min-h-[44px] px-2 text-xs font-semibold underline" onClick={finish}>Skip, use defaults</button>
+      <div className="flex items-start justify-between gap-3">
+        <div>
+          <Label>Step {step + 1} of 3</Label>
+          <div className="mt-1 flex items-center gap-3">
+            <h2 className="app-page-title" style={{ fontSize: 25, lineHeight: 1.1, whiteSpace: "nowrap" }}>{titles[step]}</h2>
+            <span className="flex gap-1" aria-hidden="true">
+              {[0, 1, 2].map((n) => (
+                <span key={n} className="h-1.5 rounded-full motion-safe:transition-all" style={{ width: n === step ? 18 : 12, background: n === step ? "var(--accent)" : "color-mix(in oklab, var(--foreground) 14%, transparent)" }} />
+              ))}
+            </span>
+          </div>
+          <Muted className="mt-1.5">{["Choose the scholarly opinion you would like to follow.", "Choose how cash is measured against nisab.", "Choose the Hijri date your zakat is due each year."][step]}</Muted>
+        </div>
+        <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl" style={{ background: "color-mix(in oklab, var(--foreground) 5%, var(--card))", color: "var(--accent)" }} aria-hidden="true"><BookOpen size={19} /></span>
       </div>
-      <div className="mt-3">
+      <div className="mt-4">
         {step === 0 && <SchoolPicker s={s} update={update} />}
         {step === 1 && <NisabPicker s={s} update={update} />}
         {step === 2 && <DatePicker s={s} update={update} />}
       </div>
-      <div className="mt-4 flex gap-2">
-        {step > 0 && <GhostButton onClick={() => setStep(step - 1)}>Back</GhostButton>}
-        <PrimaryButton className="flex-1" onClick={() => (step < 2 ? setStep(step + 1) : finish())}>{step < 2 ? "Continue" : "Start"}</PrimaryButton>
+      <div className="mt-5 flex gap-2">
+        {step > 0 && <GhostButton className="min-h-[52px] px-5" onClick={() => setStep(step - 1)}>Back</GhostButton>}
+        <PrimaryButton className="flex-1" onClick={() => (step < 2 ? setStep(step + 1) : finish())}>{step < 2 ? "Continue" : "Start"} <ArrowRight size={18} /></PrimaryButton>
       </div>
-      <Muted className="mt-3">You can change all of this later in settings.</Muted>
+      <button type="button" className="mx-auto mt-2 block min-h-[44px] px-3 text-xs font-semibold underline opacity-70" onClick={finish}>Skip, use defaults</button>
+      <div className="mt-2 flex items-start gap-3 rounded-[20px] p-4" style={{ background: "color-mix(in oklab, var(--foreground) 3.5%, var(--card))" }}>
+        <Info size={20} className="mt-0.5 shrink-0" style={{ color: "var(--accent)" }} aria-hidden="true" />
+        <div>
+          <div className="text-[14px] font-semibold">You can change this later</div>
+          <Muted>You can update the school of thought or your rulings at any time in settings.</Muted>
+        </div>
+      </div>
     </Card>
   );
 }
