@@ -294,23 +294,28 @@ function HadithList({ s, savedApi }: { s: S; savedApi: SavedApi }) {
   const [filter, setFilter] = useState("");
   const [refine, setRefine] = useState("");
   const [rPage, setRPage] = useState(1);
+  const [sort, setSortState] = useState<SortId>("relevance");
+  const nav = useNavigate({ from: "/app/hadith" });
+  const setSort = (v: SortId) => { setSortState(v); setRPage(1); if (s.page && s.page > 1) void nav({ search: (p) => ({ ...p, page: undefined }), replace: true }); };
   useEffect(() => { const t = setTimeout(() => { setRefine(filter.trim()); setRPage(1); }, 350); return () => clearTimeout(t); }, [filter]);
   const page = refine ? rPage : Math.max(1, s.page ?? 1);
   const qq = [s.q, refine].filter(Boolean).join(" ") || undefined;
   const q = useQuery({
-    queryKey: ["hadiths2", s.book, s.chapter, qq, page],
-    queryFn: cached(`list2:${s.book ?? ""}:${s.chapter ?? ""}:${qq ?? ""}:${page}`, 7 * DAY,
-      () => getHadiths({ data: { book: s.book, chapter: s.chapter, q: qq, page } })),
+    queryKey: ["hadiths2", s.book, s.chapter, qq, page, sort],
+    queryFn: cached(`list2:${s.book ?? ""}:${s.chapter ?? ""}:${qq ?? ""}:${page}:${sort}`, 7 * DAY,
+      () => getHadiths({ data: { book: s.book, chapter: s.chapter, q: qq, page, sort } })),
     placeholderData: keepPreviousData, staleTime: 1000 * 60 * 30,
   });
   useEffect(() => { document.querySelector(".scroll-area")?.scrollTo({ top: 0 }); }, [page]);
-  if (q.isLoading) return <LoadingBar label={s.q ? "Searching hadith" : "Loading hadith"} />;
+  const showBar = useLoadingGate(q.isLoading);
+  if (showBar) return <LoadingBar done={!q.isLoading} label={s.q ? "Searching hadith" : "Loading hadith"} />;
   if (q.isError) return <Empty text="Couldn't load hadith. Check your connection." />;
   const d = q.data!;
   if (!d.items.length && !filter) return <Empty text="No hadith found. Try a different word." />;
   return (
     <>
-      <PreviewList items={d.items} total={d.total} terms={d.terms ?? []} filter={filter} setFilter={setFilter} busy={q.isFetching} hideSearch={!!s.q && !s.topic} label={s.topic ?? (s.q ? `“${s.q}”` : "this chapter")} savedApi={savedApi} />
+      <div className="hadith-fade-in contents" />
+      <PreviewList sort={sort} onSort={setSort} items={d.items} total={d.total} terms={d.terms ?? []} filter={filter} setFilter={setFilter} busy={q.isFetching} hideSearch={!!s.q && !s.topic} label={s.topic ?? (s.q ? `“${s.q}”` : "this chapter")} savedApi={savedApi} />
       {d.lastPage > 1 && s.h === undefined && (
         <div className="flex items-center justify-between gap-3 pt-1">
           <Link to="/app/hadith" search={{ ...s, page: page - 1 }} disabled={page <= 1} onClick={(e) => { if (refine) { e.preventDefault(); setRPage(page - 1); } }}
@@ -360,8 +365,10 @@ function snippetOf(h: Hadith, terms: string[]) {
   return (a > 0 ? "…" : "") + t.slice(a, b).replace(/^\S*\s/, a > 0 ? "" : "$&") + (b < t.length ? "…" : "");
 }
 
-function PreviewList({ items, total, label, savedApi, terms, filter, setFilter, busy, hideSearch }: { hideSearch?: boolean; items: Hadith[]; total: number; label: string; savedApi: SavedApi; terms: string[]; filter: string; setFilter: (v: string) => void; busy: boolean }) {
-  const [sort, setSort] = useState<SortId>("relevance");
+function PreviewList({ items, total, label, savedApi, terms, filter, setFilter, busy, hideSearch, sort: sortProp, onSort }: { hideSearch?: boolean; items: Hadith[]; total: number; label: string; savedApi: SavedApi; terms: string[]; filter: string; setFilter: (v: string) => void; busy: boolean; sort?: SortId; onSort?: (s: SortId) => void }) {
+  const [localSort, setLocalSort] = useState<SortId>("relevance");
+  const sort = sortProp ?? localSort;
+  const setSort = onSort ?? setLocalSort;
   const [sortOpen, setSortOpen] = useState(false);
   const sp = Route.useSearch();
   const nav = useNavigate({ from: "/app/hadith" });
@@ -584,34 +591,52 @@ function gradeColor(status: string | null) {
 }
 
 const PATIENCE = [
-  "Allah rewards the patient — this one counts.",
-  "Every second of waiting is written as a good deed.",
-  "The scribes are still copying these out for you.",
+  "Allah rewards the patient.",
+  "May Allah reward you for your sabr.",
   "Knowledge is a path, and paths take a moment.",
   "Say SubhanAllah a few times while you wait.",
   "Good things arrive in their own time, inshaAllah.",
-  "Almost there — patience is half of faith.",
-  "The angels never rush, and they never forget.",
+  "Indeed, Allah is with the patient.",
 ];
 
-function LoadingBar({ label = "Loading hadith" }: { label?: string }) {
-  const [pct, setPct] = useState(7);
+/** Keeps the bar mounted briefly after loading ends so it can fill to 100% and fade. */
+function useLoadingGate(loading: boolean) {
+  const [show, setShow] = useState(loading);
+  useEffect(() => {
+    if (loading) { setShow(true); return; }
+    const t = setTimeout(() => setShow(false), 650);
+    return () => clearTimeout(t);
+  }, [loading]);
+  return show;
+}
+
+function LoadingBar({ label = "Loading hadith", done = false }: { label?: string; done?: boolean }) {
+  const [pct, setPct] = useState(4);
   const [line, setLine] = useState(0);
   useEffect(() => {
-    const t = setInterval(() => setPct((p) => Math.min(94, p + Math.max(0.7, (96 - p) * 0.055))), 130);
-    const r = setInterval(() => setLine((i) => (i + 1) % PATIENCE.length), 2800);
-    return () => { clearInterval(t); clearInterval(r); };
+    if (done) { setPct(100); return; }
+    const start = Date.now();
+    // Eases toward 92% over ~3s (typical load time), then creeps; never claims to be finished.
+    const t = setInterval(() => {
+      const s = (Date.now() - start) / 1000;
+      setPct(Math.min(92, 4 + 88 * (1 - Math.exp(-s / 1.4))) + Math.min(5, Math.max(0, s - 4) * 0.4));
+    }, 100);
+    return () => clearInterval(t);
+  }, [done]);
+  useEffect(() => {
+    const r = setInterval(() => setLine((i) => (i + 1) % PATIENCE.length), 3200);
+    return () => clearInterval(r);
   }, []);
   return (
-    <div className="rounded-[20px] p-4" style={card}>
+    <div className="rounded-[20px] p-4" style={{ ...card, opacity: done ? 0 : 1, transform: done ? "translateY(-4px)" : undefined, transition: "opacity 300ms ease 300ms, transform 300ms ease 300ms" }}>
       <div className="flex items-baseline justify-between gap-3">
-        <span className="text-[11px] font-semibold uppercase tracking-wider" style={{ color: "var(--muted-foreground)" }}>{label}</span>
+        <span className="text-[11px] font-semibold uppercase tracking-wider" style={{ color: "var(--muted-foreground)" }}>{done ? "Done" : label}</span>
         <span className="text-[11px] font-bold tabular-nums" style={{ color: "var(--accent)" }}>{Math.round(pct)}%</span>
       </div>
       <div className="mt-2 h-2 overflow-hidden rounded-full" style={{ background: "color-mix(in oklab, var(--accent) 12%, transparent)" }}>
-        <div className="hadith-load-fill" style={{ width: `${pct}%` }} />
+        <div className="hadith-load-fill" style={{ width: `${pct}%`, transition: done ? "width 280ms ease-out" : undefined }} />
       </div>
-      <div className="mt-2.5 text-[12px] italic leading-snug" style={{ color: "var(--muted-foreground)" }}>{PATIENCE[line]}</div>
+      <div className="mt-2.5 text-[12px] italic leading-snug" style={{ color: "var(--muted-foreground)" }}>{done ? "May Allah reward you for your sabr." : PATIENCE[line]}</div>
     </div>
   );
 }
