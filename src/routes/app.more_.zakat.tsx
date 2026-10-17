@@ -50,7 +50,7 @@ function ZakatPage() {
       <header className="page-header relative overflow-hidden" style={{ background: "var(--grad-header)", color: "var(--header-fg)" }}>
         <HeaderBackButton />
         {s?.setupDone && (
-          <button type="button" aria-label="Zakat settings" onClick={() => setSettingsOpen(true)} className="header-icon-button absolute z-10 flex h-9 w-9 items-center justify-center rounded-full" style={{ top: 18, right: 20, border: "1px solid color-mix(in oklab, currentColor 16%, transparent)", background: "color-mix(in oklab, var(--surface-card, var(--background)) 55%, transparent)", color: "var(--foreground)" }}>
+          <button type="button" aria-label="Zakat settings" onClick={() => setSettingsOpen(true)} className="header-icon-button absolute z-10 flex h-9 w-9 items-center justify-center rounded-full" style={{ top: 62, left: 20, border: "1px solid color-mix(in oklab, currentColor 16%, transparent)", background: "color-mix(in oklab, var(--surface-card, var(--background)) 55%, transparent)", color: "var(--foreground)" }}>
             <Settings2 size={17} />
           </button>
         )}
