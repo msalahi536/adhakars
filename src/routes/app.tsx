@@ -30,10 +30,13 @@ export const Route = createFileRoute("/app")({
 function AppLayout() {
   const [showWhatsNew, setShowWhatsNew] = useState(false);
   const [showGiveaway, setShowGiveaway] = useState(false);
+  const [giveawayGoal, setGiveawayGoal] = useState<string | null>(null);
   useEffect(() => {
-    const open = () => setShowGiveaway(true);
+    const open = () => { setGiveawayGoal(null); setShowGiveaway(true); };
+    const goal = (e: Event) => { setGiveawayGoal((e as CustomEvent<string>).detail); setShowGiveaway(true); };
     window.addEventListener("open-giveaway", open);
-    return () => window.removeEventListener("open-giveaway", open);
+    window.addEventListener("giveaway-goal", goal);
+    return () => { window.removeEventListener("open-giveaway", open); window.removeEventListener("giveaway-goal", goal); };
   }, []);
   // Keep the server and first browser render identical, then restore the saved
   // artwork before paint. Reading localStorage during render causes React to
@@ -338,7 +341,7 @@ function AppLayout() {
         setShowWhatsNew(false);
         if (giveawayActive() && !getStatus()) window.setTimeout(() => setShowGiveaway(true), 400);
       }} />
-      <GiveawayDialog open={showGiveaway} onClose={() => setShowGiveaway(false)} />
+      <GiveawayDialog open={showGiveaway} celebrate={giveawayGoal} onClose={() => { setShowGiveaway(false); setGiveawayGoal(null); }} />
       <AdhanEnabledNotice />
       <RatePrompt />
     </div>

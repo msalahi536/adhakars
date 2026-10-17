@@ -58,8 +58,11 @@ function Bar({ label, value, goal, children }: { label: string; value: number; g
   );
 }
 
-export function GiveawayDialog({ open, onClose }: { open: boolean; onClose: () => void }) {
+const GOAL_NAME: Record<string, string> = { surahs: "read 5 surahs", dhikr: "made 500 dhikr", referrals: "brought 5 people to the app" };
+
+export function GiveawayDialog({ open, onClose, celebrate }: { open: boolean; onClose: () => void; celebrate?: string | null }) {
   const [status, setLocal] = useState(getStatus());
+  useEffect(() => { if (celebrate) setMsg(null); }, [celebrate]);
   const [o1, setO1] = useState(false);
   const [o2, setO2] = useState(false);
   const [surahs, setSurahs] = useState(0);
@@ -111,7 +114,7 @@ export function GiveawayDialog({ open, onClose }: { open: boolean; onClose: () =
       const r = await submit({ data: { code: getDeviceCode(), email, surahs, dhikr } });
       if (r.ok) {
         setEntered(r.goals);
-        setMsg(`You're entered with ${r.goals.length} ${r.goals.length === 1 ? "entry" : "entries"}. Barakallahu feek!`);
+        setMsg(r.goals.length < 3 ? "Barakallahu feek! You can still finish the other goals for extra entries." : "Barakallahu feek! You have all 3 entries.");
       } else setMsg(r.error);
     } catch {
       setMsg("Please check your email and try again.");
@@ -134,27 +137,40 @@ export function GiveawayDialog({ open, onClose }: { open: boolean; onClose: () =
         <div className="min-h-0 space-y-2 overflow-y-auto overscroll-contain px-4 py-2">
           {status !== "joined" ? (
             <>
-              {LEVELS.map((l) => (
-                <div key={l.name} className="rounded-2xl bg-muted/40 px-3 py-2.5">
-                  <h3 className="text-sm font-semibold">{l.name}</h3>
-                  <p className="text-xs leading-5 text-muted-foreground">{l.books}</p>
+              <div className="rounded-2xl bg-muted/40 px-4 py-3">
+                <p className="label-caps mb-2 text-accent">What you'll study</p>
+                <ul className="space-y-2">
+                  {LEVELS.map((l) => (
+                    <li key={l.name}>
+                      <p className="text-[13px] font-semibold leading-5">{l.name}</p>
+                      <p className="text-[11px] leading-4 text-muted-foreground">{l.books}</p>
+                    </li>
+                  ))}
+                </ul>
+                <div className="mt-3 flex flex-wrap gap-x-3 gap-y-1.5 border-t border-border/50 pt-2.5">
+                  {FEATURES.map(({ Icon, t }) => (
+                    <span key={t} className="flex items-center gap-1.5 text-[11px] text-muted-foreground">
+                      <Icon size={13} className="text-accent" strokeWidth={1.7} />{t}
+                    </span>
+                  ))}
                 </div>
-              ))}
-              <div className="grid grid-cols-2 gap-2">
-                {FEATURES.map(({ Icon, t }) => (
-                  <div key={t} className="flex items-center gap-2 rounded-2xl bg-muted/40 px-3 py-2 text-[11px] leading-4">
-                    <Icon size={15} className="shrink-0 text-accent" strokeWidth={1.7} />{t}
-                  </div>
-                ))}
               </div>
-              <p className="px-1 pt-1 text-xs leading-5 text-muted-foreground">
-                To enter, complete any one goal: read 5 surahs, make 500 dhikr, or get 5 people to download the app. Each extra goal earns another entry.
-              </p>
+              <div className="rounded-2xl bg-muted/40 px-4 py-3">
+                <p className="label-caps mb-1.5 text-accent">How to enter</p>
+                <p className="text-xs leading-5">Finish any one goal: <b>5 surahs</b>, <b>500 dhikr</b> or <b>5 downloads</b>. Each goal you finish is another entry — up to 3.</p>
+              </div>
               <Oath checked={o1} onChange={setO1}>I swear by Allah to truthfully complete the requirements and not cheat or deceive the counters.</Oath>
               <Oath checked={o2} onChange={setO2}>I swear by Allah to try to complete the entire Ilm Guide to the best of my ability.</Oath>
             </>
           ) : (
             <>
+              {celebrate && (
+                <div className="rounded-2xl bg-accent px-4 py-3 text-center text-accent-foreground">
+                  <p className="text-base font-semibold">MashaAllah, congratulations! 🎉</p>
+                  <p className="mt-0.5 text-xs leading-5 opacity-90">You {GOAL_NAME[celebrate] ?? "finished a goal"}. That's one more entry — submit it below.</p>
+                </div>
+              )}
+              <p className="px-1 text-center text-[11px] leading-4 text-muted-foreground">Each goal is one entry, up to 3. You can submit after your first goal and add more later.</p>
               <Bar label="Read 5 surahs" value={surahs} goal={GOALS.surahs}>
                 <p className="mt-1.5 text-[11px] text-muted-foreground">Listen to a full surah until it ends.</p>
               </Bar>
@@ -175,8 +191,9 @@ export function GiveawayDialog({ open, onClose }: { open: boolean; onClose: () =
               {goals.length > 0 && (newGoals.length > 0 || !entered.length) && (
                 <div className="space-y-2 rounded-2xl bg-muted/40 px-3 py-3">
                   <p className="text-sm font-semibold">
-                    {entered.length ? "New goal complete — update your entry" : "Goal complete — enter the giveaway"}
+                    {entered.length ? "New goal complete — add it to your entry" : "Goal complete — enter the giveaway"}
                   </p>
+                  {!entered.length && <p className="text-[11px] leading-4 text-muted-foreground">Submit now — you can still finish the other goals afterwards for extra entries.</p>}
                   <input
                     type="email"
                     value={email}
@@ -192,7 +209,7 @@ export function GiveawayDialog({ open, onClose }: { open: boolean; onClose: () =
                 </div>
               )}
               {entered.length > 0 && !newGoals.length && (
-                <p className="px-1 text-center text-xs text-accent">You're entered with {entered.length} {entered.length === 1 ? "entry" : "entries"}. The winner will be contacted by email.</p>
+                <p className="px-1 text-center text-xs text-accent">You're entered with {entered.length} of 3 {entered.length === 1 ? "entry" : "entries"}.{entered.length < 3 ? " Keep going — each goal you finish adds another entry. Come back here to add it." : " The winner will be contacted by email."}</p>
               )}
               {msg && <p className="px-1 text-center text-xs text-muted-foreground">{msg}</p>}
             </>
