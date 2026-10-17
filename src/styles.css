@@ -4566,8 +4566,12 @@ html { --ayah-active: var(--accent); }
 .quran-play-sm { display: flex; height: 34px; width: 34px; flex: none; align-items: center; justify-content: center; border-radius: 999px; background: color-mix(in oklab, var(--accent) 14%, var(--card)); color: var(--accent); transition: transform .15s ease; }
 .quran-play-sm:active { transform: scale(.92); }
 .quran-continue .quran-play-sm { height: 42px; width: 42px; background: var(--accent); color: var(--accent-foreground); }
-.quran-avatar { display: inline-flex; flex: none; align-items: center; justify-content: center; overflow: hidden; border-radius: 999px; background: color-mix(in oklab, var(--accent) 18%, var(--card)); color: var(--accent); font-weight: 700; letter-spacing: .02em; }
-.quran-avatar img { height: 100%; width: 100%; object-fit: cover; }
+.quran-avatar { position: relative; display: inline-flex; flex: none; align-items: center; justify-content: center; overflow: hidden; border-radius: 999px; background: color-mix(in oklab, var(--accent) 18%, var(--card)); color: var(--accent); font-weight: 700; letter-spacing: .02em; }
+/* Initials stay behind the portrait, so an avatar is never blank while its photo arrives. */
+.quran-avatar-initials { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; }
+.quran-avatar img { position: absolute; inset: 0; height: 100%; width: 100%; object-fit: cover; opacity: 0; transition: opacity .3s ease; }
+.quran-avatar img.is-loaded { opacity: 1; }
+
 .quran-reciter-strip { display: flex; gap: 8px; overflow-x: auto; padding: 2px 2px 6px; scrollbar-width: none; scroll-snap-type: x mandatory; }
 .quran-reciter-strip::-webkit-scrollbar { display: none; }
 .quran-reciter-tile { display: flex; width: 78px; flex: none; flex-direction: column; align-items: center; gap: 6px; padding: 8px 4px; border-radius: 18px; border: 1.5px solid transparent; scroll-snap-align: start; color: var(--foreground); font-size: 11px; font-weight: 500; line-height: 1.2; text-align: center; }
