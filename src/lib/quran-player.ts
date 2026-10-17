@@ -87,7 +87,7 @@ function audioEl(): HTMLAudioElement {
     saveListen(true);
     // Not asked for by the listener and not the end of the surah: try to carry on.
     if (wanted && el && !el.ended) { recover(); return; }
-    set({ playing: false }); cancelAnimationFrame(raf); setMediaState("paused");
+    set({ playing: false }); cancelAnimationFrame(raf); setMediaState("paused"); setMetadata();
   };
   el.onerror = () => recover();
   el.onstalled = () => { if (wanted && el?.paused) recover(); };
@@ -100,7 +100,11 @@ function audioEl(): HTMLAudioElement {
   };
   el.onended = () => { wanted = state.repeat || state.shuffle; void onEnded(); };
   // Coming back to the app: if playback was dropped behind our back, pick it up again.
-  document.addEventListener("visibilitychange", () => { if (wanted && el?.paused && !el.ended) { retries = 0; recover(); } });
+  document.addEventListener("visibilitychange", () => {
+    if (wanted && el?.paused && !el.ended) { retries = 0; recover(); }
+    // Refresh the lock-screen card so it never shows up blank.
+    if (state.audio) { setMetadata(); setMediaState(state.playing ? "playing" : "paused"); }
+  });
   const ms = navigator.mediaSession;
   if (ms) {
     const h = (a: MediaSessionAction, f: MediaSessionActionHandler) => { try { ms.setActionHandler(a, f); } catch { /* unsupported */ } };
@@ -214,12 +218,24 @@ export const quranPlayer = {
     if (!state.audio) return;
     const a = audioEl();
     const t = fromKey ? state.audio.timings.find((x) => x.key === fromKey) : null;
-    if (t) a.currentTime = t.from / 1000;
+    // After a long pause the phone can silently drop the stream; reload it at
+    // the same spot so lock-screen Play keeps working without opening the app.
+    const stale = !!a.error || a.networkState === 3 || (a.readyState === 0 && !!a.src);
+    if (stale) {
+      resumeAt = t ? t.from / 1000 : a.currentTime || state.cur;
+      a.src = state.audio.url; a.load();
+    } else if (t) a.currentTime = t.from / 1000;
     a.playbackRate = state.rate;
     wanted = true; retries = 0;
     set({ loading: true });
     setMetadata();
-    void a.play().catch(() => set({ loading: false }));
+    void a.play().catch(() => {
+      // One fresh-load retry before giving up.
+      if (!state.audio || stale) { set({ loading: false }); return; }
+      resumeAt = a.currentTime || state.cur;
+      a.src = state.audio.url; a.load();
+      void a.play().catch(() => set({ loading: false }));
+    });
   },
   toggle(forcePlay = false) {
     if (!state.audio) return;
