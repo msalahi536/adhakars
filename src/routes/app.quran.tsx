@@ -8,18 +8,21 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { ChevronDown, ChevronLeft, ChevronRight, Heart, Loader2, Maximize2, Pause, Play, Repeat, Search, Shuffle, SkipBack, SkipForward, X } from "lucide-react";
 import {
   findReciter, getChapterAudio, getChapters, getVerses, homeReciterRow, POPULAR_RECITERS, RECITERS, reciterHasPhoto,
-  reciterHasSurah, reciterName, reciterScore, reciterPhoto, reciterSubtitle, searchChapters, searchReciters, type Chapter, type Reciter, type Verse,
+  reciterHasSurah, reciterName, reciterScore, reciterPhoto, reciterSubtitle, searchChapters, searchReciters, parseVerseRef, type Chapter, type Reciter, type Verse, getVerseByKey, searchVerses, type VerseHit,
 } from "@/lib/quran";
 import { getDisplay, triggerHaptic } from "@/lib/theme";
+import { guessVerses } from "@/lib/quran-search.functions";
 import { quranPlayer, useQuranPlayer } from "@/lib/quran-player";
 
-type Search = { s?: number; view?: "reciters"; tab?: "all" };
+type Search = { s?: number; v?: number; view?: "reciters"; tab?: "all" };
 
 export const Route = createFileRoute("/app/quran")({
   validateSearch: (q: Record<string, unknown>): Search => {
     const out: Search = {};
     const n = Number(q.s);
     if (Number.isInteger(n) && n >= 1 && n <= 114) out.s = n;
+    const v = Number(q.v);
+    if (out.s && Number.isInteger(v) && v >= 1 && v <= 286) out.v = v;
     if (q.view === "reciters") out.view = "reciters";
     if (q.tab === "all") out.tab = "all";
     return out;
@@ -78,9 +81,9 @@ function useFavs() {
 type Last = { s: number; v: number; t?: number; r?: number; mode?: "read" | "listen" };
 
 function QuranPage() {
-  const { s, view, tab } = Route.useSearch();
+  const { s, v, view, tab } = Route.useSearch();
   if (view === "reciters") return <ReciterPicker back={s} tab={tab} />;
-  return s ? <Reader chapterId={s} /> : <Home />;
+  return s ? <Reader key={`${s}:${v ?? ""}`} chapterId={s} verse={v} /> : <Home />;
 }
 
 /* ---------- shared bits ---------- */
@@ -211,7 +214,7 @@ function Home() {
           <div className={`quran-search-sticky${searchFloat ? " is-float" : ""}${searchShown ? "" : " is-hidden"}`}>
             <label className="quran-search">
               <Search size={16} />
-              <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search surah by name, number, or reciter…" />
+              <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search reciter, surah, verse (33:33) or topic…" />
             </label>
           </div>
 
@@ -226,6 +229,10 @@ function Home() {
               ))}
             </div>
           )}
+
+          {t && list.length > 0 && <h2 className="quran-section-title">Surahs</h2>}
+          {t && list.length > 0 && <div className="space-y-2.5">{list.slice(0, 6).map((c) => <ChapterRow key={c.id} c={c} onOpen={open} />)}</div>}
+          {t && <VerseResults q={q} chapters={chapters} onOpen={(key) => { const [cs, vs] = key.split(":").map(Number); void triggerHaptic("light"); void navigate({ to: "/app/quran", search: { s: cs, v: vs } }); }} />}
 
           {!t && (
             <section className="quran-reciter-panel">
@@ -259,9 +266,18 @@ function Home() {
 
           {error && <p className="quran-muted text-center text-sm">Couldn't load the Quran. Check your connection and try again.</p>}
           {!chapters && !error && <div className="flex justify-center py-10"><Loader2 className="animate-spin" /></div>}
-          <div className="space-y-2.5">
-            {list.map((c) => (
-              <button key={c.id} className="quran-chapter" onClick={() => open(c.id)}>
+          {!t && <div className="space-y-2.5">
+            {list.map((c) => <ChapterRow key={c.id} c={c} onOpen={open} />)}
+          </div>}
+        </div>
+      </main>
+    </>
+  );
+}
+
+function ChapterRow({ c, onOpen }: { c: Chapter; onOpen: (id: number) => void }) {
+  return (
+              <button className="quran-chapter" onClick={() => onOpen(c.id)}>
                 <NumBadge n={c.id} />
                 <span className="min-w-0 flex-1 text-left">
                   <span className="block text-[16px] font-semibold">{c.name_simple}</span>
@@ -270,10 +286,47 @@ function Home() {
                 <span className="quran-chapter-ar" dir="rtl">{c.name_arabic}</span>
                 <ChevronRight size={16} className="opacity-50" />
               </button>
-            ))}
-          </div>
+  );
+}
+
+/** Verses by reference (33:33), by remembered words, or by meaning ("stay at home"). */
+function VerseResults({ q, chapters, onOpen }: { q: string; chapters: Chapter[] | null; onOpen: (key: string) => void }) {
+  const [hits, setHits] = useState<VerseHit[] | null>(null);
+  const ref = parseVerseRef(q, chapters ?? undefined);
+  useEffect(() => {
+    const term = q.trim();
+    let live = true;
+    setHits(null);
+    if (ref) { getVerseByKey(ref).then((h) => live && setHits([h])).catch(() => live && setHits([])); return () => { live = false; }; }
+    if (term.length < 3 || /^\d+$/.test(term)) { setHits([]); return; }
+    const id = window.setTimeout(async () => {
+      const [ai, kw] = await Promise.all([
+        guessVerses({ data: { q: term } }).then((r) => r.keys).catch(() => [] as string[]),
+        searchVerses(term).catch(() => [] as VerseHit[]),
+      ]);
+      const aiHits = (await Promise.all(ai.map((k) => getVerseByKey(k).catch(() => null)))).filter((h): h is VerseHit => !!h);
+      const seen = new Set<string>();
+      const all = [...aiHits, ...kw].filter((h) => (seen.has(h.key) ? false : (seen.add(h.key), true))).slice(0, 8);
+      if (live) setHits(all);
+    }, 450);
+    return () => { live = false; window.clearTimeout(id); };
+  }, [q, ref]);
+  if (hits && !hits.length) return null;
+  const name = (key: string) => chapters?.find((c) => c.id === Number(key.split(":")[0]))?.name_simple ?? "Surah";
+  return (
+    <>
+      <h2 className="quran-section-title">Verses</h2>
+      {!hits ? <div className="flex justify-center py-4"><Loader2 className="animate-spin" size={18} /></div> : (
+        <div className="space-y-2.5">
+          {hits.map((h) => (
+            <button key={h.key} className="quran-card block w-full p-3.5 text-left" onClick={() => onOpen(h.key)}>
+              <span className="quran-muted flex items-center justify-between text-[11px] font-semibold"><span>{name(h.key)} · {h.key}</span><ChevronRight size={14} className="opacity-50" /></span>
+              <span className="mt-1.5 block text-right text-[18px] leading-[1.8] line-clamp-2" dir="rtl">{h.text}</span>
+              {h.translation && <span className="mt-1 block text-[13px] leading-snug line-clamp-3">{h.translation}</span>}
+            </button>
+          ))}
         </div>
-      </main>
+      )}
     </>
   );
 }
@@ -379,7 +432,7 @@ function ReciterPicker({ back, tab }: { back?: number; tab?: "all" }) {
 /* ---------- reader ---------- */
 const fmt = (s: number) => (Number.isFinite(s) ? `${Math.floor(s / 60)}:${String(Math.floor(s % 60)).padStart(2, "0")}` : "0:00");
 
-function Reader({ chapterId }: { chapterId: number }) {
+function Reader({ chapterId, verse }: { chapterId: number; verse?: number }) {
   const navigate = useNavigate();
   const [prefs] = usePrefs();
   const [favs, toggleFav] = useFavs();
@@ -416,7 +469,7 @@ function Reader({ chapterId }: { chapterId: number }) {
     getVerses(chapterId).then(setVerses).catch(() => setError(true));
     const last = readJSON<Last | null>(LAST, null);
     if (!last || last.s !== chapterId) localStorage.setItem(LAST, JSON.stringify({ s: chapterId, v: 1, mode: "read" }));
-    restoreTo.current = last && last.s === chapterId && last.v > 1 ? `${chapterId}:${last.v}` : null;
+    restoreTo.current = verse ? `${chapterId}:${verse}` : last && last.s === chapterId && last.v > 1 ? `${chapterId}:${last.v}` : null;
     document.querySelector(".scroll-area")?.scrollTo({ top: 0 });
     quranPlayer.setPanel(true);
   }, [chapterId]);
@@ -425,7 +478,7 @@ function Reader({ chapterId }: { chapterId: number }) {
   useEffect(() => {
     if (!verses || !restoreTo.current) return;
     const key = restoreTo.current; restoreTo.current = null;
-    requestAnimationFrame(() => document.getElementById(`v-${key}`)?.scrollIntoView({ block: "start" }));
+    requestAnimationFrame(() => document.getElementById(`v-${key}`)?.scrollIntoView({ block: verse ? "center" : "start" }));
   }, [verses]);
   // Reading progress: remember the top verse on screen while not listening.
   const saveRead = useRef(0);
