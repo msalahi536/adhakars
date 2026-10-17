@@ -3,11 +3,11 @@ import { useQuery, keepPreviousData } from "@tanstack/react-query";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { ArrowLeft, Bookmark, BookmarkCheck, BookOpen, ChevronRight, Clock, Feather, HandHeart, Heart, Home as HomeIcon, Landmark, Leaf, Moon, Search, Star, TreePalm, Users, X, Check, ChevronDown, ChevronLeft, Copy, SlidersHorizontal, User, FileText, type LucideIcon } from "lucide-react";
 import {
-  getHadithBooks, getHadithChapters, getHadiths, type Hadith,
+  getHadithBooks, getHadithChapters, getHadiths, translateIsnad, type Hadith,
 } from "@/lib/hadith.functions";
 import { hadithCover } from "@/lib/hadith-covers";
 
-type S = { book?: string; chapter?: number; q?: string; topic?: string; page?: number; saved?: number };
+type S = { book?: string; chapter?: number; q?: string; topic?: string; page?: number; saved?: number; h?: number };
 
 export const Route = createFileRoute("/app/hadith")({
   validateSearch: (s: Record<string, unknown>): S => ({
@@ -17,6 +17,7 @@ export const Route = createFileRoute("/app/hadith")({
     topic: typeof s.topic === "string" ? s.topic : undefined,
     page: typeof s.page === "number" ? s.page : undefined,
     saved: s.saved === 1 ? 1 : undefined,
+    h: typeof s.h === "number" && s.h >= 0 ? s.h : undefined,
   }),
   head: () => ({
     meta: [
@@ -86,6 +87,12 @@ function HadithLibrary() {
     if (q) void navigate({ search: { q, book: search.book } });
   };
 
+  const goBack = () => {
+    if (search.h !== undefined) return void navigate({ search: { ...search, h: undefined } });
+    if (view === "chapter") return void navigate({ search: { book: search.book } });
+    if (view === "search" && search.book) return void navigate({ search: { book: search.book } });
+    return void navigate({ search: {} });
+  };
   const title = view === "saved" ? "Saved" : view === "search" ? (search.topic ?? `“${search.q}”`) : bookName ?? "Hadith Library";
 
   return (
@@ -93,7 +100,7 @@ function HadithLibrary() {
       <header className="page-header relative overflow-hidden" style={{ background: "var(--grad-header)", color: "var(--header-fg)" }}>
         <div className="relative mx-auto max-w-md px-6 pb-5 pt-9 text-center">
           {view !== "home" && (
-            <button type="button" aria-label="Back" onClick={() => history.back()}
+            <button type="button" aria-label="Back" onClick={goBack}
               className="absolute left-4 top-9 flex h-9 w-9 items-center justify-center rounded-full"
               style={{ background: "color-mix(in oklab, var(--header-fg) 14%, transparent)" }}>
               <ArrowLeft size={18} />
@@ -169,7 +176,7 @@ function Home({ books, loading, savedCount }: { books?: { bookName: string; writ
               {(() => {
                 const cover = hadithCover(b.bookSlug, b.bookName);
                 return cover ? (
-                  <img src={cover} alt="" className="h-11 w-11 shrink-0 rounded-2xl object-cover" style={{ boxShadow: "0 1px 6px rgb(0 0 0 / 0.25)" }} />
+                  <img src={cover} alt="" className="h-14 w-11 shrink-0 rounded-md object-cover" style={{ boxShadow: "0 1px 6px rgb(0 0 0 / 0.25)" }} />
                 ) : (
                   <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl text-sm font-bold"
                     style={{ background: "color-mix(in oklab, var(--accent) 14%, var(--card))", color: "var(--accent)" }}>
@@ -227,7 +234,7 @@ function HadithList({ s, savedApi }: { s: S; savedApi: SavedApi }) {
   return (
     <>
       <PreviewList items={d.items} total={d.total} label={s.topic ?? (s.q ? `“${s.q}”` : "this chapter")} savedApi={savedApi} />
-      {d.lastPage > 1 && (
+      {d.lastPage > 1 && s.h === undefined && (
         <div className="flex items-center justify-between gap-3 pt-1">
           <Link to="/app/hadith" search={{ ...s, page: page - 1 }} disabled={page <= 1}
             className="rounded-full px-4 py-2 text-sm font-semibold" style={{ ...card, opacity: page <= 1 ? 0.4 : 1 }}>Previous</Link>
@@ -261,7 +268,10 @@ function PreviewList({ items, total, label, savedApi }: { items: Hadith[]; total
   const [filter, setFilter] = useState("");
   const [sort, setSort] = useState<SortId>("relevance");
   const [sortOpen, setSortOpen] = useState(false);
-  const [open, setOpen] = useState<number | null>(null);
+  const sp = Route.useSearch();
+  const nav = useNavigate({ from: "/app/hadith" });
+  const open = sp.h ?? null;
+  const setOpen = (i: number | null) => void nav({ search: (p) => ({ ...p, h: i ?? undefined }), replace: open !== null && i !== null });
   const list = useMemo(() => {
     const f = filter.trim().toLowerCase();
     const out = f ? items.filter((h) => [h.hadithEnglish, h.headingEnglish, h.englishNarrator, h.bookName, h.chapterEnglish, h.hadithArabic].some((x) => x?.toLowerCase().includes(f))) : [...items];
@@ -274,7 +284,7 @@ function PreviewList({ items, total, label, savedApi }: { items: Hadith[]; total
   useEffect(() => { document.querySelector(".scroll-area")?.scrollTo({ top: 0 }); }, [open]);
   if (open !== null && list[open]) {
     return <HadithDetail h={list[open]} index={open} count={list.length} savedApi={savedApi}
-      onClose={() => setOpen(null)} onMove={(d) => setOpen((o) => Math.min(list.length - 1, Math.max(0, (o ?? 0) + d)))} />;
+      onClose={() => setOpen(null)} onMove={(d) => setOpen(Math.min(list.length - 1, Math.max(0, (open ?? 0) + d)))} />;
   }
   return (
     <>
@@ -360,18 +370,20 @@ function HadithDetail({ h, index, count, savedApi, onClose, onMove }: {
   const panel: React.CSSProperties = { ...card, background: "var(--card)" };
   return (
     <div className="hadith-detail space-y-3">
-        <div className="flex items-center justify-between rounded-[18px] px-3 py-2" style={panel}>
-          <button type="button" aria-label="Back to list" onClick={onClose} className="flex min-w-0 items-center gap-1 text-[12px] font-semibold" style={{ color: "var(--muted-foreground)" }}><ChevronLeft size={16} /><span className="truncate">{h.bookName} · #{h.hadithNumber}</span></button>
-          <div className="flex items-center gap-2">
-            {h.status && <GradePill status={h.status} />}
-            <button type="button" aria-label={saved ? "Remove bookmark" : "Save hadith"} onClick={() => savedApi.toggle(h)}
-              className="flex h-10 w-10 items-center justify-center rounded-full" style={{ ...panel, color: saved ? "var(--accent)" : undefined }}>
-              {saved ? <BookmarkCheck size={18} /> : <Bookmark size={18} />}
-            </button>
-          </div>
-        </div>
         <div ref={scroller} className="space-y-3">
-          <h2 className="font-serif text-[26px] leading-tight" style={{ color: "var(--accent)" }}>{titleOf(h)}</h2>
+          <div className="rounded-[24px] p-5" style={panel}>
+            <div className="flex items-center gap-2">
+              <span className="text-[11px] font-semibold uppercase tracking-wider" style={{ color: "var(--muted-foreground)" }}>{h.bookName} · #{h.hadithNumber}</span>
+              <span className="flex-1" />
+              {h.status && <GradePill status={h.status} />}
+              <button type="button" aria-label={saved ? "Remove bookmark" : "Save hadith"} onClick={() => savedApi.toggle(h)}
+                className="flex h-9 w-9 items-center justify-center rounded-full" style={{ background: "color-mix(in oklab, var(--accent) 10%, transparent)", color: saved ? "var(--accent)" : "var(--muted-foreground)" }}>
+                {saved ? <BookmarkCheck size={17} /> : <Bookmark size={17} />}
+              </button>
+            </div>
+            <h2 className="mt-3 font-serif text-[24px] leading-snug" style={{ color: "var(--accent)" }}>{titleOf(h)}</h2>
+            {h.chapterEnglish && <div className="mt-1 text-[12px]" style={{ color: "var(--muted-foreground)" }}>Book of {h.chapterEnglish}</div>}
+          </div>
           {h.englishNarrator && (
             <button type="button" onClick={() => setNarrOpen((v) => !v)} className="block w-full rounded-[20px] p-4 text-left" style={panel}>
               <div className="flex items-center gap-3">
@@ -387,7 +399,7 @@ function HadithDetail({ h, index, count, savedApi, onClose, onMove }: {
           )}
           {h.hadithArabic && (
             <div className="rounded-[20px] p-4" style={panel}>
-              <p className="arabic text-right text-[22px] leading-[2.1]" dir="rtl" lang="ar">{h.hadithArabic}</p>
+              <p className="arabic text-right text-[21px] leading-[2.2]" dir="rtl" lang="ar">{h.hadithArabic}</p>
               <div className="mt-2 flex justify-end">
                 <button type="button" aria-label="Copy hadith" onClick={copy} className="flex items-center gap-1 text-xs" style={{ color: "var(--muted-foreground)" }}>
                   {copied ? <><Check size={15} /> Copied</> : <Copy size={16} />}
@@ -397,8 +409,8 @@ function HadithDetail({ h, index, count, savedApi, onClose, onMove }: {
           )}
           {h.hadithEnglish && (
             <div className="rounded-[20px] p-4" style={panel}>
-              <div className="mb-2 flex items-center gap-2 text-[13px] font-bold"><BookOpen size={15} /> Translation</div>
-              <p className="whitespace-pre-line text-[14px] leading-relaxed">{clean(h.hadithEnglish)}</p>
+              <div className="mb-2 flex items-center gap-2 text-[11px] font-semibold uppercase tracking-wider" style={{ color: "var(--muted-foreground)" }}><BookOpen size={14} /> Translation</div>
+              <p className="whitespace-pre-line text-[15px] leading-[1.75]">{clean(h.hadithEnglish)}</p>
             </div>
           )}
           <div className="flex items-center gap-3 rounded-[20px] p-4" style={panel}>
@@ -409,7 +421,7 @@ function HadithDetail({ h, index, count, savedApi, onClose, onMove }: {
             </div>
           </div>
         </div>
-        <div className="flex items-center justify-between pt-1">
+        <div className="flex items-center justify-between pt-1 pb-2">
           <button type="button" disabled={index === 0} onClick={() => onMove(-1)} className="flex items-center gap-1 rounded-full px-4 py-2.5 text-sm font-semibold" style={{ ...panel, opacity: index === 0 ? 0.4 : 1 }}><ChevronLeft size={16} /> Previous</button>
           <span className="text-xs" style={{ color: "var(--muted-foreground)" }}>{index + 1} of {count}</span>
           <button type="button" disabled={index >= count - 1} onClick={() => onMove(1)} className="flex items-center gap-1 rounded-full px-4 py-2.5 text-sm font-semibold" style={{ ...panel, opacity: index >= count - 1 ? 0.4 : 1 }}>Next <ChevronRight size={16} /></button>
@@ -429,15 +441,21 @@ export function splitIsnad(ar: string): string[] {
 }
 function Isnad({ h }: { h: Hadith }) {
   const links = h.hadithArabic ? splitIsnad(h.hadithArabic) : [];
+  const en = useQuery({ queryKey: ["isnad-en", h.id], enabled: links.length > 0, staleTime: Infinity,
+    queryFn: () => translateIsnad({ data: { links: links.slice(0, 20).map((l) => l.slice(0, 400)) } }) });
+  const names = en.data?.names ?? [];
   return (
     <div className="mt-3 border-t pt-3" style={{ borderColor: "var(--border)" }} onClick={(e) => e.stopPropagation()}>
       <div className="mb-2 text-[11px] font-semibold uppercase tracking-wider" style={{ color: "var(--muted-foreground)" }}>Full chain (isnad)</div>
       {links.length > 0 ? (
-        <ol className="space-y-1.5" dir="rtl">
+        <ol className="space-y-2.5">
           {links.map((l, i) => (
-            <li key={i} className="flex items-start gap-2">
+            <li key={i} className="flex items-start gap-2.5">
               <span className="mt-1 flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-[10px] font-bold" style={{ background: "color-mix(in oklab, var(--accent) 14%, transparent)", color: "var(--accent)" }}>{i + 1}</span>
-              <span className="arabic text-[16px] leading-relaxed" lang="ar">{l}</span>
+              <div className="min-w-0 flex-1">
+                <div className="text-[14px] font-semibold leading-snug">{names[i] ?? (en.isLoading ? "…" : "")}</div>
+                <div className="arabic text-right text-[15px] leading-relaxed" dir="rtl" lang="ar" style={{ color: "var(--muted-foreground)" }}>{l}</div>
+              </div>
             </li>
           ))}
         </ol>
