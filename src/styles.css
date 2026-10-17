@@ -4881,3 +4881,4 @@ body.quran-fs-on .quran-mini:not(.quran-fs .quran-mini) { display: none; }
 .hadith-detail { animation: hadith-slide 220ms cubic-bezier(.2,.8,.2,1); }
 @keyframes hadith-pop { from { opacity: 0; transform: scale(.92) translateY(-4px); } to { opacity: 1; transform: none; } }
 @keyframes hadith-slide { from { opacity: 0; transform: translateX(24px); } to { opacity: 1; transform: none; } }
+.hadith-hl { background: color-mix(in oklab, var(--accent) 22%, transparent); color: inherit; border-radius: 4px; padding: 0 2px; }

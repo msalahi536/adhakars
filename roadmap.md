@@ -13,3 +13,5 @@
 - [x] Favorites lead the home Choose a Reciter strip with no repeated names
 - [x] Preload reciter portraits in the background so avatars never sit blank
 
+- [x] Smarter hadith search + highlight
+- [x] Stop over-scroll below hadith Prev/Next
