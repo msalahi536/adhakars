@@ -451,6 +451,9 @@ function HadithDetail({ h, index, count, savedApi, onClose, onMove, terms }: {
   terms: string[]; h: Hadith; index: number; count: number; savedApi: SavedApi; onClose: () => void; onMove: (d: number) => void;
 }) {
   const [narrOpen, setNarrOpen] = useState(false);
+  useIsnad(h); // start loading English narrator names as soon as the hadith opens
+  const [copiedEn, setCopiedEn] = useState(false);
+  const copyEn = async () => { try { await navigator.clipboard.writeText(clean(h.hadithEnglish)); setCopiedEn(true); setTimeout(() => setCopiedEn(false), 1500); } catch { /* ignore */ } };
   const [copied, setCopied] = useState(false);
   const scroller = useRef<HTMLDivElement>(null);
   useEffect(() => { scroller.current?.scrollTo({ top: 0 }); setNarrOpen(false); }, [h.id]);
@@ -460,7 +463,7 @@ function HadithDetail({ h, index, count, savedApi, onClose, onMove, terms }: {
   }, [onClose]);
   const saved = savedApi.has(h.id);
   const copy = async () => {
-    try { await navigator.clipboard.writeText([h.hadithArabic, clean(h.hadithEnglish), `${h.bookName} ${h.hadithNumber}`].filter(Boolean).join("\n\n")); setCopied(true); setTimeout(() => setCopied(false), 1500); } catch { /* ignore */ }
+    try { await navigator.clipboard.writeText(h.hadithArabic ?? ""); setCopied(true); setTimeout(() => setCopied(false), 1500); } catch { /* ignore */ }
   };
   const panel: React.CSSProperties = { ...card, background: "var(--card)" };
   return (
@@ -506,6 +509,11 @@ function HadithDetail({ h, index, count, savedApi, onClose, onMove, terms }: {
             <div className="rounded-[20px] p-4" style={panel}>
               <div className="mb-2 flex items-center gap-2 text-[11px] font-semibold uppercase tracking-wider" style={{ color: "var(--muted-foreground)" }}><BookOpen size={14} /> Translation</div>
               <p className="whitespace-pre-line text-[15px] leading-[1.75]"><Hl text={clean(h.hadithEnglish)} terms={terms} /></p>
+              <div className="mt-2 flex justify-end">
+                <button type="button" aria-label="Copy translation" onClick={copyEn} className="flex items-center gap-1 text-xs" style={{ color: "var(--muted-foreground)" }}>
+                  {copiedEn ? <><Check size={15} /> Copied</> : <Copy size={16} />}
+                </button>
+              </div>
             </div>
           )}
           <div className="flex items-center gap-3 rounded-[20px] p-4" style={panel}>
@@ -519,7 +527,7 @@ function HadithDetail({ h, index, count, savedApi, onClose, onMove, terms }: {
         <div className="flex items-center justify-between pt-1 pb-2">
           <button type="button" disabled={index === 0} onClick={() => onMove(-1)} className="flex items-center gap-1 rounded-full px-4 py-2.5 text-sm font-semibold" style={{ ...panel, opacity: index === 0 ? 0.4 : 1 }}><ChevronLeft size={16} /> Previous</button>
           <span className="text-xs" style={{ color: "var(--muted-foreground)" }}>{index + 1} of {count}</span>
-          <button type="button" disabled={index >= count - 1} onClick={() => onMove(1)} className="flex items-center gap-1 rounded-full px-4 py-2.5 text-sm font-semibold" style={{ ...panel, opacity: index >= count - 1 ? 0.4 : 1 }}>Next <ChevronRight size={16} /></button>
+          <button type="button" disabled={index >= count - 1} onClick={() => onMove(1)} className="flex items-center gap-1 rounded-full px-6 py-2.5 text-sm font-semibold" style={{ background: "var(--accent)", color: "var(--accent-foreground, var(--background))", opacity: index >= count - 1 ? 0.4 : 1 }}>Next <ChevronRight size={16} /></button>
         </div>
     </div>
   );
@@ -534,14 +542,17 @@ export function splitIsnad(ar: string): string[] {
   const chain = (m && m.index > 10 ? ar.slice(0, m.index) : ar.split(/[:،,]/)[0] ?? "").trim();
   return chain.split(LINK).map((x) => x.replace(/[،,.:]+$/g, "").trim()).filter((x) => x.length > 1);
 }
-function Isnad({ h }: { h: Hadith }) {
+function useIsnad(h: Hadith) {
   const links = h.hadithArabic ? splitIsnad(h.hadithArabic) : [];
-  const en = useQuery({ queryKey: ["isnad-en", h.id], enabled: links.length > 0, staleTime: Infinity,
+  return { links, en: useQuery({ queryKey: ["isnad-en", h.id], enabled: links.length > 0, staleTime: Infinity,
     queryFn: async () => {
       const r = await cached(`isnad:${h.id}`, 365 * DAY, () => translateIsnad({ data: { links: links.slice(0, 20).map((l) => l.slice(0, 400)) } }))();
       if (!r.names.length) localStorage.removeItem(`hadith-cache:v1:isnad:${h.id}`);
       return r;
-    } });
+    } }) };
+}
+function Isnad({ h }: { h: Hadith }) {
+  const { links, en } = useIsnad(h);
   const names = en.data?.names ?? [];
   return (
     <div className="mt-3 border-t pt-3" style={{ borderColor: "var(--border)" }} onClick={(e) => e.stopPropagation()}>
@@ -552,8 +563,8 @@ function Isnad({ h }: { h: Hadith }) {
             <li key={i} className="flex items-start gap-2.5">
               <span className="mt-1 flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-[10px] font-bold" style={{ background: "color-mix(in oklab, var(--accent) 14%, transparent)", color: "var(--accent)" }}>{i + 1}</span>
               <div className="min-w-0 flex-1">
-                <div className="text-[14px] font-semibold leading-snug">{names[i] ?? (en.isLoading ? "…" : "")}</div>
-                <div className="arabic text-right text-[15px] leading-relaxed" dir="rtl" lang="ar" style={{ color: "var(--muted-foreground)" }}>{l}</div>
+                <div className="text-[14px] font-semibold leading-snug">{names[i] || (en.isLoading ? "…" : "")}</div>
+                <div className="arabic text-[15px] leading-relaxed" dir="rtl" lang="ar" style={{ color: "var(--muted-foreground)", textAlign: "left" }}>{l}</div>
               </div>
             </li>
           ))}

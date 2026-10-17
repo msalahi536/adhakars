@@ -124,8 +124,30 @@ export const getHadiths = createServerFn({ method: "GET" })
 export const translateIsnad = createServerFn({ method: "POST" })
   .inputValidator(z.object({ links: z.array(z.string().max(400)).min(1).max(20) }))
   .handler(async ({ data }) => {
+    // Shared narrator dictionary: names translated once are reused by everyone instantly.
+    const norm = (t: string) => t.replace(/[\u064B-\u065F\u0670\u0640]/g, "").replace(/[أإآ]/g, "ا").replace(/\s+/g, " ").trim();
+    const keys = data.links.map(norm);
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const known = new Map<string, string>();
+    try {
+      const { data: rows } = await supabaseAdmin.from("isnad_names").select("ar,en").in("ar", [...new Set(keys)]);
+      for (const r of rows ?? []) known.set(r.ar, r.en);
+    } catch { /* dictionary unavailable; fall through to AI */ }
+    const missingIdx = keys.map((k, i) => (known.has(k) ? -1 : i)).filter((i) => i >= 0);
+    if (!missingIdx.length) return { names: keys.map((k) => known.get(k)!) };
+    const fresh = await aiNames(missingIdx.map((i) => data.links[i]));
+    if (fresh.length === missingIdx.length) {
+      const up = missingIdx.map((i, j) => ({ ar: keys[i], en: fresh[j] })).filter((r) => r.en.trim());
+      missingIdx.forEach((i, j) => known.set(keys[i], fresh[j]));
+      try { await supabaseAdmin.from("isnad_names").upsert(up, { onConflict: "ar", ignoreDuplicates: true }); } catch { /* ignore */ }
+    }
+    return { names: keys.map((k) => known.get(k) ?? "") };
+  });
+
+async function aiNames(links: string[]): Promise<string[]> {
+    const data = { links };
     const key = process.env.LOVABLE_API_KEY;
-    if (!key) return { names: [] as string[] };
+    if (!key) return [];
     const r = await fetch("https://ai.gateway.lovable.dev/v1/responses", {
       method: "POST",
       headers: { "Lovable-API-Key": key, Authorization: `Bearer ${key}`, "Content-Type": "application/json", "X-Lovable-AIG-SDK": "fetch" },
@@ -142,7 +164,7 @@ export const translateIsnad = createServerFn({ method: "POST" })
         } } },
       }),
     });
-    if (!r.ok || !r.body) return { names: [] as string[] };
+    if (!r.ok || !r.body) return [];
     const reader = r.body.getReader();
     const dec = new TextDecoder();
     let buf = "", txt = "";
@@ -158,6 +180,6 @@ export const translateIsnad = createServerFn({ method: "POST" })
     }
     try {
       const arr = (JSON.parse(txt) as { names: unknown[] }).names;
-      return { names: Array.isArray(arr) ? arr.map(String).slice(0, data.links.length) : [] };
-    } catch { return { names: [] as string[] }; }
-  });
+      return Array.isArray(arr) ? arr.map(String).slice(0, data.links.length) : [];
+    } catch { return []; }
+}
