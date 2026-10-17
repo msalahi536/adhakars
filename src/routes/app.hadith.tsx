@@ -1,7 +1,7 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useQuery, keepPreviousData } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
-import { ArrowLeft, Bookmark, BookmarkCheck, ChevronRight, Search, X } from "lucide-react";
+import { ArrowLeft, Bookmark, BookmarkCheck, BookOpen, ChevronRight, Clock, Feather, HandHeart, Heart, Home as HomeIcon, Landmark, Leaf, Moon, Search, Star, TreePalm, Users, X, type LucideIcon } from "lucide-react";
 import {
   getHadithBooks, getHadithChapters, getHadiths, type Hadith,
 } from "@/lib/hadith.functions";
@@ -30,19 +30,20 @@ export const Route = createFileRoute("/app/hadith")({
   component: HadithLibrary,
 });
 
-const TOPICS: { label: string; q: string; ar: string }[] = [
-  { label: "Intention", q: "intention", ar: "النية" },
-  { label: "Prayer", q: "prayer", ar: "الصلاة" },
-  { label: "Patience", q: "patience", ar: "الصبر" },
-  { label: "Parents", q: "parents", ar: "الوالدين" },
-  { label: "Charity", q: "charity", ar: "الصدقة" },
-  { label: "Fasting", q: "fasting", ar: "الصيام" },
-  { label: "Knowledge", q: "knowledge", ar: "العلم" },
-  { label: "Repentance", q: "repent", ar: "التوبة" },
-  { label: "Good character", q: "character", ar: "الأخلاق" },
-  { label: "Neighbours", q: "neighbor", ar: "الجار" },
-  { label: "Paradise", q: "Paradise", ar: "الجنة" },
-  { label: "Remembrance", q: "remembrance", ar: "الذكر" },
+type Tone = "sage" | "gold" | "blue" | "rose";
+const TOPICS: { label: string; q: string; ar: string; Icon: LucideIcon; tone: Tone }[] = [
+  { label: "Intention", q: "intention", ar: "النية", Icon: Feather, tone: "sage" },
+  { label: "Prayer", q: "prayer", ar: "الصلاة", Icon: Landmark, tone: "gold" },
+  { label: "Parents", q: "parents", ar: "الوالدين", Icon: Users, tone: "blue" },
+  { label: "Charity", q: "charity", ar: "الصدقة", Icon: Heart, tone: "rose" },
+  { label: "Knowledge", q: "knowledge", ar: "العلم", Icon: BookOpen, tone: "blue" },
+  { label: "Repentance", q: "repent", ar: "التوبة", Icon: Leaf, tone: "sage" },
+  { label: "Neighbours", q: "neighbor", ar: "الجار", Icon: HomeIcon, tone: "gold" },
+  { label: "Paradise", q: "Paradise", ar: "الجنة", Icon: TreePalm, tone: "sage" },
+  { label: "Patience", q: "patience", ar: "الصبر", Icon: Clock, tone: "rose" },
+  { label: "Good character", q: "character", ar: "الأخلاق", Icon: Star, tone: "gold" },
+  { label: "Fasting", q: "fasting", ar: "الصيام", Icon: Moon, tone: "rose" },
+  { label: "Remembrance", q: "remembrance", ar: "الذكر", Icon: HandHeart, tone: "sage" },
 ];
 
 const SAVED_KEY = "adhkar:hadith:saved";
@@ -132,12 +133,19 @@ function Home({ books, loading, savedCount }: { books?: { bookName: string; writ
     <>
       <section>
         <h2 className="label-caps mb-2 px-1">Browse by topic</h2>
-        <div className="grid grid-cols-3 gap-2">
-          {TOPICS.map((t) => (
-            <Link key={t.q} to="/app/hadith" search={{ q: t.q, topic: t.label }}
-              className="rounded-2xl px-2 py-3 text-center transition-transform active:scale-[0.97]" style={card}>
-              <div className="text-base" dir="rtl" style={{ color: "var(--accent)", fontFamily: "var(--font-arabic, serif)" }}>{t.ar}</div>
-              <div className="mt-1 text-[11px] font-semibold">{t.label}</div>
+        <div className="grid grid-cols-2 gap-2.5">
+          {TOPICS.map(({ label, q, ar, Icon, tone }) => (
+            <Link key={q} to="/app/hadith" search={{ q, topic: label }}
+              className="flex items-center gap-3 rounded-2xl py-3 pl-3 pr-2 transition-transform active:scale-[0.97]" style={card}>
+              <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full"
+                style={{ background: `color-mix(in oklab, var(--topic-${tone}) 18%, var(--card))`, color: `var(--topic-${tone})` }}>
+                <Icon size={20} strokeWidth={1.8} />
+              </span>
+              <span className="min-w-0 flex-1">
+                <span className="block text-[17px] leading-tight" dir="rtl" style={{ textAlign: "left", fontFamily: "var(--font-arabic, serif)" }}>{ar}</span>
+                <span className="mt-0.5 block truncate text-[11px]" style={{ color: "var(--muted-foreground)" }}>{label}</span>
+              </span>
+              <ChevronRight size={15} className="shrink-0 opacity-40" />
             </Link>
           ))}
         </div>

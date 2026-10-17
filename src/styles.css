@@ -4866,3 +4866,11 @@ body.quran-fs-on .quran-mini:not(.quran-fs .quran-mini) { display: none; }
 }
 .quran-fav-btn:active { transform: scale(0.88); }
 .quran-fav-btn.is-on { color: var(--accent); }
+
+/* Hadith topic icon tints */
+:root {
+  --topic-sage: oklch(0.6 0.08 145);
+  --topic-gold: oklch(0.65 0.1 75);
+  --topic-blue: oklch(0.55 0.08 245);
+  --topic-rose: oklch(0.6 0.12 15);
+}
