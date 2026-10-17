@@ -157,8 +157,8 @@ export function GiveawayDialog({ open, onClose, celebrate }: { open: boolean; on
                       <span className="giveaway-panel flex h-9 w-9 shrink-0 items-center justify-center rounded-xl text-accent"><Icon size={20} strokeWidth={1.6} /></span>
                       <div className="min-w-0 flex-1">
                         <p className="label-caps text-[9px] text-soft">Level {n}</p>
-                        <p className="text-[14px] font-semibold leading-5">{name}</p>
-                        <p className="text-[11px] leading-4 text-card-foreground/80">{books}</p>
+                        <p className="text-[13px] font-semibold leading-[18px]">{name}</p>
+                        <p className="text-[10px] leading-[13px] text-card-foreground/80">{books}</p>
                       </div>
                     </li>
                   ))}
