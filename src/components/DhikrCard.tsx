@@ -1,3 +1,4 @@
+import { addGiveawayDhikr } from "@/lib/giveaway";
 import { useEffect, useRef, useState } from "react";
 import { AlertTriangle } from "lucide-react";
 import type { Dhikr } from "@/data/adhkar";
@@ -59,6 +60,7 @@ export function DhikrCard({ dhikr, count, onIncrement, isSpecial, specialLabel, 
       setTimeout(() => setJustCompleted(false), 500);
       noteDhikrSessionComplete();
     }
+    addGiveawayDhikr();
     onIncrement();
   };
 

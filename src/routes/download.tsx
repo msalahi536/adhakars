@@ -1,3 +1,6 @@
+import { useEffect } from "react";
+import { useServerFn } from "@tanstack/react-start";
+import { recordReferral } from "@/lib/giveaway.functions";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { MarketingLayout } from "@/components/marketing/MarketingLayout";
 import { StoreBadges } from "@/components/marketing/StoreBadges";
@@ -34,6 +37,15 @@ const TRUST = [
 ];
 
 function DownloadPage() {
+  const record = useServerFn(recordReferral);
+  useEffect(() => {
+    const ref = new URLSearchParams(window.location.search).get("ref")?.toUpperCase();
+    if (!ref || !/^[A-Z0-9]{6,12}$/.test(ref)) return;
+    let v = localStorage.getItem("giveaway:visitor");
+    if (!v) { v = crypto.randomUUID(); localStorage.setItem("giveaway:visitor", v); }
+    if (localStorage.getItem("giveaway:code") === ref) return;
+    void record({ data: { code: ref, visitor: v } }).catch(() => {});
+  }, [record]);
   return (
     <MarketingLayout onePage flushFooter>
       <div className="marketing-home">

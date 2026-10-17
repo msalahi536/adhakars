@@ -1,3 +1,5 @@
+import { Gift } from "lucide-react";
+import { giveawayActive } from "@/lib/giveaway";
 import { useEffect, useState } from "react";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { BedDouble, Compass, ChevronRight, HandHeart, Moon, ShieldCheck, Landmark, MoonStar, BookOpen, CalendarDays, X } from "lucide-react";
@@ -201,6 +203,22 @@ function More() {
                </Link>
              ))}
            </div>
+
+           {giveawayActive() && (
+             <button
+               type="button"
+               className="more-consistency-entry"
+               onClick={() => window.dispatchEvent(new Event("open-giveaway"))}
+               aria-label="Open the Ilm Guide giveaway"
+             >
+               <span className="more-consistency-icon" aria-hidden="true"><Gift size={20} strokeWidth={1.8} /></span>
+               <span className="min-w-0 flex-1 text-left">
+                 <span className="label-caps block">Giveaway · ends Oct 23</span>
+                 <span className="mt-0.5 block text-sm font-semibold">Win lifetime Ilm Guide access</span>
+                 <span className="mt-0.5 block text-[10px] opacity-70">Track your progress and enter</span>
+               </span>
+             </button>
+           )}
 
            <button
              type="button"

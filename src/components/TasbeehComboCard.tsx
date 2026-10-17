@@ -1,3 +1,4 @@
+import { addGiveawayDhikr } from "@/lib/giveaway";
 import { useEffect, useRef, useState } from "react";
 import { Check, Plus } from "lucide-react";
 import type { ComboDhikr } from "@/data/salah";
@@ -120,6 +121,7 @@ export function TasbeehComboCard({ combo, counts, onIncrement, index, total }: P
                       onClick={() => {
                         if (done) return;
                         triggerHaptic("heavy");
+                        addGiveawayDhikr();
                         onIncrement(part.id, part.target);
                       }}
                       disabled={done}

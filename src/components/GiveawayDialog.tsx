@@ -156,7 +156,7 @@ export function GiveawayDialog({ open, onClose }: { open: boolean; onClose: () =
           ) : (
             <>
               <Bar label="Read 5 surahs" value={surahs} goal={GOALS.surahs}>
-                <p className="mt-1.5 text-[11px] text-muted-foreground">Listen to the end or scroll to the last verse.</p>
+                <p className="mt-1.5 text-[11px] text-muted-foreground">Listen to a full surah until it ends.</p>
               </Bar>
               <Bar label="Make 500 dhikr" value={dhikr} goal={GOALS.dhikr}>
                 <p className="mt-1.5 text-[11px] text-muted-foreground">Every tap on adhkar cards and the Tasbih counts.</p>
