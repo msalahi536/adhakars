@@ -15,12 +15,21 @@ export function AdhanEnabledNotice() {
   const [open, setOpen] = useState(false);
   const router = useRouter();
   useEffect(() => {
+    let timer: number | undefined;
+    // Never stack over another open popup (giveaway, update notice): two
+    // modal layers fight over the page lock and can freeze the screen.
     const check = () => {
-      if (window.localStorage.getItem(ADHAN_PROMPT_PENDING_KEY) === "1") setOpen(true);
+      window.clearTimeout(timer);
+      if (window.localStorage.getItem(ADHAN_PROMPT_PENDING_KEY) !== "1") return;
+      if (document.querySelector('[role="dialog"][data-state="open"]')) {
+        timer = window.setTimeout(check, 1500);
+        return;
+      }
+      setOpen(true);
     };
     check();
     window.addEventListener(ADHAN_PROMPT_EVENT, check);
-    return () => window.removeEventListener(ADHAN_PROMPT_EVENT, check);
+    return () => { window.clearTimeout(timer); window.removeEventListener(ADHAN_PROMPT_EVENT, check); };
   }, []);
   const close = () => {
     window.localStorage.removeItem(ADHAN_PROMPT_PENDING_KEY);
