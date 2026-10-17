@@ -120,7 +120,7 @@ function HadithLibrary() {
             <form onSubmit={submit} className="mt-9 flex items-center gap-2 rounded-full px-4 py-3 text-left" style={card}>
               <Search size={17} style={{ color: "var(--muted-foreground)" }} />
               <input value={text} onChange={(e) => setText(e.target.value)} enterKeyHint="search"
-                placeholder={bookName ? `Search ${bookName}` : "Search all hadith (English or Arabic)"}
+                placeholder={bookName ? `Search ${bookName} — words or #number` : "Words, phrase, or “Bukhari 1”"}
                 className="min-w-0 flex-1 bg-transparent text-sm outline-none" />
               {text && <button type="button" aria-label="Clear" onClick={() => setText("")}><X size={16} /></button>}
             </form>
@@ -129,7 +129,7 @@ function HadithLibrary() {
       </header>
 
       <main className="scroll-area">
-        <div className="mx-auto max-w-md space-y-4 px-5 py-3 pb-28">
+        <div className={`mx-auto max-w-md space-y-4 px-5 py-3 ${search.h !== undefined ? "pb-4" : "pb-28"}`}>
 
           {view === "home" && <Home books={books.data} loading={books.isLoading} savedCount={savedApi.saved.length} />}
           {view === "book" && <Chapters book={search.book!} />}
@@ -225,27 +225,32 @@ function Chapters({ book }: { book: string }) {
 type SavedApi = ReturnType<typeof useSaved>;
 
 function HadithList({ s, savedApi }: { s: S; savedApi: SavedApi }) {
-  const page = Math.max(1, s.page ?? 1);
+  const [filter, setFilter] = useState("");
+  const [refine, setRefine] = useState("");
+  const [rPage, setRPage] = useState(1);
+  useEffect(() => { const t = setTimeout(() => { setRefine(filter.trim()); setRPage(1); }, 350); return () => clearTimeout(t); }, [filter]);
+  const page = refine ? rPage : Math.max(1, s.page ?? 1);
+  const qq = [s.q, refine].filter(Boolean).join(" ") || undefined;
   const q = useQuery({
-    queryKey: ["hadiths", s.book, s.chapter, s.q, page],
-    queryFn: cached(`list:${s.book ?? ""}:${s.chapter ?? ""}:${s.q ?? ""}:${page}`, 7 * DAY,
-      () => getHadiths({ data: { book: s.book, chapter: s.chapter, q: s.q, page } })),
+    queryKey: ["hadiths2", s.book, s.chapter, qq, page],
+    queryFn: cached(`list2:${s.book ?? ""}:${s.chapter ?? ""}:${qq ?? ""}:${page}`, 7 * DAY,
+      () => getHadiths({ data: { book: s.book, chapter: s.chapter, q: qq, page } })),
     placeholderData: keepPreviousData, staleTime: 1000 * 60 * 30,
   });
   useEffect(() => { document.querySelector(".scroll-area")?.scrollTo({ top: 0 }); }, [page]);
   if (q.isLoading) return <Empty text="Loading hadith…" />;
   if (q.isError) return <Empty text="Couldn't load hadith. Check your connection." />;
   const d = q.data!;
-  if (!d.items.length) return <Empty text="No hadith found. Try a different word." />;
+  if (!d.items.length && !filter) return <Empty text="No hadith found. Try a different word." />;
   return (
     <>
-      <PreviewList items={d.items} total={d.total} label={s.topic ?? (s.q ? `“${s.q}”` : "this chapter")} savedApi={savedApi} />
+      <PreviewList items={d.items} total={d.total} terms={d.terms ?? []} filter={filter} setFilter={setFilter} busy={q.isFetching} label={s.topic ?? (s.q ? `“${s.q}”` : "this chapter")} savedApi={savedApi} />
       {d.lastPage > 1 && s.h === undefined && (
         <div className="flex items-center justify-between gap-3 pt-1">
-          <Link to="/app/hadith" search={{ ...s, page: page - 1 }} disabled={page <= 1}
+          <Link to="/app/hadith" search={{ ...s, page: page - 1 }} disabled={page <= 1} onClick={(e) => { if (refine) { e.preventDefault(); setRPage(page - 1); } }}
             className="rounded-full px-4 py-2 text-sm font-semibold" style={{ ...card, opacity: page <= 1 ? 0.4 : 1 }}>Previous</Link>
           <span className="text-xs" style={{ color: "var(--muted-foreground)" }}>Page {page} of {d.lastPage}</span>
-          <Link to="/app/hadith" search={{ ...s, page: page + 1 }} disabled={page >= d.lastPage}
+          <Link to="/app/hadith" search={{ ...s, page: page + 1 }} disabled={page >= d.lastPage} onClick={(e) => { if (refine) { e.preventDefault(); setRPage(page + 1); } }}
             className="rounded-full px-4 py-2 text-sm font-semibold" style={{ ...card, opacity: page >= d.lastPage ? 0.4 : 1 }}>Next</Link>
         </div>
       )}
@@ -270,8 +275,26 @@ function titleOf(h: Hadith) {
   return t.length > 90 ? t.slice(0, 88).replace(/\s+\S*$/, "") + "…" : t;
 }
 
-function PreviewList({ items, total, label, savedApi }: { items: Hadith[]; total: number; label: string; savedApi: SavedApi }) {
-  const [filter, setFilter] = useState("");
+function esc(t: string) { return t.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"); }
+function termRegex(terms: string[]) {
+  const t = terms.filter((x) => x.trim().length > 1);
+  if (!t.length) return null;
+  return new RegExp(`(${t.map((w) => /[\u0600-\u06FF]/.test(w) ? [...w].map((c) => esc(c) + DIA).join("") : `\\b${esc(w)}[\\w'’]*`).join("|")})`, "gi");
+}
+function Hl({ text, terms }: { text: string; terms: string[] }) {
+  const re = termRegex(terms);
+  if (!re) return <>{text}</>;
+  return <>{text.split(re).map((part, i) => i % 2 ? <mark key={i} className="hadith-hl">{part}</mark> : part)}</>;
+}
+function snippetOf(h: Hadith, terms: string[]) {
+  const re = termRegex(terms); const t = clean(h.hadithEnglish);
+  if (!re || !t) return null;
+  const m = re.exec(t); if (!m) return null;
+  const a = Math.max(0, m.index - 60); const b = Math.min(t.length, m.index + 110);
+  return (a > 0 ? "…" : "") + t.slice(a, b).replace(/^\S*\s/, a > 0 ? "" : "$&") + (b < t.length ? "…" : "");
+}
+
+function PreviewList({ items, total, label, savedApi, terms, filter, setFilter, busy }: { items: Hadith[]; total: number; label: string; savedApi: SavedApi; terms: string[]; filter: string; setFilter: (v: string) => void; busy: boolean }) {
   const [sort, setSort] = useState<SortId>("relevance");
   const [sortOpen, setSortOpen] = useState(false);
   const sp = Route.useSearch();
@@ -279,17 +302,16 @@ function PreviewList({ items, total, label, savedApi }: { items: Hadith[]; total
   const open = sp.h ?? null;
   const setOpen = (i: number | null) => void nav({ search: (p) => ({ ...p, h: i ?? undefined }), replace: open !== null && i !== null });
   const list = useMemo(() => {
-    const f = filter.trim().toLowerCase();
-    const out = f ? items.filter((h) => [h.hadithEnglish, h.headingEnglish, h.englishNarrator, h.bookName, h.chapterEnglish, h.hadithArabic].some((x) => x?.toLowerCase().includes(f))) : [...items];
+    const out = [...items];
     if (sort === "grade") out.sort((a, b) => gradeRank(a.status) - gradeRank(b.status));
     if (sort === "book") out.sort((a, b) => a.bookName.localeCompare(b.bookName) || Number(a.hadithNumber) - Number(b.hadithNumber));
     if (sort === "number") out.sort((a, b) => Number(a.hadithNumber) - Number(b.hadithNumber));
     return out;
-  }, [items, filter, sort]);
+  }, [items, sort]);
 
   useEffect(() => { document.querySelector(".scroll-area")?.scrollTo({ top: 0 }); }, [open]);
   if (open !== null && list[open]) {
-    return <HadithDetail h={list[open]} index={open} count={list.length} savedApi={savedApi}
+    return <HadithDetail terms={terms} h={list[open]} index={open} count={list.length} savedApi={savedApi}
       onClose={() => setOpen(null)} onMove={(d) => setOpen(Math.min(list.length - 1, Math.max(0, (open ?? 0) + d)))} />;
   }
   return (
@@ -301,7 +323,7 @@ function PreviewList({ items, total, label, savedApi }: { items: Hadith[]; total
         {filter && <button type="button" aria-label="Clear" onClick={() => setFilter("")}><X size={16} /></button>}
       </div>
       <div className="relative flex items-center justify-between px-1">
-        <span className="text-xs font-medium" style={{ color: "var(--muted-foreground)" }}>{(filter ? list.length : total).toLocaleString()} hadith</span>
+        <span className="text-xs font-medium" style={{ color: "var(--muted-foreground)" }}>{busy ? "Searching…" : `${total.toLocaleString()} hadith`}</span>
         <button type="button" onClick={() => setSortOpen((v) => !v)} aria-expanded={sortOpen}
           className="flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-xs font-semibold" style={card}>
           <SlidersHorizontal size={14} /> Sort
@@ -321,7 +343,7 @@ function PreviewList({ items, total, label, savedApi }: { items: Hadith[]; total
           </>
         )}
       </div>
-      {list.length === 0 && <Empty text="No matches on this page." />}
+      {list.length === 0 && !busy && <Empty text="No matches. Try fewer or different words." />}
       {list.map((h, i) => {
         const saved = savedApi.has(h.id);
         return (
@@ -339,7 +361,8 @@ function PreviewList({ items, total, label, savedApi }: { items: Hadith[]; total
             </div>
             <div className="mt-1.5 flex items-center gap-2">
               <div className="min-w-0 flex-1">
-                <div className="line-clamp-2 text-[15px] font-bold leading-snug">{titleOf(h)}</div>
+                <div className="line-clamp-2 text-[15px] font-bold leading-snug"><Hl text={titleOf(h)} terms={terms} /></div>
+                {(() => { const sn = h.headingEnglish?.trim() ? snippetOf(h, terms) : null; return sn ? <div className="mt-1 line-clamp-2 text-[12.5px] leading-snug" style={{ color: "var(--muted-foreground)" }}><Hl text={sn} terms={terms} /></div> : null; })()}
                 {h.englishNarrator && <div className="mt-1 truncate text-[12px] italic" style={{ color: "var(--muted-foreground)" }}>{clean(h.englishNarrator)} …</div>}
               </div>
               <ChevronRight size={17} className="shrink-0 opacity-40" />
@@ -358,8 +381,8 @@ function GradePill({ status }: { status: string }) {
   );
 }
 
-function HadithDetail({ h, index, count, savedApi, onClose, onMove }: {
-  h: Hadith; index: number; count: number; savedApi: SavedApi; onClose: () => void; onMove: (d: number) => void;
+function HadithDetail({ h, index, count, savedApi, onClose, onMove, terms }: {
+  terms: string[]; h: Hadith; index: number; count: number; savedApi: SavedApi; onClose: () => void; onMove: (d: number) => void;
 }) {
   const [narrOpen, setNarrOpen] = useState(false);
   const [copied, setCopied] = useState(false);
@@ -387,7 +410,7 @@ function HadithDetail({ h, index, count, savedApi, onClose, onMove }: {
                 {saved ? <BookmarkCheck size={17} /> : <Bookmark size={17} />}
               </button>
             </div>
-            <h2 className="mt-3 font-serif text-[24px] leading-snug" style={{ color: "var(--accent)" }}>{titleOf(h)}</h2>
+            <h2 className="mt-3 font-serif text-[24px] leading-snug" style={{ color: "var(--accent)" }}><Hl text={titleOf(h)} terms={terms} /></h2>
             {h.chapterEnglish && <div className="mt-1 text-[12px]" style={{ color: "var(--muted-foreground)" }}>Book of {h.chapterEnglish}</div>}
           </div>
           {h.englishNarrator && (
@@ -405,7 +428,7 @@ function HadithDetail({ h, index, count, savedApi, onClose, onMove }: {
           )}
           {h.hadithArabic && (
             <div className="rounded-[20px] p-4" style={panel}>
-              <p className="arabic text-right text-[21px] leading-[2.2]" dir="rtl" lang="ar">{h.hadithArabic}</p>
+              <p className="arabic text-right text-[21px] leading-[2.2]" dir="rtl" lang="ar"><Hl text={h.hadithArabic} terms={terms.filter((t) => /[\u0600-\u06FF]/.test(t))} /></p>
               <div className="mt-2 flex justify-end">
                 <button type="button" aria-label="Copy hadith" onClick={copy} className="flex items-center gap-1 text-xs" style={{ color: "var(--muted-foreground)" }}>
                   {copied ? <><Check size={15} /> Copied</> : <Copy size={16} />}
@@ -416,7 +439,7 @@ function HadithDetail({ h, index, count, savedApi, onClose, onMove }: {
           {h.hadithEnglish && (
             <div className="rounded-[20px] p-4" style={panel}>
               <div className="mb-2 flex items-center gap-2 text-[11px] font-semibold uppercase tracking-wider" style={{ color: "var(--muted-foreground)" }}><BookOpen size={14} /> Translation</div>
-              <p className="whitespace-pre-line text-[15px] leading-[1.75]">{clean(h.hadithEnglish)}</p>
+              <p className="whitespace-pre-line text-[15px] leading-[1.75]"><Hl text={clean(h.hadithEnglish)} terms={terms} /></p>
             </div>
           )}
           <div className="flex items-center gap-3 rounded-[20px] p-4" style={panel}>
