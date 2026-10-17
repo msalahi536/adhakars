@@ -7,7 +7,7 @@ import { QuranMiniPlayer } from "@/components/QuranMiniPlayer";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { ChevronDown, ChevronLeft, ChevronRight, Heart, Loader2, Maximize2, Pause, Play, Repeat, Search, Shuffle, SkipBack, SkipForward, X } from "lucide-react";
 import {
-  findReciter, getChapterAudio, getChapters, getVerses, HOME_RECITER_IDS, POPULAR_RECITERS, RECITERS, reciterHasPhoto,
+  findReciter, getChapterAudio, getChapters, getVerses, homeReciterRow, POPULAR_RECITERS, RECITERS, reciterHasPhoto,
   reciterHasSurah, reciterName, reciterScore, reciterPhoto, reciterSubtitle, searchChapters, searchReciters, type Chapter, type Reciter, type Verse,
 } from "@/lib/quran";
 import { getDisplay, triggerHaptic } from "@/lib/theme";
@@ -90,9 +90,14 @@ function Avatar({ r, size = 48 }: { r: Reciter; size?: number }) {
   const initials = reciterName(r).replace(/^(sheikh|al-|ash-|as-)\s*/i, "").split(/\s+/).filter((w) => !/^(al|ad|ar|as|ash|bin|ibn)-?$/i.test(w)).slice(0, 2).map((w) => w.replace(/^[a-z]+-/i, "")[0]).join("").toUpperCase();
   return (
     <span className="quran-avatar" style={{ width: size, height: size, fontSize: size * 0.34 }}>
-      {photo && !broken ? <img src={photo} alt="" loading="lazy" onError={() => setBroken(true)} /> : initials}
+      <span className="quran-avatar-initials">{initials}</span>
+      {photo && !broken && (
+        <img src={photo} alt="" loading="lazy" decoding="async"
+          onLoad={(e) => e.currentTarget.classList.add("is-loaded")} onError={() => setBroken(true)} />
+      )}
     </span>
   );
+
 }
 
 function NumBadge({ n }: { n: number }) {
@@ -167,7 +172,7 @@ function Home() {
     }
   };
   const favs = useFavoriteReciters();
-  const home = [...favs.map(findReciter), ...HOME_RECITER_IDS.filter((id) => !favs.includes(id)).map(findReciter)];
+  const home = homeReciterRow(favs);
   const lastY = useRef(0);
   const [searchShown, setSearchShown] = useState(true);
   const [searchFloat, setSearchFloat] = useState(false);
