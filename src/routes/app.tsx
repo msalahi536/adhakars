@@ -9,7 +9,8 @@ import { UPDATE_NOTICE_KEY, shouldShowUpdateNotice } from "@/lib/update-notice";
 import { prefetchSunnah } from "@/components/SunnahOfTheDay";
 import { RatePrompt } from "@/components/RatePrompt";
 const GiveawayDialog = lazy(() => import("@/components/GiveawayDialog").then((m) => ({ default: m.GiveawayDialog })));
-import { getStatus, giveawayActive } from "@/lib/giveaway";
+import { shouldAskGiveaway } from "@/lib/giveaway";
+import { GiveawayTeaser } from "@/components/GiveawayTeaser";
 import { backgroundsForPreset } from "@/lib/backgrounds";
 import { PERSONAL_PRESET, cachedPhoto, loadAppearancePhotos, readAppearance, resolveAppearance, pageForAppearance } from '@/lib/custom-appearance';
 import { JUMUAH_NOTIF_ID, registerNotificationTapHandler } from "@/lib/notifications";
@@ -48,6 +49,7 @@ const whenNoDialog = (fn: () => void) => {
 function AppLayout() {
   const [showWhatsNew, setShowWhatsNew] = useState(false);
   const [showGiveaway, setShowGiveaway] = useState(false);
+  const [showTeaser, setShowTeaser] = useState(false);
   const [giveawayGoal, setGiveawayGoal] = useState<string | null>(null);
   useEffect(() => {
     const open = () => { setGiveawayGoal(null); setShowGiveaway(true); };
@@ -190,8 +192,8 @@ function AppLayout() {
   useEffect(() => {
     if (shouldShowUpdateNotice(Date.now(), window.localStorage.getItem(UPDATE_NOTICE_KEY))) {
       setShowWhatsNew(true);
-    } else if (giveawayActive() && !getStatus()) {
-      whenNoDialog(() => setShowGiveaway(true));
+    } else if (shouldAskGiveaway()) {
+      window.setTimeout(() => whenNoDialog(() => setShowTeaser(true)), 2500);
     }
   }, []);
 
@@ -365,10 +367,11 @@ function AppLayout() {
         setShowWhatsNew(false);
         // Give the reader a beat to settle on the page before the giveaway
         // offer appears, so the two popups never feel stacked.
-        if (giveawayActive() && !getStatus()) window.setTimeout(() => whenNoDialog(() => setShowGiveaway(true)), 8000);
+        if (shouldAskGiveaway()) window.setTimeout(() => whenNoDialog(() => setShowTeaser(true)), 8000);
       }} />}
       {showGiveaway && <GiveawayDialog open={showGiveaway} celebrate={giveawayGoal} onClose={() => { setShowGiveaway(false); setGiveawayGoal(null); }} />}
       </Suspense>
+      {showTeaser && <GiveawayTeaser onChoice={(yes) => { setShowTeaser(false); if (yes) { setGiveawayGoal(null); setShowGiveaway(true); } }} />}
       <AdhanEnabledNotice />
       <RatePrompt />
     </div>
