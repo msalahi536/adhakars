@@ -182,6 +182,17 @@ function Home() {
   };
   const favs = useFavoriteReciters();
   const home = homeReciterRow(favs);
+  // The strip's snap can nudge it one tile to the right while avatars load, which
+  // would push a favorited reciter out of sight, so keep the row anchored at its start.
+  const stripRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const el = stripRef.current;
+    if (!el) return;
+    el.scrollLeft = 0;
+    const later = [250, 800].map((ms) => window.setTimeout(() => { el.scrollLeft = 0; }, ms));
+    return () => later.forEach((t) => window.clearTimeout(t));
+  }, [favs.join(",")]);
+
   const lastY = useRef(0);
   const [searchShown, setSearchShown] = useState(true);
   const [searchFloat, setSearchFloat] = useState(false);
@@ -222,7 +233,7 @@ function Home() {
                 <h2 className="quran-section-title">Choose a Reciter</h2>
                 <button className="quran-see-all" onClick={() => { console.log("SEE-ALL CLICKED"); void navigate({ to: "/app/quran", search: { view: "reciters", tab: "all" } }); }}>See All <ChevronRight size={14} /></button>
               </div>
-              <div className="quran-reciter-strip">
+              <div className="quran-reciter-strip" ref={stripRef}>
                 {home.map((r) => (
                   <button key={r.id} className={`quran-reciter-tile ${prefs.reciter === r.id ? "is-on" : ""}`} onClick={() => { setPrefs({ reciter: r.id }); void triggerHaptic("light"); }}>
                     <span className="quran-reciter-ring"><Avatar r={r} size={64} eager /></span>
