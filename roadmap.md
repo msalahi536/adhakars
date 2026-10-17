@@ -5,3 +5,5 @@
 - [x] Tapping the minimized Quran player must not restart recitation
 - [x] Full screen Quran reading
 - [x] Pink morning English verse highlight visibility
+
+- [x] Ilm Guide giveaway (oaths, progress, referral link, entries in admin)

@@ -1,3 +1,5 @@
+import { adminListGiveaway, type GiveawayEntry } from "@/lib/giveaway.functions";
+import { drawWinner } from "@/lib/giveaway";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
@@ -135,6 +137,7 @@ function Dashboard({ password, onLogout }: { password: string; onLogout: () => v
     ...SECTIONS.map((s) => ({ key: s.key, label: s.label, icon: s.icon })),
     { key: "recitations", label: "Recitations", icon: Music },
     { key: "suggestions", label: "Suggestions", icon: MessageSquare },
+    { key: "giveaway", label: "Giveaway", icon: MessageSquare },
     { key: "settings", label: "Widget Settings", icon: Settings2 },
   ];
   const section = SECTIONS.find((s) => s.key === view);
@@ -166,6 +169,7 @@ function Dashboard({ password, onLogout }: { password: string; onLogout: () => v
         )}
         {view === "recitations" && <RecitationsAdmin password={password} />}
         {view === "suggestions" && <SuggestionsAdmin password={password} />}
+        {view === "giveaway" && <GiveawayAdmin password={password} />}
         {view === "settings" && <WidgetSettings password={password} content={content} schedule={schedule} onChange={refresh} />}
       </main>
     </div>
@@ -440,6 +444,46 @@ function SuggestionsAdmin({ password }: { password: string }) {
               </div>
               <p className="mt-2 whitespace-pre-wrap text-sm">{s.body}</p>
               {s.contact && <p className="mt-2 text-xs text-muted-foreground">Contact: {s.contact}</p>}
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function GiveawayAdmin({ password }: { password: string }) {
+  const load = useServerFn(adminListGiveaway);
+  const [items, setItems] = useState<GiveawayEntry[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [winner, setWinner] = useState<GiveawayEntry | null>(null);
+  useEffect(() => {
+    load({ data: { password } }).then((r) => setItems(r.items)).catch(() => setItems([])).finally(() => setLoading(false));
+  }, [load, password]);
+  const tickets = items.reduce((s, e) => s + e.tickets, 0);
+  const label: Record<string, string> = { surahs: "5 surahs", dhikr: "500 dhikr", referrals: "5 downloads" };
+  return (
+    <div>
+      <h1 className="text-2xl font-semibold">Ilm Guide giveaway</h1>
+      <p className="mt-1 text-sm text-muted-foreground">{items.length} people · {tickets} total entries. One entry per completed goal.</p>
+      <button disabled={!tickets} onClick={() => setWinner(drawWinner(items))} className="mt-4 rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground disabled:opacity-50">Draw random winner</button>
+      {winner && (
+        <div className="mt-4 rounded-xl border border-primary bg-primary/10 p-4">
+          <p className="text-xs uppercase tracking-wider text-primary">Winner</p>
+          <p className="mt-1 text-lg font-semibold">{winner.email}</p>
+          <p className="text-xs text-muted-foreground">{winner.tickets} {winner.tickets === 1 ? "entry" : "entries"} · code {winner.device_id}</p>
+        </div>
+      )}
+      {loading ? <p className="mt-6 text-sm text-muted-foreground">Loading…</p> : items.length === 0 ? <p className="mt-6 text-sm text-muted-foreground">No entries yet.</p> : (
+        <div className="mt-6 grid gap-3">
+          {items.map((e) => (
+            <div key={e.id} className="rounded-xl border border-border bg-card p-4">
+              <div className="flex items-center justify-between gap-3">
+                <span className="font-medium">{e.email}</span>
+                <span className="rounded-full bg-primary/15 px-2.5 py-0.5 text-xs font-medium text-primary">{e.tickets} {e.tickets === 1 ? "entry" : "entries"}</span>
+              </div>
+              <p className="mt-1 text-xs text-muted-foreground">{e.goals.map((g) => label[g] ?? g).join(" · ")} — surahs {e.surahs}, dhikr {e.dhikr}, downloads {e.referrals}</p>
+              <p className="mt-1 text-xs text-muted-foreground">{new Date(e.created_at).toLocaleString()} · code {e.device_id}</p>
             </div>
           ))}
         </div>
