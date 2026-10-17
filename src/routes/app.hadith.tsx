@@ -49,6 +49,18 @@ const TOPICS: { label: string; q: string; ar: string; Icon: LucideIcon; tone: To
   { label: "Remembrance", q: "remembrance", ar: "الذكر", Icon: HandHeart, tone: "sage" },
 ];
 
+const BOOK_TONES: { match: RegExp; tone: Tone | "mint" | "slate" | "clay" }[] = [
+  { match: /bukhari/i, tone: "sage" },
+  { match: /muslim/i, tone: "blue" },
+  { match: /nasa/i, tone: "mint" },
+  { match: /dawud|dawood/i, tone: "gold" },
+  { match: /tirmidhi/i, tone: "clay" },
+  { match: /majah/i, tone: "rose" },
+  { match: /mishkat/i, tone: "slate" },
+];
+const bookTone = (slug: string, name: string) =>
+  (BOOK_TONES.find((t) => t.match.test(slug) || t.match.test(name))?.tone ?? "sage") as Tone;
+
 const SAVED_KEY = "adhkar:hadith:saved";
 function readSaved(): Hadith[] {
   try { return JSON.parse(localStorage.getItem(SAVED_KEY) || "[]"); } catch { return []; }
