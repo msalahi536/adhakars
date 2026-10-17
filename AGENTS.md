@@ -17,7 +17,7 @@
 - Website branding and installable home-screen icons use CDN asset pointers derived from the same supplied logo; the favicon remains a downscaled public file so browser icon discovery works.
 - Homepage sections use native fragment links inside the shared marketing shell so navigation remains accessible and smoothly scrolls without client state.
 - Homepage download content groups its actions with the copy and reuses the actual app-screen mockup, so the section stays coherent without fabricated screens.
-- Legal copy (privacy, terms) lives only in `src/data/legal.ts`; the website and in-app legal screens both render from it so the two can never drift.
+- Legal copy (privacy, terms) lives only in `src/data/legal.ts`; the website and in-app legal screens both render from it.
 - Scheduled notifications beyond basic reminders (prayer-based adhkar, Sunnah, period) live in `src/lib/smart-notifications.ts` and are rescheduled on every app open, because local notifications can only be planned a few days ahead.
 - Adhan notifications have no master switch: each prayer is enabled independently and opens a reciter picker with native audio previews on the Salah page.
 - Real prayer alerts derive native enabled prayers from Salah settings, preserve valid schedules on fetch failure, and re-arm on app resume; tests bypass these checks.
@@ -37,3 +37,4 @@
 - Zakat rulings live only in `src/lib/zakat/rules.ts` and pure `calculate.ts` (integer cents, tested); data stays on device; evidence text is left for the owner to fill.
 - Quran verse search: AI returns verse keys only; text always loads from Quran.com.
 - Subdirectories may have their own AGENTS.md; read it before changing files there.
+- App AI uses the owner's GEMINI_API_KEY via `src/lib/gemini.server.ts`, by request.
