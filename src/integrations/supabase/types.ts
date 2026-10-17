@@ -100,6 +100,24 @@ export type Database = {
         }
         Relationships: []
       }
+      isnad_names: {
+        Row: {
+          ar: string
+          created_at: string
+          en: string
+        }
+        Insert: {
+          ar: string
+          created_at?: string
+          en: string
+        }
+        Update: {
+          ar?: string
+          created_at?: string
+          en?: string
+        }
+        Relationships: []
+      }
       recitation_files: {
         Row: {
           created_at: string

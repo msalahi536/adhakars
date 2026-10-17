@@ -8,6 +8,13 @@
       "when": 1792197809358,
       "tag": "0000_giveaway",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1792215465441,
+      "tag": "0001_isnad_names",
+      "breakpoints": true
     }
   ]
 }
