@@ -13,6 +13,8 @@ import {
 import { SunnahOfTheDay } from "@/components/SunnahOfTheDay";
 import { Portal } from "@/components/Portal";
 import { TasbihIcon } from "@/components/BottomNav";
+import { ZakatDueCard } from "@/components/zakat/tools";
+import { Calculator } from "lucide-react";
 
 // Completed days follow the active palette accent.
 const DONE = "color-mix(in oklab, var(--surface-deep-fg) 88%, transparent)";
@@ -39,7 +41,7 @@ export const Route = createFileRoute("/app/more")({
 });
 
 type Tile = {
-  to: "/app/sleep" | "/app/qibla" | "/app/about" | "/app/period" | "/app/ruqyah" | "/app/hajj" | "/app/fasting" | "/app/duas" | "/app/tasbih";
+  to: "/app/sleep" | "/app/qibla" | "/app/about" | "/app/period" | "/app/ruqyah" | "/app/hajj" | "/app/fasting" | "/app/duas" | "/app/tasbih" | "/app/more/zakat";
   title: string;
   subtitle: string;
   Icon: (props: { size?: number; strokeWidth?: number }) => React.ReactNode;
@@ -53,6 +55,7 @@ const tiles: Tile[] = [
   { to: "/app/ruqyah", title: "Ruqyah Companion", subtitle: "Daily protection and authentic ruqyah", Icon: ShieldCheck },
   { to: "/app/hajj", title: "Hajj & Umrah Companion", subtitle: "Station-by-station guide and du‘as", Icon: Landmark },
   { to: "/app/fasting", title: "Fasting Companion", subtitle: "Hijri fasting calendar and Ramadan", Icon: MoonStar },
+  { to: "/app/more/zakat", title: "Zakat Calculator", subtitle: "Every school, private on your device", Icon: Calculator },
   { to: "/app/sleep", title: "Sleep & Wake", subtitle: "17 sleep + 7 wake adhkar", Icon: BedDouble },
   { to: "/app/about", title: "About & Support", subtitle: "The project and contact", Icon: HandHeart },
 ];
@@ -203,6 +206,8 @@ function More() {
                </Link>
              ))}
            </div>
+
+           <ZakatDueCard />
 
            {giveawayActive() && (
              <button
