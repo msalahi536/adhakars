@@ -173,7 +173,7 @@ export function GiveawayDialog({ open, onClose, celebrate }: { open: boolean; on
               )}
               <p className="px-1 text-center text-[11px] leading-4 text-muted-foreground">Each goal is one entry, up to 3. You can submit after your first goal and add more later.</p>
               <Bar label="Read 5 surahs" value={surahs} goal={GOALS.surahs}>
-                <p className="mt-1.5 text-[11px] text-muted-foreground">Listen to a full surah until it ends.</p>
+                <p className="mt-1.5 text-[11px] text-muted-foreground">Listen to a full surah until it ends, or read it to the bottom of the page.</p>
               </Bar>
               <Bar label="Make 500 dhikr" value={dhikr} goal={GOALS.dhikr}>
                 <p className="mt-1.5 text-[11px] text-muted-foreground">Every tap on adhkar cards and the Tasbih counts.</p>
