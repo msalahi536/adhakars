@@ -82,18 +82,36 @@ export const getHadiths = createServerFn({ method: "GET" })
     q: z.string().max(140).optional(),
     number: z.string().max(12).optional(),
     page: z.number().int().min(1).max(5000).default(1),
+    sort: z.enum(["relevance", "grade", "book", "number"]).optional(),
   }))
   .handler(async ({ data }): Promise<HadithPage> => {
+    if (!data.sort || data.sort === "relevance") return search(data, data.page, PAGE);
+    // Sorting needs the whole result set, not one page: gather up to 400 and sort those.
+    const first = await search(data, 1, 100);
+    const rest = await Promise.all(Array.from({ length: Math.min(first.lastPage, 4) - 1 }, (_, i) => search(data, i + 2, 100)));
+    const seen = new Set<string>();
+    const all = [first, ...rest].flatMap((r) => r.items).filter((h) => !seen.has(h.id) && !!seen.add(h.id));
+    const rank = (st: string | null) => { const v = (st || "").toLowerCase(); return v.includes("sahih") ? 0 : v.includes("hasan") ? 1 : 2; };
+    const num = (h: Hadith) => parseInt(h.hadithNumber, 10) || 0;
+    if (data.sort === "grade") all.sort((a, b) => rank(a.status) - rank(b.status));
+    if (data.sort === "book") all.sort((a, b) => a.bookName.localeCompare(b.bookName) || num(a) - num(b));
+    if (data.sort === "number") all.sort((a, b) => num(a) - num(b));
+    const lastPage = Math.max(1, Math.ceil(all.length / PAGE));
+    const page = Math.min(data.page, lastPage);
+    return { items: all.slice((page - 1) * PAGE, page * PAGE), page, lastPage, total: Math.max(first.total, all.length), terms: first.terms };
+  });
+
+type Q = { book?: string; chapter?: number; q?: string; number?: string };
+async function search(data: Q, pageIn: number, size: number): Promise<HadithPage> {
     const base = { book: data.book, chapter: data.chapter, hadithNumber: data.number };
     const raw = (data.q ?? "").trim().replace(/\s+/g, " ");
-    if (!raw) return direct(base, data.page);
+    if (!raw) return direct(base, pageIn, size);
     const arabic = /[\u0600-\u06FF]/.test(raw);
     if (arabic) {
       const q = raw.replace(/[\u064B-\u065F\u0670]/g, "");
-      return { ...(await direct({ ...base, hadithArabic: q }, data.page)), terms: q.split(" ") };
+      return { ...(await direct({ ...base, hadithArabic: q }, pageIn, size)), terms: q.split(" ") };
     }
     const lower = raw.toLowerCase();
-    // Reference lookup: "<collection> <number>" or "#<number>" inside a book.
     const ref = lower.match(/^(.*?)\s*#?\s*(\d{1,5})$/);
     if (ref) {
       const name = ref[1].trim();
@@ -106,19 +124,18 @@ export const getHadiths = createServerFn({ method: "GET" })
     const quoted = /^["“].*["”]$/.test(raw);
     const phrase = lower.replace(/^["“]|["”]$/g, "").replace(/[^\p{L}\p{N}' -]/gu, " ").replace(/\s+/g, " ").trim();
     const words = phrase.split(" ").filter((w) => w.length > 1 && !STOP.has(w));
-    const exact = await direct({ ...base, hadithEnglish: phrase }, data.page);
+    const exact = await direct({ ...base, hadithEnglish: phrase }, pageIn, size);
     if (exact.total || quoted || !words.length) return { ...exact, terms: [phrase] };
     const stems = [...new Set(words.map(stem))];
-    if (stems.length === 1) return { ...(await direct({ ...base, hadithEnglish: stems[0] }, data.page)), terms: stems };
-    // All words, any order: fetch candidates by the rarest-looking word, then filter.
+    if (stems.length === 1) return { ...(await direct({ ...base, hadithEnglish: stems[0] }, pageIn, size)), terms: stems };
     const anchor = [...stems].sort((a, b) => b.length - a.length)[0];
     const first = await direct({ ...base, hadithEnglish: anchor }, 1, 100);
     const more = await Promise.all(Array.from({ length: Math.min(first.lastPage, 4) - 1 }, (_, i) => direct({ ...base, hadithEnglish: anchor }, i + 2, 100)));
     const all = [first, ...more].flatMap((r) => r.items).filter((h) => { const t = text(h); return stems.every((w) => t.includes(w)); });
-    const lastPage = Math.max(1, Math.ceil(all.length / PAGE));
-    const page = Math.min(data.page, lastPage);
-    return { items: all.slice((page - 1) * PAGE, page * PAGE), page, lastPage, total: all.length, terms: stems };
-  });
+    const lastPage = Math.max(1, Math.ceil(all.length / size));
+    const page = Math.min(pageIn, lastPage);
+    return { items: all.slice((page - 1) * size, page * size), page, lastPage, total: all.length, terms: stems };
+}
 
 /** Translates an Arabic isnad (list of narrator links) into English names, in order. */
 export const translateIsnad = createServerFn({ method: "POST" })
