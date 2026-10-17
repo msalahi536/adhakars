@@ -7,6 +7,7 @@ import {
   getHadithBooks, getHadithChapters, getHadiths, translateIsnad, type Hadith,
 } from "@/lib/hadith.functions";
 import { hadithCover } from "@/lib/hadith-covers";
+import { cached, DAY } from "@/lib/hadith-cache";
 
 type S = { book?: string; chapter?: number; q?: string; topic?: string; page?: number; saved?: number; h?: number };
 
@@ -79,7 +80,7 @@ function HadithLibrary() {
   const savedApi = useSaved();
 
   const view = search.saved ? "saved" : search.q ? "search" : search.chapter && search.book ? "chapter" : search.book ? "book" : "home";
-  const books = useQuery({ queryKey: ["hadith-books"], queryFn: () => getHadithBooks(), staleTime: Infinity });
+  const books = useQuery({ queryKey: ["hadith-books"], queryFn: cached("books", 30 * DAY, () => getHadithBooks()), staleTime: Infinity });
   const bookName = books.data?.find((b) => b.bookSlug === search.book)?.bookName;
 
   const submit = (e: React.FormEvent) => {
@@ -195,7 +196,7 @@ function Home({ books, loading, savedCount }: { books?: { bookName: string; writ
 }
 
 function Chapters({ book }: { book: string }) {
-  const q = useQuery({ queryKey: ["hadith-chapters", book], queryFn: () => getHadithChapters({ data: { book } }), staleTime: Infinity });
+  const q = useQuery({ queryKey: ["hadith-chapters", book], queryFn: cached(`chapters:${book}`, 30 * DAY, () => getHadithChapters({ data: { book } })), staleTime: Infinity });
   if (q.isLoading) return <Empty text="Loading chapters…" />;
   if (q.isError) return <Empty text="Couldn't load chapters. Check your connection." />;
   return (
@@ -218,7 +219,8 @@ function HadithList({ s, savedApi }: { s: S; savedApi: SavedApi }) {
   const page = Math.max(1, s.page ?? 1);
   const q = useQuery({
     queryKey: ["hadiths", s.book, s.chapter, s.q, page],
-    queryFn: () => getHadiths({ data: { book: s.book, chapter: s.chapter, q: s.q, page } }),
+    queryFn: cached(`list:${s.book ?? ""}:${s.chapter ?? ""}:${s.q ?? ""}:${page}`, 7 * DAY,
+      () => getHadiths({ data: { book: s.book, chapter: s.chapter, q: s.q, page } })),
     placeholderData: keepPreviousData, staleTime: 1000 * 60 * 30,
   });
   useEffect(() => { document.querySelector(".scroll-area")?.scrollTo({ top: 0 }); }, [page]);
@@ -437,7 +439,11 @@ export function splitIsnad(ar: string): string[] {
 function Isnad({ h }: { h: Hadith }) {
   const links = h.hadithArabic ? splitIsnad(h.hadithArabic) : [];
   const en = useQuery({ queryKey: ["isnad-en", h.id], enabled: links.length > 0, staleTime: Infinity,
-    queryFn: () => translateIsnad({ data: { links: links.slice(0, 20).map((l) => l.slice(0, 400)) } }) });
+    queryFn: async () => {
+      const r = await cached(`isnad:${h.id}`, 365 * DAY, () => translateIsnad({ data: { links: links.slice(0, 20).map((l) => l.slice(0, 400)) } }))();
+      if (!r.names.length) localStorage.removeItem(`hadith-cache:v1:isnad:${h.id}`);
+      return r;
+    } });
   const names = en.data?.names ?? [];
   return (
     <div className="mt-3 border-t pt-3" style={{ borderColor: "var(--border)" }} onClick={(e) => e.stopPropagation()}>
