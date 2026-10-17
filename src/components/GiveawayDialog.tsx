@@ -134,10 +134,8 @@ export function GiveawayDialog({ open, onClose, celebrate }: { open: boolean; on
   return (
     <Dialog open={open} onOpenChange={(n) => !n && onClose()}>
       <DialogContent className="update-dialog grid max-h-[86dvh] w-[calc(100%_-_32px)] max-w-[410px] grid-rows-[auto_minmax(0,1fr)_auto] gap-0 overflow-hidden rounded-3xl border-border/60 bg-card p-0 text-card-foreground">
-        {bg && <img src={bg} alt="" aria-hidden className="pointer-events-none absolute inset-0 h-full w-full object-cover object-bottom opacity-40" />}
+        {bg && <img src={bg} alt="" aria-hidden className="pointer-events-none absolute inset-0 h-full w-full object-cover object-top opacity-90" />}
         <DialogHeader className="relative overflow-hidden px-6 pb-4 pt-6 text-left">
-          {bg && <img src={bg} alt="" aria-hidden className="pointer-events-none absolute inset-0 h-full w-full object-cover opacity-70" />}
-          <div aria-hidden className="pointer-events-none absolute inset-0" style={{ background: "linear-gradient(100deg, color-mix(in oklab, var(--card) 80%, transparent) 30%, transparent 75%)" }} />
           <div className="relative">
           <span className="mb-2 flex h-11 w-11 items-center justify-center rounded-2xl bg-muted/60 text-accent"><Gift size={20} strokeWidth={1.7} /></span>
           <p className="label-caps text-accent">Giveaway · ends Friday, Oct 23</p>
