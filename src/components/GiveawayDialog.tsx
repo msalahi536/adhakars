@@ -133,7 +133,7 @@ export function GiveawayDialog({ open, onClose, celebrate }: { open: boolean; on
 
   return (
     <Dialog open={open} onOpenChange={(n) => !n && onClose()}>
-      <DialogContent className="update-dialog grid max-h-[86dvh] w-[calc(100%_-_32px)] max-w-[410px] grid-rows-[auto_minmax(0,1fr)_auto] gap-0 overflow-hidden rounded-3xl border-border/60 bg-card p-0 text-card-foreground">
+      <DialogContent className="update-dialog grid max-h-[93dvh] w-[calc(100%_-_32px)] max-w-[410px] grid-rows-[auto_minmax(0,1fr)_auto] gap-0 overflow-hidden rounded-3xl border-border/60 bg-card p-0 text-card-foreground">
         {bg && <img src={bg} alt="" aria-hidden className="pointer-events-none absolute inset-0 h-full w-full -scale-x-100 object-cover object-top opacity-90" />}
         <DialogHeader className="giveaway-header relative overflow-hidden px-6 pb-3 pt-4 text-left">
           <div className="relative">
