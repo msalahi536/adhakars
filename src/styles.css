@@ -4590,12 +4590,8 @@ html { --ayah-active: var(--accent); }
 .quran-reciter-row { display: flex; width: 100%; align-items: center; gap: 12px; padding: 10px 14px; color: var(--foreground); border-bottom: 1px solid color-mix(in oklab, var(--border) 70%, transparent); }
 .quran-reciter-row:last-child { border-bottom: 0; }
 .quran-reciter-row.is-on { background: color-mix(in oklab, var(--accent) 10%, transparent); }
-.quran-mini-eq { display: inline-flex; align-items: flex-end; gap: 2px; height: 14px; }
-.quran-mini-eq i { width: 3px; border-radius: 2px; background: var(--accent); animation: quran-eq 1s ease-in-out infinite; }
-.quran-mini-eq i:nth-child(1) { height: 60%; } .quran-mini-eq i:nth-child(2) { height: 100%; animation-delay: .2s; } .quran-mini-eq i:nth-child(3) { height: 75%; animation-delay: .4s; }
-@keyframes quran-eq { 50% { transform: scaleY(.45); } }
-.quran-mini-eq i { transform-origin: bottom; }
 .quran-reciter-select { display: flex; align-items: center; gap: 12px; padding: 10px 16px 10px 10px; }
+
 .quran-toggles { display: flex; gap: 8px; justify-content: center; }
 .quran-toggles button { height: 38px; flex: 1; max-width: 150px; padding: 0 14px; border-radius: 999px; border: 1px solid var(--border); background: var(--surface, var(--card)); color: var(--foreground); font-size: 13px; font-weight: 500; }
 .quran-toggles button.is-on { background: var(--accent); color: var(--accent-foreground); border-color: transparent; }
@@ -4855,6 +4851,9 @@ body.quran-fs-on .quran-mini:not(.quran-fs .quran-mini) { display: none; }
 .quran-reciter-panel .quran-section-title { margin-top: 0; color: var(--foreground); }
 .quran-reciter-panel .quran-see-all { color: var(--accent); font-weight: 600; }
 .quran-reciter-panel .quran-reciter-name { color: var(--foreground); }
+/* The Continue Reading card sits right under the reciter panel: keep a clear gap. */
+.quran-reciter-panel.quran-reciter-panel { margin-bottom: 26px; }
+
 .quran-reciter-row .quran-fav-btn {
   position: static;
   display: inline-flex; height: 36px; width: 36px; flex-shrink: 0; align-items: center; justify-content: center;
