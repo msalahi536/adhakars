@@ -37,4 +37,4 @@
 - Zakat rulings live only in `src/lib/zakat/rules.ts` and pure `calculate.ts` (integer cents, tested); data stays on device; evidence text is left for the owner to fill.
 - Quran verse search: AI returns verse keys only; text always loads from Quran.com.
 - Subdirectories may have their own AGENTS.md; read it before changing files there.
-- All app AI calls go through `src/lib/gemini.server.ts` using the owner's own GEMINI_API_KEY (Flash-Lite), not the Lovable gateway, by owner request.
+- App AI uses the owner's GEMINI_API_KEY via `src/lib/gemini.server.ts`, by request.
