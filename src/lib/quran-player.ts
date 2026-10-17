@@ -100,7 +100,11 @@ function audioEl(): HTMLAudioElement {
   };
   el.onended = () => { wanted = state.repeat || state.shuffle; void onEnded(); };
   // Coming back to the app: if playback was dropped behind our back, pick it up again.
-  document.addEventListener("visibilitychange", () => { if (wanted && el?.paused && !el.ended) { retries = 0; recover(); } });
+  document.addEventListener("visibilitychange", () => {
+    if (wanted && el?.paused && !el.ended) { retries = 0; recover(); }
+    // Refresh the lock-screen card so it never shows up blank.
+    if (state.audio) { setMetadata(); setMediaState(state.playing ? "playing" : "paused"); }
+  });
   const ms = navigator.mediaSession;
   if (ms) {
     const h = (a: MediaSessionAction, f: MediaSessionActionHandler) => { try { ms.setActionHandler(a, f); } catch { /* unsupported */ } };
