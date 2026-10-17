@@ -70,3 +70,29 @@ export const getHadiths = createServerFn({ method: "GET" })
     }));
     return { items, page: h.current_page, lastPage: h.last_page, total: h.total };
   });
+
+/** Translates an Arabic isnad (list of narrator links) into English names, in order. */
+export const translateIsnad = createServerFn({ method: "POST" })
+  .inputValidator(z.object({ links: z.array(z.string().max(400)).min(1).max(20) }))
+  .handler(async ({ data }) => {
+    const key = process.env.LOVABLE_API_KEY;
+    if (!key) return { names: [] as string[] };
+    const r = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+      method: "POST",
+      headers: { Authorization: `Bearer ${key}`, "Content-Type": "application/json" },
+      body: JSON.stringify({
+        model: "google/gemini-2.5-flash-lite",
+        messages: [
+          { role: "system", content: "You transliterate hadith narrator names from Arabic into standard English scholarly transliteration (e.g. 'Umar ibn al-Khattab, Yahya ibn Sa'id al-Ansari). Reply ONLY with a JSON array of strings, one per input line, same order. Name only, no verbs like 'narrated'." },
+          { role: "user", content: data.links.map((l, i) => `${i + 1}. ${l}`).join("\n") },
+        ],
+      }),
+    });
+    if (!r.ok) return { names: [] as string[] };
+    const j = (await r.json()) as { choices?: { message?: { content?: string } }[] };
+    const txt = j.choices?.[0]?.message?.content ?? "";
+    try {
+      const arr = JSON.parse(txt.slice(txt.indexOf("["), txt.lastIndexOf("]") + 1));
+      return { names: Array.isArray(arr) ? arr.map(String).slice(0, data.links.length) : [] };
+    } catch { return { names: [] as string[] }; }
+  });
