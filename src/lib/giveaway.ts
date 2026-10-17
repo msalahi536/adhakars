@@ -29,7 +29,7 @@ export function setStatus(v: "joined" | "declined") {
 }
 
 // Bump to re-ask everyone who hasn't joined yet (joined users keep their progress).
-const ASK_KEY = "giveaway:asked:v2";
+const ASK_KEY = "giveaway:asked:v3";
 export function shouldAskGiveaway() {
   return giveawayActive() && getStatus() !== "joined" && !ls()?.getItem(ASK_KEY);
 }

@@ -4856,3 +4856,9 @@ body.quran-fs-on .quran-mini:not(.quran-fs .quran-mini) { display: none; }
   animation: hadith-shimmer 1.2s linear infinite;
 }
 @keyframes hadith-shimmer { from { transform: translateX(-100%); } to { transform: translateX(100%); } }
+
+/* Soft haze behind the giveaway popup (overlay is the dialog's preceding sibling) */
+[data-slot="dialog-overlay"]:has(+ .giveaway-dialog),
+div[data-state="open"]:has(+ .giveaway-dialog) {
+  backdrop-filter: blur(6px);
+}
