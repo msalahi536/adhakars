@@ -173,3 +173,36 @@ async function aiMatches(q: string, base: Record<string, string | number | undef
   return (Array.isArray(pick?.ids) ? pick.ids : []).map((x) => byId.get(String(x))).filter((h): h is Hadith => !!h).slice(0, 5);
 }
 
+/** Translates an Arabic isnad (list of narrator links) into English names, in order. */
+export const translateIsnad = createServerFn({ method: "POST" })
+  .inputValidator(z.object({ links: z.array(z.string().max(400)).min(1).max(20) }))
+  .handler(async ({ data }) => {
+    // Shared narrator dictionary: names translated once are reused by everyone instantly.
+    const norm = (t: string) => t.replace(/[\u064B-\u065F\u0670\u0640]/g, "").replace(/[أإآ]/g, "ا").replace(/\s+/g, " ").trim();
+    const keys = data.links.map(norm);
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const known = new Map<string, string>();
+    try {
+      const { data: rows } = await supabaseAdmin.from("isnad_names").select("ar,en").in("ar", [...new Set(keys)]);
+      for (const r of rows ?? []) known.set(r.ar, r.en);
+    } catch { /* dictionary unavailable; fall through to AI */ }
+    const missingIdx = keys.map((k, i) => (known.has(k) ? -1 : i)).filter((i) => i >= 0);
+    if (!missingIdx.length) return { names: keys.map((k) => known.get(k)!) };
+    const fresh = await aiNames(missingIdx.map((i) => data.links[i]));
+    if (fresh.length === missingIdx.length) {
+      const up = missingIdx.map((i, j) => ({ ar: keys[i], en: fresh[j] })).filter((r) => r.en.trim());
+      missingIdx.forEach((i, j) => known.set(keys[i], fresh[j]));
+      try { await supabaseAdmin.from("isnad_names").upsert(up, { onConflict: "ar", ignoreDuplicates: true }); } catch { /* ignore */ }
+    }
+    return { names: keys.map((k) => known.get(k) ?? "") };
+  });
+
+async function aiNames(links: string[]): Promise<string[]> {
+    const { geminiJson } = await import("./gemini.server");
+    const res = await geminiJson<{ names: unknown[] }>(
+      "You transliterate hadith narrator names from Arabic into standard English scholarly transliteration without diacritics (e.g. 'Umar ibn al-Khattab, Yahya ibn Sa'id al-Ansari). Return one name per input line, same order. Name only, no verbs like 'narrated'.",
+      links.map((l, i) => `${i + 1}. ${l}`).join("\n"),
+      { type: "object", properties: { names: { type: "array", items: { type: "string" } } }, required: ["names"] },
+    );
+    return Array.isArray(res?.names) ? res.names.map(String).slice(0, links.length) : [];
+}
