@@ -332,8 +332,8 @@ function ReciterPicker({ back, tab }: { back?: number; tab?: "all" }) {
                     <Avatar r={r} size={48} />
                     <span className="min-w-0 flex-1"><span className="block truncate text-[14.5px] font-semibold">{reciterName(r)}</span><span className="quran-muted block truncate text-[11.5px]">{reciterSubtitle(r)}</span></span>
                   </button>
-                  {on && <span className="quran-mini-eq" aria-label="Selected"><i /><i /><i /></span>}
                   <button className={`quran-fav-btn${fav ? " is-on" : ""}`} aria-pressed={fav} aria-label={fav ? `Remove ${r.name} from favorites` : `Add ${r.name} to favorites`} onClick={() => { toggleFavorite(r.id); void triggerHaptic("light"); }}>
+
                     <Heart size={17} fill={fav ? "currentColor" : "none"} />
                   </button>
                   <button className="quran-play-sm" aria-label={preview === r.id ? "Stop preview" : `Preview ${r.name}`} onClick={() => void togglePreview(r)}>
