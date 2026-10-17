@@ -2,6 +2,7 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useQuery, keepPreviousData } from "@tanstack/react-query";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Bookmark, BookmarkCheck, BookOpen, ChevronRight, Clock, Feather, HandHeart, Heart, Home as HomeIcon, Landmark, Leaf, Moon, Search, Star, TreePalm, Users, X, Check, ChevronDown, ChevronLeft, Copy, SlidersHorizontal, User, FileText, type LucideIcon } from "lucide-react";
+import { HeaderBackButton } from "@/components/HeaderBackButton";
 import {
   getHadithBooks, getHadithChapters, getHadiths, translateIsnad, type Hadith,
 } from "@/lib/hadith.functions";
@@ -98,14 +99,8 @@ function HadithLibrary() {
   return (
     <>
       <header className="page-header relative overflow-hidden" style={{ background: "var(--grad-header)", color: "var(--header-fg)" }}>
+        {view !== "home" && <HeaderBackButton onBack={goBack} />}
         <div className="relative mx-auto max-w-md px-6 pb-5 pt-9 text-center">
-          {view !== "home" && (
-            <button type="button" aria-label="Back" onClick={goBack}
-              className="absolute left-4 top-9 flex h-9 w-9 items-center justify-center rounded-full"
-              style={{ background: "color-mix(in oklab, var(--header-fg) 14%, transparent)" }}>
-              <ArrowLeft size={18} />
-            </button>
-          )}
           <div className="label-caps" style={{ color: "var(--header-sub)" }}>Sunnah</div>
           <h1 className="app-page-title mt-2">{title}</h1>
           {view === "home" && <p className="mt-2 text-xs opacity-90">40,000+ hadith from the major collections</p>}
