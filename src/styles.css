@@ -4608,9 +4608,9 @@ html { --ayah-active: var(--accent); }
 .quran-verse { position: relative; display: flex; gap: 10px; padding: 16px 14px 14px; border-radius: 22px; background: var(--surface, var(--card)); border: 1px solid var(--border); color: var(--foreground); transition: background .4s ease; }
 .quran-verse.is-active { background: color-mix(in oklab, var(--accent) 9%, var(--surface, var(--card))); }
 .quran-verse-side { display: flex; flex-direction: column; align-items: center; gap: 14px; padding-top: 2px; }
-.quran-fav-btn { position: absolute; right: 12px; top: 12px; color: var(--muted-foreground); opacity: .7; transition: transform .15s ease, color .2s ease; }
-.quran-fav-btn.is-on { color: var(--accent); opacity: 1; }
-.quran-fav-btn:active { transform: scale(.85); }
+.quran-heart { position: absolute; right: 12px; top: 12px; color: var(--muted-foreground); opacity: .7; transition: transform .15s ease, color .2s ease; }
+.quran-heart.is-on { color: var(--accent); opacity: 1; }
+.quran-heart:active { transform: scale(.85); }
 .quran-ar { margin: 4px 22px 10px 0; font-family: var(--font-arabic); font-size: 27px; line-height: 2.1; text-align: right; color: var(--foreground); cursor: pointer; transition: color .4s ease; }
 /* Karaoke: the verse being recited brightens; in word mode upcoming words
    wait softly, recited words settle in, and the current word glows. */
@@ -4855,7 +4855,8 @@ body.quran-fs-on .quran-mini:not(.quran-fs .quran-mini) { display: none; }
 .quran-reciter-panel .quran-section-title { margin-top: 0; color: var(--foreground); }
 .quran-reciter-panel .quran-see-all { color: var(--accent); font-weight: 600; }
 .quran-reciter-panel .quran-reciter-name { color: var(--foreground); }
-.quran-fav-btn {
+.quran-reciter-row .quran-fav-btn {
+  position: static;
   display: inline-flex; height: 36px; width: 36px; flex-shrink: 0; align-items: center; justify-content: center;
   border-radius: 999px; color: color-mix(in oklab, var(--foreground) 55%, transparent);
   transition: transform 150ms ease, color 150ms ease;
