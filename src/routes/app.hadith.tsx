@@ -469,18 +469,18 @@ function HadithDetail({ h, index, count, savedApi, onClose, onMove, terms }: {
   return (
     <div className="hadith-detail space-y-3">
         <div ref={scroller} className="space-y-3">
-          <div className="rounded-[24px] p-5" style={panel}>
+          <div className="rounded-[20px] p-3.5" style={panel}>
             <div className="flex items-center gap-2">
-              <span className="text-[11px] font-semibold uppercase tracking-wider" style={{ color: "var(--muted-foreground)" }}>{h.bookName} · #{h.hadithNumber}</span>
+              <span className="text-[10px] font-semibold uppercase tracking-wider" style={{ color: "var(--muted-foreground)" }}>{h.bookName} · #{h.hadithNumber}</span>
               <span className="flex-1" />
               {h.status && <GradePill status={h.status} />}
               <button type="button" aria-label={saved ? "Remove bookmark" : "Save hadith"} onClick={() => savedApi.toggle(h)}
-                className="flex h-9 w-9 items-center justify-center rounded-full" style={{ background: "color-mix(in oklab, var(--accent) 10%, transparent)", color: saved ? "var(--accent)" : "var(--muted-foreground)" }}>
-                {saved ? <BookmarkCheck size={17} /> : <Bookmark size={17} />}
+                className="flex h-8 w-8 items-center justify-center rounded-full" style={{ background: "color-mix(in oklab, var(--accent) 10%, transparent)", color: saved ? "var(--accent)" : "var(--muted-foreground)" }}>
+                {saved ? <BookmarkCheck size={15} /> : <Bookmark size={15} />}
               </button>
             </div>
-            <h2 className="mt-3 font-serif text-[24px] leading-snug" style={{ color: "var(--accent)" }}><Hl text={titleOf(h)} terms={terms} /></h2>
-            {h.chapterEnglish && <div className="mt-1 text-[12px]" style={{ color: "var(--muted-foreground)" }}>Book of {h.chapterEnglish}</div>}
+            <h2 className="mt-1.5 font-serif text-[19px] leading-[1.3]" style={{ color: "var(--accent)" }}><Hl text={titleOf(h)} terms={terms} /></h2>
+            {h.chapterEnglish && <div className="mt-0.5 text-[11px]" style={{ color: "var(--muted-foreground)" }}>Book of {h.chapterEnglish}</div>}
           </div>
           {h.englishNarrator && (
             <button type="button" onClick={() => setNarrOpen((v) => !v)} className="block w-full rounded-[20px] p-4 text-left" style={panel}>
