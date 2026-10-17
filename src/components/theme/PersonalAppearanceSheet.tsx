@@ -71,7 +71,17 @@ export function PersonalAppearanceSheet({ open, onClose, onApply }: { open: bool
       <div className="personal-appearance-scroll">
         <div className="personal-preview-wrap"><HomeAppearancePreview palette={palette} phase={phase} image={image} /></div>
         <div className="personal-phase" role="group" aria-label="Appearance phase">{(['morning', 'evening'] as const).map(value => <Button key={value} variant="ghost" disabled={busy} aria-pressed={phase === value} onClick={() => { setPhase(value); setError(''); }} className={phase === value ? 'is-selected' : ''}>{value === 'morning' ? <Sun /> : <Moon />}{value === 'morning' ? 'Morning' : 'Evening'}</Button>)}</div>
-        <label className="personal-apply-both"><Switch checked={applyBoth} disabled={busy} onCheckedChange={setApplyBoth} aria-label="Apply to morning and evening" /><span>Apply to morning &amp; evening</span></label>
+        <label className="personal-apply-both"><Switch checked={applyBoth} disabled={busy} onCheckedChange={value => {
+          setApplyBoth(value);
+          if (value) setDraft(previous => {
+            const other: AppearancePhase = phase === 'morning' ? 'evening' : 'morning';
+            const current = previous[phase][page];
+            const next = { ...previous, [other]: { ...previous[other] } };
+            if (current) next[other][page] = { ...current, ...(current.colors ? { colors: { ...current.colors } } : {}) };
+            else delete next[other][page];
+            return next;
+          });
+        }} aria-label="Apply to morning and evening" /><span>Apply to morning &amp; evening</span></label>
         <input ref={fileInput} className="sr-only" type="file" accept="image/*" aria-label="Choose background photo" onChange={event => void upload(event.target.files?.[0])} />
         <section className="personal-section"><h3>Background</h3><div className="personal-photo-actions"><Button variant="outline" disabled={busy || loading} onClick={() => fileInput.current?.click()}>{busy ? <LoaderCircle className="animate-spin" /> : <ImagePlus />}{busy ? 'Opening…' : appearance.photo ? 'Change photo' : 'Choose photo'}</Button><Button variant="outline" disabled={busy || loading} onClick={() => update({ photo: null })}><RotateCcw />Reset</Button></div></section>
         <section className="personal-section"><h3>Colors</h3><div className="personal-basic-colors">{BASIC_COLORS.map(colorControl)}</div></section>
