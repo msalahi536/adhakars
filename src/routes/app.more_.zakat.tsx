@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
-import { Settings2 } from "lucide-react";
+import { Calculator, GraduationCap, Settings2, Wrench } from "lucide-react";
 import { HeaderBackButton } from "@/components/HeaderBackButton";
 import { useZakatState } from "@/lib/zakat/store";
 import { getZakatPrices } from "@/lib/zakat/prices.functions";
@@ -10,7 +10,7 @@ import { Results } from "@/components/zakat/results";
 import { Tools } from "@/components/zakat/tools";
 import { Learn } from "@/components/zakat/learn";
 import { getRules } from "@/lib/zakat/rules";
-import { Muted, PrimaryButton } from "@/components/zakat/ui";
+import { Muted, PrimaryButton, Segmented } from "@/components/zakat/ui";
 
 export const Route = createFileRoute("/app/more_/zakat")({
   head: () => ({
@@ -67,22 +67,20 @@ function ZakatPage() {
             <Setup s={s} update={update} />
           ) : (
             <>
-              <div className="grid grid-cols-3 gap-1 rounded-full p-1" role="tablist" style={{ background: "color-mix(in oklab, var(--foreground) 6%, transparent)" }}>
-                {(["calculate", "tools", "learn"] as const).map((t) => (
-                  <button key={t} role="tab" aria-selected={tab === t} type="button" onClick={() => setTab(t)} className="min-h-[40px] rounded-full text-[13px] font-semibold capitalize" style={{ background: tab === t ? "var(--accent)" : "transparent", color: tab === t ? "var(--accent-foreground)" : "var(--foreground)" }}>
-                    {t}
-                  </button>
-                ))}
-              </div>
+              <Segmented
+                value={tab}
+                onChange={setTab}
+                options={[
+                  { value: "calculate", label: "Calculate", icon: <Calculator size={15} /> },
+                  { value: "tools", label: "Tools", icon: <Wrench size={15} /> },
+                  { value: "learn", label: "Learn", icon: <GraduationCap size={15} /> },
+                ]}
+              />
 
               {tab === "calculate" && (
                 <>
-                  <div className="grid grid-cols-2 gap-1 rounded-full p-1" style={{ border: "1px solid var(--border)" }}>
-                    {(["guided", "quick"] as const).map((m) => (
-                      <button key={m} type="button" aria-pressed={s.mode === m} onClick={() => { update((x) => ({ ...x, mode: m })); setShowResult(false); }} className="min-h-[36px] rounded-full text-xs font-semibold capitalize" style={{ background: s.mode === m ? "color-mix(in oklab, var(--accent) 16%, transparent)" : "transparent" }}>
-                        {m}
-                      </button>
-                    ))}
+                  <div className="mx-auto w-[220px]">
+                    <Segmented size="sm" value={s.mode} onChange={(m) => { update((x) => ({ ...x, mode: m })); setShowResult(false); }} options={[{ value: "guided", label: "Guided" }, { value: "quick", label: "Quick" }]} />
                   </div>
                   {showResult ? (
                     <>

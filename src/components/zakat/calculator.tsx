@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Plus, Trash2 } from "lucide-react";
+import { ArrowLeft, ArrowRight, Plus, Trash2 } from "lucide-react";
 import { EMPTY_INPUT, metalValue, type MetalItem, type MetalType, type Receivable, type ZakatInput } from "@/lib/zakat/calculate";
 import { getRules } from "@/lib/zakat/rules";
 import { currentPrices, money, nisabGrams, uid, type ZakatState } from "@/lib/zakat/store";
@@ -369,26 +369,37 @@ export function Guided({ s, update, onDone }: { s: ZakatState; update: Update; o
   const r = getRules(s.madhab, s.custom);
   const stopChild = step === "who" && s.input.forWhom === "child" && !r.childWealthZakatable;
   return (
-    <div className="space-y-3 pb-24">
-      <div>
-        <div className="flex justify-between text-[11px] font-semibold" style={{ color: "var(--muted-foreground)" }}>
-          <span>Step {idx + 1} of {GUIDED_STEPS.length}: {STEP_TITLES[step]}</span>
+    <div className="space-y-3">
+      <Card className="space-y-4">
+        <div className="flex items-start justify-between gap-3">
+          <div className="min-w-0">
+            <Label>Step {idx + 1} of {GUIDED_STEPS.length}</Label>
+            <h2 className="app-page-title mt-1" style={{ fontSize: 25, lineHeight: 1.15 }}>{STEP_TITLES[step]}</h2>
+          </div>
+          <span className="shrink-0 rounded-full px-3 py-1 text-[12px] font-semibold" style={{ background: "color-mix(in oklab, var(--accent) 14%, var(--card))", color: "var(--accent)" }}>
+            {Math.round(((idx + 1) / GUIDED_STEPS.length) * 100)}%
+          </span>
         </div>
-        <div className="mt-1 h-1.5 overflow-hidden rounded-full" style={{ background: "color-mix(in oklab, var(--foreground) 10%, transparent)" }}>
-          <div className="h-full rounded-full motion-safe:transition-all" style={{ width: `${((idx + 1) / GUIDED_STEPS.length) * 100}%`, background: "var(--accent)" }} />
+        <div className="flex gap-1" aria-hidden="true">
+          {GUIDED_STEPS.map((st, n) => (
+            <button key={st} type="button" tabIndex={-1} onClick={() => setIdx(n)} className="h-1.5 flex-1 rounded-full motion-safe:transition-all" style={{ background: n <= idx ? "var(--accent)" : "color-mix(in oklab, var(--foreground) 12%, transparent)" }} />
+          ))}
         </div>
-      </div>
-      <Card>
+        <div className="h-px" style={{ background: "color-mix(in oklab, var(--foreground) 8%, transparent)" }} />
         <GuidedStepView step={step} s={s} update={update} goto={(st) => setIdx(GUIDED_STEPS.indexOf(st))} />
+        <div className="flex gap-2 pt-2">
+          {idx > 0 && (
+            <button type="button" onClick={() => setIdx(idx - 1)} aria-label="Back" className="flex h-[52px] w-[52px] shrink-0 items-center justify-center rounded-full" style={{ background: "color-mix(in oklab, var(--foreground) 5%, var(--card))", border: "1px solid color-mix(in oklab, var(--foreground) 8%, transparent)" }}>
+              <ArrowLeft size={19} />
+            </button>
+          )}
+          {!stopChild && (
+            <PrimaryButton className="flex-1" onClick={() => { (step === "review" ? onDone() : setIdx(idx + 1)); window.scrollTo?.({ top: 0 }); document.querySelector(".scroll-area")?.scrollTo({ top: 0, behavior: "smooth" }); }}>
+              {step === "review" ? "See my zakat" : "Continue"} <ArrowRight size={18} />
+            </PrimaryButton>
+          )}
+        </div>
       </Card>
-      <div className="sticky bottom-24 z-10 flex gap-2 rounded-full p-1" style={{ background: "color-mix(in oklab, var(--background) 85%, transparent)", backdropFilter: "blur(12px)" }}>
-        {idx > 0 && <GhostButton onClick={() => setIdx(idx - 1)}>Back</GhostButton>}
-        {!stopChild && (
-          <PrimaryButton className="flex-1" onClick={() => (step === "review" ? onDone() : setIdx(idx + 1))}>
-            {step === "review" ? "See my zakat" : "Continue"}
-          </PrimaryButton>
-        )}
-      </div>
     </div>
   );
 }

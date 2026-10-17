@@ -17,7 +17,7 @@ export function SchoolPicker({ s, update }: { s: ZakatState; update: Update }) {
       {SCHOOL_IDS.map((id) => card(id, RULES[id].name, RULES[id].summary))}
       <Collapsible title="I don't follow a specific school">
         <Muted>
-          People often follow the school of their local scholars or community. You can pick one of the schools above, follow a scholar's preferred view below, or choose Custom and set each ruling yourself.
+          People often follow the school of their local scholars or community. You can pick one of the schools above, follow a scholar's preferred view below.
         </Muted>
       </Collapsible>
       <div className="pt-2">
@@ -27,8 +27,6 @@ export function SchoolPicker({ s, update }: { s: ZakatState; update: Update }) {
         </Muted>
         <div className="space-y-2">{SCHOLAR_IDS.map((id) => card(id, RULES[id].name, RULES[id].summary))}</div>
       </div>
-      <div className="pt-2">{card("custom", "Custom", "Choose every ruling yourself.")}</div>
-      {s.madhab === "custom" && <CustomRules s={s} update={update} />}
     </div>
   );
 }
