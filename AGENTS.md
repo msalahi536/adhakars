@@ -35,6 +35,6 @@
 - Quran reading mode is an in-app body-portaled overlay, never the browser/native fullscreen API, which broke the reader.
 - mp3quran.net only adds reciters Quran.com lacks (audio + verse timings); Quran text stays from Quran.com.
 - Zakat rulings live only in `src/lib/zakat/rules.ts` and pure `calculate.ts` (integer cents, tested); data stays on device; evidence text is left for the owner to fill.
-- AI search only returns references (Quran verse keys, hadith ids picked from service results); text always comes from the source API.
-- Subdirectories may have their own AGENTS.md; read it before changing files there.
+- AI search returns only references (verse keys, hadith ids); text comes from the source API.
+- Read subdirectory AGENTS.md files before editing there.
 - App AI uses the owner's GEMINI_API_KEY via `src/lib/gemini.server.ts`, by request.
