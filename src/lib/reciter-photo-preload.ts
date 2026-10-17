@@ -67,9 +67,8 @@ export function preloadReciterPhotos() {
 export function scheduleReciterPhotoPreload() {
   if (typeof window === "undefined") return;
   const go = () => preloadReciterPhotos();
-  if ("requestIdleCallback" in window) {
-    window.requestIdleCallback(go, { timeout: 5000 });
-  } else {
-    window.setTimeout(go, 1500);
-  }
+  const idle = (window as Window & { requestIdleCallback?: (cb: () => void, opts?: { timeout?: number }) => void }).requestIdleCallback;
+  if (typeof idle === "function") idle(go, { timeout: 5000 });
+  else window.setTimeout(go, 1500);
 }
+
