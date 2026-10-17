@@ -177,10 +177,10 @@ export function GiveawayDialog({ open, onClose, celebrate }: { open: boolean; on
               </div>
               <div className="giveaway-panel rounded-2xl px-3 py-2.5">
                 <p className="label-caps mb-1.5 px-1 text-soft">How to enter</p>
-                <div className="flex items-start gap-3">
-                  <span className="giveaway-inset flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-accent"><Target size={18} strokeWidth={1.6} /></span>
-                  <p className="text-xs leading-5">Finish any one goal: <b>5 surahs</b>, <b>500 dhikr</b> or <b>5 downloads</b>. Each goal you finish is another entry — up to 3.</p>
-                </div>
+                <p className="flex items-start gap-2 px-1 text-xs leading-5">
+                  <Target size={15} strokeWidth={1.7} className="mt-[3px] shrink-0 text-accent" />
+                  <span>Finish any one goal: <b>5 surahs</b>, <b>500 dhikr</b> or <b>5 downloads</b>. Each goal you finish is another entry — up to 3.</span>
+                </p>
               </div>
               <Oath checked={o1} onChange={setO1}>I swear by Allah to truthfully complete the requirements and not cheat or deceive the counters.</Oath>
               <Oath checked={o2} onChange={setO2}>I swear by Allah to try to complete the entire Ilm Guide to the best of my ability.</Oath>
