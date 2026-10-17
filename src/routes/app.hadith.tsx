@@ -6,7 +6,6 @@ import { HeaderBackButton } from "@/components/HeaderBackButton";
 import {
   getHadithBooks, getHadithChapters, getHadiths, translateIsnad, type Hadith,
 } from "@/lib/hadith.functions";
-import { hadithCover } from "@/lib/hadith-covers";
 import { cached, DAY } from "@/lib/hadith-cache";
 
 type S = { book?: string; chapter?: number; q?: string; topic?: string; page?: number; saved?: number; h?: number };
@@ -49,6 +48,18 @@ const TOPICS: { label: string; q: string; ar: string; Icon: LucideIcon; tone: To
   { label: "Fasting", q: "fasting", ar: "الصيام", Icon: Moon, tone: "rose" },
   { label: "Remembrance", q: "remembrance", ar: "الذكر", Icon: HandHeart, tone: "sage" },
 ];
+
+const BOOK_TONES: { match: RegExp; tone: Tone | "mint" | "slate" | "clay" }[] = [
+  { match: /bukhari/i, tone: "sage" },
+  { match: /muslim/i, tone: "blue" },
+  { match: /nasa/i, tone: "mint" },
+  { match: /dawud|dawood/i, tone: "gold" },
+  { match: /tirmidhi/i, tone: "clay" },
+  { match: /majah/i, tone: "rose" },
+  { match: /mishkat/i, tone: "slate" },
+];
+const bookTone = (slug: string, name: string) =>
+  (BOOK_TONES.find((t) => t.match.test(slug) || t.match.test(name))?.tone ?? "sage") as Tone;
 
 const SAVED_KEY = "adhkar:hadith:saved";
 function readSaved(): Hadith[] {
@@ -170,14 +181,12 @@ function Home({ books, loading, savedCount }: { books?: { bookName: string; writ
             <Link key={b.bookSlug} to="/app/hadith" search={{ book: b.bookSlug }}
               className="flex items-center gap-3 rounded-[20px] p-4 transition-transform active:scale-[0.98]" style={card}>
               {(() => {
-                const cover = hadithCover(b.bookSlug, b.bookName);
-                return cover ? (
-                  <img src={cover} alt="" className="h-14 w-11 shrink-0 rounded-md object-cover" style={{ boxShadow: "0 1px 6px rgb(0 0 0 / 0.25)" }} />
-                ) : (
-                  <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl text-sm font-bold"
-                    style={{ background: "color-mix(in oklab, var(--accent) 14%, var(--card))", color: "var(--accent)" }}>
-                    {b.bookName.replace(/^(Sahih|Sunan|Jami'|Mishkat)\s*/i, "").charAt(0)}
-                  </div>
+                const tone = bookTone(b.bookSlug, b.bookName);
+                return (
+                  <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full"
+                    style={{ background: `color-mix(in oklab, var(--topic-${tone}) 18%, var(--card))`, color: `var(--topic-${tone})` }}>
+                    <BookOpen size={20} strokeWidth={1.6} />
+                  </span>
                 );
               })()}
               <div className="min-w-0 flex-1">
