@@ -1,5 +1,6 @@
 import { Fragment, memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
+import { markSurahComplete } from "@/lib/giveaway";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { QuranMiniPlayer } from "@/components/QuranMiniPlayer";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
@@ -391,7 +392,13 @@ function Reader({ chapterId }: { chapterId: number }) {
   }, [verses]);
   // Reading progress: remember the top verse on screen while not listening.
   const saveRead = useRef(0);
+  const checkReadEnd = (el: HTMLElement) => {
+    if (!verses || !chapter || verses.length < chapter.verses_count) return;
+    if (el.scrollHeight <= el.clientHeight + 40) return;
+    if (el.scrollTop + el.clientHeight >= el.scrollHeight - 120) markSurahComplete(chapterId);
+  };
   const onReadScroll = (e: React.UIEvent<HTMLElement>) => {
+    checkReadEnd(e.currentTarget);
     const now = Date.now();
     if (now - saveRead.current < 400 || restoreTo.current) return;
     saveRead.current = now;
@@ -497,7 +504,7 @@ function Reader({ chapterId }: { chapterId: number }) {
       {full && typeof document !== "undefined" && createPortal(
         <div className="quran-fs" role="dialog" aria-modal="true" aria-label={`${chapter?.name_simple ?? "Surah"}, reading mode`}>
           <button className="quran-fs-x" onClick={closeFull} aria-label="Close reading mode"><X size={18} /></button>
-          <div className={`quran-fs-scroll ${player.panelOpen ? "has-panel" : ""}`}>
+          <div className={`quran-fs-scroll ${player.panelOpen ? "has-panel" : ""}`} onScroll={(e) => checkReadEnd(e.currentTarget)}>
             <section className="quran-fs-sheet">
               <header className="quran-fs-band">
                 <span className="quran-fs-meta">{chapter ? (chapter.revelation_place === "makkah" ? "Makki" : "Madani") : ""}</span>
