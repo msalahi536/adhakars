@@ -321,8 +321,8 @@ function VerseResults({ q, chapters, onOpen }: { q: string; chapters: Chapter[] 
           {hits.map((h) => (
             <button key={h.key} className="quran-card block w-full p-3.5 text-left" onClick={() => onOpen(h.key)}>
               <span className="quran-muted flex items-center justify-between text-[11px] font-semibold"><span>{name(h.key)} · {h.key}</span><ChevronRight size={14} className="opacity-50" /></span>
-              <span className="mt-1.5 block text-right text-[18px] leading-[1.8] line-clamp-2" dir="rtl">{h.text}</span>
-              {h.translation && <span className="mt-1 block text-[13px] leading-snug line-clamp-3">{h.translation}</span>}
+              <span className="mt-1.5 text-right text-[18px] leading-[1.8] line-clamp-2" dir="rtl">{h.text}</span>
+              {h.translation && <span className="mt-1 text-[13px] leading-snug line-clamp-3">{h.translation}</span>}
             </button>
           ))}
         </div>
