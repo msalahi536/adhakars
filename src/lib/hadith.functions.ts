@@ -86,11 +86,13 @@ export const getHadiths = createServerFn({ method: "GET" })
   }))
   .handler(async ({ data }): Promise<HadithPage> => {
     if (!data.sort || data.sort === "relevance") return search(data, data.page, PAGE);
-    // Sorting needs the whole result set, not one page: gather up to 400 and sort those.
-    const first = await search(data, 1, 100);
-    const rest = await Promise.all(Array.from({ length: Math.min(first.lastPage, 4) - 1 }, (_, i) => search(data, i + 2, 100)));
+    // Sorting needs results from every collection, not just the service's first
+    // pages (which are all one book): gather up to 100 per collection, then sort.
+    const books = data.book ? [data.book] : BOOK_ALIASES.map(([, slug]) => slug);
+    const parts = await Promise.all(books.map((book) => search({ ...data, book }, 1, 100).catch(() => null)));
     const seen = new Set<string>();
-    const all = [first, ...rest].flatMap((r) => r.items).filter((h) => !seen.has(h.id) && !!seen.add(h.id));
+    const all = parts.flatMap((r) => r?.items ?? []).filter((h) => !seen.has(h.id) && !!seen.add(h.id));
+    const first = { total: parts.reduce((n, r) => n + (r?.total ?? 0), 0), terms: parts.find((r) => r?.terms)?.terms };
     const rank = (st: string | null) => { const v = (st || "").toLowerCase(); return v.includes("sahih") ? 0 : v.includes("hasan") ? 1 : 2; };
     const num = (h: Hadith) => parseInt(h.hadithNumber, 10) || 0;
     if (data.sort === "grade") all.sort((a, b) => rank(a.status) - rank(b.status));
