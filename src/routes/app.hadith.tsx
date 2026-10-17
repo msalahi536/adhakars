@@ -1,7 +1,8 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useQuery, keepPreviousData } from "@tanstack/react-query";
-import { useEffect, useState } from "react";
-import { ArrowLeft, Bookmark, BookmarkCheck, BookOpen, ChevronRight, Clock, Feather, HandHeart, Heart, Home as HomeIcon, Landmark, Leaf, Moon, Search, Star, TreePalm, Users, X, type LucideIcon } from "lucide-react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { Portal } from "@/components/Portal";
+import { ArrowLeft, Bookmark, BookmarkCheck, BookOpen, ChevronRight, Clock, Feather, HandHeart, Heart, Home as HomeIcon, Landmark, Leaf, Moon, Search, Star, TreePalm, Users, X, Check, ChevronDown, ChevronLeft, Copy, SlidersHorizontal, User, FileText, type LucideIcon } from "lucide-react";
 import {
   getHadithBooks, getHadithChapters, getHadiths, type Hadith,
 } from "@/lib/hadith.functions";
@@ -106,7 +107,7 @@ function HadithLibrary() {
 
       <main className="scroll-area">
         <div className="mx-auto max-w-md space-y-4 px-5 py-3 pb-28">
-          {view !== "saved" && (
+          {(view === "home" || view === "book") && (
             <form onSubmit={submit} className="flex items-center gap-2 rounded-full px-4 py-3" style={card}>
               <Search size={17} style={{ color: "var(--muted-foreground)" }} />
               <input value={text} onChange={(e) => setText(e.target.value)} enterKeyHint="search"
@@ -120,7 +121,7 @@ function HadithLibrary() {
           {view === "book" && <Chapters book={search.book!} />}
           {(view === "chapter" || view === "search") && <HadithList s={search} savedApi={savedApi} />}
           {view === "saved" && (savedApi.saved.length
-            ? savedApi.saved.map((h) => <HadithCard key={h.id} h={h} savedApi={savedApi} />)
+            ? <PreviewList items={savedApi.saved} total={savedApi.saved.length} label="Saved" savedApi={savedApi} />
             : <Empty text="Tap the bookmark on any hadith to keep it here." />)}
         </div>
       </main>
@@ -218,8 +219,7 @@ function HadithList({ s, savedApi }: { s: S; savedApi: SavedApi }) {
   if (!d.items.length) return <Empty text="No hadith found. Try a different word." />;
   return (
     <>
-      {s.q && <p className="px-1 text-xs" style={{ color: "var(--muted-foreground)" }}>{d.total.toLocaleString()} results</p>}
-      {d.items.map((h) => <HadithCard key={h.id} h={h} savedApi={savedApi} />)}
+      <PreviewList items={d.items} total={d.total} label={s.topic ?? (s.q ? `“${s.q}”` : "this chapter")} savedApi={savedApi} />
       {d.lastPage > 1 && (
         <div className="flex items-center justify-between gap-3 pt-1">
           <Link to="/app/hadith" search={{ ...s, page: page - 1 }} disabled={page <= 1}
@@ -233,46 +233,190 @@ function HadithList({ s, savedApi }: { s: S; savedApi: SavedApi }) {
   );
 }
 
+const SORTS = [
+  { id: "relevance", label: "Most relevant" },
+  { id: "grade", label: "Sahih first" },
+  { id: "book", label: "By collection" },
+  { id: "number", label: "Hadith number" },
+] as const;
+type SortId = (typeof SORTS)[number]["id"];
+const gradeRank = (st: string | null) => { const v = (st || "").toLowerCase(); return v.includes("sahih") ? 0 : v.includes("hasan") ? 1 : 2; };
+
+function clean(t: string | null) { return (t ?? "").replace(/\(?\uFDFA\)?/g, "(peace be upon him)").trim(); }
+function narratorName(n: string | null) { return clean(n).replace(/^narrated\s*(by)?\s*/i, "").replace(/[:\s]+$/, ""); }
+function titleOf(h: Hadith) {
+  if (h.headingEnglish?.trim()) return clean(h.headingEnglish);
+  const t = clean(h.hadithEnglish);
+  return t.length > 90 ? t.slice(0, 88).replace(/\s+\S*$/, "") + "…" : t;
+}
+
+function PreviewList({ items, total, label, savedApi }: { items: Hadith[]; total: number; label: string; savedApi: SavedApi }) {
+  const [filter, setFilter] = useState("");
+  const [sort, setSort] = useState<SortId>("relevance");
+  const [sortOpen, setSortOpen] = useState(false);
+  const [open, setOpen] = useState<number | null>(null);
+  const list = useMemo(() => {
+    const f = filter.trim().toLowerCase();
+    const out = f ? items.filter((h) => [h.hadithEnglish, h.headingEnglish, h.englishNarrator, h.bookName, h.chapterEnglish, h.hadithArabic].some((x) => x?.toLowerCase().includes(f))) : [...items];
+    if (sort === "grade") out.sort((a, b) => gradeRank(a.status) - gradeRank(b.status));
+    if (sort === "book") out.sort((a, b) => a.bookName.localeCompare(b.bookName) || Number(a.hadithNumber) - Number(b.hadithNumber));
+    if (sort === "number") out.sort((a, b) => Number(a.hadithNumber) - Number(b.hadithNumber));
+    return out;
+  }, [items, filter, sort]);
+
+  return (
+    <>
+      <div className="flex items-center gap-2 rounded-full px-4 py-3" style={card}>
+        <Search size={17} style={{ color: "var(--muted-foreground)" }} />
+        <input value={filter} onChange={(e) => setFilter(e.target.value)} placeholder={`Search in ${label}…`}
+          className="min-w-0 flex-1 bg-transparent text-sm outline-none" />
+        {filter && <button type="button" aria-label="Clear" onClick={() => setFilter("")}><X size={16} /></button>}
+      </div>
+      <div className="relative flex items-center justify-between px-1">
+        <span className="text-xs font-medium" style={{ color: "var(--muted-foreground)" }}>{(filter ? list.length : total).toLocaleString()} hadith</span>
+        <button type="button" onClick={() => setSortOpen((v) => !v)} aria-expanded={sortOpen}
+          className="flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-xs font-semibold" style={card}>
+          <SlidersHorizontal size={14} /> Sort
+        </button>
+        {sortOpen && (
+          <>
+            <button type="button" aria-label="Close sort" className="fixed inset-0 z-20 cursor-default" onClick={() => setSortOpen(false)} />
+            <div className="hadith-sort-pop absolute right-0 top-10 z-30 w-48 overflow-hidden rounded-2xl p-1" style={{ ...card, background: "var(--card)" }}>
+              {SORTS.map((o) => (
+                <button key={o.id} type="button" onClick={() => { setSort(o.id); setSortOpen(false); }}
+                  className="flex w-full items-center justify-between rounded-xl px-3 py-2.5 text-left text-[13px]"
+                  style={{ background: sort === o.id ? "color-mix(in oklab, var(--accent) 12%, transparent)" : undefined, fontWeight: sort === o.id ? 600 : 400 }}>
+                  {o.label}{sort === o.id && <Check size={14} style={{ color: "var(--accent)" }} />}
+                </button>
+              ))}
+            </div>
+          </>
+        )}
+      </div>
+      {list.length === 0 && <Empty text="No matches on this page." />}
+      {list.map((h, i) => {
+        const saved = savedApi.has(h.id);
+        return (
+          <div key={h.id} role="button" tabIndex={0} onClick={() => setOpen(i)} onKeyDown={(e) => e.key === "Enter" && setOpen(i)}
+            className="cursor-pointer rounded-[20px] p-4 transition-transform active:scale-[0.98]" style={card}>
+            <div className="flex items-start gap-2">
+              <div className="min-w-0 flex-1 truncate text-[11px] font-semibold" style={{ color: "var(--muted-foreground)" }}>
+                {h.bookName} · #{h.hadithNumber}{h.chapterEnglish ? ` · ${h.chapterEnglish}` : ""}
+              </div>
+              {h.status && <GradePill status={h.status} />}
+              <button type="button" aria-label={saved ? "Remove bookmark" : "Save hadith"}
+                onClick={(e) => { e.stopPropagation(); savedApi.toggle(h); }} style={{ color: saved ? "var(--accent)" : "var(--muted-foreground)" }}>
+                {saved ? <BookmarkCheck size={17} /> : <Bookmark size={17} />}
+              </button>
+            </div>
+            <div className="mt-1.5 flex items-center gap-2">
+              <div className="min-w-0 flex-1">
+                <div className="line-clamp-2 text-[15px] font-bold leading-snug">{titleOf(h)}</div>
+                {h.englishNarrator && <div className="mt-1 truncate text-[12px] italic" style={{ color: "var(--muted-foreground)" }}>{clean(h.englishNarrator)} …</div>}
+              </div>
+              <ChevronRight size={17} className="shrink-0 opacity-40" />
+            </div>
+          </div>
+        );
+      })}
+      {open !== null && list[open] && (
+        <HadithDetail h={list[open]} index={open} count={list.length} savedApi={savedApi}
+          onClose={() => setOpen(null)} onMove={(d) => setOpen((o) => Math.min(list.length - 1, Math.max(0, (o ?? 0) + d)))} />
+      )}
+    </>
+  );
+}
+
+function GradePill({ status }: { status: string }) {
+  return (
+    <span className="shrink-0 rounded-full px-2 py-0.5 text-[10px] font-bold"
+      style={{ color: gradeColor(status), background: "color-mix(in oklab, currentColor 12%, transparent)" }}>{status}</span>
+  );
+}
+
+function HadithDetail({ h, index, count, savedApi, onClose, onMove }: {
+  h: Hadith; index: number; count: number; savedApi: SavedApi; onClose: () => void; onMove: (d: number) => void;
+}) {
+  const [narrOpen, setNarrOpen] = useState(false);
+  const [copied, setCopied] = useState(false);
+  const scroller = useRef<HTMLDivElement>(null);
+  useEffect(() => { scroller.current?.scrollTo({ top: 0 }); setNarrOpen(false); }, [h.id]);
+  useEffect(() => {
+    const k = (e: KeyboardEvent) => e.key === "Escape" && onClose();
+    window.addEventListener("keydown", k); return () => window.removeEventListener("keydown", k);
+  }, [onClose]);
+  const saved = savedApi.has(h.id);
+  const copy = async () => {
+    try { await navigator.clipboard.writeText([h.hadithArabic, clean(h.hadithEnglish), `${h.bookName} ${h.hadithNumber}`].filter(Boolean).join("\n\n")); setCopied(true); setTimeout(() => setCopied(false), 1500); } catch { /* ignore */ }
+  };
+  const panel: React.CSSProperties = { ...card, background: "var(--card)" };
+  return (
+    <Portal>
+      <div className="hadith-detail fixed inset-0 z-[60] flex flex-col" style={{ background: "var(--background)", color: "var(--foreground)" }}>
+        <div className="flex items-center justify-between px-4 pb-2" style={{ paddingTop: "max(14px, env(safe-area-inset-top))" }}>
+          <button type="button" aria-label="Back" onClick={onClose} className="flex h-10 w-10 items-center justify-center rounded-full" style={panel}><ChevronLeft size={19} /></button>
+          <div className="flex items-center gap-2">
+            {h.status && <GradePill status={h.status} />}
+            <button type="button" aria-label={saved ? "Remove bookmark" : "Save hadith"} onClick={() => savedApi.toggle(h)}
+              className="flex h-10 w-10 items-center justify-center rounded-full" style={{ ...panel, color: saved ? "var(--accent)" : undefined }}>
+              {saved ? <BookmarkCheck size={18} /> : <Bookmark size={18} />}
+            </button>
+          </div>
+        </div>
+        <div ref={scroller} className="min-h-0 flex-1 space-y-3 overflow-y-auto overscroll-contain px-4 pb-4 pt-2">
+          <h2 className="font-serif text-[26px] leading-tight" style={{ color: "var(--accent)" }}>{titleOf(h)}</h2>
+          {h.englishNarrator && (
+            <button type="button" onClick={() => setNarrOpen((v) => !v)} className="block w-full rounded-[20px] p-4 text-left" style={panel}>
+              <div className="flex items-center gap-3">
+                <User size={18} style={{ color: "var(--muted-foreground)" }} />
+                <div className="min-w-0 flex-1">
+                  <div className="text-[11px]" style={{ color: "var(--muted-foreground)" }}>Narrated by</div>
+                  <div className={`text-[15px] font-bold ${narrOpen ? "" : "truncate"}`}>{narratorName(h.englishNarrator)}</div>
+                </div>
+                <ChevronDown size={17} className="opacity-50 transition-transform" style={{ transform: narrOpen ? "rotate(180deg)" : undefined }} />
+              </div>
+              {narrOpen && <p className="mt-3 text-[12px]" style={{ color: "var(--muted-foreground)" }}>{h.bookName}{h.chapterEnglish ? ` · Book of ${h.chapterEnglish}` : ""}</p>}
+            </button>
+          )}
+          {h.hadithArabic && (
+            <div className="rounded-[20px] p-4" style={panel}>
+              <p className="arabic text-right text-[22px] leading-[2.1]" dir="rtl" lang="ar">{h.hadithArabic}</p>
+              <div className="mt-2 flex justify-end">
+                <button type="button" aria-label="Copy hadith" onClick={copy} className="flex items-center gap-1 text-xs" style={{ color: "var(--muted-foreground)" }}>
+                  {copied ? <><Check size={15} /> Copied</> : <Copy size={16} />}
+                </button>
+              </div>
+            </div>
+          )}
+          {h.hadithEnglish && (
+            <div className="rounded-[20px] p-4" style={panel}>
+              <div className="mb-2 flex items-center gap-2 text-[13px] font-bold"><BookOpen size={15} /> Translation</div>
+              <p className="whitespace-pre-line text-[14px] leading-relaxed">{clean(h.hadithEnglish)}</p>
+            </div>
+          )}
+          <div className="flex items-center gap-3 rounded-[20px] p-4" style={panel}>
+            <FileText size={18} style={{ color: "var(--muted-foreground)" }} />
+            <div className="min-w-0 flex-1">
+              <div className="text-[13px] font-bold">Reference</div>
+              <div className="text-[12px]" style={{ color: "var(--muted-foreground)" }}>{h.bookName}{h.chapterEnglish ? `, ${h.chapterEnglish}` : ""}, Hadith {h.hadithNumber}</div>
+            </div>
+          </div>
+        </div>
+        <div className="flex items-center justify-between px-4 pt-2" style={{ paddingBottom: "max(14px, env(safe-area-inset-bottom))" }}>
+          <button type="button" disabled={index === 0} onClick={() => onMove(-1)} className="flex items-center gap-1 rounded-full px-4 py-2.5 text-sm font-semibold" style={{ ...panel, opacity: index === 0 ? 0.4 : 1 }}><ChevronLeft size={16} /> Previous</button>
+          <span className="text-xs" style={{ color: "var(--muted-foreground)" }}>{index + 1} of {count}</span>
+          <button type="button" disabled={index >= count - 1} onClick={() => onMove(1)} className="flex items-center gap-1 rounded-full px-4 py-2.5 text-sm font-semibold" style={{ ...panel, opacity: index >= count - 1 ? 0.4 : 1 }}>Next <ChevronRight size={16} /></button>
+        </div>
+      </div>
+    </Portal>
+  );
+}
+
 function gradeColor(status: string | null) {
   const s = (status || "").toLowerCase();
   if (s.includes("sahih")) return "var(--accent)";
-  if (s.includes("hasan")) return "color-mix(in oklab, var(--accent) 60%, var(--muted-foreground))";
+  if (s.includes("hasan")) return "var(--topic-gold)";
   return "var(--muted-foreground)";
-}
-
-function HadithCard({ h, savedApi }: { h: Hadith; savedApi: SavedApi }) {
-  const [showArabic, setShowArabic] = useState(false);
-  const saved = savedApi.has(h.id);
-  return (
-    <article className="rounded-[22px] p-4" style={card}>
-      <div className="flex items-start gap-2">
-        <div className="min-w-0 flex-1">
-          <div className="text-[11px] font-semibold" style={{ color: "var(--muted-foreground)" }}>
-            {h.bookName} · #{h.hadithNumber}{h.chapterEnglish ? ` · ${h.chapterEnglish}` : ""}
-          </div>
-          {h.headingEnglish && <div className="mt-1 text-[13px] font-bold leading-snug">{h.headingEnglish}</div>}
-        </div>
-        {h.status && (
-          <span className="shrink-0 rounded-full px-2 py-0.5 text-[10px] font-bold"
-            style={{ color: gradeColor(h.status), background: "color-mix(in oklab, currentColor 12%, transparent)" }}>{h.status}</span>
-        )}
-        <button type="button" aria-label={saved ? "Remove bookmark" : "Save hadith"} onClick={() => savedApi.toggle(h)}
-          style={{ color: saved ? "var(--accent)" : "var(--muted-foreground)" }}>
-          {saved ? <BookmarkCheck size={18} /> : <Bookmark size={18} />}
-        </button>
-      </div>
-      {h.englishNarrator && <p className="mt-3 text-[12px] italic" style={{ color: "var(--muted-foreground)" }}>{h.englishNarrator}</p>}
-      {h.hadithEnglish && <p className="mt-1 whitespace-pre-line text-[14px] leading-relaxed">{h.hadithEnglish.replace(/\(?\uFDFA\)?/g, "(peace be upon him)")}</p>}
-      {h.hadithArabic && (
-        <>
-          <button type="button" onClick={() => setShowArabic((v) => !v)} className="mt-3 text-xs font-semibold" style={{ color: "var(--accent)" }}>
-            {showArabic ? "Hide Arabic" : "Show Arabic"}
-          </button>
-          {showArabic && <p className="mt-2 text-lg leading-loose" dir="rtl" lang="ar">{h.hadithArabic}</p>}
-        </>
-      )}
-    </article>
-  );
 }
 
 function Empty({ text }: { text: string }) {
