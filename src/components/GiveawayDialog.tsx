@@ -134,6 +134,7 @@ export function GiveawayDialog({ open, onClose, celebrate }: { open: boolean; on
   return (
     <Dialog open={open} onOpenChange={(n) => !n && onClose()}>
       <DialogContent className="update-dialog grid max-h-[86dvh] w-[calc(100%_-_32px)] max-w-[410px] grid-rows-[auto_minmax(0,1fr)_auto] gap-0 overflow-hidden rounded-3xl border-border/60 bg-card p-0 text-card-foreground">
+        {bg && <img src={bg} alt="" aria-hidden className="pointer-events-none absolute inset-0 h-full w-full object-cover opacity-[0.12]" />}
         <DialogHeader className="relative overflow-hidden px-6 pb-4 pt-6 text-left">
           {bg && <img src={bg} alt="" aria-hidden className="pointer-events-none absolute inset-0 h-full w-full object-cover opacity-70" />}
           <div aria-hidden className="pointer-events-none absolute inset-0" style={{ background: "linear-gradient(100deg, var(--card) 35%, color-mix(in oklab, var(--card) 55%, transparent) 70%, transparent), linear-gradient(to top, var(--card), transparent 45%)" }} />
@@ -147,7 +148,7 @@ export function GiveawayDialog({ open, onClose, celebrate }: { open: boolean; on
           </div>
         </DialogHeader>
 
-        <div className="min-h-0 space-y-2 overflow-y-auto overscroll-contain px-4 py-2">
+        <div className="relative min-h-0 space-y-2 overflow-y-auto overscroll-contain px-4 py-2">
           {status !== "joined" ? (
             <>
               <div className="rounded-2xl bg-muted/40 px-3 py-3">
@@ -241,7 +242,7 @@ export function GiveawayDialog({ open, onClose, celebrate }: { open: boolean; on
           )}
         </div>
 
-        <div className="flex gap-2 px-5 pb-6 pt-3">
+        <div className="relative flex gap-2 px-5 pb-6 pt-3">
           {status !== "joined" ? (
             <>
               <Button variant="ghost" className="h-11 flex-1 rounded-full" onClick={() => { setStatus("declined"); onClose(); }}>
