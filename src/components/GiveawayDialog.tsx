@@ -134,7 +134,7 @@ export function GiveawayDialog({ open, onClose, celebrate }: { open: boolean; on
   return (
     <Dialog open={open} onOpenChange={(n) => !n && onClose()}>
       <DialogContent className="update-dialog grid max-h-[86dvh] w-[calc(100%_-_32px)] max-w-[410px] grid-rows-[auto_minmax(0,1fr)_auto] gap-0 overflow-hidden rounded-3xl border-border/60 bg-card p-0 text-card-foreground">
-        {bg && <img src={bg} alt="" aria-hidden className="pointer-events-none absolute inset-0 h-full w-full object-cover object-top opacity-90" />}
+        {bg && <img src={bg} alt="" aria-hidden className="pointer-events-none absolute inset-0 h-full w-full -scale-x-100 object-cover object-top opacity-90" />}
         <DialogHeader className="relative overflow-hidden px-6 pb-4 pt-6 text-left">
           <div className="relative">
           <span className="mb-2 flex h-11 w-11 items-center justify-center rounded-2xl bg-muted/60 text-accent"><Gift size={20} strokeWidth={1.7} /></span>
