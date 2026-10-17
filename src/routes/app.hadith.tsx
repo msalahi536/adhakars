@@ -277,7 +277,7 @@ function HadithList({ s, savedApi }: { s: S; savedApi: SavedApi }) {
   if (!d.items.length && !filter) return <Empty text="No hadith found. Try a different word." />;
   return (
     <>
-      <PreviewList items={d.items} total={d.total} terms={d.terms ?? []} filter={filter} setFilter={setFilter} busy={q.isFetching} label={s.topic ?? (s.q ? `“${s.q}”` : "this chapter")} savedApi={savedApi} />
+      <PreviewList items={d.items} total={d.total} terms={d.terms ?? []} filter={filter} setFilter={setFilter} busy={q.isFetching} hideSearch={!!s.q && !s.topic} label={s.topic ?? (s.q ? `“${s.q}”` : "this chapter")} savedApi={savedApi} />
       {d.lastPage > 1 && s.h === undefined && (
         <div className="flex items-center justify-between gap-3 pt-1">
           <Link to="/app/hadith" search={{ ...s, page: page - 1 }} disabled={page <= 1} onClick={(e) => { if (refine) { e.preventDefault(); setRPage(page - 1); } }}
@@ -327,7 +327,7 @@ function snippetOf(h: Hadith, terms: string[]) {
   return (a > 0 ? "…" : "") + t.slice(a, b).replace(/^\S*\s/, a > 0 ? "" : "$&") + (b < t.length ? "…" : "");
 }
 
-function PreviewList({ items, total, label, savedApi, terms, filter, setFilter, busy }: { items: Hadith[]; total: number; label: string; savedApi: SavedApi; terms: string[]; filter: string; setFilter: (v: string) => void; busy: boolean }) {
+function PreviewList({ items, total, label, savedApi, terms, filter, setFilter, busy, hideSearch }: { hideSearch?: boolean; items: Hadith[]; total: number; label: string; savedApi: SavedApi; terms: string[]; filter: string; setFilter: (v: string) => void; busy: boolean }) {
   const [sort, setSort] = useState<SortId>("relevance");
   const [sortOpen, setSortOpen] = useState(false);
   const sp = Route.useSearch();
@@ -349,12 +349,12 @@ function PreviewList({ items, total, label, savedApi, terms, filter, setFilter, 
   }
   return (
     <>
-      <div className="flex items-center gap-2 rounded-full px-4 py-3" style={card}>
+      {!hideSearch && <div className="flex items-center gap-2 rounded-full px-4 py-3" style={card}>
         <Search size={17} style={{ color: "var(--muted-foreground)" }} />
         <input value={filter} onChange={(e) => setFilter(e.target.value)} placeholder={`Search in ${label}…`}
           className="min-w-0 flex-1 bg-transparent text-sm outline-none" />
         {filter && <button type="button" aria-label="Clear" onClick={() => setFilter("")}><X size={16} /></button>}
-      </div>
+      </div>}
       <div className="relative flex items-center justify-between px-1">
         <span className="text-xs font-medium" style={{ color: "var(--muted-foreground)" }}>{busy ? "Searching…" : `${total.toLocaleString()} hadith`}</span>
         <button type="button" onClick={() => setSortOpen((v) => !v)} aria-expanded={sortOpen}
