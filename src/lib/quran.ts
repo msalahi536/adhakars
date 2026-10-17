@@ -429,3 +429,30 @@ export function searchReciters(q: string, limit = 5): Reciter[] {
   }).filter(([, s]) => s > 0).sort((a, b) => b[1] - a[1] || rank(a[0]) - rank(b[0]) || Number(!reciterHasPhoto(a[0])) - Number(!reciterHasPhoto(b[0])) || a[0].group - b[0].group || a[0].name.length - b[0].name.length)
     .filter(([, , name]) => (seen.has(name) ? false : (seen.add(name), true))).slice(0, limit).map(([r]) => r);
 }
+
+/* ---------- verse search ---------- */
+export type VerseHit = { key: string; text: string; translation: string };
+
+/** "33:33", "33 33", "33.33" or "2:255" -> verse key, if it is a real verse number. */
+export function parseVerseRef(q: string, chapters?: Pick<Chapter, "id" | "verses_count">[]): string | null {
+  const m = q.trim().match(/^(\d{1,3})\s*[:.\s]\s*(\d{1,3})$/);
+  if (!m) return null;
+  const s = Number(m[1]), v = Number(m[2]);
+  if (s < 1 || s > 114 || v < 1) return null;
+  const c = chapters?.find((x) => x.id === s);
+  if (c && v > c.verses_count) return null;
+  return `${s}:${v}`;
+}
+
+export async function getVerseByKey(key: string): Promise<VerseHit> {
+  type Raw = { verse: { verse_key: string; text_uthmani: string; translations: { text: string }[] } };
+  const r = await get<Raw>(`/verses/by_key/${key}?translations=20&fields=text_uthmani`);
+  return { key: r.verse.verse_key, text: r.verse.text_uthmani, translation: stripTags(r.verse.translations[0]?.text ?? "") };
+}
+
+/** Keyword search across verse translations. */
+export async function searchVerses(q: string, size = 6): Promise<VerseHit[]> {
+  type Raw = { search: { results: { verse_key: string; text: string; translations?: { text: string }[] }[] } };
+  const r = await get<Raw>(`/search?q=${encodeURIComponent(q)}&size=${size}&language=en`);
+  return r.search.results.map((x) => ({ key: x.verse_key, text: x.text, translation: stripTags(x.translations?.[0]?.text ?? "") }));
+}
