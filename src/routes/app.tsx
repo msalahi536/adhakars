@@ -1,14 +1,14 @@
-import { useEffect, useLayoutEffect, useState } from "react";
+import { lazy, Suspense, useEffect, useLayoutEffect, useState } from "react";
 import { QuranMiniPlayer } from "@/components/QuranMiniPlayer";
 import { createFileRoute, Outlet, useRouter, useRouterState } from "@tanstack/react-router";
 import { BottomNav } from "@/components/BottomNav";
 import { SettingsButton } from "@/components/SettingsButton";
-import { WhatsNewDialog } from "@/components/WhatsNewDialog";
+const WhatsNewDialog = lazy(() => import("@/components/WhatsNewDialog").then((m) => ({ default: m.WhatsNewDialog })));
 import { AdhanEnabledNotice } from "@/components/AdhanEnabledNotice";
 import { UPDATE_NOTICE_KEY, shouldShowUpdateNotice } from "@/lib/update-notice";
 import { prefetchSunnah } from "@/components/SunnahOfTheDay";
 import { RatePrompt } from "@/components/RatePrompt";
-import { GiveawayDialog } from "@/components/GiveawayDialog";
+const GiveawayDialog = lazy(() => import("@/components/GiveawayDialog").then((m) => ({ default: m.GiveawayDialog })));
 import { getStatus, giveawayActive } from "@/lib/giveaway";
 import { backgroundsForPreset } from "@/lib/backgrounds";
 import { PERSONAL_PRESET, cachedPhoto, loadAppearancePhotos, readAppearance, resolveAppearance, pageForAppearance } from '@/lib/custom-appearance';
@@ -24,6 +24,13 @@ import { getPrayerSettings } from "@/lib/prayer-times";
 import { initNativeBridge } from "@/lib/native-bridge";
 import { getReciterForPrayer, isAdhanPlaying, isSilentReciter, onAdhanPlaying, startSilentFallbackAdhan } from "@/lib/adhan-bridge";
 import { PRAYER_NOTIF_IDS } from "@/lib/adhan-notifications";
+
+/** Runs non-urgent startup work after the first screen has painted. */
+const afterFirstPaint = (fn: () => void, timeout = 2000) => {
+  const w = window as Window & { requestIdleCallback?: (cb: () => void, o?: { timeout: number }) => number };
+  const go = () => (w.requestIdleCallback ? w.requestIdleCallback(fn, { timeout }) : window.setTimeout(fn, 400));
+  requestAnimationFrame(() => window.setTimeout(go, 0));
+};
 
 export const Route = createFileRoute("/app")({
   component: AppLayout,
@@ -103,7 +110,7 @@ function AppLayout() {
   const [adhan, setAdhan] = useState({ visible: false, prayer: "", reciterId: "" });
 
   useEffect(() => {
-    initNativeBridge();
+    afterFirstPaint(() => initNativeBridge());
     // Location permission belongs to Salah, not app launch or widget sync.
     // Android: tapping an adhan notification shows the player; native audio is
     // already playing, so the player only reflects it.
@@ -119,7 +126,7 @@ function AppLayout() {
       // Sunnah, Jumu'ah, streak, period and smart adhkar reminders too.
       void import("@/lib/smart-notifications").then((m) => m.rescheduleSmartNotifications());
     };
-    reschedule();
+    afterFirstPaint(reschedule, 3000);
     const onVisible = () => {
       if (document.visibilityState === "visible") reschedule();
     };
@@ -193,15 +200,15 @@ function AppLayout() {
   // Warm the most-used tab pages and the daily Sunnah right after launch so
   // the first tap on Settings, Tasbih or More opens instantly.
   useEffect(() => {
-    void prefetchSunnah();
+    afterFirstPaint(() => void prefetchSunnah());
     const warm = () => {
       for (const to of ["/app/settings", "/app/quran", "/app/more", "/app/salah", "/app/evening"] as const) {
         void router.preloadRoute({ to }).catch(() => {});
       }
     };
     const w = window as Window & { requestIdleCallback?: (cb: () => void, o?: { timeout: number }) => number };
-    if (w.requestIdleCallback) w.requestIdleCallback(warm, { timeout: 1500 });
-    else window.setTimeout(warm, 600);
+    // Wait until launch has settled so warming never competes with the first screen.
+    window.setTimeout(() => (w.requestIdleCallback ? w.requestIdleCallback(warm, { timeout: 3000 }) : warm()), 1500);
   }, [router]);
 
   useEffect(() => {
@@ -352,14 +359,16 @@ function AppLayout() {
         reciterId={adhan.reciterId}
         onClose={() => setAdhan((a) => ({ ...a, visible: false }))}
       />
-      <WhatsNewDialog open={showWhatsNew} onClose={() => {
+      <Suspense fallback={null}>
+      {showWhatsNew && <WhatsNewDialog open={showWhatsNew} onClose={() => {
         window.localStorage.setItem(UPDATE_NOTICE_KEY, "seen");
         setShowWhatsNew(false);
         // Give the reader a beat to settle on the page before the giveaway
         // offer appears, so the two popups never feel stacked.
         if (giveawayActive() && !getStatus()) window.setTimeout(() => whenNoDialog(() => setShowGiveaway(true)), 8000);
-      }} />
-      <GiveawayDialog open={showGiveaway} celebrate={giveawayGoal} onClose={() => { setShowGiveaway(false); setGiveawayGoal(null); }} />
+      }} />}
+      {showGiveaway && <GiveawayDialog open={showGiveaway} celebrate={giveawayGoal} onClose={() => { setShowGiveaway(false); setGiveawayGoal(null); }} />}
+      </Suspense>
       <AdhanEnabledNotice />
       <RatePrompt />
     </div>
