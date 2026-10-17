@@ -140,7 +140,7 @@ function HadithLibrary() {
         <div className={`mx-auto max-w-md space-y-4 px-5 py-3 ${search.h !== undefined ? "pb-4" : "pb-28"}`}>
 
           {view === "home" && <Home books={books.data} loading={books.isLoading} savedCount={savedApi.saved.length} />}
-          {view === "book" && <Chapters book={search.book!} />}
+          {view === "book" && <Chapters book={search.book!} info={books.data?.find((b) => b.bookSlug === search.book)} />}
           {view === "search" && !search.topic && <Suggestions q={search.q ?? ""} books={books.data} />}
           {(view === "chapter" || view === "search") && <HadithList s={search} savedApi={savedApi} />}
           {view === "saved" && (savedApi.saved.length
@@ -213,21 +213,54 @@ function Home({ books, loading, savedCount }: { books?: { bookName: string; writ
   );
 }
 
-function Chapters({ book }: { book: string }) {
+const ABOUT: Record<string, string> = {
+  "sahih-bukhari": "The most authentic collection of hadith, compiled by Imam al-Bukhari. Its narrations are held to the strictest standards of authenticity.",
+  "sahih-muslim": "Compiled by Imam Muslim, second only to Sahih al-Bukhari in authenticity and known for its careful arrangement of narrations.",
+  "al-tirmidhi": "Compiled by Imam at-Tirmidhi, notable for grading each hadith and noting the views of the early jurists.",
+  "abu-dawood": "Compiled by Imam Abu Dawud, focused on the hadith behind rulings of fiqh and everyday practice.",
+  "ibn-e-majah": "Compiled by Imam Ibn Majah, one of the six major collections, containing many narrations not found elsewhere.",
+  "sunan-nasai": "Compiled by Imam an-Nasa'i, regarded as one of the most rigorous of the Sunan collections.",
+  "mishkat": "Mishkat al-Masabih by al-Khatib at-Tabrizi, a widely studied selection drawn from the major collections.",
+};
+
+function Chapters({ book, info }: { book: string; info?: { bookName: string; writerName: string; hadiths_count: number; chapters_count: number } }) {
   const q = useQuery({ queryKey: ["hadith-chapters", book], queryFn: cached(`chapters:${book}`, 30 * DAY, () => getHadithChapters({ data: { book } })), staleTime: Infinity });
-  if (q.isLoading) return <Empty text="Loading chapters…" />;
-  if (q.isError) return <Empty text="Couldn't load chapters. Check your connection." />;
+  const soft = "color-mix(in oklab, var(--accent) 12%, transparent)";
   return (
-    <div className="overflow-hidden rounded-[20px]" style={card}>
-      {q.data?.map((c, i) => (
-        <Link key={c.chapterNumber} to="/app/hadith" search={{ book, chapter: c.chapterNumber }}
-          className="flex items-center gap-3 px-4 py-3" style={{ borderTop: i ? "1px solid var(--border)" : undefined }}>
-          <span className="w-7 text-xs font-bold" style={{ color: "var(--accent)" }}>{c.chapterNumber}</span>
-          <span className="min-w-0 flex-1 text-sm font-medium">{c.chapterEnglish}</span>
-          <span className="max-w-[40%] truncate text-sm" dir="rtl" style={{ color: "var(--muted-foreground)" }}>{c.chapterArabic}</span>
-        </Link>
-      ))}
-    </div>
+    <>
+      {info && (
+        <div className="flex items-center gap-4 rounded-[24px] p-5" style={card}>
+          <span className="flex h-16 w-16 shrink-0 items-center justify-center rounded-full" style={{ background: soft, color: "var(--accent)" }}><BookOpen size={28} strokeWidth={1.5} /></span>
+          <div className="min-w-0 flex-1">
+            <div className="font-serif text-[22px] leading-tight">{info.bookName}</div>
+            <div className="mt-1 text-[12px]" style={{ color: "var(--muted-foreground)" }}>{info.writerName} · {info.hadiths_count.toLocaleString()} hadith · {info.chapters_count} books</div>
+          </div>
+        </div>
+      )}
+      {ABOUT[book] && (
+        <div className="flex gap-3 rounded-[20px] p-4" style={card}>
+          <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full" style={{ background: soft, color: "var(--accent)" }}><FileText size={17} /></span>
+          <div><div className="text-[13px] font-bold">About this collection</div>
+            <p className="mt-1 text-[12.5px] leading-relaxed" style={{ color: "var(--muted-foreground)" }}>{ABOUT[book]}</p></div>
+        </div>
+      )}
+      <div className="label-caps px-1 pt-1 text-[10px]" style={{ color: "var(--muted-foreground)" }}>All books</div>
+      {q.isLoading && <Empty text="Loading chapters…" />}
+      {q.isError && <Empty text="Couldn't load chapters. Check your connection." />}
+      <div className="space-y-2.5">
+        {q.data?.map((c) => (
+          <Link key={c.chapterNumber} to="/app/hadith" search={{ book, chapter: c.chapterNumber }}
+            className="flex items-center gap-3 rounded-[18px] px-4 py-3.5 transition-transform active:scale-[0.98]" style={card}>
+            <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-[13px] font-semibold" style={{ background: soft, color: "var(--accent)" }}>{c.chapterNumber}</span>
+            <div className="min-w-0 flex-1">
+              <div className="truncate font-serif text-[15.5px]">{c.chapterEnglish}</div>
+              {c.chapterArabic && <div className="truncate text-[12px]" dir="rtl" style={{ color: "var(--muted-foreground)", textAlign: "left" }}>{c.chapterArabic}</div>}
+            </div>
+            <ChevronRight size={17} className="shrink-0 opacity-40" />
+          </Link>
+        ))}
+      </div>
+    </>
   );
 }
 
