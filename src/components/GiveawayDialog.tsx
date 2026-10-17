@@ -135,7 +135,7 @@ export function GiveawayDialog({ open, onClose, celebrate }: { open: boolean; on
     <Dialog open={open} onOpenChange={(n) => !n && onClose()}>
       <DialogContent className="update-dialog grid max-h-[93dvh] w-[calc(100%_-_32px)] max-w-[410px] grid-rows-[auto_minmax(0,1fr)_auto] gap-0 overflow-hidden rounded-3xl border-border/60 bg-card p-0 text-card-foreground">
         {bg && <img src={bg} alt="" aria-hidden className="pointer-events-none absolute inset-0 h-full w-full -scale-x-100 object-cover object-top opacity-90" />}
-        <DialogHeader className="giveaway-header relative overflow-hidden px-6 pb-3 pt-3 text-left">
+        <DialogHeader className="giveaway-header relative overflow-hidden px-6 pb-2 pt-3 text-left">
           <div className="relative">
           <span className="giveaway-inset mb-2 flex h-11 w-11 items-center justify-center rounded-2xl text-accent"><Gift size={20} strokeWidth={1.7} /></span>
           <p className="label-caps text-accent">Giveaway · ends Friday, Oct 23</p>
@@ -146,7 +146,7 @@ export function GiveawayDialog({ open, onClose, celebrate }: { open: boolean; on
           </div>
         </DialogHeader>
 
-        <div className="relative min-h-0 space-y-1.5 overflow-y-auto overscroll-contain px-4 py-2">
+        <div className="relative min-h-0 space-y-1.5 overflow-y-auto overscroll-contain px-4 py-1.5">
           {status !== "joined" ? (
             <>
               <div className="giveaway-panel rounded-2xl px-3 py-2.5">
@@ -154,7 +154,7 @@ export function GiveawayDialog({ open, onClose, celebrate }: { open: boolean; on
                 <ul className="space-y-1.5">
                   {LEVELS.map(({ n, Icon, name, books }) => (
                     <li key={name} className="giveaway-inset flex items-center gap-3 rounded-xl px-2.5 py-1.5">
-                      <span className="giveaway-panel flex h-10 w-10 shrink-0 items-center justify-center rounded-xl text-accent"><Icon size={20} strokeWidth={1.6} /></span>
+                      <span className="giveaway-panel flex h-9 w-9 shrink-0 items-center justify-center rounded-xl text-accent"><Icon size={20} strokeWidth={1.6} /></span>
                       <div className="min-w-0 flex-1">
                         <p className="label-caps text-[9px] text-soft">Level {n}</p>
                         <p className="text-[14px] font-semibold leading-5">{name}</p>
@@ -169,7 +169,7 @@ export function GiveawayDialog({ open, onClose, celebrate }: { open: boolean; on
                 <div className="grid grid-cols-4 divide-x divide-border/50">
                   {FEATURES.map(({ Icon, t }) => (
                     <div key={t} className="flex flex-col items-center gap-1.5 px-1 text-center">
-                      <span className="giveaway-inset flex h-10 w-10 items-center justify-center rounded-full text-accent"><Icon size={17} strokeWidth={1.6} /></span>
+                      <span className="giveaway-inset flex h-9 w-9 items-center justify-center rounded-full text-accent"><Icon size={17} strokeWidth={1.6} /></span>
                       <span className="text-[10px] leading-[13px] text-soft">{t}</span>
                     </div>
                   ))}
