@@ -52,6 +52,7 @@ function AppLayout() {
   // preserve the server's default background during hydration.
   const [activePresetId, setActivePresetId] = useState(DEFAULT_PRESET_ID);
   const [activeVisualPhase, setActiveVisualPhase] = useState<VisualPhase>("morning");
+  const [ready, setReady] = useState(false);
   const [personalBackgrounds, setPersonalBackgrounds] = useState<Partial<Record<VisualPhase, string>>>({});
   const pathname = useRouterState({ select: (state) => state.location.pathname });
   
@@ -294,6 +295,7 @@ function AppLayout() {
       const page = pageForAppearance(window.location.pathname);
       setPersonalBackgrounds({ morning: cachedPhoto(resolveAppearance(config, 'morning', page).photo) ?? backgroundsForPreset('original').morning,
         evening: cachedPhoto(resolveAppearance(config, 'evening', page).photo) ?? backgroundsForPreset('original').evening });
+      setReady(true);
     };
     sync();
     let cancelled = false;
@@ -322,7 +324,7 @@ function AppLayout() {
   }, []);
 
   return (
-    <div className={`app-shell ${shownPhase === "evening" ? "is-evening" : ""} ${eveningHold ? "is-evening-hold" : ""} ${isAdhkar ? "is-adhkar" : ""} ${isSettings ? "is-settings" : ""}`}>
+    <div className={`app-shell ${ready ? "is-ready" : ""} ${shownPhase === "evening" ? "is-evening" : ""} ${eveningHold ? "is-evening-hold" : ""} ${isAdhkar ? "is-adhkar" : ""} ${isSettings ? "is-settings" : ""}`}>
       <div
         className="app-background app-background-morning"
         style={{ "--screen-background": `url(${backgrounds.morning})` } as React.CSSProperties}
