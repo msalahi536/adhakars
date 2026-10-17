@@ -2,7 +2,7 @@ import { Gift } from "lucide-react";
 import { giveawayActive } from "@/lib/giveaway";
 import { useEffect, useState } from "react";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { BedDouble, Compass, ChevronRight, HandHeart, Moon, ShieldCheck, Landmark, MoonStar, BookOpen, CalendarDays, X } from "lucide-react";
+import { BedDouble, Compass, ChevronRight, HandHeart, Moon, ShieldCheck, Landmark, MoonStar, BookOpen, CalendarDays, X, ScrollText } from "lucide-react";
 import {
   getConsistency,
   getLifetime,
@@ -40,7 +40,7 @@ export const Route = createFileRoute("/app/more")({
 });
 
 type Tile = {
-  to: "/app/sleep" | "/app/qibla" | "/app/about" | "/app/period" | "/app/ruqyah" | "/app/hajj" | "/app/fasting" | "/app/duas" | "/app/tasbih";
+  to: "/app/sleep" | "/app/qibla" | "/app/about" | "/app/period" | "/app/ruqyah" | "/app/hajj" | "/app/fasting" | "/app/duas" | "/app/tasbih" | "/app/hadith";
 
   title: string;
   subtitle: string;
@@ -50,6 +50,7 @@ type Tile = {
 const tiles: Tile[] = [
   { to: "/app/tasbih", title: "Tasbih", subtitle: "A calm digital counter", Icon: TasbihIcon },
   { to: "/app/duas", title: "Dua Library", subtitle: "50 authentic duas for every feeling", Icon: BookOpen },
+  { to: "/app/hadith", title: "Hadith Library", subtitle: "40,000+ hadith by book and topic", Icon: ScrollText },
   { to: "/app/qibla", title: "Qibla Finder", subtitle: "Find the direction of the Ka'bah", Icon: Compass },
   { to: "/app/period", title: "Period Companion", subtitle: "Private cycle tracker and guidance", Icon: Moon },
   { to: "/app/ruqyah", title: "Ruqyah Companion", subtitle: "Daily protection and authentic ruqyah", Icon: ShieldCheck },

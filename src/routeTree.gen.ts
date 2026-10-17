@@ -23,6 +23,7 @@ import { Route as AppAboutRouteImport } from './routes/app.about'
 import { Route as AppDuasRouteImport } from './routes/app.duas'
 import { Route as AppEveningRouteImport } from './routes/app.evening'
 import { Route as AppFastingRouteImport } from './routes/app.fasting'
+import { Route as AppHadithRouteImport } from './routes/app.hadith'
 import { Route as AppHajjRouteImport } from './routes/app.hajj'
 import { Route as AppMoreRouteImport } from './routes/app.more'
 import { Route as AppPeriodRouteImport } from './routes/app.period'
@@ -107,6 +108,11 @@ const AppFastingRoute = AppFastingRouteImport.update({
   path: '/fasting',
   getParentRoute: () => AppRoute,
 } as any)
+const AppHadithRoute = AppHadithRouteImport.update({
+  id: '/hadith',
+  path: '/hadith',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppHajjRoute = AppHajjRouteImport.update({
   id: '/hajj',
   path: '/hajj',
@@ -187,6 +193,7 @@ export interface FileRoutesByFullPath {
   '/app/duas': typeof AppDuasRoute
   '/app/evening': typeof AppEveningRoute
   '/app/fasting': typeof AppFastingRoute
+  '/app/hadith': typeof AppHadithRoute
   '/app/hajj': typeof AppHajjRoute
   '/app/more': typeof AppMoreRoute
   '/app/period': typeof AppPeriodRoute
@@ -215,6 +222,7 @@ export interface FileRoutesByTo {
   '/app/duas': typeof AppDuasRoute
   '/app/evening': typeof AppEveningRoute
   '/app/fasting': typeof AppFastingRoute
+  '/app/hadith': typeof AppHadithRoute
   '/app/hajj': typeof AppHajjRoute
   '/app/more': typeof AppMoreRoute
   '/app/period': typeof AppPeriodRoute
@@ -245,6 +253,7 @@ export interface FileRoutesById {
   '/app/duas': typeof AppDuasRoute
   '/app/evening': typeof AppEveningRoute
   '/app/fasting': typeof AppFastingRoute
+  '/app/hadith': typeof AppHadithRoute
   '/app/hajj': typeof AppHajjRoute
   '/app/more': typeof AppMoreRoute
   '/app/period': typeof AppPeriodRoute
@@ -276,6 +285,7 @@ export interface FileRouteTypes {
     | '/app/duas'
     | '/app/evening'
     | '/app/fasting'
+    | '/app/hadith'
     | '/app/hajj'
     | '/app/more'
     | '/app/period'
@@ -304,6 +314,7 @@ export interface FileRouteTypes {
     | '/app/duas'
     | '/app/evening'
     | '/app/fasting'
+    | '/app/hadith'
     | '/app/hajj'
     | '/app/more'
     | '/app/period'
@@ -333,6 +344,7 @@ export interface FileRouteTypes {
     | '/app/duas'
     | '/app/evening'
     | '/app/fasting'
+    | '/app/hadith'
     | '/app/hajj'
     | '/app/more'
     | '/app/period'
@@ -461,6 +473,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppFastingRouteImport
       parentRoute: typeof AppRoute
     }
+    '/app/hadith': {
+      id: '/app/hadith'
+      path: '/hadith'
+      fullPath: '/app/hadith'
+      preLoaderRoute: typeof AppHadithRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/app/hajj': {
       id: '/app/hajj'
       path: '/hajj'
@@ -560,6 +579,7 @@ interface AppRouteChildren {
   AppDuasRoute: typeof AppDuasRoute
   AppEveningRoute: typeof AppEveningRoute
   AppFastingRoute: typeof AppFastingRoute
+  AppHadithRoute: typeof AppHadithRoute
   AppHajjRoute: typeof AppHajjRoute
   AppMoreRoute: typeof AppMoreRoute
   AppPeriodRoute: typeof AppPeriodRoute
@@ -581,6 +601,7 @@ const AppRouteChildren: AppRouteChildren = {
   AppDuasRoute: AppDuasRoute,
   AppEveningRoute: AppEveningRoute,
   AppFastingRoute: AppFastingRoute,
+  AppHadithRoute: AppHadithRoute,
   AppHajjRoute: AppHajjRoute,
   AppMoreRoute: AppMoreRoute,
   AppPeriodRoute: AppPeriodRoute,
