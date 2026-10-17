@@ -27,6 +27,15 @@ export const Route = createFileRoute("/app")({
   component: AppLayout,
 });
 
+/** Opens the giveaway only once no other popup is showing, so modals never stack. */
+const whenNoDialog = (fn: () => void) => {
+  const tryOpen = () => {
+    if (document.querySelector('[role="dialog"][data-state="open"]')) window.setTimeout(tryOpen, 1500);
+    else fn();
+  };
+  tryOpen();
+};
+
 function AppLayout() {
   const [showWhatsNew, setShowWhatsNew] = useState(false);
   const [showGiveaway, setShowGiveaway] = useState(false);
@@ -169,7 +178,7 @@ function AppLayout() {
     if (shouldShowUpdateNotice(Date.now(), window.localStorage.getItem(UPDATE_NOTICE_KEY))) {
       setShowWhatsNew(true);
     } else if (giveawayActive() && !getStatus()) {
-      setShowGiveaway(true);
+      whenNoDialog(() => setShowGiveaway(true));
     }
   }, []);
 
@@ -341,7 +350,7 @@ function AppLayout() {
         setShowWhatsNew(false);
         // Give the reader a beat to settle on the page before the giveaway
         // offer appears, so the two popups never feel stacked.
-        if (giveawayActive() && !getStatus()) window.setTimeout(() => setShowGiveaway(true), 8000);
+        if (giveawayActive() && !getStatus()) window.setTimeout(() => whenNoDialog(() => setShowGiveaway(true)), 8000);
       }} />
       <GiveawayDialog open={showGiveaway} celebrate={giveawayGoal} onClose={() => { setShowGiveaway(false); setGiveawayGoal(null); }} />
       <AdhanEnabledNotice />
