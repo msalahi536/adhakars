@@ -126,7 +126,7 @@ async function search(data: Q, pageIn: number, size: number): Promise<HadithPage
     const quoted = /^["“].*["”]$/.test(raw);
     const phrase = lower.replace(/^["“]|["”]$/g, "").replace(/[^\p{L}\p{N}' -]/gu, " ").replace(/\s+/g, " ").trim();
     const words = phrase.split(" ").filter((w) => w.length > 1 && !STOP.has(w));
-    const smart = !quoted && pageIn === 1 && words.length >= 2 ? aiMatches(raw, base) : Promise.resolve([] as Hadith[]);
+    const smart = !quoted && pageIn === 1 && size === PAGE && words.length >= 2 ? aiMatches(raw, base) : Promise.resolve([] as Hadith[]);
     const withSmart = async (r: HadithPage): Promise<HadithPage> => {
       const extra = await smart.catch(() => [] as Hadith[]);
       if (!extra.length) return r;
