@@ -596,7 +596,7 @@ const PATIENCE = [
 
 function LoadingBar({ label = "Loading hadith" }: { label?: string }) {
   const [pct, setPct] = useState(7);
-  const [line, setLine] = useState(() => Math.floor(Math.random() * PATIENCE.length));
+  const [line, setLine] = useState(0);
   useEffect(() => {
     const t = setInterval(() => setPct((p) => Math.min(94, p + Math.max(0.7, (96 - p) * 0.055))), 130);
     const r = setInterval(() => setLine((i) => (i + 1) % PATIENCE.length), 2800);
