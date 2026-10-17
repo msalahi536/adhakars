@@ -1,0 +1,1 @@
+- Widget bridge and rotation tests run with Bun beside their modules.
