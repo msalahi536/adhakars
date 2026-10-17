@@ -7,7 +7,7 @@ test("each completed goal is one entry", () => {
 });
 test("draw is weighted by tickets", () => {
   const e = [{ id: "a", tickets: 1 }, { id: "b", tickets: 3 }];
-  expect(drawWinner(e, () => 0.2)?.id).toBe("b");
+  expect(drawWinner(e, () => 0.5)?.id).toBe("b");
   expect(drawWinner(e, () => 0.1)?.id).toBe("a");
   expect(drawWinner([{ tickets: 0 }])).toBeNull();
 });
