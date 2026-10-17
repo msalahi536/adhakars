@@ -564,7 +564,7 @@ function Isnad({ h }: { h: Hadith }) {
               <span className="mt-1 flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-[10px] font-bold" style={{ background: "color-mix(in oklab, var(--accent) 14%, transparent)", color: "var(--accent)" }}>{i + 1}</span>
               <div className="min-w-0 flex-1">
                 <div className="text-[14px] font-semibold leading-snug">{names[i] || (en.isLoading ? "…" : "")}</div>
-                <div className="arabic text-left text-[15px] leading-relaxed" dir="rtl" lang="ar" style={{ color: "var(--muted-foreground)" }}>{l}</div>
+                <div className="arabic text-[15px] leading-relaxed" dir="rtl" lang="ar" style={{ color: "var(--muted-foreground)", textAlign: "left" }}>{l}</div>
               </div>
             </li>
           ))}
