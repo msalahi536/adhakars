@@ -5,6 +5,7 @@ import { ArrowLeft, Bookmark, BookmarkCheck, BookOpen, ChevronRight, Clock, Feat
 import {
   getHadithBooks, getHadithChapters, getHadiths, type Hadith,
 } from "@/lib/hadith.functions";
+import { hadithCover } from "@/lib/hadith-covers";
 
 type S = { book?: string; chapter?: number; q?: string; topic?: string; page?: number; saved?: number };
 
