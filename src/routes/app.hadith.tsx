@@ -463,7 +463,7 @@ function HadithDetail({ h, index, count, savedApi, onClose, onMove, terms }: {
   }, [onClose]);
   const saved = savedApi.has(h.id);
   const copy = async () => {
-    try { await navigator.clipboard.writeText([h.hadithArabic, clean(h.hadithEnglish), `${h.bookName} ${h.hadithNumber}`].filter(Boolean).join("\n\n")); setCopied(true); setTimeout(() => setCopied(false), 1500); } catch { /* ignore */ }
+    try { await navigator.clipboard.writeText(h.hadithArabic ?? ""); setCopied(true); setTimeout(() => setCopied(false), 1500); } catch { /* ignore */ }
   };
   const panel: React.CSSProperties = { ...card, background: "var(--card)" };
   return (
