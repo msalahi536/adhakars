@@ -68,7 +68,7 @@ export function GiveawayDialog({ open, onClose, celebrate }: { open: boolean; on
   const [surahs, setSurahs] = useState(0);
   const [dhikr, setDhikr] = useState(0);
   const [refs, setRefs] = useState(0);
-  const [email, setEmail] = useState("");
+  const [email, setEmail] = useState(() => (typeof window === "undefined" ? "" : localStorage.getItem("giveaway:email") ?? ""));
   const [consent, setConsent] = useState(false);
   const [entered, setEnt] = useState<string[]>([]);
   const [msg, setMsg] = useState<string | null>(null);
@@ -114,6 +114,7 @@ export function GiveawayDialog({ open, onClose, celebrate }: { open: boolean; on
       const r = await submit({ data: { code: getDeviceCode(), email, surahs, dhikr } });
       if (r.ok) {
         setEntered(r.goals);
+        localStorage.setItem("giveaway:email", email.trim());
         setMsg(r.goals.length < 3 ? "Barakallahu feek! You can still finish the other goals for extra entries." : "Barakallahu feek! You have all 3 entries.");
       } else setMsg(r.error);
     } catch {
