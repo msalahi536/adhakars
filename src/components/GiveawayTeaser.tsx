@@ -8,7 +8,7 @@ import { markGiveawayAsked } from "@/lib/giveaway";
 export function GiveawayTeaser({ onChoice }: { onChoice: (yes: boolean) => void }) {
   const pick = (yes: boolean) => { markGiveawayAsked(yes ? "yes" : "no"); onChoice(yes); };
   return (
-    <div className="fixed inset-0 z-[60] flex items-center justify-center px-8" style={{ background: "color-mix(in oklab, var(--background) 35%, transparent)" }}
+    <div className="fixed inset-0 z-[60] flex items-center justify-center px-8" style={{ background: "color-mix(in oklab, var(--background) 30%, transparent)", backdropFilter: "blur(6px)" }}
       onClick={() => pick(false)}>
       <div role="alertdialog" aria-labelledby="gt-title" onClick={(e) => e.stopPropagation()}
         className="w-full max-w-[300px] rounded-3xl border border-border/60 bg-card p-5 text-center text-card-foreground shadow-xl animate-in fade-in zoom-in-95 duration-200">
