@@ -30,7 +30,7 @@ export const Route = createFileRoute("/app")({
 /** Opens the giveaway only once no other popup is showing, so modals never stack. */
 const whenNoDialog = (fn: () => void) => {
   const tryOpen = () => {
-    if (document.querySelector('[role="dialog"][data-state="open"]')) window.setTimeout(tryOpen, 1500);
+    if (document.querySelector('[role="dialog"][data-state="open"], .adhan-settings-backdrop')) window.setTimeout(tryOpen, 1500);
     else fn();
   };
   tryOpen();

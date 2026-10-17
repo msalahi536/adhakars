@@ -22,7 +22,7 @@ export function AdhanEnabledNotice() {
     const check = () => {
       window.clearTimeout(timer);
       if (window.localStorage.getItem(ADHAN_PROMPT_PENDING_KEY) !== "1") return;
-      if (document.querySelector('[role="dialog"][data-state="open"]')) {
+      if (document.querySelector('[role="dialog"][data-state="open"], .adhan-settings-backdrop')) {
         timer = window.setTimeout(check, 1500);
         return;
       }

@@ -115,8 +115,15 @@ function Salah() {
   const [previewingReciter, setPreviewingReciter] = useState<string | null>(null);
 
   useEffect(() => {
+    let timer: number | undefined;
     const open = () => {
+      window.clearTimeout(timer);
       if (window.localStorage.getItem("adhkar:open-adhan-settings") !== "1") return;
+      // Wait for other popups (e.g. the giveaway) to close so layers never stack and freeze the page.
+      if (document.querySelector('[role="dialog"][data-state="open"]')) {
+        timer = window.setTimeout(open, 1000);
+        return;
+      }
       window.localStorage.removeItem("adhkar:open-adhan-settings");
       setAdhanPrefsState(getAdhanPrefs());
       setSettingsState(getPrayerSettings());
@@ -124,7 +131,7 @@ function Salah() {
     };
     open();
     window.addEventListener("adhkar:open-adhan-settings", open);
-    return () => window.removeEventListener("adhkar:open-adhan-settings", open);
+    return () => { window.clearTimeout(timer); window.removeEventListener("adhkar:open-adhan-settings", open); };
   }, []);
 
   const autoSelected = useRef(false);
