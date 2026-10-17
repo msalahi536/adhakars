@@ -254,7 +254,7 @@ function HadithCard({ h, savedApi }: { h: Hadith; savedApi: SavedApi }) {
         </button>
       </div>
       {h.englishNarrator && <p className="mt-3 text-[12px] italic" style={{ color: "var(--muted-foreground)" }}>{h.englishNarrator}</p>}
-      {h.hadithEnglish && <p className="mt-1 whitespace-pre-line text-[14px] leading-relaxed">{h.hadithEnglish}</p>}
+      {h.hadithEnglish && <p className="mt-1 whitespace-pre-line text-[14px] leading-relaxed">{h.hadithEnglish.replace(/\(?\uFDFA\)?/g, "(peace be upon him)")}</p>}
       {h.hadithArabic && (
         <>
           <button type="button" onClick={() => setShowArabic((v) => !v)} className="mt-3 text-xs font-semibold" style={{ color: "var(--accent)" }}>
