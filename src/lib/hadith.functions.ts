@@ -126,17 +126,42 @@ async function search(data: Q, pageIn: number, size: number): Promise<HadithPage
     const quoted = /^["“].*["”]$/.test(raw);
     const phrase = lower.replace(/^["“]|["”]$/g, "").replace(/[^\p{L}\p{N}' -]/gu, " ").replace(/\s+/g, " ").trim();
     const words = phrase.split(" ").filter((w) => w.length > 1 && !STOP.has(w));
+    const smart = !quoted && pageIn === 1 && words.length >= 2 ? aiMatches(raw, base) : Promise.resolve([] as Hadith[]);
+    const withSmart = async (r: HadithPage): Promise<HadithPage> => {
+      const extra = await smart.catch(() => [] as Hadith[]);
+      if (!extra.length) return r;
+      const ids = new Set(extra.map((h) => h.id));
+      return { ...r, items: [...extra, ...r.items.filter((h) => !ids.has(h.id))], total: Math.max(r.total, extra.length) };
+    };
     const exact = await direct({ ...base, hadithEnglish: phrase }, pageIn, size);
-    if (exact.total || quoted || !words.length) return { ...exact, terms: [phrase] };
+    if (exact.total || quoted || !words.length) return withSmart({ ...exact, terms: [phrase] });
     const stems = [...new Set(words.map(stem))];
-    if (stems.length === 1) return { ...(await direct({ ...base, hadithEnglish: stems[0] }, pageIn, size)), terms: stems };
+    if (stems.length === 1) return withSmart({ ...(await direct({ ...base, hadithEnglish: stems[0] }, pageIn, size)), terms: stems });
     const anchor = [...stems].sort((a, b) => b.length - a.length)[0];
     const first = await direct({ ...base, hadithEnglish: anchor }, 1, 100);
     const more = await Promise.all(Array.from({ length: Math.min(first.lastPage, 4) - 1 }, (_, i) => direct({ ...base, hadithEnglish: anchor }, i + 2, 100)));
     const all = [first, ...more].flatMap((r) => r.items).filter((h) => { const t = text(h); return stems.every((w) => t.includes(w)); });
     const lastPage = Math.max(1, Math.ceil(all.length / size));
     const page = Math.min(pageIn, lastPage);
-    return { items: all.slice((page - 1) * size, page * size), page, lastPage, total: all.length, terms: stems };
+    return withSmart({ items: all.slice((page - 1) * size, page * size), page, lastPage, total: all.length, terms: stems });
+}
+
+/**
+ * Meaning search: AI suggests short exact phrases that appear in the English
+ * text of matching hadith; the hadith themselves always come from the service.
+ */
+async function aiMatches(q: string, base: Record<string, string | number | undefined>): Promise<Hadith[]> {
+  const { geminiJson } = await import("./gemini.server");
+  const res = await geminiJson<{ phrases: unknown[] }>(
+    "You help find hadith from vague descriptions or paraphrases (e.g. 'leaving surah baqarah is a loss' -> the Sahih Muslim hadith 'Recite Surah al-Baqara, for to take recourse to it is a blessing and to give it up is a cause of grief'). Return up to 4 short distinctive phrases (3-6 words) likely to appear verbatim in common English translations (Bukhari/Muslim Darussalam or Siddiqui style) of the matching hadith. Lowercase, no quotes, no punctuation.",
+    q,
+    { type: "object", properties: { phrases: { type: "array", items: { type: "string" } } }, required: ["phrases"] },
+  );
+  const phrases = (Array.isArray(res?.phrases) ? res.phrases : []).map(String)
+    .map((p) => p.toLowerCase().replace(/[^\p{L}\p{N}' -]/gu, " ").replace(/\s+/g, " ").trim()).filter((p) => p.length > 4).slice(0, 4);
+  const found = await Promise.all(phrases.map((p) => direct({ ...base, hadithEnglish: p }, 1, 5).catch(() => null)));
+  const seen = new Set<string>();
+  return found.flatMap((r) => r?.items ?? []).filter((h) => !seen.has(h.id) && !!seen.add(h.id)).slice(0, 6);
 }
 
 /** Translates an Arabic isnad (list of narrator links) into English names, in order. */
