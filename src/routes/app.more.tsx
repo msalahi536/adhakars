@@ -48,10 +48,10 @@ type Tile = {
 };
 
 const tiles: Tile[] = [
-  { to: "/app/tasbih", title: "Tasbih", subtitle: "A calm digital counter", Icon: TasbihIcon },
-  { to: "/app/duas", title: "Dua Library", subtitle: "50 authentic duas for every feeling", Icon: BookOpen },
   { to: "/app/hadith", title: "Hadith Library", subtitle: "40,000+ hadith by book and topic", Icon: ScrollText },
+  { to: "/app/duas", title: "Dua Library", subtitle: "50 authentic duas for every feeling", Icon: BookOpen },
   { to: "/app/qibla", title: "Qibla Finder", subtitle: "Find the direction of the Ka'bah", Icon: Compass },
+  { to: "/app/tasbih", title: "Tasbih", subtitle: "A calm digital counter", Icon: TasbihIcon },
   { to: "/app/period", title: "Period Companion", subtitle: "Private cycle tracker and guidance", Icon: Moon },
   { to: "/app/ruqyah", title: "Ruqyah Companion", subtitle: "Daily protection and authentic ruqyah", Icon: ShieldCheck },
   { to: "/app/hajj", title: "Hajj & Umrah Companion", subtitle: "Station-by-station guide and du‘as", Icon: Landmark },
