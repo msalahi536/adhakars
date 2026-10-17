@@ -35,6 +35,7 @@ import { Route as AppSettingsRouteImport } from './routes/app.settings'
 import { Route as AppSleepRouteImport } from './routes/app.sleep'
 import { Route as AppTasbihRouteImport } from './routes/app.tasbih'
 import { Route as AppTermsRouteImport } from './routes/app.terms'
+import { Route as AppMoreZakatRouteImport } from './routes/app.more_.zakat'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -166,6 +167,11 @@ const AppTermsRoute = AppTermsRouteImport.update({
   path: '/terms',
   getParentRoute: () => AppRoute,
 } as any)
+const AppMoreZakatRoute = AppMoreZakatRouteImport.update({
+  id: '/more_/zakat',
+  path: '/more/zakat',
+  getParentRoute: () => AppRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -194,6 +200,7 @@ export interface FileRoutesByFullPath {
   '/app/tasbih': typeof AppTasbihRoute
   '/app/terms': typeof AppTermsRoute
   '/app/': typeof AppIndexRoute
+  '/app/more/zakat': typeof AppMoreZakatRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -221,6 +228,7 @@ export interface FileRoutesByTo {
   '/app/tasbih': typeof AppTasbihRoute
   '/app/terms': typeof AppTermsRoute
   '/app': typeof AppIndexRoute
+  '/app/more/zakat': typeof AppMoreZakatRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -250,6 +258,7 @@ export interface FileRoutesById {
   '/app/tasbih': typeof AppTasbihRoute
   '/app/terms': typeof AppTermsRoute
   '/app/': typeof AppIndexRoute
+  '/app/more_/zakat': typeof AppMoreZakatRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -280,6 +289,7 @@ export interface FileRouteTypes {
     | '/app/tasbih'
     | '/app/terms'
     | '/app/'
+    | '/app/more/zakat'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -307,6 +317,7 @@ export interface FileRouteTypes {
     | '/app/tasbih'
     | '/app/terms'
     | '/app'
+    | '/app/more/zakat'
   id:
     | '__root__'
     | '/'
@@ -335,6 +346,7 @@ export interface FileRouteTypes {
     | '/app/tasbih'
     | '/app/terms'
     | '/app/'
+    | '/app/more_/zakat'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -533,6 +545,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppTermsRouteImport
       parentRoute: typeof AppRoute
     }
+    '/app/more_/zakat': {
+      id: '/app/more_/zakat'
+      path: '/more/zakat'
+      fullPath: '/app/more/zakat'
+      preLoaderRoute: typeof AppMoreZakatRouteImport
+      parentRoute: typeof AppRoute
+    }
   }
 }
 
@@ -554,6 +573,7 @@ interface AppRouteChildren {
   AppTasbihRoute: typeof AppTasbihRoute
   AppTermsRoute: typeof AppTermsRoute
   AppIndexRoute: typeof AppIndexRoute
+  AppMoreZakatRoute: typeof AppMoreZakatRoute
 }
 
 const AppRouteChildren: AppRouteChildren = {
@@ -574,6 +594,7 @@ const AppRouteChildren: AppRouteChildren = {
   AppTasbihRoute: AppTasbihRoute,
   AppTermsRoute: AppTermsRoute,
   AppIndexRoute: AppIndexRoute,
+  AppMoreZakatRoute: AppMoreZakatRoute,
 }
 
 const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)
