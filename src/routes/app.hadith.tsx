@@ -6,7 +6,6 @@ import { HeaderBackButton } from "@/components/HeaderBackButton";
 import {
   getHadithBooks, getHadithChapters, getHadiths, translateIsnad, type Hadith,
 } from "@/lib/hadith.functions";
-import { hadithCover } from "@/lib/hadith-covers";
 import { cached, DAY } from "@/lib/hadith-cache";
 
 type S = { book?: string; chapter?: number; q?: string; topic?: string; page?: number; saved?: number; h?: number };
