@@ -206,7 +206,7 @@ function Home() {
             <section className="quran-reciter-panel">
               <div className="flex items-center justify-between">
                 <h2 className="quran-section-title">Choose a Reciter</h2>
-                <button className="quran-see-all" onClick={() => navigate({ to: "/app/quran", search: { view: "reciters", tab: "all" } })}>See All <ChevronRight size={14} /></button>
+                <button className="quran-see-all" onClick={() => { console.log("SEE-ALL CLICKED"); void navigate({ to: "/app/quran", search: { view: "reciters", tab: "all" } }); }}>See All <ChevronRight size={14} /></button>
               </div>
               <div className="quran-reciter-strip">
                 {home.map((r) => (
