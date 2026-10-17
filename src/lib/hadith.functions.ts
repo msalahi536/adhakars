@@ -126,17 +126,51 @@ async function search(data: Q, pageIn: number, size: number): Promise<HadithPage
     const quoted = /^["“].*["”]$/.test(raw);
     const phrase = lower.replace(/^["“]|["”]$/g, "").replace(/[^\p{L}\p{N}' -]/gu, " ").replace(/\s+/g, " ").trim();
     const words = phrase.split(" ").filter((w) => w.length > 1 && !STOP.has(w));
+    const smart = !quoted && pageIn === 1 && size === PAGE && words.length >= 2 ? aiMatches(raw, base) : Promise.resolve([] as Hadith[]);
+    const withSmart = async (r: HadithPage): Promise<HadithPage> => {
+      const extra = await smart.catch(() => [] as Hadith[]);
+      if (!extra.length) return r;
+      const ids = new Set(extra.map((h) => h.id));
+      return { ...r, items: [...extra, ...r.items.filter((h) => !ids.has(h.id))], total: Math.max(r.total, extra.length) };
+    };
     const exact = await direct({ ...base, hadithEnglish: phrase }, pageIn, size);
-    if (exact.total || quoted || !words.length) return { ...exact, terms: [phrase] };
+    if (exact.total || quoted || !words.length) return withSmart({ ...exact, terms: [phrase] });
     const stems = [...new Set(words.map(stem))];
-    if (stems.length === 1) return { ...(await direct({ ...base, hadithEnglish: stems[0] }, pageIn, size)), terms: stems };
+    if (stems.length === 1) return withSmart({ ...(await direct({ ...base, hadithEnglish: stems[0] }, pageIn, size)), terms: stems });
     const anchor = [...stems].sort((a, b) => b.length - a.length)[0];
     const first = await direct({ ...base, hadithEnglish: anchor }, 1, 100);
     const more = await Promise.all(Array.from({ length: Math.min(first.lastPage, 4) - 1 }, (_, i) => direct({ ...base, hadithEnglish: anchor }, i + 2, 100)));
     const all = [first, ...more].flatMap((r) => r.items).filter((h) => { const t = text(h); return stems.every((w) => t.includes(w)); });
     const lastPage = Math.max(1, Math.ceil(all.length / size));
     const page = Math.min(pageIn, lastPage);
-    return { items: all.slice((page - 1) * size, page * size), page, lastPage, total: all.length, terms: stems };
+    return withSmart({ items: all.slice((page - 1) * size, page * size), page, lastPage, total: all.length, terms: stems });
+}
+
+/**
+ * Meaning search: AI picks rare words to gather candidates from the service,
+ * then picks which candidates match the description. Hadith text always comes
+ * from the service, never from AI.
+ */
+async function aiMatches(q: string, base: Record<string, string | number | undefined>): Promise<Hadith[]> {
+  const { geminiJson } = await import("./gemini.server");
+  const arr = { type: "array", items: { type: "string" } };
+  const w = await geminiJson<{ words: unknown[] }>(
+    "You help find hadith from vague descriptions or paraphrases. Return 1-4 rare single words (names of surahs, people, places, objects, distinctive acts) likely to appear in the English translation of matching hadith, including common spelling variants (e.g. baqara and baqarah). Lowercase.",
+    q, { type: "object", properties: { words: arr }, required: ["words"] },
+  );
+  const words = [...new Set((Array.isArray(w?.words) ? w.words : []).map((x) => String(x).toLowerCase().trim()).filter((x) => x.length > 2))].slice(0, 4);
+  if (!words.length) return [];
+  const seen = new Set<string>();
+  const pool = (await Promise.all(words.map((x) => direct({ ...base, hadithEnglish: x }, 1, 100).catch(() => null))))
+    .flatMap((r) => r?.items ?? []).filter((h) => !seen.has(h.id) && !!seen.add(h.id)).slice(0, 220);
+  if (!pool.length) return [];
+  const list = pool.map((h) => `${h.id}: ${(h.hadithEnglish ?? "").replace(/\s+/g, " ").slice(0, 500)}`).join("\n");
+  const pick = await geminiJson<{ ids: unknown[] }>(
+    "Given a user's description and hadith texts (id: text), return ids of hadith whose meaning matches the description, best first, max 5. Return an empty list if none truly match.",
+    `Description: ${q}\n\n${list}`, { type: "object", properties: { ids: arr }, required: ["ids"] },
+  );
+  const byId = new Map(pool.map((h) => [h.id, h]));
+  return (Array.isArray(pick?.ids) ? pick.ids : []).map((x) => byId.get(String(x))).filter((h): h is Hadith => !!h).slice(0, 5);
 }
 
 /** Translates an Arabic isnad (list of narrator links) into English names, in order. */
