@@ -77,17 +77,41 @@ export const translateIsnad = createServerFn({ method: "POST" })
   .handler(async ({ data }) => {
     const key = process.env.LOVABLE_API_KEY;
     if (!key) return { names: [] as string[] };
-    const r = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+    const r = await fetch("https://ai.gateway.lovable.dev/v1/responses", {
       method: "POST",
-      headers: { Authorization: `Bearer ${key}`, "Content-Type": "application/json" },
+      headers: { "Lovable-API-Key": key, Authorization: `Bearer ${key}`, "Content-Type": "application/json", "X-Lovable-AIG-SDK": "fetch" },
       body: JSON.stringify({
-        model: "google/gemini-2.5-flash-lite",
-        messages: [
-          { role: "system", content: "You transliterate hadith narrator names from Arabic into standard English scholarly transliteration (e.g. 'Umar ibn al-Khattab, Yahya ibn Sa'id al-Ansari). Reply ONLY with a JSON array of strings, one per input line, same order. Name only, no verbs like 'narrated'." },
-          { role: "user", content: data.links.map((l, i) => `${i + 1}. ${l}`).join("\n") },
-        ],
+        model: "openai/gpt-6-astra",
+        stream: true,
+        store: false,
+        reasoning: { effort: "low" },
+        instructions: "You transliterate hadith narrator names from Arabic into standard English scholarly transliteration (e.g. 'Umar ibn al-Khattab, Yahya ibn Sa'id al-Ansari). Return one name per input line, same order. Name only, no verbs like 'narrated'.",
+        input: data.links.map((l, i) => `${i + 1}. ${l}`).join("\n"),
+        text: { format: { type: "json_schema", name: "isnad", strict: true, schema: {
+          type: "object", additionalProperties: false, required: ["names"],
+          properties: { names: { type: "array", items: { type: "string" } } },
+        } } },
       }),
     });
+    if (!r.ok || !r.body) return { names: [] as string[] };
+    const reader = r.body.getReader();
+    const dec = new TextDecoder();
+    let buf = "", txt = "";
+    for (;;) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      buf += dec.decode(value, { stream: true });
+      const lines = buf.split("\n"); buf = lines.pop() ?? "";
+      for (const ln of lines) {
+        if (!ln.startsWith("data:")) continue;
+        try { const ev = JSON.parse(ln.slice(5)); if (ev.type === "response.output_text.delta") txt += ev.delta; } catch { /* skip */ }
+      }
+    }
+    try {
+      const arr = (JSON.parse(txt) as { names: unknown[] }).names;
+      return { names: Array.isArray(arr) ? arr.map(String).slice(0, data.links.length) : [] };
+    } catch { return { names: [] as string[] }; }
+  });
     if (!r.ok) return { names: [] as string[] };
     const j = (await r.json()) as { choices?: { message?: { content?: string } }[] };
     const txt = j.choices?.[0]?.message?.content ?? "";
