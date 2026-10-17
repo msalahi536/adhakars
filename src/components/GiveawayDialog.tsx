@@ -137,7 +137,7 @@ export function GiveawayDialog({ open, onClose, celebrate }: { open: boolean; on
         {bg && <img src={bg} alt="" aria-hidden className="pointer-events-none absolute inset-0 h-full w-full -scale-x-100 object-cover object-top opacity-90" />}
         <DialogHeader className="relative overflow-hidden px-6 pb-4 pt-6 text-left">
           <div className="relative">
-          <span className="mb-2 flex h-11 w-11 items-center justify-center rounded-2xl bg-muted/60 text-accent"><Gift size={20} strokeWidth={1.7} /></span>
+          <span className="giveaway-inset mb-2 flex h-11 w-11 items-center justify-center rounded-2xl text-accent"><Gift size={20} strokeWidth={1.7} /></span>
           <p className="label-caps text-accent">Giveaway · ends Friday, Oct 23</p>
           <DialogTitle className="max-w-[260px] font-display text-[26px] font-semibold leading-tight">Win lifetime access to Ilm Guide</DialogTitle>
           <DialogDescription className="max-w-[230px] pt-1 text-sm leading-6 text-muted-foreground">
@@ -149,37 +149,36 @@ export function GiveawayDialog({ open, onClose, celebrate }: { open: boolean; on
         <div className="relative min-h-0 space-y-2 overflow-y-auto overscroll-contain px-4 py-2">
           {status !== "joined" ? (
             <>
-              <div className="rounded-2xl bg-muted/40 px-3 py-3">
+              <div className="giveaway-panel rounded-2xl px-3 py-3">
                 <p className="label-caps mb-2 px-1 text-muted-foreground">What you'll study</p>
                 <ul className="space-y-1.5">
                   {LEVELS.map(({ n, Icon, name, books }) => (
-                    <li key={name} className="flex items-center gap-3 rounded-xl bg-card/70 px-2.5 py-2">
-                      <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-muted/70 text-accent"><Icon size={20} strokeWidth={1.6} /></span>
+                    <li key={name} className="giveaway-inset flex items-center gap-3 rounded-xl px-2.5 py-2">
+                      <span className="giveaway-panel flex h-11 w-11 shrink-0 items-center justify-center rounded-xl text-accent"><Icon size={20} strokeWidth={1.6} /></span>
                       <div className="min-w-0 flex-1">
                         <p className="label-caps text-[9px] text-muted-foreground">Level {n}</p>
                         <p className="text-[14px] font-semibold leading-5">{name}</p>
                         <p className="truncate text-[11px] leading-4 text-muted-foreground">{books}</p>
                       </div>
-                      <ChevronRight size={16} className="shrink-0 text-muted-foreground" />
                     </li>
                   ))}
                 </ul>
               </div>
-              <div className="rounded-2xl bg-muted/40 px-3 py-3">
+              <div className="giveaway-panel rounded-2xl px-3 py-3">
                 <p className="label-caps mb-2 px-1 text-muted-foreground">What's included</p>
                 <div className="grid grid-cols-4 divide-x divide-border/50">
                   {FEATURES.map(({ Icon, t }) => (
                     <div key={t} className="flex flex-col items-center gap-1.5 px-1 text-center">
-                      <span className="flex h-10 w-10 items-center justify-center rounded-full bg-card/80 text-accent"><Icon size={17} strokeWidth={1.6} /></span>
+                      <span className="giveaway-inset flex h-10 w-10 items-center justify-center rounded-full text-accent"><Icon size={17} strokeWidth={1.6} /></span>
                       <span className="text-[10px] leading-[13px] text-muted-foreground">{t}</span>
                     </div>
                   ))}
                 </div>
               </div>
-              <div className="rounded-2xl bg-muted/40 px-3 py-3">
+              <div className="giveaway-panel rounded-2xl px-3 py-3">
                 <p className="label-caps mb-2 px-1 text-muted-foreground">How to enter</p>
                 <div className="flex items-start gap-3">
-                  <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-card/80 text-accent"><Target size={18} strokeWidth={1.6} /></span>
+                  <span className="giveaway-inset flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-accent"><Target size={18} strokeWidth={1.6} /></span>
                   <p className="text-xs leading-5">Finish any one goal: <b>5 surahs</b>, <b>500 dhikr</b> or <b>5 downloads</b>. Each goal you finish is another entry — up to 3.</p>
                 </div>
               </div>
@@ -213,7 +212,7 @@ export function GiveawayDialog({ open, onClose, celebrate }: { open: boolean; on
                 </div>
               </Bar>
               {goals.length > 0 && (newGoals.length > 0 || !entered.length) && (
-                <div className="space-y-2 rounded-2xl bg-muted/40 px-3 py-3">
+                <div className="giveaway-panel space-y-2 rounded-2xl px-3 py-3">
                   <p className="text-sm font-semibold">
                     {entered.length ? "New goal complete — add it to your entry" : "Goal complete — enter the giveaway"}
                   </p>
