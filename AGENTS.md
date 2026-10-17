@@ -37,3 +37,4 @@
 - Quran reading mode is an in-app body-portaled overlay, never the browser/native fullscreen API, which broke the reader.
 - mp3quran.net only adds reciters Quran.com lacks (audio + verse timings); Quran text stays from Quran.com.
 - Zakat rulings live only in `src/lib/zakat/rules.ts` and pure `calculate.ts` (integer cents, tested); data stays on device; evidence text is left for the owner to fill.
+- Quran verse search merges reference parsing, AI-guessed verse keys (keys only) and keyword search; verse text always loads from Quran.com so no AI-written Quran text is shown.
