@@ -4882,3 +4882,21 @@ body.quran-fs-on .quran-mini:not(.quran-fs .quran-mini) { display: none; }
 @keyframes hadith-pop { from { opacity: 0; transform: scale(.92) translateY(-4px); } to { opacity: 1; transform: none; } }
 @keyframes hadith-slide { from { opacity: 0; transform: translateX(24px); } to { opacity: 1; transform: none; } }
 .hadith-hl { background: color-mix(in oklab, var(--accent) 22%, transparent); color: inherit; border-radius: 4px; padding: 0 2px; }
+
+/* Hadith loading progress bar */
+.hadith-load-fill {
+  position: relative;
+  height: 100%;
+  border-radius: 999px;
+  overflow: hidden;
+  background: linear-gradient(90deg, color-mix(in oklab, var(--accent) 45%, transparent), var(--accent));
+  transition: width 170ms linear;
+}
+.hadith-load-fill::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, transparent, color-mix(in oklab, var(--background) 60%, transparent), transparent);
+  animation: hadith-shimmer 1.2s linear infinite;
+}
+@keyframes hadith-shimmer { from { transform: translateX(-100%); } to { transform: translateX(100%); } }

@@ -185,7 +185,7 @@ function Home({ books, loading, savedCount }: { books?: { bookName: string; writ
       <section>
         <h2 className="label-caps mb-2 px-1">The collections</h2>
         <div className="space-y-2">
-          {loading && <Empty text="Loading collections…" />}
+          {loading && <LoadingBar label="Loading collections" />}
           {books?.map((b) => (
             <Link key={b.bookSlug} to="/app/hadith" search={{ book: b.bookSlug }}
               className="flex items-center gap-3 rounded-[20px] p-4 transition-transform active:scale-[0.98]" style={card}>
@@ -245,7 +245,7 @@ function Chapters({ book, info }: { book: string; info?: { bookName: string; wri
         </div>
       )}
       <div className="label-caps px-1 pt-1 text-[10px]" style={{ color: "var(--muted-foreground)" }}>All books</div>
-      {q.isLoading && <Empty text="Loading chapters…" />}
+      {q.isLoading && <LoadingBar label="Loading chapters" />}
       {q.isError && <Empty text="Couldn't load chapters. Check your connection." />}
       <div className="space-y-2.5">
         {q.data?.map((c) => (
@@ -304,7 +304,7 @@ function HadithList({ s, savedApi }: { s: S; savedApi: SavedApi }) {
     placeholderData: keepPreviousData, staleTime: 1000 * 60 * 30,
   });
   useEffect(() => { document.querySelector(".scroll-area")?.scrollTo({ top: 0 }); }, [page]);
-  if (q.isLoading) return <Empty text="Loading hadith…" />;
+  if (q.isLoading) return <LoadingBar label={s.q ? "Searching hadith" : "Loading hadith"} />;
   if (q.isError) return <Empty text="Couldn't load hadith. Check your connection." />;
   const d = q.data!;
   if (!d.items.length && !filter) return <Empty text="No hadith found. Try a different word." />;
@@ -581,6 +581,39 @@ function gradeColor(status: string | null) {
   if (s.includes("sahih")) return "var(--accent)";
   if (s.includes("hasan")) return "var(--topic-gold)";
   return "var(--muted-foreground)";
+}
+
+const PATIENCE = [
+  "Allah rewards the patient — this one counts.",
+  "Every second of waiting is written as a good deed.",
+  "The scribes are still copying these out for you.",
+  "Knowledge is a path, and paths take a moment.",
+  "Say SubhanAllah a few times while you wait.",
+  "Good things arrive in their own time, inshaAllah.",
+  "Almost there — patience is half of faith.",
+  "The angels never rush, and they never forget.",
+];
+
+function LoadingBar({ label = "Loading hadith" }: { label?: string }) {
+  const [pct, setPct] = useState(7);
+  const [line, setLine] = useState(() => Math.floor(Math.random() * PATIENCE.length));
+  useEffect(() => {
+    const t = setInterval(() => setPct((p) => Math.min(94, p + Math.max(0.7, (96 - p) * 0.055))), 130);
+    const r = setInterval(() => setLine((i) => (i + 1) % PATIENCE.length), 2800);
+    return () => { clearInterval(t); clearInterval(r); };
+  }, []);
+  return (
+    <div className="rounded-[20px] p-4" style={card}>
+      <div className="flex items-baseline justify-between gap-3">
+        <span className="text-[11px] font-semibold uppercase tracking-wider" style={{ color: "var(--muted-foreground)" }}>{label}</span>
+        <span className="text-[11px] font-bold tabular-nums" style={{ color: "var(--accent)" }}>{Math.round(pct)}%</span>
+      </div>
+      <div className="mt-2 h-2 overflow-hidden rounded-full" style={{ background: "color-mix(in oklab, var(--accent) 12%, transparent)" }}>
+        <div className="hadith-load-fill" style={{ width: `${pct}%` }} />
+      </div>
+      <div className="mt-2.5 text-[12px] italic leading-snug" style={{ color: "var(--muted-foreground)" }}>{PATIENCE[line]}</div>
+    </div>
+  );
 }
 
 function Empty({ text }: { text: string }) {
