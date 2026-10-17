@@ -1,0 +1,2 @@
+- Widget bridge and rotation tests run with Bun beside their modules.
+- Extra reciter portraits are asset pointers matched by normalized name before the Quran.com photo fallback.
