@@ -28,6 +28,19 @@ export function setStatus(v: "joined" | "declined") {
   emit();
 }
 
+// Bump to re-ask everyone who hasn't joined yet (joined users keep their progress).
+const ASK_KEY = "giveaway:asked:v2";
+export function shouldAskGiveaway() {
+  return giveawayActive() && getStatus() !== "joined" && !ls()?.getItem(ASK_KEY);
+}
+export function markGiveawayAsked(choice: "yes" | "no") {
+  const s = ls();
+  if (!s) return;
+  s.setItem(ASK_KEY, choice);
+  if (choice === "yes") { s.removeItem(K.status); emit(); }
+  else setStatus("declined");
+}
+
 export function getDeviceCode(): string {
   const s = ls();
   if (!s) return "";
