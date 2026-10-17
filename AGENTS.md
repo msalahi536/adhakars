@@ -26,7 +26,7 @@
 - More keeps its feature tools first; detailed consistency and lifetime statistics open from one compact summary so they never obscure feature discovery.
 
 - App launch has no onboarding or guided tour; release notices use a versioned acknowledgment and bounded release window without resetting appearance or progress.
-- The adhan consent prompt is offered once (persisted acknowledgment) on the first Salah visit without a location, before any location request, or on the first notification grant; "Yes" requests notifications, enables all five prayers, then asks for location and opens Adhan Settings; "Not now" leaves manual city/location controls — nothing is auto-enabled.
+- Adhan consent is asked once (persisted) on the first location-less Salah visit or first notification grant, before location; "Yes" enables all prayers then asks location.
 - Salah owns the once-per-install automatic location request; app launch, Settings entry, and widget synchronization only read saved coordinates so permissions never stack on launch.
 - Explicit rating actions synchronously open the store review page, not the native review popup, which Apple can silently suppress.
 
