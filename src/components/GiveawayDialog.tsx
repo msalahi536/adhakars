@@ -135,7 +135,7 @@ export function GiveawayDialog({ open, onClose, celebrate }: { open: boolean; on
     <Dialog open={open} onOpenChange={(n) => !n && onClose()}>
       <DialogContent className="update-dialog grid max-h-[86dvh] w-[calc(100%_-_32px)] max-w-[410px] grid-rows-[auto_minmax(0,1fr)_auto] gap-0 overflow-hidden rounded-3xl border-border/60 bg-card p-0 text-card-foreground">
         {bg && <img src={bg} alt="" aria-hidden className="pointer-events-none absolute inset-0 h-full w-full -scale-x-100 object-cover object-top opacity-90" />}
-        <DialogHeader className="relative overflow-hidden px-6 pb-4 pt-6 text-left">
+        <DialogHeader className="giveaway-header relative overflow-hidden px-6 pb-4 pt-6 text-left">
           <div className="relative">
           <span className="giveaway-inset mb-2 flex h-11 w-11 items-center justify-center rounded-2xl text-accent"><Gift size={20} strokeWidth={1.7} /></span>
           <p className="label-caps text-accent">Giveaway · ends Friday, Oct 23</p>
@@ -158,7 +158,7 @@ export function GiveawayDialog({ open, onClose, celebrate }: { open: boolean; on
                       <div className="min-w-0 flex-1">
                         <p className="label-caps text-[9px] text-muted-foreground">Level {n}</p>
                         <p className="text-[14px] font-semibold leading-5">{name}</p>
-                        <p className="truncate text-[11px] leading-4 text-muted-foreground">{books}</p>
+                        <p className="text-[11px] leading-4 text-muted-foreground">{books}</p>
                       </div>
                     </li>
                   ))}
