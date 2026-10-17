@@ -36,4 +36,4 @@
 - Quran playback uses one app-wide store outside routes so recitation survives page changes; repeat restarts manually, not audio.loop.
 - Quran reading mode is an in-app body-portaled overlay, never the browser/native fullscreen API, which broke the reader.
 - mp3quran.net only adds reciters Quran.com lacks (audio + verse timings); Quran text stays from Quran.com.
-- Zakat rulings live only in `src/lib/zakat/rules.ts` configs and the pure `calculate.ts` (integer cents, Bun tests beside it); zakat data stays in device storage `zakat_v1`, and evidence text in `src/data/zakat/evidence.ts` is left empty for the owner to fill verbatim.
+- Zakat rulings live only in `src/lib/zakat/rules.ts` and pure `calculate.ts` (integer cents, tested); data stays on device; evidence text is left for the owner to fill.
