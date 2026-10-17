@@ -7,7 +7,7 @@ import { QuranMiniPlayer } from "@/components/QuranMiniPlayer";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { ChevronDown, ChevronLeft, ChevronRight, Heart, Loader2, Maximize2, Pause, Play, Repeat, Search, Shuffle, SkipBack, SkipForward, X } from "lucide-react";
 import {
-  findReciter, getChapterAudio, getChapters, getVerses, HOME_RECITER_IDS, POPULAR_RECITERS, RECITERS, reciterHasPhoto,
+  findReciter, getChapterAudio, getChapters, getVerses, homeReciterRow, POPULAR_RECITERS, RECITERS, reciterHasPhoto,
   reciterHasSurah, reciterName, reciterScore, reciterPhoto, reciterSubtitle, searchChapters, searchReciters, type Chapter, type Reciter, type Verse,
 } from "@/lib/quran";
 import { getDisplay, triggerHaptic } from "@/lib/theme";
@@ -84,15 +84,29 @@ function QuranPage() {
 }
 
 /* ---------- shared bits ---------- */
-function Avatar({ r, size = 48 }: { r: Reciter; size?: number }) {
+function Avatar({ r, size = 48, eager = false }: { r: Reciter; size?: number; eager?: boolean }) {
   const [broken, setBroken] = useState(false);
   const photo = reciterPhoto(r);
   const initials = reciterName(r).replace(/^(sheikh|al-|ash-|as-)\s*/i, "").split(/\s+/).filter((w) => !/^(al|ad|ar|as|ash|bin|ibn)-?$/i.test(w)).slice(0, 2).map((w) => w.replace(/^[a-z]+-/i, "")[0]).join("").toUpperCase();
+  // A portrait already in the browser cache finishes before React attaches onLoad,
+  // so show it as soon as the node exists instead of leaving the initials up.
+  const showIfReady = (el: HTMLImageElement | null) => {
+    if (el && el.complete && el.naturalWidth > 0) el.classList.add("is-loaded");
+  };
   return (
     <span className="quran-avatar" style={{ width: size, height: size, fontSize: size * 0.34 }}>
-      {photo && !broken ? <img src={photo} alt="" loading="lazy" onError={() => setBroken(true)} /> : initials}
+      <span className="quran-avatar-initials">{initials}</span>
+      {photo && !broken && (
+        <img src={photo} alt="" loading={eager ? "eager" : "lazy"} decoding="async"
+          fetchPriority={eager ? "high" : "low"}
+          ref={showIfReady}
+          onLoad={(e) => e.currentTarget.classList.add("is-loaded")} onError={() => setBroken(true)} />
+      )}
     </span>
   );
+
+
+
 }
 
 function NumBadge({ n }: { n: number }) {
@@ -167,7 +181,18 @@ function Home() {
     }
   };
   const favs = useFavoriteReciters();
-  const home = [...favs.map(findReciter), ...HOME_RECITER_IDS.filter((id) => !favs.includes(id)).map(findReciter)];
+  const home = homeReciterRow(favs);
+  // The strip's snap can nudge it one tile to the right while avatars load, which
+  // would push a favorited reciter out of sight, so keep the row anchored at its start.
+  const stripRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const el = stripRef.current;
+    if (!el) return;
+    el.scrollLeft = 0;
+    const later = [250, 800].map((ms) => window.setTimeout(() => { el.scrollLeft = 0; }, ms));
+    return () => later.forEach((t) => window.clearTimeout(t));
+  }, [favs.join(",")]);
+
   const lastY = useRef(0);
   const [searchShown, setSearchShown] = useState(true);
   const [searchFloat, setSearchFloat] = useState(false);
@@ -206,12 +231,12 @@ function Home() {
             <section className="quran-reciter-panel">
               <div className="flex items-center justify-between">
                 <h2 className="quran-section-title">Choose a Reciter</h2>
-                <button className="quran-see-all" onClick={() => navigate({ to: "/app/quran", search: { view: "reciters", tab: "all" } })}>See All <ChevronRight size={14} /></button>
+                <button className="quran-see-all" onClick={() => { console.log("SEE-ALL CLICKED"); void navigate({ to: "/app/quran", search: { view: "reciters", tab: "all" } }); }}>See All <ChevronRight size={14} /></button>
               </div>
-              <div className="quran-reciter-strip">
+              <div className="quran-reciter-strip" ref={stripRef}>
                 {home.map((r) => (
                   <button key={r.id} className={`quran-reciter-tile ${prefs.reciter === r.id ? "is-on" : ""}`} onClick={() => { setPrefs({ reciter: r.id }); void triggerHaptic("light"); }}>
-                    <span className="quran-reciter-ring"><Avatar r={r} size={64} /></span>
+                    <span className="quran-reciter-ring"><Avatar r={r} size={64} eager /></span>
                     <span className="quran-reciter-name">{reciterName(r)}</span>
                   </button>
                 ))}
@@ -332,8 +357,8 @@ function ReciterPicker({ back, tab }: { back?: number; tab?: "all" }) {
                     <Avatar r={r} size={48} />
                     <span className="min-w-0 flex-1"><span className="block truncate text-[14.5px] font-semibold">{reciterName(r)}</span><span className="quran-muted block truncate text-[11.5px]">{reciterSubtitle(r)}</span></span>
                   </button>
-                  {on && <span className="quran-mini-eq" aria-label="Selected"><i /><i /><i /></span>}
                   <button className={`quran-fav-btn${fav ? " is-on" : ""}`} aria-pressed={fav} aria-label={fav ? `Remove ${r.name} from favorites` : `Add ${r.name} to favorites`} onClick={() => { toggleFavorite(r.id); void triggerHaptic("light"); }}>
+
                     <Heart size={17} fill={fav ? "currentColor" : "none"} />
                   </button>
                   <button className="quran-play-sm" aria-label={preview === r.id ? "Stop preview" : `Preview ${r.name}`} onClick={() => void togglePreview(r)}>
@@ -472,7 +497,7 @@ function Reader({ chapterId }: { chapterId: number }) {
       <main className="scroll-area" onScroll={onReadScroll}>
         <div className={`mx-auto max-w-md space-y-3 px-5 pt-4 ${player.panelOpen ? "pb-64" : "pb-28"}`}>
           <button className="quran-card quran-reciter-select" onClick={() => { void triggerHaptic("light"); setSheet((o) => !o); }}>
-            <Avatar r={shownReciter} size={46} />
+            <Avatar r={shownReciter} size={46} eager />
             <span className="min-w-0 flex-1 text-left"><span className="block truncate text-[15px] font-semibold">{reciterName(shownReciter)}</span><span className="quran-muted block truncate text-[11.5px]">{reciterSubtitle(shownReciter)}</span></span>
             <ChevronDown size={18} className="opacity-60" style={{ transform: sheet ? "rotate(180deg)" : undefined, transition: "transform .2s" }} />
           </button>

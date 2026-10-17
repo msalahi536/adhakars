@@ -325,6 +325,32 @@ export const POPULAR_RECITERS = [7, 1, 13, 174, 100107, 159, 3, 10, 104, 158, 19
 export const HOME_RECITER_IDS = [7, 1, 100107, 174, 159, 3, 10, 104, 158, 19];
 export const findReciter = (id: number) => RECITERS.find((r) => r.id === id) ?? RECITERS[0];
 
+/**
+ * The "Choose a Reciter" strip on the Quran home.
+ * Favorited reciters lead (newest favorite first), then the usual picks; every
+ * name appears once, so a Mujawwad/Murattal pair never shows up twice.
+ */
+export function homeReciterRow(favs: number[]): Reciter[] {
+  const row: Reciter[] = [];
+  const names = new Set<string>();
+  const add = (id: number) => {
+    const r = RECITERS.find((x) => x.id === id);
+    if (!r) return;
+    const name = normalizeQuery(reciterName(r));
+    if (names.has(name)) return;
+    names.add(name);
+    row.push(r);
+  };
+  favs.forEach(add);
+  HOME_RECITER_IDS.forEach(add);
+  for (const id of POPULAR_RECITERS) {
+    if (row.length >= HOME_RECITER_IDS.length) break;
+    add(id);
+  }
+  return row;
+}
+
+
 /* ---------- smart search ---------- */
 /** Lowercase, strip diacritics, apostrophes, hyphens and Arabic article variants. */
 export function normalizeQuery(s: string): string {

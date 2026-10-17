@@ -27,3 +27,23 @@ test("mp3quran reciters only add people Quran.com lacks and keep Quran.com first
   expect(RECITERS.slice(firstNoPhoto).every((r) => !reciterHasPhoto(r))).toBe(true);
   expect(RECITERS.some((r) => r.server && /alafas|minshawi|husary|sudaes|ghamdi/i.test(r.name))).toBe(false);
 });
+
+describe("Quran home reciter strip", () => {
+  test("favorited reciters come first and no name repeats", async () => {
+    const { homeReciterRow, RECITERS, reciterName } = await import("./quran");
+    const row = homeReciterRow([2]);
+    expect(reciterName(row[0])).toBe("AbdulBaset AbdulSamad");
+    const names = row.map((r) => reciterName(r));
+    expect(new Set(names).size).toBe(names.length);
+    expect(row.length).toBeLessThanOrEqual(10);
+    expect(row.every((r) => RECITERS.includes(r))).toBe(true);
+  });
+  test("an unknown favorite is skipped instead of repeating the first reciter", async () => {
+    const { homeReciterRow, reciterName } = await import("./quran");
+    const row = homeReciterRow([999999]);
+    const names = row.map((r) => reciterName(r));
+    expect(new Set(names).size).toBe(names.length);
+    expect(names.length).toBeGreaterThan(0);
+  });
+});
+

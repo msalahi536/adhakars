@@ -15,6 +15,8 @@ import { PERSONAL_PRESET, cachedPhoto, loadAppearancePhotos, readAppearance, res
 import { JUMUAH_NOTIF_ID, registerNotificationTapHandler } from "@/lib/notifications";
 import { DEFAULT_PRESET_ID, getPresetId, resolveVisualPhase, type VisualPhase } from "@/lib/theme-store";
 import { rememberMoreDestination } from "@/lib/more-navigation";
+import { scheduleReciterPhotoPreload } from "@/lib/reciter-photo-preload";
+
 import { isPeriodNotifId, isSmartAdhkarId, smartAdhkarKind, SUNNAH_NOTIF_ID } from "@/lib/smart-notifications";
 import { FULL_ADHAN_URL, isPrayerNotifId, rescheduleAdhanNotifications } from "@/lib/adhan-notifications";
 import { AdhanPlayer } from "@/components/AdhanPlayer";
@@ -47,7 +49,10 @@ function AppLayout() {
     window.addEventListener("giveaway-goal", goal);
     return () => { window.removeEventListener("open-giveaway", open); window.removeEventListener("giveaway-goal", goal); };
   }, []);
+  // Reciter portraits are cached in the background once the app has gone idle.
+  useEffect(() => { scheduleReciterPhotoPreload(); }, []);
   // Keep the server and first browser render identical, then restore the saved
+
   // artwork before paint. Reading localStorage during render causes React to
   // preserve the server's default background during hydration.
   const [activePresetId, setActivePresetId] = useState(DEFAULT_PRESET_ID);
