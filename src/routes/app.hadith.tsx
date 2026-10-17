@@ -144,7 +144,7 @@ function HadithLibrary() {
           {view === "search" && !search.topic && <Suggestions q={search.q ?? ""} books={books.data} />}
           {(view === "chapter" || view === "search") && <HadithList s={search} savedApi={savedApi} />}
           {view === "saved" && (savedApi.saved.length
-            ? <PreviewList items={savedApi.saved} total={savedApi.saved.length} label="Saved" savedApi={savedApi} />
+            ? <PreviewList terms={[]} filter="" setFilter={() => {}} busy={false} hideSearch items={savedApi.saved} total={savedApi.saved.length} label="Saved" savedApi={savedApi} />
             : <Empty text="Tap the bookmark on any hadith to keep it here." />)}
         </div>
       </main>
