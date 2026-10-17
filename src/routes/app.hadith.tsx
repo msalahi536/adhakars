@@ -185,7 +185,7 @@ function Home({ books, loading, savedCount }: { books?: { bookName: string; writ
       <section>
         <h2 className="label-caps mb-2 px-1">The collections</h2>
         <div className="space-y-2">
-          {loading && <Empty text="Loading collections…" />}
+          {loading && <LoadingBar label="Loading collections" />}
           {books?.map((b) => (
             <Link key={b.bookSlug} to="/app/hadith" search={{ book: b.bookSlug }}
               className="flex items-center gap-3 rounded-[20px] p-4 transition-transform active:scale-[0.98]" style={card}>
@@ -245,7 +245,7 @@ function Chapters({ book, info }: { book: string; info?: { bookName: string; wri
         </div>
       )}
       <div className="label-caps px-1 pt-1 text-[10px]" style={{ color: "var(--muted-foreground)" }}>All books</div>
-      {q.isLoading && <Empty text="Loading chapters…" />}
+      {q.isLoading && <LoadingBar label="Loading chapters" />}
       {q.isError && <Empty text="Couldn't load chapters. Check your connection." />}
       <div className="space-y-2.5">
         {q.data?.map((c) => (
@@ -304,7 +304,7 @@ function HadithList({ s, savedApi }: { s: S; savedApi: SavedApi }) {
     placeholderData: keepPreviousData, staleTime: 1000 * 60 * 30,
   });
   useEffect(() => { document.querySelector(".scroll-area")?.scrollTo({ top: 0 }); }, [page]);
-  if (q.isLoading) return <Empty text="Loading hadith…" />;
+  if (q.isLoading) return <LoadingBar label={s.q ? "Searching hadith" : "Loading hadith"} />;
   if (q.isError) return <Empty text="Couldn't load hadith. Check your connection." />;
   const d = q.data!;
   if (!d.items.length && !filter) return <Empty text="No hadith found. Try a different word." />;
@@ -469,18 +469,18 @@ function HadithDetail({ h, index, count, savedApi, onClose, onMove, terms }: {
   return (
     <div className="hadith-detail space-y-3">
         <div ref={scroller} className="space-y-3">
-          <div className="rounded-[24px] p-5" style={panel}>
+          <div className="rounded-[20px] p-3.5" style={panel}>
             <div className="flex items-center gap-2">
-              <span className="text-[11px] font-semibold uppercase tracking-wider" style={{ color: "var(--muted-foreground)" }}>{h.bookName} · #{h.hadithNumber}</span>
+              <span className="text-[10px] font-semibold uppercase tracking-wider" style={{ color: "var(--muted-foreground)" }}>{h.bookName} · #{h.hadithNumber}</span>
               <span className="flex-1" />
               {h.status && <GradePill status={h.status} />}
               <button type="button" aria-label={saved ? "Remove bookmark" : "Save hadith"} onClick={() => savedApi.toggle(h)}
-                className="flex h-9 w-9 items-center justify-center rounded-full" style={{ background: "color-mix(in oklab, var(--accent) 10%, transparent)", color: saved ? "var(--accent)" : "var(--muted-foreground)" }}>
-                {saved ? <BookmarkCheck size={17} /> : <Bookmark size={17} />}
+                className="flex h-8 w-8 items-center justify-center rounded-full" style={{ background: "color-mix(in oklab, var(--accent) 10%, transparent)", color: saved ? "var(--accent)" : "var(--muted-foreground)" }}>
+                {saved ? <BookmarkCheck size={15} /> : <Bookmark size={15} />}
               </button>
             </div>
-            <h2 className="mt-3 font-serif text-[24px] leading-snug" style={{ color: "var(--accent)" }}><Hl text={titleOf(h)} terms={terms} /></h2>
-            {h.chapterEnglish && <div className="mt-1 text-[12px]" style={{ color: "var(--muted-foreground)" }}>Book of {h.chapterEnglish}</div>}
+            <h2 className="mt-1.5 font-serif text-[19px] leading-[1.3]" style={{ color: "var(--accent)" }}><Hl text={titleOf(h)} terms={terms} /></h2>
+            {h.chapterEnglish && <div className="mt-0.5 text-[11px]" style={{ color: "var(--muted-foreground)" }}>Book of {h.chapterEnglish}</div>}
           </div>
           {h.englishNarrator && (
             <button type="button" onClick={() => setNarrOpen((v) => !v)} className="block w-full rounded-[20px] p-4 text-left" style={panel}>
@@ -581,6 +581,39 @@ function gradeColor(status: string | null) {
   if (s.includes("sahih")) return "var(--accent)";
   if (s.includes("hasan")) return "var(--topic-gold)";
   return "var(--muted-foreground)";
+}
+
+const PATIENCE = [
+  "Allah rewards the patient — this one counts.",
+  "Every second of waiting is written as a good deed.",
+  "The scribes are still copying these out for you.",
+  "Knowledge is a path, and paths take a moment.",
+  "Say SubhanAllah a few times while you wait.",
+  "Good things arrive in their own time, inshaAllah.",
+  "Almost there — patience is half of faith.",
+  "The angels never rush, and they never forget.",
+];
+
+function LoadingBar({ label = "Loading hadith" }: { label?: string }) {
+  const [pct, setPct] = useState(7);
+  const [line, setLine] = useState(0);
+  useEffect(() => {
+    const t = setInterval(() => setPct((p) => Math.min(94, p + Math.max(0.7, (96 - p) * 0.055))), 130);
+    const r = setInterval(() => setLine((i) => (i + 1) % PATIENCE.length), 2800);
+    return () => { clearInterval(t); clearInterval(r); };
+  }, []);
+  return (
+    <div className="rounded-[20px] p-4" style={card}>
+      <div className="flex items-baseline justify-between gap-3">
+        <span className="text-[11px] font-semibold uppercase tracking-wider" style={{ color: "var(--muted-foreground)" }}>{label}</span>
+        <span className="text-[11px] font-bold tabular-nums" style={{ color: "var(--accent)" }}>{Math.round(pct)}%</span>
+      </div>
+      <div className="mt-2 h-2 overflow-hidden rounded-full" style={{ background: "color-mix(in oklab, var(--accent) 12%, transparent)" }}>
+        <div className="hadith-load-fill" style={{ width: `${pct}%` }} />
+      </div>
+      <div className="mt-2.5 text-[12px] italic leading-snug" style={{ color: "var(--muted-foreground)" }}>{PATIENCE[line]}</div>
+    </div>
+  );
 }
 
 function Empty({ text }: { text: string }) {

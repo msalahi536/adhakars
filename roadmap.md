@@ -15,3 +15,6 @@
 
 - [x] Smarter hadith search + highlight
 - [x] Stop over-scroll below hadith Prev/Next
+
+- [x] Hadith loading pill -> animated progress bar with a patience line
+- [x] Compact hadith title card (verified 161px, 14px padding)
