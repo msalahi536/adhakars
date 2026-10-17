@@ -214,7 +214,7 @@ function Home() {
           <div className={`quran-search-sticky${searchFloat ? " is-float" : ""}${searchShown ? "" : " is-hidden"}`}>
             <label className="quran-search">
               <Search size={16} />
-              <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search reciter, surah, verse (33:33) or topic…" />
+              <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search reciter, surah, verse (24:32) or topic…" />
             </label>
           </div>
 
