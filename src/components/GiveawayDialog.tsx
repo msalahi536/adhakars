@@ -135,7 +135,7 @@ export function GiveawayDialog({ open, onClose, celebrate }: { open: boolean; on
     <Dialog open={open} onOpenChange={(n) => !n && onClose()}>
       <DialogContent className="update-dialog grid max-h-[93dvh] w-[calc(100%_-_32px)] max-w-[410px] grid-rows-[auto_minmax(0,1fr)_auto] gap-0 overflow-hidden rounded-3xl border-border/60 bg-card p-0 text-card-foreground">
         {bg && <img src={bg} alt="" aria-hidden className="pointer-events-none absolute inset-0 h-full w-full -scale-x-100 object-cover object-top opacity-90" />}
-        <DialogHeader className="giveaway-header relative overflow-hidden px-6 pb-3 pt-4 text-left">
+        <DialogHeader className="giveaway-header relative overflow-hidden px-6 pb-3 pt-3 text-left">
           <div className="relative">
           <span className="giveaway-inset mb-2 flex h-11 w-11 items-center justify-center rounded-2xl text-accent"><Gift size={20} strokeWidth={1.7} /></span>
           <p className="label-caps text-accent">Giveaway · ends Friday, Oct 23</p>
@@ -146,11 +146,11 @@ export function GiveawayDialog({ open, onClose, celebrate }: { open: boolean; on
           </div>
         </DialogHeader>
 
-        <div className="relative min-h-0 space-y-2 overflow-y-auto overscroll-contain px-4 py-2">
+        <div className="relative min-h-0 space-y-1.5 overflow-y-auto overscroll-contain px-4 py-2">
           {status !== "joined" ? (
             <>
-              <div className="giveaway-panel rounded-2xl px-3 py-3">
-                <p className="label-caps mb-2 px-1 text-soft">What you'll study</p>
+              <div className="giveaway-panel rounded-2xl px-3 py-2.5">
+                <p className="label-caps mb-1.5 px-1 text-soft">What you'll study</p>
                 <ul className="space-y-1.5">
                   {LEVELS.map(({ n, Icon, name, books }) => (
                     <li key={name} className="giveaway-inset flex items-center gap-3 rounded-xl px-2.5 py-1.5">
@@ -164,8 +164,8 @@ export function GiveawayDialog({ open, onClose, celebrate }: { open: boolean; on
                   ))}
                 </ul>
               </div>
-              <div className="giveaway-panel rounded-2xl px-3 py-3">
-                <p className="label-caps mb-2 px-1 text-soft">What's included</p>
+              <div className="giveaway-panel rounded-2xl px-3 py-2.5">
+                <p className="label-caps mb-1.5 px-1 text-soft">What's included</p>
                 <div className="grid grid-cols-4 divide-x divide-border/50">
                   {FEATURES.map(({ Icon, t }) => (
                     <div key={t} className="flex flex-col items-center gap-1.5 px-1 text-center">
@@ -175,8 +175,8 @@ export function GiveawayDialog({ open, onClose, celebrate }: { open: boolean; on
                   ))}
                 </div>
               </div>
-              <div className="giveaway-panel rounded-2xl px-3 py-3">
-                <p className="label-caps mb-2 px-1 text-soft">How to enter</p>
+              <div className="giveaway-panel rounded-2xl px-3 py-2.5">
+                <p className="label-caps mb-1.5 px-1 text-soft">How to enter</p>
                 <div className="flex items-start gap-3">
                   <span className="giveaway-inset flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-accent"><Target size={18} strokeWidth={1.6} /></span>
                   <p className="text-xs leading-5">Finish any one goal: <b>5 surahs</b>, <b>500 dhikr</b> or <b>5 downloads</b>. Each goal you finish is another entry — up to 3.</p>
