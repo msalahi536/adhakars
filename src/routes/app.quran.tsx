@@ -1,3 +1,4 @@
+import { favoritesFirst, toggleFavorite, useFavoriteReciters } from "@/lib/quran-favorites";
 import { Fragment, memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { markSurahComplete } from "@/lib/giveaway";
@@ -165,7 +166,8 @@ function Home() {
       await quranPlayer.select(reciter, last.s, name, true, `${last.s}:${last.v}`);
     }
   };
-  const home = HOME_RECITER_IDS.map(findReciter);
+  const favs = useFavoriteReciters();
+  const home = [...favs.map(findReciter), ...HOME_RECITER_IDS.filter((id) => !favs.includes(id)).map(findReciter)];
   const lastY = useRef(0);
   const [searchShown, setSearchShown] = useState(true);
   const [searchFloat, setSearchFloat] = useState(false);
@@ -201,7 +203,7 @@ function Home() {
           )}
 
           {!t && (
-            <section>
+            <section className="quran-reciter-panel">
               <div className="flex items-center justify-between">
                 <h2 className="quran-section-title">Choose a Reciter</h2>
                 <button className="quran-see-all" onClick={() => navigate({ to: "/app/quran", search: { view: "reciters", tab: "all" } })}>See All <ChevronRight size={14} /></button>
@@ -281,6 +283,12 @@ function ReciterPicker({ back, tab }: { back?: number; tab?: "all" }) {
     }
     return list;
   }, [filter, t, list]);
+  const favs = useFavoriteReciters();
+  const ordered = useMemo(() => {
+    if (t) return sorted;
+    const extra = favs.map(findReciter).filter((r) => r && !sorted.includes(r));
+    return favoritesFirst([...extra, ...sorted], favs);
+  }, [sorted, favs, t]);
 
   const goBack = () => { audio.current?.pause(); void navigate({ to: "/app/quran", search: back ? { s: back } : {} }); };
   const choose = (r: Reciter) => { setPrefs({ reciter: r.id }); void triggerHaptic("medium"); };
@@ -315,8 +323,9 @@ function ReciterPicker({ back, tab }: { back?: number; tab?: "all" }) {
             </div>
           )}
           <div className="quran-card overflow-hidden">
-            {sorted.map((r) => {
+            {ordered.map((r) => {
               const on = prefs.reciter === r.id;
+              const fav = favs.includes(r.id);
               return (
                 <div key={r.id} className={`quran-reciter-row ${on ? "is-on" : ""}`}>
                   <button className="flex min-w-0 flex-1 items-center gap-3 text-left" onClick={() => choose(r)}>
@@ -324,13 +333,16 @@ function ReciterPicker({ back, tab }: { back?: number; tab?: "all" }) {
                     <span className="min-w-0 flex-1"><span className="block truncate text-[14.5px] font-semibold">{reciterName(r)}</span><span className="quran-muted block truncate text-[11.5px]">{reciterSubtitle(r)}</span></span>
                   </button>
                   {on && <span className="quran-mini-eq" aria-label="Selected"><i /><i /><i /></span>}
+                  <button className={`quran-fav-btn${fav ? " is-on" : ""}`} aria-pressed={fav} aria-label={fav ? `Remove ${r.name} from favorites` : `Add ${r.name} to favorites`} onClick={() => { toggleFavorite(r.id); void triggerHaptic("light"); }}>
+                    <Heart size={17} fill={fav ? "currentColor" : "none"} />
+                  </button>
                   <button className="quran-play-sm" aria-label={preview === r.id ? "Stop preview" : `Preview ${r.name}`} onClick={() => void togglePreview(r)}>
                     {preview === r.id ? <Pause size={15} /> : <Play size={15} style={{ marginLeft: 2 }} />}
                   </button>
                 </div>
               );
             })}
-            {sorted.length === 0 && <p className="quran-muted p-6 text-center text-sm">No reciters found.</p>}
+            {ordered.length === 0 && <p className="quran-muted p-6 text-center text-sm">No reciters found.</p>}
           </div>
           <p className="quran-muted text-center text-[10px]">Preview plays Al-Fatihah. Tap a name to choose — it saves right away.</p>
         </div>
@@ -650,7 +662,7 @@ const VerseCard = memo(function VerseCard({ verse: v, active, word, translit, tr
         {translit && v.transliteration && <p className={`quran-translit ${!arabic && !translation ? "is-big" : ""}`} onClick={!arabic && !translation ? () => onPlay(v.key) : undefined}>{v.transliteration}</p>}
         {translation && <p className={`quran-tr ${arabic ? "" : "is-big"}`} onClick={arabic ? undefined : () => onPlay(v.key)}>{v.translation}</p>}
       </div>
-      <button className={`quran-heart ${fav ? "is-on" : ""}`} aria-label={fav ? "Remove from favorites" : "Save verse"} aria-pressed={fav} onClick={() => onFav(v.key)}>
+      <button className={`quran-fav-btn ${fav ? "is-on" : ""}`} aria-label={fav ? "Remove from favorites" : "Save verse"} aria-pressed={fav} onClick={() => onFav(v.key)}>
         <Heart size={18} fill={fav ? "currentColor" : "none"} />
       </button>
     </article>

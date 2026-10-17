@@ -4839,3 +4839,27 @@ body.quran-fs-on .quran-mini:not(.quran-fs .quran-mini) { display: none; }
 .bottom-nav { position: relative; }
 .quran-nav-hint-wrap { position: absolute; inset: 0; pointer-events: none; }
 .quran-nav-hint-wrap .quran-nav-hint { left: 70%; bottom: calc(100% + 8px); }
+
+/* Reciter row sits over theme artwork: give it its own readable panel in every theme. */
+.quran-reciter-panel {
+  margin: 0 -6px;
+  padding: 12px 12px 8px;
+  border-radius: 24px;
+  background: color-mix(in oklab, var(--surface, var(--card)) 82%, transparent);
+  border: 1px solid color-mix(in oklab, var(--foreground) 8%, transparent);
+  box-shadow: var(--card-shadow);
+  backdrop-filter: blur(14px) saturate(130%);
+  -webkit-backdrop-filter: blur(14px) saturate(130%);
+  color: var(--foreground);
+}
+.quran-reciter-panel .quran-section-title { margin-top: 0; color: var(--foreground); }
+.quran-reciter-panel .quran-see-all { color: var(--accent); font-weight: 600; }
+.quran-reciter-panel .quran-reciter-name { color: var(--foreground); }
+.quran-reciter-row .quran-fav-btn {
+  position: static;
+  display: inline-flex; height: 36px; width: 36px; flex-shrink: 0; align-items: center; justify-content: center;
+  border-radius: 999px; color: color-mix(in oklab, var(--foreground) 55%, transparent);
+  transition: transform 150ms ease, color 150ms ease;
+}
+.quran-fav-btn:active { transform: scale(0.88); }
+.quran-fav-btn.is-on { color: var(--accent); }
