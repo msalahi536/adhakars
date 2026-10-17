@@ -153,6 +153,7 @@ function HadithLibrary() {
 }
 
 function Home({ books, loading, savedCount }: { books?: { bookName: string; writerName: string; bookSlug: string; hadiths_count: number; chapters_count: number }[]; loading: boolean; savedCount: number }) {
+  const booksBar = useLoadingGate(loading);
   return (
     <>
       <section>
@@ -226,6 +227,7 @@ const ABOUT: Record<string, string> = {
 function Chapters({ book, info }: { book: string; info?: { bookName: string; writerName: string; hadiths_count: number; chapters_count: number } }) {
   const q = useQuery({ queryKey: ["hadith-chapters", book], queryFn: cached(`chapters:${book}`, 30 * DAY, () => getHadithChapters({ data: { book } })), staleTime: Infinity });
   const soft = "color-mix(in oklab, var(--accent) 12%, transparent)";
+  const chBar = useLoadingGate(q.isLoading);
   return (
     <>
       {info && (
