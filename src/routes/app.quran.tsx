@@ -218,7 +218,7 @@ function Home() {
               <div className="quran-reciter-strip">
                 {home.map((r) => (
                   <button key={r.id} className={`quran-reciter-tile ${prefs.reciter === r.id ? "is-on" : ""}`} onClick={() => { setPrefs({ reciter: r.id }); void triggerHaptic("light"); }}>
-                    <span className="quran-reciter-ring"><Avatar r={r} size={64} /></span>
+                    <span className="quran-reciter-ring"><Avatar r={r} size={64} eager /></span>
                     <span className="quran-reciter-name">{reciterName(r)}</span>
                   </button>
                 ))}
@@ -479,7 +479,7 @@ function Reader({ chapterId }: { chapterId: number }) {
       <main className="scroll-area" onScroll={onReadScroll}>
         <div className={`mx-auto max-w-md space-y-3 px-5 pt-4 ${player.panelOpen ? "pb-64" : "pb-28"}`}>
           <button className="quran-card quran-reciter-select" onClick={() => { void triggerHaptic("light"); setSheet((o) => !o); }}>
-            <Avatar r={shownReciter} size={46} />
+            <Avatar r={shownReciter} size={46} eager />
             <span className="min-w-0 flex-1 text-left"><span className="block truncate text-[15px] font-semibold">{reciterName(shownReciter)}</span><span className="quran-muted block truncate text-[11.5px]">{reciterSubtitle(shownReciter)}</span></span>
             <ChevronDown size={18} className="opacity-60" style={{ transform: sheet ? "rotate(180deg)" : undefined, transition: "transform .2s" }} />
           </button>
