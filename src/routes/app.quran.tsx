@@ -84,7 +84,7 @@ function QuranPage() {
 }
 
 /* ---------- shared bits ---------- */
-function Avatar({ r, size = 48 }: { r: Reciter; size?: number }) {
+function Avatar({ r, size = 48, eager = false }: { r: Reciter; size?: number; eager?: boolean }) {
   const [broken, setBroken] = useState(false);
   const photo = reciterPhoto(r);
   const initials = reciterName(r).replace(/^(sheikh|al-|ash-|as-)\s*/i, "").split(/\s+/).filter((w) => !/^(al|ad|ar|as|ash|bin|ibn)-?$/i.test(w)).slice(0, 2).map((w) => w.replace(/^[a-z]+-/i, "")[0]).join("").toUpperCase();
@@ -92,11 +92,13 @@ function Avatar({ r, size = 48 }: { r: Reciter; size?: number }) {
     <span className="quran-avatar" style={{ width: size, height: size, fontSize: size * 0.34 }}>
       <span className="quran-avatar-initials">{initials}</span>
       {photo && !broken && (
-        <img src={photo} alt="" loading="lazy" decoding="async"
+        <img src={photo} alt="" loading={eager ? "eager" : "lazy"} decoding="async"
+          fetchPriority={eager ? "high" : "low"}
           onLoad={(e) => e.currentTarget.classList.add("is-loaded")} onError={() => setBroken(true)} />
       )}
     </span>
   );
+
 
 }
 
