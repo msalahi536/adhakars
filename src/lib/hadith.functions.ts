@@ -112,11 +112,3 @@ export const translateIsnad = createServerFn({ method: "POST" })
       return { names: Array.isArray(arr) ? arr.map(String).slice(0, data.links.length) : [] };
     } catch { return { names: [] as string[] }; }
   });
-    if (!r.ok) return { names: [] as string[] };
-    const j = (await r.json()) as { choices?: { message?: { content?: string } }[] };
-    const txt = j.choices?.[0]?.message?.content ?? "";
-    try {
-      const arr = JSON.parse(txt.slice(txt.indexOf("["), txt.lastIndexOf("]") + 1));
-      return { names: Array.isArray(arr) ? arr.map(String).slice(0, data.links.length) : [] };
-    } catch { return { names: [] as string[] }; }
-  });
