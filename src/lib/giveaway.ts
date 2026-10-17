@@ -62,6 +62,7 @@ export function markSurahComplete(chapter: number | null | undefined) {
   if (list.includes(chapter)) return;
   ls()?.setItem(K.surahs, JSON.stringify([...list, chapter]));
   emit();
+  if (list.length + 1 === GOALS.surahs) celebrate("surahs");
 }
 
 export function getDhikr(): number {
@@ -69,8 +70,10 @@ export function getDhikr(): number {
 }
 export function addGiveawayDhikr(n = 1) {
   if (!tracking()) return;
-  ls()?.setItem(K.dhikr, String(getDhikr() + n));
+  const before = getDhikr();
+  ls()?.setItem(K.dhikr, String(before + n));
   emit();
+  if (before < GOALS.dhikr && before + n >= GOALS.dhikr) celebrate("dhikr");
 }
 
 export function getEntered(): string[] {
@@ -104,6 +107,11 @@ export function drawWinner<T extends { tickets: number }>(entries: T[], rand = M
     if (r < 0) return e;
   }
   return entries[entries.length - 1];
+}
+
+export const GOAL_EVT = "giveaway-goal";
+function celebrate(goal: string) {
+  window.dispatchEvent(new CustomEvent(GOAL_EVT, { detail: goal }));
 }
 
 function emit() {
