@@ -87,7 +87,15 @@ function HadithLibrary() {
   const search = Route.useSearch();
   const navigate = useNavigate({ from: "/app/hadith" });
   const [text, setText] = useState(search.q ?? "");
-  useEffect(() => setText(search.q ?? ""), [search.q]);
+  useEffect(() => { if (!search.topic) setText(search.q ?? ""); }, [search.q, search.topic]);
+  // Live search: results update as you type, no Enter needed.
+  useEffect(() => {
+    if (search.topic || search.saved || (search.chapter && search.book)) return;
+    const q = text.trim();
+    if (q === (search.q ?? "")) return;
+    const t = setTimeout(() => void navigate({ search: q ? { q, book: search.book } : { book: search.book }, replace: !!search.q }), 450);
+    return () => clearTimeout(t);
+  }, [text]); // eslint-disable-line react-hooks/exhaustive-deps
   const savedApi = useSaved();
 
   const view = search.saved ? "saved" : search.q ? "search" : search.chapter && search.book ? "chapter" : search.book ? "book" : "home";
@@ -116,7 +124,7 @@ function HadithLibrary() {
           <div className="label-caps" style={{ color: "var(--header-sub)" }}>Sunnah</div>
           <h1 className="app-page-title mt-2">{title}</h1>
           {view === "home" && <p className="mt-2 text-xs opacity-90">40,000+ hadith from the major collections</p>}
-          {(view === "home" || view === "book") && (
+          {(view === "home" || view === "book" || (view === "search" && !search.topic)) && (
             <form onSubmit={submit} className="mt-9 flex items-center gap-2 rounded-full px-4 py-3 text-left" style={card}>
               <Search size={17} style={{ color: "var(--muted-foreground)" }} />
               <input value={text} onChange={(e) => setText(e.target.value)} enterKeyHint="search"
@@ -133,9 +141,10 @@ function HadithLibrary() {
 
           {view === "home" && <Home books={books.data} loading={books.isLoading} savedCount={savedApi.saved.length} />}
           {view === "book" && <Chapters book={search.book!} />}
+          {view === "search" && !search.topic && <Suggestions q={search.q ?? ""} books={books.data} />}
           {(view === "chapter" || view === "search") && <HadithList s={search} savedApi={savedApi} />}
           {view === "saved" && (savedApi.saved.length
-            ? <PreviewList items={savedApi.saved} total={savedApi.saved.length} label="Saved" savedApi={savedApi} />
+            ? <PreviewList terms={[]} filter="" setFilter={() => {}} busy={false} hideSearch items={savedApi.saved} total={savedApi.saved.length} label="Saved" savedApi={savedApi} />
             : <Empty text="Tap the bookmark on any hadith to keep it here." />)}
         </div>
       </main>
@@ -224,6 +233,30 @@ function Chapters({ book }: { book: string }) {
 
 type SavedApi = ReturnType<typeof useSaved>;
 
+function Suggestions({ q, books }: { q: string; books?: { bookSlug: string; bookName: string; hadiths_count: number }[] }) {
+  const f = q.trim().toLowerCase();
+  if (f.length < 2) return null;
+  const topics = TOPICS.filter((t) => t.label.toLowerCase().includes(f) || t.q.toLowerCase().includes(f) || t.ar.includes(q.trim()));
+  const cols = (books ?? []).filter((b) => b.bookName.toLowerCase().replace(/[^a-z ]/g, "").includes(f.replace(/[^a-z ]/g, "")));
+  if (!topics.length && !cols.length) return null;
+  const chip = "flex shrink-0 items-center gap-2 rounded-full px-3.5 py-2 text-[13px] font-semibold";
+  return (
+    <div className="space-y-3">
+      {topics.length > 0 && <div>
+        <div className="label-caps mb-2 px-1 text-[10px]" style={{ color: "var(--muted-foreground)" }}>Topics</div>
+        <div className="flex gap-2 overflow-x-auto pb-1">{topics.map(({ label, q: tq, Icon }) => (
+          <Link key={tq} to="/app/hadith" search={{ q: tq, topic: label }} className={chip} style={card}><Icon size={14} /> {label}</Link>))}</div>
+      </div>}
+      {cols.length > 0 && <div>
+        <div className="label-caps mb-2 px-1 text-[10px]" style={{ color: "var(--muted-foreground)" }}>Collections</div>
+        <div className="flex gap-2 overflow-x-auto pb-1">{cols.map((b) => (
+          <Link key={b.bookSlug} to="/app/hadith" search={{ book: b.bookSlug }} className={chip} style={card}><BookOpen size={14} /> {b.bookName}</Link>))}</div>
+      </div>}
+      <div className="label-caps px-1 text-[10px]" style={{ color: "var(--muted-foreground)" }}>Hadith</div>
+    </div>
+  );
+}
+
 function HadithList({ s, savedApi }: { s: S; savedApi: SavedApi }) {
   const [filter, setFilter] = useState("");
   const [refine, setRefine] = useState("");
@@ -244,7 +277,7 @@ function HadithList({ s, savedApi }: { s: S; savedApi: SavedApi }) {
   if (!d.items.length && !filter) return <Empty text="No hadith found. Try a different word." />;
   return (
     <>
-      <PreviewList items={d.items} total={d.total} terms={d.terms ?? []} filter={filter} setFilter={setFilter} busy={q.isFetching} label={s.topic ?? (s.q ? `“${s.q}”` : "this chapter")} savedApi={savedApi} />
+      <PreviewList items={d.items} total={d.total} terms={d.terms ?? []} filter={filter} setFilter={setFilter} busy={q.isFetching} hideSearch={!!s.q && !s.topic} label={s.topic ?? (s.q ? `“${s.q}”` : "this chapter")} savedApi={savedApi} />
       {d.lastPage > 1 && s.h === undefined && (
         <div className="flex items-center justify-between gap-3 pt-1">
           <Link to="/app/hadith" search={{ ...s, page: page - 1 }} disabled={page <= 1} onClick={(e) => { if (refine) { e.preventDefault(); setRPage(page - 1); } }}
@@ -279,7 +312,7 @@ function esc(t: string) { return t.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"); }
 function termRegex(terms: string[]) {
   const t = terms.filter((x) => x.trim().length > 1);
   if (!t.length) return null;
-  return new RegExp(`(${t.map((w) => /[\u0600-\u06FF]/.test(w) ? [...w].map((c) => esc(c) + DIA).join("") : `\\b${esc(w)}[\\w'’]*`).join("|")})`, "gi");
+  return new RegExp(`(${t.map((w) => /[\u0600-\u06FF]/.test(w) ? [...w].map((c) => esc(c) + DIA).join("") : `[\\w'’]*${esc(w)}[\\w'’]*`).join("|")})`, "gi");
 }
 function Hl({ text, terms }: { text: string; terms: string[] }) {
   const re = termRegex(terms);
@@ -294,7 +327,7 @@ function snippetOf(h: Hadith, terms: string[]) {
   return (a > 0 ? "…" : "") + t.slice(a, b).replace(/^\S*\s/, a > 0 ? "" : "$&") + (b < t.length ? "…" : "");
 }
 
-function PreviewList({ items, total, label, savedApi, terms, filter, setFilter, busy }: { items: Hadith[]; total: number; label: string; savedApi: SavedApi; terms: string[]; filter: string; setFilter: (v: string) => void; busy: boolean }) {
+function PreviewList({ items, total, label, savedApi, terms, filter, setFilter, busy, hideSearch }: { hideSearch?: boolean; items: Hadith[]; total: number; label: string; savedApi: SavedApi; terms: string[]; filter: string; setFilter: (v: string) => void; busy: boolean }) {
   const [sort, setSort] = useState<SortId>("relevance");
   const [sortOpen, setSortOpen] = useState(false);
   const sp = Route.useSearch();
@@ -316,12 +349,12 @@ function PreviewList({ items, total, label, savedApi, terms, filter, setFilter, 
   }
   return (
     <>
-      <div className="flex items-center gap-2 rounded-full px-4 py-3" style={card}>
+      {!hideSearch && <div className="flex items-center gap-2 rounded-full px-4 py-3" style={card}>
         <Search size={17} style={{ color: "var(--muted-foreground)" }} />
         <input value={filter} onChange={(e) => setFilter(e.target.value)} placeholder={`Search in ${label}…`}
           className="min-w-0 flex-1 bg-transparent text-sm outline-none" />
         {filter && <button type="button" aria-label="Clear" onClick={() => setFilter("")}><X size={16} /></button>}
-      </div>
+      </div>}
       <div className="relative flex items-center justify-between px-1">
         <span className="text-xs font-medium" style={{ color: "var(--muted-foreground)" }}>{busy ? "Searching…" : `${total.toLocaleString()} hadith`}</span>
         <button type="button" onClick={() => setSortOpen((v) => !v)} aria-expanded={sortOpen}
@@ -362,7 +395,7 @@ function PreviewList({ items, total, label, savedApi, terms, filter, setFilter, 
             <div className="mt-1.5 flex items-center gap-2">
               <div className="min-w-0 flex-1">
                 <div className="line-clamp-2 text-[15px] font-bold leading-snug"><Hl text={titleOf(h)} terms={terms} /></div>
-                {(() => { const sn = h.headingEnglish?.trim() ? snippetOf(h, terms) : null; return sn ? <div className="mt-1 line-clamp-2 text-[12.5px] leading-snug" style={{ color: "var(--muted-foreground)" }}><Hl text={sn} terms={terms} /></div> : null; })()}
+                {(() => { const re = termRegex(terms); const sn = re && !re.test(titleOf(h)) ? snippetOf(h, terms) : null; return sn ? <div className="mt-1 line-clamp-2 text-[12.5px] leading-snug" style={{ color: "var(--muted-foreground)" }}><Hl text={sn} terms={terms} /></div> : null; })()}
                 {h.englishNarrator && <div className="mt-1 truncate text-[12px] italic" style={{ color: "var(--muted-foreground)" }}>{clean(h.englishNarrator)} …</div>}
               </div>
               <ChevronRight size={17} className="shrink-0 opacity-40" />
