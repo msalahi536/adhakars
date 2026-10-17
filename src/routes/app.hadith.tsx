@@ -166,10 +166,17 @@ function Home({ books, loading, savedCount }: { books?: { bookName: string; writ
           {books?.map((b) => (
             <Link key={b.bookSlug} to="/app/hadith" search={{ book: b.bookSlug }}
               className="flex items-center gap-3 rounded-[20px] p-4 transition-transform active:scale-[0.98]" style={card}>
-              <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl text-sm font-bold"
-                style={{ background: "color-mix(in oklab, var(--accent) 14%, var(--card))", color: "var(--accent)" }}>
-                {b.bookName.replace(/^(Sahih|Sunan|Jami'|Mishkat)\s*/i, "").charAt(0)}
-              </div>
+              {(() => {
+                const cover = hadithCover(b.bookSlug, b.bookName);
+                return cover ? (
+                  <img src={cover} alt="" className="h-11 w-11 shrink-0 rounded-2xl object-cover" style={{ boxShadow: "0 1px 6px rgb(0 0 0 / 0.25)" }} />
+                ) : (
+                  <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl text-sm font-bold"
+                    style={{ background: "color-mix(in oklab, var(--accent) 14%, var(--card))", color: "var(--accent)" }}>
+                    {b.bookName.replace(/^(Sahih|Sunan|Jami'|Mishkat)\s*/i, "").charAt(0)}
+                  </div>
+                );
+              })()}
               <div className="min-w-0 flex-1">
                 <div className="text-[15px] font-bold">{b.bookName}</div>
                 <div className="text-[11px]" style={{ color: "var(--muted-foreground)" }}>
