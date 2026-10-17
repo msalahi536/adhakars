@@ -88,16 +88,23 @@ function Avatar({ r, size = 48, eager = false }: { r: Reciter; size?: number; ea
   const [broken, setBroken] = useState(false);
   const photo = reciterPhoto(r);
   const initials = reciterName(r).replace(/^(sheikh|al-|ash-|as-)\s*/i, "").split(/\s+/).filter((w) => !/^(al|ad|ar|as|ash|bin|ibn)-?$/i.test(w)).slice(0, 2).map((w) => w.replace(/^[a-z]+-/i, "")[0]).join("").toUpperCase();
+  // A portrait already in the browser cache finishes before React attaches onLoad,
+  // so show it as soon as the node exists instead of leaving the initials up.
+  const showIfReady = (el: HTMLImageElement | null) => {
+    if (el && el.complete && el.naturalWidth > 0) el.classList.add("is-loaded");
+  };
   return (
     <span className="quran-avatar" style={{ width: size, height: size, fontSize: size * 0.34 }}>
       <span className="quran-avatar-initials">{initials}</span>
       {photo && !broken && (
         <img src={photo} alt="" loading={eager ? "eager" : "lazy"} decoding="async"
           fetchPriority={eager ? "high" : "low"}
+          ref={showIfReady}
           onLoad={(e) => e.currentTarget.classList.add("is-loaded")} onError={() => setBroken(true)} />
       )}
     </span>
   );
+
 
 
 }
