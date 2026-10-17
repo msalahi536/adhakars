@@ -1,3 +1,4 @@
+import { PRESET_BACKGROUNDS } from "@/lib/backgrounds";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useEffect, useLayoutEffect } from "react";
 import {
@@ -104,12 +105,15 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
   errorComponent: ErrorComponent,
 });
 
+// Sets the saved theme's artwork before the first paint so launch never flashes the default background.
+const BOOT_BACKGROUND_SCRIPT = `(function(){try{var m=${JSON.stringify(PRESET_BACKGROUNDS)};var b=m[localStorage.getItem('adhkar:preset')||'original'];if(!b)return;var s=document.documentElement.style;s.setProperty('--boot-bg-morning','url('+b.morning+')');s.setProperty('--boot-bg-evening','url('+b.evening+')');}catch(e){}})();`;
+
 function RootShell({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
         <HeadContent />
-        <script dangerouslySetInnerHTML={{ __html: PRE_PAINT_SCRIPT }} />
+        <script dangerouslySetInnerHTML={{ __html: PRE_PAINT_SCRIPT + BOOT_BACKGROUND_SCRIPT }} />
       </head>
       <body>
         {children}

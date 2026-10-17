@@ -239,6 +239,11 @@
   .app-background-morning {
     opacity: 1;
   }
+  /* Before the app finishes starting, show the saved theme's artwork chosen by the pre-paint script, with no fade. */
+  .app-shell:not(.is-ready) .app-background { transition: none; }
+  .app-shell:not(.is-ready) .app-background-morning { background-image: var(--boot-bg-morning, var(--screen-background)); }
+  .app-shell:not(.is-ready) .app-background-evening { background-image: var(--boot-bg-evening, var(--screen-background)); }
+  html[data-visual-phase="evening"] .app-shell:not(.is-ready) .app-background-evening { opacity: 1; }
 
   .calibration-phone {
     position: absolute;
