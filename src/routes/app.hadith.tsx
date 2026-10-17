@@ -136,14 +136,14 @@ function Home({ books, loading, savedCount }: { books?: { bookName: string; writ
         <div className="grid grid-cols-2 gap-2.5">
           {TOPICS.map(({ label, q, ar, Icon, tone }) => (
             <Link key={q} to="/app/hadith" search={{ q, topic: label }}
-              className="flex items-center gap-3 rounded-2xl py-3 pl-3 pr-2 transition-transform active:scale-[0.97]" style={card}>
+              className="flex items-center gap-3 rounded-[18px] py-3 pl-3 pr-1.5 transition-transform active:scale-[0.97]" style={card}>
               <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full"
                 style={{ background: `color-mix(in oklab, var(--topic-${tone}) 18%, var(--card))`, color: `var(--topic-${tone})` }}>
                 <Icon size={20} strokeWidth={1.8} />
               </span>
               <span className="min-w-0 flex-1">
                 <span className="block text-[17px] leading-tight" dir="rtl" style={{ textAlign: "left", fontFamily: "var(--font-arabic, serif)" }}>{ar}</span>
-                <span className="mt-0.5 block truncate text-[11px]" style={{ color: "var(--muted-foreground)" }}>{label}</span>
+                <span className="mt-0.5 block text-[11px] leading-tight" style={{ color: "var(--muted-foreground)" }}>{label}</span>
               </span>
               <ChevronRight size={15} className="shrink-0 opacity-40" />
             </Link>
