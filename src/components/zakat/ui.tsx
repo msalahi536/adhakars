@@ -5,7 +5,7 @@ import { Portal } from "@/components/Portal";
 export function Card({ children, className = "" }: { children: ReactNode; className?: string }) {
   return (
     <section
-      className={`rounded-[22px] p-4 ${className}`}
+      className={`rounded-[28px] p-5 ${className}`}
       style={{ background: "var(--surface, var(--card))", border: "1px solid var(--border)", boxShadow: "var(--card-shadow)", color: "var(--foreground)" }}
     >
       {children}
@@ -110,15 +110,21 @@ export function Choice<T extends string | number | boolean>({
             role="radio"
             aria-checked={active}
             onClick={() => onChange(o.value)}
-            className="min-h-[44px] rounded-2xl px-3 py-2.5 text-left transition-transform active:scale-[0.98]"
+            className="flex min-h-[48px] items-center gap-3 rounded-[20px] px-4 py-3.5 text-left transition-all active:scale-[0.98]"
             style={{
-              background: active ? "color-mix(in oklab, var(--accent) 14%, var(--card))" : "color-mix(in oklab, var(--foreground) 4%, transparent)",
-              border: `1.5px solid ${active ? "var(--accent)" : "var(--border)"}`,
+              background: active ? "color-mix(in oklab, var(--accent) 16%, var(--card))" : "color-mix(in oklab, var(--foreground) 3.5%, var(--card))",
+              border: `1px solid ${active ? "color-mix(in oklab, var(--accent) 70%, transparent)" : "color-mix(in oklab, var(--foreground) 6%, transparent)"}`,
+              boxShadow: active ? "0 6px 18px color-mix(in oklab, var(--accent) 14%, transparent)" : "none",
               color: "var(--foreground)",
             }}
           >
-            <span className="block text-[13px] font-semibold leading-snug">{o.label}</span>
-            {o.sub && <span className="mt-0.5 block text-[11px] leading-snug" style={{ color: "var(--muted-foreground)" }}>{o.sub}</span>}
+            <span aria-hidden="true" className="flex h-[22px] w-[22px] shrink-0 items-center justify-center rounded-full" style={{ border: `1.5px solid ${active ? "var(--accent)" : "color-mix(in oklab, var(--foreground) 35%, transparent)"}` }}>
+              {active && <span className="h-3 w-3 rounded-full" style={{ background: "var(--accent)" }} />}
+            </span>
+            <span className="min-w-0">
+              <span className="block text-[15px] font-semibold leading-snug">{o.label}</span>
+              {o.sub && <span className="mt-0.5 block text-[12px] leading-snug" style={{ color: "var(--muted-foreground)" }}>{o.sub}</span>}
+            </span>
           </button>
         );
       })}
@@ -153,7 +159,7 @@ export function PrimaryButton({ children, onClick, disabled, className = "" }: {
       type="button"
       onClick={onClick}
       disabled={disabled}
-      className={`min-h-[48px] rounded-full px-5 text-sm font-semibold transition-transform active:scale-[0.98] disabled:opacity-50 ${className}`}
+      className={`inline-flex min-h-[52px] items-center justify-center gap-2 rounded-full px-6 text-[16px] font-semibold shadow-[var(--card-shadow)] transition-transform active:scale-[0.98] disabled:opacity-50 ${className}`}
       style={{ background: "var(--accent)", color: "var(--accent-foreground)" }}
     >
       {children}
@@ -202,8 +208,8 @@ export function Sheet({ open, onClose, title, children }: { open: boolean; onClo
 
 export function Collapsible({ title, children }: { title: string; children: ReactNode }) {
   return (
-    <details className="rounded-2xl px-3 py-2" style={{ border: "1px solid var(--border)" }}>
-      <summary className="min-h-[36px] cursor-pointer py-1.5 text-[13px] font-semibold">{title}</summary>
+    <details className="rounded-[20px] px-4 py-2" style={{ background: "color-mix(in oklab, var(--foreground) 3.5%, var(--card))", border: "1px solid color-mix(in oklab, var(--foreground) 6%, transparent)" }}>
+      <summary className="min-h-[40px] cursor-pointer py-2 text-[14px] font-semibold">{title}</summary>
       <div className="pb-2 pt-1">{children}</div>
     </details>
   );
