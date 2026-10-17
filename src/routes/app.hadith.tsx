@@ -110,7 +110,7 @@ function HadithLibrary() {
           <h1 className="app-page-title mt-2">{title}</h1>
           {view === "home" && <p className="mt-2 text-xs opacity-90">40,000+ hadith from the major collections</p>}
           {(view === "home" || view === "book") && (
-            <form onSubmit={submit} className="mt-14 flex items-center gap-2 rounded-full px-4 py-3.5 text-left shadow-lg" style={{ ...card, background: "var(--card)", color: "var(--foreground)" }}>
+            <form onSubmit={submit} className="mt-6 flex items-center gap-2 rounded-full px-4 py-3 text-left" style={card}>
               <Search size={17} style={{ color: "var(--muted-foreground)" }} />
               <input value={text} onChange={(e) => setText(e.target.value)} enterKeyHint="search"
                 placeholder={bookName ? `Search ${bookName}` : "Search all hadith (English or Arabic)"}
