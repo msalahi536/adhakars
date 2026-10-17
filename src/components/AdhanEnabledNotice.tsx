@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from "@/components/ui/dialog";
 import { enableAllPrayerAlerts } from "@/lib/adhan-bridge";
 import { ADHAN_PROMPT_EVENT, ADHAN_PROMPT_PENDING_KEY, requestNotificationPermission } from "@/lib/notifications";
+import { getPrayerSettings, resolveLocation, setPrayerSettings } from "@/lib/prayer-times";
 
 /**
  * Asks once whether to turn on adhan. Uses the shared modal dialog layer so it
@@ -39,6 +40,11 @@ export function AdhanEnabledNotice() {
     close();
     await requestNotificationPermission().catch(() => null);
     await enableAllPrayerAlerts().catch(() => null);
+    // Location is asked only after they agree to adhan.
+    if (!getPrayerSettings().location) {
+      const loc = await resolveLocation().catch(() => null);
+      if (loc) setPrayerSettings({ ...getPrayerSettings(), location: loc });
+    }
     window.localStorage.setItem("adhkar:open-adhan-settings", "1");
     window.dispatchEvent(new Event("adhkar:open-adhan-settings"));
     void router.navigate({ to: "/app/salah" });
