@@ -163,14 +163,9 @@ function Salah() {
     (async () => {
       let s = getPrayerSettings();
       if (!s.location && claimSalahLocationRequest()) {
-        const loc = await resolveLocation();
-        if (loc) {
-          s = { ...getPrayerSettings(), location: getPrayerSettings().location ?? loc };
-          setPrayerSettings(s);
-          void offerAdhanPrompt();
-        } else {
-          setCityError("Location permission is off. Enable it in your phone settings, or type a city instead.");
-        }
+        // Ask about adhan first; "Yes" then asks for location. "Not now"
+        // leaves the city box and location button on this page.
+        void offerAdhanPrompt();
       } else if (s.location) {
         // One time repair for city coordinates saved by an older build.
         const fixed = await repairLocation(s.location);
