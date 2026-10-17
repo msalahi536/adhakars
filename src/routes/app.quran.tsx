@@ -333,7 +333,7 @@ function ReciterPicker({ back, tab }: { back?: number; tab?: "all" }) {
                     <span className="min-w-0 flex-1"><span className="block truncate text-[14.5px] font-semibold">{reciterName(r)}</span><span className="quran-muted block truncate text-[11.5px]">{reciterSubtitle(r)}</span></span>
                   </button>
                   {on && <span className="quran-mini-eq" aria-label="Selected"><i /><i /><i /></span>}
-                  <button className={`quran-heart${fav ? " is-on" : ""}`} aria-pressed={fav} aria-label={fav ? `Remove ${r.name} from favorites` : `Add ${r.name} to favorites`} onClick={() => { toggleFavorite(r.id); void triggerHaptic("light"); }}>
+                  <button className={`quran-fav-btn${fav ? " is-on" : ""}`} aria-pressed={fav} aria-label={fav ? `Remove ${r.name} from favorites` : `Add ${r.name} to favorites`} onClick={() => { toggleFavorite(r.id); void triggerHaptic("light"); }}>
                     <Heart size={17} fill={fav ? "currentColor" : "none"} />
                   </button>
                   <button className="quran-play-sm" aria-label={preview === r.id ? "Stop preview" : `Preview ${r.name}`} onClick={() => void togglePreview(r)}>
@@ -662,7 +662,7 @@ const VerseCard = memo(function VerseCard({ verse: v, active, word, translit, tr
         {translit && v.transliteration && <p className={`quran-translit ${!arabic && !translation ? "is-big" : ""}`} onClick={!arabic && !translation ? () => onPlay(v.key) : undefined}>{v.transliteration}</p>}
         {translation && <p className={`quran-tr ${arabic ? "" : "is-big"}`} onClick={arabic ? undefined : () => onPlay(v.key)}>{v.translation}</p>}
       </div>
-      <button className={`quran-heart ${fav ? "is-on" : ""}`} aria-label={fav ? "Remove from favorites" : "Save verse"} aria-pressed={fav} onClick={() => onFav(v.key)}>
+      <button className={`quran-fav-btn ${fav ? "is-on" : ""}`} aria-label={fav ? "Remove from favorites" : "Save verse"} aria-pressed={fav} onClick={() => onFav(v.key)}>
         <Heart size={18} fill={fav ? "currentColor" : "none"} />
       </button>
     </article>
