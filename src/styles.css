@@ -404,6 +404,27 @@
   box-shadow: 0 2px 8px color-mix(in oklab, var(--title) 6%, transparent);
 }
 
+/* Giveaway popup: the theme picture runs behind the dialog, so its section
+   blocks must read as solid panels. Each layer is composited over an opaque
+   base so no theme token's alpha can let the picture bleed through. */
+.giveaway-panel {
+  background-image:
+    linear-gradient(var(--surface-card), var(--surface-card)),
+    linear-gradient(var(--background), var(--background));
+  border: 1px solid color-mix(in oklab, var(--border) 70%, transparent);
+  box-shadow: 0 2px 10px color-mix(in oklab, var(--card-foreground) 6%, transparent);
+}
+
+.giveaway-inset {
+  background-image:
+    linear-gradient(
+      color-mix(in oklab, var(--surface-card) 94%, var(--card-foreground)),
+      color-mix(in oklab, var(--surface-card) 94%, var(--card-foreground))
+    ),
+    linear-gradient(var(--background), var(--background));
+}
+
+
 .dhikr-card {
   border-radius: 26px;
   background: color-mix(in oklab, var(--card) 94%, transparent) !important;

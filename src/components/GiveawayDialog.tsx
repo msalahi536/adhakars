@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
-import { ArrowRight, Award, BarChart3, BookOpen, Check, ChevronRight, Copy, Gift, Layers, ListChecks, Share2, Target } from "lucide-react";
+import { ArrowRight, Award, BarChart3, BookOpen, Check, Copy, Gift, Layers, ListChecks, Share2, Target } from "lucide-react";
 import { backgroundsForPreset } from "@/lib/backgrounds";
 import { getPresetId, resolveVisualPhase } from "@/lib/theme-store";
 import { Button } from "@/components/ui/button";
@@ -34,7 +34,7 @@ const FEATURES = [
 
 function Oath({ checked, onChange, children }: { checked: boolean; onChange: (v: boolean) => void; children: React.ReactNode }) {
   return (
-    <label className="flex cursor-pointer items-start gap-3 rounded-2xl bg-muted/40 px-3 py-2.5 text-xs leading-5">
+    <label className="giveaway-panel flex cursor-pointer items-start gap-3 rounded-2xl px-3 py-2.5 text-xs leading-5">
       <input type="checkbox" className="mt-0.5 h-4 w-4 shrink-0 accent-[var(--accent)]" checked={checked} onChange={(e) => onChange(e.target.checked)} />
       <span>{children}</span>
     </label>
@@ -44,7 +44,7 @@ function Oath({ checked, onChange, children }: { checked: boolean; onChange: (v:
 function Bar({ label, value, goal, children }: { label: string; value: number; goal: number; children?: React.ReactNode }) {
   const done = value >= goal;
   return (
-    <div className="rounded-2xl bg-muted/40 px-3 py-2.5">
+    <div className="giveaway-panel rounded-2xl px-3 py-2.5">
       <div className="flex items-center justify-between text-sm">
         <span className="font-semibold">{label}</span>
         <span className="flex items-center gap-1 text-xs tabular-nums text-muted-foreground">
