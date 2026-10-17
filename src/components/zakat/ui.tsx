@@ -51,13 +51,13 @@ export function MoneyField({
   const id = `f-${label.replace(/\W+/g, "-")}`;
   return (
     <label htmlFor={id} className="block">
-      <span className="text-[13px] font-semibold">{label}</span>
-      <div className="mt-1 flex min-h-[48px] items-center rounded-2xl px-3" style={{ background: "color-mix(in oklab, var(--foreground) 5%, transparent)", border: "1px solid var(--border)" }}>
+      <span className="text-[14px] font-semibold">{label}</span>
+      <div className="mt-1.5 flex min-h-[56px] items-center rounded-[18px] px-4 focus-within:ring-2 focus-within:ring-[color:var(--accent)]" style={{ background: "color-mix(in oklab, var(--foreground) 3.5%, var(--card))", border: "1px solid color-mix(in oklab, var(--foreground) 7%, transparent)" }}>
         <span className="mr-2 text-sm" style={{ color: "var(--muted-foreground)" }}>{symbolFor(currency)}</span>
         <input
           id={id}
           inputMode="decimal"
-          className="w-full bg-transparent py-2 text-lg font-semibold outline-none"
+          className="w-full bg-transparent py-2 text-[20px] font-semibold tabular-nums outline-none"
           placeholder="0"
           value={text}
           onChange={(e) => {
@@ -78,14 +78,14 @@ export function MoneyField({
 export function NumberField({ label, value, onChange, suffix, step = "any" }: { label: string; value: number; onChange: (n: number) => void; suffix?: string; step?: string }) {
   return (
     <label className="block">
-      <span className="text-[13px] font-semibold">{label}</span>
-      <div className="mt-1 flex min-h-[48px] items-center rounded-2xl px-3" style={{ background: "color-mix(in oklab, var(--foreground) 5%, transparent)", border: "1px solid var(--border)" }}>
+      <span className="text-[14px] font-semibold">{label}</span>
+      <div className="mt-1.5 flex min-h-[56px] items-center rounded-[18px] px-4 focus-within:ring-2 focus-within:ring-[color:var(--accent)]" style={{ background: "color-mix(in oklab, var(--foreground) 3.5%, var(--card))", border: "1px solid color-mix(in oklab, var(--foreground) 7%, transparent)" }}>
         <input
           type="number"
           min={0}
           step={step}
           inputMode="decimal"
-          className="w-full bg-transparent py-2 text-lg font-semibold outline-none"
+          className="w-full bg-transparent py-2 text-[20px] font-semibold tabular-nums outline-none"
           value={value || ""}
           placeholder="0"
           onChange={(e) => onChange(Math.max(0, parseFloat(e.target.value) || 0))}
@@ -172,8 +172,8 @@ export function GhostButton({ children, onClick, className = "" }: { children: R
     <button
       type="button"
       onClick={onClick}
-      className={`min-h-[44px] rounded-full px-4 text-sm font-semibold transition-transform active:scale-[0.98] ${className}`}
-      style={{ border: "1px solid var(--border)", color: "var(--foreground)", background: "color-mix(in oklab, var(--foreground) 4%, transparent)" }}
+      className={`inline-flex min-h-[46px] items-center justify-center gap-1.5 rounded-full px-4 text-[13px] font-semibold transition-transform active:scale-[0.98] ${className}`}
+      style={{ border: "1px solid color-mix(in oklab, var(--foreground) 8%, transparent)", color: "var(--foreground)", background: "color-mix(in oklab, var(--foreground) 4%, var(--card))" }}
     >
       {children}
     </button>
@@ -220,5 +220,22 @@ export function Pill({ children }: { children: ReactNode }) {
     <span className="inline-block rounded-full px-2 py-0.5 text-[10px] font-semibold" style={{ background: "color-mix(in oklab, var(--accent) 14%, transparent)", color: "var(--accent)" }}>
       {children}
     </span>
+  );
+}
+
+export function Segmented<T extends string>({ options, value, onChange, size = "lg" }: { options: Array<{ value: T; label: string; icon?: ReactNode }>; value: T; onChange: (v: T) => void; size?: "lg" | "sm" }) {
+  return (
+    <div role="tablist" className="grid gap-1 rounded-full p-1.5" style={{ gridTemplateColumns: `repeat(${options.length}, minmax(0, 1fr))`, background: "var(--surface, var(--card))", border: "1px solid color-mix(in oklab, var(--foreground) 7%, transparent)", boxShadow: "var(--card-shadow)" }}>
+      {options.map((o) => {
+        const active = o.value === value;
+        return (
+          <button key={o.value} type="button" role="tab" aria-selected={active} onClick={() => onChange(o.value)}
+            className={`inline-flex items-center justify-center gap-1.5 rounded-full font-semibold motion-safe:transition-all ${size === "lg" ? "min-h-[44px] text-[14px]" : "min-h-[38px] text-[13px]"}`}
+            style={{ background: active ? "var(--accent)" : "transparent", color: active ? "var(--accent-foreground)" : "var(--foreground)", boxShadow: active ? "0 6px 16px color-mix(in oklab, var(--accent) 28%, transparent)" : "none" }}>
+            {o.icon}{o.label}
+          </button>
+        );
+      })}
+    </div>
   );
 }
