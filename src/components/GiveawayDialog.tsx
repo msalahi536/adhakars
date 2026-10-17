@@ -153,8 +153,8 @@ export function GiveawayDialog({ open, onClose, celebrate }: { open: boolean; on
                 <p className="label-caps mb-2 px-1 text-soft">What you'll study</p>
                 <ul className="space-y-1.5">
                   {LEVELS.map(({ n, Icon, name, books }) => (
-                    <li key={name} className="giveaway-inset flex items-center gap-3 rounded-xl px-2.5 py-2">
-                      <span className="giveaway-panel flex h-11 w-11 shrink-0 items-center justify-center rounded-xl text-accent"><Icon size={20} strokeWidth={1.6} /></span>
+                    <li key={name} className="giveaway-inset flex items-center gap-3 rounded-xl px-2.5 py-1.5">
+                      <span className="giveaway-panel flex h-10 w-10 shrink-0 items-center justify-center rounded-xl text-accent"><Icon size={20} strokeWidth={1.6} /></span>
                       <div className="min-w-0 flex-1">
                         <p className="label-caps text-[9px] text-soft">Level {n}</p>
                         <p className="text-[14px] font-semibold leading-5">{name}</p>
