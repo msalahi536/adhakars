@@ -1,3 +1,4 @@
+import { markSurahComplete } from "@/lib/giveaway";
 import { useSyncExternalStore } from "react";
 import { findReciter, getChapterAudio, getChapters, locate, reciterName, reciterPhoto, type ChapterAudio } from "@/lib/quran";
 
@@ -165,6 +166,7 @@ function setMetadata() {
 
 async function onEnded() {
   if (!el) return;
+  markSurahComplete(state.chapter);
   if (state.repeat) {
     // Manual restart instead of audio.loop: avoids the stale highlight/scroll jump at the seam.
     set({ pos: { key: null, word: null } });

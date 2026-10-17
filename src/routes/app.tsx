@@ -8,6 +8,8 @@ import { AdhanEnabledNotice } from "@/components/AdhanEnabledNotice";
 import { UPDATE_NOTICE_KEY, shouldShowUpdateNotice } from "@/lib/update-notice";
 import { prefetchSunnah } from "@/components/SunnahOfTheDay";
 import { RatePrompt } from "@/components/RatePrompt";
+import { GiveawayDialog } from "@/components/GiveawayDialog";
+import { getStatus, giveawayActive } from "@/lib/giveaway";
 import { backgroundsForPreset } from "@/lib/backgrounds";
 import { PERSONAL_PRESET, cachedPhoto, loadAppearancePhotos, readAppearance, resolveAppearance, pageForAppearance } from '@/lib/custom-appearance';
 import { JUMUAH_NOTIF_ID, registerNotificationTapHandler } from "@/lib/notifications";
@@ -27,6 +29,12 @@ export const Route = createFileRoute("/app")({
 
 function AppLayout() {
   const [showWhatsNew, setShowWhatsNew] = useState(false);
+  const [showGiveaway, setShowGiveaway] = useState(false);
+  useEffect(() => {
+    const open = () => setShowGiveaway(true);
+    window.addEventListener("open-giveaway", open);
+    return () => window.removeEventListener("open-giveaway", open);
+  }, []);
   // Keep the server and first browser render identical, then restore the saved
   // artwork before paint. Reading localStorage during render causes React to
   // preserve the server's default background during hydration.
@@ -157,6 +165,8 @@ function AppLayout() {
   useEffect(() => {
     if (shouldShowUpdateNotice(Date.now(), window.localStorage.getItem(UPDATE_NOTICE_KEY))) {
       setShowWhatsNew(true);
+    } else if (giveawayActive() && !getStatus()) {
+      setShowGiveaway(true);
     }
   }, []);
 
@@ -326,7 +336,9 @@ function AppLayout() {
       <WhatsNewDialog open={showWhatsNew} onClose={() => {
         window.localStorage.setItem(UPDATE_NOTICE_KEY, "seen");
         setShowWhatsNew(false);
+        if (giveawayActive() && !getStatus()) window.setTimeout(() => setShowGiveaway(true), 400);
       }} />
+      <GiveawayDialog open={showGiveaway} onClose={() => setShowGiveaway(false)} />
       <AdhanEnabledNotice />
       <RatePrompt />
     </div>

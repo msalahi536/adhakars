@@ -1,3 +1,4 @@
+import { addGiveawayDhikr } from "@/lib/giveaway";
 import { useEffect, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { RotateCcw, Undo2 } from "lucide-react";
@@ -66,6 +67,7 @@ function Tasbih() {
   const tap = () => {
     triggerHaptic("heavy");
     bumpLifetime("tasbih", 1);
+    addGiveawayDhikr();
     setTapped(true);
     setTimeout(() => setTapped(false), 200);
     setTotal((n) => {

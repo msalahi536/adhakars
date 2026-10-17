@@ -40,6 +40,66 @@ export type Database = {
           },
         ]
       }
+      giveaway_entries: {
+        Row: {
+          created_at: string
+          device_id: string
+          dhikr: number
+          email: string
+          goals: string[]
+          id: string
+          referrals: number
+          surahs: number
+          tickets: number
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          device_id: string
+          dhikr?: number
+          email: string
+          goals?: string[]
+          id?: string
+          referrals?: number
+          surahs?: number
+          tickets?: number
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          device_id?: string
+          dhikr?: number
+          email?: string
+          goals?: string[]
+          id?: string
+          referrals?: number
+          surahs?: number
+          tickets?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      giveaway_referrals: {
+        Row: {
+          created_at: string
+          id: string
+          ref_code: string
+          visitor_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          ref_code: string
+          visitor_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          ref_code?: string
+          visitor_id?: string
+        }
+        Relationships: []
+      }
       recitation_files: {
         Row: {
           created_at: string
