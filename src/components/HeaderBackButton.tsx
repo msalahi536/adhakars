@@ -7,10 +7,11 @@ import { isMoreDestination } from "@/lib/more-navigation";
  * block, mirroring HeaderSettingsButton on the right. Parent header MUST
  * be `position: relative`.
  */
-export function HeaderBackButton({ fallbackTo = "/app/more" }: { fallbackTo?: string }) {
+export function HeaderBackButton({ fallbackTo = "/app/more", onBack }: { fallbackTo?: string; onBack?: () => void }) {
   const router = useRouter();
 
   const onClick = () => {
+    if (onBack) { onBack(); return; }
     const pathname = router.state.location.pathname;
     if (isMoreDestination(pathname) && pathname !== "/app/more") {
       router.navigate({ to: "/app/more" });

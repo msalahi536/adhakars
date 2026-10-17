@@ -1,7 +1,7 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useQuery, keepPreviousData } from "@tanstack/react-query";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { ArrowLeft, Bookmark, BookmarkCheck, BookOpen, ChevronRight, Clock, Feather, HandHeart, Heart, Home as HomeIcon, Landmark, Leaf, Moon, Search, Star, TreePalm, Users, X, Check, ChevronDown, ChevronLeft, Copy, SlidersHorizontal, User, FileText, type LucideIcon } from "lucide-react";
+import { Bookmark, BookmarkCheck, BookOpen, ChevronRight, Clock, Feather, HandHeart, Heart, Home as HomeIcon, Landmark, Leaf, Moon, Search, Star, TreePalm, Users, X, Check, ChevronDown, ChevronLeft, Copy, SlidersHorizontal, User, FileText, type LucideIcon } from "lucide-react";
 import {
   getHadithBooks, getHadithChapters, getHadiths, translateIsnad, type Hadith,
 } from "@/lib/hadith.functions";
