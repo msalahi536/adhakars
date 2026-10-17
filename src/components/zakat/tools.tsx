@@ -5,7 +5,7 @@ import { catchUp } from "@/lib/zakat/calculate";
 import { getRules } from "@/lib/zakat/rules";
 import { HIJRI_MONTHS, currentPrices, daysUntil, hijriOf, loadZakat, money, nextDueDate, nisabGrams, type ZakatState } from "@/lib/zakat/store";
 import { useResult } from "./results";
-import { Card, Choice, GhostButton, Label, MoneyField, Muted, NumberField, PrimaryButton } from "./ui";
+import { Card, Choice, GhostButton, Label, MoneyField, Muted, NumberField } from "./ui";
 
 type Update = (fn: (s: ZakatState) => ZakatState) => void;
 
@@ -166,7 +166,6 @@ function Fitr({ s, update }: { s: ZakatState; update: Update }) {
           )}
         </>
       )}
-      <PrimaryButton className="hidden" />
     </Card>
   );
 }
