@@ -148,7 +148,7 @@ export function DatePicker({ s, update }: { s: ZakatState; update: Update }) {
 
 export function Setup({ s, update }: { s: ZakatState; update: Update }) {
   const [step, setStep] = useState(0);
-  const titles = ["School of thought", "Nisab for cash", "Zakat date"];
+  const titles = ["School of Thought", "Nisab for Cash", "Zakat Date"];
   const finish = () => {
     update((x) => ({ ...x, setupDone: true }));
     void rescheduleZakatReminders({ ...s, setupDone: true });
