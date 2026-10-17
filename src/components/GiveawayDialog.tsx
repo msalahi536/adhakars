@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
-import { ArrowRight, Award, BarChart3, BookOpen, Check, ChevronRight, Copy, Gift, Layers, ListChecks, Share2, Target } from "lucide-react";
+import { ArrowRight, Award, BarChart3, BookOpen, Check, Copy, Gift, Layers, ListChecks, Share2, Target } from "lucide-react";
 import { backgroundsForPreset } from "@/lib/backgrounds";
 import { getPresetId, resolveVisualPhase } from "@/lib/theme-store";
 import { Button } from "@/components/ui/button";
@@ -34,7 +34,7 @@ const FEATURES = [
 
 function Oath({ checked, onChange, children }: { checked: boolean; onChange: (v: boolean) => void; children: React.ReactNode }) {
   return (
-    <label className="flex cursor-pointer items-start gap-3 rounded-2xl bg-muted/40 px-3 py-2.5 text-xs leading-5">
+    <label className="giveaway-panel flex cursor-pointer items-start gap-3 rounded-2xl px-3 py-2.5 text-xs leading-5">
       <input type="checkbox" className="mt-0.5 h-4 w-4 shrink-0 accent-[var(--accent)]" checked={checked} onChange={(e) => onChange(e.target.checked)} />
       <span>{children}</span>
     </label>
@@ -44,10 +44,10 @@ function Oath({ checked, onChange, children }: { checked: boolean; onChange: (v:
 function Bar({ label, value, goal, children }: { label: string; value: number; goal: number; children?: React.ReactNode }) {
   const done = value >= goal;
   return (
-    <div className="rounded-2xl bg-muted/40 px-3 py-2.5">
+    <div className="giveaway-panel rounded-2xl px-3 py-2.5">
       <div className="flex items-center justify-between text-sm">
         <span className="font-semibold">{label}</span>
-        <span className="flex items-center gap-1 text-xs tabular-nums text-muted-foreground">
+        <span className="flex items-center gap-1 text-xs tabular-nums text-soft">
           {done && <Check size={13} className="text-accent" />}
           {Math.min(value, goal)}/{goal}
         </span>
@@ -133,55 +133,54 @@ export function GiveawayDialog({ open, onClose, celebrate }: { open: boolean; on
 
   return (
     <Dialog open={open} onOpenChange={(n) => !n && onClose()}>
-      <DialogContent className="update-dialog grid max-h-[86dvh] w-[calc(100%_-_32px)] max-w-[410px] grid-rows-[auto_minmax(0,1fr)_auto] gap-0 overflow-hidden rounded-3xl border-border/60 bg-card p-0 text-card-foreground">
+      <DialogContent className="update-dialog grid max-h-[93dvh] w-[calc(100%_-_32px)] max-w-[410px] grid-rows-[auto_minmax(0,1fr)_auto] gap-0 overflow-hidden rounded-3xl border-border/60 bg-card p-0 text-card-foreground">
         {bg && <img src={bg} alt="" aria-hidden className="pointer-events-none absolute inset-0 h-full w-full -scale-x-100 object-cover object-top opacity-90" />}
-        <DialogHeader className="relative overflow-hidden px-6 pb-4 pt-6 text-left">
+        <DialogHeader className="giveaway-header relative overflow-hidden px-6 pb-2 pt-3 text-left">
           <div className="relative">
-          <span className="mb-2 flex h-11 w-11 items-center justify-center rounded-2xl bg-muted/60 text-accent"><Gift size={20} strokeWidth={1.7} /></span>
+          <span className="giveaway-inset mb-2 flex h-11 w-11 items-center justify-center rounded-2xl text-accent"><Gift size={20} strokeWidth={1.7} /></span>
           <p className="label-caps text-accent">Giveaway · ends Friday, Oct 23</p>
           <DialogTitle className="max-w-[260px] font-display text-[26px] font-semibold leading-tight">Win lifetime access to Ilm Guide</DialogTitle>
-          <DialogDescription className="max-w-[230px] pt-1 text-sm leading-6 text-muted-foreground">
+          <DialogDescription className="max-w-[240px] pt-0.5 text-[13px] leading-5 text-soft">
             A full $75+ curriculum of classical texts on Tawḥīd and ‘Aqīdah — yours for life.
           </DialogDescription>
           </div>
         </DialogHeader>
 
-        <div className="relative min-h-0 space-y-2 overflow-y-auto overscroll-contain px-4 py-2">
+        <div className="relative min-h-0 space-y-1.5 overflow-y-auto overscroll-contain px-4 py-1.5">
           {status !== "joined" ? (
             <>
-              <div className="rounded-2xl bg-muted/40 px-3 py-3">
-                <p className="label-caps mb-2 px-1 text-muted-foreground">What you'll study</p>
+              <div className="giveaway-panel rounded-2xl px-3 py-2.5">
+                <p className="label-caps mb-1.5 px-1 text-soft">What you'll study</p>
                 <ul className="space-y-1.5">
                   {LEVELS.map(({ n, Icon, name, books }) => (
-                    <li key={name} className="flex items-center gap-3 rounded-xl bg-card/70 px-2.5 py-2">
-                      <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-muted/70 text-accent"><Icon size={20} strokeWidth={1.6} /></span>
+                    <li key={name} className="giveaway-inset flex items-center gap-3 rounded-xl px-2.5 py-1.5">
+                      <span className="giveaway-panel flex h-9 w-9 shrink-0 items-center justify-center rounded-xl text-accent"><Icon size={20} strokeWidth={1.6} /></span>
                       <div className="min-w-0 flex-1">
-                        <p className="label-caps text-[9px] text-muted-foreground">Level {n}</p>
-                        <p className="text-[14px] font-semibold leading-5">{name}</p>
-                        <p className="truncate text-[11px] leading-4 text-muted-foreground">{books}</p>
+                        <p className="label-caps text-[9px] text-soft">Level {n}</p>
+                        <p className="text-[13px] font-semibold leading-[18px]">{name}</p>
+                        <p className="text-[10px] leading-[13px] text-card-foreground/80">{books}</p>
                       </div>
-                      <ChevronRight size={16} className="shrink-0 text-muted-foreground" />
                     </li>
                   ))}
                 </ul>
               </div>
-              <div className="rounded-2xl bg-muted/40 px-3 py-3">
-                <p className="label-caps mb-2 px-1 text-muted-foreground">What's included</p>
+              <div className="giveaway-panel rounded-2xl px-3 py-2.5">
+                <p className="label-caps mb-1.5 px-1 text-soft">What's included</p>
                 <div className="grid grid-cols-4 divide-x divide-border/50">
                   {FEATURES.map(({ Icon, t }) => (
                     <div key={t} className="flex flex-col items-center gap-1.5 px-1 text-center">
-                      <span className="flex h-10 w-10 items-center justify-center rounded-full bg-card/80 text-accent"><Icon size={17} strokeWidth={1.6} /></span>
-                      <span className="text-[10px] leading-[13px] text-muted-foreground">{t}</span>
+                      <span className="giveaway-inset flex h-9 w-9 items-center justify-center rounded-full text-accent"><Icon size={17} strokeWidth={1.6} /></span>
+                      <span className="text-[10px] leading-[13px] text-soft">{t}</span>
                     </div>
                   ))}
                 </div>
               </div>
-              <div className="rounded-2xl bg-muted/40 px-3 py-3">
-                <p className="label-caps mb-2 px-1 text-muted-foreground">How to enter</p>
-                <div className="flex items-start gap-3">
-                  <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-card/80 text-accent"><Target size={18} strokeWidth={1.6} /></span>
-                  <p className="text-xs leading-5">Finish any one goal: <b>5 surahs</b>, <b>500 dhikr</b> or <b>5 downloads</b>. Each goal you finish is another entry — up to 3.</p>
-                </div>
+              <div className="giveaway-panel rounded-2xl px-3 py-2.5">
+                <p className="label-caps mb-1.5 px-1 text-soft">How to enter</p>
+                <p className="flex items-start gap-2 px-1 text-xs leading-5">
+                  <Target size={15} strokeWidth={1.7} className="mt-[3px] shrink-0 text-accent" />
+                  <span>Finish any one goal: <b>5 surahs</b>, <b>500 dhikr</b> or <b>5 downloads</b>. Each goal you finish is another entry — up to 3.</span>
+                </p>
               </div>
               <Oath checked={o1} onChange={setO1}>I swear by Allah to truthfully complete the requirements and not cheat or deceive the counters.</Oath>
               <Oath checked={o2} onChange={setO2}>I swear by Allah to try to complete the entire Ilm Guide to the best of my ability.</Oath>
@@ -194,16 +193,16 @@ export function GiveawayDialog({ open, onClose, celebrate }: { open: boolean; on
                   <p className="mt-0.5 text-xs leading-5 opacity-90">You {GOAL_NAME[celebrate] ?? "finished a goal"}. That's one more entry — submit it below.</p>
                 </div>
               )}
-              <p className="px-1 text-center text-[11px] leading-4 text-muted-foreground">Each goal is one entry, up to 3. You can submit after your first goal and add more later.</p>
+              <p className="px-1 text-center text-[11px] leading-4 text-soft">Each goal is one entry, up to 3. You can submit after your first goal and add more later.</p>
               <Bar label="Read 5 surahs" value={surahs} goal={GOALS.surahs}>
-                <p className="mt-1.5 text-[11px] text-muted-foreground">Listen to a full surah until it ends, or read it to the bottom of the page.</p>
+                <p className="mt-1.5 text-[11px] text-soft">Listen to a full surah until it ends, or read it to the bottom of the page.</p>
               </Bar>
               <Bar label="Make 500 dhikr" value={dhikr} goal={GOALS.dhikr}>
-                <p className="mt-1.5 text-[11px] text-muted-foreground">Every tap on adhkar cards and the Tasbih counts.</p>
+                <p className="mt-1.5 text-[11px] text-soft">Every tap on adhkar cards and the Tasbih counts.</p>
               </Bar>
               <Bar label="5 people download" value={refs} goal={GOALS.referrals}>
                 <div className="mt-2 flex items-center gap-2">
-                  <span className="min-w-0 flex-1 truncate rounded-full bg-card px-3 py-1.5 text-[11px] text-muted-foreground ring-1 ring-border/60">{link}</span>
+                  <span className="min-w-0 flex-1 truncate rounded-full bg-card px-3 py-1.5 text-[11px] text-soft ring-1 ring-border/60">{link}</span>
                   <button onClick={copy} aria-label="Copy your referral link" className="flex h-8 w-8 items-center justify-center rounded-full bg-card ring-1 ring-border/60">
                     {copied ? <Check size={14} className="text-accent" /> : <Copy size={14} />}
                   </button>
@@ -213,11 +212,11 @@ export function GiveawayDialog({ open, onClose, celebrate }: { open: boolean; on
                 </div>
               </Bar>
               {goals.length > 0 && (newGoals.length > 0 || !entered.length) && (
-                <div className="space-y-2 rounded-2xl bg-muted/40 px-3 py-3">
+                <div className="giveaway-panel space-y-2 rounded-2xl px-3 py-3">
                   <p className="text-sm font-semibold">
                     {entered.length ? "New goal complete — add it to your entry" : "Goal complete — enter the giveaway"}
                   </p>
-                  {!entered.length && <p className="text-[11px] leading-4 text-muted-foreground">Submit now — you can still finish the other goals afterwards for extra entries.</p>}
+                  {!entered.length && <p className="text-[11px] leading-4 text-soft">Submit now — you can still finish the other goals afterwards for extra entries.</p>}
                   <input
                     type="email"
                     value={email}
@@ -226,7 +225,7 @@ export function GiveawayDialog({ open, onClose, celebrate }: { open: boolean; on
                     maxLength={255}
                     className="h-10 w-full rounded-full bg-card px-4 text-sm outline-none ring-1 ring-border/60 focus:ring-accent"
                   />
-                  <label className="flex items-start gap-2 text-[11px] leading-4 text-muted-foreground">
+                  <label className="flex items-start gap-2 text-[11px] leading-4 text-soft">
                     <input type="checkbox" className="mt-0.5 h-4 w-4 shrink-0" checked={consent} onChange={(e) => setConsent(e.target.checked)} />
                     I agree to my email being recorded and used only to contact me if I win this giveaway.
                   </label>
@@ -235,7 +234,7 @@ export function GiveawayDialog({ open, onClose, celebrate }: { open: boolean; on
               {entered.length > 0 && !newGoals.length && (
                 <p className="px-1 text-center text-xs text-accent">You're entered with {entered.length} of 3 {entered.length === 1 ? "entry" : "entries"}.{entered.length < 3 ? " Keep going — each goal you finish adds another entry. Come back here to add it." : " The winner will be contacted by email."}</p>
               )}
-              {msg && <p className="px-1 text-center text-xs text-muted-foreground">{msg}</p>}
+              {msg && <p className="px-1 text-center text-xs text-soft">{msg}</p>}
             </>
           )}
         </div>
