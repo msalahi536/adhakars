@@ -31,7 +31,6 @@
 
 - Preset day palettes are scoped to the morning visual phase, never a route alone; evening maps all shared surfaces and text roles to its own palette so Settings, tools and reading screens cannot inherit day colors.
 - The Quran tab reads text, translation, transliteration and word-timed chapter audio directly from the public Quran.com v4 API in the browser; karaoke highlighting is derived only from the audio clock, so no Quran content is stored in the app.
-- Extra reciter portraits are asset pointers matched by normalized name before the Quran.com photo fallback.
 - Quran playback uses one app-wide store outside routes so recitation survives page changes; repeat restarts manually, not audio.loop.
 - Quran reading mode is an in-app body-portaled overlay, never the browser/native fullscreen API, which broke the reader.
 - mp3quran.net only adds reciters Quran.com lacks (audio + verse timings); Quran text stays from Quran.com.
