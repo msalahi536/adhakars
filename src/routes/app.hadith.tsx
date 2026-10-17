@@ -185,7 +185,7 @@ function Home({ books, loading, savedCount }: { books?: { bookName: string; writ
       <section>
         <h2 className="label-caps mb-2 px-1">The collections</h2>
         <div className="space-y-2">
-          {loading && <LoadingBar label="Loading collections" />}
+          {booksBar && <LoadingBar done={!loading} label="Loading collections" />}
           {books?.map((b) => (
             <Link key={b.bookSlug} to="/app/hadith" search={{ book: b.bookSlug }}
               className="flex items-center gap-3 rounded-[20px] p-4 transition-transform active:scale-[0.98]" style={card}>
@@ -245,7 +245,7 @@ function Chapters({ book, info }: { book: string; info?: { bookName: string; wri
         </div>
       )}
       <div className="label-caps px-1 pt-1 text-[10px]" style={{ color: "var(--muted-foreground)" }}>All books</div>
-      {q.isLoading && <LoadingBar label="Loading chapters" />}
+      {chBar && <LoadingBar done={!q.isLoading} label="Loading chapters" />}
       {q.isError && <Empty text="Couldn't load chapters. Check your connection." />}
       <div className="space-y-2.5">
         {q.data?.map((c) => (
@@ -314,7 +314,6 @@ function HadithList({ s, savedApi }: { s: S; savedApi: SavedApi }) {
   if (!d.items.length && !filter) return <Empty text="No hadith found. Try a different word." />;
   return (
     <>
-      <div className="hadith-fade-in contents" />
       <PreviewList sort={sort} onSort={setSort} items={d.items} total={d.total} terms={d.terms ?? []} filter={filter} setFilter={setFilter} busy={q.isFetching} hideSearch={!!s.q && !s.topic} label={s.topic ?? (s.q ? `“${s.q}”` : "this chapter")} savedApi={savedApi} />
       {d.lastPage > 1 && s.h === undefined && (
         <div className="flex items-center justify-between gap-3 pt-1">
