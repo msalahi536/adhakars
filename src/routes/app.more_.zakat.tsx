@@ -49,15 +49,14 @@ function ZakatPage() {
     <>
       <header className="page-header relative overflow-hidden" style={{ background: "var(--grad-header)", color: "var(--header-fg)" }}>
         <HeaderBackButton />
-        {s?.setupDone && (
-          <button type="button" aria-label="Zakat settings" onClick={() => setSettingsOpen(true)} className="header-icon-button absolute z-10 flex h-9 w-9 items-center justify-center rounded-full" style={{ top: 62, left: 20, border: "1px solid color-mix(in oklab, currentColor 16%, transparent)", background: "color-mix(in oklab, var(--surface-card, var(--background)) 55%, transparent)", color: "var(--foreground)" }}>
-            <Settings2 size={17} />
-          </button>
-        )}
         <div className="relative mx-auto max-w-md px-16 pb-6 pt-9 text-center">
           <div className="label-caps" style={{ color: "var(--header-sub)", opacity: 1 }}>More</div>
           <h1 className="app-page-title mt-2">Zakat Calculator</h1>
-          {s?.setupDone && <p className="mt-2 text-xs opacity-90">{getRules(s.madhab, s.custom).name}</p>}
+          {s?.setupDone && (
+            <button type="button" aria-label="Zakat settings" onClick={() => setSettingsOpen(true)} className="mt-2 inline-flex min-h-[32px] items-center gap-1.5 rounded-full px-3 text-xs font-semibold" style={{ background: "color-mix(in oklab, var(--surface-card, var(--background)) 60%, transparent)", border: "1px solid color-mix(in oklab, currentColor 14%, transparent)" }}>
+              {getRules(s.madhab, s.custom).name} <Settings2 size={13} />
+            </button>
+          )}
         </div>
       </header>
 
