@@ -339,7 +339,9 @@ function AppLayout() {
       <WhatsNewDialog open={showWhatsNew} onClose={() => {
         window.localStorage.setItem(UPDATE_NOTICE_KEY, "seen");
         setShowWhatsNew(false);
-        if (giveawayActive() && !getStatus()) window.setTimeout(() => setShowGiveaway(true), 400);
+        // Give the reader a beat to settle on the page before the giveaway
+        // offer appears, so the two popups never feel stacked.
+        if (giveawayActive() && !getStatus()) window.setTimeout(() => setShowGiveaway(true), 8000);
       }} />
       <GiveawayDialog open={showGiveaway} celebrate={giveawayGoal} onClose={() => { setShowGiveaway(false); setGiveawayGoal(null); }} />
       <AdhanEnabledNotice />
