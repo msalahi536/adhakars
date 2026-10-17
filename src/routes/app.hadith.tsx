@@ -1,7 +1,6 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useQuery, keepPreviousData } from "@tanstack/react-query";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Portal } from "@/components/Portal";
 import { ArrowLeft, Bookmark, BookmarkCheck, BookOpen, ChevronRight, Clock, Feather, HandHeart, Heart, Home as HomeIcon, Landmark, Leaf, Moon, Search, Star, TreePalm, Users, X, Check, ChevronDown, ChevronLeft, Copy, SlidersHorizontal, User, FileText, type LucideIcon } from "lucide-react";
 import {
   getHadithBooks, getHadithChapters, getHadiths, type Hadith,
@@ -91,7 +90,7 @@ function HadithLibrary() {
   return (
     <>
       <header className="page-header relative overflow-hidden" style={{ background: "var(--grad-header)", color: "var(--header-fg)" }}>
-        <div className="relative mx-auto max-w-md px-6 pb-6 pt-9 text-center">
+        <div className="relative mx-auto max-w-md px-6 pb-5 pt-9 text-center">
           {view !== "home" && (
             <button type="button" aria-label="Back" onClick={() => history.back()}
               className="absolute left-4 top-9 flex h-9 w-9 items-center justify-center rounded-full"
@@ -102,13 +101,8 @@ function HadithLibrary() {
           <div className="label-caps" style={{ color: "var(--header-sub)" }}>Sunnah</div>
           <h1 className="app-page-title mt-2">{title}</h1>
           {view === "home" && <p className="mt-2 text-xs opacity-90">40,000+ hadith from the major collections</p>}
-        </div>
-      </header>
-
-      <main className="scroll-area">
-        <div className="mx-auto max-w-md space-y-4 px-5 py-3 pb-28">
           {(view === "home" || view === "book") && (
-            <form onSubmit={submit} className="flex items-center gap-2 rounded-full px-4 py-3" style={card}>
+            <form onSubmit={submit} className="mt-14 flex items-center gap-2 rounded-full px-4 py-3.5 text-left shadow-lg" style={{ ...card, background: "var(--card)", color: "var(--foreground)" }}>
               <Search size={17} style={{ color: "var(--muted-foreground)" }} />
               <input value={text} onChange={(e) => setText(e.target.value)} enterKeyHint="search"
                 placeholder={bookName ? `Search ${bookName}` : "Search all hadith (English or Arabic)"}
@@ -116,6 +110,11 @@ function HadithLibrary() {
               {text && <button type="button" aria-label="Clear" onClick={() => setText("")}><X size={16} /></button>}
             </form>
           )}
+        </div>
+      </header>
+
+      <main className="scroll-area">
+        <div className="mx-auto max-w-md space-y-4 px-5 py-3 pb-28">
 
           {view === "home" && <Home books={books.data} loading={books.isLoading} savedCount={savedApi.saved.length} />}
           {view === "book" && <Chapters book={search.book!} />}
@@ -264,6 +263,11 @@ function PreviewList({ items, total, label, savedApi }: { items: Hadith[]; total
     return out;
   }, [items, filter, sort]);
 
+  useEffect(() => { document.querySelector(".scroll-area")?.scrollTo({ top: 0 }); }, [open]);
+  if (open !== null && list[open]) {
+    return <HadithDetail h={list[open]} index={open} count={list.length} savedApi={savedApi}
+      onClose={() => setOpen(null)} onMove={(d) => setOpen((o) => Math.min(list.length - 1, Math.max(0, (o ?? 0) + d)))} />;
+  }
   return (
     <>
       <div className="flex items-center gap-2 rounded-full px-4 py-3" style={card}>
@@ -319,10 +323,6 @@ function PreviewList({ items, total, label, savedApi }: { items: Hadith[]; total
           </div>
         );
       })}
-      {open !== null && list[open] && (
-        <HadithDetail h={list[open]} index={open} count={list.length} savedApi={savedApi}
-          onClose={() => setOpen(null)} onMove={(d) => setOpen((o) => Math.min(list.length - 1, Math.max(0, (o ?? 0) + d)))} />
-      )}
     </>
   );
 }
@@ -351,10 +351,9 @@ function HadithDetail({ h, index, count, savedApi, onClose, onMove }: {
   };
   const panel: React.CSSProperties = { ...card, background: "var(--card)" };
   return (
-    <Portal>
-      <div className="hadith-detail fixed inset-0 z-[60] flex flex-col" style={{ background: "var(--background)", color: "var(--foreground)" }}>
-        <div className="flex items-center justify-between px-4 pb-2" style={{ paddingTop: "max(14px, env(safe-area-inset-top))" }}>
-          <button type="button" aria-label="Back" onClick={onClose} className="flex h-10 w-10 items-center justify-center rounded-full" style={panel}><ChevronLeft size={19} /></button>
+    <div className="hadith-detail space-y-3">
+        <div className="flex items-center justify-between rounded-[18px] px-3 py-2" style={panel}>
+          <button type="button" aria-label="Back to list" onClick={onClose} className="flex min-w-0 items-center gap-1 text-[12px] font-semibold" style={{ color: "var(--muted-foreground)" }}><ChevronLeft size={16} /><span className="truncate">{h.bookName} · #{h.hadithNumber}</span></button>
           <div className="flex items-center gap-2">
             {h.status && <GradePill status={h.status} />}
             <button type="button" aria-label={saved ? "Remove bookmark" : "Save hadith"} onClick={() => savedApi.toggle(h)}
@@ -363,7 +362,7 @@ function HadithDetail({ h, index, count, savedApi, onClose, onMove }: {
             </button>
           </div>
         </div>
-        <div ref={scroller} className="min-h-0 flex-1 space-y-3 overflow-y-auto overscroll-contain px-4 pb-4 pt-2">
+        <div ref={scroller} className="space-y-3">
           <h2 className="font-serif text-[26px] leading-tight" style={{ color: "var(--accent)" }}>{titleOf(h)}</h2>
           {h.englishNarrator && (
             <button type="button" onClick={() => setNarrOpen((v) => !v)} className="block w-full rounded-[20px] p-4 text-left" style={panel}>
@@ -375,7 +374,7 @@ function HadithDetail({ h, index, count, savedApi, onClose, onMove }: {
                 </div>
                 <ChevronDown size={17} className="opacity-50 transition-transform" style={{ transform: narrOpen ? "rotate(180deg)" : undefined }} />
               </div>
-              {narrOpen && <p className="mt-3 text-[12px]" style={{ color: "var(--muted-foreground)" }}>{h.bookName}{h.chapterEnglish ? ` · Book of ${h.chapterEnglish}` : ""}</p>}
+              {narrOpen && <Isnad h={h} />}
             </button>
           )}
           {h.hadithArabic && (
@@ -402,13 +401,42 @@ function HadithDetail({ h, index, count, savedApi, onClose, onMove }: {
             </div>
           </div>
         </div>
-        <div className="flex items-center justify-between px-4 pt-2" style={{ paddingBottom: "max(14px, env(safe-area-inset-bottom))" }}>
+        <div className="flex items-center justify-between pt-1">
           <button type="button" disabled={index === 0} onClick={() => onMove(-1)} className="flex items-center gap-1 rounded-full px-4 py-2.5 text-sm font-semibold" style={{ ...panel, opacity: index === 0 ? 0.4 : 1 }}><ChevronLeft size={16} /> Previous</button>
           <span className="text-xs" style={{ color: "var(--muted-foreground)" }}>{index + 1} of {count}</span>
           <button type="button" disabled={index >= count - 1} onClick={() => onMove(1)} className="flex items-center gap-1 rounded-full px-4 py-2.5 text-sm font-semibold" style={{ ...panel, opacity: index >= count - 1 ? 0.4 : 1 }}>Next <ChevronRight size={16} /></button>
         </div>
-      </div>
-    </Portal>
+    </div>
+  );
+}
+
+const DIA = "[\\u064B-\\u065F\\u0670\\u06D6-\\u06ED]*";
+const fuzzy = (w: string) => [...w].map((c) => (c === " " ? "\\s+" : c === "ا" ? "[اأإآ]" : c) + DIA).join("");
+const MATN = new RegExp(["قال رسول الله", "سمعت رسول الله", "سمعت النبي", "ان رسول الله", "ان النبي", "عن النبي", "قال النبي", "عن رسول الله"].map(fuzzy).join("|"));
+const LINK = new RegExp(`(?:^|\\s)(?:${["حدثنا", "حدثني", "اخبرنا", "اخبرني", "عن", "سمعت", "انبانا"].map(fuzzy).join("|")})(?=\\s)`, "g");
+export function splitIsnad(ar: string): string[] {
+  const m = MATN.exec(ar);
+  const chain = (m && m.index > 10 ? ar.slice(0, m.index) : ar.split(/[:،,]/)[0] ?? "").trim();
+  return chain.split(LINK).map((x) => x.replace(/[،,.:]+$/g, "").trim()).filter((x) => x.length > 1);
+}
+function Isnad({ h }: { h: Hadith }) {
+  const links = h.hadithArabic ? splitIsnad(h.hadithArabic) : [];
+  return (
+    <div className="mt-3 border-t pt-3" style={{ borderColor: "var(--border)" }} onClick={(e) => e.stopPropagation()}>
+      <div className="mb-2 text-[11px] font-semibold uppercase tracking-wider" style={{ color: "var(--muted-foreground)" }}>Full chain (isnad)</div>
+      {links.length > 0 ? (
+        <ol className="space-y-1.5" dir="rtl">
+          {links.map((l, i) => (
+            <li key={i} className="flex items-start gap-2">
+              <span className="mt-1 flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-[10px] font-bold" style={{ background: "color-mix(in oklab, var(--accent) 14%, transparent)", color: "var(--accent)" }}>{i + 1}</span>
+              <span className="arabic text-[16px] leading-relaxed" lang="ar">{l}</span>
+            </li>
+          ))}
+        </ol>
+      ) : null}
+      <p className="mt-2 text-[12px] italic" style={{ color: "var(--muted-foreground)" }}>{clean(h.englishNarrator)}</p>
+      <p className="mt-1 text-[11px]" style={{ color: "var(--muted-foreground)" }}>{h.bookName}{h.chapterEnglish ? ` · Book of ${h.chapterEnglish}` : ""}</p>
+    </div>
   );
 }
 
