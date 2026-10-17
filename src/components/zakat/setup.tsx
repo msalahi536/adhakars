@@ -159,7 +159,7 @@ export function Setup({ s, update }: { s: ZakatState; update: Update }) {
         <div>
           <Label>Step {step + 1} of 3</Label>
           <div className="mt-1 flex items-center gap-3">
-            <h2 className="app-page-title" style={{ fontSize: 28, lineHeight: 1.1 }}>{titles[step]}</h2>
+            <h2 className="app-page-title" style={{ fontSize: 25, lineHeight: 1.1, whiteSpace: "nowrap" }}>{titles[step]}</h2>
             <span className="flex gap-1" aria-hidden="true">
               {[0, 1, 2].map((n) => (
                 <span key={n} className="h-1.5 rounded-full motion-safe:transition-all" style={{ width: n === step ? 18 : 12, background: n === step ? "var(--accent)" : "color-mix(in oklab, var(--foreground) 14%, transparent)" }} />
