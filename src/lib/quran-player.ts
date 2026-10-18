@@ -85,12 +85,14 @@ function audioEl(): HTMLAudioElement {
   el.onwaiting = () => set({ loading: true });
   el.onpause = () => {
     saveListen(true);
-    // Not asked for by the listener and not the end of the surah: try to carry on.
-    if (wanted && el && !el.ended) { recover(); return; }
-    set({ playing: false }); cancelAnimationFrame(raf); setMediaState("paused"); setMetadata();
+    // A clean pause (phone call, Siri, another app taking audio) is respected:
+    // only real stream errors trigger recovery, never a system interruption.
+    if (wanted && el && !el.ended && (el.error || el.networkState === 3)) { recover(); return; }
+    wanted = false;
+    set({ playing: false, loading: false }); cancelAnimationFrame(raf); setMediaState("paused"); setMetadata();
   };
   el.onerror = () => recover();
-  el.onstalled = () => { if (wanted && el?.paused) recover(); };
+  el.onstalled = () => { if (wanted && el?.paused && (el.error || el.networkState === 3)) recover(); };
   el.ontimeupdate = () => { if (el) set({ cur: el.currentTime, dur: el.duration || 0 }); updatePosition(); saveListen(); };
   el.onloadedmetadata = () => {
     if (!el) return;
@@ -99,9 +101,8 @@ function audioEl(): HTMLAudioElement {
     set({ cur: el.currentTime, dur: el.duration || 0 });
   };
   el.onended = () => { wanted = state.repeat || state.shuffle; void onEnded(); };
-  // Coming back to the app: if playback was dropped behind our back, pick it up again.
+  // Coming back to the app only refreshes the lock-screen card; never auto-resumes.
   document.addEventListener("visibilitychange", () => {
-    if (wanted && el?.paused && !el.ended) { retries = 0; recover(); }
     // Refresh the lock-screen card so it never shows up blank.
     if (state.audio) { setMetadata(); setMediaState(state.playing ? "playing" : "paused"); }
   });
