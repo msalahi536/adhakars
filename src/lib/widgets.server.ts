@@ -95,7 +95,7 @@ export async function buildWidgetPayload(now = new Date()) {
 
   return {
     date: now.toISOString().slice(0, 10),
-    quran_verse: q && { arabic: q.arabic_text, translation: q.translation, reference: q.reference },
+    quran_verse: q && { arabic: numberVerseMarkers(q.arabic_text, q.reference), translation: q.translation, reference: q.reference },
     daily_dhikr: dh && {
       arabic: dh.arabic_text,
       transliteration: dh.transliteration,
@@ -109,4 +109,16 @@ export async function buildWidgetPayload(now = new Date()) {
     name_of_allah: n && { arabic: n.arabic_text, transliteration: n.transliteration, meaning: n.translation },
     sunnah_of_day: su && { arabic: su.arabic_text, translation: su.translation, reference: su.reference },
   };
+}
+
+const AR_DIGITS = "٠١٢٣٤٥٦٧٨٩";
+const toArabicDigits = (n: number) => String(n).replace(/\d/g, (d) => AR_DIGITS[+d]);
+
+/** Replace empty verse-end markers (۝) with numbered ﴿٥﴾ markers using the reference's starting ayah. */
+export function numberVerseMarkers(arabic: string, reference: string | null): string {
+  if (!arabic.includes("\u06DD")) return arabic;
+  const m = reference?.match(/\d+\s*:\s*(\d+)/);
+  if (!m) return arabic.replace(/\s*\u06DD\s*/g, " ۞ ");
+  let ayah = Number(m[1]);
+  return arabic.replace(/\s*\u06DD[\u0660-\u0669\d]*\s*/g, () => ` ﴿${toArabicDigits(ayah++)}﴾ `).trim();
 }

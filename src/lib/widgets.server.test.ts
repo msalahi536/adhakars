@@ -16,3 +16,8 @@ for (const widgetType of ["quran_verse", "name_of_allah"]) {
     expect(index("2026-10-13T00:00:00Z")).toBe(1);
   });
 }
+import { numberVerseMarkers } from "./widgets.server";
+test("empty verse markers get the ayah number from the reference", () => {
+  expect(numberVerseMarkers("فَإِنَّ مَعَ الْعُسْرِ يُسْرًا ۝ إِنَّ مَعَ الْعُسْرِ يُسْرًا", "Ash-Sharh 94:5-6"))
+    .toBe("فَإِنَّ مَعَ الْعُسْرِ يُسْرًا ﴿٥﴾ إِنَّ مَعَ الْعُسْرِ يُسْرًا");
+});
