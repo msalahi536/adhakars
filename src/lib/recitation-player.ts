@@ -14,13 +14,17 @@ export type PlayerState = {
   queueIndex: number;
   queueLabel: string | null;
   levels: MeterLevels;
+  rate: number;
+  /** Sleep timer: end timestamp (ms), "track" for end of this recitation, or off. */
+  sleep: number | "track" | null;
 };
 
-let state: PlayerState = { track: null, playing: false, current: 0, duration: 0, queue: [], queueIndex: -1, queueLabel: null, levels: restingLevels() };
+let state: PlayerState = { track: null, playing: false, current: 0, duration: 0, queue: [], queueIndex: -1, queueLabel: null, levels: restingLevels(), rate: 1, sleep: null };
 const subs = new Set<() => void>();
 const set = (p: Partial<PlayerState>) => { state = { ...state, ...p }; subs.forEach((f) => f()); };
 
 let audio: HTMLAudioElement | null = null;
+let sleepTimer: ReturnType<typeof setTimeout> | null = null;
 let audioContext: AudioContext | null = null;
 let analyser: AnalyserNode | null = null;
 let analyserData: Float32Array<ArrayBuffer> | null = null;
@@ -144,6 +148,7 @@ function el() {
   audio.addEventListener("play", () => { set({ playing: true }); startMeter(); });
   audio.addEventListener("pause", () => { set({ playing: false }); stopMeter(); });
   audio.addEventListener("ended", () => {
+    if (state.sleep === "track") { set({ sleep: null, playing: false, current: 0 }); return; }
     if (state.queue.length && state.queueIndex < state.queue.length - 1) load(state.queueIndex + 1);
     else set({ playing: false, current: 0, queue: [], queueIndex: -1, queueLabel: null });
   });
@@ -161,6 +166,7 @@ function el() {
 function start(track: Track) {
   const a = el();
   a.src = track.url;
+  a.playbackRate = state.rate;
   set({ track, current: 0, duration: 0 });
   void a.play().catch(() => set({ playing: false }));
   if (navigator.mediaSession && "MediaMetadata" in window) {
@@ -196,6 +202,15 @@ export const recitationPlayer = {
     if (a.paused) void a.play(); else a.pause();
   },
   pause() { audio?.pause(); },
+  setRate(r: number) { set({ rate: r }); if (audio) audio.playbackRate = r; },
+  setSleep(v: number | "track" | null) {
+    if (sleepTimer) clearTimeout(sleepTimer);
+    sleepTimer = null;
+    if (typeof v === "number") {
+      sleepTimer = setTimeout(() => { audio?.pause(); set({ sleep: null }); }, v * 60000);
+      set({ sleep: Date.now() + v * 60000 });
+    } else set({ sleep: v });
+  },
   stop() {
     const a = audio;
     if (a) {
