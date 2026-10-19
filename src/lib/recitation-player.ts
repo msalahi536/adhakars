@@ -164,9 +164,13 @@ function start(track: Track) {
   set({ track, current: 0, duration: 0 });
   void a.play().catch(() => set({ playing: false }));
   if (navigator.mediaSession && "MediaMetadata" in window) {
+    // The phone shows the title line first, so it carries the section name
+    // ("Morning Adhkar"); the individual card stays on the album line.
+    const section = state.queueLabel;
     navigator.mediaSession.metadata = new MediaMetadata({
-      title: track.title,
-      artist: state.queueLabel ? `Sahih Al-Adhkar · ${state.queueLabel}` : "Sahih Al-Adhkar",
+      title: section ?? track.title,
+      artist: "Sahih Al-Adhkar",
+      album: section ? track.title : "Sahih Al-Adhkar",
     });
   }
   window.dispatchEvent(new CustomEvent("recitation:track", { detail: track.dhikrId }));
@@ -178,8 +182,8 @@ function load(i: number) {
 }
 
 export const recitationPlayer = {
-  playOne(track: Track) {
-    set({ queue: [], queueIndex: -1, queueLabel: null });
+  playOne(track: Track, section?: string | null) {
+    set({ queue: [], queueIndex: -1, queueLabel: section ?? null });
     start(track);
   },
   playAll(tracks: Track[], label: string, startAt = 0) {

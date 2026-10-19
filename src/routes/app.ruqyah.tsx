@@ -425,7 +425,7 @@ function GuideRecitation({ item, compact = false, scroll = false, hideSource = f
           <h3>{item.title}</h3>
           {!hideSource && <div className="period-source mt-1"><BookOpen size={12} /> {item.source}</div>}
         </div>
-        <ListenButton dhikrId={item.id} size={34} />
+        <ListenButton dhikrId={item.id} size={34} section="Ruqyah" />
       </div>
       <div className={useScroll ? "rq-guide-scroll" : undefined}>
         {item.arabicMulti ? item.arabicMulti.map((part) => (
