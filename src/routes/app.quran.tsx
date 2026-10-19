@@ -10,7 +10,7 @@ import {
   findReciter, getChapterAudio, getChapters, getVerses, homeReciterRow, POPULAR_RECITERS, RECITERS, reciterHasPhoto,
   reciterHasSurah, reciterName, reciterScore, reciterPhoto, reciterSubtitle, searchChapters, searchReciters, parseVerseRef, type Chapter, type Reciter, type Verse, getVerseByKey, searchVerses, type VerseHit,
 } from "@/lib/quran";
-import { getDisplay, triggerHaptic } from "@/lib/theme";
+import { getDisplay, setDisplay, triggerHaptic, type DisplayPrefs } from "@/lib/theme";
 import { guessVerses } from "@/lib/quran-search.functions";
 import { quranPlayer, SPEEDS, useQuranPlayer } from "@/lib/quran-player";
 
@@ -437,7 +437,12 @@ function Reader({ chapterId, verse }: { chapterId: number; verse?: number }) {
   const [prefs] = usePrefs();
   const [favs, toggleFav] = useFavs();
   const [display, setDisplayState] = useState({ translit: true, translation: true, trOn: true, arabic: true, page: false, follow: true, words: true });
-  useEffect(() => { const d = getDisplay(); setDisplayState({ translit: d.showTransliteration, translation: d.showTranslation || (!d.showArabic && !d.showTransliteration), trOn: d.showTranslation, arabic: d.showArabic, page: d.quranPageView, follow: d.quranAutoScroll, words: d.quranWordHighlight }); }, []);
+  useEffect(() => {
+    const read = () => { const d = getDisplay(); setDisplayState({ translit: d.showTransliteration, translation: d.showTranslation || (!d.showArabic && !d.showTransliteration), trOn: d.showTranslation, arabic: d.showArabic, page: d.quranPageView, follow: d.quranAutoScroll, words: d.quranWordHighlight }); };
+    read();
+    window.addEventListener("adhkar:display-update", read);
+    return () => window.removeEventListener("adhkar:display-update", read);
+  }, []);
   const [chapter, setChapter] = useState<Chapter | null>(null);
   const [verses, setVerses] = useState<Verse[] | null>(null);
   const [error, setError] = useState(false);
@@ -699,6 +704,44 @@ function QuranSwitch({ on, onChange, label }: { on: boolean; onChange: (v: boole
   );
 }
 
+const AUDIO_TOGGLES: { key: keyof DisplayPrefs; label: string; sub: string }[] = [
+  { key: "showArabic", label: "Show Arabic", sub: "Arabic verse text" },
+  { key: "showTransliteration", label: "Show transliteration", sub: "Latin letters under the Arabic" },
+  { key: "showTranslation", label: "Show translation", sub: "English meaning of each verse" },
+  { key: "arabicLarge", label: "Large Arabic text", sub: "Bigger Arabic letters" },
+  { key: "quranPageView", label: "Full page view", sub: "One flowing page, like a printed Quran" },
+  { key: "quranAutoScroll", label: "Follow recitation", sub: "Moves to the verse being recited" },
+  { key: "quranWordHighlight", label: "Word by word highlight", sub: "Lights up each word as it's recited" },
+];
+
+function QuranAudioSettings({ onClose }: { onClose: () => void }) {
+  const [d, setD] = useState<DisplayPrefs>(() => getDisplay());
+  const update = (patch: Partial<DisplayPrefs>) => {
+    const next = { ...d, ...patch };
+    setD(next); setDisplay(next);
+    window.dispatchEvent(new Event("adhkar:display-update"));
+  };
+  return createPortal(
+    <div className="qp-audio-backdrop" onPointerDown={(e) => { if (e.target === e.currentTarget) onClose(); }}>
+      <div className="qp-audio" role="dialog" aria-label="Audio settings">
+        <div className="mb-1 flex items-center justify-between">
+          <h3 className="qp-title">Quran settings</h3>
+          <button className="quran-player-x" aria-label="Close settings" onClick={onClose}><X size={16} /></button>
+        </div>
+        <div className="qp-audio-list">
+          {AUDIO_TOGGLES.map((t) => (
+            <div key={t.key} className="qp-pop-row" onClick={() => update({ [t.key]: !d[t.key] } as Partial<DisplayPrefs>)}>
+              <span className="flex-1"><span className="block text-[14px] font-medium">{t.label}</span><span className="quran-muted block text-[11.5px]">{t.sub}</span></span>
+              <QuranSwitch on={!!d[t.key]} onChange={(v) => update({ [t.key]: v } as Partial<DisplayPrefs>)} label={t.label} />
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>,
+    document.body,
+  );
+}
+
 function QuranPlayerPanel() {
   const p = useQuranPlayer();
   const r = findReciter(p.reciterId);
@@ -708,6 +751,7 @@ function QuranPlayerPanel() {
   const [menu, setMenu] = useState<null | "main" | "sleep" | "speed">(null);
   const menuRef = useRef<HTMLDivElement | null>(null);
   const sleepLeft = useSleepLeft(p.sleep);
+  const [audioOpen, setAudioOpen] = useState(false);
   useEffect(() => { quranPlayer.loadPrefs(); }, []);
   useEffect(() => {
     const onNext = (e: Event) => { void navigate({ to: "/app/quran", search: { s: (e as CustomEvent<number>).detail } }); };
@@ -762,7 +806,7 @@ function QuranPlayerPanel() {
                 <span className="flex-1 text-[14px]">Sleep timer{sleepLeft && <span className="quran-muted block text-[11.5px]">{sleepLeft}</span>}</span>
                 <ChevronRight size={16} className="quran-muted" />
               </button>
-              <button className="qp-pop-row" onClick={tap(() => { setMenu(null); void navigate({ to: "/app/settings" }); })}>
+              <button className="qp-pop-row" onClick={tap(() => { setMenu(null); setAudioOpen(true); })}>
                 <Settings size={19} className="qp-ic" />
                 <span className="flex-1 text-[14px]">Audio settings</span>
                 <ChevronRight size={16} className="quran-muted" />
@@ -785,6 +829,7 @@ function QuranPlayerPanel() {
         </div>
         <button className="quran-player-x" aria-label="Hide player" onClick={() => quranPlayer.setPanel(false)}><X size={18} /></button>
       </div>
+      {audioOpen && <QuranAudioSettings onClose={() => setAudioOpen(false)} />}
       <input className="quran-seek" type="range" min={0} max={1000} aria-label="Seek"
         value={p.dur ? Math.round((p.cur / p.dur) * 1000) : 0}
         style={{ ["--p" as string]: `${p.dur ? (p.cur / p.dur) * 100 : 0}%` }}
@@ -794,11 +839,6 @@ function QuranPlayerPanel() {
         <button className="qp-verse" onClick={tap(() => quranPlayer.step(-1))} disabled={!ready || !prevV}>
           <ChevronLeft size={18} /><span className="min-w-0 text-left"><b>Previous verse</b><small>{prevV ? `Verse ${prevV}` : "—"}</small></span>
         </button>
-        <div className="qp-cont" onClick={() => quranPlayer.setContinuous(!p.continuous)}>
-          <InfinityIcon size={20} className="qp-ic flex-none" />
-          <span className="min-w-0 flex-1"><b>Play entire Quran</b><small>Continue to next surah</small></span>
-          <QuranSwitch on={p.continuous} onChange={quranPlayer.setContinuous} label="Play entire Quran" />
-        </div>
         <button className="qp-verse is-next" onClick={tap(() => quranPlayer.step(1))} disabled={!ready || !nextV}>
           <span className="min-w-0 text-right"><b>Next verse</b><small>{nextV ? `Verse ${nextV}` : "—"}</small></span><ChevronRight size={18} />
         </button>
