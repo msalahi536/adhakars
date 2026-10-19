@@ -5,7 +5,7 @@ import { markSurahComplete } from "@/lib/giveaway";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { QuranMiniPlayer } from "@/components/QuranMiniPlayer";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { Check, ChevronDown, ChevronLeft, ChevronRight, Clock, Heart, Infinity, MoreHorizontal, Settings, Loader2, Maximize2, Pause, Play, Repeat, Search, Shuffle, SkipBack, SkipForward, X } from "lucide-react";
+import { Check, ChevronDown, ChevronLeft, ChevronRight, Clock, Heart, Infinity as InfinityIcon, MoreHorizontal, Settings, Loader2, Maximize2, Pause, Play, Repeat, Search, Shuffle, SkipBack, SkipForward, X } from "lucide-react";
 import {
   findReciter, getChapterAudio, getChapters, getVerses, homeReciterRow, POPULAR_RECITERS, RECITERS, reciterHasPhoto,
   reciterHasSurah, reciterName, reciterScore, reciterPhoto, reciterSubtitle, searchChapters, searchReciters, parseVerseRef, type Chapter, type Reciter, type Verse, getVerseByKey, searchVerses, type VerseHit,
@@ -753,7 +753,7 @@ function QuranPlayerPanel() {
           {menu === "main" && (
             <div className="qp-pop" role="menu">
               <div className="qp-pop-row" onClick={() => quranPlayer.setContinuous(!p.continuous)}>
-                <Infinity size={20} className="qp-ic" />
+                <InfinityIcon size={20} className="qp-ic" />
                 <span className="flex-1"><span className="block text-[14px] font-medium">Play entire Quran</span><span className="quran-muted block text-[11.5px]">Continue to next surah</span></span>
                 <QuranSwitch on={p.continuous} onChange={quranPlayer.setContinuous} label="Play entire Quran" />
               </div>
@@ -795,7 +795,7 @@ function QuranPlayerPanel() {
           <ChevronLeft size={18} /><span className="min-w-0 text-left"><b>Previous verse</b><small>{prevV ? `Verse ${prevV}` : "—"}</small></span>
         </button>
         <div className="qp-cont" onClick={() => quranPlayer.setContinuous(!p.continuous)}>
-          <Infinity size={20} className="qp-ic flex-none" />
+          <InfinityIcon size={20} className="qp-ic flex-none" />
           <span className="min-w-0 flex-1"><b>Play entire Quran</b><small>Continue to next surah</small></span>
           <QuranSwitch on={p.continuous} onChange={quranPlayer.setContinuous} label="Play entire Quran" />
         </div>
