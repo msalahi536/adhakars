@@ -134,6 +134,17 @@ function RootComponent() {
     applyThemeForRoute(pathname);
   }, [pathname]);
 
+  // Native app: keep the launch screen up until the first page has painted.
+  useEffect(() => {
+    const cap = (window as unknown as { Capacitor?: { isNativePlatform?: () => boolean } }).Capacitor;
+    if (!cap?.isNativePlatform?.()) return;
+    requestAnimationFrame(() => {
+      import("@capacitor/splash-screen")
+        .then(({ SplashScreen }) => SplashScreen.hide({ fadeOutDuration: 300 }))
+        .catch(() => {});
+    });
+  }, []);
+
   // Re-apply when the selected color preset changes.
   useEffect(() => {
     const reapply = () => applyThemeForRoute(window.location.pathname);
