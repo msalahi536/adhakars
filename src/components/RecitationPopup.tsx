@@ -64,7 +64,15 @@ export function RecitationPopup() {
   useLayoutEffect(() => {
     if (!open) return;
     const anchor = getAnchor(track?.dhikrId ?? open.openerId);
-    if (!anchor) return; // keep last position (e.g. user swiped away mid-listen)
+    if (!anchor) {
+      // Reopened from the mini player on another page: sit just above it.
+      if (!posRef.current) {
+        const next = { left: Math.max(10, (window.innerWidth - POP_W) / 2), top: Math.max(10, window.innerHeight - 380) };
+        setPos(next);
+        posRef.current = next;
+      }
+      return;
+    }
     const r = anchor.getBoundingClientRect();
     const left = Math.max(10, Math.min(r.left, window.innerWidth - POP_W - 10));
     const next = { left, top: r.bottom + 8 };
