@@ -9,9 +9,11 @@ type Props = {
   dhikrId: string;
   size?: number;
   title?: string;
+  /** Section name for pages outside a swipe stack, e.g. "Duas". */
+  section?: string;
 };
 
-export function ListenButton({ dhikrId, size = 32, title }: Props) {
+export function ListenButton({ dhikrId, size = 32, title, section }: Props) {
   const btnRef = useRef<HTMLButtonElement | null>(null);
   const map = useRecitationMap();
   const player = usePlayer();
@@ -41,7 +43,7 @@ export function ListenButton({ dhikrId, size = 32, title }: Props) {
         type="button"
         onClick={(e) => {
           e.stopPropagation();
-          setPopupOpen(isOpen ? null : { openerId: dhikrId, title: name, tracks: queueTracks, label: playlist?.label ?? null, track: rec ? { dhikrId, title: name, url: rec.url } : null });
+          setPopupOpen(isOpen ? null : { openerId: dhikrId, title: name, tracks: queueTracks, label: playlist?.label ?? section ?? null, track: rec ? { dhikrId, title: name, url: rec.url } : null });
         }}
         aria-label="play recitation"
         aria-expanded={isOpen}

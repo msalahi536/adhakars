@@ -105,7 +105,7 @@ export function RecitationPopup() {
         <div className="rec-pop-sub">{hasAudio ? "Imam Taha Hassane" : "Recitation coming soon"}</div>
 
         {mismatch && playing && openerTrack && (
-          <button type="button" className="rec-pop-switch" onClick={() => recitationPlayer.playOne(openerTrack)}>
+          <button type="button" className="rec-pop-switch" onClick={() => recitationPlayer.playOne(openerTrack, open?.label ?? null)}>
             Play this card instead
           </button>
         )}
@@ -118,9 +118,9 @@ export function RecitationPopup() {
             type="button"
             className="rec-pop-play"
             onClick={() => {
-              if (mismatch && !playing && openerTrack) recitationPlayer.playOne(openerTrack);
+              if (mismatch && !playing && openerTrack) recitationPlayer.playOne(openerTrack, open?.label ?? null);
               else if (track) recitationPlayer.toggle();
-              else if (openerTrack) recitationPlayer.playOne(openerTrack);
+              else if (openerTrack) recitationPlayer.playOne(openerTrack, open?.label ?? null);
             }}
             disabled={!hasAudio}
             aria-label={playing ? "Pause" : "Play"}
