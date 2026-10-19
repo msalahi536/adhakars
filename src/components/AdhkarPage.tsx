@@ -67,9 +67,9 @@ export function AdhkarPage({
   useEffect(() => {
     const onEnded = (e: Event) => {
       const id = (e as CustomEvent<{ dhikrId: string }>).detail?.dhikrId;
-      const item = items.find((i) => i.dhikr.id === id);
-      if (!item) return;
-      const target = item.dhikr.count ?? 1;
+      const d = items.flatMap((i) => (i.dhikr ? [i.dhikr] : i.combo?.parts ?? [])).find((x) => x.id === id);
+      if (!d) return;
+      const target = d.target;
       setCounts((cur) => {
         const prev = cur[id] ?? 0;
         if (prev >= target) return cur;
