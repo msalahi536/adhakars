@@ -4971,3 +4971,4 @@ div[data-state="open"]:has(+ .giveaway-dialog) {
 .rec-panel-chev { position: absolute; right: 16px; top: 50%; transform: translateY(-50%); }
 .rec-panel-controls { gap: 22px; }
 .mini-pill.is-adhkar { z-index: 46; }
+body.has-adhkar-mini .quran-player:not(.rec-panel), body.has-adhkar-mini .mini-pill:not(.is-adhkar) { bottom: calc(env(safe-area-inset-bottom, 0px) + 150px); }

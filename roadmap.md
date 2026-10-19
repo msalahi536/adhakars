@@ -18,3 +18,4 @@
 
 - [x] Hadith loading pill -> animated progress bar with a patience line
 - [x] Compact hadith title card (verified 161px, 14px padding)
+- [x] Adhkar mini bar sits under the Quran player
