@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { Check, ChevronDown, ChevronLeft, ChevronRight, Clock, MoreHorizontal, Pause, Play, SkipBack, SkipForward, Square } from "lucide-react";
 import imamTaha from "@/assets/imam-taha.png.asset.json";
 import { Portal } from "./Portal";
-import { closePopup, usePopupOpen } from "@/lib/recitation-popup";
+import { closePopup, setPopupOpen, usePopupOpen } from "@/lib/recitation-popup";
 import { recitationPlayer, usePlayer } from "@/lib/recitation-player";
 
 const RATES = [0.75, 1, 1.25, 1.5, 2];
@@ -65,9 +65,16 @@ export function RecitationPopup() {
   const canPrev = queueActive ? player.queueIndex > 0 : listIndex > 0;
   const canNext = queueActive ? player.queueIndex < player.queue.length - 1 : listIndex >= 0 && listIndex < open.tracks.length - 1;
   const step = (d: number) => {
-    if (queueActive) { if (d < 0) recitationPlayer.previous(); else recitationPlayer.next(); return; }
-    const t = open.tracks[listIndex + d];
-    if (t) recitationPlayer.playOne(t, open.label ?? null);
+    let t: typeof track = null;
+    if (queueActive) {
+      t = player.queue[player.queueIndex + d] ?? null;
+      if (d < 0) recitationPlayer.previous(); else recitationPlayer.next();
+    } else {
+      t = open.tracks[listIndex + d] ?? null;
+      if (t) recitationPlayer.playOne(t, open.label ?? null);
+    }
+    // Skipping makes the new card the one this popup is "about", so no switch prompt.
+    if (t) setPopupOpen({ ...open, openerId: t.dhikrId, title: t.title, track: t });
   };
 
   const onPlay = () => {
