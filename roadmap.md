@@ -30,8 +30,9 @@
 - [x] Prayer timeline sheet a little taller (min(76dvh, 690px) — top edge ~24% down, 641px of 844px)
 - [x] Player: with "Play entire Quran" on, the next surah keeps the player minimized
 - [x] After-salah sheet: close button works with a finger tap; sheet a touch shorter
-- [ ] Prayer timeline: a tiny bit taller
-- [ ] Prayer timeline: open focused on today, not between days
-- [ ] Prayer timeline: swipe-to-close only from the top handle line
+- [x] Prayer timeline: a tiny bit taller
+- [x] Prayer timeline: open focused on today, not between days
+- [x] Prayer timeline: swipe-to-close only from the top handle line
+
 
 
