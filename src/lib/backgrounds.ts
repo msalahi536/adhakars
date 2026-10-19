@@ -26,6 +26,7 @@ export type BackgroundPair = { morning: string; evening: string };
 // Emerald morning's previous artwork is kept at /tmp/emerald-bg/emerald-morning.PREV.asset.json (asset b869bd18-8627-4c4a-8f76-fefd66972f4e).
 // Sand morning's previous artwork is kept at /tmp/sand-bg/sand-morning.PREV.asset.json (asset 70a281b5-1e96-4a47-a408-386deaffaa8a).
 // Midnight morning's previous artwork is kept at /tmp/midnight-bg/midnight-morning.PREV.asset.json (asset cb78ea65-651e-4c28-8ad8-57a76548b4fa).
+// Dark-red morning's previous artwork is kept at /tmp/darkred-bg/dark-red-morning.PREV.asset.json.
 export const DEFAULT_BACKGROUNDS: BackgroundPair = {
   morning: morningMisty.url,
   evening: eveningDefault.url,
