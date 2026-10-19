@@ -175,7 +175,7 @@ function SheetDay({ day, now, nextAt, dayRef, isToday, past }: {
           const state = nextAt !== null && t === nextAt ? "next" : t <= now.getTime() ? "past" : "future";
           const Icon = ICONS[s.id] ?? Sun;
           return (
-            <div key={s.id} ref={state === "next" ? nextRef : undefined} className="ptl-row" data-state={state}>
+            <div key={s.id} className="ptl-row" data-state={state}>
               <span className="ptl-dot" aria-hidden />
               <span className="ptl-pill">
                 <span className="ptl-ic"><Icon size={16} strokeWidth={1.6} /></span>
