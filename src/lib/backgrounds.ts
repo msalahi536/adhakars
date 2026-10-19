@@ -22,6 +22,7 @@ import darkRedEvening from "@/assets/dark-red-evening.png.asset.json";
 export type BackgroundPair = { morning: string; evening: string };
 
 // To restore the previous "original" morning artwork, swap morningMisty back to morningDefault.
+// Ocean morning's previous artwork is kept at /tmp/ocean-bg/ocean-morning.PREV.asset.json (asset daa965d2-62bc-4a02-bf9d-953794066e45).
 export const DEFAULT_BACKGROUNDS: BackgroundPair = {
   morning: morningMisty.url,
   evening: eveningDefault.url,
