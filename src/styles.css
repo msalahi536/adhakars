@@ -4970,3 +4970,4 @@ div[data-state="open"]:has(+ .giveaway-dialog) {
 .rec-panel .rec-pop-all { position: relative; justify-content: center; gap: 8px; }
 .rec-panel-chev { position: absolute; right: 16px; top: 50%; transform: translateY(-50%); }
 .rec-panel-controls { gap: 22px; }
+.mini-pill.is-adhkar { z-index: 46; }

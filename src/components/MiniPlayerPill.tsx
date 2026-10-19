@@ -1,3 +1,4 @@
+import type React from "react";
 import { useEffect, useRef, useState } from "react";
 import { Loader2, Pause, Play, X } from "lucide-react";
 import { restingLevels, shapeMeter, type MeterLevels } from "@/lib/recitation-meter";
@@ -35,14 +36,14 @@ function useMeter(playing: boolean, levels?: MeterLevels) {
 
 type Props = {
   label: string; title: string; subtitle: string; photo?: string | null; initial?: string;
-  playing: boolean; loading?: boolean; levels?: MeterLevels; className?: string;
+  playing: boolean; loading?: boolean; levels?: MeterLevels; className?: string; style?: React.CSSProperties;
   onOpen: () => void; onToggle: () => void; onClose: () => void;
 };
 
 export function MiniPlayerPill(p: Props) {
   const bars = useMeter(p.playing, p.playing ? p.levels : undefined);
   return (
-    <div className={`mini-pill ${p.className ?? ""}`} role="group" aria-label={p.label}>
+    <div className={`mini-pill ${p.className ?? ""}`} role="group" aria-label={p.label} style={p.style}>
       <span className="mini-pill-art" aria-hidden />
       <button className="mini-pill-main" onClick={p.onOpen} aria-label={`Open player, ${p.title}`}>
         <span className="mini-pill-photo">{p.photo ? <img src={p.photo} alt="" /> : p.initial}</span>
