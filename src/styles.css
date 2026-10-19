@@ -4940,3 +4940,6 @@ div[data-state="open"]:has(+ .giveaway-dialog) {
 .qp-verse::before { height: 62%; background: color-mix(in oklab, var(--accent) 10%, transparent); }
 .qp-verse::after { bottom: -3px; right: 1px; width: 30px; height: 34px; background: color-mix(in oklab, var(--accent) 12%, transparent); }
 .qp-verse.is-next::after { right: auto; left: 1px; }
+/* No verse timings: gentle notice under the seek buttons */
+.qp-noverse { display: flex; align-items: center; justify-content: center; gap: 5px; margin: -7px 0 10px; font-size: 11px; color: color-mix(in oklab, var(--muted-foreground) 88%, transparent); }
+.qp-noverse svg { opacity: .7; flex: none; }

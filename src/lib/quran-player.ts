@@ -276,6 +276,12 @@ export const quranPlayer = {
     el.currentTime = ratio * el.duration;
     set({ cur: el.currentTime, dur: el.duration });
   },
+  /** Skip by seconds (used when a recitation has no verse timings). */
+  skip(delta: number) {
+    if (!el || !Number.isFinite(el.duration)) return;
+    el.currentTime = Math.min(el.duration - 0.5, Math.max(0, el.currentTime + delta));
+    set({ cur: el.currentTime, dur: el.duration });
+  },
   cycleRate() {
     const rate = SPEEDS[(SPEEDS.indexOf(state.rate) + 1) % SPEEDS.length];
     if (el) el.playbackRate = rate;
