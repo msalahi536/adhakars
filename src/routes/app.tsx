@@ -193,6 +193,7 @@ function AppLayout() {
       timers.forEach((t) => window.clearTimeout(t));
       document.removeEventListener("visibilitychange", onVisible);
       document.removeEventListener("resume", onResume);
+      window.removeEventListener("adhan:stop-media", stopMedia);
       if (typeof unsubscribe === "function") unsubscribe();
     };
   }, []);
