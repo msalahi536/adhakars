@@ -148,6 +148,8 @@ function el() {
   audio.addEventListener("play", () => { set({ playing: true }); startMeter(); });
   audio.addEventListener("pause", () => { set({ playing: false }); stopMeter(); });
   audio.addEventListener("ended", () => {
+    // Listening to a recitation to the end counts the card as done.
+    if (state.track) window.dispatchEvent(new CustomEvent("recitation:ended", { detail: { dhikrId: state.track.dhikrId } }));
     if (state.sleep === "track") { set({ sleep: null, playing: false, current: 0 }); return; }
     if (state.queue.length && state.queueIndex < state.queue.length - 1) load(state.queueIndex + 1);
     else set({ playing: false, current: 0, queue: [], queueIndex: -1, queueLabel: null });

@@ -63,6 +63,25 @@ export function AdhkarPage({
     bumpLifetime(lifetimeCategory, next - prev);
   };
 
+  // Finishing a card's recitation (single or "Play all") completes its counter.
+  useEffect(() => {
+    const onEnded = (e: Event) => {
+      const id = (e as CustomEvent<{ dhikrId: string }>).detail?.dhikrId;
+      const d = items.flatMap((i) => (i.dhikr ? [i.dhikr] : i.combo?.parts ?? [])).find((x) => x.id === id);
+      if (!d) return;
+      const target = d.target;
+      setCounts((cur) => {
+        const prev = cur[id] ?? 0;
+        if (prev >= target) return cur;
+        setCount(storageKey, id, target);
+        bumpLifetime(lifetimeCategory, target - prev);
+        return { ...cur, [id]: target };
+      });
+    };
+    window.addEventListener("recitation:ended", onEnded);
+    return () => window.removeEventListener("recitation:ended", onEnded);
+  });
+
   const dailyLayout = dailyLayoutProp ?? ["morning", "evening", "sleep", "wake"].includes(storageKey);
 
   return (
