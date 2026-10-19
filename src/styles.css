@@ -4903,6 +4903,6 @@ div[data-state="open"]:has(+ .giveaway-dialog) {
 .qp-verse { flex: 0 0 auto; width: 44%; min-height: 52px; padding: 8px 12px; gap: 10px; border-radius: 20px; background: color-mix(in oklab, var(--foreground) 9%, transparent); }
 .qp-row b { font-size: 13px; }
 .qp-row small { font-size: 11px; }
+.quran-fs-row { display: flex; align-items: stretch; gap: 8px; } .quran-fs-row > .quran-fs-toggle { width: auto; margin: 0; white-space: nowrap; } .quran-fs-row > .quran-fs-toggle:first-child { flex: 1 1 0; min-width: 0; }
 .quran-read-settings { flex: none; padding: 7px 6px; flex-direction: column; gap: 3px; border-radius: 16px; font-size: 9.5px; line-height: 1.05; }
 .quran-fs-row > .quran-read-settings { width: 62px; min-width: 62px; }
-.quran-fs-row { display: flex; align-items: stretch; gap: 8px; } .quran-fs-row > .quran-fs-toggle { width: auto; margin: 0; white-space: nowrap; } .quran-fs-row > .quran-fs-toggle:first-child { flex: 1 1 0; min-width: 0; }
