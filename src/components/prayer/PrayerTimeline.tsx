@@ -1,7 +1,7 @@
 // Vertical mini timeline of prayer times, with an expanded multi day view.
 
 import { useEffect, useRef, useState } from "react";
-import { CloudSun, Moon, Sun, Sunrise, Sunset, X } from "lucide-react";
+import { ChevronRight, CloudSun, Moon, Sun, Sunrise, Sunset, X } from "lucide-react";
 import { formatMinutes, type Slot } from "@/lib/prayer-times";
 
 type Props = {

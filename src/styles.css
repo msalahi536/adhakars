@@ -1155,8 +1155,8 @@ html[data-preset="dark-red"]:not([data-visual-phase="evening"]) .salah-dismiss.i
 .prayer-timeline-card .prayer-timeline-list > span { display: none; }
 .prayer-timeline-card .prayer-timeline-row { height: 30px; gap: 18px !important; padding: 0 !important; border-radius: 0 !important; opacity: 1 !important; }
 .prayer-timeline-card .prayer-timeline-marker { width: 7px !important; }
-.prayer-timeline-card .prayer-timeline-marker span { z-index: 1; width: 6px !important; height: 6px !important; border: 0 !important; background: rgba(255, 255, 255, 0.5) !important; box-shadow: none !important; }
-.prayer-timeline-card .prayer-timeline-row[data-state="next"] .prayer-timeline-marker span { width: 10px !important; height: 10px !important; background: color-mix(in oklab, var(--preset-ink) 40%, #ffffff) !important; box-shadow: 0 0 0 4px rgba(var(--preset-ink-rgb), 0.3) !important; }
+.prayer-timeline-card .prayer-timeline-marker span { z-index: 1; width: 9px !important; height: 9px !important; border: 0 !important; background: rgba(255, 255, 255, 0.55) !important; box-shadow: none !important; }
+.prayer-timeline-card .prayer-timeline-row[data-state="next"] .prayer-timeline-marker span { width: 13px !important; height: 13px !important; background: rgba(255, 255, 255, 0.92) !important; box-shadow: 0 0 0 5px rgba(255, 255, 255, 0.18) !important; }
 .prayer-timeline-card .prayer-timeline-name,
 .prayer-timeline-card .prayer-timeline-time { color: #ffffff !important; font-family: var(--font-display); font-size: 16px !important; font-weight: 500 !important; line-height: 30px; }
 .prayer-timeline-card .prayer-timeline-row[data-state="next"] .prayer-timeline-name,
