@@ -5,14 +5,14 @@ import { markSurahComplete } from "@/lib/giveaway";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { QuranMiniPlayer } from "@/components/QuranMiniPlayer";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { ChevronDown, ChevronLeft, ChevronRight, Heart, Loader2, Maximize2, Pause, Play, Repeat, Search, Shuffle, SkipBack, SkipForward, X } from "lucide-react";
+import { Check, ChevronDown, ChevronLeft, ChevronRight, Clock, Heart, Infinity, MoreHorizontal, Settings, Loader2, Maximize2, Pause, Play, Repeat, Search, Shuffle, SkipBack, SkipForward, X } from "lucide-react";
 import {
   findReciter, getChapterAudio, getChapters, getVerses, homeReciterRow, POPULAR_RECITERS, RECITERS, reciterHasPhoto,
   reciterHasSurah, reciterName, reciterScore, reciterPhoto, reciterSubtitle, searchChapters, searchReciters, parseVerseRef, type Chapter, type Reciter, type Verse, getVerseByKey, searchVerses, type VerseHit,
 } from "@/lib/quran";
 import { getDisplay, triggerHaptic } from "@/lib/theme";
 import { guessVerses } from "@/lib/quran-search.functions";
-import { quranPlayer, useQuranPlayer } from "@/lib/quran-player";
+import { quranPlayer, SPEEDS, useQuranPlayer } from "@/lib/quran-player";
 
 type Search = { s?: number; v?: number; view?: "reciters"; tab?: "all" };
 
@@ -674,12 +674,52 @@ function ReciterSheet({ onClose, onSeeAll }: { onClose: () => void; onSeeAll: ()
   );
 }
 
+const SLEEP_OPTIONS: { label: string; v: number | "surah" | null }[] = [
+  { label: "Off", v: null }, { label: "5 minutes", v: 5 }, { label: "15 minutes", v: 15 },
+  { label: "30 minutes", v: 30 }, { label: "1 hour", v: 60 }, { label: "End of surah", v: "surah" },
+];
+
+function useSleepLeft(sleep: number | "surah" | null) {
+  const [, force] = useState(0);
+  useEffect(() => {
+    if (typeof sleep !== "number") return;
+    const t = setInterval(() => force((n) => n + 1), 1000);
+    return () => clearInterval(t);
+  }, [sleep]);
+  if (sleep === "surah") return "End of surah";
+  if (typeof sleep !== "number") return null;
+  const s = Math.max(0, Math.round((sleep - Date.now()) / 1000));
+  return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, "0")} left`;
+}
+
+function QuranSwitch({ on, onChange, label }: { on: boolean; onChange: (v: boolean) => void; label: string }) {
+  return (
+    <button type="button" role="switch" aria-checked={on} aria-label={label} className={`qp-switch ${on ? "is-on" : ""}`}
+      onClick={(e) => { e.stopPropagation(); void triggerHaptic("light"); onChange(!on); }}><i /></button>
+  );
+}
+
 function QuranPlayerPanel() {
   const p = useQuranPlayer();
   const r = findReciter(p.reciterId);
   const ready = !!p.audio;
   const tap = (f: () => void) => () => { void triggerHaptic("light"); f(); };
   const navigate = useNavigate();
+  const [menu, setMenu] = useState<null | "main" | "sleep" | "speed">(null);
+  const menuRef = useRef<HTMLDivElement | null>(null);
+  const sleepLeft = useSleepLeft(p.sleep);
+  useEffect(() => { quranPlayer.loadPrefs(); }, []);
+  useEffect(() => {
+    const onNext = (e: Event) => { void navigate({ to: "/app/quran", search: { s: (e as CustomEvent<number>).detail } }); };
+    window.addEventListener("quran:auto-next", onNext);
+    return () => window.removeEventListener("quran:auto-next", onNext);
+  }, [navigate]);
+  useEffect(() => {
+    if (!menu) return;
+    const close = (e: PointerEvent) => { if (!menuRef.current?.contains(e.target as Node)) setMenu(null); };
+    document.addEventListener("pointerdown", close);
+    return () => document.removeEventListener("pointerdown", close);
+  }, [menu]);
   const goSurah = async (d: number) => {
     const id = (p.chapter ?? 1) + d;
     if (id < 1 || id > 114) return;
@@ -688,30 +728,88 @@ function QuranPlayerPanel() {
     await quranPlayer.select(p.reciterId, id, name, true);
     void navigate({ to: "/app/quran", search: { s: id } });
   };
+  const ts = p.audio?.timings ?? [];
+  const vi = ts.findIndex((t) => t.key === p.pos.key);
+  const curV = vi < 0 ? 0 : vi;
+  const prevV = ts[curV - 1]?.key.split(":")[1];
+  const nextV = ts[vi < 0 ? 0 : curV + 1]?.key.split(":")[1];
   return (
     <div className="quran-player" role="group" aria-label="Recitation controls">
       <div className="flex items-center gap-3">
-        <Avatar r={r} size={44} />
-        <span className="min-w-0 flex-1"><span className="block truncate text-[16px] font-semibold">{p.chapterName}</span><span className="quran-muted block truncate text-[12.5px]">{reciterName(r)}</span></span>
-        <button className="quran-speed" aria-label={`Playback speed ${p.rate}x`} onClick={tap(quranPlayer.cycleRate)}>{p.rate}x</button>
-        <button className="quran-player-x" aria-label="Hide player" onClick={() => quranPlayer.setPanel(false)}><X size={16} /></button>
+        <Avatar r={r} size={48} />
+        <span className="min-w-0 flex-1"><span className="qp-title block truncate">{p.chapterName}</span><span className="quran-muted block truncate text-[13px]">{reciterName(r)}</span></span>
+        <div className="qp-menu-wrap" ref={menuRef}>
+          <button className="quran-speed qp-speed" aria-label={`Playback speed ${p.rate}x`} aria-expanded={menu === "speed"} onClick={tap(() => setMenu(menu === "speed" ? null : "speed"))}>{p.rate}x <ChevronDown size={14} /></button>
+          <button className="quran-player-x qp-more" aria-label="More options" aria-expanded={menu === "main" || menu === "sleep"} onClick={tap(() => setMenu(menu === "main" || menu === "sleep" ? null : "main"))}><MoreHorizontal size={18} /></button>
+          {menu === "speed" && (
+            <div className="qp-pop qp-pop-speed" role="menu">
+              {SPEEDS.map((s) => (
+                <button key={s} role="menuitemradio" aria-checked={p.rate === s} className={`qp-pop-row ${p.rate === s ? "is-on" : ""}`} onClick={tap(() => { quranPlayer.setRate(s); setMenu(null); })}>
+                  <span className="flex-1">{s}x</span>{p.rate === s && <Check size={15} />}
+                </button>
+              ))}
+            </div>
+          )}
+          {menu === "main" && (
+            <div className="qp-pop" role="menu">
+              <div className="qp-pop-row" onClick={() => quranPlayer.setContinuous(!p.continuous)}>
+                <Infinity size={20} className="qp-ic" />
+                <span className="flex-1"><span className="block text-[14px] font-medium">Play entire Quran</span><span className="quran-muted block text-[11.5px]">Continue to next surah</span></span>
+                <QuranSwitch on={p.continuous} onChange={quranPlayer.setContinuous} label="Play entire Quran" />
+              </div>
+              <button className="qp-pop-row" onClick={tap(() => setMenu("sleep"))}>
+                <Clock size={19} className="qp-ic" />
+                <span className="flex-1 text-[14px]">Sleep timer{sleepLeft && <span className="quran-muted block text-[11.5px]">{sleepLeft}</span>}</span>
+                <ChevronRight size={16} className="quran-muted" />
+              </button>
+              <button className="qp-pop-row" onClick={tap(() => { setMenu(null); void navigate({ to: "/app/settings" }); })}>
+                <Settings size={19} className="qp-ic" />
+                <span className="flex-1 text-[14px]">Audio settings</span>
+                <ChevronRight size={16} className="quran-muted" />
+              </button>
+            </div>
+          )}
+          {menu === "sleep" && (
+            <div className="qp-pop" role="menu">
+              <button className="qp-pop-row qp-pop-back" onClick={tap(() => setMenu("main"))}><ChevronLeft size={16} /><span className="flex-1 text-[14px] font-medium">Sleep timer</span></button>
+              {SLEEP_OPTIONS.map((o) => {
+                const on = o.v === null ? p.sleep === null : o.v === "surah" ? p.sleep === "surah" : false;
+                return (
+                  <button key={o.label} role="menuitemradio" aria-checked={on} className={`qp-pop-row ${on ? "is-on" : ""}`} onClick={tap(() => { quranPlayer.setSleep(o.v); setMenu(null); })}>
+                    <span className="flex-1 text-[14px]">{o.label}</span>{on && <Check size={15} />}
+                  </button>
+                );
+              })}
+            </div>
+          )}
+        </div>
+        <button className="quran-player-x" aria-label="Hide player" onClick={() => quranPlayer.setPanel(false)}><X size={18} /></button>
       </div>
       <input className="quran-seek" type="range" min={0} max={1000} aria-label="Seek"
         value={p.dur ? Math.round((p.cur / p.dur) * 1000) : 0}
         style={{ ["--p" as string]: `${p.dur ? (p.cur / p.dur) * 100 : 0}%` }}
         onChange={(e) => quranPlayer.seek(Number(e.target.value) / 1000)} disabled={!ready} />
       <div className="quran-times"><span>{fmt(p.cur)}</span><span>{fmt(p.dur)}</span></div>
-      <div className="quran-surah-nav">
-        <button onClick={() => void goSurah(-1)} disabled={(p.chapter ?? 1) <= 1}><ChevronLeft size={15} /> Previous surah</button>
-        <button onClick={() => void goSurah(1)} disabled={(p.chapter ?? 114) >= 114}>Next surah <ChevronRight size={15} /></button>
+      <div className="qp-row">
+        <button className="qp-verse" onClick={tap(() => quranPlayer.step(-1))} disabled={!ready || !prevV}>
+          <ChevronLeft size={18} /><span className="min-w-0 text-left"><b>Previous verse</b><small>{prevV ? `Verse ${prevV}` : "—"}</small></span>
+        </button>
+        <div className="qp-cont" onClick={() => quranPlayer.setContinuous(!p.continuous)}>
+          <Infinity size={20} className="qp-ic flex-none" />
+          <span className="min-w-0 flex-1"><b>Play entire Quran</b><small>Continue to next surah</small></span>
+          <QuranSwitch on={p.continuous} onChange={quranPlayer.setContinuous} label="Play entire Quran" />
+        </div>
+        <button className="qp-verse is-next" onClick={tap(() => quranPlayer.step(1))} disabled={!ready || !nextV}>
+          <span className="min-w-0 text-right"><b>Next verse</b><small>{nextV ? `Verse ${nextV}` : "—"}</small></span><ChevronRight size={18} />
+        </button>
       </div>
       <div className="quran-controls">
         <button aria-label="Shuffle surahs" aria-pressed={p.shuffle} className={p.shuffle ? "is-on" : ""} onClick={tap(quranPlayer.toggleShuffle)}><Shuffle size={19} /></button>
-        <button aria-label="Previous verse" onClick={tap(() => quranPlayer.step(-1))} disabled={!ready}><SkipBack size={24} fill="currentColor" /></button>
+        <button aria-label="Previous surah" onClick={() => void goSurah(-1)} disabled={(p.chapter ?? 1) <= 1}><SkipBack size={22} fill="currentColor" /></button>
         <button className="quran-play" aria-label={p.playing ? "Pause" : "Play"} onClick={tap(() => quranPlayer.toggle())} disabled={!ready}>
           {p.loading && !p.playing ? <Loader2 size={24} className="animate-spin" /> : p.playing ? <Pause size={24} fill="currentColor" /> : <Play size={24} fill="currentColor" style={{ marginLeft: 3 }} />}
         </button>
-        <button aria-label="Next verse" onClick={tap(() => quranPlayer.step(1))} disabled={!ready}><SkipForward size={24} fill="currentColor" /></button>
+        <button aria-label="Next surah" onClick={() => void goSurah(1)} disabled={(p.chapter ?? 114) >= 114}><SkipForward size={22} fill="currentColor" /></button>
         <button aria-label="Repeat surah" aria-pressed={p.repeat} className={p.repeat ? "is-on" : ""} onClick={tap(quranPlayer.toggleRepeat)}><Repeat size={19} /></button>
       </div>
     </div>
