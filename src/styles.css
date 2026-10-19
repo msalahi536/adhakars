@@ -2798,6 +2798,14 @@ html[data-visual-phase="evening"] .bottom-nav-row {
 .app-shell > [data-overlay="after-salah"],
 .app-shell > [data-overlay="prayer-timeline"] { z-index: 90 !important; }
 .app-shell > .bottom-nav { z-index: 100 !important; }
+/* A prayer sheet covers the whole page, so the corner settings control must never
+   float above it: WebKit composites its backdrop-filter layer over the sheet on
+   iPhone even though the sheet paints above it in the normal stacking order. */
+body:has([data-overlay="prayer-timeline"]) .settings-button,
+body:has([data-overlay="after-salah"]) .settings-button {
+  opacity: 0;
+  pointer-events: none;
+}
 html[data-visual-phase="evening"] .tasbih-disc {
   border-color: var(--card-border) !important;
   background: radial-gradient(circle at 50% 34%, color-mix(in oklab, var(--card) 82%, var(--eve-ink)) 0%, var(--card) 72%, color-mix(in oklab, var(--card) 88%, var(--background)) 100%) !important;

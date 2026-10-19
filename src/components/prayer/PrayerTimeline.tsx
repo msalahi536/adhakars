@@ -305,7 +305,9 @@ export function PrayerTimeline({ days, now, todayKey, tone = "light" }: Props) {
             }}
             className="prayer-timeline-sheet rounded-t-[28px] px-5 pt-3"
             style={{
-              maxHeight: "calc(100dvh - 40px)", paddingBottom: "calc(var(--bottom-nav-row) + env(safe-area-inset-bottom, 0px) + 10px)", display: "flex", flexDirection: "column",
+              // Partial sheet: the top edge sits well below the status bar so the
+              // panel reads as a sheet resting on the page, not a full-screen cover.
+              maxHeight: "min(66dvh, 600px)", paddingBottom: "calc(var(--bottom-nav-row) + env(safe-area-inset-bottom, 0px) + 10px)", display: "flex", flexDirection: "column",
               transform: `translateY(${dragY}px)`,
               transition: startY === null ? "transform 220ms ease" : "none",
             } as React.CSSProperties}
