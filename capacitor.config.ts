@@ -12,7 +12,7 @@ const config: CapacitorConfig = {
     SplashScreen: {
       // Stay on the launch screen until the web app reports it has painted
       // (hidden from __root), with a safety timeout so it never sticks.
-      launchAutoHide: false,
+      launchAutoHide: true,
       launchShowDuration: 8000,
       backgroundColor: '#F4EFE6',
       showSpinner: true,
