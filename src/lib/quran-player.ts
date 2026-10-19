@@ -1,5 +1,6 @@
 import { markSurahComplete } from "@/lib/giveaway";
 import { useSyncExternalStore } from "react";
+import { recitationPlayer } from "@/lib/recitation-player";
 import { findReciter, getChapterAudio, getChapters, locate, reciterName, reciterPhoto, type ChapterAudio } from "@/lib/quran";
 
 /**
@@ -85,6 +86,8 @@ function audioEl(): HTMLAudioElement {
   el.preload = "auto";
   el.setAttribute("playsinline", "");
   el.onplaying = () => { retries = 0; set({ playing: true, loading: false }); cancelAnimationFrame(raf); raf = requestAnimationFrame(tick); setMediaState("playing"); };
+  // Starting the Quran pauses any adhkar recitation; its player stays open.
+  el.onplay = () => recitationPlayer.pause();
   el.onwaiting = () => set({ loading: true });
   el.onpause = () => {
     saveListen(true);

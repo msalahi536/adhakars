@@ -195,6 +195,7 @@ export const recitationPlayer = {
     const a = el();
     if (a.paused) void a.play(); else a.pause();
   },
+  pause() { audio?.pause(); },
   stop() {
     const a = audio;
     if (a) {
