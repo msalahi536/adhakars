@@ -47,8 +47,15 @@ let retries = 0;
 let lastSave = 0;
 let resumeAt: number | null = null;
 
+// True only while the element is actually playing the current surah's file, so
+// late events from the previous surah never leak its position into the new one.
+const current = () => {
+  if (!el || !state.audio) return false;
+  try { return el.src === new URL(state.audio.url, location.href).href; } catch { return true; }
+};
+
 function saveListen(force = false) {
-  if (!el || !state.chapter || !state.audio) return;
+  if (!el || !state.chapter || !state.audio || !current()) return;
   const now = Date.now();
   if (!force && now - lastSave < 2000) return;
   lastSave = now;
@@ -99,7 +106,7 @@ function audioEl(): HTMLAudioElement {
   };
   el.onerror = () => recover();
   el.onstalled = () => { if (wanted && el?.paused && (el.error || el.networkState === 3)) recover(); };
-  el.ontimeupdate = () => { if (el) set({ cur: el.currentTime, dur: el.duration || 0 }); updatePosition(); saveListen(); };
+  el.ontimeupdate = () => { if (el && current()) set({ cur: el.currentTime, dur: el.duration || 0 }); updatePosition(); saveListen(); };
   el.onloadedmetadata = () => {
     if (!el) return;
     el.playbackRate = state.rate;
@@ -226,6 +233,7 @@ export const quranPlayer = {
     if (state.chapter === chapter && state.reciterId === reciterId && state.loading && !autoplay) return;
     const id = ++reqId;
     wanted = false; resumeAt = null;
+    saveListen(true);
     el?.pause();
     set({ chapter, chapterName, reciterId, audio: null, cur: 0, dur: 0, playing: false, loading: autoplay, pos: { key: null, word: null } });
     try {
@@ -233,8 +241,9 @@ export const quranPlayer = {
       if (id !== reqId) return;
       const a = audioEl();
       a.src = audio.url;
+      a.currentTime = 0;
       a.playbackRate = state.rate;
-      set({ audio });
+      set({ audio, cur: 0, dur: 0 });
       setMetadata();
       if (autoplay) quranPlayer.play(fromKey);
     } catch { if (id === reqId) set({ loading: false }); }
