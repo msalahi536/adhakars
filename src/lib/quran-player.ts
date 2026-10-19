@@ -49,7 +49,10 @@ let resumeAt: number | null = null;
 
 // True only while the element is actually playing the current surah's file, so
 // late events from the previous surah never leak its position into the new one.
-const current = () => !!el && !!state.audio && el.src === state.audio.url;
+const current = () => {
+  if (!el || !state.audio) return false;
+  try { return el.src === new URL(state.audio.url, location.href).href; } catch { return true; }
+};
 
 function saveListen(force = false) {
   if (!el || !state.chapter || !state.audio || !current()) return;
