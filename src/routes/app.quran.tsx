@@ -5,7 +5,7 @@ import { markSurahComplete } from "@/lib/giveaway";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { QuranMiniPlayer } from "@/components/QuranMiniPlayer";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { Check, ChevronDown, ChevronLeft, ChevronRight, Clock, Heart, Infinity as InfinityIcon, MoreHorizontal, Settings, Loader2, Maximize2, Pause, Play, Repeat, Search, Shuffle, SkipBack, SkipForward, X } from "lucide-react";
+import { Check, ChevronDown, ChevronLeft, ChevronRight, Clock, Heart, Infinity as InfinityIcon, MoreHorizontal, SlidersHorizontal, Loader2, Maximize2, Pause, Play, Repeat, Search, Shuffle, SkipBack, SkipForward, X } from "lucide-react";
 import {
   findReciter, getChapterAudio, getChapters, getVerses, homeReciterRow, POPULAR_RECITERS, RECITERS, reciterHasPhoto,
   reciterHasSurah, reciterName, reciterScore, reciterPhoto, reciterSubtitle, searchChapters, searchReciters, parseVerseRef, type Chapter, type Reciter, type Verse, getVerseByKey, searchVerses, type VerseHit,
@@ -452,6 +452,7 @@ function Reader({ chapterId, verse }: { chapterId: number; verse?: number }) {
   const lastKey = useRef<string | null>(null);
   const restoreTo = useRef<string | null>(null);
   const [sheet, setSheet] = useState(false);
+  const [readSettings, setReadSettings] = useState(false);
   const missingKey = `${shownReciter.id}:${chapterId}`;
   const [missingClosed, setMissingClosed] = useState<string | null>(null);
   const missingOpen = !reciterHasSurah(shownReciter, chapterId) && missingClosed !== missingKey;
@@ -559,9 +560,15 @@ function Reader({ chapterId, verse }: { chapterId: number; verse?: number }) {
             <span className="min-w-0 flex-1 text-left"><span className="block truncate text-[15px] font-semibold">{reciterName(shownReciter)}</span><span className="quran-muted block truncate text-[11.5px]">{reciterSubtitle(shownReciter)}</span></span>
             <ChevronDown size={18} className="opacity-60" style={{ transform: sheet ? "rotate(180deg)" : undefined, transition: "transform .2s" }} />
           </button>
-          <button className="quran-card quran-fs-toggle" onClick={openFull} aria-label="Read in full screen">
-            <Maximize2 size={16} /><span>Full screen reading</span>
-          </button>
+          <div className="quran-fs-row">
+            <button className="quran-card quran-fs-toggle" style={{ flex: "1 1 0", width: "auto", minWidth: 0 }} onClick={openFull} aria-label="Read in full screen">
+              <Maximize2 size={16} /><span>Full screen reading</span>
+            </button>
+            <button className="quran-card quran-fs-toggle quran-read-settings" style={{ flex: "0 0 auto", width: "auto" }} onClick={() => { void triggerHaptic("light"); setReadSettings(true); }} aria-label="Reading settings">
+              <SlidersHorizontal size={16} /><span>Reading</span>
+            </button>
+          </div>
+          {readSettings && <QuranAudioSettings onClose={() => setReadSettings(false)} />}
           {sheet && <ReciterSheet onClose={() => setSheet(false)} onSeeAll={() => { setSheet(false); void navigate({ to: "/app/quran", search: { s: chapterId, view: "reciters", tab: "all" } }); }} />}
           {showBismillah && (
             <section className="quran-card quran-bismillah-card">
@@ -723,9 +730,9 @@ function QuranAudioSettings({ onClose }: { onClose: () => void }) {
   };
   return createPortal(
     <div className="qp-audio-backdrop" onPointerDown={(e) => { if (e.target === e.currentTarget) onClose(); }}>
-      <div className="qp-audio" role="dialog" aria-label="Audio settings">
+      <div className="qp-audio" role="dialog" aria-label="Reading settings">
         <div className="mb-1 flex items-center justify-between">
-          <h3 className="qp-title">Quran settings</h3>
+          <h3 className="qp-title">Reading settings</h3>
           <button className="quran-player-x" aria-label="Close settings" onClick={onClose}><X size={16} /></button>
         </div>
         <div className="qp-audio-list">
@@ -751,7 +758,6 @@ function QuranPlayerPanel() {
   const [menu, setMenu] = useState<null | "main" | "sleep" | "speed">(null);
   const menuRef = useRef<HTMLDivElement | null>(null);
   const sleepLeft = useSleepLeft(p.sleep);
-  const [audioOpen, setAudioOpen] = useState(false);
   useEffect(() => { quranPlayer.loadPrefs(); }, []);
   useEffect(() => {
     const onNext = (e: Event) => { void navigate({ to: "/app/quran", search: { s: (e as CustomEvent<number>).detail } }); };
@@ -806,11 +812,6 @@ function QuranPlayerPanel() {
                 <span className="flex-1 text-[14px]">Sleep timer{sleepLeft && <span className="quran-muted block text-[11.5px]">{sleepLeft}</span>}</span>
                 <ChevronRight size={16} className="quran-muted" />
               </button>
-              <button className="qp-pop-row" onClick={tap(() => { setMenu(null); setAudioOpen(true); })}>
-                <Settings size={19} className="qp-ic" />
-                <span className="flex-1 text-[14px]">Audio settings</span>
-                <ChevronRight size={16} className="quran-muted" />
-              </button>
             </div>
           )}
           {menu === "sleep" && (
@@ -829,7 +830,6 @@ function QuranPlayerPanel() {
         </div>
         <button className="quran-player-x" aria-label="Hide player" onClick={() => quranPlayer.setPanel(false)}><X size={18} /></button>
       </div>
-      {audioOpen && <QuranAudioSettings onClose={() => setAudioOpen(false)} />}
       <input className="quran-seek" type="range" min={0} max={1000} aria-label="Seek"
         value={p.dur ? Math.round((p.cur / p.dur) * 1000) : 0}
         style={{ ["--p" as string]: `${p.dur ? (p.cur / p.dur) * 100 : 0}%` }}
