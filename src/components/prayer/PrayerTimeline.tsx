@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { ChevronRight, CloudSun, Moon, Sun, Sunrise, Sunset, X } from "lucide-react";
 import { formatMinutes, type Slot } from "@/lib/prayer-times";
+import { useSheetDrag } from "@/lib/sheet-drag";
 
 type Props = {
   /** yesterday, today, tomorrow, day after, in order */
@@ -207,16 +208,12 @@ function DayPill({ label }: { label: string }) {
 
 export function PrayerTimeline({ days, now, todayKey, tone = "light" }: Props) {
   const [expanded, setExpanded] = useState(false);
-  const [dragY, setDragY] = useState(0);
-  const [startY, setStartY] = useState<number | null>(null);
+  const { handlers: dragHandlers, style: dragStyle } = useSheetDrag(!expanded, () => setExpanded(false));
   const scrollRef = useRef<HTMLDivElement | null>(null);
   const nextRowRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
-    if (!expanded) {
-      setDragY(0);
-      return;
-    }
+    if (!expanded) return;
     // Center the next prayer when the timeline opens, even if it is tomorrow.
     const t = window.setTimeout(() => {
       const box = scrollRef.current;
@@ -293,23 +290,13 @@ export function PrayerTimeline({ days, now, todayKey, tone = "light" }: Props) {
         >
           <div
             onClick={(e) => e.stopPropagation()}
-            onTouchStart={(e) => setStartY(e.touches[0].clientY)}
-            onTouchMove={(e) => {
-              if (startY === null) return;
-              setDragY(Math.max(0, e.touches[0].clientY - startY));
-            }}
-            onTouchEnd={() => {
-              if (dragY > 90) setExpanded(false);
-              setDragY(0);
-              setStartY(null);
-            }}
+            {...dragHandlers}
             className="prayer-timeline-sheet rounded-t-[28px] px-5 pt-3"
             style={{
               // Partial sheet: the top edge sits below the status bar so the
               // panel reads as a sheet resting on the page, not a full-screen cover.
               maxHeight: "min(76dvh, 690px)", paddingBottom: "calc(var(--bottom-nav-row) + env(safe-area-inset-bottom, 0px) + 10px)", display: "flex", flexDirection: "column",
-              transform: `translateY(${dragY}px)`,
-              transition: startY === null ? "transform 220ms ease" : "none",
+              ...dragStyle,
             } as React.CSSProperties}
           >
             <div
