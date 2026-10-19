@@ -564,8 +564,8 @@ function Reader({ chapterId, verse }: { chapterId: number; verse?: number }) {
             <button className="quran-card quran-fs-toggle" style={{ flex: "1 1 0", width: "auto", minWidth: 0 }} onClick={openFull} aria-label="Read in full screen">
               <Maximize2 size={16} /><span>Full screen reading</span>
             </button>
-            <button className="quran-card quran-fs-toggle quran-read-settings" style={{ flex: "0 0 auto", width: "auto" }} onClick={() => { void triggerHaptic("light"); setReadSettings(true); }} aria-label="Reading settings">
-              <SlidersHorizontal size={16} /><span>Reading</span>
+            <button className="quran-card quran-fs-toggle quran-read-settings" onClick={() => { void triggerHaptic("light"); setReadSettings(true); }} aria-label="Reading settings">
+              <SlidersHorizontal size={15} /><span>Reading</span>
             </button>
           </div>
           {readSettings && <QuranAudioSettings onClose={() => setReadSettings(false)} />}
