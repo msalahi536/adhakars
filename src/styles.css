@@ -2893,11 +2893,14 @@ html[data-visual-phase="evening"] .tasbih-disc {
   box-shadow: none !important;
 }
 .after-salah-stack .adhkar-card-stage { padding: 0 14px 12px; }
-.after-salah-stack .adhkar-reference-card {
-  border-radius: 22px;
-  border-color: color-mix(in oklab, var(--card-foreground) 7%, transparent) !important;
-  background: color-mix(in oklab, var(--card) 95%, var(--background)) !important;
-  box-shadow: 0 12px 34px color-mix(in oklab, var(--foreground) 10%, transparent) !important;
+/* No drop shadow behind the card: the sheet behind it is tinted a shade deeper than
+   the card itself, so the card reads without a dark blur landing on the page dots. */
+html[data-preset] .after-salah-stack :is(.adhkar-reference-card, .dhikr-card) {
+  border-radius: 24px;
+  box-shadow: none !important;
+}
+.after-salah-panel {
+  background: color-mix(in oklab, var(--card) 90%, var(--card-foreground)) !important;
 }
 .after-salah-stack .adhkar-pagination-row { padding-bottom: 4px; }
 .after-salah-stack .adhkar-card-heading h3 { color: var(--accent) !important; }
@@ -3612,9 +3615,15 @@ html[data-preset][data-visual-phase="evening"][data-section="salah"] .bottom-nav
   background: var(--nav-bg) !important;
 }
 
-html[data-preset][data-visual-phase="evening"][data-section="salah"] :is(.prayer-timeline-sheet, .after-salah-panel) {
+html[data-preset][data-visual-phase="evening"][data-section="salah"] .prayer-timeline-sheet {
   border-color: var(--card-border) !important;
   background: var(--card) !important;
+  color: var(--card-foreground) !important;
+}
+
+html[data-preset][data-visual-phase="evening"][data-section="salah"] .after-salah-panel {
+  border-color: var(--card-border) !important;
+  background: color-mix(in oklab, var(--card) 90%, var(--card-foreground)) !important;
   color: var(--card-foreground) !important;
 }
 

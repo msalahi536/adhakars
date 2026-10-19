@@ -33,6 +33,8 @@
 - [x] Prayer timeline: a tiny bit taller
 - [x] Prayer timeline: open focused on today, not between days
 - [x] Prayer timeline: swipe-to-close only from the top handle line
+- [x] After-salah sheet: card drop shadow removed; sheet tinted deeper so the card reads
+
 
 
 
