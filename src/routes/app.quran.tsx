@@ -436,9 +436,9 @@ function Reader({ chapterId, verse }: { chapterId: number; verse?: number }) {
   const navigate = useNavigate();
   const [prefs] = usePrefs();
   const [favs, toggleFav] = useFavs();
-  const [display, setDisplayState] = useState({ translit: true, translation: true, trOn: true, arabic: true, page: false, follow: true, words: true });
+  const [display, setDisplayState] = useState({ translit: true, translation: true, trOn: true, arabic: true, page: false, follow: true, words: true, large: false });
   useEffect(() => {
-    const read = () => { const d = getDisplay(); setDisplayState({ translit: d.showTransliteration, translation: d.showTranslation || (!d.showArabic && !d.showTransliteration), trOn: d.showTranslation, arabic: d.showArabic, page: d.quranPageView, follow: d.quranAutoScroll, words: d.quranWordHighlight }); };
+    const read = () => { const d = getDisplay(); setDisplayState({ translit: d.showTransliteration, translation: d.showTranslation || (!d.showArabic && !d.showTransliteration), trOn: d.showTranslation, arabic: d.showArabic, page: d.quranPageView, follow: d.quranAutoScroll, words: d.quranWordHighlight, large: d.arabicLarge }); };
     read();
     window.addEventListener("adhkar:display-update", read);
     return () => window.removeEventListener("adhkar:display-update", read);
@@ -552,7 +552,7 @@ function Reader({ chapterId, verse }: { chapterId: number; verse?: number }) {
   return (
     <>
       <Header kicker={`Surah ${chapterId}${chapter ? ` · ${chapter.translated_name.name}` : ""}`} title={chapter?.name_simple ?? "…"} sub={chapter?.name_arabic} onBack={back} />
-      <main className="scroll-area" onScroll={onReadScroll}>
+      <main className={`scroll-area ${display.large ? "quran-ar-large" : ""}`} onScroll={onReadScroll}>
         <div className={`mx-auto max-w-md space-y-3 px-5 pt-4 ${player.panelOpen ? "pb-64" : "pb-28"}`}>
           <button className="quran-card quran-reciter-select" onClick={() => { void triggerHaptic("light"); setSheet((o) => !o); }}>
             <Avatar r={shownReciter} size={46} eager />
