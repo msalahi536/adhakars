@@ -8,7 +8,20 @@ const config: CapacitorConfig = {
     url: 'https://sahihaladhkar.com/app',
     cleartext: false
   },
+  plugins: {
+    SplashScreen: {
+      // Stay on the launch screen until the web app reports it has painted
+      // (hidden from __root), with a safety timeout so it never sticks.
+      launchAutoHide: true,
+      launchShowDuration: 8000,
+      backgroundColor: '#F4EFE6',
+      showSpinner: true,
+      iosSpinnerStyle: 'small',
+      spinnerColor: '#8A7A55',
+    },
+  },
   ios: {
+    backgroundColor: '#F4EFE6',
     // CRITICAL: Prevent Capacitor's NotificationRouter from stealing
     // UNUserNotificationCenter.delegate from our AppDelegate.
     // Without this, tapping an adhan notification goes to Capacitor's router
