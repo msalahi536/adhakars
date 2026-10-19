@@ -1151,7 +1151,7 @@ html[data-preset="dark-red"]:not([data-visual-phase="evening"]) .salah-dismiss.i
 .prayer-timeline-card .prayer-timeline-heading > span:last-child { color: rgba(255, 255, 255, 0.85) !important; font-family: var(--font-display); font-size: 13px !important; font-weight: 400; display: inline-flex; align-items: center; }
 .prayer-timeline-card .prayer-timeline-list::before { position: absolute; top: 15px; bottom: 15px; left: 3px; width: 1.5px; background: rgba(255, 255, 255, 0.45); content: ""; }
 /* Hairline dividers between rows, starting past the dot column like the reference. */
-.prayer-timeline-card .prayer-timeline-row:not(:last-child)::after { content: ""; position: absolute; left: 26px; right: 0; bottom: 0; height: 1px; background: rgba(255, 255, 255, 0.42); }
+.prayer-timeline-card .prayer-timeline-row:not(:last-child)::after { content: ""; position: absolute; left: 26px; right: 0; bottom: 0; height: 1px; background: rgba(255, 255, 255, 0.10); }
 .prayer-timeline-card .prayer-timeline-list > span { display: none; }
 .prayer-timeline-card .prayer-timeline-row { height: 30px; gap: 18px !important; padding: 0 !important; border-radius: 0 !important; opacity: 1 !important; }
 .prayer-timeline-card .prayer-timeline-marker { width: 7px !important; }
