@@ -4924,12 +4924,11 @@ div[data-state="open"]:has(+ .giveaway-dialog) {
 .quran-player .quran-controls .quran-play { height: 66px; width: 66px; color: var(--accent-foreground); background: radial-gradient(120% 120% at 30% 15%, color-mix(in oklab, var(--accent) 78%, var(--card)) 0%, var(--accent) 55%, color-mix(in oklab, var(--accent) 80%, var(--foreground)) 100%); box-shadow: 0 0 0 5px color-mix(in oklab, var(--accent) 10%, var(--card)), 0 10px 26px color-mix(in oklab, var(--accent) 32%, transparent), inset 0 1px 0 color-mix(in oklab, var(--card) 35%, transparent); }
 /* Verse cards: one continuous landscape split across the divider */
 .qp-row { gap: 5px; }
-.qp-divider { margin: 14px 0; }
+.qp-divider { margin: 10px 0; }
 .qp-verse::before { height: 88%; background: color-mix(in oklab, var(--accent) 18%, transparent); -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 60' preserveAspectRatio='none'%3E%3Cpath d='M0 46 C40 44 70 38 100 30 S150 14 175 10 S195 12 200 14 V60 H0Z' opacity='.45'/%3E%3Cpath d='M0 54 C50 50 90 46 130 36 S180 26 200 28 V60 H0Z' opacity='.7'/%3E%3Cpath d='M0 58 C60 56 110 54 150 46 S190 42 200 44 V60 H0Z'/%3E%3C/svg%3E"); mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 60' preserveAspectRatio='none'%3E%3Cpath d='M0 46 C40 44 70 38 100 30 S150 14 175 10 S195 12 200 14 V60 H0Z' opacity='.45'/%3E%3Cpath d='M0 54 C50 50 90 46 130 36 S180 26 200 28 V60 H0Z' opacity='.7'/%3E%3Cpath d='M0 58 C60 56 110 54 150 46 S190 42 200 44 V60 H0Z'/%3E%3C/svg%3E"); }
-.qp-verse:not(.is-next) { border-top-right-radius: 22px; }
 .qp-verse::after { right: 2px; }
 .qp-verse.is-next::after { left: 2px; }
 /* Verse cards grow to fill their half so they meet the divider */
-.qp-row { justify-content: stretch; gap: 4px; }
+.qp-row { justify-content: stretch; gap: 22px; }
 .qp-verse { flex: 1 1 0; width: auto; min-width: 0; }
 .qp-divider { flex: none; }
