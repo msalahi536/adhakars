@@ -1,6 +1,6 @@
 import type React from "react";
 import { useEffect, useRef, useState } from "react";
-import { ChevronsDownUp, Loader2, Pause, Play, X } from "lucide-react";
+import { ChevronDown, Loader2, Pause, Play, X } from "lucide-react";
 import { restingLevels, shapeMeter, type MeterLevels } from "@/lib/recitation-meter";
 import { proceduralLevels, useFacePulse } from "@/lib/face-pulse";
 
@@ -71,8 +71,8 @@ export function MiniPlayerPill(p: Props) {
       </button>
       <span className="mini-pill-div" aria-hidden />
       <span className="mini-pill-side">
+        <button className="mini-pill-x mini-pill-tuck" aria-label="Minimize to face" onClick={() => setTucked(true)}><ChevronDown size={17} /></button>
         <button className="mini-pill-x" aria-label="Stop and close" onClick={p.onClose}><X size={17} /></button>
-        <button className="mini-pill-x mini-pill-tuck" aria-label="Minimize to face" onClick={() => setTucked(true)}><ChevronsDownUp size={14} /></button>
       </span>
     </div>
   );
