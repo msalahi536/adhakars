@@ -321,7 +321,7 @@ export const quranPlayer = {
     if (el) el.playbackRate = rate;
     set({ rate }); updatePosition();
   },
-  setPanel(panelOpen: boolean) { set({ panelOpen }); },
+  setPanel(panelOpen: boolean) { console.log("[panel]", panelOpen, new Error().stack); set({ panelOpen }); },
   setName(chapterName: string) { if (chapterName !== state.chapterName) { set({ chapterName }); setMetadata(); } },
   /** Play from a saved second (listening progress). */
   playAt(seconds: number) {
