@@ -284,10 +284,10 @@ export function PrayerTimeline({ days, now, todayKey, tone = "light" }: Props) {
 
       {expanded && (
         <div
-          className="fixed inset-0 flex flex-col justify-end"
+          className="fixed inset-x-0 top-0 flex flex-col justify-end"
           // eslint-disable-next-line
           data-overlay="prayer-timeline"
-          style={{ background: "color-mix(in oklab, var(--foreground) 36%, transparent)", backdropFilter: "blur(8px)", zIndex: 90 }}
+          style={{ background: "color-mix(in oklab, var(--foreground) 36%, transparent)", backdropFilter: "blur(8px)", zIndex: 90, bottom: "calc(var(--bottom-nav-row) + env(safe-area-inset-bottom, 0px))" }}
           onClick={() => setExpanded(false)}
         >
           <div
@@ -304,7 +304,7 @@ export function PrayerTimeline({ days, now, todayKey, tone = "light" }: Props) {
             }}
             className="prayer-timeline-sheet rounded-t-[28px] px-5 pt-3"
             style={{
-              maxHeight: "88dvh",
+              maxHeight: "calc(100dvh - var(--bottom-nav-row) - env(safe-area-inset-bottom, 0px) - 40px)", display: "flex", flexDirection: "column",
               transform: `translateY(${dragY}px)`,
               transition: startY === null ? "transform 220ms ease" : "none",
             } as React.CSSProperties}
@@ -317,7 +317,7 @@ export function PrayerTimeline({ days, now, todayKey, tone = "light" }: Props) {
                 background: "color-mix(in oklab, var(--foreground) 22%, transparent)",
               }}
             />
-            <div className="ptl-head mb-3 flex items-start justify-between">
+            <div className="ptl-head mb-0 flex items-start justify-between">
               <span className="ptl-art" aria-hidden />
               <div className="relative">
                 <h2 className="ptl-title">Prayer timeline</h2>
@@ -341,10 +341,12 @@ export function PrayerTimeline({ days, now, todayKey, tone = "light" }: Props) {
               ref={scrollRef}
               className="overflow-y-auto overscroll-contain"
               style={{
-                maxHeight: "72vh",
-                position: "relative",
+                flex: 1, minHeight: 0,
+                position: "relative", zIndex: 1,
                 paddingRight: "10px",
-                paddingBottom: "calc(var(--bottom-nav-row) + env(safe-area-inset-bottom) + 46px)",
+                paddingBottom: "28px",
+                WebkitMaskImage: "linear-gradient(to bottom, #000 calc(100% - 44px), transparent)",
+                maskImage: "linear-gradient(to bottom, #000 calc(100% - 44px), transparent)",
               }}
             >
               {days.map((d) => (
