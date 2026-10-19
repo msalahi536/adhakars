@@ -459,8 +459,13 @@ function Reader({ chapterId, verse }: { chapterId: number; verse?: number }) {
   const [full, setFull] = useState(false);
   const [dock, setDock] = useState<"face" | "open">("face");
   // Play entire Quran: when the next surah starts, the open reader follows it.
+  // The player keeps whatever state it had — if it was minimized it stays minimized.
+  const autoNext = useRef(false);
   useEffect(() => {
-    const onNext = (e: Event) => { void navigate({ to: "/app/quran", search: { s: (e as CustomEvent<number>).detail } }); };
+    const onNext = (e: Event) => {
+      autoNext.current = true;
+      void navigate({ to: "/app/quran", search: { s: (e as CustomEvent<number>).detail } });
+    };
     window.addEventListener("quran:auto-next", onNext);
     return () => window.removeEventListener("quran:auto-next", onNext);
   }, [navigate]);
@@ -484,7 +489,8 @@ function Reader({ chapterId, verse }: { chapterId: number; verse?: number }) {
     if (!last || last.s !== chapterId) localStorage.setItem(LAST, JSON.stringify({ s: chapterId, v: 1, mode: "read" }));
     restoreTo.current = verse ? `${chapterId}:${verse}` : last && last.s === chapterId && last.v > 1 ? `${chapterId}:${last.v}` : null;
     document.querySelector(".scroll-area")?.scrollTo({ top: 0 });
-    quranPlayer.setPanel(true);
+    if (autoNext.current) autoNext.current = false;
+    else quranPlayer.setPanel(true);
   }, [chapterId]);
 
   // Jump back to the saved verse once the verses are on the page.
