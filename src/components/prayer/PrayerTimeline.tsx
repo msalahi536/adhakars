@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { ChevronRight, CloudSun, Moon, Sun, Sunrise, Sunset, X } from "lucide-react";
 import { formatMinutes, type Slot } from "@/lib/prayer-times";
+import { useSheetDrag } from "@/lib/sheet-drag";
 
 type Props = {
   /** yesterday, today, tomorrow, day after, in order */
@@ -156,13 +157,13 @@ function DayList({
 
 const ICONS: Record<string, typeof Sun> = { fajr: Sunrise, sunrise: Sun, dhuhr: Sun, asr: CloudSun, maghrib: Sunset, isha: Moon };
 
-function SheetDay({ day, now, nextAt, nextRef, isToday, past }: {
+function SheetDay({ day, now, nextAt, dayRef, isToday, past }: {
   day: { key: string; label: string; slots: Slot[] }; now: Date; nextAt: number | null;
-  nextRef: (el: HTMLDivElement | null) => void; isToday: boolean; past: boolean;
+  dayRef: (el: HTMLElement | null) => void; isToday: boolean; past: boolean;
 }) {
   const date = day.slots[0]?.at;
   return (
-    <section className={`ptl-day ${past ? "is-past" : ""}`}>
+    <section ref={dayRef} className={`ptl-day ${past ? "is-past" : ""}`}>
       <header className="ptl-day-head">
         <span className="ptl-day-title">{day.label}</span>
         {date && <span className="ptl-day-date">{date.toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" })}</span>}
@@ -174,7 +175,7 @@ function SheetDay({ day, now, nextAt, nextRef, isToday, past }: {
           const state = nextAt !== null && t === nextAt ? "next" : t <= now.getTime() ? "past" : "future";
           const Icon = ICONS[s.id] ?? Sun;
           return (
-            <div key={s.id} ref={state === "next" ? nextRef : undefined} className="ptl-row" data-state={state}>
+            <div key={s.id} className="ptl-row" data-state={state}>
               <span className="ptl-dot" aria-hidden />
               <span className="ptl-pill">
                 <span className="ptl-ic"><Icon size={16} strokeWidth={1.6} /></span>
@@ -207,26 +208,20 @@ function DayPill({ label }: { label: string }) {
 
 export function PrayerTimeline({ days, now, todayKey, tone = "light" }: Props) {
   const [expanded, setExpanded] = useState(false);
-  const [dragY, setDragY] = useState(0);
-  const [startY, setStartY] = useState<number | null>(null);
+  const { handlers: dragHandlers, style: dragStyle } = useSheetDrag(!expanded, () => setExpanded(false));
   const scrollRef = useRef<HTMLDivElement | null>(null);
-  const nextRowRef = useRef<HTMLDivElement | null>(null);
+  const todaySectionRef = useRef<HTMLElement | null>(null);
 
   useEffect(() => {
-    if (!expanded) {
-      setDragY(0);
-      return;
-    }
-    // Center the next prayer when the timeline opens, even if it is tomorrow.
+    if (!expanded) return;
+    // Open on today: today's heading lands at the top of the list instead of the
+    // view settling somewhere between yesterday and tomorrow.
     const t = window.setTimeout(() => {
       const box = scrollRef.current;
-      const row = nextRowRef.current;
-      if (!box || !row) return;
+      const day = todaySectionRef.current;
+      if (!box || !day) return;
       const top =
-        box.scrollTop +
-        (row.getBoundingClientRect().top - box.getBoundingClientRect().top) -
-        box.clientHeight / 2 +
-        row.clientHeight / 2;
+        box.scrollTop + (day.getBoundingClientRect().top - box.getBoundingClientRect().top) - 8;
       box.scrollTo({ top: Math.max(0, top), behavior: "auto" });
 
     }, 40);
@@ -293,33 +288,30 @@ export function PrayerTimeline({ days, now, todayKey, tone = "light" }: Props) {
         >
           <div
             onClick={(e) => e.stopPropagation()}
-            onTouchStart={(e) => setStartY(e.touches[0].clientY)}
-            onTouchMove={(e) => {
-              if (startY === null) return;
-              setDragY(Math.max(0, e.touches[0].clientY - startY));
-            }}
-            onTouchEnd={() => {
-              if (dragY > 90) setExpanded(false);
-              setDragY(0);
-              setStartY(null);
-            }}
             className="prayer-timeline-sheet rounded-t-[28px] px-5 pt-3"
             style={{
               // Partial sheet: the top edge sits below the status bar so the
               // panel reads as a sheet resting on the page, not a full-screen cover.
-              maxHeight: "min(76dvh, 690px)", paddingBottom: "calc(var(--bottom-nav-row) + env(safe-area-inset-bottom, 0px) + 10px)", display: "flex", flexDirection: "column",
-              transform: `translateY(${dragY}px)`,
-              transition: startY === null ? "transform 220ms ease" : "none",
+              maxHeight: "min(79dvh, 715px)", paddingBottom: "calc(var(--bottom-nav-row) + env(safe-area-inset-bottom, 0px) + 10px)", display: "flex", flexDirection: "column",
+              ...dragStyle,
             } as React.CSSProperties}
           >
+            {/* Only this grab strip closes the sheet. Dragging through the prayer list
+                scrolls the list; it must not swipe the whole popup away. */}
             <div
-              className="mx-auto mb-3 rounded-full"
-              style={{
-                width: 40,
-                height: 4,
-                background: "color-mix(in oklab, var(--foreground) 22%, transparent)",
-              }}
-            />
+              {...dragHandlers}
+              className="ptl-grab"
+              style={{ padding: "7px 0 12px", touchAction: "none", cursor: "grab" }}
+            >
+              <div
+                className="mx-auto rounded-full"
+                style={{
+                  width: 40,
+                  height: 4,
+                  background: "color-mix(in oklab, var(--foreground) 22%, transparent)",
+                }}
+              />
+            </div>
             <div className="ptl-head mb-0 flex items-start justify-between">
               <span className="ptl-art" aria-hidden />
               <div className="relative">
@@ -354,7 +346,7 @@ export function PrayerTimeline({ days, now, todayKey, tone = "light" }: Props) {
             >
               {days.map((d) => (
                 <SheetDay key={d.key} day={d} now={now} nextAt={nextAt} isToday={d.key === todayKey} past={d.key < todayKey}
-                  nextRef={(el) => { if (el) nextRowRef.current = el; }} />
+                  dayRef={(el) => { if (el && d.key === todayKey) todaySectionRef.current = el; }} />
               ))}
             </div>
           </div>

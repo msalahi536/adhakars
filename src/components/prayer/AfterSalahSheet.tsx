@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { X } from "lucide-react";
 import { SwipeStack } from "@/components/SwipeStack";
+import { useSheetDrag } from "@/lib/sheet-drag";
 import { SALAH_PRAYERS, getSalahItems, isItemComplete, type SalahPrayer } from "@/data/salah";
 import { getCounts, setCount, clearCounts, bumpLifetime } from "@/lib/storage";
 
@@ -15,8 +16,7 @@ type Props = {
 
 export function AfterSalahSheet({ open, prayer, onPrayer, onClose }: Props) {
   const [counts, setCounts] = useState<Record<string, number>>({});
-  const [dragY, setDragY] = useState(0);
-  const [startY, setStartY] = useState<number | null>(null);
+  const { dragY, dragging, handlers, style: dragStyle } = useSheetDrag(!open, onClose);
   const storageKey = `salah_${prayer}`;
   const items = getSalahItems(prayer);
   const completed = items.filter((i) => isItemComplete(i, counts)).length;
@@ -24,10 +24,6 @@ export function AfterSalahSheet({ open, prayer, onPrayer, onClose }: Props) {
   useEffect(() => {
     setCounts(getCounts(storageKey));
   }, [storageKey, open]);
-
-  useEffect(() => {
-    if (!open) setDragY(0);
-  }, [open]);
 
   if (!open) return null;
 
@@ -54,23 +50,13 @@ export function AfterSalahSheet({ open, prayer, onPrayer, onClose }: Props) {
         onClick={(e) => e.stopPropagation()}
         className="after-salah-panel flex flex-col rounded-t-[28px] pt-3"
         style={{
-          height: "92dvh",
-          transform: `translateY(${dragY}px)`,
-          transition: startY === null ? "transform 220ms ease" : "none",
-          animation: startY === null && dragY === 0 ? "sheet-up 260ms ease" : undefined,
+          height: "90dvh",
+          ...dragStyle,
+          animation: !dragging && dragY === 0 ? "sheet-up 260ms ease" : undefined,
         }}
       >
         <div
-          onTouchStart={(e) => setStartY(e.touches[0].clientY)}
-          onTouchMove={(e) => {
-            if (startY === null) return;
-            setDragY(Math.max(0, e.touches[0].clientY - startY));
-          }}
-          onTouchEnd={() => {
-            if (dragY > 90) onClose();
-            setDragY(0);
-            setStartY(null);
-          }}
+          {...handlers}
           className="after-salah-header shrink-0 px-6 pb-2"
         >
           <div
