@@ -27,3 +27,5 @@
 - [x] Midnight theme morning wallpaper replaced with the moonlit mountain valley mist
 
 - [x] Prayer timeline opens as a lower partial sheet; settings button hidden while it is open
+
+- [ ] Player: with "Play entire Quran" on, when the next surah starts, keep the player minimized if the user had it minimized (do not pop it open).
