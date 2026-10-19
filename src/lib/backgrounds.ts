@@ -2,6 +2,7 @@
 // evening image; presets without artwork fall back to the default pair.
 
 import morningDefault from "@/assets/morning-landscape.webp.asset.json";
+import morningMisty from "@/assets/morning-misty.webp.asset.json";
 import eveningDefault from "@/assets/evening-landscape.webp.asset.json";
 import roseMorning from "@/assets/rose-morning.webp.asset.json";
 import roseEvening from "@/assets/rose-evening.webp.asset.json";
@@ -20,8 +21,9 @@ import darkRedEvening from "@/assets/dark-red-evening.png.asset.json";
 
 export type BackgroundPair = { morning: string; evening: string };
 
+// To restore the previous "original" morning artwork, swap morningMisty back to morningDefault.
 export const DEFAULT_BACKGROUNDS: BackgroundPair = {
-  morning: morningDefault.url,
+  morning: morningMisty.url,
   evening: eveningDefault.url,
 };
 
