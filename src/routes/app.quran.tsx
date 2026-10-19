@@ -786,7 +786,7 @@ function QuranPlayerPanel() {
   return (
     <div className="quran-player" role="group" aria-label="Recitation controls">
       <div className="flex items-center gap-3">
-        <Avatar r={r} size={48} />
+        <span className="qp-avatar"><Avatar r={r} size={52} /></span>
         <span className="min-w-0 flex-1"><span className="qp-title block truncate">{p.chapterName}</span><span className="quran-muted block truncate text-[13px]">{reciterName(r)}</span></span>
         <div className="qp-menu-wrap" ref={menuRef}>
           <button className="quran-speed qp-speed" aria-label={`Playback speed ${p.rate}x`} aria-expanded={menu === "speed"} onClick={tap(() => setMenu(menu === "speed" ? null : "speed"))}>{p.rate}x <ChevronDown size={14} /></button>
@@ -839,6 +839,7 @@ function QuranPlayerPanel() {
         <button className="qp-verse" onClick={tap(() => quranPlayer.step(-1))} disabled={!ready || !prevV}>
           <ChevronLeft size={18} /><span className="min-w-0 text-left"><b>Previous verse</b><small>{prevV ? `Verse ${prevV}` : "—"}</small></span>
         </button>
+        <span className="qp-divider" aria-hidden />
         <button className="qp-verse is-next" onClick={tap(() => quranPlayer.step(1))} disabled={!ready || !nextV}>
           <span className="min-w-0 text-right"><b>Next verse</b><small>{nextV ? `Verse ${nextV}` : "—"}</small></span><ChevronRight size={18} />
         </button>
