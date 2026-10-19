@@ -432,6 +432,11 @@ function ReciterPicker({ back, tab }: { back?: number; tab?: "all" }) {
 /* ---------- reader ---------- */
 const fmt = (s: number) => (Number.isFinite(s) ? `${Math.floor(s / 60)}:${String(Math.floor(s % 60)).padStart(2, "0")}` : "0:00");
 
+// The surah view is keyed by surah, so the next surah mounts a fresh component.
+// These two notes live outside it so the player and the reader dock survive that swap.
+let followQuietly = false;
+let dockSeen: "face" | "open" = "face";
+
 function Reader({ chapterId, verse }: { chapterId: number; verse?: number }) {
   const navigate = useNavigate();
   const [prefs] = usePrefs();
