@@ -1,6 +1,6 @@
 import type React from "react";
 import { useEffect, useRef, useState } from "react";
-import { Loader2, Pause, Play, X } from "lucide-react";
+import { ChevronsDownUp, Loader2, Pause, Play, X } from "lucide-react";
 import { restingLevels, shapeMeter, type MeterLevels } from "@/lib/recitation-meter";
 
 const BARS = 12;
@@ -42,6 +42,20 @@ type Props = {
 
 export function MiniPlayerPill(p: Props) {
   const bars = useMeter(p.playing, p.playing ? p.levels : undefined);
+  const [tucked, setTucked] = useState(false);
+  const adhkar = (p.className ?? "").includes("is-adhkar");
+  useEffect(() => {
+    const c = adhkar ? "adhkar-tucked" : "quran-tucked";
+    document.body.classList.toggle(c, tucked);
+    return () => document.body.classList.remove(c);
+  }, [tucked, adhkar]);
+  if (tucked) {
+    return (
+      <button className={`quran-face mini-face ${adhkar ? "is-adhkar" : ""} ${p.playing ? "is-playing" : ""}`} aria-label={`Show player, ${p.title}`} onClick={() => setTucked(false)}>
+        {p.photo ? <img src={p.photo} alt="" /> : <span>{p.initial}</span>}
+      </button>
+    );
+  }
   return (
     <div className={`mini-pill ${p.className ?? ""}`} role="group" aria-label={p.label} style={p.style}>
       <span className="mini-pill-art" aria-hidden />
@@ -59,7 +73,10 @@ export function MiniPlayerPill(p: Props) {
         {p.loading && !p.playing ? <Loader2 size={18} className="animate-spin" /> : p.playing ? <Pause size={18} fill="currentColor" /> : <Play size={18} fill="currentColor" style={{ marginLeft: 2 }} />}
       </button>
       <span className="mini-pill-div" aria-hidden />
-      <button className="mini-pill-x" aria-label="Stop and close" onClick={p.onClose}><X size={18} /></button>
+      <span className="mini-pill-side">
+        <button className="mini-pill-x" aria-label="Stop and close" onClick={p.onClose}><X size={17} /></button>
+        <button className="mini-pill-x mini-pill-tuck" aria-label="Minimize to face" onClick={() => setTucked(true)}><ChevronsDownUp size={14} /></button>
+      </span>
     </div>
   );
 }

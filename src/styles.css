@@ -5004,3 +5004,13 @@ body.has-adhkar-mini .quran-player:not(.rec-panel), body.has-adhkar-mini .mini-p
 .prayer-timeline-sheet .ptl-row[data-state="next"] .ptl-dot { margin-left: 1px; height: 13px; width: 13px; background: var(--accent); box-shadow: 0 0 0 4px color-mix(in oklab, var(--accent) 22%, transparent); }
 .prayer-timeline-sheet .ptl-row[data-state="next"] .ptl-pill { background: color-mix(in oklab, var(--accent) 16%, var(--card)); border-color: color-mix(in oklab, var(--accent) 28%, transparent); }
 .prayer-timeline-sheet .ptl-row[data-state="next"] .ptl-name, .prayer-timeline-sheet .ptl-row[data-state="next"] .ptl-time { color: var(--accent); font-weight: 700; }
+
+/* Mini player: tuck to face */
+.mini-pill-side { display: flex; flex-direction: column; align-items: center; flex: none; }
+.mini-pill-side .mini-pill-x { height: 24px; }
+.mini-pill-tuck { opacity: .8; }
+.mini-face { bottom: calc(env(safe-area-inset-bottom, 0px) + 96px); z-index: 46; }
+.mini-face.is-adhkar { right: 74px; }
+body.quran-tucked .mini-face.is-adhkar { right: 74px; }
+body:not(.quran-tucked) .mini-face.is-adhkar { right: 14px; }
+body.has-adhkar-mini.adhkar-tucked .quran-player:not(.rec-panel), body.has-adhkar-mini.adhkar-tucked .mini-pill:not(.is-adhkar) { bottom: calc(env(safe-area-inset-bottom, 0px) + 86px); }
