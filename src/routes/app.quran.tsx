@@ -434,7 +434,7 @@ const fmt = (s: number) => (Number.isFinite(s) ? `${Math.floor(s / 60)}:${String
 
 // The surah view is keyed by surah, so the next surah mounts a fresh component.
 // These two notes live outside it so the player and the reader dock survive that swap.
-let followQuietly = false;
+let quietUntil = 0;
 let dockSeen: "face" | "open" = "face";
 
 function Reader({ chapterId, verse }: { chapterId: number; verse?: number }) {
@@ -468,8 +468,7 @@ function Reader({ chapterId, verse }: { chapterId: number; verse?: number }) {
   // The player keeps whatever state it had — if it was minimized it stays minimized.
   useEffect(() => {
     const onNext = (e: Event) => {
-      console.log("[listener] auto-next", (e as CustomEvent<number>).detail);
-      followQuietly = true;
+      quietUntil = Date.now() + 1500;
       void navigate({ to: "/app/quran", search: { s: (e as CustomEvent<number>).detail } });
     };
     window.addEventListener("quran:auto-next", onNext);
@@ -495,9 +494,10 @@ function Reader({ chapterId, verse }: { chapterId: number; verse?: number }) {
     if (!last || last.s !== chapterId) localStorage.setItem(LAST, JSON.stringify({ s: chapterId, v: 1, mode: "read" }));
     restoreTo.current = verse ? `${chapterId}:${verse}` : last && last.s === chapterId && last.v > 1 ? `${chapterId}:${last.v}` : null;
     document.querySelector(".scroll-area")?.scrollTo({ top: 0 });
-    console.log("[effect] chapter", chapterId, "quiet", followQuietly);
-    if (followQuietly) followQuietly = false;
-    else quranPlayer.setPanel(true);
+    // Arrived because the recitation moved on: the player keeps whatever state it had,
+    // so a minimized player stays minimized. The surah view mounts twice in a row, so
+    // this is a short window rather than a flag that one run would consume.
+    if (Date.now() >= quietUntil) quranPlayer.setPanel(true);
   }, [chapterId]);
 
   // Jump back to the saved verse once the verses are on the page.
