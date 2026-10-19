@@ -27,7 +27,7 @@ function useMeter(playing: boolean, levels?: MeterLevels) {
   const src = levels ?? lv;
   // Mirror six bands into a symmetric 12-bar wave, tallest in the middle.
   return Array.from({ length: BARS }, (_, i) => {
-    const b = src[[5, 4, 3, 2, 1, 0, 0, 1, 2, 3, 4, 5][i]];
+    const b = src[[0, 5, 1, 4, 3, 2, 2, 3, 4, 1, 5, 0][i]];
     const shape = 0.55 + 0.45 * Math.sin((Math.PI * (i + 0.5)) / BARS);
     return playing ? Math.max(0.12, b * shape) : 0.12 + 0.1 * shape;
   });
