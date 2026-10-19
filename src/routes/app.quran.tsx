@@ -432,6 +432,11 @@ function ReciterPicker({ back, tab }: { back?: number; tab?: "all" }) {
 /* ---------- reader ---------- */
 const fmt = (s: number) => (Number.isFinite(s) ? `${Math.floor(s / 60)}:${String(Math.floor(s % 60)).padStart(2, "0")}` : "0:00");
 
+// The surah view is keyed by surah, so the next surah mounts a fresh component.
+// These two notes live outside it so the player and the reader dock survive that swap.
+let quietUntil = 0;
+let dockSeen: "face" | "open" = "face";
+
 function Reader({ chapterId, verse }: { chapterId: number; verse?: number }) {
   const navigate = useNavigate();
   const [prefs] = usePrefs();
@@ -457,10 +462,15 @@ function Reader({ chapterId, verse }: { chapterId: number; verse?: number }) {
   const [missingClosed, setMissingClosed] = useState<string | null>(null);
   const missingOpen = !reciterHasSurah(shownReciter, chapterId) && missingClosed !== missingKey;
   const [full, setFull] = useState(false);
-  const [dock, setDock] = useState<"face" | "open">("face");
+  const [dock, setDockState] = useState<"face" | "open">(dockSeen);
+  const setDock = (d: "face" | "open") => { dockSeen = d; setDockState(d); };
   // Play entire Quran: when the next surah starts, the open reader follows it.
+  // The player keeps whatever state it had — if it was minimized it stays minimized.
   useEffect(() => {
-    const onNext = (e: Event) => { void navigate({ to: "/app/quran", search: { s: (e as CustomEvent<number>).detail } }); };
+    const onNext = (e: Event) => {
+      quietUntil = Date.now() + 1500;
+      void navigate({ to: "/app/quran", search: { s: (e as CustomEvent<number>).detail } });
+    };
     window.addEventListener("quran:auto-next", onNext);
     return () => window.removeEventListener("quran:auto-next", onNext);
   }, [navigate]);
@@ -484,7 +494,10 @@ function Reader({ chapterId, verse }: { chapterId: number; verse?: number }) {
     if (!last || last.s !== chapterId) localStorage.setItem(LAST, JSON.stringify({ s: chapterId, v: 1, mode: "read" }));
     restoreTo.current = verse ? `${chapterId}:${verse}` : last && last.s === chapterId && last.v > 1 ? `${chapterId}:${last.v}` : null;
     document.querySelector(".scroll-area")?.scrollTo({ top: 0 });
-    quranPlayer.setPanel(true);
+    // Arrived because the recitation moved on: the player keeps whatever state it had,
+    // so a minimized player stays minimized. The surah view mounts twice in a row, so
+    // this is a short window rather than a flag that one run would consume.
+    if (Date.now() >= quietUntil) quranPlayer.setPanel(true);
   }, [chapterId]);
 
   // Jump back to the saved verse once the verses are on the page.
