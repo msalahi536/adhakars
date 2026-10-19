@@ -560,8 +560,8 @@ function Reader({ chapterId, verse }: { chapterId: number; verse?: number }) {
             <span className="min-w-0 flex-1 text-left"><span className="block truncate text-[15px] font-semibold">{reciterName(shownReciter)}</span><span className="quran-muted block truncate text-[11.5px]">{reciterSubtitle(shownReciter)}</span></span>
             <ChevronDown size={18} className="opacity-60" style={{ transform: sheet ? "rotate(180deg)" : undefined, transition: "transform .2s" }} />
           </button>
-          <div className="flex gap-2">
-            <button className="quran-card quran-fs-toggle flex-1" onClick={openFull} aria-label="Read in full screen">
+          <div className="quran-fs-row">
+            <button className="quran-card quran-fs-toggle" onClick={openFull} aria-label="Read in full screen">
               <Maximize2 size={16} /><span>Full screen reading</span>
             </button>
             <button className="quran-card quran-fs-toggle quran-read-settings" onClick={() => { void triggerHaptic("light"); setReadSettings(true); }} aria-label="Reading settings">

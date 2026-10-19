@@ -4904,3 +4904,4 @@ div[data-state="open"]:has(+ .giveaway-dialog) {
 .qp-row b { font-size: 13px; }
 .qp-row small { font-size: 11px; }
 .quran-read-settings { flex: none; padding-left: 16px; padding-right: 16px; }
+.quran-fs-row { display: flex; gap: 8px; } .quran-fs-row > .quran-fs-toggle { width: auto; margin: 0; white-space: nowrap; } .quran-fs-row > .quran-fs-toggle:first-child { flex: 1 1 0; min-width: 0; }
