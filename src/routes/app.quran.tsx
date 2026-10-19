@@ -458,6 +458,12 @@ function Reader({ chapterId, verse }: { chapterId: number; verse?: number }) {
   const missingOpen = !reciterHasSurah(shownReciter, chapterId) && missingClosed !== missingKey;
   const [full, setFull] = useState(false);
   const [dock, setDock] = useState<"face" | "open">("face");
+  // Play entire Quran: when the next surah starts, the open reader follows it.
+  useEffect(() => {
+    const onNext = (e: Event) => { void navigate({ to: "/app/quran", search: { s: (e as CustomEvent<number>).detail } }); };
+    window.addEventListener("quran:auto-next", onNext);
+    return () => window.removeEventListener("quran:auto-next", onNext);
+  }, [navigate]);
   // In-app reading mode: the surah takes over the whole app screen like a book page.
   // Deliberately NOT the browser/native fullscreen API.
   const openFull = () => { void triggerHaptic("light"); setSheet(false); setDock("face"); setFull(true); };
@@ -760,11 +766,6 @@ function QuranPlayerPanel() {
   const menuRef = useRef<HTMLDivElement | null>(null);
   const sleepLeft = useSleepLeft(p.sleep);
   useEffect(() => { quranPlayer.loadPrefs(); }, []);
-  useEffect(() => {
-    const onNext = (e: Event) => { void navigate({ to: "/app/quran", search: { s: (e as CustomEvent<number>).detail } }); };
-    window.addEventListener("quran:auto-next", onNext);
-    return () => window.removeEventListener("quran:auto-next", onNext);
-  }, [navigate]);
   useEffect(() => {
     if (!menu) return;
     const close = (e: PointerEvent) => { if (!menuRef.current?.contains(e.target as Node)) setMenu(null); };
