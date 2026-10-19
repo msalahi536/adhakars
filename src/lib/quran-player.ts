@@ -208,6 +208,10 @@ async function onEnded() {
     while (n === state.chapter) n = 1 + Math.floor(Math.random() * 114);
     const name = (await getChapters().catch(() => [])).find((c) => c.id === n)?.name_simple ?? "";
     await quranPlayer.select(state.reciterId, n, name, true);
+    // Surah changes come in on the big player, not the small bar — even if the
+    // mini pill was up. The reader page also follows to the new surah.
+    quranPlayer.setPanel(true);
+    if (typeof window !== "undefined") window.dispatchEvent(new CustomEvent("quran:auto-next", { detail: n }));
     return;
   }
   if (state.continuous && state.chapter && state.chapter < 114) {
