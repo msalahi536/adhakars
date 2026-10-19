@@ -468,6 +468,7 @@ function Reader({ chapterId, verse }: { chapterId: number; verse?: number }) {
   // The player keeps whatever state it had — if it was minimized it stays minimized.
   useEffect(() => {
     const onNext = (e: Event) => {
+      console.log("[listener] auto-next", (e as CustomEvent<number>).detail);
       followQuietly = true;
       void navigate({ to: "/app/quran", search: { s: (e as CustomEvent<number>).detail } });
     };
@@ -494,6 +495,7 @@ function Reader({ chapterId, verse }: { chapterId: number; verse?: number }) {
     if (!last || last.s !== chapterId) localStorage.setItem(LAST, JSON.stringify({ s: chapterId, v: 1, mode: "read" }));
     restoreTo.current = verse ? `${chapterId}:${verse}` : last && last.s === chapterId && last.v > 1 ? `${chapterId}:${last.v}` : null;
     document.querySelector(".scroll-area")?.scrollTo({ top: 0 });
+    console.log("[effect] chapter", chapterId, "quiet", followQuietly);
     if (followQuietly) followQuietly = false;
     else quranPlayer.setPanel(true);
   }, [chapterId]);
