@@ -38,3 +38,5 @@
 
 
 
+- [x] Player: shuffle/repeat engaged state clearly visible (accent tint + ring)
+- [x] Salah dismiss button reads "Tap to mute next adhan"

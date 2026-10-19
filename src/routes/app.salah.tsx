@@ -234,7 +234,7 @@ function Salah() {
       const ctx = document.createElement("canvas").getContext("2d");
       if (!ctx) return;
       ctx.font = "400 12px Outfit, sans-serif";
-      const active = Math.ceil(ctx.measureText("Tap to dismiss").width);
+      const active = Math.ceil(ctx.measureText("Tap to mute next adhan").width);
       const dismissed = Math.ceil(ctx.measureText(`Dismissed until after ${nextSalah?.label ?? ""}`).width);
       if (!cancelled) setDismissWidths({ active: active + 29, dismissed: dismissed + 29 });
     };
@@ -451,7 +451,7 @@ function Salah() {
           style={settings.location && dismissWidths ? { width: nextIsDismissed ? dismissWidths.dismissed : dismissWidths.active } : undefined}
           className={`salah-dismiss active:scale-95 ${nextIsDismissed ? "is-dismissed" : ""}`}
         >
-          {!settings.location ? "Sample countdown" : nextIsDismissed ? `Dismissed until after ${nextSalah?.label ?? ""}` : "Tap to dismiss"}
+          {!settings.location ? "Sample countdown" : nextIsDismissed ? `Dismissed until after ${nextSalah?.label ?? ""}` : "Tap to mute next adhan"}
         </button>
       </header>
 
