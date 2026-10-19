@@ -208,11 +208,19 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     private func startAdhanPlayback(prayer: String, reciterId: String, firedAt: Double) {
         let elapsed = Date().timeIntervalSince1970 - firedAt
         let seekTo = elapsed > 0 && elapsed < 300 ? elapsed : 0
+        pauseWebAudio()
         print("[AppDelegate] Starting adhan: \(prayer), elapsed=\(elapsed)s, seekTo=\(seekTo)s")
         AdhanAudioManager.shared.playFullAdhan(reciterId: reciterId, seekTo: seekTo, prayer: prayer)
 
         // Keep audio alive if we go to background
         startBackgroundTask()
+    }
+
+    /// Pause any adhkar/Quran audio in the webview so it can't interrupt the adhan.
+    private func pauseWebAudio() {
+        guard let rootVC = window?.rootViewController,
+              let webView = findBridgeVC(rootVC)?.bridge?.webView else { return }
+        webView.evaluateJavaScript("window.dispatchEvent(new Event('adhan:stop-media'));", completionHandler: nil)
     }
 
     /// Process pending adhan after app becomes active (cold launch)
@@ -221,6 +229,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
               let reciterId = info["reciterId"] as? String,
               let seekTo = info["seekTo"] as? TimeInterval else { return }
 
+        pauseWebAudio()
         print("[AppDelegate] processPendingAdhan: \(prayer), reciter=\(reciterId), seekTo=\(seekTo)")
         AdhanAudioManager.shared.playFullAdhan(reciterId: reciterId, seekTo: seekTo, prayer: prayer)
         startBackgroundTask()

@@ -17,7 +17,13 @@ let open: PopupOpen | null = null;
 const subs = new Set<() => void>();
 const emit = () => subs.forEach((f) => f());
 
+// Last section-level opening (with its full card list) so the mini player can
+// reopen with "Play all" even when only a single card was played.
+let lastSection: PopupOpen | null = null;
+export function getLastSection() { return lastSection; }
+
 export function setPopupOpen(next: PopupOpen | null) {
+  if (next && next.label && next.tracks.length > 1) lastSection = next;
   open = next;
   emit();
 }

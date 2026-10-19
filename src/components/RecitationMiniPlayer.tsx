@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import imamTaha from "@/assets/imam-taha.png.asset.json";
 import { recitationPlayer, usePlayer } from "@/lib/recitation-player";
-import { setPopupOpen, usePopupOpen } from "@/lib/recitation-popup";
+import { getLastSection, setPopupOpen, usePopupOpen } from "@/lib/recitation-popup";
 import { useQuranPlayer } from "@/lib/quran-player";
 import { MiniPlayerPill } from "./MiniPlayerPill";
 
@@ -28,11 +28,15 @@ export function RecitationMiniPlayer() {
       photo={imamTaha.url}
       playing={player.playing}
       levels={player.levels}
-      onOpen={() => setPopupOpen({
-        openerId: track.dhikrId, title: track.title,
-        tracks: player.queue.length ? player.queue : [track],
-        label: player.queueLabel, track,
-      })}
+      onOpen={() => {
+        const sec = getLastSection();
+        const fromSection = sec && sec.tracks.some((t) => t.dhikrId === track.dhikrId) ? sec : null;
+        setPopupOpen({
+          openerId: track.dhikrId, title: track.title,
+          tracks: player.queue.length ? player.queue : fromSection?.tracks ?? [track],
+          label: player.queueLabel ?? fromSection?.label ?? null, track,
+        });
+      }}
       onToggle={() => recitationPlayer.toggle()}
       onClose={() => recitationPlayer.stop()}
     />
