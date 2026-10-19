@@ -3,7 +3,7 @@ import { Fragment, memo, useCallback, useEffect, useMemo, useRef, useState } fro
 import { createPortal } from "react-dom";
 import { markSurahComplete } from "@/lib/giveaway";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { QuranMiniPlayer } from "@/components/QuranMiniPlayer";
+import { QuranFaceBubble, QuranMiniPlayer } from "@/components/QuranMiniPlayer";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { Check, ChevronDown, ChevronLeft, ChevronRight, Clock, Heart, Infinity as InfinityIcon, Info, MoreHorizontal, RotateCcw, RotateCw, SlidersHorizontal, Loader2, Maximize2, Pause, Play, Repeat, Search, Shuffle, SkipBack, SkipForward, X } from "lucide-react";
 import {
@@ -457,9 +457,10 @@ function Reader({ chapterId, verse }: { chapterId: number; verse?: number }) {
   const [missingClosed, setMissingClosed] = useState<string | null>(null);
   const missingOpen = !reciterHasSurah(shownReciter, chapterId) && missingClosed !== missingKey;
   const [full, setFull] = useState(false);
+  const [dock, setDock] = useState<"face" | "open">("face");
   // In-app reading mode: the surah takes over the whole app screen like a book page.
   // Deliberately NOT the browser/native fullscreen API.
-  const openFull = () => { void triggerHaptic("light"); setSheet(false); setFull(true); };
+  const openFull = () => { void triggerHaptic("light"); setSheet(false); setDock("face"); setFull(true); };
   const closeFull = useCallback(() => { void triggerHaptic("light"); setFull(false); }, []);
   useEffect(() => {
     if (!full) return;
@@ -622,7 +623,7 @@ function Reader({ chapterId, verse }: { chapterId: number; verse?: number }) {
               <footer className="quran-fs-foot"><span aria-hidden="true">۞</span><span>Surah {chapterId} of 114</span><span aria-hidden="true">۞</span></footer>
             </section>
           </div>
-          {player.panelOpen ? <QuranPlayerPanel /> : <QuranMiniPlayer />}
+          {dock === "face" ? <QuranFaceBubble onOpen={() => { quranPlayer.setPanel(false); setDock("open"); }} /> : player.panelOpen ? <QuranPlayerPanel /> : <QuranMiniPlayer />}
         </div>,
         document.body,
       )}

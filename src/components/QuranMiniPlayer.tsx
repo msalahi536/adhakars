@@ -32,3 +32,16 @@ export function QuranMiniPlayer() {
     />
   );
 }
+
+/** Tiny reciter face for the full-screen reader; tapping grows it into the mini player. */
+export function QuranFaceBubble({ onOpen }: { onOpen: () => void }) {
+  const p = useQuranPlayer();
+  if (!p.chapter) return null;
+  const r = findReciter(p.reciterId);
+  const photo = reciterPhoto(r);
+  return (
+    <button className={`quran-face ${p.playing ? "is-playing" : ""}`} aria-label={`Show player, ${p.chapterName}`} onClick={() => { void triggerHaptic("light"); onOpen(); }}>
+      {photo ? <img src={photo} alt="" /> : <span>{reciterName(r).slice(0, 1)}</span>}
+    </button>
+  );
+}
