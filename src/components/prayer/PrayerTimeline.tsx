@@ -1,7 +1,7 @@
 // Vertical mini timeline of prayer times, with an expanded multi day view.
 
 import { useEffect, useRef, useState } from "react";
-import { X } from "lucide-react";
+import { CloudSun, Moon, Sun, Sunrise, Sunset, X } from "lucide-react";
 import { formatMinutes, type Slot } from "@/lib/prayer-times";
 
 type Props = {
@@ -154,6 +154,42 @@ function DayList({
   );
 }
 
+const ICONS: Record<string, typeof Sun> = { fajr: Sunrise, sunrise: Sun, dhuhr: Sun, asr: CloudSun, maghrib: Sunset, isha: Moon };
+
+function SheetDay({ day, now, nextAt, nextRef, isToday, past }: {
+  day: { key: string; label: string; slots: Slot[] }; now: Date; nextAt: number | null;
+  nextRef: (el: HTMLDivElement | null) => void; isToday: boolean; past: boolean;
+}) {
+  const date = day.slots[0]?.at;
+  return (
+    <section className={`ptl-day ${past ? "is-past" : ""}`}>
+      <header className="ptl-day-head">
+        <span className="ptl-day-title">{day.label}</span>
+        {date && <span className="ptl-day-date">{date.toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" })}</span>}
+      </header>
+      <div className="ptl-list">
+        <span className="ptl-line" aria-hidden />
+        {day.slots.map((s) => {
+          const t = s.at.getTime();
+          const state = nextAt !== null && t === nextAt ? "next" : t <= now.getTime() ? "past" : "future";
+          const Icon = ICONS[s.id] ?? Sun;
+          return (
+            <div key={s.id} ref={state === "next" ? nextRef : undefined} className="ptl-row" data-state={state}>
+              <span className="ptl-dot" aria-hidden />
+              <span className="ptl-pill">
+                <span className="ptl-ic"><Icon size={16} strokeWidth={1.6} /></span>
+                <span className="ptl-name">{s.label}</span>
+                <span className="ptl-time">{formatMinutes(s.minutes)}</span>
+              </span>
+            </div>
+          );
+        })}
+      </div>
+      {isToday && null}
+    </section>
+  );
+}
+
 function DayPill({ label }: { label: string }) {
   return (
     <span
@@ -281,8 +317,12 @@ export function PrayerTimeline({ days, now, todayKey, tone = "light" }: Props) {
                 background: "color-mix(in oklab, var(--foreground) 22%, transparent)",
               }}
             />
-            <div className="mb-2 flex items-center justify-between">
-              <h2 className="text-lg font-bold">Prayer timeline</h2>
+            <div className="ptl-head mb-3 flex items-start justify-between">
+              <span className="ptl-art" aria-hidden />
+              <div className="relative">
+                <h2 className="ptl-title">Prayer timeline</h2>
+                <p className="ptl-sub">Today &amp; tomorrow's prayer times</p>
+              </div>
               <button
                 onClick={() => setExpanded(false)}
                 aria-label="Close"
@@ -308,22 +348,8 @@ export function PrayerTimeline({ days, now, todayKey, tone = "light" }: Props) {
               }}
             >
               {days.map((d) => (
-                <div key={d.key} className="mb-5">
-                  <div className="mb-2.5">
-                    <DayPill label={d.label} />
-                  </div>
-                  <DayList
-                    slots={d.slots}
-                    now={now}
-                    nextAt={nextAt}
-                    nextRef={(el) => {
-                      if (el) nextRowRef.current = el;
-                    }}
-                    showNowDivider={d.key === todayKey}
-                    dim={d.key < todayKey}
-                  />
-                </div>
-
+                <SheetDay key={d.key} day={d} now={now} nextAt={nextAt} isToday={d.key === todayKey} past={d.key < todayKey}
+                  nextRef={(el) => { if (el) nextRowRef.current = el; }} />
               ))}
             </div>
           </div>
