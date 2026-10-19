@@ -2900,7 +2900,7 @@ html[data-preset] .after-salah-stack :is(.adhkar-reference-card, .dhikr-card) {
   box-shadow: none !important;
 }
 .after-salah-panel {
-  background: color-mix(in oklab, var(--card) 92%, var(--card-foreground)) !important;
+  background: color-mix(in oklab, var(--card) 90%, var(--card-foreground)) !important;
 }
 .after-salah-stack .adhkar-pagination-row { padding-bottom: 4px; }
 .after-salah-stack .adhkar-card-heading h3 { color: var(--accent) !important; }
@@ -3623,7 +3623,7 @@ html[data-preset][data-visual-phase="evening"][data-section="salah"] .prayer-tim
 
 html[data-preset][data-visual-phase="evening"][data-section="salah"] .after-salah-panel {
   border-color: var(--card-border) !important;
-  background: color-mix(in oklab, var(--card) 92%, var(--card-foreground)) !important;
+  background: color-mix(in oklab, var(--card) 90%, var(--card-foreground)) !important;
   color: var(--card-foreground) !important;
 }
 
