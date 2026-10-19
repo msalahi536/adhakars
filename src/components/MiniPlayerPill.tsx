@@ -2,6 +2,7 @@ import type React from "react";
 import { useEffect, useRef, useState } from "react";
 import { ChevronsDownUp, Loader2, Pause, Play, X } from "lucide-react";
 import { restingLevels, shapeMeter, type MeterLevels } from "@/lib/recitation-meter";
+import { proceduralLevels, useFacePulse } from "@/lib/face-pulse";
 
 const BARS = 12;
 
@@ -13,12 +14,7 @@ function useMeter(playing: boolean, levels?: MeterLevels) {
     if (levels || !playing) { prev.current = restingLevels(); setLv(prev.current); return; }
     let raf = 0; let last = performance.now();
     const tick = (now: number) => {
-      const t = now / 1000;
-      const bands = Array.from({ length: 6 }, (_, i) => {
-        const v = 0.45 + 0.3 * Math.sin(t * (3.1 + i * 0.7) + i) * Math.sin(t * 1.3 + i * 2) + 0.25 * Math.sin(t * 7.3 + i * 1.7);
-        return Math.max(0, Math.min(1, v));
-      }) as MeterLevels;
-      prev.current = shapeMeter(bands, prev.current, Math.min(64, now - last));
+      prev.current = shapeMeter(proceduralLevels(now / 1000), prev.current, Math.min(64, now - last));
       last = now; setLv(prev.current);
       raf = requestAnimationFrame(tick);
     };
@@ -43,6 +39,7 @@ type Props = {
 export function MiniPlayerPill(p: Props) {
   const bars = useMeter(p.playing, p.playing ? p.levels : undefined);
   const [tucked, setTucked] = useState(false);
+  const pulseRef = useFacePulse<HTMLButtonElement>(p.playing, p.playing ? p.levels : undefined);
   const adhkar = (p.className ?? "").includes("is-adhkar");
   useEffect(() => {
     const c = adhkar ? "adhkar-tucked" : "quran-tucked";
@@ -51,7 +48,7 @@ export function MiniPlayerPill(p: Props) {
   }, [tucked, adhkar]);
   if (tucked) {
     return (
-      <button className={`quran-face mini-face ${adhkar ? "is-adhkar" : ""} ${p.playing ? "is-playing" : ""}`} aria-label={`Show player, ${p.title}`} onClick={() => setTucked(false)}>
+      <button ref={pulseRef} className={`quran-face mini-face ${adhkar ? "is-adhkar" : ""}`} aria-label={`Show player, ${p.title}`} onClick={() => setTucked(false)}>
         {p.photo ? <img src={p.photo} alt="" /> : <span>{p.initial}</span>}
       </button>
     );

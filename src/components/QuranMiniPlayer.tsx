@@ -2,6 +2,7 @@ import { useNavigate, useRouterState } from "@tanstack/react-router";
 import { findReciter, reciterName, reciterPhoto } from "@/lib/quran";
 import { quranPlayer, useQuranPlayer } from "@/lib/quran-player";
 import { triggerHaptic } from "@/lib/theme";
+import { useFacePulse } from "@/lib/face-pulse";
 import { MiniPlayerPill } from "./MiniPlayerPill";
 
 /** Floating pill that keeps Quran recitation reachable on every page. */
@@ -36,11 +37,12 @@ export function QuranMiniPlayer() {
 /** Tiny reciter face for the full-screen reader; tapping grows it into the mini player. */
 export function QuranFaceBubble({ onOpen }: { onOpen: () => void }) {
   const p = useQuranPlayer();
+  const pulseRef = useFacePulse<HTMLButtonElement>(p.playing);
   if (!p.chapter) return null;
   const r = findReciter(p.reciterId);
   const photo = reciterPhoto(r);
   return (
-    <button className={`quran-face ${p.playing ? "is-playing" : ""}`} aria-label={`Show player, ${p.chapterName}`} onClick={() => { void triggerHaptic("light"); onOpen(); }}>
+    <button ref={pulseRef} className="quran-face" aria-label={`Show player, ${p.chapterName}`} onClick={() => { void triggerHaptic("light"); onOpen(); }}>
       {photo ? <img src={photo} alt="" /> : <span>{reciterName(r).slice(0, 1)}</span>}
     </button>
   );
