@@ -23,3 +23,4 @@
 - [x] Lavender (twilight) theme morning wallpaper replaced with the twilight mountain mist
 - [x] Ocean theme morning wallpaper replaced with the ocean mist mountain valley
 - [x] Emerald theme morning wallpaper replaced with the misty emerald valley sunrise
+- [x] Sand theme morning wallpaper replaced with the golden misty valley at sunrise
