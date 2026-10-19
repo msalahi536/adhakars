@@ -25,3 +25,5 @@
 - [x] Emerald theme morning wallpaper replaced with the misty emerald valley sunrise
 - [x] Sand theme morning wallpaper replaced with the golden misty valley at sunrise
 - [x] Midnight theme morning wallpaper replaced with the moonlit mountain valley mist
+
+- [x] Prayer timeline opens as a lower partial sheet; settings button hidden while it is open
