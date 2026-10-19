@@ -1,5 +1,6 @@
 import { lazy, Suspense, useEffect, useLayoutEffect, useState } from "react";
 import { QuranMiniPlayer } from "@/components/QuranMiniPlayer";
+import { RecitationMiniPlayer } from "@/components/RecitationMiniPlayer";
 import { createFileRoute, Outlet, useRouter, useRouterState } from "@tanstack/react-router";
 import { BottomNav } from "@/components/BottomNav";
 import { SettingsButton } from "@/components/SettingsButton";
@@ -354,6 +355,7 @@ function AppLayout() {
         <Outlet />
       </div>
       <QuranMiniPlayer />
+      <RecitationMiniPlayer />
       <BottomNav />
       <AdhanPlayer
         visible={adhan.visible}
