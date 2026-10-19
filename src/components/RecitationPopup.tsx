@@ -1,4 +1,4 @@
-import { ChevronDown, ListMusic, Pause, Play, Square } from "lucide-react";
+import { ChevronDown, ChevronRight, Pause, Play, SkipBack, SkipForward, Square } from "lucide-react";
 import imamTaha from "@/assets/imam-taha.png.asset.json";
 import { Portal } from "./Portal";
 import { closePopup, usePopupOpen } from "@/lib/recitation-popup";
@@ -27,6 +27,17 @@ export function RecitationPopup() {
   const hasAudio = !!track || !!openerTrack;
   const cur = showOpener ? 0 : player.current;
   const dur = showOpener ? 0 : player.duration;
+
+  const byTrack = track ? open.tracks.findIndex((t) => t.dhikrId === track.dhikrId) : -1;
+  const byOpener = open.tracks.findIndex((t) => t.dhikrId === open.openerId);
+  const listIndex = showOpener ? byOpener : (byTrack >= 0 ? byTrack : byOpener);
+  const canPrev = queueActive ? player.queueIndex > 0 : listIndex > 0;
+  const canNext = queueActive ? player.queueIndex < player.queue.length - 1 : listIndex >= 0 && listIndex < open.tracks.length - 1;
+  const step = (d: number) => {
+    if (queueActive) { if (d < 0) recitationPlayer.previous(); else recitationPlayer.next(); return; }
+    const t = open.tracks[listIndex + d];
+    if (t) recitationPlayer.playOne(t, open.label ?? null);
+  };
 
   const onPlay = () => {
     if (showOpener && openerTrack) recitationPlayer.playOne(openerTrack, open.label ?? null);
@@ -61,9 +72,11 @@ export function RecitationPopup() {
         )}
 
         <div className="quran-controls rec-panel-controls">
+          <button type="button" onClick={() => step(-1)} disabled={!canPrev} aria-label="Previous recitation"><SkipBack size={22} fill="currentColor" /></button>
           <button type="button" className="quran-play" onClick={onPlay} disabled={!hasAudio} aria-label={playing && !showOpener ? "Pause" : "Play"}>
             {playing && !showOpener ? <Pause size={24} fill="currentColor" /> : <Play size={24} fill="currentColor" style={{ marginLeft: 3 }} />}
           </button>
+          <button type="button" onClick={() => step(1)} disabled={!canNext} aria-label="Next recitation"><SkipForward size={22} fill="currentColor" /></button>
         </div>
 
         {open.label && open.tracks.length > 0 && (
@@ -76,9 +89,9 @@ export function RecitationPopup() {
               recitationPlayer.playAll(open.tracks, open.label!, 0);
             }}
           >
-            <span className="rec-pop-all-ic">{queueActive ? <Square size={11} fill="currentColor" /> : <ListMusic size={13} />}</span>
-            <span className="rec-pop-all-div" aria-hidden />
+            {queueActive && <Square size={11} fill="currentColor" />}
             <span className="rec-pop-all-tx">{queueActive ? `End ${open.label}` : `Play all ${open.label}`}</span>
+            {!queueActive && <ChevronRight size={16} className="rec-panel-chev" />}
           </button>
         )}
       </div>

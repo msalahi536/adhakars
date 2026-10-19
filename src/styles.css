@@ -4966,3 +4966,7 @@ div[data-state="open"]:has(+ .giveaway-dialog) {
 .rec-panel-photo { height: 52px; width: 52px; border-radius: 999px; object-fit: cover; display: block; }
 .rec-panel-controls { justify-content: center; margin: 4px 0 10px; }
 .rec-panel .rec-pop-all { width: 100%; }
+.rec-panel .qp-title { color: var(--accent); }
+.rec-panel .rec-pop-all { position: relative; justify-content: center; gap: 8px; }
+.rec-panel-chev { position: absolute; right: 16px; top: 50%; transform: translateY(-50%); }
+.rec-panel-controls { gap: 22px; }
