@@ -5,7 +5,7 @@ import { markSurahComplete } from "@/lib/giveaway";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { QuranMiniPlayer } from "@/components/QuranMiniPlayer";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { Check, ChevronDown, ChevronLeft, ChevronRight, Clock, Heart, Infinity as InfinityIcon, MoreHorizontal, SlidersHorizontal, Loader2, Maximize2, Pause, Play, Repeat, Search, Shuffle, SkipBack, SkipForward, X } from "lucide-react";
+import { Check, ChevronDown, ChevronLeft, ChevronRight, Clock, Heart, Infinity as InfinityIcon, Info, MoreHorizontal, RotateCcw, RotateCw, SlidersHorizontal, Loader2, Maximize2, Pause, Play, Repeat, Search, Shuffle, SkipBack, SkipForward, X } from "lucide-react";
 import {
   findReciter, getChapterAudio, getChapters, getVerses, homeReciterRow, POPULAR_RECITERS, RECITERS, reciterHasPhoto,
   reciterHasSurah, reciterName, reciterScore, reciterPhoto, reciterSubtitle, searchChapters, searchReciters, parseVerseRef, type Chapter, type Reciter, type Verse, getVerseByKey, searchVerses, type VerseHit,
@@ -779,6 +779,7 @@ function QuranPlayerPanel() {
     void navigate({ to: "/app/quran", search: { s: id } });
   };
   const ts = p.audio?.timings ?? [];
+  const hasTimings = ts.length > 0;
   const vi = ts.findIndex((t) => t.key === p.pos.key);
   const curV = vi < 0 ? 0 : vi;
   const prevV = ts[curV - 1]?.key.split(":")[1];
@@ -836,14 +837,31 @@ function QuranPlayerPanel() {
         onChange={(e) => quranPlayer.seek(Number(e.target.value) / 1000)} disabled={!ready} />
       <div className="quran-times"><span>{fmt(p.cur)}</span><span>{fmt(p.dur)}</span></div>
       <div className="qp-row">
-        <button className="qp-verse" onClick={tap(() => quranPlayer.step(-1))} disabled={!ready || !prevV}>
-          <ChevronLeft size={18} /><span className="min-w-0 text-left"><b>Previous verse</b><small>{prevV ? `Verse ${prevV}` : "—"}</small></span>
-        </button>
-        <span className="qp-divider" aria-hidden />
-        <button className="qp-verse is-next" onClick={tap(() => quranPlayer.step(1))} disabled={!ready || !nextV}>
-          <span className="min-w-0 text-right"><b>Next verse</b><small>{nextV ? `Verse ${nextV}` : "—"}</small></span><ChevronRight size={18} />
-        </button>
+        {hasTimings ? (
+          <>
+            <button className="qp-verse" onClick={tap(() => quranPlayer.step(-1))} disabled={!ready || !prevV}>
+              <ChevronLeft size={18} /><span className="min-w-0 text-left"><b>Previous verse</b><small>{prevV ? `Verse ${prevV}` : "—"}</small></span>
+            </button>
+            <span className="qp-divider" aria-hidden />
+            <button className="qp-verse is-next" onClick={tap(() => quranPlayer.step(1))} disabled={!ready || !nextV}>
+              <span className="min-w-0 text-right"><b>Next verse</b><small>{nextV ? `Verse ${nextV}` : "—"}</small></span><ChevronRight size={18} />
+            </button>
+          </>
+        ) : (
+          <>
+            <button className="qp-verse" onClick={tap(() => quranPlayer.skip(-10))} disabled={!ready || !p.dur} aria-label="Back 10 seconds">
+              <RotateCcw size={17} /><span className="min-w-0 text-left"><b>Back 10s</b><small>skip back</small></span>
+            </button>
+            <span className="qp-divider" aria-hidden />
+            <button className="qp-verse is-next" onClick={tap(() => quranPlayer.skip(15))} disabled={!ready || !p.dur} aria-label="Forward 15 seconds">
+              <span className="min-w-0 text-right"><b>Forward 15s</b><small>skip forward</small></span><RotateCw size={17} />
+            </button>
+          </>
+        )}
       </div>
+      {p.audio && !hasTimings && (
+        <div className="qp-noverse"><Info size={12} /> Verse-by-verse not available for this recitation</div>
+      )}
       <div className="quran-controls">
         <button aria-label="Shuffle surahs" aria-pressed={p.shuffle} className={p.shuffle ? "is-on" : ""} onClick={tap(quranPlayer.toggleShuffle)}><Shuffle size={19} /></button>
         <button aria-label="Previous surah" onClick={() => void goSurah(-1)} disabled={(p.chapter ?? 1) <= 1}><SkipBack size={22} fill="currentColor" /></button>
