@@ -1142,16 +1142,21 @@ html[data-preset="dark-red"]:not([data-visual-phase="evening"]) .salah-dismiss.i
 .salah-action-track { height: 4px; margin-top: 8px; overflow: hidden; border-radius: 999px; background: rgba(0, 0, 0, 0.08); }
 .salah-action-track span { display: block; height: 100%; border-radius: inherit; background: var(--preset-ink); transition: width 300ms ease; }
 .salah-upcoming-wrap { height: 242px; }
-.prayer-timeline-card { box-sizing: border-box; height: 242px !important; padding: 16px 20px 14px; border-radius: 18px !important; background: var(--surface-deep-gradient) !important; color: #ffffff !important; box-shadow: 0 8px 24px rgba(var(--preset-ink-rgb), 0.28) !important; }
+.prayer-timeline-card { box-sizing: border-box; position: relative; height: 242px !important; padding: 16px 20px 14px; border-radius: 18px !important; background: var(--surface-deep-gradient) !important; color: #ffffff !important; box-shadow: 0 8px 24px rgba(var(--preset-ink-rgb), 0.28) !important; }
 .prayer-timeline-card .prayer-timeline-heading { margin-bottom: 12px; }
+.prayer-timeline-card .prayer-timeline-heading, .prayer-timeline-card .prayer-timeline-list { position: relative; z-index: 1; }
+/* Faint landscape sitting quietly behind the times, like the reference. */
+.prayer-timeline-card::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 48%; border-radius: 0 0 18px 18px; pointer-events: none; background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 320 100' preserveAspectRatio='none'%3E%3Cpath d='M0 100V64c34-12 66-2 104-10s86 14 128 6 62-14 88-10v50z' fill='%23ffffff' fill-opacity='.08'/%3E%3Cpath d='M0 100V82c48-8 96 4 150-2s120-10 170-4v24z' fill='%23ffffff' fill-opacity='.06'/%3E%3C/svg%3E") bottom center / 100% 100% no-repeat; }
 .prayer-timeline-card .prayer-timeline-heading .label-caps { color: rgba(255, 255, 255, 0.85); font-family: var(--font-sans); font-size: 11px; font-weight: 500; letter-spacing: 0.18em; opacity: 1; }
-.prayer-timeline-card .prayer-timeline-heading > span:last-child { color: rgba(255, 255, 255, 0.85) !important; font-family: var(--font-display); font-size: 13px !important; font-weight: 400; }
-.prayer-timeline-card .prayer-timeline-list::before { position: absolute; top: 15px; bottom: 15px; left: 3px; width: 1px; background: rgba(255, 255, 255, 0.3); content: ""; }
+.prayer-timeline-card .prayer-timeline-heading > span:last-child { color: rgba(255, 255, 255, 0.85) !important; font-family: var(--font-display); font-size: 13px !important; font-weight: 400; display: inline-flex; align-items: center; }
+.prayer-timeline-card .prayer-timeline-list::before { position: absolute; top: 15px; bottom: 15px; left: 3px; width: 1.5px; background: rgba(255, 255, 255, 0.35); content: ""; }
+/* Hairline dividers between rows, starting past the dot column like the reference. */
+.prayer-timeline-card .prayer-timeline-row:not(:last-child)::after { content: ""; position: absolute; left: 26px; right: 0; bottom: 0; height: 1px; background: rgba(255, 255, 255, 0.16); }
 .prayer-timeline-card .prayer-timeline-list > span { display: none; }
 .prayer-timeline-card .prayer-timeline-row { height: 30px; gap: 18px !important; padding: 0 !important; border-radius: 0 !important; opacity: 1 !important; }
 .prayer-timeline-card .prayer-timeline-marker { width: 7px !important; }
-.prayer-timeline-card .prayer-timeline-marker span { z-index: 1; width: 6px !important; height: 6px !important; border: 0 !important; background: rgba(255, 255, 255, 0.5) !important; box-shadow: none !important; }
-.prayer-timeline-card .prayer-timeline-row[data-state="next"] .prayer-timeline-marker span { width: 10px !important; height: 10px !important; background: color-mix(in oklab, var(--preset-ink) 40%, #ffffff) !important; box-shadow: 0 0 0 4px rgba(var(--preset-ink-rgb), 0.3) !important; }
+.prayer-timeline-card .prayer-timeline-marker span { z-index: 1; width: 9px !important; height: 9px !important; border: 0 !important; background: rgba(255, 255, 255, 0.55) !important; box-shadow: none !important; }
+.prayer-timeline-card .prayer-timeline-row[data-state="next"] .prayer-timeline-marker span { width: 13px !important; height: 13px !important; background: rgba(255, 255, 255, 0.92) !important; box-shadow: 0 0 0 5px rgba(255, 255, 255, 0.18) !important; }
 .prayer-timeline-card .prayer-timeline-name,
 .prayer-timeline-card .prayer-timeline-time { color: #ffffff !important; font-family: var(--font-display); font-size: 16px !important; font-weight: 500 !important; line-height: 30px; }
 .prayer-timeline-card .prayer-timeline-row[data-state="next"] .prayer-timeline-name,

@@ -1,7 +1,7 @@
 // Vertical mini timeline of prayer times, with an expanded multi day view.
 
 import { useEffect, useRef, useState } from "react";
-import { CloudSun, Moon, Sun, Sunrise, Sunset, X } from "lucide-react";
+import { ChevronRight, CloudSun, Moon, Sun, Sunrise, Sunset, X } from "lucide-react";
 import { formatMinutes, type Slot } from "@/lib/prayer-times";
 
 type Props = {
@@ -271,6 +271,7 @@ export function PrayerTimeline({ days, now, todayKey, tone = "light" }: Props) {
           <span className="label-caps">Upcoming</span>
           <span className="text-[10px]" style={{ color: "var(--muted-foreground)" }}>
             Tap for all
+            <ChevronRight size={12} strokeWidth={1.8} style={{ marginLeft: 2, verticalAlign: "-1px" }} />
           </span>
         </div>
         {compact.length === 0 ? (
