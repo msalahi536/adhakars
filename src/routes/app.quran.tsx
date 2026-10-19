@@ -457,13 +457,13 @@ function Reader({ chapterId, verse }: { chapterId: number; verse?: number }) {
   const [missingClosed, setMissingClosed] = useState<string | null>(null);
   const missingOpen = !reciterHasSurah(shownReciter, chapterId) && missingClosed !== missingKey;
   const [full, setFull] = useState(false);
-  const [dock, setDock] = useState<"face" | "open">("face");
+  const [dock, setDockState] = useState<"face" | "open">(dockSeen);
+  const setDock = (d: "face" | "open") => { dockSeen = d; setDockState(d); };
   // Play entire Quran: when the next surah starts, the open reader follows it.
   // The player keeps whatever state it had — if it was minimized it stays minimized.
-  const autoNext = useRef(false);
   useEffect(() => {
     const onNext = (e: Event) => {
-      autoNext.current = true;
+      followQuietly = true;
       void navigate({ to: "/app/quran", search: { s: (e as CustomEvent<number>).detail } });
     };
     window.addEventListener("quran:auto-next", onNext);
@@ -489,7 +489,7 @@ function Reader({ chapterId, verse }: { chapterId: number; verse?: number }) {
     if (!last || last.s !== chapterId) localStorage.setItem(LAST, JSON.stringify({ s: chapterId, v: 1, mode: "read" }));
     restoreTo.current = verse ? `${chapterId}:${verse}` : last && last.s === chapterId && last.v > 1 ? `${chapterId}:${last.v}` : null;
     document.querySelector(".scroll-area")?.scrollTo({ top: 0 });
-    if (autoNext.current) autoNext.current = false;
+    if (followQuietly) followQuietly = false;
     else quranPlayer.setPanel(true);
   }, [chapterId]);
 
