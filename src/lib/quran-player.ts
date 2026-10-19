@@ -19,6 +19,9 @@ export type QuranPlayerState = {
   repeat: boolean;
   shuffle: boolean;
   rate: number;
+  continuous: boolean;
+  /** Sleep timer: epoch ms to pause at, "surah" to stop at the end of this surah, or null. */
+  sleep: number | "surah" | null;
   panelOpen: boolean;
   pos: { key: string | null; word: number | null };
 };
@@ -28,7 +31,7 @@ const LAST = "adhkar:quran:last";
 
 let state: QuranPlayerState = {
   chapter: null, chapterName: "", reciterId: 7, audio: null, playing: false, loading: false,
-  cur: 0, dur: 0, repeat: false, shuffle: false, rate: 1, panelOpen: true, pos: { key: null, word: null },
+  cur: 0, dur: 0, repeat: false, shuffle: false, rate: 1, continuous: false, sleep: null, panelOpen: true, pos: { key: null, word: null },
 };
 const listeners = new Set<() => void>();
 const set = (p: Partial<QuranPlayerState>) => { state = { ...state, ...p }; listeners.forEach((l) => l()); };
@@ -169,9 +172,19 @@ function setMetadata() {
   });
 }
 
+const CONT = "adhkar:quran:continuous";
+let sleepTimer: ReturnType<typeof setTimeout> | null = null;
+function clearSleep() { if (sleepTimer) clearTimeout(sleepTimer); sleepTimer = null; }
+
 async function onEnded() {
   if (!el) return;
   markSurahComplete(state.chapter);
+  if (state.sleep === "surah") {
+    wanted = false;
+    set({ sleep: null, playing: false, pos: { key: null, word: null } });
+    setMediaState("paused");
+    return;
+  }
   if (state.repeat) {
     // Manual restart instead of audio.loop: avoids the stale highlight/scroll jump at the seam.
     set({ pos: { key: null, word: null } });
@@ -185,6 +198,14 @@ async function onEnded() {
     while (n === state.chapter) n = 1 + Math.floor(Math.random() * 114);
     const name = (await getChapters().catch(() => [])).find((c) => c.id === n)?.name_simple ?? "";
     await quranPlayer.select(state.reciterId, n, name, true);
+    return;
+  }
+  if (state.continuous && state.chapter && state.chapter < 114) {
+    const n = state.chapter + 1;
+    wanted = true;
+    const name = (await getChapters().catch(() => [])).find((c) => c.id === n)?.name_simple ?? `Surah ${n}`;
+    await quranPlayer.select(state.reciterId, n, name, true);
+    if (typeof window !== "undefined") window.dispatchEvent(new CustomEvent("quran:auto-next", { detail: n }));
   }
 }
 
@@ -262,6 +283,26 @@ export const quranPlayer = {
   },
   toggleRepeat() { set({ repeat: !state.repeat, shuffle: state.repeat ? state.shuffle : false }); },
   toggleShuffle() { set({ shuffle: !state.shuffle, repeat: state.shuffle ? state.repeat : false }); },
+  setContinuous(continuous: boolean) {
+    set({ continuous });
+    try { localStorage.setItem(CONT, continuous ? "1" : "0"); } catch { /* ignore */ }
+  },
+  /** minutes > 0 sets a countdown, "surah" stops at the end of the surah, null turns it off. */
+  setSleep(v: number | "surah" | null) {
+    clearSleep();
+    if (typeof v === "number") {
+      const at = Date.now() + v * 60_000;
+      sleepTimer = setTimeout(() => { sleepTimer = null; set({ sleep: null }); quranPlayer.pause(); }, v * 60_000);
+      set({ sleep: at });
+    } else set({ sleep: v });
+  },
+  loadPrefs() {
+    try { const c = localStorage.getItem(CONT) === "1"; if (c !== state.continuous) set({ continuous: c }); } catch { /* ignore */ }
+  },
+  setRate(rate: number) {
+    if (el) el.playbackRate = rate;
+    set({ rate }); updatePosition();
+  },
   setPanel(panelOpen: boolean) { set({ panelOpen }); },
   setName(chapterName: string) { if (chapterName !== state.chapterName) { set({ chapterName }); setMetadata(); } },
   /** Play from a saved second (listening progress). */
@@ -273,9 +314,9 @@ export const quranPlayer = {
   },
   pause() { wanted = false; el?.pause(); },
   stop() {
-    wanted = false;
+    wanted = false; clearSleep();
     el?.pause();
-    set({ chapter: null, audio: null, playing: false, cur: 0, dur: 0, pos: { key: null, word: null } });
+    set({ chapter: null, audio: null, playing: false, sleep: null, cur: 0, dur: 0, pos: { key: null, word: null } });
     try { if (navigator.mediaSession) navigator.mediaSession.metadata = null; } catch { /* ignore */ }
     setMediaState("none");
   },
