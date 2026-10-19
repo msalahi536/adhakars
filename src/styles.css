@@ -1142,16 +1142,16 @@ html[data-preset="dark-red"]:not([data-visual-phase="evening"]) .salah-dismiss.i
 .salah-action-track { height: 4px; margin-top: 8px; overflow: hidden; border-radius: 999px; background: rgba(0, 0, 0, 0.08); }
 .salah-action-track span { display: block; height: 100%; border-radius: inherit; background: var(--preset-ink); transition: width 300ms ease; }
 .salah-upcoming-wrap { height: 242px; }
-.prayer-timeline-card { box-sizing: border-box; position: relative; height: 242px !important; padding: 16px 20px 14px; border-radius: 18px !important; background: linear-gradient(180deg, rgba(255,255,255,0.06) 0%, rgba(0,0,0,0.10) 45%, rgba(0,0,0,0.30) 100%), var(--surface-deep-gradient) !important; background-color: color-mix(in oklab, var(--preset-ink) 70%, #000) !important; color: #ffffff !important; box-shadow: 0 10px 28px rgba(var(--preset-ink-rgb), 0.35) !important; overflow: hidden; }
+.prayer-timeline-card { box-sizing: border-box; position: relative; height: 242px !important; padding: 16px 20px 14px; border-radius: 18px !important; background: linear-gradient(180deg, rgba(255,255,255,0.08) 0%, rgba(0,0,0,0.04) 45%, rgba(0,0,0,0.16) 100%), var(--surface-deep-gradient) !important; background-color: color-mix(in oklab, var(--preset-ink) 70%, #000) !important; color: #ffffff !important; box-shadow: 0 10px 28px rgba(var(--preset-ink-rgb), 0.35) !important; overflow: hidden; }
 .prayer-timeline-card .prayer-timeline-heading { margin-bottom: 12px; }
 .prayer-timeline-card .prayer-timeline-heading, .prayer-timeline-card .prayer-timeline-list { position: relative; z-index: 1; }
 /* Faint landscape sitting quietly behind the times, like the reference. */
 .prayer-timeline-card::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 30%; border-radius: 0 0 18px 18px; opacity: .9; pointer-events: none; background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 320 100' preserveAspectRatio='none'%3E%3Cpath d='M0 100V64c34-12 66-2 104-10s86 14 128 6 62-14 88-10v50z' fill='%23000000' fill-opacity='.10'/%3E%3Cpath d='M0 100V82c48-8 96 4 150-2s120-10 170-4v24z' fill='%23000000' fill-opacity='.14'/%3E%3C/svg%3E") bottom center / 100% 100% no-repeat; }
 .prayer-timeline-card .prayer-timeline-heading .label-caps { color: rgba(255, 255, 255, 0.85); font-family: var(--font-sans); font-size: 11px; font-weight: 500; letter-spacing: 0.18em; opacity: 1; }
 .prayer-timeline-card .prayer-timeline-heading > span:last-child { color: rgba(255, 255, 255, 0.85) !important; font-family: var(--font-display); font-size: 13px !important; font-weight: 400; display: inline-flex; align-items: center; }
-.prayer-timeline-card .prayer-timeline-list::before { position: absolute; top: 15px; bottom: 15px; left: 3px; width: 1.5px; background: rgba(255, 255, 255, 0.35); content: ""; }
+.prayer-timeline-card .prayer-timeline-list::before { position: absolute; top: 15px; bottom: 15px; left: 3px; width: 1.5px; background: rgba(255, 255, 255, 0.45); content: ""; }
 /* Hairline dividers between rows, starting past the dot column like the reference. */
-.prayer-timeline-card .prayer-timeline-row:not(:last-child)::after { content: ""; position: absolute; left: 26px; right: 0; bottom: 0; height: 1px; background: rgba(255, 255, 255, 0.16); }
+.prayer-timeline-card .prayer-timeline-row:not(:last-child)::after { content: ""; position: absolute; left: 26px; right: 0; bottom: 0; height: 1px; background: rgba(255, 255, 255, 0.30); }
 .prayer-timeline-card .prayer-timeline-list > span { display: none; }
 .prayer-timeline-card .prayer-timeline-row { height: 30px; gap: 18px !important; padding: 0 !important; border-radius: 0 !important; opacity: 1 !important; }
 .prayer-timeline-card .prayer-timeline-marker { width: 7px !important; }
