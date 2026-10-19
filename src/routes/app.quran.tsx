@@ -561,10 +561,10 @@ function Reader({ chapterId, verse }: { chapterId: number; verse?: number }) {
             <ChevronDown size={18} className="opacity-60" style={{ transform: sheet ? "rotate(180deg)" : undefined, transition: "transform .2s" }} />
           </button>
           <div className="quran-fs-row">
-            <button className="quran-card quran-fs-toggle" onClick={openFull} aria-label="Read in full screen">
+            <button className="quran-card quran-fs-toggle" style={{ flex: "1 1 0", width: "auto", minWidth: 0 }} onClick={openFull} aria-label="Read in full screen">
               <Maximize2 size={16} /><span>Full screen reading</span>
             </button>
-            <button className="quran-card quran-fs-toggle quran-read-settings" onClick={() => { void triggerHaptic("light"); setReadSettings(true); }} aria-label="Reading settings">
+            <button className="quran-card quran-fs-toggle quran-read-settings" style={{ flex: "0 0 auto", width: "auto" }} onClick={() => { void triggerHaptic("light"); setReadSettings(true); }} aria-label="Reading settings">
               <SlidersHorizontal size={16} /><span>Reading</span>
             </button>
           </div>
