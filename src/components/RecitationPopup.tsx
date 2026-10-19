@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { Check, ChevronDown, ChevronLeft, ChevronRight, Clock, MoreHorizontal, Pause, Play, SkipBack, SkipForward, Square } from "lucide-react";
 import imamTaha from "@/assets/imam-taha.png.asset.json";
 import { Portal } from "./Portal";
-import { closePopup, usePopupOpen } from "@/lib/recitation-popup";
+import { closePopup, setPopupOpen, usePopupOpen } from "@/lib/recitation-popup";
 import { recitationPlayer, usePlayer } from "@/lib/recitation-player";
 
 const RATES = [0.75, 1, 1.25, 1.5, 2];
