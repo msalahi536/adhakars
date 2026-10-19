@@ -4946,6 +4946,7 @@ div[data-state="open"]:has(+ .giveaway-dialog) {
 .qp-row .qp-verse b { font-size: 13.5px; }
 .qp-row .qp-verse small { font-size: 11.5px; }
 .quran-player .quran-controls button:not(.quran-play) { background: color-mix(in oklab, var(--foreground) 4%, var(--card)); box-shadow: 0 3px 10px color-mix(in oklab, var(--foreground) 7%, transparent), inset 0 1px 0 color-mix(in oklab, var(--card) 70%, transparent); }
+.quran-player .quran-controls button:not(.quran-play).is-on { color: var(--accent); background: color-mix(in oklab, var(--accent) 22%, var(--card)); box-shadow: 0 0 0 1.5px color-mix(in oklab, var(--accent) 55%, transparent), 0 3px 10px color-mix(in oklab, var(--foreground) 7%, transparent), inset 0 1px 0 color-mix(in oklab, var(--card) 70%, transparent); }
 .quran-player .quran-controls .quran-play { height: 66px; width: 66px; color: var(--accent-foreground); background: radial-gradient(120% 120% at 30% 15%, color-mix(in oklab, var(--accent) 78%, var(--card)) 0%, var(--accent) 55%, color-mix(in oklab, var(--accent) 80%, var(--foreground)) 100%); box-shadow: 0 0 0 5px color-mix(in oklab, var(--accent) 10%, var(--card)), 0 10px 26px color-mix(in oklab, var(--accent) 32%, transparent), inset 0 1px 0 color-mix(in oklab, var(--card) 35%, transparent); }
 /* Verse cards: one continuous landscape split across the divider */
 .qp-row { gap: 5px; }
