@@ -220,7 +220,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     private func pauseWebAudio() {
         guard let rootVC = window?.rootViewController,
               let webView = findBridgeVC(rootVC)?.bridge?.webView else { return }
-        webView.evaluateJavaScript("document.querySelectorAll('audio,video').forEach(function(a){try{a.pause()}catch(e){}});", completionHandler: nil)
+        webView.evaluateJavaScript("window.dispatchEvent(new Event('adhan:stop-media'));", completionHandler: nil)
     }
 
     /// Process pending adhan after app becomes active (cold launch)

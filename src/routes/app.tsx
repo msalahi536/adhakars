@@ -139,11 +139,15 @@ function AppLayout() {
 
   useEffect(() => {
     const isAndroid = (window as any).Capacitor?.getPlatform?.() === "android";
+    const stopMedia = () => {
+      void import("@/lib/recitation-player").then((m) => m.recitationPlayer.pause());
+      void import("@/lib/quran-player").then((m) => m.quranPlayer.pause());
+    };
+    window.addEventListener("adhan:stop-media", stopMedia);
     const unsubscribe = onAdhanPlaying(({ prayer, reciterId }) => {
       const name = prayer || "fajr";
       // Adhan takes priority: stop any adhkar or Quran recitation.
-      void import("@/lib/recitation-player").then((m) => m.recitationPlayer.pause());
-      void import("@/lib/quran-player").then((m) => m.quranPlayer.pause());
+      stopMedia();
       // iPhone silent alert: nothing to continue natively, so play Mishary from zero.
       if (!isAndroid && isSilentReciter(reciterId)) {
         void startSilentFallbackAdhan(name).then((id) => setAdhan({ visible: true, prayer: name, reciterId: id }));
