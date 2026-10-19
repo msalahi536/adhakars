@@ -40,7 +40,9 @@ export function useFacePulse<T extends HTMLElement = HTMLElement>(playing: boole
       last = now;
       const live = playingRef.current ? (levelsRef.current ?? proceduralLevels(now / 1000)) : restingLevels();
       bands = shapeMeter(live, bands, dt);
-      const target = playingRef.current ? voiceEnergy(bands) : 0;
+      const raw = playingRef.current ? voiceEnergy(bands) : 0;
+      // Widen the spread so quiet passages fade out and phrases swell, instead of hovering mid-level.
+      const target = clamp01((raw - 0.32) / 0.5);
       // Slower than the meter itself: the ring should breathe, never flicker.
       env += (target - env) * (1 - Math.exp(-dt / (target > env ? 260 : 520)));
       el.style.setProperty("--face-pulse", env.toFixed(3));
