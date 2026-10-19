@@ -20,7 +20,14 @@ export function RecitationPopup() {
   const queueActive = player.queue.length > 0;
   const openerTrack = open.track ?? open.tracks.find((t) => t.dhikrId === open.openerId) ?? null;
   const openerInQueue = queueActive && player.queue.some((t) => t.dhikrId === open.openerId);
-  const mismatch = !!track && track.dhikrId !== open.openerId && !openerInQueue;
+  // The card this popup was opened from differs from the recitation loaded.
+  const mismatch = !!track && track.dhikrId !== open.openerId;
+  const switchTo = () => {
+    if (!openerTrack) return;
+    const qi = openerInQueue ? player.queue.findIndex((t) => t.dhikrId === open.openerId) : -1;
+    if (qi >= 0) recitationPlayer.playAll(player.queue, player.queueLabel ?? open.label ?? "recitations", qi);
+    else recitationPlayer.playOne(openerTrack, open.label ?? null);
+  };
   const playing = player.playing;
   const showOpener = !track || (mismatch && !playing);
   const name = (showOpener ? open.title : track?.title) ?? "Recitation";
@@ -40,7 +47,7 @@ export function RecitationPopup() {
   };
 
   const onPlay = () => {
-    if (showOpener && openerTrack) recitationPlayer.playOne(openerTrack, open.label ?? null);
+    if (showOpener && openerTrack) switchTo();
     else if (track) recitationPlayer.toggle();
   };
 
@@ -66,7 +73,7 @@ export function RecitationPopup() {
         )}
 
         {mismatch && playing && openerTrack && (
-          <button type="button" className="rec-pop-switch" onClick={() => recitationPlayer.playOne(openerTrack, open.label ?? null)}>
+          <button type="button" className="rec-pop-switch" onClick={switchTo}>
             Play this card instead
           </button>
         )}
