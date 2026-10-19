@@ -4929,3 +4929,7 @@ div[data-state="open"]:has(+ .giveaway-dialog) {
 .qp-verse:not(.is-next) { border-top-right-radius: 22px; }
 .qp-verse::after { right: 2px; }
 .qp-verse.is-next::after { left: 2px; }
+/* Verse cards grow to fill their half so they meet the divider */
+.qp-row { justify-content: stretch; gap: 4px; }
+.qp-verse { flex: 1 1 0; width: auto; min-width: 0; }
+.qp-divider { flex: none; }
