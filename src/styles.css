@@ -4975,9 +4975,8 @@ body.has-adhkar-mini .quran-player:not(.rec-panel), body.has-adhkar-mini .mini-p
 .quran-face { position: fixed; right: 14px; bottom: calc(env(safe-area-inset-bottom, 0px) + 24px); z-index: 45; height: 52px; width: 52px; padding: 3px; border-radius: 999px; background: linear-gradient(145deg, var(--card), color-mix(in oklab, var(--accent) 28%, var(--card))); box-shadow: 0 8px 22px -6px color-mix(in oklab, var(--accent) 45%, transparent); color: var(--accent); font-weight: 700; animation: quran-face-in .35s cubic-bezier(.2,.9,.3,1.2); transition: transform .2s; }
 .quran-face:active { transform: scale(.92); }
 .quran-face img { height: 100%; width: 100%; border-radius: 999px; object-fit: cover; }
-.quran-face.is-playing::after { content: ""; position: absolute; inset: -4px; border-radius: 999px; border: 2px solid color-mix(in oklab, var(--accent) 40%, transparent); animation: quran-face-ring 2s ease-out infinite; }
+.quran-face::after { content: ""; position: absolute; inset: -3px; border-radius: 999px; border: 1px solid color-mix(in oklab, var(--accent) 85%, transparent); opacity: calc(var(--face-pulse, 0) * .26); transform: scale(calc(1 + var(--face-pulse, 0) * .05)); box-shadow: 0 0 calc(var(--face-pulse, 0) * 16px) color-mix(in oklab, var(--accent) 30%, transparent); pointer-events: none; }
 @keyframes quran-face-in { from { opacity: 0; transform: scale(.4); } to { opacity: 1; transform: none; } }
-@keyframes quran-face-ring { from { opacity: .9; transform: scale(.95); } to { opacity: 0; transform: scale(1.25); } }
 .quran-player { animation: quran-panel-in .32s cubic-bezier(.2,.8,.3,1); }
 @keyframes quran-panel-in { from { opacity: 0; transform: translate(-50%, 16px) scale(.97); } to { opacity: 1; transform: translateX(-50%); } }
 
