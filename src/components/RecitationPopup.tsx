@@ -65,9 +65,16 @@ export function RecitationPopup() {
   const canPrev = queueActive ? player.queueIndex > 0 : listIndex > 0;
   const canNext = queueActive ? player.queueIndex < player.queue.length - 1 : listIndex >= 0 && listIndex < open.tracks.length - 1;
   const step = (d: number) => {
-    if (queueActive) { if (d < 0) recitationPlayer.previous(); else recitationPlayer.next(); return; }
-    const t = open.tracks[listIndex + d];
-    if (t) recitationPlayer.playOne(t, open.label ?? null);
+    let t: typeof track = null;
+    if (queueActive) {
+      t = player.queue[player.queueIndex + d] ?? null;
+      if (d < 0) recitationPlayer.previous(); else recitationPlayer.next();
+    } else {
+      t = open.tracks[listIndex + d] ?? null;
+      if (t) recitationPlayer.playOne(t, open.label ?? null);
+    }
+    // Skipping makes the new card the one this popup is "about", so no switch prompt.
+    if (t) setPopupOpen({ ...open, openerId: t.dhikrId, title: t.title, track: t });
   };
 
   const onPlay = () => {
