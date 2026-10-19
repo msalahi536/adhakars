@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import imamTaha from "@/assets/imam-taha.png.asset.json";
 import { recitationPlayer, usePlayer } from "@/lib/recitation-player";
 import { setPopupOpen, usePopupOpen } from "@/lib/recitation-popup";
@@ -10,25 +10,18 @@ export function RecitationMiniPlayer() {
   const player = usePlayer();
   const open = usePopupOpen();
   const q = useQuranPlayer();
-  const [lift, setLift] = useState<number | null>(null);
-  // Sit just above the Quran player (full or mini) so both stay usable.
+  const shown = !!player.track && !open;
+  // Quran player moves up to sit above this bar.
   useEffect(() => {
-    const measure = () => {
-      const q = document.querySelector<HTMLElement>(".quran-player:not(.rec-panel), .mini-pill:not(.is-adhkar)");
-      const r = q?.getBoundingClientRect();
-      setLift(r && r.height ? window.innerHeight - r.top + 8 : null);
-    };
-    measure();
-    const id = window.setInterval(measure, 300);
-    return () => window.clearInterval(id);
-  }, []);
+    document.body.classList.toggle("has-adhkar-mini", shown);
+    return () => document.body.classList.remove("has-adhkar-mini");
+  }, [shown]);
   const track = player.track;
   if (!track || open) return null;
   void q;
   return (
     <MiniPlayerPill
       className="is-adhkar"
-      style={lift != null ? { bottom: lift } : undefined}
       label="Recitation player"
       title={player.queueLabel ?? track.title}
       subtitle="Imam Taha Hassane"
