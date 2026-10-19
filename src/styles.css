@@ -2891,11 +2891,11 @@ html[data-visual-phase="evening"] .tasbih-disc {
 .after-salah-stack .adhkar-pagination-row { padding-bottom: 4px; }
 .after-salah-stack .adhkar-card-heading h3 { color: var(--accent) !important; }
 .after-salah-stack .adhkar-card-heading button { background: color-mix(in oklab, var(--accent) 16%, transparent) !important; color: var(--accent) !important; }
-.adhkar-commentary { margin-top: 16px; }
-.adhkar-commentary summary { display: flex; align-items: center; min-height: 44px; padding: 6px 16px 6px 8px; border-radius: 999px; background: color-mix(in oklab, var(--card-foreground) 6%, var(--card)); border: 1px solid color-mix(in oklab, var(--card-foreground) 7%, transparent); color: color-mix(in oklab, var(--accent) 75%, var(--card-foreground)); font-size: 13.5px; font-weight: 600; cursor: pointer; list-style: none; transition: background .2s; }
+.adhkar-commentary { margin-top: 12px; }
+.adhkar-commentary summary { display: flex; align-items: center; min-height: 34px; padding: 5px 13px 5px 5px; border-radius: 999px; background: color-mix(in oklab, var(--card-foreground) 4%, var(--card)); border: 1px solid color-mix(in oklab, var(--card-foreground) 5%, transparent); color: color-mix(in oklab, var(--accent) 68%, var(--card-foreground)); font-size: 12.5px; font-weight: 500; cursor: pointer; list-style: none; transition: background .2s; }
 .adhkar-commentary summary::-webkit-details-marker { display: none; }
-.adhkar-commentary summary::before { content: "+"; display: inline-flex; flex: none; width: 28px; height: 28px; margin-right: 12px; align-items: center; justify-content: center; border-radius: 50%; background: color-mix(in oklab, var(--accent) 14%, var(--card)); color: var(--accent); font-size: 17px; font-weight: 500; }
-.adhkar-commentary summary::after { content: ""; margin-left: auto; width: 7px; height: 7px; border-right: 1.6px solid currentColor; border-bottom: 1.6px solid currentColor; transform: rotate(-45deg); opacity: .6; transition: transform .2s; }
+.adhkar-commentary summary::before { content: "+"; display: inline-flex; flex: none; width: 22px; height: 22px; margin-right: 9px; align-items: center; justify-content: center; border-radius: 50%; background: color-mix(in oklab, var(--accent) 12%, var(--card)); color: var(--accent); font-size: 14px; font-weight: 500; }
+.adhkar-commentary summary::after { content: ""; margin-left: auto; width: 6px; height: 6px; border-right: 1.5px solid currentColor; border-bottom: 1.5px solid currentColor; transform: rotate(-45deg); opacity: .55; transition: transform .2s; }
 .adhkar-commentary[open] summary::before { content: "−"; }
 .adhkar-commentary[open] summary::after { transform: rotate(45deg); }
 .adhkar-commentary p { padding: 0 10px; }
