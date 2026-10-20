@@ -167,7 +167,7 @@ function Footer({ flush = false }: { flush?: boolean }) {
         borderTop: flush ? "none" : "1px solid rgba(31, 61, 43, 0.1)",
       }}
     >
-      <div className="mx-auto max-w-6xl px-5 pt-14 md:px-10">
+      <div className="mx-auto max-w-6xl px-5 pt-14 pb-12 md:px-10">
         <div className="grid gap-10 md:grid-cols-[1.35fr_1fr_1fr]">
           <div>
             <div className="flex items-center gap-2">
