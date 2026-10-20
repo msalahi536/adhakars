@@ -400,12 +400,6 @@ function ReciterPicker({ back, tab }: { back?: number; tab?: "all" }) {
               {RFILTERS.map(([k, l]) => <button key={k} className={filter === k ? "is-on" : ""} onClick={() => setFilter(k)}>{l}</button>)}
             </div>
           )}
-          {!t && (
-            <div className="quran-legend">
-              <span><b>Word-by-word highlighting</b> — each word lights up as it's recited.</span>
-              <span><b>Verse-by-verse highlighting</b> — the whole verse lights up at once.</span>
-            </div>
-          )}
           <div className="quran-card overflow-hidden">
             {ordered.map((r) => {
               const on = prefs.reciter === r.id;
