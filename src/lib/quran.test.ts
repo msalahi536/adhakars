@@ -58,3 +58,18 @@ describe("reciter list order", () => {
   });
 });
 
+describe("reciter labels", () => {
+  test("no reciter is labelled Streaming", async () => {
+    const { RECITERS, reciterName, reciterSubtitle } = await import("./quran");
+    const labelled = RECITERS.filter((r) => /streaming/i.test(`${reciterName(r)} ${reciterSubtitle(r)}`));
+    expect(labelled.map((r) => r.id)).toEqual([]);
+  });
+  test("highlighting labels say what they light up", async () => {
+    const { RECITERS, reciterSubtitle } = await import("./quran");
+    const word = RECITERS.find((r) => r.group === 1 && r.sync === "word" && !/\(/.test(r.name))!;
+    const verse = RECITERS.find((r) => r.group === 1 && r.sync === "verse" && !/\(/.test(r.name))!;
+    expect(reciterSubtitle(word)).toBe("Word-by-word highlighting");
+    expect(reciterSubtitle(verse)).toBe("Verse-by-verse highlighting");
+  });
+});
+
