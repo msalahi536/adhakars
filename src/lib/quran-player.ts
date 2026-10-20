@@ -60,7 +60,7 @@ function saveListen(force = false) {
   if (!force && now - lastSave < 2000) return;
   lastSave = now;
   const v = state.pos.key ? Number(state.pos.key.split(":")[1]) : 1;
-  try { localStorage.setItem(LAST, JSON.stringify({ s: state.chapter, v, t: el.currentTime, r: state.reciterId, mode: "listen" })); } catch { /* ignore */ }
+  try { localStorage.setItem(LAST, JSON.stringify({ s: state.chapter, v, t: el.currentTime, d: Number.isFinite(el.duration) ? el.duration : undefined, r: state.reciterId, mode: "listen", ao: state.audio.timings.length === 0 })); } catch { /* ignore */ }
 }
 
 function recover() {
