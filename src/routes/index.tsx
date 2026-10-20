@@ -78,7 +78,6 @@ function HomePage() {
           <div className="marketing-hero-shade" />
           <div className="marketing-shell marketing-hero-grid">
             <div className="marketing-hero-copy animate-fade-in">
-              <p className="marketing-eyebrow">Authentic remembrance, every day</p>
               <h1>
                 A calm companion
                 <em>for every day.</em>
