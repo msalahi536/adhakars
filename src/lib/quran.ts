@@ -51,7 +51,6 @@ const QURAN_COM_RECITERS: Reciter[] = [
   { id: 161, name: "Khalifa al-Tunaiji", sync: "word", group: 1 },
   { id: 6, name: "Mahmoud Khalil al-Husary", sync: "word", group: 1 },
   { id: 7, name: "Mishary Rashid Alafasy", sync: "word", group: 1 },
-  { id: 173, name: "Mishary Rashid Alafasy (Streaming)", sync: "word", group: 1 },
   { id: 10, name: "Sa'ud ash-Shuraim", sync: "word", group: 1 },
   { id: 174, name: "Yasser ad-Dossari", sync: "word", group: 1 },
   { id: 158, name: "Abdullah Ali Jabir", sync: "verse", group: 1 },
@@ -318,13 +317,26 @@ const hasPhoto = new Map(RECITERS.map((r) => [r.id, !!reciterPhoto(r)]));
 export const featuredRank = (r: Reciter) => (POPULAR_RECITERS.includes(r.id) || PINNED_RECITERS.has(r.id) ? 0 : 1);
 RECITERS.sort((a, b) => Number(!PINNED_RECITERS.has(a.id)) - Number(!PINNED_RECITERS.has(b.id)) || Number(!hasPhoto.get(a.id)) - Number(!hasPhoto.get(b.id)));
 export const reciterHasPhoto = (r: Reciter) => !!hasPhoto.get(r.id);
+/** What the listener actually sees while this recitation plays. */
+const SYNC_LABEL: Record<Reciter["sync"], string> = {
+  word: "Word-by-word highlighting",
+  verse: "Verse-by-verse highlighting",
+  none: "Audio only",
+};
+/** With a recitation style in front of it there is no room for "highlighting" — the legend above the list explains both terms. */
+const SYNC_SHORT: Record<Reciter["sync"], string> = {
+  word: "Word-by-word",
+  verse: "Verse-by-verse",
+  none: "Audio only",
+};
 export function reciterSubtitle(r: Reciter): string {
   if (r.group === 2) return "Haramain Taraweeh";
   if (r.group === 3) return "Other qira'at";
   if (r.group === 4) return "With translation";
-  const style = r.name.match(/\(([^)]+)\)/)?.[1];
-  const sync = r.sync === "word" ? "Word-by-word" : r.sync === "verse" ? "Verse by verse" : "Audio only";
-  return style ? `${style} · ${sync}` : sync;
+  // Delivery notes like "Streaming" are inaudible to a listener — never show them.
+  const style = (r.name.match(/\(([^)]+)\)/)?.[1] ?? "").trim();
+  const keep = /streaming/i.test(style) ? "" : style;
+  return keep ? `${keep} · ${SYNC_SHORT[r.sync]}` : SYNC_LABEL[r.sync];
 }
 export const reciterName = (r: Reciter) => r.name.replace(/\s*\([^)]*\)\s*$/, "");
 export const POPULAR_RECITERS = [7, 1, 13, 174, 100107, 159, 3, 10, 104, 158, 19];
