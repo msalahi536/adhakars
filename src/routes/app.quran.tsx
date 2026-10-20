@@ -400,6 +400,12 @@ function ReciterPicker({ back, tab }: { back?: number; tab?: "all" }) {
               {RFILTERS.map(([k, l]) => <button key={k} className={filter === k ? "is-on" : ""} onClick={() => setFilter(k)}>{l}</button>)}
             </div>
           )}
+          {!t && (
+            <div className="quran-legend">
+              <span><b>Word-by-word highlighting</b> — each word lights up as it's recited.</span>
+              <span><b>Verse-by-verse highlighting</b> — the whole verse lights up at once.</span>
+            </div>
+          )}
           <div className="quran-card overflow-hidden">
             {ordered.map((r) => {
               const on = prefs.reciter === r.id;
@@ -738,7 +744,7 @@ const AUDIO_TOGGLES: { key: keyof DisplayPrefs; label: string; sub: string }[] =
   { key: "arabicLarge", label: "Large Arabic text", sub: "Bigger Arabic letters" },
   { key: "quranPageView", label: "Full page view", sub: "One flowing page, like a printed Quran" },
   { key: "quranAutoScroll", label: "Follow recitation", sub: "Moves to the verse being recited" },
-  { key: "quranWordHighlight", label: "Word by word highlight", sub: "Lights up each word as it's recited" },
+  { key: "quranWordHighlight", label: "Word-by-word highlighting", sub: "Lights up each word as it's recited" },
 ];
 
 function QuranAudioSettings({ onClose }: { onClose: () => void }) {
@@ -875,7 +881,7 @@ function QuranPlayerPanel() {
         )}
       </div>
       {p.audio && !hasTimings && (
-        <div className="qp-noverse"><Info size={12} /> Verse-by-verse not available for this recitation</div>
+        <div className="qp-noverse"><Info size={12} /> Verse-by-verse highlighting isn't available for this recitation</div>
       )}
       <div className="quran-controls">
         <button aria-label="Shuffle surahs" aria-pressed={p.shuffle} className={p.shuffle ? "is-on" : ""} onClick={tap(quranPlayer.toggleShuffle)}><Shuffle size={19} /></button>

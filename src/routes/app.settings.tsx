@@ -529,7 +529,7 @@ function Settings() {
               <Toggle
                 icon={<BookOpen size={17} strokeWidth={1.8} />}
                 label="Full page view"
-                description="Read the whole surah as one flowing page, like a printed Quran, instead of verse by verse cards."
+                description="Read the whole surah as one flowing page, like a printed Quran, instead of one card per verse."
                 value={display.quranPageView}
                 onChange={(v) => updateDisplay({ quranPageView: v })}
               />
@@ -542,7 +542,7 @@ function Settings() {
               />
               <Toggle
                 icon={<Highlighter size={17} strokeWidth={1.8} />}
-                label="Word by word highlight"
+                label="Word-by-word highlighting"
                 description="Lights up each word as it's recited."
                 value={display.quranWordHighlight}
                 onChange={(v) => updateDisplay({ quranWordHighlight: v })}
