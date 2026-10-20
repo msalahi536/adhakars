@@ -167,7 +167,7 @@ function Footer({ flush = false }: { flush?: boolean }) {
         borderTop: flush ? "none" : "1px solid rgba(31, 61, 43, 0.1)",
       }}
     >
-      <div className="mx-auto max-w-6xl px-5 pt-14 md:px-10">
+      <div className="mx-auto max-w-6xl px-5 pt-14 pb-12 md:px-10">
         <div className="grid gap-10 md:grid-cols-[1.35fr_1fr_1fr]">
           <div>
             <div className="flex items-center gap-2">
@@ -212,18 +212,6 @@ function Footer({ flush = false }: { flush?: boolean }) {
         <div className="mt-12 text-xs" style={{ color: "rgba(31, 61, 43, 0.55)" }}>
           © {new Date().getFullYear()} Sahih Al-Adhkar. All rights reserved.
         </div>
-      </div>
-      <div className="marketing-footer-wordmark" aria-hidden="true">
-        {"SAHIH AL-ADHKAR".split("").map((ch, i) => (
-          <span
-            key={i}
-            className="marketing-footer-letter"
-            data-space={ch === " " ? "" : undefined}
-            style={{ ["--i" as string]: i }}
-          >
-            {ch === " " ? "\u00A0" : ch}
-          </span>
-        ))}
       </div>
     </footer>
   );
