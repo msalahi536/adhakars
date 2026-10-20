@@ -78,7 +78,7 @@ function useFavs() {
   return [favs, toggle] as const;
 }
 
-type Last = { s: number; v: number; t?: number; r?: number; mode?: "read" | "listen" };
+type Last = { s: number; v: number; t?: number; d?: number; r?: number; mode?: "read" | "listen"; ao?: boolean };
 
 function QuranPage() {
   const { s, v, view, tab } = Route.useSearch();
@@ -167,6 +167,7 @@ function Home() {
   const list = useMemo(() => searchChapters(chapters ?? [], q), [chapters, q]);
   const reciterHits = useMemo(() => searchReciters(q), [q]);
   const lastChapter = last && chapters?.find((c) => c.id === last.s);
+  const audioPct = last?.mode === "listen" && last.ao && last.t != null && last.d ? Math.min(100, Math.round((last.t / last.d) * 100)) : null;
   const open = (id: number) => { void triggerHaptic("light"); void navigate({ to: "/app/quran", search: { s: id } }); };
   // Resume where they left off: listening position if they last listened, otherwise the verse they read to.
   const resume = async () => {
@@ -252,13 +253,13 @@ function Home() {
           )}
 
           {lastChapter && !t && (
-            <button className="quran-card quran-continue" onClick={() => open(lastChapter.id)}>
+            <button className="quran-card quran-continue" onClick={() => { if (audioPct != null) void resume(); else open(lastChapter.id); }}>
               <SurahArt name={lastChapter.name_arabic} />
               <span className="min-w-0 flex-1 text-left">
                 <span className="quran-continue-kicker">Continue Reading</span>
                 <span className="quran-continue-title">{lastChapter.name_simple}</span>
-                <span className="quran-continue-meta">Surah {lastChapter.id} · Verse {last!.v} of {lastChapter.verses_count}</span>
-                <span className="quran-progress"><i style={{ width: `${Math.max(4, (last!.v / lastChapter.verses_count) * 100)}%` }} /></span>
+                <span className="quran-continue-meta">Surah {lastChapter.id} · {audioPct != null ? `${audioPct}% complete` : `Verse ${last!.v} of ${lastChapter.verses_count}`}</span>
+                <span className="quran-progress"><i style={{ width: `${Math.max(4, audioPct ?? (last!.v / lastChapter.verses_count) * 100)}%` }} /></span>
               </span>
               <span className="quran-continue-play" role="button" aria-label="Resume" onClick={(e) => { e.stopPropagation(); void resume(); }}><Play size={20} strokeWidth={1.6} strokeLinejoin="round" style={{ marginLeft: 2 }} /></span>
             </button>
@@ -520,6 +521,9 @@ function Reader({ chapterId, verse }: { chapterId: number; verse?: number }) {
     saveRead.current = now;
     const s = quranPlayer.get();
     if (s.playing && s.chapter === chapterId) return;
+    // Audio-only listening progress is a timestamp; scrolling must not erase it.
+    const prev = readJSON<Last | null>(LAST, null);
+    if (prev && prev.s === chapterId && prev.mode === "listen" && prev.ao) return;
     const top = e.currentTarget.getBoundingClientRect().top + 8;
     const el = Array.from(e.currentTarget.querySelectorAll<HTMLElement>('[id^="v-"]')).find((n) => n.getBoundingClientRect().bottom > top);
     const v = el ? Number(el.id.split(":")[1]) : 1;
