@@ -244,8 +244,8 @@ export async function getVerses(chapter: number): Promise<Verse[]> {
 }
 
 export async function getChapterAudio(reciter: number, chapter: number): Promise<ChapterAudio> {
-  const extra = RECITERS.find((r) => r.id === reciter && r.server);
-  if (extra?.server) return getMp3QuranAudio(extra, chapter);
+  const extra = RECITERS.find((r) => r.id === reciter && (r.server || r.files));
+  if (extra) return getMp3QuranAudio(extra, chapter);
   type Raw = { audio_file: { audio_url: string; timestamps: { verse_key: string; timestamp_from: number; timestamp_to: number; segments: number[][] }[] } };
   const r = await get<Raw>(`/chapter_recitations/${reciter}/${chapter}?segments=true`);
   return {
@@ -265,7 +265,7 @@ export function reciterHasSurah(r: Reciter, chapter: number): boolean {
 
 async function getMp3QuranAudio(r: Reciter, chapter: number): Promise<ChapterAudio> {
   if (!reciterHasSurah(r, chapter)) throw new Error("This reciter hasn't recorded this surah");
-  const url = `${r.server}${String(chapter).padStart(3, "0")}.mp3`;
+  const url = r.files ? r.files[chapter] : `${r.server}${String(chapter).padStart(3, "0")}.mp3`;
   if (!r.read) return { url, timings: [] };
   const key = `mp3q:${r.read}:${chapter}`;
   if (!cache.has(key)) {
