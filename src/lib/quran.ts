@@ -311,8 +311,12 @@ export function reciterPhoto(r: Reciter): string | null {
   return hit ? PHOTO_BASE + hit[1] : null;
 }
 // Reciters with a portrait come first everywhere; stable sort keeps the original order otherwise.
+// Owner-supplied reciters are pinned just below the usual picks so they stay near the top of every list.
+export const PINNED_RECITERS = new Set(OWNER_RECITERS.map((r) => r.id));
 const hasPhoto = new Map(RECITERS.map((r) => [r.id, !!reciterPhoto(r)]));
-RECITERS.sort((a, b) => Number(!hasPhoto.get(a.id)) - Number(!hasPhoto.get(b.id)));
+/** 0 = usual picks or pinned, 1 = everyone else. */
+export const featuredRank = (r: Reciter) => (POPULAR_RECITERS.includes(r.id) || PINNED_RECITERS.has(r.id) ? 0 : 1);
+RECITERS.sort((a, b) => Number(!PINNED_RECITERS.has(a.id)) - Number(!PINNED_RECITERS.has(b.id)) || Number(!hasPhoto.get(a.id)) - Number(!hasPhoto.get(b.id)));
 export const reciterHasPhoto = (r: Reciter) => !!hasPhoto.get(r.id);
 export function reciterSubtitle(r: Reciter): string {
   if (r.group === 2) return "Haramain Taraweeh";
@@ -326,7 +330,7 @@ export const reciterName = (r: Reciter) => r.name.replace(/\s*\([^)]*\)\s*$/, ""
 export const POPULAR_RECITERS = [7, 1, 13, 174, 100107, 159, 3, 10, 104, 158, 19];
 /** The "Choose a Reciter" strip on the Quran home: Mohammed Al-Luhaidan takes Saad al-Ghamdi's spot. */
 export const HOME_RECITER_IDS = [7, 1, 100107, 174, 159, 3, 10, 104, 158, 19];
-export const findReciter = (id: number) => RECITERS.find((r) => r.id === id) ?? RECITERS[0];
+export const findReciter = (id: number) => RECITERS.find((r) => r.id === id) ?? RECITERS.find((r) => r.id === POPULAR_RECITERS[0]) ?? RECITERS[0];
 
 /**
  * The "Choose a Reciter" strip on the Quran home.
@@ -420,7 +424,7 @@ export function reciterScore(r: Reciter, q: string): number {
 }
 
 /** Popular first, then Quran.com, then mp3quran extras. */
-const rank = (r: Reciter) => (POPULAR_RECITERS.includes(r.id) ? 0 : r.server ? 2 : 1);
+const rank = (r: Reciter) => (featuredRank(r) ? (r.server ? 2 : 1) : 0);
 
 export function searchReciters(q: string, limit = 5): Reciter[] {
   const n = normalizeQuery(q);

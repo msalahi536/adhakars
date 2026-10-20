@@ -7,7 +7,7 @@ import { QuranFaceBubble, QuranMiniPlayer } from "@/components/QuranMiniPlayer";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { Check, ChevronDown, ChevronLeft, ChevronRight, Clock, Heart, Infinity as InfinityIcon, Info, MoreHorizontal, RotateCcw, RotateCw, SlidersHorizontal, Loader2, Maximize2, Pause, Play, Repeat, Search, Shuffle, SkipBack, SkipForward, X } from "lucide-react";
 import {
-  findReciter, getChapterAudio, getChapters, getVerses, homeReciterRow, POPULAR_RECITERS, RECITERS, reciterHasPhoto,
+  featuredRank, findReciter, getChapterAudio, getChapters, getVerses, homeReciterRow, POPULAR_RECITERS, RECITERS, reciterHasPhoto,
   reciterHasSurah, reciterName, reciterScore, reciterPhoto, reciterSubtitle, searchChapters, searchReciters, parseVerseRef, type Chapter, type Reciter, type Verse, getVerseByKey, searchVerses, type VerseHit,
 } from "@/lib/quran";
 import { getDisplay, setDisplay, triggerHaptic, type DisplayPrefs } from "@/lib/theme";
@@ -345,7 +345,7 @@ function ReciterPicker({ back, tab }: { back?: number; tab?: "all" }) {
   useEffect(() => () => audio.current?.pause(), []);
 
   const t = q.trim().toLowerCase();
-  const list = (t ? RECITERS.map((r) => [r, reciterScore(r, t)] as const).filter(([, sc]) => sc > 0).sort((a, b) => b[1] - a[1] || Number(!POPULAR_RECITERS.includes(a[0].id)) - Number(!POPULAR_RECITERS.includes(b[0].id)) || Number(!reciterHasPhoto(a[0])) - Number(!reciterHasPhoto(b[0])) || Number(!!a[0].server) - Number(!!b[0].server)).map(([r]) => r) : RECITERS.filter((r) => {
+  const list = (t ? RECITERS.map((r) => [r, reciterScore(r, t)] as const).filter(([, sc]) => sc > 0).sort((a, b) => b[1] - a[1] || featuredRank(a[0]) - featuredRank(b[0]) || Number(!reciterHasPhoto(a[0])) - Number(!reciterHasPhoto(b[0])) || Number(!!a[0].server) - Number(!!b[0].server)).map(([r]) => r) : RECITERS.filter((r) => {
     if (filter === "popular") return POPULAR_RECITERS.includes(r.id);
     if (filter === "all") return r.group === 1;
     if (filter === "madinah") return r.group === 2 && /madinah/i.test(r.name);

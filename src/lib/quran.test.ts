@@ -47,3 +47,14 @@ describe("Quran home reciter strip", () => {
   });
 });
 
+describe("reciter list order", () => {
+  test("an owner reciter sits among the first 15 of the See All list", async () => {
+    const { POPULAR_RECITERS, RECITERS, findReciter } = await import("./quran");
+    const popIds = new Set(POPULAR_RECITERS);
+    const all = [...POPULAR_RECITERS.map(findReciter), ...RECITERS.filter((r) => r.group === 1 && !popIds.has(r.id))];
+    const pos = all.findIndex((r) => r.id === 200001);
+    expect(pos).toBeGreaterThanOrEqual(0);
+    expect(pos + 1).toBeLessThanOrEqual(15);
+  });
+});
+
