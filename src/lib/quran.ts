@@ -346,10 +346,11 @@ export const findReciter = (id: number) => RECITERS.find((r) => r.id === id) ?? 
 
 /**
  * The "Choose a Reciter" strip on the Quran home.
- * Favorited reciters lead (newest favorite first), then the usual picks; every
- * name appears once, so a Mujawwad/Murattal pair never shows up twice.
+ * The reciter they picked last leads so they can see who is selected, then
+ * favorited reciters (newest favorite first), then the usual picks; every name
+ * appears once, so a Mujawwad/Murattal pair never shows up twice.
  */
-export function homeReciterRow(favs: number[]): Reciter[] {
+export function homeReciterRow(favs: number[], selected?: number): Reciter[] {
   const row: Reciter[] = [];
   const names = new Set<string>();
   const add = (id: number) => {
@@ -360,6 +361,7 @@ export function homeReciterRow(favs: number[]): Reciter[] {
     names.add(name);
     row.push(r);
   };
+  if (selected) add(selected);
   favs.forEach(add);
   HOME_RECITER_IDS.forEach(add);
   for (const id of POPULAR_RECITERS) {
