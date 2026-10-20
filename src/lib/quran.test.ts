@@ -38,6 +38,15 @@ describe("Quran home reciter strip", () => {
     expect(row.length).toBeLessThanOrEqual(10);
     expect(row.every((r) => RECITERS.includes(r))).toBe(true);
   });
+  test("the reciter just chosen from See All leads the strip", async () => {
+    const { homeReciterRow, reciterName } = await import("./quran");
+    const row = homeReciterRow([2], 200001);
+    expect(row[0].id).toBe(200001);
+    expect(reciterName(row[0])).toBe("Muhammad Aba Al-Hasan");
+    expect(row.filter((r) => r.id === 200001).length).toBe(1);
+    const names = row.map((r) => reciterName(r));
+    expect(new Set(names).size).toBe(names.length);
+  });
   test("an unknown favorite is skipped instead of repeating the first reciter", async () => {
     const { homeReciterRow, reciterName } = await import("./quran");
     const row = homeReciterRow([999999]);

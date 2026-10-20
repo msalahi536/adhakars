@@ -184,9 +184,9 @@ function Home() {
     }
   };
   const favs = useFavoriteReciters();
-  const home = homeReciterRow(favs);
+  const home = homeReciterRow(favs, prefs.reciter);
   // The strip's snap can nudge it one tile to the right while avatars load, which
-  // would push a favorited reciter out of sight, so keep the row anchored at its start.
+  // would push the chosen reciter out of sight, so keep the row anchored at its start.
   const stripRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
     const el = stripRef.current;
@@ -194,7 +194,7 @@ function Home() {
     el.scrollLeft = 0;
     const later = [250, 800].map((ms) => window.setTimeout(() => { el.scrollLeft = 0; }, ms));
     return () => later.forEach((t) => window.clearTimeout(t));
-  }, [favs.join(",")]);
+  }, [favs.join(","), prefs.reciter]);
 
   const lastY = useRef(0);
   const [searchShown, setSearchShown] = useState(true);
