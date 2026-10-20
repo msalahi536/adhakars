@@ -213,18 +213,6 @@ function Footer({ flush = false }: { flush?: boolean }) {
           © {new Date().getFullYear()} Sahih Al-Adhkar. All rights reserved.
         </div>
       </div>
-      <div className="marketing-footer-wordmark" aria-hidden="true">
-        {"SAHIH AL-ADHKAR".split("").map((ch, i) => (
-          <span
-            key={i}
-            className="marketing-footer-letter"
-            data-space={ch === " " ? "" : undefined}
-            style={{ ["--i" as string]: i }}
-          >
-            {ch === " " ? "\u00A0" : ch}
-          </span>
-        ))}
-      </div>
     </footer>
   );
 }
