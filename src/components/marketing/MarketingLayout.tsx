@@ -156,11 +156,14 @@ export function MarketingLayout({ children, onePage = false, flushFooter = false
 function Footer({ flush = false }: { flush?: boolean }) {
   return (
     <footer
-      className={flush ? "mt-0" : "mt-24 border-t"}
-      style={{ borderColor: "rgba(31, 61, 43, 0.1)", background: "#F3EEDC" }}
+      className={`marketing-footer ${flush ? "mt-0" : "mt-24"}`}
+      style={{
+        background: "#F3EEDC",
+        borderTop: flush ? "none" : "1px solid rgba(31, 61, 43, 0.1)",
+      }}
     >
-      <div className="mx-auto max-w-6xl px-5 py-14 md:px-10">
-        <div className="grid gap-10 md:grid-cols-[1.4fr_1fr_1fr]">
+      <div className="mx-auto max-w-6xl px-5 pt-14 md:px-10">
+        <div className="grid gap-10 md:grid-cols-[1.35fr_1fr_1fr]">
           <div>
             <div className="flex items-center gap-2">
               <BrandMark />
@@ -180,44 +183,33 @@ function Footer({ flush = false }: { flush?: boolean }) {
             </p>
           </div>
           <div>
-            <div
-              className="text-xs font-semibold uppercase tracking-widest"
-              style={{ color: "rgba(31, 61, 43, 0.55)" }}
-            >
-              Explore
-            </div>
-            <ul className="mt-3 space-y-2 text-sm">
-              <li><Link to="/" style={{ color: "#1F3D2B" }}>Home</Link></li>
-              <li><Link to="/about" style={{ color: "#1F3D2B" }}>About</Link></li>
-              <li><Link to="/download" style={{ color: "#1F3D2B" }}>Download</Link></li>
-              
-              <li><Link to="/app" style={{ color: "#1F3D2B" }}>Open app</Link></li>
+            <div className="marketing-footer-label">Explore</div>
+            <ul className="mt-4 space-y-2.5">
+              <li><Link to="/" className="marketing-footer-link">Home</Link></li>
+              <li><Link to="/about" className="marketing-footer-link">About</Link></li>
+              <li><Link to="/download" className="marketing-footer-link">Download</Link></li>
+              <li><Link to="/app" className="marketing-footer-link">Open app</Link></li>
             </ul>
           </div>
           <div>
-            <div
-              className="text-xs font-semibold uppercase tracking-widest"
-              style={{ color: "rgba(31, 61, 43, 0.55)" }}
-            >
-              Legal
-            </div>
-            <ul className="mt-3 space-y-2 text-sm">
-              <li><Link to="/privacy" style={{ color: "#1F3D2B" }}>Privacy Policy</Link></li>
-              <li><Link to="/terms" style={{ color: "#1F3D2B" }}>Terms of Service</Link></li>
+            <div className="marketing-footer-label">Legal</div>
+            <ul className="mt-4 space-y-2.5">
+              <li><Link to="/privacy" className="marketing-footer-link">Privacy Policy</Link></li>
+              <li><Link to="/terms" className="marketing-footer-link">Terms of Service</Link></li>
               <li>
-                <a href="mailto:msalahi536@gmail.com" style={{ color: "#1F3D2B" }}>
+                <a href="mailto:msalahi536@gmail.com" className="marketing-footer-link">
                   msalahi536@gmail.com
                 </a>
               </li>
             </ul>
           </div>
         </div>
-        <div
-          className="mt-10 border-t pt-6 text-xs"
-          style={{ borderColor: "rgba(31, 61, 43, 0.1)", color: "rgba(31, 61, 43, 0.55)" }}
-        >
+        <div className="mt-12 text-xs" style={{ color: "rgba(31, 61, 43, 0.55)" }}>
           © {new Date().getFullYear()} Sahih Al-Adhkar. All rights reserved.
         </div>
+      </div>
+      <div className="marketing-footer-wordmark" aria-hidden="true">
+        SAHIH AL-ADHKAR
       </div>
     </footer>
   );
