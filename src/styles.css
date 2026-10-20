@@ -4606,6 +4606,9 @@ html { --ayah-active: var(--accent); }
 .quran-chips > button.is-on { background: var(--accent); color: var(--accent-foreground); border-color: transparent; }
 .quran-chips-scroll { overflow-x: auto; scrollbar-width: none; }
 .quran-chips-scroll > button { flex: none; }
+/* What the highlighting labels mean, shown above the reciter list */
+.quran-legend { display: flex; flex-direction: column; gap: 4px; padding: 10px 12px; border-radius: 14px; background: color-mix(in oklab, var(--card) 82%, var(--background)); border: 1px solid var(--border); font-size: 11.5px; line-height: 1.45; color: var(--muted-foreground); }
+.quran-legend b { font-weight: 600; color: var(--foreground); }
 .quran-chip-sm { font-size: 10px; padding: 3px 8px; border-radius: 99px; background: var(--accent); color: var(--accent-foreground); }
 .quran-chapter { display: flex; width: 100%; align-items: center; gap: 12px; padding: 14px 14px; border-radius: 20px; background: var(--surface, var(--card)); border: 1px solid var(--border); color: var(--foreground); transition: transform .15s ease; }
 .quran-chapter:active { transform: scale(0.985); }
