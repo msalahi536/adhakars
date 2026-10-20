@@ -323,6 +323,12 @@ const SYNC_LABEL: Record<Reciter["sync"], string> = {
   verse: "Verse-by-verse highlighting",
   none: "Audio only",
 };
+/** With a recitation style in front of it there is no room for "highlighting" — the legend above the list explains both terms. */
+const SYNC_SHORT: Record<Reciter["sync"], string> = {
+  word: "Word-by-word",
+  verse: "Verse-by-verse",
+  none: "Audio only",
+};
 export function reciterSubtitle(r: Reciter): string {
   if (r.group === 2) return "Haramain Taraweeh";
   if (r.group === 3) return "Other qira'at";
@@ -330,7 +336,7 @@ export function reciterSubtitle(r: Reciter): string {
   // Delivery notes like "Streaming" are inaudible to a listener — never show them.
   const style = (r.name.match(/\(([^)]+)\)/)?.[1] ?? "").trim();
   const keep = /streaming/i.test(style) ? "" : style;
-  return keep ? `${keep} · ${SYNC_LABEL[r.sync]}` : SYNC_LABEL[r.sync];
+  return keep ? `${keep} · ${SYNC_SHORT[r.sync]}` : SYNC_LABEL[r.sync];
 }
 export const reciterName = (r: Reciter) => r.name.replace(/\s*\([^)]*\)\s*$/, "");
 export const POPULAR_RECITERS = [7, 1, 13, 174, 100107, 159, 3, 10, 104, 158, 19];

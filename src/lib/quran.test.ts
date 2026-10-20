@@ -71,5 +71,10 @@ describe("reciter labels", () => {
     expect(reciterSubtitle(word)).toBe("Word-by-word highlighting");
     expect(reciterSubtitle(verse)).toBe("Verse-by-verse highlighting");
   });
+  test("no label is so long the row clips it", async () => {
+    const { RECITERS, reciterSubtitle } = await import("./quran");
+    const long = RECITERS.map((r) => [r.id, reciterSubtitle(r)] as const).filter(([, s]) => s.length > 30);
+    expect(long).toEqual([]);
+  });
 });
 
