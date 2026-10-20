@@ -253,7 +253,7 @@ function Home() {
           )}
 
           {lastChapter && !t && (
-            <button className="quran-card quran-continue" onClick={() => open(lastChapter.id)}>
+            <button className="quran-card quran-continue" onClick={() => { if (audioPct != null) void resume(); else open(lastChapter.id); }}>
               <SurahArt name={lastChapter.name_arabic} />
               <span className="min-w-0 flex-1 text-left">
                 <span className="quran-continue-kicker">Continue Reading</span>
