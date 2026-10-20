@@ -157,6 +157,11 @@ function Footer({ flush = false }: { flush?: boolean }) {
   return (
     <footer
       className={`marketing-footer ${flush ? "mt-0" : "mt-24"}`}
+      onMouseMove={(e) => {
+        const r = e.currentTarget.getBoundingClientRect();
+        e.currentTarget.style.setProperty("--mx", `${e.clientX - r.left}px`);
+        e.currentTarget.style.setProperty("--my", `${e.clientY - r.top}px`);
+      }}
       style={{
         background: "#F3EEDC",
         borderTop: flush ? "none" : "1px solid rgba(31, 61, 43, 0.1)",
@@ -209,7 +214,16 @@ function Footer({ flush = false }: { flush?: boolean }) {
         </div>
       </div>
       <div className="marketing-footer-wordmark" aria-hidden="true">
-        SAHIH AL-ADHKAR
+        {"SAHIH AL-ADHKAR".split("").map((ch, i) => (
+          <span
+            key={i}
+            className="marketing-footer-letter"
+            data-space={ch === " " ? "" : undefined}
+            style={{ ["--i" as string]: i }}
+          >
+            {ch === " " ? "\u00A0" : ch}
+          </span>
+        ))}
       </div>
     </footer>
   );
