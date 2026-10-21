@@ -216,10 +216,10 @@ export function GiveawayDialog({ open, onClose, celebrate }: { open: boolean; on
                   </button>
                 </div>
               </Bar>
-              {goals.length > 0 && (newGoals.length > 0 || !entered.length) && (
+              {goals.length > 0 && (!entered.length || hasNew) && (
                 <div className="giveaway-panel space-y-2 rounded-2xl px-3 py-3">
                   <p className="text-sm font-semibold">
-                    {entered.length ? "New goal complete — add it to your entry" : "Goal complete — enter the giveaway"}
+                    {entered.length ? "New entries ready — add them" : "Goal complete — enter the giveaway"}
                   </p>
                   {!entered.length && <p className="text-[11px] leading-4 text-soft">Submit now — you can still finish the other goals afterwards for extra entries.</p>}
                   <input
@@ -236,8 +236,8 @@ export function GiveawayDialog({ open, onClose, celebrate }: { open: boolean; on
                   </label>
                 </div>
               )}
-              {entered.length > 0 && !newGoals.length && (
-                <p className="px-1 text-center text-xs text-accent">You're entered with {entered.length} of 3 {entered.length === 1 ? "entry" : "entries"}.{entered.length < 3 ? " Keep going — each goal you finish adds another entry. Come back here to add it." : " The winner will be contacted by email."}</p>
+              {entered.length > 0 && !hasNew && (
+                <p className="px-1 text-center text-xs text-accent">You're entered with {enteredEntries} {enteredEntries === 1 ? "entry" : "entries"}. Keep going — every goal you finish and every 5 downloads adds another entry.</p>
               )}
               {msg && <p className="px-1 text-center text-xs text-soft">{msg}</p>}
             </>
