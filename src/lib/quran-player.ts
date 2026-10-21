@@ -246,6 +246,13 @@ export const quranPlayer = {
       const a = audioEl();
       a.src = audio.url;
       a.currentTime = 0;
+      // Returning to the same surah with the same reciter resumes the saved spot.
+      if (!fromKey) {
+        try {
+          const saved = JSON.parse(localStorage.getItem(LAST) || "null");
+          if (saved && saved.mode === "listen" && saved.s === chapter && saved.r === reciterId && saved.t > 1 && !(saved.d && saved.t > saved.d - 3)) resumeAt = saved.t;
+        } catch { /* ignore */ }
+      }
       a.playbackRate = state.rate;
       set({ audio, cur: 0, dur: 0 });
       setMetadata();
