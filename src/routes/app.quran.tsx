@@ -522,9 +522,9 @@ function Reader({ chapterId, verse }: { chapterId: number; verse?: number }) {
     saveRead.current = now;
     const s = quranPlayer.get();
     if (s.playing && s.chapter === chapterId) return;
-    // Audio-only listening progress is a timestamp; scrolling must not erase it.
+    // Listening progress is an exact timestamp; scrolling must not erase it.
     const prev = readJSON<Last | null>(LAST, null);
-    if (prev && prev.s === chapterId && prev.mode === "listen" && prev.ao) return;
+    if (prev && prev.s === chapterId && prev.mode === "listen" && prev.t) return;
     const top = e.currentTarget.getBoundingClientRect().top + 8;
     const el = Array.from(e.currentTarget.querySelectorAll<HTMLElement>('[id^="v-"]')).find((n) => n.getBoundingClientRect().bottom > top);
     const v = el ? Number(el.id.split(":")[1]) : 1;

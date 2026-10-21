@@ -260,7 +260,8 @@ export const quranPlayer = {
     // the same spot so lock-screen Play keeps working without opening the app.
     const stale = !!a.error || a.networkState === 3 || (a.readyState === 0 && !!a.src);
     if (stale) {
-      resumeAt = t ? t.from / 1000 : a.currentTime || state.cur;
+      // Keep a pending resume point (saved listening spot) instead of resetting to 0.
+      resumeAt = t ? t.from / 1000 : resumeAt ?? (a.currentTime || state.cur);
       a.src = state.audio.url; a.load();
     } else if (t) a.currentTime = t.from / 1000;
     a.playbackRate = state.rate;
