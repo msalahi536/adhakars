@@ -5064,8 +5064,61 @@ body.has-adhkar-mini.adhkar-tucked .quran-player:not(.rec-panel), body.has-adhka
   transition: transform 150ms ease;
 }
 .quran-tafsir-btn:active { transform: scale(0.92); }
-.tafsir-body { font-size: 15px; line-height: 1.75; }
+.tafsir-card {
+  background: color-mix(in oklab, var(--surface, var(--card)) 92%, transparent);
+  border: 1px solid color-mix(in oklab, var(--border) 70%, transparent);
+  box-shadow: 0 6px 22px -14px color-mix(in oklab, var(--accent) 45%, transparent);
+  color: var(--foreground); transition: transform 150ms ease;
+}
+.tafsir-title { color: var(--accent); }
+.tafsir-hero { border-radius: 26px; }
+.tafsir-pills {
+  display: flex; gap: 4px; padding: 4px; border-radius: 999px;
+  background: color-mix(in oklab, var(--accent) 9%, var(--card));
+  border: 1px solid color-mix(in oklab, var(--border) 70%, transparent);
+}
+.tafsir-pills button {
+  flex: 1; height: 38px; border-radius: 999px; font-size: 13px; font-weight: 500;
+  color: color-mix(in oklab, var(--foreground) 65%, transparent); transition: background 200ms ease, color 200ms ease;
+}
+.tafsir-pills button.is-on {
+  color: var(--surface-deep-accent-fg, var(--card));
+  background: linear-gradient(180deg, color-mix(in oklab, var(--accent) 88%, white), var(--accent));
+  box-shadow: 0 4px 12px -6px var(--accent);
+}
+.tafsir-book-icon {
+  display: flex; height: 48px; width: 48px; flex-shrink: 0; align-items: center; justify-content: center; border-radius: 999px;
+  background: color-mix(in oklab, var(--accent) 12%, var(--card)); color: color-mix(in oklab, var(--foreground) 70%, var(--accent));
+}
+.tafsir-num {
+  display: flex; min-width: 38px; height: 38px; padding: 0 6px; flex-shrink: 0; align-items: center; justify-content: center; border-radius: 999px;
+  font-size: 13px; font-weight: 600; color: var(--accent); background: color-mix(in oklab, var(--accent) 12%, var(--card));
+}
+.tafsir-mini-icon {
+  display: flex; height: 28px; width: 28px; flex-shrink: 0; align-items: center; justify-content: center; border-radius: 9px;
+  color: var(--accent); border: 1px solid color-mix(in oklab, var(--accent) 25%, transparent);
+}
+.tafsir-chips { display: flex; gap: 8px; overflow-x: auto; scrollbar-width: none; padding-bottom: 2px; }
+.tafsir-chips::-webkit-scrollbar { display: none; }
+.tafsir-chip { display: inline-flex; flex-shrink: 0; align-items: center; gap: 8px; border-radius: 999px; padding: 9px 16px; font-size: 13px; }
+.tafsir-action { display: flex; flex-direction: column; align-items: center; gap: 6px; border-radius: 20px; padding: 14px 6px; font-size: 11px; font-weight: 500; }
+.tafsir-action:active { transform: scale(0.96); }
+.tafsir-action-icon { display: flex; height: 32px; width: 32px; align-items: center; justify-content: center; border-radius: 999px; color: var(--accent); }
+.tafsir-action-icon.is-solid { background: var(--accent); color: var(--surface-deep-accent-fg, var(--card)); box-shadow: 0 4px 12px -4px var(--accent); }
+.tafsir-step {
+  display: flex; height: 30px; width: 30px; align-items: center; justify-content: center; border-radius: 10px;
+  background: color-mix(in oklab, var(--card) 80%, transparent); color: var(--foreground); border: 1px solid var(--border);
+}
+.tafsir-step:disabled { opacity: .4; }
+.tafsir-word {
+  display: flex; align-items: center; gap: 16px; padding: 8px 12px; border-radius: 14px;
+  background: color-mix(in oklab, var(--accent) 6%, var(--card));
+}
+.tafsir-word > span:first-child { min-width: 72px; text-align: center; }
+.tafsir-page > * { animation: tafsir-in 260ms ease both; }
+@keyframes tafsir-in { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+.tafsir-body { font-size: 14px; line-height: 1.75; }
 .tafsir-body .is-rtl { font-family: var(--font-arabic, serif); font-size: 18px; line-height: 2; text-align: right; }
-.tafsir-body h1, .tafsir-body h2, .tafsir-body h3, .tafsir-body h4 { font-weight: 700; font-size: 1.05em; margin: 1em 0 .4em; }
+.tafsir-body h1, .tafsir-body h2, .tafsir-body h3, .tafsir-body h4 { font-weight: 700; font-size: 1.05em; margin: 1em 0 .4em; color: var(--accent); }
 .tafsir-body p { margin: 0 0 .8em; }
 .tafsir-body ul, .tafsir-body ol { padding-inline-start: 1.2em; margin-bottom: .8em; list-style: disc; }
