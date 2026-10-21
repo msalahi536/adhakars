@@ -34,6 +34,7 @@ import { Route as AppRuqyahRouteImport } from './routes/app.ruqyah'
 import { Route as AppSalahRouteImport } from './routes/app.salah'
 import { Route as AppSettingsRouteImport } from './routes/app.settings'
 import { Route as AppSleepRouteImport } from './routes/app.sleep'
+import { Route as AppTafsirRouteImport } from './routes/app.tafsir'
 import { Route as AppTasbihRouteImport } from './routes/app.tasbih'
 import { Route as AppTermsRouteImport } from './routes/app.terms'
 import { Route as AppMoreZakatRouteImport } from './routes/app.more_.zakat'
@@ -163,6 +164,11 @@ const AppSleepRoute = AppSleepRouteImport.update({
   path: '/sleep',
   getParentRoute: () => AppRoute,
 } as any)
+const AppTafsirRoute = AppTafsirRouteImport.update({
+  id: '/tafsir',
+  path: '/tafsir',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppTasbihRoute = AppTasbihRouteImport.update({
   id: '/tasbih',
   path: '/tasbih',
@@ -204,6 +210,7 @@ export interface FileRoutesByFullPath {
   '/app/salah': typeof AppSalahRoute
   '/app/settings': typeof AppSettingsRoute
   '/app/sleep': typeof AppSleepRoute
+  '/app/tafsir': typeof AppTafsirRoute
   '/app/tasbih': typeof AppTasbihRoute
   '/app/terms': typeof AppTermsRoute
   '/app/': typeof AppIndexRoute
@@ -233,6 +240,7 @@ export interface FileRoutesByTo {
   '/app/salah': typeof AppSalahRoute
   '/app/settings': typeof AppSettingsRoute
   '/app/sleep': typeof AppSleepRoute
+  '/app/tafsir': typeof AppTafsirRoute
   '/app/tasbih': typeof AppTasbihRoute
   '/app/terms': typeof AppTermsRoute
   '/app': typeof AppIndexRoute
@@ -264,6 +272,7 @@ export interface FileRoutesById {
   '/app/salah': typeof AppSalahRoute
   '/app/settings': typeof AppSettingsRoute
   '/app/sleep': typeof AppSleepRoute
+  '/app/tafsir': typeof AppTafsirRoute
   '/app/tasbih': typeof AppTasbihRoute
   '/app/terms': typeof AppTermsRoute
   '/app/': typeof AppIndexRoute
@@ -296,6 +305,7 @@ export interface FileRouteTypes {
     | '/app/salah'
     | '/app/settings'
     | '/app/sleep'
+    | '/app/tafsir'
     | '/app/tasbih'
     | '/app/terms'
     | '/app/'
@@ -325,6 +335,7 @@ export interface FileRouteTypes {
     | '/app/salah'
     | '/app/settings'
     | '/app/sleep'
+    | '/app/tafsir'
     | '/app/tasbih'
     | '/app/terms'
     | '/app'
@@ -355,6 +366,7 @@ export interface FileRouteTypes {
     | '/app/salah'
     | '/app/settings'
     | '/app/sleep'
+    | '/app/tafsir'
     | '/app/tasbih'
     | '/app/terms'
     | '/app/'
@@ -550,6 +562,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppSleepRouteImport
       parentRoute: typeof AppRoute
     }
+    '/app/tafsir': {
+      id: '/app/tafsir'
+      path: '/tafsir'
+      fullPath: '/app/tafsir'
+      preLoaderRoute: typeof AppTafsirRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/app/tasbih': {
       id: '/app/tasbih'
       path: '/tasbih'
@@ -590,6 +609,7 @@ interface AppRouteChildren {
   AppSalahRoute: typeof AppSalahRoute
   AppSettingsRoute: typeof AppSettingsRoute
   AppSleepRoute: typeof AppSleepRoute
+  AppTafsirRoute: typeof AppTafsirRoute
   AppTasbihRoute: typeof AppTasbihRoute
   AppTermsRoute: typeof AppTermsRoute
   AppIndexRoute: typeof AppIndexRoute
@@ -612,6 +632,7 @@ const AppRouteChildren: AppRouteChildren = {
   AppSalahRoute: AppSalahRoute,
   AppSettingsRoute: AppSettingsRoute,
   AppSleepRoute: AppSleepRoute,
+  AppTafsirRoute: AppTafsirRoute,
   AppTasbihRoute: AppTasbihRoute,
   AppTermsRoute: AppTermsRoute,
   AppIndexRoute: AppIndexRoute,

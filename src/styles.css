@@ -5054,3 +5054,18 @@ body.has-adhkar-mini .quran-player:not(.rec-panel), body.has-adhkar-mini .mini-p
 body.quran-tucked .mini-face.is-adhkar { right: 74px; }
 body:not(.quran-tucked) .mini-face.is-adhkar { right: 14px; }
 body.has-adhkar-mini.adhkar-tucked .quran-player:not(.rec-panel), body.has-adhkar-mini.adhkar-tucked .mini-pill:not(.is-adhkar) { bottom: calc(env(safe-area-inset-bottom, 0px) + 86px); }
+
+/* Tafsir */
+.quran-tafsir-btn {
+  margin-top: 6px; display: inline-flex; align-items: center; justify-content: center;
+  height: 20px; padding: 0 7px; border-radius: 999px; font-size: 9px; font-weight: 700; letter-spacing: .02em;
+  color: var(--accent); background: color-mix(in oklab, var(--accent) 12%, transparent);
+  border: 1px solid color-mix(in oklab, var(--accent) 25%, transparent);
+  transition: transform 150ms ease;
+}
+.quran-tafsir-btn:active { transform: scale(0.92); }
+.tafsir-body { font-size: 15px; line-height: 1.75; }
+.tafsir-body .is-rtl { font-family: var(--font-arabic, serif); font-size: 18px; line-height: 2; text-align: right; }
+.tafsir-body h1, .tafsir-body h2, .tafsir-body h3, .tafsir-body h4 { font-weight: 700; font-size: 1.05em; margin: 1em 0 .4em; }
+.tafsir-body p { margin: 0 0 .8em; }
+.tafsir-body ul, .tafsir-body ol { padding-inline-start: 1.2em; margin-bottom: .8em; list-style: disc; }

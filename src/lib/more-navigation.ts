@@ -9,6 +9,7 @@ export const MORE_DESTINATIONS = [
   "/app/fasting",
   "/app/tasbih",
   "/app/more/zakat",
+  "/app/tafsir",
 ] as const;
 
 export type MoreDestination = (typeof MORE_DESTINATIONS)[number];

@@ -2,7 +2,7 @@ import { Gift } from "lucide-react";
 import { giveawayActive } from "@/lib/giveaway";
 import { useEffect, useState } from "react";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { BedDouble, Compass, ChevronRight, HandHeart, Moon, ShieldCheck, Landmark, MoonStar, BookOpen, CalendarDays, X, ScrollText } from "lucide-react";
+import { BedDouble, Compass, ChevronRight, HandHeart, Moon, ShieldCheck, Landmark, MoonStar, BookOpen, CalendarDays, X, ScrollText, Library } from "lucide-react";
 import {
   getConsistency,
   getLifetime,
@@ -40,7 +40,7 @@ export const Route = createFileRoute("/app/more")({
 });
 
 type Tile = {
-  to: "/app/sleep" | "/app/qibla" | "/app/about" | "/app/period" | "/app/ruqyah" | "/app/hajj" | "/app/fasting" | "/app/duas" | "/app/tasbih" | "/app/hadith";
+  to: "/app/sleep" | "/app/qibla" | "/app/about" | "/app/period" | "/app/ruqyah" | "/app/hajj" | "/app/fasting" | "/app/duas" | "/app/tasbih" | "/app/hadith" | "/app/tafsir";
 
   title: string;
   subtitle: string;
@@ -49,6 +49,7 @@ type Tile = {
 
 const tiles: Tile[] = [
   { to: "/app/hadith", title: "Hadith Library", subtitle: "40,000+ hadith by book and topic", Icon: ScrollText },
+  { to: "/app/tafsir", title: "Tafsir Library", subtitle: "20 classical tafsir books, verse by verse", Icon: Library },
   { to: "/app/duas", title: "Dua Library", subtitle: "50 authentic duas for every feeling", Icon: BookOpen },
   { to: "/app/qibla", title: "Qibla Finder", subtitle: "Find the direction of the Ka'bah", Icon: Compass },
   { to: "/app/tasbih", title: "Tasbih", subtitle: "A calm digital counter", Icon: TasbihIcon },

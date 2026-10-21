@@ -227,7 +227,7 @@ function VerseTafsir({ book, vkey, surah }: { book: number; vkey: string; surah?
         <div className="label-caps text-[10px]" style={{ color: "var(--muted-foreground)" }}>{surah?.name_simple ?? "Surah"} · {vkey}</div>
         {verse.data ? (
           <>
-            {verse.data.arabic && <p className="mt-2 text-right text-[22px] leading-loose" dir="rtl" lang="ar" style={{ fontFamily: "var(--font-arabic, serif)" }}>{verse.data.arabic}</p>}
+            {verse.data.text && <p className="mt-2 text-right text-[22px] leading-loose" dir="rtl" lang="ar" style={{ fontFamily: "var(--font-arabic, serif)" }}>{verse.data.text}</p>}
             {verse.data.translation && <p className="mt-2 text-sm leading-relaxed" style={{ color: "var(--muted-foreground)" }}>{verse.data.translation}</p>}
           </>
         ) : <p className="mt-2 text-xs" style={{ color: "var(--muted-foreground)" }}>Loading verse…</p>}
