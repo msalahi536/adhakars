@@ -246,6 +246,13 @@ export const quranPlayer = {
       const a = audioEl();
       a.src = audio.url;
       a.currentTime = 0;
+      // Returning to the same surah with the same reciter resumes the saved spot.
+      if (!fromKey) {
+        try {
+          const saved = JSON.parse(localStorage.getItem(LAST) || "null");
+          if (saved && saved.mode === "listen" && saved.s === chapter && saved.r === reciterId && saved.t > 1 && !(saved.d && saved.t > saved.d - 3)) resumeAt = saved.t;
+        } catch { /* ignore */ }
+      }
       a.playbackRate = state.rate;
       set({ audio, cur: 0, dur: 0 });
       setMetadata();
@@ -260,7 +267,8 @@ export const quranPlayer = {
     // the same spot so lock-screen Play keeps working without opening the app.
     const stale = !!a.error || a.networkState === 3 || (a.readyState === 0 && !!a.src);
     if (stale) {
-      resumeAt = t ? t.from / 1000 : a.currentTime || state.cur;
+      // Keep a pending resume point (saved listening spot) instead of resetting to 0.
+      resumeAt = t ? t.from / 1000 : resumeAt ?? (a.currentTime || state.cur);
       a.src = state.audio.url; a.load();
     } else if (t) a.currentTime = t.from / 1000;
     a.playbackRate = state.rate;
