@@ -2,7 +2,7 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useEffect, useMemo, useRef, useState } from "react";
 import {
-  BookOpen, Bookmark, BookmarkCheck, ChevronDown, ChevronLeft, ChevronRight, Clock, Copy, Check, History, Layers, MapPin, MessageSquare,
+  BookOpen, Bookmark, BookmarkCheck, ChevronDown, ChevronLeft, ChevronRight, Clock, Copy, Check, History, MapPin, MessageSquare,
   Pause, Play, Search, Volume2, X, Hash,
 } from "lucide-react";
 import { HeaderBackButton } from "@/components/HeaderBackButton";
@@ -538,5 +538,3 @@ function CopyAction({ text }: { text: string }) {
     </button>
   );
 }
-// Layers icon kept available for future Topics tab.
-void Layers;
