@@ -80,6 +80,8 @@ export type GiveawayEntry = {
   updated_at: string;
 };
 
+export type PendingReferrer = { code: string; referrals: number; last: string };
+
 export const adminListGiveaway = createServerFn({ method: "POST" })
   .inputValidator((d: unknown) => z.object({ password: z.string().min(1) }).parse(d))
   .handler(async ({ data }) => {
@@ -92,5 +94,45 @@ export const adminListGiveaway = createServerFn({ method: "POST" })
       .order("created_at", { ascending: false })
       .limit(5000);
     if (error) throw new Error(error.message);
-    return { items: (rows ?? []) as GiveawayEntry[] };
+
+    // Live referral counts (entries only store a snapshot from submission time).
+    const counts = new Map<string, { n: number; last: string }>();
+    for (let from = 0; ; from += 1000) {
+      const { data: refs, error: rErr } = await supabaseAdmin
+        .from("giveaway_referrals")
+        .select("ref_code, created_at")
+        .range(from, from + 999);
+      if (rErr) throw new Error(rErr.message);
+      for (const r of refs ?? []) {
+        const c = counts.get(r.ref_code) ?? { n: 0, last: r.created_at };
+        c.n += 1;
+        if (r.created_at > c.last) c.last = r.created_at;
+        counts.set(r.ref_code, c);
+      }
+      if (!refs || refs.length < 1000) break;
+    }
+
+    const items = (rows ?? []) as GiveawayEntry[];
+    const updated: GiveawayEntry[] = [];
+    for (const e of items) {
+      const referrals = Math.max(e.referrals, counts.get(e.device_id)?.n ?? 0);
+      const goals = e.goals.filter((g) => g !== "referrals");
+      if (referrals >= 5) goals.push("referrals");
+      const next = { ...e, referrals, goals, tickets: Math.max(1, goals.length) };
+      if (next.referrals !== e.referrals || next.tickets !== e.tickets) {
+        await supabaseAdmin
+          .from("giveaway_entries")
+          .update({ referrals: next.referrals, goals: next.goals, tickets: next.tickets })
+          .eq("id", e.id);
+      }
+      updated.push(next);
+    }
+
+    const entered = new Set(items.map((e) => e.device_id));
+    const pending: PendingReferrer[] = [...counts]
+      .filter(([code]) => !entered.has(code))
+      .map(([code, c]) => ({ code, referrals: c.n, last: c.last }))
+      .sort((a, b) => b.referrals - a.referrals);
+
+    return { items: updated, pending };
   });
