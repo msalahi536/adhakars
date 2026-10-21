@@ -101,13 +101,22 @@ export function setEntered(goals: string[]) {
   emit();
 }
 
-/** One ticket per completed goal. */
+/** Completed goals — one entry each, except referrals which grant one entry per 5 downloads. */
 export function completedGoals(p: { surahs: number; dhikr: number; referrals: number }) {
   const g: string[] = [];
   if (p.surahs >= GOALS.surahs) g.push("surahs");
   if (p.dhikr >= GOALS.dhikr) g.push("dhikr");
   if (p.referrals >= GOALS.referrals) g.push("referrals");
   return g;
+}
+
+/** Total entries: one per completed goal, plus one extra entry for every 5 downloads. */
+export function countEntries(p: { surahs: number; dhikr: number; referrals: number }) {
+  let t = 0;
+  if (p.surahs >= GOALS.surahs) t += 1;
+  if (p.dhikr >= GOALS.dhikr) t += 1;
+  t += Math.floor(p.referrals / GOALS.referrals);
+  return t;
 }
 
 /** Weighted pick: each entry appears once per ticket. */

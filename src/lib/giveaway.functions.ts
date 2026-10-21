@@ -50,12 +50,17 @@ export const submitGiveawayEntry = createServerFn({ method: "POST" })
     if (data.dhikr >= 500) goals.push("dhikr");
     if (referrals >= 5) goals.push("referrals");
     if (!goals.length) return { ok: false as const, error: "Complete a goal first." };
+    // One entry per completed goal, plus one extra entry for every 5 downloads.
+    const tickets = Math.max(
+      1,
+      goals.filter((g) => g !== "referrals").length + Math.floor(referrals / 5),
+    );
     const { error } = await supabaseAdmin.from("giveaway_entries").upsert(
       {
         device_id: data.code,
         email: data.email,
         goals,
-        tickets: goals.length,
+        tickets,
         surahs: data.surahs,
         dhikr: data.dhikr,
         referrals,
