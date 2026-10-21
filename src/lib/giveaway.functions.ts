@@ -123,7 +123,13 @@ export const adminListGiveaway = createServerFn({ method: "POST" })
       const referrals = Math.max(e.referrals, counts.get(e.device_id)?.n ?? 0);
       const goals = e.goals.filter((g) => g !== "referrals");
       if (referrals >= 5) goals.push("referrals");
-      const next = { ...e, referrals, goals, tickets: Math.max(1, goals.length) };
+      // One entry per completed goal, plus one extra entry for every 5 downloads.
+      const next = {
+        ...e,
+        referrals,
+        goals,
+        tickets: Math.max(1, goals.filter((g) => g !== "referrals").length + Math.floor(referrals / 5)),
+      };
       if (next.referrals !== e.referrals || next.tickets !== e.tickets) {
         await supabaseAdmin
           .from("giveaway_entries")

@@ -469,7 +469,7 @@ function GiveawayAdmin({ password }: { password: string }) {
   return (
     <div>
       <h1 className="text-2xl font-semibold">Ilm Guide giveaway</h1>
-      <p className="mt-1 text-sm text-muted-foreground">{items.length} people · {tickets} total entries. One entry per completed goal.</p>
+      <p className="mt-1 text-sm text-muted-foreground">{items.length} people · {tickets} total entries. One entry per completed goal, plus one entry for every 5 downloads.</p>
       <button disabled={!tickets} onClick={() => setWinner(drawWinner(items))} className="mt-4 rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground disabled:opacity-50">Draw random winner</button>
       {winner && (
         <div className="mt-4 rounded-xl border border-primary bg-primary/10 p-4">
