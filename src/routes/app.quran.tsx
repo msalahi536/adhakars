@@ -2,9 +2,10 @@ import { favoritesFirst, toggleFavorite, useFavoriteReciters } from "@/lib/quran
 import { Fragment, memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { markSurahComplete } from "@/lib/giveaway";
+import { preferredTafsirBook } from "@/lib/tafsir";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { QuranFaceBubble, QuranMiniPlayer } from "@/components/QuranMiniPlayer";
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { Check, ChevronDown, ChevronLeft, ChevronRight, Clock, Heart, Infinity as InfinityIcon, Info, MoreHorizontal, RotateCcw, RotateCw, SlidersHorizontal, Loader2, Maximize2, Pause, Play, Repeat, Search, Shuffle, SkipBack, SkipForward, X } from "lucide-react";
 import {
   featuredRank, findReciter, getChapterAudio, getChapters, getVerses, homeReciterRow, POPULAR_RECITERS, RECITERS, reciterHasPhoto,
@@ -905,6 +906,7 @@ const VerseCard = memo(function VerseCard({ verse: v, active, word, translit, tr
       <div className="quran-verse-side">
         <AyahMarker n={v.number} />
         <button className="quran-play-sm" aria-label={`Play verse ${v.number}`} onClick={() => onPlay(v.key)}><Play size={13} fill="currentColor" style={{ marginLeft: 2 }} /></button>
+        <Link to="/app/tafsir" search={{ book: preferredTafsirBook(), v: v.key }} className="quran-tafsir-btn" aria-label={`Tafsir of verse ${v.key}`}>Tafsir</Link>
       </div>
       <div className="min-w-0 flex-1">
         {arabic && <p className="quran-ar" dir="rtl" lang="ar" onClick={() => onPlay(v.key)}>
