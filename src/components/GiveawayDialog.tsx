@@ -8,6 +8,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import {
   GOALS,
   completedGoals,
+  countEntries,
   getDeviceCode,
   getDhikr,
   getEntered,
@@ -100,6 +101,10 @@ export function GiveawayDialog({ open, onClose, celebrate }: { open: boolean; on
 
   const goals = completedGoals({ surahs, dhikr, referrals: refs });
   const newGoals = goals.filter((g) => !entered.includes(g));
+  // Entries: one per completed goal, plus one extra entry for every 5 downloads.
+  const enteredEntries = entered.filter((g) => g !== "referrals").length + (entered.includes("referrals") ? Math.floor(refs / GOALS.referrals) : 0);
+  const currentEntries = countEntries({ surahs, dhikr, referrals: refs });
+  const hasNew = entered.length > 0 && currentEntries > enteredEntries;
   const link = status === "joined" ? referralLink() : "";
 
   const copy = async () => {
@@ -123,7 +128,7 @@ export function GiveawayDialog({ open, onClose, celebrate }: { open: boolean; on
       if (r.ok) {
         setEntered(r.goals);
         localStorage.setItem("giveaway:email", email.trim());
-        setMsg(r.goals.length < 3 ? "Barakallahu feek! You can still finish the other goals for extra entries." : "Barakallahu feek! You have all 3 entries.");
+        setMsg("Barakallahu feek! You can keep going — every extra goal and every 5 downloads is another entry.");
       } else setMsg(r.error);
     } catch {
       setMsg("Please check your email and try again.");
@@ -179,7 +184,7 @@ export function GiveawayDialog({ open, onClose, celebrate }: { open: boolean; on
                 <p className="label-caps mb-1.5 px-1 text-soft">How to enter</p>
                 <p className="flex items-start gap-2 px-1 text-xs leading-5">
                   <Target size={15} strokeWidth={1.7} className="mt-[3px] shrink-0 text-accent" />
-                  <span>Finish any one goal: <b>5 surahs</b>, <b>500 dhikr</b> or <b>5 downloads</b>. Each goal you finish is another entry — up to 3.</span>
+                  <span>Finish any one goal: <b>5 surahs</b>, <b>500 dhikr</b> or <b>5 downloads</b>. Each goal is one entry — and every 5 downloads is another entry.</span>
                 </p>
               </div>
               <Oath checked={o1} onChange={setO1}>I swear by Allah to truthfully complete the requirements and not cheat or deceive the counters.</Oath>
@@ -193,7 +198,7 @@ export function GiveawayDialog({ open, onClose, celebrate }: { open: boolean; on
                   <p className="mt-0.5 text-xs leading-5 opacity-90">You {GOAL_NAME[celebrate] ?? "finished a goal"}. That's one more entry — submit it below.</p>
                 </div>
               )}
-              <p className="px-1 text-center text-[11px] leading-4 text-soft">Each goal is one entry, up to 3. You can submit after your first goal and add more later.</p>
+              <p className="px-1 text-center text-[11px] leading-4 text-soft">Each goal is one entry, and every 5 people you bring is another entry. You can submit after your first goal and add more later.</p>
               <Bar label="Read 5 surahs" value={surahs} goal={GOALS.surahs}>
                 <p className="mt-1.5 text-[11px] text-soft">Listen to a full surah until it ends, or read it to the bottom of the page.</p>
               </Bar>
