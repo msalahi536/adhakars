@@ -455,10 +455,14 @@ function SuggestionsAdmin({ password }: { password: string }) {
 function GiveawayAdmin({ password }: { password: string }) {
   const load = useServerFn(adminListGiveaway);
   const [items, setItems] = useState<GiveawayEntry[]>([]);
+  const [pending, setPending] = useState<{ code: string; referrals: number; last: string }[]>([]);
   const [loading, setLoading] = useState(true);
   const [winner, setWinner] = useState<GiveawayEntry | null>(null);
   useEffect(() => {
-    load({ data: { password } }).then((r) => setItems(r.items)).catch(() => setItems([])).finally(() => setLoading(false));
+    load({ data: { password } })
+      .then((r) => { setItems(r.items); setPending(r.pending); })
+      .catch(() => setItems([]))
+      .finally(() => setLoading(false));
   }, [load, password]);
   const tickets = items.reduce((s, e) => s + e.tickets, 0);
   const label: Record<string, string> = { surahs: "5 surahs", dhikr: "500 dhikr", referrals: "5 downloads" };
@@ -486,6 +490,20 @@ function GiveawayAdmin({ password }: { password: string }) {
               <p className="mt-1 text-xs text-muted-foreground">{new Date(e.created_at).toLocaleString()} · code {e.device_id}</p>
             </div>
           ))}
+        </div>
+      )}
+      {pending.length > 0 && (
+        <div className="mt-8">
+          <h2 className="text-lg font-semibold">Referrals from people who haven't entered yet</h2>
+          <p className="mt-1 text-xs text-muted-foreground">Saved downloads-link visits. They appear above once that person submits their email.</p>
+          <div className="mt-3 grid gap-2">
+            {pending.map((p) => (
+              <div key={p.code} className="flex items-center justify-between rounded-xl border border-border bg-card px-4 py-3 text-sm">
+                <span>code {p.code}</span>
+                <span className="text-xs text-muted-foreground">{p.referrals} downloads · last {new Date(p.last).toLocaleString()}</span>
+              </div>
+            ))}
+          </div>
         </div>
       )}
     </div>
