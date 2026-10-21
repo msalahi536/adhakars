@@ -100,7 +100,6 @@ export function GiveawayDialog({ open, onClose, celebrate }: { open: boolean; on
   }, [open, countRefs]);
 
   const goals = completedGoals({ surahs, dhikr, referrals: refs });
-  const newGoals = goals.filter((g) => !entered.includes(g));
   // Entries: one per completed goal, plus one extra entry for every 5 downloads.
   const enteredEntries = entered.filter((g) => g !== "referrals").length + (entered.includes("referrals") ? Math.floor(refs / GOALS.referrals) : 0);
   const currentEntries = countEntries({ surahs, dhikr, referrals: refs });
@@ -254,7 +253,7 @@ export function GiveawayDialog({ open, onClose, celebrate }: { open: boolean; on
                 Participate <ArrowRight size={16} />
               </Button>
             </>
-          ) : goals.length > 0 && (newGoals.length > 0 || !entered.length) ? (
+          ) : goals.length > 0 && (!entered.length || hasNew) ? (
             <Button className="h-11 w-full rounded-full" disabled={!consent || !email.includes("@") || busy} onClick={onSubmit}>
               {busy ? "Submitting…" : "Submit entry"}
             </Button>
