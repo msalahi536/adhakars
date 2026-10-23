@@ -757,7 +757,6 @@ const AUDIO_TOGGLES: { key: keyof DisplayPrefs; label: string; sub: string }[] =
   { key: "showTranslation", label: "Show translation", sub: "English meaning of each verse" },
   { key: "arabicLarge", label: "Large Arabic text", sub: "Bigger Arabic letters" },
   { key: "quranPageView", label: "Full page view", sub: "One flowing page, like a printed Quran" },
-  { key: "quranFlipPages", label: "Turn pages in full screen", sub: "Swipe page by page like a mushaf. Off: one continuous scroll" },
   { key: "quranAutoScroll", label: "Follow recitation", sub: "Moves to the verse being recited" },
   { key: "quranWordHighlight", label: "Word-by-word highlighting", sub: "Lights up each word as it's recited" },
 ];
@@ -777,6 +776,13 @@ function QuranAudioSettings({ onClose }: { onClose: () => void }) {
           <button className="quran-player-x" aria-label="Close settings" onClick={onClose}><X size={16} /></button>
         </div>
         <div className="qp-audio-list">
+          <div className="qp-pop-row" style={{ flexDirection: "column", alignItems: "stretch", gap: 8 }}>
+            <span><span className="block text-[14px] font-medium">Full screen reading</span><span className="quran-muted block text-[11.5px]">How pages look in full screen only</span></span>
+            <div className="qp-seg" role="radiogroup" aria-label="Full screen reading">
+              <button type="button" role="radio" aria-checked={d.quranFlipPages !== false} className={d.quranFlipPages !== false ? "is-on" : ""} onClick={() => { void triggerHaptic("light"); update({ quranFlipPages: true }); }}>Turn pages</button>
+              <button type="button" role="radio" aria-checked={d.quranFlipPages === false} className={d.quranFlipPages === false ? "is-on" : ""} onClick={() => { void triggerHaptic("light"); update({ quranFlipPages: false }); }}>One long scroll</button>
+            </div>
+          </div>
           {AUDIO_TOGGLES.map((t) => (
             <div key={t.key} className="qp-pop-row" onClick={() => update({ [t.key]: !d[t.key] } as Partial<DisplayPrefs>)}>
               <span className="flex-1"><span className="block text-[14px] font-medium">{t.label}</span><span className="quran-muted block text-[11.5px]">{t.sub}</span></span>
