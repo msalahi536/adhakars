@@ -103,7 +103,7 @@ export function RecitationPopup() {
           <span className="qp-avatar"><img src={imamTaha.url} alt="" className="rec-panel-photo" /></span>
           <span className="min-w-0 flex-1">
             <span className="qp-title block truncate">{open.label && queueActive ? open.label : name}</span>
-            <span className="quran-muted block truncate text-[13px]">{hasAudio ? (open.label && queueActive ? name : "Imam Taha Hassane") : "Recitation coming soon"}</span>
+            <span className="quran-muted block truncate text-[13px]">{hasAudio ? (open.label && queueActive ? name : "Imam Taha Hassane") : "Recitation coming soon"}{track && player.repeatCounts && REPEATABLE[track.dhikrId] && !showOpener ? ` · ${player.rep}/${REPEATABLE[track.dhikrId]}` : ""}</span>
           </span>
           <div className="qp-menu-wrap" ref={menuRef}>
             <button type="button" className="quran-speed qp-speed" aria-label={`Playback speed ${player.rate}x`} onClick={() => setMenu(menu === "speed" ? null : "speed")}>{player.rate}x <ChevronDown size={14} /></button>
