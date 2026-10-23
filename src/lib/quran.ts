@@ -22,6 +22,8 @@ export type Verse = {
   words: Word[];
   translation: string;
   transliteration: string;
+  /** Page of the standard 604-page Madani mushaf. */
+  page?: number;
 };
 export type Timing = { key: string; from: number; to: number; segments: [number, number, number][] };
 export type ChapterAudio = { url: string; timings: Timing[] };
@@ -220,12 +222,12 @@ export async function getChapters(): Promise<Chapter[]> {
 }
 
 export async function getVerses(chapter: number): Promise<Verse[]> {
-  type Raw = { verse_key: string; verse_number: number; words: { position: number; text_uthmani: string; char_type_name: string }[]; translations: { text: string }[] };
+  type Raw = { verse_key: string; verse_number: number; page_number?: number; words: { position: number; text_uthmani: string; char_type_name: string }[]; translations: { text: string }[] };
   const raw: Raw[] = [];
   let page = 1;
   for (;;) {
     const res = await get<{ verses: Raw[]; pagination: { next_page: number | null } }>(
-      `/verses/by_chapter/${chapter}?language=en&words=true&word_fields=text_uthmani&translations=20&per_page=50&page=${page}`,
+      `/verses/by_chapter/${chapter}?language=en&words=true&word_fields=text_uthmani&translations=20&fields=page_number&per_page=50&page=${page}`,
     );
     raw.push(...res.verses);
     if (!res.pagination.next_page) break;
@@ -239,6 +241,7 @@ export async function getVerses(chapter: number): Promise<Verse[]> {
     words: v.words.map((w) => ({ position: w.position, text: w.text_uthmani, isEnd: w.char_type_name === "end" })),
     translation: stripTags(v.translations[0]?.text ?? ""),
     transliteration: stripTags(translit[i]?.text ?? ""),
+    page: v.page_number,
   }));
 }
 

@@ -443,9 +443,9 @@ function Reader({ chapterId, verse }: { chapterId: number; verse?: number }) {
   const navigate = useNavigate();
   const [prefs] = usePrefs();
   const [favs, toggleFav] = useFavs();
-  const [display, setDisplayState] = useState({ translit: true, translation: true, trOn: true, arabic: true, page: false, follow: true, words: true, large: false });
+  const [display, setDisplayState] = useState({ translit: true, translation: true, trOn: true, arabic: true, page: false, follow: true, words: true, large: false, flip: true });
   useEffect(() => {
-    const read = () => { const d = getDisplay(); setDisplayState({ translit: d.showTransliteration, translation: d.showTranslation || (!d.showArabic && !d.showTransliteration), trOn: d.showTranslation, arabic: d.showArabic, page: d.quranPageView, follow: d.quranAutoScroll, words: d.quranWordHighlight, large: d.arabicLarge }); };
+    const read = () => { const d = getDisplay(); setDisplayState({ translit: d.showTransliteration, translation: d.showTranslation || (!d.showArabic && !d.showTransliteration), trOn: d.showTranslation, arabic: d.showArabic, page: d.quranPageView, follow: d.quranAutoScroll, words: d.quranWordHighlight, large: d.arabicLarge, flip: d.quranFlipPages }); };
     read();
     window.addEventListener("adhkar:display-update", read);
     return () => window.removeEventListener("adhkar:display-update", read);
@@ -561,8 +561,19 @@ function Reader({ chapterId, verse }: { chapterId: number; verse?: number }) {
     if (!pos.key || pos.key === lastKey.current) return;
     lastKey.current = pos.key;
     if (!display.follow) return;
-    document.getElementById(`v-${pos.key}`)?.scrollIntoView({ behavior: "smooth", block: "center" });
+    const el = document.getElementById(`v-${pos.key}`);
+    if (!el) return;
+    if (!revealOnPage(el, true)) el.scrollIntoView({ behavior: "smooth", block: "center" });
   }, [pos.key, display.follow]);
+  // Page mode: opening full screen lands on the page being recited or last read.
+  const flipping = full && display.flip;
+  useEffect(() => {
+    if (!flipping || !verses) return;
+    const last = readJSON<Last | null>(LAST, null);
+    const key = pos.key ?? (last && last.s === chapterId && last.v > 1 ? `${chapterId}:${last.v}` : null);
+    requestAnimationFrame(() => { const el = key && document.getElementById(`v-${key}`); if (el) revealOnPage(el, false); });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [flipping, verses]);
 
   const nameRef = useRef(""); nameRef.current = chapter?.name_simple ?? "";
   const onPlayVerse = useCallback((key: string) => {
@@ -631,6 +642,10 @@ function Reader({ chapterId, verse }: { chapterId: number; verse?: number }) {
       {full && typeof document !== "undefined" && createPortal(
         <div className="quran-fs" role="dialog" aria-modal="true" aria-label={`${chapter?.name_simple ?? "Surah"}, reading mode`}>
           <button className="quran-fs-x" onClick={closeFull} aria-label="Close reading mode"><X size={18} /></button>
+          {display.flip ? (verses ? <MushafPages verses={verses} chapter={chapter} chapterId={chapterId} showBismillah={!!showBismillah} arabic={display.arabic}
+              activeKey={pos.key} word={display.words ? pos.word : null} translitOnly={!display.arabic && !display.trOn && display.translit}
+              panel={dock !== "face" && player.panelOpen} onPlay={onPlayVerse} onLastPage={() => { if (chapter && verses.length >= chapter.verses_count) markSurahComplete(chapterId); }} />
+            : <div className="flex flex-1 items-center justify-center">{error ? <p className="quran-muted text-sm">Couldn't load this surah. Check your connection.</p> : <Loader2 className="animate-spin" />}</div>) : (
           <div className={`quran-fs-scroll ${player.panelOpen ? "has-panel" : ""}`} onScroll={(e) => checkReadEnd(e.currentTarget)}>
             <section className="quran-fs-sheet">
               <header className="quran-fs-band">
@@ -646,7 +661,7 @@ function Reader({ chapterId, verse }: { chapterId: number; verse?: number }) {
                 : <div className="flex justify-center py-12"><Loader2 className="animate-spin" /></div>}
               <footer className="quran-fs-foot"><span aria-hidden="true">۞</span><span>Surah {chapterId} of 114</span><span aria-hidden="true">۞</span></footer>
             </section>
-          </div>
+          </div>)}
           {dock === "face" ? <QuranFaceBubble onOpen={() => { quranPlayer.setPanel(false); setDock("open"); }} /> : player.panelOpen ? <QuranPlayerPanel /> : <QuranMiniPlayer />}
         </div>,
         document.body,
@@ -742,6 +757,7 @@ const AUDIO_TOGGLES: { key: keyof DisplayPrefs; label: string; sub: string }[] =
   { key: "showTranslation", label: "Show translation", sub: "English meaning of each verse" },
   { key: "arabicLarge", label: "Large Arabic text", sub: "Bigger Arabic letters" },
   { key: "quranPageView", label: "Full page view", sub: "One flowing page, like a printed Quran" },
+  { key: "quranFlipPages", label: "Turn pages in full screen", sub: "Swipe page by page like a mushaf. Off: one continuous scroll" },
   { key: "quranAutoScroll", label: "Follow recitation", sub: "Moves to the verse being recited" },
   { key: "quranWordHighlight", label: "Word-by-word highlighting", sub: "Lights up each word as it's recited" },
 ];
@@ -924,6 +940,75 @@ const VerseCard = memo(function VerseCard({ verse: v, active, word, translit, tr
     </article>
   );
 });
+
+/** Page mode: brings a verse's page into view (and the verse within it). Returns false outside page mode. */
+function revealOnPage(el: HTMLElement, smooth: boolean): boolean {
+  const page = el.closest<HTMLElement>(".quran-fs-page");
+  const strip = page?.parentElement;
+  if (!page || !strip) return false;
+  const behavior: ScrollBehavior = smooth ? "smooth" : "auto";
+  strip.scrollTo({ left: page.offsetLeft - strip.offsetLeft, behavior });
+  const top = el.offsetTop - page.offsetTop;
+  if (top < page.scrollTop || top > page.scrollTop + page.clientHeight - 80) page.scrollTo({ top: Math.max(0, top - page.clientHeight / 3), behavior });
+  return true;
+}
+
+/** Surah split into the pages of the standard Madani mushaf, turned by swiping. */
+function MushafPages({ verses, chapter, chapterId, showBismillah, arabic, activeKey, word, translitOnly, panel, onPlay, onLastPage }: {
+  verses: Verse[]; chapter: Chapter | null; chapterId: number; showBismillah: boolean; arabic: boolean; activeKey: string | null; word: number | null;
+  translitOnly: boolean; panel: boolean; onPlay: (key: string) => void; onLastPage: () => void;
+}) {
+  const pages = useMemo(() => {
+    const out: { n: number; verses: Verse[] }[] = [];
+    verses.forEach((v, i) => {
+      const n = v.page ?? Math.floor(i / 10) + 1;
+      const cur = out[out.length - 1];
+      if (cur && cur.n === n) cur.verses.push(v); else out.push({ n, verses: [v] });
+    });
+    return out;
+  }, [verses]);
+  const strip = useRef<HTMLDivElement | null>(null);
+  const [at, setAt] = useState(0);
+  const onScroll = () => {
+    const el = strip.current; if (!el) return;
+    const i = Math.min(pages.length - 1, Math.round(Math.abs(el.scrollLeft) / el.clientWidth));
+    if (i !== at) { setAt(i); void triggerHaptic("light"); }
+    if (i === pages.length - 1) onLastPage();
+  };
+  const go = (d: number) => {
+    const el = strip.current; if (!el) return;
+    const i = Math.max(0, Math.min(pages.length - 1, at + d));
+    const page = el.children[i] as HTMLElement | undefined;
+    if (page) el.scrollTo({ left: page.offsetLeft - el.offsetLeft, behavior: "smooth" });
+  };
+  return (
+    <>
+      <div ref={strip} className="quran-fs-pages" dir="rtl" onScroll={onScroll}>
+        {pages.map((p, i) => (
+          <div key={p.n} className={`quran-fs-page ${panel ? "has-panel" : ""}`} dir="ltr">
+            <section className="quran-fs-sheet">
+              {i === 0 && (
+                <>
+                  <header className="quran-fs-band"><span className="quran-fs-name" lang="ar" dir="rtl">{chapter ? `سُورَةُ ${chapter.name_arabic}` : "…"}</span></header>
+                  {showBismillah && (arabic ? <div className="quran-fs-bismillah" dir="rtl" lang="ar">بِسْمِ ٱللَّهِ ٱلرَّحْمَـٰنِ ٱلرَّحِيمِ</div>
+                    : <div className="quran-fs-bismillah is-en">In the name of Allah, the Entirely Merciful, the Especially Merciful.</div>)}
+                </>
+              )}
+              <MushafPage bare verses={p.verses} activeKey={p.verses.some((v) => v.key === activeKey) ? activeKey : null} word={word} arabic={arabic} translitOnly={translitOnly} onPlay={onPlay} />
+              <p className="quran-fs-pageno">{arabic ? toArabicDigits(p.n) : p.n}</p>
+            </section>
+          </div>
+        ))}
+      </div>
+      <div className={`quran-fs-pager ${panel ? "has-panel" : ""}`}>
+        <button onClick={() => go(1)} disabled={at >= pages.length - 1} aria-label="Next page"><ChevronLeft size={16} /></button>
+        <span>Page {pages[at]?.n ?? ""} · {at + 1}/{pages.length}</span>
+        <button onClick={() => go(-1)} disabled={at <= 0} aria-label="Previous page"><ChevronRight size={16} /></button>
+      </div>
+      <span className="sr-only">Surah {chapterId}</span>
+    </>
+  );
+}
 
 /** Whole surah as one flowing page, like reading from a printed mushaf. */
 const MushafPage = memo(function MushafPage({ verses, activeKey, word, arabic, onPlay, bare = false, translitOnly = false }: {
