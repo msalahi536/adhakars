@@ -78,8 +78,22 @@ export function AdhkarPage({
         return { ...cur, [id]: target };
       });
     };
+    // One finished repetition of a 10x/100x card adds one to its counter.
+    const onRep = (e: Event) => {
+      const id = (e as CustomEvent<{ dhikrId: string }>).detail?.dhikrId;
+      const d = items.flatMap((i) => (i.dhikr ? [i.dhikr] : i.combo?.parts ?? [])).find((x) => x.id === id);
+      if (!d) return;
+      setCounts((cur) => {
+        const prev = cur[id] ?? 0;
+        if (prev >= d.target) return cur;
+        setCount(storageKey, id, prev + 1);
+        bumpLifetime(lifetimeCategory, 1);
+        return { ...cur, [id]: prev + 1 };
+      });
+    };
     window.addEventListener("recitation:ended", onEnded);
-    return () => window.removeEventListener("recitation:ended", onEnded);
+    window.addEventListener("recitation:rep", onRep);
+    return () => { window.removeEventListener("recitation:ended", onEnded); window.removeEventListener("recitation:rep", onRep); };
   });
 
   const dailyLayout = dailyLayoutProp ?? ["morning", "evening", "sleep", "wake"].includes(storageKey);

@@ -178,6 +178,8 @@ function el() {
   audio.addEventListener("ended", () => {
     const target = state.track ? REPEATABLE[state.track.dhikrId] : undefined;
     if (state.repeatCounts && target && state.rep < target && audio) {
+      // With streak counting on, every finished repetition adds one to the counter.
+      if (state.track && state.autoCount) window.dispatchEvent(new CustomEvent("recitation:rep", { detail: { dhikrId: state.track.dhikrId } }));
       set({ rep: state.rep + 1, current: 0 });
       audio.currentTime = 0;
       void audio.play().catch(() => set({ playing: false }));
