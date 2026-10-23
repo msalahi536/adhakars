@@ -17,9 +17,37 @@ export type PlayerState = {
   rate: number;
   /** Sleep timer: end timestamp (ms), "track" for end of this recitation, or off. */
   sleep: number | "track" | null;
+  /** Count cards as done when their recitation ends (off by default). */
+  autoCount: boolean;
+  /** Repeat 10x/100x cards their full count (off by default). */
+  repeatCounts: boolean;
+  /** Current repetition (1-based) while repeating a counted card. */
+  rep: number;
 };
 
-let state: PlayerState = { track: null, playing: false, current: 0, duration: 0, queue: [], queueIndex: -1, queueLabel: null, levels: restingLevels(), rate: 1, sleep: null };
+// Cards whose counter asks for 10 or 100 recitations.
+export const REPEATABLE: Record<string, number> = {
+  "morning-15-subhana-llahi-wa-bi-hamdih": 100,
+  "morning-16-la-ilaha-illa-llahu-wahdahu-la-shari": 10,
+  "morning-19-astaghfiru-llaha-wa-atubu-ilayh": 100,
+  "morning-20-allahumma-alli-wa-sallim-ala-nabiyyi": 10,
+  "evening-15-subhana-llahi-wa-bi-hamdih": 100,
+  "evening-16-la-ilaha-illa-llahu-wahdahu-la-shari": 10,
+  "evening-18-allahumma-alli-wa-sallim-ala-nabiyyi": 10,
+};
+const PREF_KEY = "recitation_prefs_v1";
+function readPrefs(): { autoCount: boolean; repeatCounts: boolean } {
+  try {
+    const v = JSON.parse(localStorage.getItem(PREF_KEY) ?? "{}");
+    return { autoCount: v.autoCount === true, repeatCounts: v.repeatCounts === true };
+  } catch { return { autoCount: false, repeatCounts: false }; }
+}
+function savePrefs() {
+  try { localStorage.setItem(PREF_KEY, JSON.stringify({ autoCount: state.autoCount, repeatCounts: state.repeatCounts })); } catch { /* ignore */ }
+}
+
+let state: PlayerState = { track: null, playing: false, current: 0, duration: 0, queue: [], queueIndex: -1, queueLabel: null, levels: restingLevels(), rate: 1, sleep: null, autoCount: false, repeatCounts: false, rep: 1 };
+if (typeof window !== "undefined") state = { ...state, ...readPrefs() };
 const subs = new Set<() => void>();
 const set = (p: Partial<PlayerState>) => { state = { ...state, ...p }; subs.forEach((f) => f()); };
 
@@ -148,8 +176,15 @@ function el() {
   audio.addEventListener("play", () => { set({ playing: true }); startMeter(); });
   audio.addEventListener("pause", () => { set({ playing: false }); stopMeter(); });
   audio.addEventListener("ended", () => {
-    // Listening to a recitation to the end counts the card as done.
-    if (state.track) window.dispatchEvent(new CustomEvent("recitation:ended", { detail: { dhikrId: state.track.dhikrId } }));
+    const target = state.track ? REPEATABLE[state.track.dhikrId] : undefined;
+    if (state.repeatCounts && target && state.rep < target && audio) {
+      set({ rep: state.rep + 1, current: 0 });
+      audio.currentTime = 0;
+      void audio.play().catch(() => set({ playing: false }));
+      return;
+    }
+    // Only counts the card when the listener turned that on.
+    if (state.track && state.autoCount) window.dispatchEvent(new CustomEvent("recitation:ended", { detail: { dhikrId: state.track.dhikrId } }));
     if (state.sleep === "track") { set({ sleep: null, playing: false, current: 0 }); return; }
     if (state.queue.length && state.queueIndex < state.queue.length - 1) load(state.queueIndex + 1);
     else set({ playing: false, current: 0, queue: [], queueIndex: -1, queueLabel: null });
@@ -169,7 +204,7 @@ function start(track: Track) {
   const a = el();
   a.src = track.url;
   a.playbackRate = state.rate;
-  set({ track, current: 0, duration: 0 });
+  set({ track, current: 0, duration: 0, rep: 1 });
   void a.play().catch(() => set({ playing: false }));
   if (navigator.mediaSession && "MediaMetadata" in window) {
     // The phone shows the title line first, so it carries the section name
@@ -204,6 +239,8 @@ export const recitationPlayer = {
     if (a.paused) void a.play(); else a.pause();
   },
   pause() { audio?.pause(); },
+  setAutoCount(v: boolean) { set({ autoCount: v }); savePrefs(); },
+  setRepeatCounts(v: boolean) { set({ repeatCounts: v }); savePrefs(); },
   setRate(r: number) { set({ rate: r }); if (audio) audio.playbackRate = r; },
   setSleep(v: number | "track" | null) {
     if (sleepTimer) clearTimeout(sleepTimer);
