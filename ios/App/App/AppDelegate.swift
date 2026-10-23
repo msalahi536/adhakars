@@ -25,6 +25,22 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         UNUserNotificationCenter.current().delegate = self
         print("[AppDelegate] didFinishLaunchingWithOptions - notification delegate set")
 
+        // Rotation: iOS reveals the window behind the web view while it resizes.
+        // Paint it the app's cream instead of black so turning the phone never flashes.
+        let cream = UIColor(red: 0xF4/255, green: 0xEF/255, blue: 0xE6/255, alpha: 1)
+        window?.backgroundColor = cream
+        DispatchQueue.main.async { [weak self] in
+            self?.window?.backgroundColor = cream
+            if let root = self?.window?.rootViewController {
+                root.view.backgroundColor = cream
+                if let webView = root.view.subviews.compactMap({ $0 as? WKWebView }).first ?? (root.view as? WKWebView) {
+                    webView.isOpaque = false
+                    webView.backgroundColor = cream
+                    webView.scrollView.backgroundColor = cream
+                }
+            }
+        }
+
         // Pre-configure audio session so it's ready for background playback
         do {
             try AVAudioSession.sharedInstance().setCategory(.playback, mode: .default, options: [])

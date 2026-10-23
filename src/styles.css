@@ -5163,3 +5163,9 @@ body.has-adhkar-mini.adhkar-tucked .quran-player:not(.rec-panel), body.has-adhka
 .qp-seg { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; padding: 4px; border-radius: 14px; background: color-mix(in oklab, var(--foreground) 6%, transparent); }
 .qp-seg button { padding: 8px 6px; border-radius: 10px; font-size: 13px; font-weight: 600; color: var(--muted-foreground); transition: background .18s ease, color .18s ease; }
 .qp-seg button.is-on { background: var(--card); color: var(--accent); box-shadow: 0 2px 8px color-mix(in oklab, var(--foreground) 10%, transparent); }
+
+/* Orientation change: freeze transitions while the viewport resizes so the
+   layout snaps once instead of animating through a half-sized frame. */
+html.is-rotating *, html.is-rotating *::before, html.is-rotating *::after { transition: none !important; animation-play-state: paused !important; }
+html.is-rotating .app-shell { opacity: 0; }
+html .app-shell { transition: background-color 400ms ease, opacity 160ms ease; }

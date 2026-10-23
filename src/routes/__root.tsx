@@ -211,6 +211,41 @@ function RootComponent() {
     return () => sub.subscription.unsubscribe();
   }, [router]);
 
+  // Orientation change: hide the shell briefly while iOS resizes, then fade back in.
+  useEffect(() => {
+    const root = document.documentElement;
+    let timer = 0;
+    let lastLandscape = window.innerWidth > window.innerHeight;
+    const settle = () => {
+      window.clearTimeout(timer);
+      timer = window.setTimeout(() => {
+        requestAnimationFrame(() => root.classList.remove("is-rotating"));
+      }, 260);
+    };
+    const start = () => {
+      root.classList.add("is-rotating");
+      settle();
+    };
+    const onResize = () => {
+      const landscape = window.innerWidth > window.innerHeight;
+      if (landscape !== lastLandscape) {
+        lastLandscape = landscape;
+        start();
+      } else if (root.classList.contains("is-rotating")) settle();
+    };
+    const so = window.screen?.orientation;
+    so?.addEventListener?.("change", start);
+    window.addEventListener("orientationchange", start);
+    window.addEventListener("resize", onResize);
+    return () => {
+      window.clearTimeout(timer);
+      so?.removeEventListener?.("change", start);
+      window.removeEventListener("orientationchange", start);
+      window.removeEventListener("resize", onResize);
+      root.classList.remove("is-rotating");
+    };
+  }, []);
+
   // Deter casual copying of artwork: block right-click save and drag on media.
   useEffect(() => {
     const isMedia = (t: EventTarget | null) =>
