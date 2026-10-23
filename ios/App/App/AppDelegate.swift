@@ -20,25 +20,51 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     /// Background task identifier for keeping audio alive
     private var backgroundTaskID: UIBackgroundTaskIdentifier = .invalid
 
+    private func findWebView() -> WKWebView? {
+        guard let root = window?.rootViewController else { return nil }
+        if let wv = root.view as? WKWebView { return wv }
+        return root.view.subviews.compactMap { $0 as? WKWebView }.first
+    }
+
+    private func applyNativeBackground(_ color: UIColor) {
+        window?.backgroundColor = color
+        window?.rootViewController?.view.backgroundColor = color
+        if let webView = findWebView() {
+            webView.isOpaque = false
+            webView.backgroundColor = color
+            webView.scrollView.backgroundColor = color
+        }
+    }
+
+    /// Reads the active theme's background colour from the page and paints the native views with it.
+    private func syncNativeBackgroundFromPage() {
+        guard let webView = findWebView() else { return }
+        let js = "(function(){var e=document.querySelector('.app-shell')||document.body;return getComputedStyle(e).backgroundColor||'';})()"
+        webView.evaluateJavaScript(js) { [weak self] result, _ in
+            guard let css = result as? String else { return }
+            let nums = css.components(separatedBy: CharacterSet(charactersIn: "0123456789.").inverted)
+                .compactMap { Double($0) }
+            guard nums.count >= 3 else { return }
+            let alpha = nums.count >= 4 ? nums[3] : 1
+            if alpha < 0.5 { return }
+            self?.applyNativeBackground(UIColor(red: nums[0]/255, green: nums[1]/255, blue: nums[2]/255, alpha: 1))
+        }
+    }
+
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         // Register as notification delegate so we receive taps
         UNUserNotificationCenter.current().delegate = self
         print("[AppDelegate] didFinishLaunchingWithOptions - notification delegate set")
 
         // Rotation: iOS reveals the window behind the web view while it resizes.
-        // Paint it the app's cream instead of black so turning the phone never flashes.
-        let cream = UIColor(red: 0xF4/255, green: 0xEF/255, blue: 0xE6/255, alpha: 1)
-        window?.backgroundColor = cream
-        DispatchQueue.main.async { [weak self] in
-            self?.window?.backgroundColor = cream
-            if let root = self?.window?.rootViewController {
-                root.view.backgroundColor = cream
-                if let webView = root.view.subviews.compactMap({ $0 as? WKWebView }).first ?? (root.view as? WKWebView) {
-                    webView.isOpaque = false
-                    webView.backgroundColor = cream
-                    webView.scrollView.backgroundColor = cream
-                }
-            }
+        // Paint it the current theme's background (read from the page) so turning
+        // the phone never flashes black, whatever theme is active.
+        applyNativeBackground(UIColor(red: 0xF4/255, green: 0xEF/255, blue: 0xE6/255, alpha: 1))
+        NotificationCenter.default.addObserver(forName: UIDevice.orientationDidChangeNotification, object: nil, queue: .main) { [weak self] _ in
+            self?.syncNativeBackgroundFromPage()
+        }
+        NotificationCenter.default.addObserver(forName: UIApplication.didBecomeActiveNotification, object: nil, queue: .main) { [weak self] _ in
+            self?.syncNativeBackgroundFromPage()
         }
 
         // Pre-configure audio session so it's ready for background playback
