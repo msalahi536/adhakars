@@ -3,7 +3,8 @@ import { Check, ChevronDown, ChevronLeft, ChevronRight, Clock, MoreHorizontal, P
 import imamTaha from "@/assets/imam-taha.png.asset.json";
 import { Portal } from "./Portal";
 import { closePopup, setPopupOpen, usePopupOpen } from "@/lib/recitation-popup";
-import { recitationPlayer, usePlayer } from "@/lib/recitation-player";
+import { recitationPlayer, usePlayer, REPEATABLE } from "@/lib/recitation-player";
+import { Repeat, ListChecks } from "lucide-react";
 
 const RATES = [0.75, 1, 1.25, 1.5, 2];
 const SLEEP: { label: string; v: number | "track" | null }[] = [
@@ -24,6 +25,19 @@ export function RecitationPopup() {
   const [menu, setMenu] = useState<null | "main" | "sleep" | "speed">(null);
   const menuRef = useRef<HTMLDivElement | null>(null);
   const [, tick] = useState(0);
+  const [hint, setHint] = useState(false);
+  const hintId = open ? (open.track?.dhikrId ?? open.openerId) : null;
+  const hintTarget = hintId ? REPEATABLE[hintId] : undefined;
+  useEffect(() => {
+    if (!hintTarget) return;
+    try {
+      if (localStorage.getItem("repeat_hint_seen_v1")) return;
+      localStorage.setItem("repeat_hint_seen_v1", "1");
+    } catch { return; }
+    const show = window.setTimeout(() => setHint(true), 600);
+    const hide = window.setTimeout(() => setHint(false), 7600);
+    return () => { window.clearTimeout(show); window.clearTimeout(hide); };
+  }, [hintTarget]);
   useEffect(() => {
     if (!menu) return;
     const close = (e: PointerEvent) => { if (!menuRef.current?.contains(e.target as Node)) setMenu(null); };
@@ -93,7 +107,13 @@ export function RecitationPopup() {
           </span>
           <div className="qp-menu-wrap" ref={menuRef}>
             <button type="button" className="quran-speed qp-speed" aria-label={`Playback speed ${player.rate}x`} onClick={() => setMenu(menu === "speed" ? null : "speed")}>{player.rate}x <ChevronDown size={14} /></button>
-            <button type="button" className="quran-player-x qp-more" aria-label="More options" onClick={() => setMenu(menu === "main" || menu === "sleep" ? null : "main")}><MoreHorizontal size={18} /></button>
+            <button type="button" className="quran-player-x qp-more" aria-label="More options" onClick={() => { setHint(false); setMenu(menu === "main" || menu === "sleep" ? null : "main"); }}><MoreHorizontal size={18} /></button>
+            {hint && !menu && (
+              <button type="button" className="qp-hint" onClick={() => { setHint(false); setMenu("main"); }}>
+                <Repeat size={15} className="shrink-0" />
+                <span>New: play this dhikr <b>{hintTarget}x</b> on repeat. Tap ⋯ to turn it on.</span>
+              </button>
+            )}
             {menu === "speed" && (
               <div className="qp-pop qp-pop-speed" role="menu">
                 {RATES.map((r) => (
@@ -109,6 +129,16 @@ export function RecitationPopup() {
                   <Clock size={19} className="qp-ic" />
                   <span className="flex-1 text-left text-[14px]">Sleep timer{sleepLeft && <span className="quran-muted block text-[11.5px]">{sleepLeft}</span>}</span>
                   <ChevronRight size={16} className="quran-muted" />
+                </button>
+                <button type="button" role="menuitemcheckbox" aria-checked={player.repeatCounts} className="qp-pop-row" onClick={() => recitationPlayer.setRepeatCounts(!player.repeatCounts)}>
+                  <Repeat size={19} className="qp-ic" />
+                  <span className="flex-1 text-left text-[14px]">Repeat to full count<span className="quran-muted block text-[11.5px]">Plays 10x and 100x adhkar their full number of times</span></span>
+                  <span className={`qp-check ${player.repeatCounts ? "is-on" : ""}`}>{player.repeatCounts && <Check size={13} strokeWidth={3} />}</span>
+                </button>
+                <button type="button" role="menuitemcheckbox" aria-checked={player.autoCount} className="qp-pop-row" onClick={() => recitationPlayer.setAutoCount(!player.autoCount)}>
+                  <ListChecks size={19} className="qp-ic" />
+                  <span className="flex-1 text-left text-[14px]">Count toward my streak<span className="quran-muted block text-[11.5px]">Mark a card done when its audio finishes</span></span>
+                  <span className={`qp-check ${player.autoCount ? "is-on" : ""}`}>{player.autoCount && <Check size={13} strokeWidth={3} />}</span>
                 </button>
               </div>
             )}
