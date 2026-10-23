@@ -20,6 +20,37 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     /// Background task identifier for keeping audio alive
     private var backgroundTaskID: UIBackgroundTaskIdentifier = .invalid
 
+    private func findWebView() -> WKWebView? {
+        guard let root = window?.rootViewController else { return nil }
+        if let wv = root.view as? WKWebView { return wv }
+        return root.view.subviews.compactMap { $0 as? WKWebView }.first
+    }
+
+    private func applyNativeBackground(_ color: UIColor) {
+        window?.backgroundColor = color
+        window?.rootViewController?.view.backgroundColor = color
+        if let webView = findWebView() {
+            webView.isOpaque = false
+            webView.backgroundColor = color
+            webView.scrollView.backgroundColor = color
+        }
+    }
+
+    /// Reads the active theme's background colour from the page and paints the native views with it.
+    private func syncNativeBackgroundFromPage() {
+        guard let webView = findWebView() else { return }
+        let js = "(function(){var e=document.querySelector('.app-shell')||document.body;return getComputedStyle(e).backgroundColor||'';})()"
+        webView.evaluateJavaScript(js) { [weak self] result, _ in
+            guard let css = result as? String else { return }
+            let nums = css.components(separatedBy: CharacterSet(charactersIn: "0123456789.").inverted)
+                .compactMap { Double($0) }
+            guard nums.count >= 3 else { return }
+            let alpha = nums.count >= 4 ? nums[3] : 1
+            if alpha < 0.5 { return }
+            self?.applyNativeBackground(UIColor(red: nums[0]/255, green: nums[1]/255, blue: nums[2]/255, alpha: 1))
+        }
+    }
+
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         // Register as notification delegate so we receive taps
         UNUserNotificationCenter.current().delegate = self
