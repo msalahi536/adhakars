@@ -5122,3 +5122,25 @@ body.has-adhkar-mini.adhkar-tucked .quran-player:not(.rec-panel), body.has-adhka
 .tafsir-body h1, .tafsir-body h2, .tafsir-body h3, .tafsir-body h4 { font-weight: 700; font-size: 1.05em; margin: 1em 0 .4em; color: var(--accent); }
 .tafsir-body p { margin: 0 0 .8em; }
 .tafsir-body ul, .tafsir-body ol { padding-inline-start: 1.2em; margin-bottom: .8em; list-style: disc; }
+
+/* Full screen mushaf pages: swipe right-to-left like a printed Quran */
+.quran-fs-pages { flex: 1; min-height: 0; display: flex; overflow-x: auto; overflow-y: hidden; scroll-snap-type: x mandatory; overscroll-behavior: contain; scrollbar-width: none; -webkit-overflow-scrolling: touch; }
+.quran-fs-pages::-webkit-scrollbar { display: none; }
+.quran-fs-page { flex: 0 0 100%; width: 100%; height: 100%; overflow-y: auto; scroll-snap-align: start; scroll-snap-stop: always; overscroll-behavior: contain; scrollbar-width: none;
+  padding: calc(env(safe-area-inset-top, 0px) + 54px) calc(env(safe-area-inset-right, 0px) + 12px) calc(env(safe-area-inset-bottom, 0px) + 74px) calc(env(safe-area-inset-left, 0px) + 12px); }
+.quran-fs-page::-webkit-scrollbar { display: none; }
+.quran-fs-page.has-panel { padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 300px); }
+.quran-fs-page .quran-fs-sheet { min-height: 100%; display: flex; flex-direction: column; border-inline: 1px solid color-mix(in oklab, var(--accent) 22%, transparent) !important; border-radius: 18px; }
+.quran-fs-page .quran-mushaf { flex: 1; }
+.quran-fs-pageno { margin: 12px auto 0; min-width: 34px; padding: 2px 10px; text-align: center; font-size: 13px; color: var(--accent); border-top: 1px solid color-mix(in oklab, var(--accent) 30%, transparent); }
+.quran-fs-pager { position: absolute; left: 50%; transform: translateX(-50%); bottom: calc(env(safe-area-inset-bottom, 0px) + 14px); z-index: 3; display: flex; align-items: center; gap: 6px; padding: 4px; border-radius: 999px; font-size: 12px; color: var(--foreground);
+  background: color-mix(in oklab, var(--card) 85%, transparent); border: 1px solid color-mix(in oklab, var(--foreground) 10%, transparent); -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px); box-shadow: 0 4px 14px rgba(0,0,0,.10); }
+.quran-fs-pager span { padding: 0 6px; white-space: nowrap; font-variant-numeric: tabular-nums; }
+.quran-fs-pager button { display: flex; height: 28px; width: 28px; align-items: center; justify-content: center; border-radius: 999px; color: var(--accent); background: color-mix(in oklab, var(--accent) 12%, transparent); }
+.quran-fs-pager button:disabled { opacity: .35; }
+.quran-fs-pager.has-panel { display: none; }
+@media (orientation: landscape) and (max-height: 560px) {
+  .quran-fs-page { padding-top: calc(env(safe-area-inset-top, 0px) + 14px); padding-left: calc(env(safe-area-inset-left, 0px) + 56px); padding-right: calc(env(safe-area-inset-right, 0px) + 56px); padding-bottom: 64px; }
+  .quran-fs-page.has-panel { padding-bottom: 28px; padding-right: calc(env(safe-area-inset-right, 0px) + 352px); }
+  .quran-fs-pager { bottom: calc(env(safe-area-inset-bottom, 0px) + 8px); }
+}

@@ -48,9 +48,11 @@ export type DisplayPrefs = {
   quranAutoScroll: boolean;
   /** Quran reader: light up each word as it is recited. */
   quranWordHighlight: boolean;
+  /** Quran full screen: turn mushaf pages instead of one continuous scroll. */
+  quranFlipPages: boolean;
 };
 const DISPLAY_KEY = "adhkar:display";
-const defaults: DisplayPrefs = { showTransliteration: true, showTranslation: true, showArabic: true, arabicLarge: false, haptics: true, quranPageView: false, quranAutoScroll: true, quranWordHighlight: true };
+const defaults: DisplayPrefs = { showTransliteration: true, showTranslation: true, showArabic: true, arabicLarge: false, haptics: true, quranPageView: false, quranAutoScroll: true, quranWordHighlight: true, quranFlipPages: true };
 
 export const getDisplay = (): DisplayPrefs => {
   if (typeof window === "undefined") return defaults;
