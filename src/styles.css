@@ -5169,4 +5169,3 @@ body.has-adhkar-mini.adhkar-tucked .quran-player:not(.rec-panel), body.has-adhka
 html.is-rotating *, html.is-rotating *::before, html.is-rotating *::after { transition: none !important; animation-play-state: paused !important; }
 html.is-rotating .app-shell { opacity: 0; }
 html .app-shell { transition: background-color 400ms ease, opacity 160ms ease; }
-html, body { background-color: var(--background); }
