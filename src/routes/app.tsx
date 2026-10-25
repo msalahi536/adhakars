@@ -12,6 +12,7 @@ import { RatePrompt } from "@/components/RatePrompt";
 const GiveawayDialog = lazy(() => import("@/components/GiveawayDialog").then((m) => ({ default: m.GiveawayDialog })));
 import { shouldAskGiveaway } from "@/lib/giveaway";
 import { GiveawayTeaser } from "@/components/GiveawayTeaser";
+import { WinnerNotice } from "@/components/WinnerNotice";
 import { backgroundsForPreset } from "@/lib/backgrounds";
 import { PERSONAL_PRESET, cachedPhoto, loadAppearancePhotos, readAppearance, resolveAppearance, pageForAppearance } from '@/lib/custom-appearance';
 import { JUMUAH_NOTIF_ID, registerNotificationTapHandler } from "@/lib/notifications";
@@ -384,6 +385,7 @@ function AppLayout() {
       {showTeaser && <GiveawayTeaser onChoice={(yes) => { setShowTeaser(false); if (yes) { setGiveawayGoal(null); setShowGiveaway(true); } }} />}
       <AdhanEnabledNotice />
       <RatePrompt />
+      <WinnerNotice />
     </div>
   );
 }
