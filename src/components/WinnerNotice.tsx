@@ -23,7 +23,7 @@ export function WinnerNotice() {
         <span className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-2xl text-accent" style={{ background: "color-mix(in oklab, var(--accent) 14%, transparent)" }}>
           <Gift size={22} strokeWidth={1.7} />
         </span>
-        <h2 id="wn-title" className="text-[19px] font-semibold leading-snug">MashaAllah, you won! 🎉</h2>
+        <h2 id="wn-title" className="text-[19px] font-semibold leading-snug">Allahumma barik, you won! 🎉</h2>
         <p className="mt-2 text-[13px] leading-relaxed text-muted-foreground">
           You're one of the winners of lifetime access to Ilm Guide. Please check your email — and your spam or junk folder — for the details.
         </p>
