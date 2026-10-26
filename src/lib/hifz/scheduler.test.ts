@@ -48,8 +48,8 @@ describe("hifz rules", () => {
     expect(pullForward(p, 3, T, N).due).toBe(T);
   });
   test("merge keeps newest item and unions reviews", () => {
-    const a = { ...emptyState(), ayahs: { "1:1": { ...newAyah("1:1", 1, T, "2026-01-01"), interval: 2 } }, reviews: [{ id: "x" } as never] };
-    const b = { ...emptyState(), ayahs: { "1:1": { ...newAyah("1:1", 1, T, "2026-02-01"), interval: 8 } }, reviews: [{ id: "y" } as never] };
+    const a = { ...emptyState(), ayahs: { "1:1": { ...newAyah("1:1", 1, T, "2026-01-01"), interval: 2 } }, reviews: [{ id: "x", at: "1" } as never] };
+    const b = { ...emptyState(), ayahs: { "1:1": { ...newAyah("1:1", 1, T, "2026-02-01"), interval: 8 } }, reviews: [{ id: "y", at: "2" } as never] };
     const m = mergeHifz(a, b);
     expect(m.ayahs["1:1"].interval).toBe(8);
     expect(m.reviews.length).toBe(2);
