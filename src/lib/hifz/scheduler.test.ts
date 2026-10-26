@@ -90,7 +90,7 @@ describe("repeated word errors", () => {
     expect(derive(evs).pages[1].due).not.toBe(days(D, 52));
   });
   test("a Perfect review of the ayah resets its count", () => {
-    const evs = [...setup(), tap(days(D, 5)), tap(days(D, 6)), ev({ kind: "ayah", key: "1:1", page: 1, grade: "perfect" }, days(D, 6)), tap(days(D, 7))];
+    const evs = [...setup(), tap(days(D, 16)), tap(days(D, 17)), ev({ kind: "ayah", key: "1:1", page: 1, grade: "perfect" }, days(D, 17)), tap(days(D, 18))];
     expect(derive(evs).wordErrors["1:1:2"]).toHaveLength(1);
   });
 });
