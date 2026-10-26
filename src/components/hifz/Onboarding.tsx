@@ -264,7 +264,7 @@ function KnownStep({ chapters, known, toggle, setKnown, pages, name, Steps, onBa
       )}
 
       <p className="text-sm">{known.size ? <>{pages} page{pages === 1 ? "" : "s"} · {known.size} ayahs checked</> : <span style={muted}>Nothing yet? That's fine, tap Continue.</span>}</p>
-      {part === null && known.size > 0 && tab === "surah" && <p className="text-xs" style={muted}>Partly memorized surahs: tap Part to set an ayah range. {name(1) && ""}</p>}
+      {part === null && known.size > 0 && tab === "surah" && <p className="text-xs" style={muted}>Partly memorized surahs: tap Part to set an ayah range.</p>}
       <div className="grid grid-cols-[auto_1fr] gap-2">
         <button onClick={onBack} className="min-h-12 rounded-full px-5 text-sm font-semibold" style={soft}>Back</button>
         <button onClick={onNext} className="min-h-12 rounded-full text-sm font-semibold" style={on}>{known.size ? "Continue to quick test" : "Continue"}</button>
