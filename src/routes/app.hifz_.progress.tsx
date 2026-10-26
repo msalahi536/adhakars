@@ -90,7 +90,7 @@ function Progress() {
                   <span className="text-[11px]" style={muted}>{new Date(w.day + "T12:00:00").toLocaleDateString(undefined, { weekday: "narrow" })}</span>
                 </div>
               ))}
-            </div>
+            </div>}
           </section>
 
           <section className="glass-card space-y-3 p-4" style={card}>
