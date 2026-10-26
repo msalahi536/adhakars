@@ -42,4 +42,5 @@
 - [x] Salah dismiss button reads "Tap to mute next adhan"
 
 - [x] Hifz Step 1: data model, local storage, merge/backup
-- [ ] Hifz Step 2+ (waiting for owner testing)
+- [x] Hifz Step 3: Recall Loop workspace
+- [ ] Hifz Step 4+ (waiting for owner testing)
