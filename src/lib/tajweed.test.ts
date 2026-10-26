@@ -1,5 +1,5 @@
 import { expect, test } from "bun:test";
-import { parseTajweed, RULE_GROUP } from "./tajweed";
+import { parseTajweed, RULE_GROUP } from "./tajweed-rules";
 
 test("parses Quran.com word tajweed markup into colored segments", () => {
   expect(parseTajweed("أَحَ<rule class=qalaqah>د</rule>ٌ")).toEqual([{ text: "أَحَ" }, { text: "د", group: "qalqalah" }, { text: "ٌ" }]);
