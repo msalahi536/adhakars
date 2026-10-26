@@ -4,10 +4,9 @@ import { HeaderBackButton } from "@/components/HeaderBackButton";
 import { RecallBlock } from "@/components/hifz/RecallBlock";
 import { hifzChapters, type MChapter } from "@/lib/hifz/mushaf";
 import { derive, loadHifz, recordEvents } from "@/lib/hifz/store";
-import { localDay, type Grade } from "@/lib/hifz/scheduler";
+import { daysBetween, localDay, type Grade } from "@/lib/hifz/scheduler";
 import { buildQueue, drillEvent, pickDrills, sabaqProgress, salahEvents, type Drill, type EventInput, type SalahOutcome } from "@/lib/hifz/session";
 import { countLines, surahAyahs } from "@/lib/hifz/layout";
-import { localDay as _ld, daysBetween } from "@/lib/hifz/scheduler";
 import { rescheduleHifzReminder } from "@/lib/hifz/reminder";
 
 export const Route = createFileRoute("/app/hifz_/today")({
@@ -30,7 +29,7 @@ const CATCHUP = "hifz:catchup";
 function catchUpDay(paused: boolean, days: number): { day: number; of: number } | null {
   try {
     if (!paused) { localStorage.removeItem(CATCHUP); return null; }
-    const today = _ld(new Date());
+    const today = localDay(new Date());
     let start = localStorage.getItem(CATCHUP);
     if (!start) { start = today; localStorage.setItem(CATCHUP, start); }
     const day = daysBetween(start, today) + 1;
