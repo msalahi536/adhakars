@@ -1,6 +1,7 @@
 // Hifz settings: daily reminder, pace, goal and re-running setup. Reads device storage only after mount.
 import { useEffect, useState } from "react";
-import { getHifzReminder, rescheduleHifzReminder, setHifzReminder, type HifzReminder } from "@/lib/hifz/reminder";
+import { Link } from "@tanstack/react-router";
+import { getNotificationPrefs, HIFZ_REMINDER_ID, rescheduleHifzReminder, type Reminder } from "@/lib/notifications";
 import { loadHifz, savePlan, type HifzPlan } from "@/lib/hifz/store";
 import type { Goal } from "@/lib/hifz/layout";
 import type { MChapter } from "@/lib/hifz/mushaf";
@@ -20,24 +21,9 @@ export function goalLabel(g: Goal | undefined, chapters: MChapter[]): string {
 }
 
 export function HifzSettings({ chapters, onSetup }: { chapters: MChapter[]; onSetup: () => void }) {
-  const [rem, setRem] = useState<HifzReminder>({ on: false, time: "19:00" });
+  const [rem, setRem] = useState<Reminder | null>(null);
   const [plan, setPlan] = useState<HifzPlan | null>(null);
-  const [msg, setMsg] = useState("");
-  const [busy, setBusy] = useState(false);
-  useEffect(() => { setRem(getHifzReminder()); setPlan(loadHifz().plan); void rescheduleHifzReminder(); }, []);
-
-  const toggle = async () => {
-    setBusy(true); setMsg("");
-    const next = { ...rem, on: !rem.on };
-    const r = await setHifzReminder(next);
-    if (r.ok) setRem(next); else setMsg(r.error ?? "Couldn't turn on reminders.");
-    setBusy(false);
-  };
-  const setTime = async (time: string) => {
-    const next = { ...rem, time };
-    setRem(next);
-    if (next.on) await setHifzReminder(next); else try { localStorage.setItem("hifz:reminder", JSON.stringify(next)); } catch { /* ignore */ }
-  };
+  useEffect(() => { setRem(getNotificationPrefs().reminders.find((r) => r.id === HIFZ_REMINDER_ID) ?? null); setPlan(loadHifz().plan); }, []);
   const setPace = (v: number) => {
     if (!plan) return;
     const p = { ...plan, paceLines: v, updatedAt: new Date().toISOString() };
@@ -48,20 +34,10 @@ export function HifzSettings({ chapters, onSetup }: { chapters: MChapter[]; onSe
     <section className="glass-card space-y-4 p-5" style={{ background: "var(--surface)", border: "1px solid var(--border)" }}>
       <h2 className="label-caps">Hifz settings</h2>
 
-      <div className="space-y-2">
-        <div className="flex items-center justify-between gap-3">
-          <span><span className="block text-sm font-semibold">Daily reminder</span><span className="block text-xs" style={muted}>"Hifz: X reviews due today". Skipped once today is done.</span></span>
-          <button role="switch" aria-checked={rem.on} aria-label="Daily Hifz reminder" disabled={busy} onClick={toggle} className="relative h-8 w-14 shrink-0 rounded-full transition-colors" style={rem.on ? on : soft}>
-            <span className="absolute top-1 h-6 w-6 rounded-full transition-all" style={{ left: rem.on ? 28 : 4, background: rem.on ? "var(--accent-foreground)" : "var(--muted-foreground)" }} />
-          </button>
-        </div>
-        {rem.on && (
-          <label className="flex items-center justify-between text-sm">Time
-            <input type="time" value={rem.time} onChange={(e) => e.target.value && setTime(e.target.value)} className="min-h-11 rounded-xl px-3" style={soft} />
-          </label>
-        )}
-        {msg && <p className="text-xs" style={{ color: "var(--destructive)" }}>{msg}</p>}
-      </div>
+      <Link to="/app/settings" className="flex min-h-11 items-center justify-between gap-3">
+        <span><span className="block text-sm font-semibold">Daily reminder</span><span className="block text-xs" style={muted}>{rem?.enabled ? `On at ${String(rem.hour).padStart(2, "0")}:${String(rem.minute).padStart(2, "0")}` : "Off"} · set with your other reminders in Settings</span></span>
+        <span aria-hidden>→</span>
+      </Link>
 
       <div>
         <div className="mb-1.5 text-sm font-semibold">Daily pace</div>

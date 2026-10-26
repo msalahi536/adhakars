@@ -8,7 +8,7 @@ import { addDays, localDay } from "@/lib/hifz/scheduler";
 import { forecast } from "@/lib/hifz/session";
 import { countLines, daysToFinish, goalAyahs, pageOfAyah, remainingGoal } from "@/lib/hifz/layout";
 import { lastReview, pagesByJuz, pageStates, type PageInfo, type PageState } from "@/lib/hifz/progress";
-import { rescheduleHifzReminder } from "@/lib/hifz/reminder";
+import { rescheduleHifzReminder } from "@/lib/notifications";
 
 export const Route = createFileRoute("/app/hifz_/progress")({
   head: () => ({
@@ -24,7 +24,8 @@ export const Route = createFileRoute("/app/hifz_/progress")({
   component: Progress,
 });
 
-const card = { background: "var(--surface)", border: "1px solid var(--border)" };
+// No backdrop blur here: WebKit can drop blurred cards above a very tall grid, leaving the top of the page blank.
+const card = { background: "var(--surface)", border: "1px solid var(--border)", backdropFilter: "none", WebkitBackdropFilter: "none" };
 const muted = { color: "var(--muted-foreground)" };
 
 const STYLE: Record<PageState | "none", { bg: string; fg: string; mark: string; label: string }> = {
@@ -42,12 +43,17 @@ const fmtDay = (d: string) => new Date(d + "T12:00:00").toLocaleDateString(undef
 function Progress() {
   const [st, setSt] = useState<HifzState | null>(null);
   const [open, setOpen] = useState<number | null>(null);
-  useEffect(() => { setSt(loadHifz()); void rescheduleHifzReminder(); }, []);
+  useEffect(() => {
+    setSt(loadHifz());
+    document.querySelector(".scroll-area")?.scrollTo({ top: 0 });
+    void rescheduleHifzReminder();
+  }, []);
   const today = useMemo(() => localDay(new Date()), []);
   const d = useMemo(() => (st ? derive(st.events) : null), [st]);
   const states = useMemo(() => (d ? pageStates(d, today) : {}), [d, today]);
   const week = useMemo(() => (st ? forecast(st.events, today, st.plan?.goal, st.plan?.paceLines ?? 5, 7) : []), [st, today]);
-  if (!st || !d) return null;
+  if (!st || !d) return <ProgressShell><p className="py-10 text-center text-sm" style={muted}>Loading your progress…</p></ProgressShell>;
+  const empty = !Object.keys(states).length;
 
   const juz = pagesByJuz();
   const known = new Set(Object.keys(d.ayahs));
@@ -56,18 +62,17 @@ function Progress() {
   const left = remainingGoal(goalKeys, known);
   const finishDays = pace === 0 ? new Set(left.map(pageOfAyah)).size : daysToFinish(goalKeys, known, pace);
   const max = Math.max(1, ...week.map((w) => w.total));
+  const quiet = week.every((w) => w.total === 0);
 
   return (
-    <>
-      <header className="page-header relative overflow-hidden" style={{ background: "var(--grad-header)", color: "var(--header-fg)" }}>
-        <HeaderBackButton />
-        <div className="relative mx-auto max-w-md pb-6 pt-9 text-center" style={{ paddingLeft: 60, paddingRight: 60 }}>
-          <div className="label-caps" style={{ color: "var(--header-sub)", opacity: 1 }}>Hifz Companion</div>
-          <h1 className="app-page-title mt-2">Progress</h1>
-        </div>
-      </header>
-      <main className="scroll-area">
-        <div className="mx-auto max-w-md space-y-4 px-4 py-4" style={{ color: "var(--foreground)" }}>
+    <ProgressShell>
+          {empty && (
+            <section className="glass-card space-y-2 p-4 text-sm" style={card}>
+              <p className="font-semibold">Nothing memorized yet</p>
+              <p style={muted}>Pages light up here as you memorize and review them.</p>
+              <Link to="/app/hifz" className="font-semibold underline">Start memorizing</Link>
+            </section>
+          )}
           <section className="glass-card grid grid-cols-3 gap-2 p-4 text-center" style={card}>
             <Stat n={Object.keys(states).length} l="pages" />
             <Stat n={countLines([...known])} l="lines" />
@@ -76,7 +81,8 @@ function Progress() {
 
           <section className="glass-card space-y-3 p-4" style={card}>
             <div className="flex items-baseline justify-between"><h2 className="label-caps">Next 7 days</h2><span className="text-xs" style={muted}>reviews per day, if all go well</span></div>
-            <div className="flex h-32 items-end gap-2" role="list">
+            {quiet && <p className="text-sm" style={muted}>No reviews due in the next 7 days.</p>}
+            {!quiet && <div className="flex h-28 items-end gap-2" role="list">
               {week.map((w) => (
                 <div key={w.day} role="listitem" aria-label={`${fmtDay(w.day)}: ${w.total} reviews`} className="flex flex-1 flex-col items-center gap-1">
                   <span className="text-xs font-semibold">{w.total}</span>
@@ -84,7 +90,7 @@ function Progress() {
                   <span className="text-[11px]" style={muted}>{new Date(w.day + "T12:00:00").toLocaleDateString(undefined, { weekday: "narrow" })}</span>
                 </div>
               ))}
-            </div>
+            </div>}
           </section>
 
           <section className="glass-card space-y-3 p-4" style={card}>
@@ -122,9 +128,24 @@ function Progress() {
             </div>
           </section>
           <Link to="/app/hifz/today" className="block text-center text-sm underline" style={muted}>Back to today's session</Link>
-        </div>
-      </main>
       {open !== null && <PageSheet page={open} info={states[open]} st={st} onClose={() => setOpen(null)} />}
+    </ProgressShell>
+  );
+}
+
+function ProgressShell({ children }: { children: React.ReactNode }) {
+  return (
+    <>
+      <header className="page-header relative overflow-hidden" style={{ background: "var(--grad-header)", color: "var(--header-fg)" }}>
+        <HeaderBackButton />
+        <div className="relative mx-auto max-w-md pb-6 pt-9 text-center" style={{ paddingLeft: 60, paddingRight: 60 }}>
+          <div className="label-caps" style={{ color: "var(--header-sub)", opacity: 1 }}>Hifz Companion</div>
+          <h1 className="app-page-title mt-2">Progress</h1>
+        </div>
+      </header>
+      <main className="scroll-area">
+        <div className="mx-auto max-w-md space-y-4 px-4 py-4" style={{ color: "var(--foreground)" }}>{children}</div>
+      </main>
     </>
   );
 }

@@ -2,6 +2,7 @@
 // optional lead-in words (transition drills), reveal, word taps and the four grades.
 // A hint or any wrong word rules out Perfect.
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { TajweedText, useTajweed } from "@/lib/tajweed";
 import { Haptics, ImpactStyle } from "@capacitor/haptics";
 import { getDisplay } from "@/lib/theme";
 import { hifzPage, pageLines, type MWord } from "@/lib/hifz/mushaf";
@@ -63,6 +64,7 @@ export function RecallBlock({ keys, lead, cue = true, onGrade }: Props) {
   }, [rows.length, loaded]);
 
   const cls = "arabic shrink-0 px-[0.15em] leading-[1.9]";
+  const tajweed = useTajweed();
   const word = (w: MWord) => {
     const id = wid(w);
     if (!involved(w)) return <span key={id} aria-hidden className={cls} style={{ opacity: 0.3, filter: "blur(6px)", userSelect: "none" }}>{w.text}</span>;
@@ -72,7 +74,7 @@ export function RecallBlock({ keys, lead, cue = true, onGrade }: Props) {
       const bad = errors.has(id);
       return (
         <button key={id} onClick={() => setErrors((s) => { const n = new Set(s); if (n.has(id)) n.delete(id); else n.add(id); return n; })} aria-pressed={bad} className={`${cls} min-h-12 rounded-lg`}
-          style={bad ? { background: "color-mix(in oklab, var(--destructive) 18%, transparent)", color: "var(--destructive)", textDecoration: "underline" } : {}}>{w.text}</button>
+          style={bad ? { background: "color-mix(in oklab, var(--destructive) 18%, transparent)", color: "var(--destructive)", textDecoration: "underline" } : {}}>{!bad && tajweed && w.tj ? <TajweedText markup={w.tj} /> : w.text}</button>
       );
     }
     if (cueWord && id === wid(cueWord)) return <span key={id} className={cls} style={{ color: "var(--accent)" }}>{w.text}</span>;

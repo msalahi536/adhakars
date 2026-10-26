@@ -2,7 +2,7 @@
 // device so a surah works offline once loaded. Audio is never cached; it streams when online.
 const API = "https://api.quran.com/api/v4";
 
-export type MWord = { key: string; pos: number; text: string; end: boolean; page: number; line: number };
+export type MWord = { key: string; pos: number; text: string; end: boolean; page: number; line: number; tj?: string };
 export type MChapter = { id: number; name: string; arabic: string; verses: number };
 
 const read = <T,>(k: string): T | null => {
@@ -36,40 +36,46 @@ export async function hifzChapters(): Promise<MChapter[]> {
 export async function hifzWords(chapter: number): Promise<MWord[]> {
   const k = `hifz:words:${chapter}`;
   const hit = read<MWord[]>(k);
-  if (hit) return hit;
-  type Raw = { verse_key: string; words: { position: number; text_uthmani: string; char_type_name: string; page_number: number; line_number: number }[] };
+  if (hit && (hit.some((w) => w.tj !== undefined) || !navigator.onLine)) return hit;
+  try { return await loadWords(); } catch (e) { if (hit) return hit; throw e; }
+  async function loadWords(): Promise<MWord[]> {
+  type Raw = { verse_key: string; words: { position: number; text_uthmani: string; text_uthmani_tajweed?: string; char_type_name: string; page_number: number; line_number: number }[] };
   const out: MWord[] = [];
   for (let page = 1; ; ) {
-    const r = await fetch(`${API}/verses/by_chapter/${chapter}?words=true&word_fields=text_uthmani,page_number,line_number&per_page=50&page=${page}`).then((x) => {
+    const r = await fetch(`${API}/verses/by_chapter/${chapter}?words=true&word_fields=text_uthmani,text_uthmani_tajweed,page_number,line_number&per_page=50&page=${page}`).then((x) => {
       if (!x.ok) throw new Error("Could not load this surah");
       return x.json();
     });
     for (const v of r.verses as Raw[])
       for (const w of v.words)
-        out.push({ key: v.verse_key, pos: w.position, text: w.text_uthmani, end: w.char_type_name === "end", page: w.page_number, line: w.line_number });
+        out.push({ key: v.verse_key, pos: w.position, text: w.text_uthmani, end: w.char_type_name === "end", page: w.page_number, line: w.line_number, tj: w.text_uthmani_tajweed });
     if (!r.pagination.next_page) break;
     page = r.pagination.next_page;
   }
   write(k, out);
   return out;
+  }
 }
 
 /** Every word on one Madani 15-line page (all surahs on it), cached for offline use. */
 export async function hifzPage(page: number): Promise<MWord[]> {
   const k = `hifz:page:${page}`;
   const hit = read<MWord[]>(k);
-  if (hit) return hit;
-  type Raw = { verse_key: string; words: { position: number; text_uthmani: string; char_type_name: string; page_number: number; line_number: number }[] };
-  const r = await fetch(`${API}/verses/by_page/${page}?words=true&word_fields=text_uthmani,page_number,line_number&per_page=50`).then((x) => {
+  if (hit && (hit.some((w) => w.tj !== undefined) || !navigator.onLine)) return hit;
+  try { return await loadWords(); } catch (e) { if (hit) return hit; throw e; }
+  async function loadWords(): Promise<MWord[]> {
+  type Raw = { verse_key: string; words: { position: number; text_uthmani: string; text_uthmani_tajweed?: string; char_type_name: string; page_number: number; line_number: number }[] };
+  const r = await fetch(`${API}/verses/by_page/${page}?words=true&word_fields=text_uthmani,text_uthmani_tajweed,page_number,line_number&per_page=50`).then((x) => {
     if (!x.ok) throw new Error("Could not load this page");
     return x.json();
   });
   const out: MWord[] = [];
   for (const v of r.verses as Raw[])
     for (const w of v.words)
-      out.push({ key: v.verse_key, pos: w.position, text: w.text_uthmani, end: w.char_type_name === "end", page: w.page_number, line: w.line_number });
+      out.push({ key: v.verse_key, pos: w.position, text: w.text_uthmani, end: w.char_type_name === "end", page: w.page_number, line: w.line_number, tj: w.text_uthmani_tajweed });
   write(k, out);
   return out;
+  }
 }
 
 /** All 15 lines of a page with their words; lines without words (surah headers, basmala) stay empty. */

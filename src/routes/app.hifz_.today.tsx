@@ -7,7 +7,7 @@ import { derive, loadHifz, recordEvents } from "@/lib/hifz/store";
 import { daysBetween, localDay, type Grade } from "@/lib/hifz/scheduler";
 import { buildQueue, drillEvent, pickDrills, sabaqProgress, salahEvents, type Drill, type EventInput, type SalahOutcome } from "@/lib/hifz/session";
 import { countLines, surahAyahs } from "@/lib/hifz/layout";
-import { rescheduleHifzReminder } from "@/lib/hifz/reminder";
+import { rescheduleHifzReminder } from "@/lib/notifications";
 
 export const Route = createFileRoute("/app/hifz_/today")({
   head: () => ({

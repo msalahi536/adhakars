@@ -13,6 +13,7 @@ import {
   reciterHasSurah, reciterName, reciterScore, reciterPhoto, reciterSubtitle, searchChapters, searchReciters, parseVerseRef, type Chapter, type Reciter, type Verse, getVerseByKey, searchVerses, type VerseHit,
 } from "@/lib/quran";
 import { getDisplay, setDisplay, triggerHaptic, type DisplayPrefs } from "@/lib/theme";
+import { TajweedLegend, TajweedText, useTajweed } from "@/lib/tajweed";
 import { guessVerses } from "@/lib/quran-search.functions";
 import { quranPlayer, SPEEDS, useQuranPlayer } from "@/lib/quran-player";
 
@@ -766,6 +767,7 @@ const AUDIO_TOGGLES: { key: keyof DisplayPrefs; label: string; sub: string }[] =
 
 function QuranAudioSettings({ onClose }: { onClose: () => void }) {
   const [d, setD] = useState<DisplayPrefs>(() => getDisplay());
+  const [legend, setLegend] = useState(false);
   const update = (patch: Partial<DisplayPrefs>) => {
     const next = { ...d, ...patch };
     setD(next); setDisplay(next);
@@ -786,6 +788,11 @@ function QuranAudioSettings({ onClose }: { onClose: () => void }) {
               <button type="button" role="radio" aria-checked={d.quranFlipPages === false} className={d.quranFlipPages === false ? "is-on" : ""} onClick={() => { void triggerHaptic("light"); update({ quranFlipPages: false }); }}>One long scroll</button>
             </div>
           </div>
+          <div className="qp-pop-row" onClick={() => update({ quranTajweed: !d.quranTajweed })}>
+            <span className="flex-1"><span className="block text-[14px] font-medium">Tajweed colors</span>
+              <span className="quran-muted block text-[11.5px]">Dar al-Ma'rifah colors. <button type="button" className="font-semibold underline" onClick={(e) => { e.stopPropagation(); setLegend(true); }}>Color guide</button></span></span>
+            <QuranSwitch on={!!d.quranTajweed} onChange={(v) => update({ quranTajweed: v })} label="Tajweed colors" />
+          </div>
           {AUDIO_TOGGLES.map((t) => (
             <div key={t.key} className="qp-pop-row" onClick={() => update({ [t.key]: !d[t.key] } as Partial<DisplayPrefs>)}>
               <span className="flex-1"><span className="block text-[14px] font-medium">{t.label}</span><span className="quran-muted block text-[11.5px]">{t.sub}</span></span>
@@ -794,6 +801,7 @@ function QuranAudioSettings({ onClose }: { onClose: () => void }) {
           ))}
         </div>
       </div>
+      {legend && <TajweedLegend onClose={() => setLegend(false)} />}
     </div>,
     document.body,
   );
@@ -926,6 +934,7 @@ const VerseCard = memo(function VerseCard({ verse: v, active, word, translit, tr
   onPlay: (key: string) => void; onFav: (key: string) => void;
 }) {
   const wordMode = active && word !== null;
+  const tajweed = useTajweed();
   return (
     <article id={`v-${v.key}`} className={`quran-verse ${active ? "is-active" : ""} ${wordMode ? "is-word-mode" : ""}`}>
       <div className="quran-verse-side">
@@ -937,7 +946,7 @@ const VerseCard = memo(function VerseCard({ verse: v, active, word, translit, tr
         {arabic && <p className="quran-ar" dir="rtl" lang="ar" onClick={() => onPlay(v.key)}>
           {v.words.map((w) => {
             const state = w.isEnd ? "quran-end" : !wordMode ? "quran-word" : w.position < word! ? "quran-word is-done" : w.position === word ? "quran-word is-now" : "quran-word";
-            return <Fragment key={w.position}><span className={state}>{w.text}</span>{" "}</Fragment>;
+            return <Fragment key={w.position}><span className={state}>{tajweed && w.tj && !w.isEnd ? <TajweedText markup={w.tj} /> : w.text}</span>{" "}</Fragment>;
           })}
         </p>}
         {translit && v.transliteration && <p className={`quran-translit ${!arabic && !translation ? "is-big" : ""}`} onClick={!arabic && !translation ? () => onPlay(v.key) : undefined}>{v.transliteration}</p>}
@@ -1024,6 +1033,7 @@ const MushafPage = memo(function MushafPage({ verses, activeKey, word, arabic, o
   verses: Verse[]; activeKey: string | null; word: number | null; arabic: boolean; onPlay: (key: string) => void; bare?: boolean; translitOnly?: boolean;
 }) {
   const box = bare ? "quran-mushaf is-bare" : "quran-card quran-mushaf";
+  const tajweed = useTajweed();
   if (!arabic) {
     return (
       <article className={`${box} is-en ${activeKey ? "has-active" : ""} ${translitOnly ? "is-translit" : ""}`}>
@@ -1044,7 +1054,7 @@ const MushafPage = memo(function MushafPage({ verses, activeKey, word, arabic, o
           <span key={v.key} id={`v-${v.key}`} className={`quran-mushaf-v ${active ? "is-active" : ""} ${wordMode ? "is-word-mode" : ""}`} onClick={() => onPlay(v.key)}>
             {v.words.filter((w) => !w.isEnd).map((w) => {
               const cls = !wordMode ? "quran-word" : w.position < word! ? "quran-word is-done" : w.position === word ? "quran-word is-now" : "quran-word";
-              return <Fragment key={w.position}><span className={cls}>{w.text}</span>{" "}</Fragment>;
+              return <Fragment key={w.position}><span className={cls}>{tajweed && w.tj ? <TajweedText markup={w.tj} /> : w.text}</span>{" "}</Fragment>;
             })}
             <AyahMarker n={v.number} />{" "}
           </span>

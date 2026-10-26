@@ -123,3 +123,16 @@ describe("heatmap states", () => {
     expect(["strong", "good", "light"]).toContain(s[20].state);
   });
 });
+
+describe("hifz reminder", () => {
+  test("plans at most 3 days and skips today once the session is done", async () => {
+    const { hifzReminderNotes } = await import("./reminder");
+    const st = { plan: { targets: [], dailyNewAyahs: 0, direction: "backward" as const, updatedAt: "", goal: juzAmma, paceLines: 5 }, events: [] };
+    const now = new Date("2026-10-26T08:00:00");
+    const all = hifzReminderNotes(st, now, 19, 0, false);
+    expect(all.length).toBeLessThanOrEqual(3);
+    expect(all[0].at.getDate()).toBe(26);
+    const done = hifzReminderNotes(st, now, 19, 0, true);
+    expect(done.every((n) => n.at.getDate() !== 26)).toBe(true);
+  });
+});

@@ -5174,3 +5174,14 @@ body.has-adhkar-mini.adhkar-tucked .quran-player:not(.rec-panel), body.has-adhka
   --hifz-on-light: oklch(0.22 0.02 75);
   --hifz-none: color-mix(in oklab, var(--muted-foreground) 22%, transparent);
 }
+
+/* Tajweed colors, Dar al-Ma'rifah scheme (fixed across themes so rules always read the same). */
+:root {
+  --tj-necessary: oklch(0.48 0.17 25);
+  --tj-obligatory: oklch(0.6 0.22 27);
+  --tj-permissible: oklch(0.7 0.17 55);
+  --tj-normal: oklch(0.72 0.13 85);
+  --tj-ghunnah: oklch(0.6 0.16 145);
+  --tj-qalqalah: oklch(0.64 0.13 235);
+  --tj-silent: oklch(0.66 0 0);
+}

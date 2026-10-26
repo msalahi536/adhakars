@@ -16,6 +16,7 @@ import { goalAyahs, remainingGoal } from "@/lib/hifz/layout";
 import { nextSabaq, sabaqProgress } from "@/lib/hifz/session";
 import { Link, useNavigate } from "@tanstack/react-router";
 import { HifzSettings } from "@/components/hifz/HifzSettings";
+import { TajweedText, useTajweed } from "@/lib/tajweed";
 
 export const Route = createFileRoute("/app/hifz")({
   head: () => ({
@@ -247,6 +248,7 @@ function Workspace({ chapter, maxAyah, start, size, words, reciterId, onNext, on
   }, [start]);
 
   const [phase, setPhase] = useState<Phase>("study");
+  const tajweed = useTajweed();
   const [level, setLevel] = useState(1);
   const [pass, setPass] = useState(1);
   const [suggest, setSuggest] = useState(false);
@@ -387,6 +389,8 @@ function Workspace({ chapter, maxAyah, start, size, words, reciterId, onNext, on
     return all.filter((l) => l.line >= lo && l.line <= hi).map((l) => ({ ...l, context: !mine.includes(l.line) }));
   });
   const wordCls = "arabic shrink-0 px-[0.15em] leading-[1.9]";
+  // Tajweed colors only where the full text is meant to be read: L1 and the check view, never hidden levels or peeks.
+  const colored = (w: MWord) => (tajweed && w.tj ? <TajweedText markup={w.tj} /> : w.text);
   const renderWord = (w: MWord) => {
     const id = wid(w);
     if (!chunkSet.has(w.key)) {
@@ -401,7 +405,7 @@ function Workspace({ chapter, maxAyah, start, size, words, reciterId, onNext, on
     }
     idx += 1;
     const isErr = errors.has(id);
-    let shown: React.ReactNode = w.text;
+    let shown: React.ReactNode = effLevel === 1 && phase === "study" ? colored(w) : w.text;
     let hidden = false;
     if (!checking && !revealed.has(id)) {
       if (effLevel === 2) { const f = firstLetter(w.text); shown = <>{f}<span style={{ visibility: "hidden" }}>{w.text.slice(f.length)}</span></>; }
@@ -425,7 +429,7 @@ function Workspace({ chapter, maxAyah, start, size, words, reciterId, onNext, on
         className={`${wordCls} min-h-12 rounded-lg`}
         style={isErr ? { background: "color-mix(in oklab, var(--destructive) 18%, transparent)", color: "var(--destructive)", textDecoration: "underline" } : {}}
       >
-        {w.text}
+        {isErr ? w.text : colored(w)}
       </button>
     ) : (
       <span key={id} className={wordCls}>{shown}</span>

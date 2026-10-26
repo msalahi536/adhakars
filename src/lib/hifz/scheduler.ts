@@ -49,8 +49,19 @@ export function newAyah(key: string, page: number, day: string): AyahItem {
   return { key, page, stage: "sabaq", interval: FIRST_INTERVAL, due: addDays(day, FIRST_INTERVAL), graduated: false };
 }
 
+/**
+ * Reviewed before its due date: growth is earned only for the days actually elapsed since the last review
+ * (last review = due − interval). Perfect: max(current, elapsed × 2); Hesitation: elapsed × 1.2 (at least 1).
+ * Mistake/Blank and on-time or late reviews use the normal multipliers.
+ */
+export function reviewInterval(current: number, due: string, grade: Grade, day: string): number {
+  if (day >= due || grade === "mistake" || grade === "blank") return nextAyahInterval(current, grade);
+  const elapsed = Math.max(0, daysBetween(addDays(due, -current), day));
+  return grade === "perfect" ? Math.max(current, elapsed * 2) : Math.max(1, Math.ceil(elapsed * 1.2));
+}
+
 export function gradeAyah(a: AyahItem, grade: Grade, day: string): AyahItem {
-  const interval = nextAyahInterval(a.interval, grade);
+  const interval = reviewInterval(a.interval, a.due, grade, day);
   const graduated = interval >= GRADUATE_AT;
   return { ...a, interval, due: addDays(day, interval), graduated, stage: graduated ? "manzil" : "sabqi" };
 }
@@ -73,7 +84,7 @@ export function enterManzil(page: number, day: string): PageItem {
 /** Perfect/Hesitation grow the page (cap 30). Mistake/Blank send error-tapped ayahs to sabqi at 1 day. */
 export function gradePage(p: PageItem, memorized: AyahItem[], grade: Grade, errorKeys: string[], day: string) {
   if (grade === "perfect" || grade === "hesitation") {
-    const interval = Math.min(MANZIL_CAP, nextAyahInterval(p.interval, grade));
+    const interval = Math.min(MANZIL_CAP, reviewInterval(p.interval, p.due, grade, day));
     return { page: { ...p, interval, due: addDays(day, interval) }, ayahs: memorized };
   }
   const errs = new Set(errorKeys);

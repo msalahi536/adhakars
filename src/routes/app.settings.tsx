@@ -28,6 +28,7 @@ import {
   requestNotificationPermission,
   checkNotificationPermission,
   applyReminders,
+  HIFZ_REMINDER_ID,
   scheduleReminder,
   cancelReminder,
   isNativePlatform,
@@ -834,6 +835,7 @@ function Settings() {
                   )}
                   {notifPrefs.reminders.map((r, i) => {
                     const isSmart = r.id === 1 || r.id === 2;
+                    const isFixed = isSmart || r.id === HIFZ_REMINDER_ID;
                     const followsPrayer = isSmart && !r.customTime && !!prayerSettings.location;
                     const prayerLabel = r.id === 1 ? "5 mins after Fajr" : "5 mins after Asr";
                     return (
@@ -847,7 +849,7 @@ function Settings() {
                         </span>
                         <div className="flex min-w-0 flex-1 flex-col gap-1">
                           <div className="flex min-w-0 items-center gap-2">
-                            {isSmart ? (
+                            {isFixed ? (
                               <div
                                 className="min-w-0 flex-1 font-semibold"
                                 style={{ color: "var(--foreground)", opacity: r.enabled ? 1 : 0.6, fontSize: 16 }}
@@ -902,7 +904,7 @@ function Settings() {
                                 style={{ left: r.enabled ? 22 : 2 }}
                               />
                             </button>
-                            {!isSmart && (
+                            {!isFixed && (
                               <button
                                 onClick={() => void removeReminder(r.id)}
                                 className="shrink-0 rounded-full text-lg leading-none opacity-50 hover:opacity-100"
@@ -925,6 +927,11 @@ function Settings() {
                                   {followsPrayer ? "Set custom time" : "Follow prayer times"}
                                 </button>
                               )}
+                            </div>
+                          )}
+                          {r.id === HIFZ_REMINDER_ID && (
+                            <div className="text-xs" style={{ color: "var(--muted-foreground)" }}>
+                              "Hifz: X reviews due today". Skipped once today's session is done.
                             </div>
                           )}
                         </div>
