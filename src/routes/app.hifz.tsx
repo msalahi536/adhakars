@@ -181,6 +181,8 @@ function Workspace({ chapter, maxAyah, start, size, words, reciterId, onNext, on
   const [errors, setErrors] = useState<Set<string>>(new Set());
   const [saved, setSaved] = useState<string>("");
   const [outlines, setOutlines] = useState(false);
+  const fitRef = useRef<HTMLDivElement | null>(null);
+  const [fit, setFit] = useState(24);
   const [pageWords, setPageWords] = useState<Record<number, MWord[]>>({});
   useEffect(() => {
     const pages = [...new Set(words.filter((w) => w.key.startsWith(`${chapter}:`) && [...prevKeys, ...keys].includes(w.key)).map((w) => w.page))];
@@ -309,7 +311,7 @@ function Workspace({ chapter, maxAyah, start, size, words, reciterId, onNext, on
     const lo = Math.max(1, Math.min(...mine) - 2), hi = Math.min(15, Math.max(...mine) + 2);
     return all.filter((l) => l.line >= lo && l.line <= hi).map((l) => ({ ...l, context: !mine.includes(l.line) }));
   });
-  const wordCls = "arabic px-[0.15em] text-[clamp(14px,4.3vw,26px)] leading-[1.9]";
+  const wordCls = "arabic px-[0.15em] leading-[1.9]";
   const renderWord = (w: MWord) => {
     const id = wid(w);
     if (!chunkSet.has(w.key)) {
@@ -317,7 +319,7 @@ function Workspace({ chapter, maxAyah, start, size, words, reciterId, onNext, on
     }
     if (w.end) {
       return (
-        <span key={id} className="arabic mx-0.5 inline-flex h-9 min-w-9 shrink-0 items-center justify-center rounded-full text-base" style={{ border: "1.5px solid var(--accent)", color: "var(--accent)" }}>
+        <span key={id} className="arabic mx-[0.1em] inline-flex h-[1.5em] min-w-[1.5em] shrink-0 items-center justify-center rounded-full text-[0.65em]" style={{ border: "1.5px solid var(--accent)", color: "var(--accent)" }}>
           {w.text}
         </span>
       );
@@ -355,6 +357,25 @@ function Workspace({ chapter, maxAyah, start, size, words, reciterId, onNext, on
     );
   };
 
+  // One font size for the whole page, shrunk so the widest real mushaf line fits without wrapping.
+  const rowSig = rows.map((r) => r.id).join();
+  useLayoutEffect(() => {
+    const el = fitRef.current;
+    if (!el) return;
+    const measure = () => {
+      el.style.fontSize = "28px";
+      let f = 1;
+      el.querySelectorAll<HTMLElement>("[data-line]").forEach((l) => { if (l.scrollWidth > l.clientWidth) f = Math.min(f, l.clientWidth / l.scrollWidth); });
+      const px = Math.max(12, Math.floor(28 * f * 0.98));
+      el.style.fontSize = `${px}px`;
+      setFit(px);
+    };
+    measure();
+    const ro = new ResizeObserver(measure);
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, [rowSig]);
+
   const card = { background: "var(--surface)", border: "1px solid var(--border)" };
   const label = `${keys[0]}${keys.length > 1 ? `–${keys[keys.length - 1].split(":")[1]}` : ""}`;
 
@@ -367,7 +388,7 @@ function Workspace({ chapter, maxAyah, start, size, words, reciterId, onNext, on
 
       {/* Mushaf lines */}
       <section className="glass-card px-2 py-4" style={card}>
-        <div dir="rtl" lang="ar">
+        <div ref={fitRef} dir="rtl" lang="ar" style={{ fontSize: fit }}>
           {rows.map((l) => (
             <div
               key={l.id}
