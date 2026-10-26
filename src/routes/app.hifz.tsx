@@ -75,6 +75,9 @@ function Hifz() {
     hifzWords(chapter).then(setWords).catch(() => setErr("Connect to the internet once to load this surah. After that it works offline."));
   }, [chapter]);
 
+  const pendingBegin = useRef(false);
+  useEffect(() => { if (words && pendingBegin.current) { pendingBegin.current = false; setBegun(true); } }, [words]);
+
   const ch = chapters.find((c) => c.id === chapter);
   const max = ch?.verses ?? 7;
 
@@ -150,6 +153,7 @@ function Hifz() {
                 {words ? "Start" : "Loading surah…"}
               </button>
             </section>
+            </>
           ) : (
             words && (
               <Workspace
