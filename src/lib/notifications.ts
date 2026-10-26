@@ -1,3 +1,4 @@
+import { enforceNotificationBudget, REMINDER_DAYS_AHEAD } from "@/lib/notification-budget";
 // Local device notifications via @capacitor/local-notifications.
 
 export type Reminder = {
@@ -16,6 +17,11 @@ export type NotificationPrefs = {
 };
 
 const PREFS_KEY = "adhkar:notifications";
+/** Fixed Hifz review reminder: lives in the same list as the other reminders, off until turned on. */
+export const HIFZ_REMINDER_ID = 900;
+const HIFZ_DEFAULT: Reminder = { id: HIFZ_REMINDER_ID, label: "Hifz review", hour: 19, minute: 0, enabled: false };
+const withHifz = (p: NotificationPrefs): NotificationPrefs =>
+  p.reminders.some((r) => r.id === HIFZ_REMINDER_ID) ? p : { ...p, reminders: [...p.reminders, HIFZ_DEFAULT] };
 
 const defaults: NotificationPrefs = {
   reminders: [
@@ -68,13 +74,13 @@ const migrate = (parsed: LegacyPrefs): NotificationPrefs => {
 };
 
 export const getNotificationPrefs = (): NotificationPrefs => {
-  if (typeof window === "undefined") return defaults;
+  if (typeof window === "undefined") return withHifz(defaults);
   try {
     const raw = localStorage.getItem(PREFS_KEY);
-    if (!raw) return defaults;
-    return migrate(JSON.parse(raw) as LegacyPrefs);
+    if (!raw) return withHifz(defaults);
+    return withHifz(migrate(JSON.parse(raw) as LegacyPrefs));
   } catch {
-    return defaults;
+    return withHifz(defaults);
   }
 };
 
@@ -271,7 +277,7 @@ const nextOccurrence = (hour: number, minute: number): Date => {
 export type ActionResult = { ok: true } | { ok: false; error: string };
 
 /** How many future days each reminder is pre-scheduled for. */
-const DAYS_AHEAD = 14;
+const DAYS_AHEAD = REMINDER_DAYS_AHEAD;
 /** Derived notification ids for a reminder: id*1000 + dayOffset. */
 const idsFor = (reminderId: number) =>
   Array.from({ length: DAYS_AHEAD }, (_, i) => reminderId * 1000 + i);
@@ -327,6 +333,10 @@ export const scheduleReminder = async (r: Reminder, firstAt?: Date): Promise<Act
   if (!isNativePlatform()) return { ok: false, error: "Not running in the native app" };
   const plugin = await loadPlugin();
   if (!plugin) return { ok: false, error: "Notifications plugin is missing from this build." };
+  if (r.id === HIFZ_REMINDER_ID) {
+    await rescheduleHifzReminder();
+    return { ok: true };
+  }
   if (!firstAt) {
     const smart = await import("@/lib/smart-notifications");
     if (smart.usesPrayerTimes(r)) {
@@ -405,6 +415,42 @@ export const applyReminders = async (prefs: NotificationPrefs): Promise<void> =>
   }
   const smart = await import("@/lib/smart-notifications");
   await smart.rescheduleSmartAdhkar();
+  await enforceBudget();
+};
+
+/** Keep the whole app under iOS's 64 pending notifications; prayer alerts are never cut. */
+export const enforceBudget = async (): Promise<void> => {
+  const plugin = await loadPlugin();
+  if (!plugin) return;
+  const { isPrayerNotifId } = await import("@/lib/adhan-notifications");
+  await enforceNotificationBudget(plugin, (id) => isPrayerNotifId(id) || id === JUMUAH_NOTIF_ID);
+};
+
+/** Hifz reminder: dynamic "X reviews due" bodies, re-planned on every app open and after each Hifz session change. */
+export const rescheduleHifzReminder = async (): Promise<void> => {
+  if (typeof window === "undefined" || !isNativePlatform()) return;
+  const plugin = await loadPlugin();
+  if (!plugin) return;
+  await cancelReminder(HIFZ_REMINDER_ID);
+  const r = getNotificationPrefs().reminders.find((x) => x.id === HIFZ_REMINDER_ID);
+  if (!r?.enabled) return;
+  const perm = await plugin.checkPermissions?.().catch(() => null);
+  if (perm && perm.display !== "granted") return;
+  await ensureChannel(plugin);
+  const [{ hifzReminderNotes, hifzTodayDone }, { loadHifz }] = await Promise.all([import("@/lib/hifz/reminder"), import("@/lib/hifz/store")]);
+  const notes = hifzReminderNotes(loadHifz(), new Date(), r.hour, r.minute, hifzTodayDone());
+  const notifications = notes.map((n, i) => ({
+    id: HIFZ_REMINDER_ID * 1000 + i,
+    title: "Hifz",
+    body: n.body,
+    schedule: { at: n.at, allowWhileIdle: true },
+    channelId: ANDROID_CHANNEL,
+    extra: { route: "/app/hifz/today" },
+  }));
+  if (notifications.length) {
+    try { await plugin.schedule({ notifications }); } catch (e) { console.error("[hifz] reminder schedule failed", e); }
+  }
+  await enforceBudget();
 };
 
 

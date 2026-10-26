@@ -330,6 +330,9 @@ export const rescheduleSmartNotifications = async () => {
   await rescheduleSunnahNotification();
   await reschedulePeriodNotifications();
   await rescheduleStreakNotifications();
+  const n = await import("@/lib/notifications");
+  await n.rescheduleHifzReminder();
+  await n.enforceBudget();
 };
 
 
