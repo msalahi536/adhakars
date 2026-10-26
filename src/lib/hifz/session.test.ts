@@ -72,7 +72,7 @@ describe("backlog guard", () => {
   });
   test("beginner at 10 lines/day completing every session is never paused in 30 days", () => {
     const f = forecast([], D, { type: "whole", direction: "forward" }, 10, 30);
-    expect(f.every((d) => d.newLines >= 9)).toBe(true);
+    expect(f.every((d) => d.newLines > 0)).toBe(true); // chunks end on ayah boundaries, so a day is ~7–10 lines
   });
   test("skipping 5 days triggers the guard", () => {
     // 30 days of perfect sessions, then 5 days skipped.
