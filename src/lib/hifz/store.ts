@@ -71,7 +71,7 @@ export function derive(events: HifzEvent[]): Derived {
       for (const k of e.keys)
         ayahs[k] = known
           ? { key: k, page: e.page, stage: "manzil", interval: GRADUATE_AT, due: addDays(e.day, GRADUATE_AT), graduated: true }
-          : { key: k, page: e.page, stage: "sabqi", interval: 1, due: addDays(e.day, 1), graduated: false };
+          : { key: k, page: e.page, stage: "sabqi", interval: 1, due: addDays(e.day, Math.max(1, e.dueOffset ?? 1)), graduated: false };
       if (known) pages[e.page] = { page: e.page, inManzil: true, interval: MANZIL_FIRST, due: addDays(e.day, Math.max(1, e.dueOffset ?? MANZIL_FIRST)) };
       else if (pages[e.page]) pages[e.page] = { ...pages[e.page], inManzil: false };
     } else if (e.kind === "page" && pages[e.page]?.inManzil && e.grade) {

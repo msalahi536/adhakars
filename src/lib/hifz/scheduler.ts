@@ -82,3 +82,8 @@ export function gradePage(p: PageItem, memorized: AyahItem[], grade: Grade, erro
   );
   return { page: pageReady(ayahs) ? p : { ...p, inManzil: false }, ayahs };
 }
+
+/** A hint or any word tapped as wrong rules out Perfect: the best grade is then Hesitation. */
+export function capGrade(g: Grade, hintUsed: boolean, wrongWords: number): Grade {
+  return g === "perfect" && (hintUsed || wrongWords > 0) ? "hesitation" : g;
+}
