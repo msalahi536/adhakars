@@ -79,6 +79,10 @@ function Today() {
   const current = items[snap.done];
   const name = (c: number) => chapters.find((x) => x.id === c)?.name ?? `Surah ${c}`;
   const ref = (k: string) => { const [c, a] = k.split(":"); return `${name(+c)} ${a}`; };
+  const span = (ks: string[]) => {
+    const [c1, a1] = ks[0].split(":"), [c2, a2] = ks[ks.length - 1].split(":");
+    return ks.length === 1 ? ref(ks[0]) : c1 === c2 ? `${name(+c1)} ${a1}–${a2}` : `${ref(ks[0])} – ${ref(ks[ks.length - 1])}`;
+  };
 
   const advance = (events: EventInput[]) => {
     if (events.length) recordEvents(events);
@@ -113,9 +117,9 @@ function Today() {
   if (running && current) {
     const label =
       current.t === "manzil" ? { kicker: "Manzil · whole page", title: `Page ${current.page}`, hint: "Recite the page from memory, starting from the cue." }
-      : current.t === "sabqi" ? { kicker: "Sabqi", title: `${ref(current.keys[0])}${current.keys.length > 1 ? `–${current.keys[current.keys.length - 1].split(":")[1]}` : ""}`, hint: "Recite these ayahs together from the cue." }
-      : current.t === "drill" ? { kicker: "Transition drill", title: `${ref(current.drill.prev)} → ${current.drill.next.split(":")[1]}`, hint: "Read the end of the ayah, then recite the start of the next one." }
-      : { kicker: "Sabaq · new lines", title: `${ref(current.keys[0])}–${current.keys[current.keys.length - 1].split(":")[1]}`, hint: "" };
+      : current.t === "sabqi" ? { kicker: "Sabqi", title: span(current.keys), hint: "Recite these ayahs together from the cue." }
+      : current.t === "drill" ? { kicker: "Transition drill", title: `${ref(current.drill.prev)} → ${current.drill.next.split(":")[0] === current.drill.prev.split(":")[0] ? current.drill.next.split(":")[1] : ref(current.drill.next)}`, hint: "Read the end of the ayah, then recite the start of the next one." }
+      : { kicker: "Sabaq · new lines", title: span(current.keys), hint: "" };
     const memorized = current.t === "manzil" ? Object.values(derive(st.events).ayahs).filter((a) => a.page === current.page).map((a) => a.key).sort((a, b) => { const [x, y] = a.split(":").map(Number), [u, v] = b.split(":").map(Number); return x - u || y - v; }) : [];
     return (
       <>
