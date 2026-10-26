@@ -71,12 +71,11 @@ describe("backlog guard", () => {
     }
   });
   test("beginner at 10 lines/day completing every session is never paused in 30 days", () => {
-    const f = forecast([], D, juzAmma, 10, 30);
-    expect(f.every((d) => d.newLines > 0)).toBe(true);
+    const f = forecast([], D, { type: "whole", direction: "forward" }, 10, 30);
+    expect(f.every((d) => d.newLines >= 9)).toBe(true);
   });
   test("skipping 5 days triggers the guard", () => {
     // 30 days of perfect sessions, then 5 days skipped.
-    const f = forecast([], "2026-09-01", juzAmma, 10, 1);
     let evs: HifzEvent[] = [];
     let day = "2026-09-01";
     for (let i = 0; i < 30; i++) {
@@ -88,7 +87,6 @@ describe("backlog guard", () => {
       day = new Date(Date.parse(day + "T12:00:00Z") + 864e5).toISOString().slice(0, 10);
     }
     const back = new Date(Date.parse(day + "T12:00:00Z") + 5 * 864e5).toISOString().slice(0, 10);
-    expect(f.length).toBe(1);
     expect(buildQueue(derive(evs), back, juzAmma, 10).backlog.paused).toBe(true);
   });
   test("reviews due today on schedule never trip the guard", () => {
