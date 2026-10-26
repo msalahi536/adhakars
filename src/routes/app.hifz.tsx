@@ -365,7 +365,11 @@ function Workspace({ chapter, maxAyah, start, size, words, reciterId, onNext, on
     const measure = () => {
       el.style.fontSize = "28px";
       let f = 1;
-      el.querySelectorAll<HTMLElement>("[data-line]").forEach((l) => { if (l.scrollWidth > l.clientWidth) f = Math.min(f, l.clientWidth / l.scrollWidth); });
+      el.querySelectorAll<HTMLElement>("[data-line]").forEach((l) => {
+        // Sum children: a centred overflow spills both ways, so scrollWidth under-reports it.
+        const w = [...l.children].reduce((a, c) => a + c.getBoundingClientRect().width, 0);
+        if (w > l.clientWidth) f = Math.min(f, l.clientWidth / w);
+      });
       const px = Math.max(12, Math.floor(28 * f * 0.98));
       el.style.fontSize = `${px}px`;
       setFit(px);
