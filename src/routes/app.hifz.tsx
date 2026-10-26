@@ -354,7 +354,7 @@ function Workspace({ chapter, maxAyah, start, size, words, reciterId, onNext, on
       </section>
 
       {/* Listen */}
-      {(phase === "study" || checking) && (
+      {((phase === "study" && level < 4) || checking) && (
         <section className="glass-card space-y-3 p-4" style={card}>
           <div className="flex items-center justify-between">
             <h2 className="label-caps">Listen · {reciterName(findReciter(reciterId))}</h2>
