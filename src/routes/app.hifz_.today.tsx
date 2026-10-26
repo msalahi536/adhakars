@@ -267,7 +267,7 @@ function Today() {
             {salahOpen && <SalahLogger chapters={chapters} onClose={() => { setSalahOpen(false); setSnap({ ...snap }); }} />}
           </section>
 
-          <Link to="/app/hifz/progress" className="glass-card flex min-h-14 items-center justify-between p-4 text-sm font-semibold" style={card}>Progress, forecast and reminders <span aria-hidden>→</span></Link>
+          <Link to="/app/hifz/progress" className="glass-card flex min-h-14 items-center justify-between p-4 text-sm font-semibold" style={card}>Progress and forecast <span aria-hidden>→</span></Link>
           <Link to="/app/hifz" className="block text-center text-sm underline" style={muted}>Memorize something else</Link>
         </div>
       </main>
