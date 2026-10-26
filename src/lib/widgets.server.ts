@@ -109,6 +109,7 @@ export async function buildWidgetPayload(now = new Date()) {
 
   return {
     date: now.toISOString().slice(0, 10),
+    degraded,
     quran_verse: q && { arabic: numberVerseMarkers(q.arabic_text, q.reference), translation: q.translation, reference: q.reference },
     daily_dhikr: dh && {
       arabic: dh.arabic_text,

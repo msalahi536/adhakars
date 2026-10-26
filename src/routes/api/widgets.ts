@@ -14,8 +14,11 @@ export const Route = createFileRoute("/api/widgets")({
         try {
           const { buildWidgetPayload } = await import("@/lib/widgets.server");
           const payload = await buildWidgetPayload();
+          // A degraded (empty fallback) feed is flagged and never cached, so a recovery shows up at once.
           return Response.json(payload, {
-            headers: { ...CORS, "Cache-Control": "public, max-age=300" },
+            headers: payload.degraded
+              ? { ...CORS, "Cache-Control": "no-store", "X-Widget-Feed": "fallback-empty" }
+              : { ...CORS, "Cache-Control": "public, max-age=300" },
           });
         } catch (e) {
           console.error("widgets api", e);
