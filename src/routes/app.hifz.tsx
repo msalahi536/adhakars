@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { Haptics, ImpactStyle } from "@capacitor/haptics";
 import { Eye, Lightbulb, Pause, Play, RotateCcw, Square } from "lucide-react";
 import { HeaderBackButton } from "@/components/HeaderBackButton";
@@ -329,7 +329,7 @@ function Workspace({ chapter, maxAyah, start, size, words, reciterId, onNext, on
     let shown: React.ReactNode = w.text;
     let hidden = false;
     if (!checking && !revealed.has(id)) {
-      if (effLevel === 2) shown = <>{firstLetter(w.text)}<span style={{ opacity: 0.35 }}>…</span></>;
+      if (effLevel === 2) { const f = firstLetter(w.text); shown = <>{f}<span style={{ visibility: "hidden" }}>{w.text.slice(f.length)}</span></>; }
       if (effLevel === 3 && fadeHidden(idx, pass)) hidden = true;
       if (effLevel === 4) hidden = true;
     }
