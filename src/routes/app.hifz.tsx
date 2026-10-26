@@ -13,6 +13,8 @@ import { HifzOnboarding } from "@/components/hifz/Onboarding";
 const SKIP_KEY = "hifz:onboarding-skipped";
 import { capGrade, type Grade } from "@/lib/hifz/scheduler";
 import { goalAyahs, remainingGoal } from "@/lib/hifz/layout";
+import { nextSabaq } from "@/lib/hifz/session";
+import { Link } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/app/hifz")({
   head: () => ({
@@ -83,6 +85,12 @@ function Hifz() {
       if (!st.plan && !localStorage.getItem(SKIP_KEY)) setOnboarding(true);
       const next = planNext();
       if (next) { setChapter(next.c); setStart(next.a); setFromPlan(true); }
+      // From Today's Sabaq: open the recall loop on the plan's next chunk (up to 3 ayahs).
+      if (next && new URLSearchParams(window.location.search).get("session")) {
+        const n = nextSabaq(st.plan?.goal, derive(st.events), st.plan?.paceLines ?? 5).length;
+        setSize(Math.max(1, Math.min(3, n)));
+        pendingBegin.current = true;
+      }
     } catch { /* storage blocked */ }
     hifzChapters().then(setChapters).catch(() => setErr("Connect to the internet once to load the surah list."));
   }, []);
@@ -127,6 +135,9 @@ function Hifz() {
               </div>
               <button onClick={() => setOnboarding(true)} className="min-h-11 shrink-0 rounded-full px-4 text-sm font-semibold" style={{ background: "var(--background)", border: "1px solid var(--border)" }}>Run setup</button>
             </section>
+            <Link to="/app/hifz/today" className="glass-card flex min-h-14 items-center justify-between p-4 text-sm font-semibold" style={{ background: "var(--accent)", color: "var(--accent-foreground)" }}>
+              Today's session <span aria-hidden>→</span>
+            </Link>
             <section className="glass-card space-y-4 p-5" style={{ background: "var(--surface)", border: "1px solid var(--border)" }}>
               <h2 className="label-caps">Choose what to memorize</h2>
               {fromPlan && <p className="text-xs" style={{ color: "var(--muted-foreground)" }}>Next chunk from your plan. Change the surah or ayah to pick something else.</p>}
