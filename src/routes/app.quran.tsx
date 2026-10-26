@@ -767,6 +767,7 @@ const AUDIO_TOGGLES: { key: keyof DisplayPrefs; label: string; sub: string }[] =
 
 function QuranAudioSettings({ onClose }: { onClose: () => void }) {
   const [d, setD] = useState<DisplayPrefs>(() => getDisplay());
+  const [legend, setLegend] = useState(false);
   const update = (patch: Partial<DisplayPrefs>) => {
     const next = { ...d, ...patch };
     setD(next); setDisplay(next);
