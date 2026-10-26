@@ -77,7 +77,8 @@ export function HifzOnboarding({ chapters, onSkip, onDone }: Props) {
     setSummary({
       ok: plan.filter((s) => s.grade === "perfect" || s.grade === "hesitation").length,
       work: plan.filter((s) => s.grade === "mistake" || s.grade === "blank").length,
-      review: Math.round((due30 / 30) * 10) / 10,
+      // Manzil pages spread over 30 days, plus need-work pages, which are reviewed in sabqi straight away.
+      review: due30 + plan.length === 0 ? 0 : Math.max(1, Math.round(due30 / 30 + plan.filter((x) => x.grade === "mistake" || x.grade === "blank").length)),
     });
     setStep("finish");
   }
