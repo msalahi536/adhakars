@@ -39,6 +39,7 @@ import { Route as AppSleepRouteImport } from './routes/app.sleep'
 import { Route as AppTafsirRouteImport } from './routes/app.tafsir'
 import { Route as AppTasbihRouteImport } from './routes/app.tasbih'
 import { Route as AppTermsRouteImport } from './routes/app.terms'
+import { Route as AppHifzTodayRouteImport } from './routes/app.hifz_.today'
 import { Route as AppMoreZakatRouteImport } from './routes/app.more_.zakat'
 
 const IndexRoute = IndexRouteImport.update({
@@ -191,6 +192,11 @@ const AppTermsRoute = AppTermsRouteImport.update({
   path: '/terms',
   getParentRoute: () => AppRoute,
 } as any)
+const AppHifzTodayRoute = AppHifzTodayRouteImport.update({
+  id: '/hifz_/today',
+  path: '/hifz/today',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppMoreZakatRoute = AppMoreZakatRouteImport.update({
   id: '/more_/zakat',
   path: '/more/zakat',
@@ -228,6 +234,7 @@ export interface FileRoutesByFullPath {
   '/app/tasbih': typeof AppTasbihRoute
   '/app/terms': typeof AppTermsRoute
   '/app/': typeof AppIndexRoute
+  '/app/hifz/today': typeof AppHifzTodayRoute
   '/app/more/zakat': typeof AppMoreZakatRoute
 }
 export interface FileRoutesByTo {
@@ -260,6 +267,7 @@ export interface FileRoutesByTo {
   '/app/tasbih': typeof AppTasbihRoute
   '/app/terms': typeof AppTermsRoute
   '/app': typeof AppIndexRoute
+  '/app/hifz/today': typeof AppHifzTodayRoute
   '/app/more/zakat': typeof AppMoreZakatRoute
 }
 export interface FileRoutesById {
@@ -294,6 +302,7 @@ export interface FileRoutesById {
   '/app/tasbih': typeof AppTasbihRoute
   '/app/terms': typeof AppTermsRoute
   '/app/': typeof AppIndexRoute
+  '/app/hifz_/today': typeof AppHifzTodayRoute
   '/app/more_/zakat': typeof AppMoreZakatRoute
 }
 export interface FileRouteTypes {
@@ -329,6 +338,7 @@ export interface FileRouteTypes {
     | '/app/tasbih'
     | '/app/terms'
     | '/app/'
+    | '/app/hifz/today'
     | '/app/more/zakat'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -361,6 +371,7 @@ export interface FileRouteTypes {
     | '/app/tasbih'
     | '/app/terms'
     | '/app'
+    | '/app/hifz/today'
     | '/app/more/zakat'
   id:
     | '__root__'
@@ -394,6 +405,7 @@ export interface FileRouteTypes {
     | '/app/tasbih'
     | '/app/terms'
     | '/app/'
+    | '/app/hifz_/today'
     | '/app/more_/zakat'
   fileRoutesById: FileRoutesById
 }
@@ -621,6 +633,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppTermsRouteImport
       parentRoute: typeof AppRoute
     }
+    '/app/hifz_/today': {
+      id: '/app/hifz_/today'
+      path: '/hifz/today'
+      fullPath: '/app/hifz/today'
+      preLoaderRoute: typeof AppHifzTodayRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/app/more_/zakat': {
       id: '/app/more_/zakat'
       path: '/more/zakat'
@@ -653,6 +672,7 @@ interface AppRouteChildren {
   AppTasbihRoute: typeof AppTasbihRoute
   AppTermsRoute: typeof AppTermsRoute
   AppIndexRoute: typeof AppIndexRoute
+  AppHifzTodayRoute: typeof AppHifzTodayRoute
   AppMoreZakatRoute: typeof AppMoreZakatRoute
 }
 
@@ -678,6 +698,7 @@ const AppRouteChildren: AppRouteChildren = {
   AppTasbihRoute: AppTasbihRoute,
   AppTermsRoute: AppTermsRoute,
   AppIndexRoute: AppIndexRoute,
+  AppHifzTodayRoute: AppHifzTodayRoute,
   AppMoreZakatRoute: AppMoreZakatRoute,
 }
 

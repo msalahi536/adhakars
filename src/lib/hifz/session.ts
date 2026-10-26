@@ -1,0 +1,132 @@
+// Pure daily-session rules: today's queue (Manzil → Sabqi → Sabaq), backlog guard, transition drills,
+// Salah logging and the first-week forecast. No I/O; everything is expressed as log events.
+import { countLines, goalAyahs, linesOfAyah, pageOfAyah, remainingGoal, surahLength, type Goal } from "./layout";
+import { addDays, capGrade, type Grade } from "./scheduler";
+import { derive, type Derived, type HifzEvent } from "./store";
+
+export type EventInput = Omit<HifzEvent, "id" | "at" | "day">;
+export type SabqiGroup = { page: number; keys: string[] };
+export type Queue = {
+  manzil: number[];
+  sabqi: SabqiGroup[];
+  sabaq: string[]; // today's new ayahs (empty when paused by the backlog guard)
+  backlog: { paused: boolean; due: number; limit: number };
+  minutes: number;
+};
+
+export const BACKLOG_FACTOR = 2;
+export const MIN_NORMAL_LOAD = 2;
+
+const ayahOrder = (a: string, b: string) => {
+  const [x, y] = a.split(":").map(Number), [u, v] = b.split(":").map(Number);
+  return x - u || y - v;
+};
+
+/** Due ayahs (not graduated) grouped by page, consecutive ayahs together. */
+export function sabqiGroups(d: Derived, today: string): SabqiGroup[] {
+  const due = Object.values(d.ayahs).filter((a) => !a.graduated && a.due <= today).map((a) => a.key).sort(ayahOrder);
+  const groups: SabqiGroup[] = [];
+  for (const k of due) {
+    const g = groups[groups.length - 1];
+    const [c, a] = k.split(":").map(Number);
+    const prev = g?.keys[g.keys.length - 1].split(":").map(Number);
+    if (g && g.page === pageOfAyah(k) && prev && prev[0] === c && prev[1] === a - 1) g.keys.push(k);
+    else groups.push({ page: pageOfAyah(k), keys: [k] });
+  }
+  return groups;
+}
+
+/** Normal daily review load: what an average day costs at current intervals (each page/group once per interval). */
+export function normalLoad(d: Derived): number {
+  const pages = Object.values(d.pages).filter((p) => p.inManzil).reduce((s, p) => s + 1 / Math.max(1, p.interval), 0);
+  const ayahPages = new Map<number, number>();
+  for (const a of Object.values(d.ayahs)) if (!a.graduated) ayahPages.set(a.page, Math.min(ayahPages.get(a.page) ?? 99, a.interval));
+  const sabqi = [...ayahPages.values()].reduce((s, i) => s + 1 / Math.max(1, i), 0);
+  return Math.max(MIN_NORMAL_LOAD, pages + sabqi);
+}
+
+/** The plan's next new ayahs at today's pace (lines per day; 0 = one full page). */
+export function nextSabaq(goal: Goal | undefined, d: Derived, paceLines: number): string[] {
+  if (!goal) return [];
+  const left = remainingGoal(goalAyahs(goal), new Set(Object.keys(d.ayahs)));
+  const out: string[] = [];
+  const firstPage = left[0] ? pageOfAyah(left[0]) : 0;
+  for (const k of left) {
+    if (paceLines === 0 ? pageOfAyah(k) !== firstPage : out.length > 0 && countLines([...out, k]) > paceLines) break;
+    out.push(k);
+  }
+  return out;
+}
+
+export function buildQueue(d: Derived, today: string, goal: Goal | undefined, paceLines: number): Queue {
+  const manzil = Object.values(d.pages).filter((p) => p.inManzil && p.due <= today).sort((a, b) => a.due.localeCompare(b.due) || a.page - b.page).map((p) => p.page);
+  const sabqi = sabqiGroups(d, today);
+  const due = manzil.length + sabqi.length;
+  const limit = Math.ceil(BACKLOG_FACTOR * normalLoad(d));
+  const paused = due > limit;
+  const sabaq = paused ? [] : nextSabaq(goal, d, paceLines);
+  const minutes = Math.round(manzil.length * 3 + sabqi.reduce((s, g) => s + g.keys.length, 0) * 1 + countLines(sabaq) * 1.5 + 2);
+  return { manzil, sabqi, sabaq, backlog: { paused, due, limit }, minutes };
+}
+
+// ---- transition drills ----
+export type Drill = { prev: string; next: string };
+
+/** 3–5 drills from memorized consecutive ayahs; pairs whose boundary words were tapped as errors come first. */
+export function pickDrills(d: Derived, rand: () => number = Math.random, n = 3 + Math.floor(rand() * 3)): Drill[] {
+  const known = new Set(Object.keys(d.ayahs));
+  const pairs: Drill[] = [];
+  for (const k of [...known].sort(ayahOrder)) {
+    const [c, a] = k.split(":").map(Number);
+    const next = a < surahLength(c) ? `${c}:${a + 1}` : `${c + 1}:1`;
+    if (known.has(next)) pairs.push({ prev: k, next });
+  }
+  const errs = Object.keys(d.wordErrors);
+  const hot = (p: Drill) =>
+    errs.some((w) => w.startsWith(p.next + ":") && Number(w.split(":")[2]) <= 2) ? 2 : errs.some((w) => w.startsWith(p.prev + ":")) ? 1 : 0;
+  const scored = pairs.map((p) => ({ p, s: hot(p), r: rand() })).sort((a, b) => b.s - a.s || a.r - b.r);
+  return scored.slice(0, Math.min(5, Math.max(3, n), pairs.length)).map((x) => x.p);
+}
+
+/** A drill is a review of the NEXT ayah: reciting into it is what's being tested. */
+export function drillEvent(drill: Drill, grade: Grade, errorWords: string[] = []): EventInput {
+  return { kind: "ayah", session: "drill", key: drill.next, page: pageOfAyah(drill.next), grade: capGrade(grade, false, errorWords.length), errorWords };
+}
+
+// ---- salah ----
+export const SALAH_OUTCOMES = { smooth: "perfect", stumbled: "hesitation", forgot: "mistake" } as const;
+export type SalahOutcome = keyof typeof SALAH_OUTCOMES;
+
+/** Only already-memorized ayahs can be logged; anything else rejects the whole entry. */
+export function salahEvents(d: Derived, keys: string[], outcome: SalahOutcome, prayer: string): { ok: true; events: EventInput[] } | { ok: false; error: string } {
+  if (!keys.length) return { ok: false, error: "Pick at least one ayah." };
+  const missing = keys.filter((k) => !d.ayahs[k]);
+  if (missing.length) return { ok: false, error: `Only memorized ayahs can be logged. Not yet memorized: ${missing.slice(0, 3).join(", ")}${missing.length > 3 ? "…" : ""}` };
+  return { ok: true, events: keys.map((k) => ({ kind: "ayah", session: "salah", prayer, key: k, page: pageOfAyah(k), grade: SALAH_OUTCOMES[outcome] })) };
+}
+
+// ---- forecast ----
+export type DayLoad = { day: string; manzil: number; sabqi: number; hesitationSeed: number; total: number; newLines: number };
+
+/** Simulate the next days assuming Perfect grades: each day's due reviews are done, then the day's new lines learned. */
+export function forecast(events: HifzEvent[], today: string, goal: Goal | undefined, paceLines: number, days = 7): DayLoad[] {
+  const sim = [...events];
+  const hesSeed = new Set(events.filter((e) => e.kind === "seed" && e.grade === "hesitation").map((e) => e.page));
+  const out: DayLoad[] = [];
+  let n = 0;
+  const push = (day: string, e: EventInput) => sim.push({ ...e, id: `sim-${n}`, at: `${day}T23:00:00.${String(n++ % 1000).padStart(3, "0")}Z`, day });
+  for (let i = 0; i < days; i++) {
+    const day = addDays(today, i + 1);
+    const d = derive(sim);
+    const manzil = Object.values(d.pages).filter((p) => p.inManzil && p.due <= day).map((p) => p.page);
+    const groups = sabqiGroups(d, day);
+    const sabqiPages = new Set(groups.map((g) => g.page).filter((p) => !manzil.includes(p)));
+    const h = manzil.filter((p) => hesSeed.has(p)).length;
+    for (const p of manzil) { push(day, { kind: "page", session: "session", key: String(p), page: p, grade: "perfect" }); hesSeed.delete(p); }
+    for (const g of groups) for (const k of g.keys) push(day, { kind: "ayah", session: "session", key: k, page: g.page, grade: "perfect" });
+    const fresh = nextSabaq(goal, derive(sim), paceLines);
+    for (const k of fresh) push(day, { kind: "learn", key: k, page: pageOfAyah(k) });
+    out.push({ day, manzil: manzil.length - h, sabqi: sabqiPages.size, hesitationSeed: h, total: manzil.length + sabqiPages.size, newLines: new Set(fresh.flatMap(linesOfAyah)).size });
+  }
+  return out;
+}

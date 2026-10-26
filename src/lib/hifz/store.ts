@@ -33,7 +33,8 @@ export type HifzEvent = {
   // "chain" = joined-chunk review and "placement" = placement-test prompt: logged, never move intervals.
   // "seed" = onboarding seed for one page's memorized ayahs (keys), from a placement grade.
   kind: "learn" | "ayah" | "page" | "chain" | "placement" | "seed";
-  session?: "placement" | "seed";
+  session?: "placement" | "seed" | "session" | "drill" | "salah";
+  prayer?: string; // salah logs only
   keys?: string[];
   dueOffset?: number; // seed only: days until the page's first manzil review
   key: string; // ayah key ("2:255") or page number as text

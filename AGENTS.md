@@ -43,3 +43,4 @@
 - Open-source notices live only in `src/data/licenses.ts`.
 - Hifz chain (joined-chunk) reviews are logged as their own event kind that replay ignores for intervals, so joining never double-grades an ayah.
 - Hifz onboarding seeds only via "placement"/"seed" log events (pure rules in `src/lib/hifz/placement.ts`, static per-ayah Madani layout in `src/data/hifz-layout.json`), so sync replay rebuilds placement like any review.
+- Hifz daily session rules (queue, backlog guard, drills, Salah logs, forecast) live only in pure `src/lib/hifz/session.ts`; the Today screen freezes its queue per local day so sessions pause and resume while every grade is logged immediately.
