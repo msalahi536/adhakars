@@ -37,11 +37,18 @@ function Licenses() {
               </p>
               {l.modified && <p className="mt-2 text-sm">{l.modified}</p>}
               {l.notice && <pre className="mt-3 whitespace-pre-wrap text-[11px] leading-relaxed" style={{ color: "var(--muted-foreground)" }}>{l.notice}</pre>}
-              <pre className="mt-4 whitespace-pre-wrap break-words text-[11px] leading-relaxed" style={{ color: "var(--muted-foreground)" }}>{l.text}</pre>
+              <div className="mt-4 space-y-2 break-words text-[11px] leading-relaxed" style={{ color: "var(--muted-foreground)" }}>
+                {reflow(l.text).map((para, i) => <p key={i}>{para}</p>)}
+              </div>
             </section>
           ))}
         </div>
       </main>
     </>
   );
+}
+
+/** Strip hard line breaks inside paragraphs so the text wraps naturally on small screens. */
+function reflow(text: string): string[] {
+  return text.split(/\n\s*\n/).map((p) => p.replace(/\s*\n\s*/g, " ").replace(/\s+/g, " ").trim()).filter(Boolean);
 }
