@@ -40,7 +40,6 @@ const GRADES: { g: Grade; label: string }[] = [
   { g: "hesitation", label: "Hesitation" },
   { g: "perfect", label: "Perfect" },
 ];
-const LEVELS = ["Full text", "First letters", "Fading", "Hidden"];
 
 function savedReciter(): number {
   try {
@@ -251,7 +250,6 @@ function Workspace({ chapter, maxAyah, start, size, words, reciterId, onNext, on
   const tajweed = useTajweed();
   const [level, setLevel] = useState(1);
   const [pass, setPass] = useState(1);
-  const [suggest, setSuggest] = useState(false);
   const [revealed, setRevealed] = useState<Set<string>>(new Set());
   const [aids, setAids] = useState(false);
   const [errors, setErrors] = useState<Set<string>>(new Set());
@@ -284,6 +282,7 @@ function Workspace({ chapter, maxAyah, start, size, words, reciterId, onNext, on
   const [rate, setRate] = useState(1);
   const [playing, setPlaying] = useState(false);
   const [loop, setLoop] = useState(0);
+  const [heard, setHeard] = useState(false);
   const stopAt = useRef<{ from: number; to: number; times: number; done: number } | null>(null);
 
   useEffect(() => {
@@ -308,7 +307,7 @@ function Workspace({ chapter, maxAyah, start, size, words, reciterId, onNext, on
           s.done += 1;
           setLoop(s.done);
           if (s.done < s.times) el.currentTime = s.from / 1000;
-          else { el.pause(); setPlaying(false); stopAt.current = null; }
+          else { el.pause(); setPlaying(false); if (s.times > 1) setHeard(true); stopAt.current = null; }
         }
       };
       el.onpause = () => setPlaying(false);
@@ -349,11 +348,6 @@ function Workspace({ chapter, maxAyah, start, size, words, reciterId, onNext, on
   const toggleError = (id: string) => setErrors((e) => { const n = new Set(e); if (n.has(id)) n.delete(id); else n.add(id); return n; });
   const resetRecall = () => { setRevealed(new Set()); setAids(false); setErrors(new Set()); stop(); };
 
-  function practiceGrade(g: Grade) {
-    buzz();
-    if (g === "perfect" && level < 4) setSuggest(true);
-    if (level === 3 && g !== "perfect") setPass((p) => p);
-  }
 
   function logGrade(picked: Grade) {
     buzz();
@@ -498,7 +492,7 @@ function Workspace({ chapter, maxAyah, start, size, words, reciterId, onNext, on
         <section className="glass-card space-y-3 p-4" style={card}>
           <div className="flex items-center justify-between">
             <h2 className="label-caps">Listen · {reciterName(findReciter(reciterId))}</h2>
-            {playing && stopAt.current && stopAt.current.times > 1 && <span className="text-xs">{loop + 1}/{stopAt.current.times}</span>}
+            {playing && stopAt.current && stopAt.current.times > 1 ? <span className="text-xs font-semibold">Playing {Math.min(loop + 1, stopAt.current.times)} of {stopAt.current.times}</span> : heard && phase === "study" ? <span className="text-xs font-semibold">✓ Listened</span> : null}
           </div>
           {audioErr ? (
             <p className="text-sm" style={{ color: "var(--muted-foreground)" }}>{audioErr}</p>
@@ -530,41 +524,46 @@ function Workspace({ chapter, maxAyah, start, size, words, reciterId, onNext, on
         </section>
       )}
 
-      {/* Hide levels + recall */}
+      {/* Guided path: 1 Listen → 2 Hints → 3 Test */}
       {phase === "study" && (
         <section className="glass-card space-y-3 p-4" style={card}>
-          <h2 className="label-caps">Hide level</h2>
-          <div className="grid grid-cols-4 gap-1.5">
-            {LEVELS.map((t, i) => (
-              <button
-                key={t}
-                onClick={() => { setLevel(i + 1); setSuggest(false); resetRecall(); }}
-                className="min-h-12 rounded-xl px-1 text-[11px] font-semibold leading-tight"
-                style={level === i + 1 ? { background: "var(--accent)", color: "var(--accent-foreground)" } : { background: "var(--background)", border: "1px solid var(--border)" }}
-              >
-                L{i + 1}<br />{t}
-              </button>
-            ))}
+          <div className="grid grid-cols-3 gap-1.5">
+            {["Listen", "Hints", "Test"].map((t, i) => {
+              const cur = level === 1 ? 0 : level < 4 ? 1 : 2;
+              return (
+                <button key={t} onClick={() => { setLevel(i === 0 ? 1 : i === 1 ? 2 : 4); resetRecall(); }}
+                  className="min-h-11 rounded-xl text-xs font-semibold"
+                  style={cur === i ? { background: "var(--accent)", color: "var(--accent-foreground)" } : { background: "var(--background)", border: "1px solid var(--border)", opacity: i < cur ? 1 : 0.7 }}>
+                  {i < cur ? "✓ " : `${i + 1}. `}{t}
+                </button>
+              );
+            })}
           </div>
-          {level === 3 && (
-            <button onClick={() => setPass((p) => Math.min(4, p + 1))} className="min-h-11 w-full rounded-full text-sm font-semibold" style={{ background: "var(--background)", border: "1px solid var(--border)" }}>
-              Next pass (fade more words) · pass {pass}/4
-            </button>
-          )}
-          {level < 4 ? (
+          {level === 1 && (
             <>
-              <p className="text-sm" style={{ color: "var(--muted-foreground)" }}>Recite along with what's showing. How did it go? This practice grade isn't saved.</p>
-              <GradeRow onGrade={practiceGrade} />
-              {suggest && (
-                <div className="rounded-xl p-3 text-sm" style={{ background: "color-mix(in oklab, var(--accent) 14%, transparent)" }}>
-                  Perfect! Ready to move down to <b>L{level + 1} {LEVELS[level]}</b>?
-                  <button onClick={() => { setLevel(level + 1); setSuggest(false); resetRecall(); }} className="mt-2 min-h-11 w-full rounded-full font-semibold" style={{ background: "var(--accent)", color: "var(--accent-foreground)" }}>
-                    Move to L{level + 1}
-                  </button>
-                </div>
-              )}
+              <p className="text-sm" style={{ color: "var(--muted-foreground)" }}>
+                {heard ? "Well done. Now try reciting with only a few hints." : "Read along while the reciter plays it a few times. Then move on whenever you feel ready."}
+              </p>
+              <button onClick={() => { stop(); setLevel(2); resetRecall(); }} className="min-h-12 w-full rounded-full text-sm font-semibold"
+                style={heard ? { background: "var(--accent)", color: "var(--accent-foreground)" } : { background: "var(--background)", border: "1px solid var(--border)" }}>
+                Ready to recite →
+              </button>
             </>
-          ) : (
+          )}
+          {(level === 2 || level === 3) && (
+            <>
+              <p className="text-sm" style={{ color: "var(--muted-foreground)" }}>
+                {level === 2 ? "Only the first letter of each word shows. Recite the whole ayah aloud." : `Some words are hidden. Recite it aloud, then hide more. Round ${pass} of 4.`}
+              </p>
+              {level === 2 ? (
+                <button onClick={() => { setLevel(3); setPass(1); resetRecall(); }} className="min-h-11 w-full rounded-full text-sm font-semibold" style={{ background: "var(--background)", border: "1px solid var(--border)" }}>Hide more words</button>
+              ) : pass < 4 ? (
+                <button onClick={() => setPass((p) => Math.min(4, p + 1))} className="min-h-11 w-full rounded-full text-sm font-semibold" style={{ background: "var(--background)", border: "1px solid var(--border)" }}>Hide more words</button>
+              ) : null}
+              <button onClick={() => { stop(); setLevel(4); resetRecall(); }} className="min-h-12 w-full rounded-full text-sm font-semibold" style={{ background: "var(--accent)", color: "var(--accent-foreground)" }}>Test from memory →</button>
+            </>
+          )}
+          {level === 4 && (
             <RecallTools onPeek={peek} onFirst={firstWord} onPause={hasWordTimings ? pauseAndContinue : null} aids={aids} onCheck={() => { stop(); setPhase("check"); }} />
           )}
         </section>
@@ -598,7 +597,7 @@ function Workspace({ chapter, maxAyah, start, size, words, reciterId, onNext, on
         <section className="glass-card space-y-3 p-4" style={card}>
           <p className="text-sm">{saved}</p>
           {start + size <= maxAyah && (
-            <button onClick={onNext} className="min-h-12 w-full rounded-full text-sm font-semibold" style={{ background: "var(--accent)", color: "var(--accent-foreground)" }}>Next chunk</button>
+            <button onClick={onNext} className="min-h-12 w-full rounded-full text-sm font-semibold" style={{ background: "var(--accent)", color: "var(--accent-foreground)" }}>Next ayah →</button>
           )}
           <button onClick={() => { resetRecall(); setLevel(1); setPhase("study"); }} className="flex min-h-11 w-full items-center justify-center gap-2 text-sm underline" style={{ color: "var(--muted-foreground)" }}>
             <RotateCcw size={14} /> Practise this chunk again
