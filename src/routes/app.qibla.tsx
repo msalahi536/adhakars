@@ -65,6 +65,15 @@ function distanceKm(lat: number, lng: number): number {
 
 const CAL_DONE_KEY = "qibla-calibrated";
 
+function savedPrayerLocation(): { lat: number; lng: number } | null {
+  try {
+    const loc = JSON.parse(localStorage.getItem("adhkar:prayer-settings") ?? "null")?.location;
+    return typeof loc?.lat === "number" && typeof loc?.lng === "number" ? { lat: loc.lat, lng: loc.lng } : null;
+  } catch {
+    return null;
+  }
+}
+
 function Qibla() {
   const [phase, setPhase] = useState<"intro" | "requesting" | "ready" | "error">("requesting");
   const [step, setStep] = useState<string>("");
@@ -202,8 +211,12 @@ function Qibla() {
     if (sensor === "granted") storePermissionGranted();
 
     setStep("Getting your location…");
-    // Always take a fresh fix here; the watcher keeps it live afterwards.
-    const pos = await getPosition({ force: true });
+    // Use a saved fix instantly (Qibla cache or Salah location) so the compass
+    // never waits on GPS; the live watcher refines it afterwards.
+    const saved = savedPrayerLocation();
+    const pos = saved
+      ? ({ ok: true, coords: saved, source: "cached", at: Date.now() } as const)
+      : await getPosition();
     if (!pos.ok) {
       setError(pos.error);
       setPhase("error");
