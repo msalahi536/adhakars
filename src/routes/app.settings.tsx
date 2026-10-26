@@ -1,6 +1,7 @@
 import { useEffect, useState, type ReactNode } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { HeaderBackButton } from "@/components/HeaderBackButton";
+import { VoiceLabUnlock } from "@/components/VoiceLabUnlock";
 import { getDisplay, setDisplay, themes } from "@/lib/theme";
 import {
   setSeed,
