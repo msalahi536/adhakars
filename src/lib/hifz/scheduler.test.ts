@@ -125,7 +125,9 @@ describe("early reviews", () => {
   test("early Perfect earns elapsed × 2, early Hesitation elapsed × 1.2; on-time unchanged", () => {
     expect(reviewInterval(10, "2026-10-20", "perfect", "2026-10-18")).toBe(16); // 8 days elapsed
     expect(reviewInterval(10, "2026-10-20", "perfect", "2026-10-12")).toBe(10); // 2 days → max(10, 4)
-    expect(reviewInterval(10, "2026-10-20", "hesitation", "2026-10-15")).toBe(6); // 5 × 1.2
+    expect(reviewInterval(10, "2026-10-20", "hesitation", "2026-10-15")).toBe(10); // max(10, 5 × 1.2): never shortens
+    expect(reviewInterval(4, "2026-10-20", "hesitation", "2026-10-19")).toBe(4); // max(4, ceil(3 × 1.2)=4)
+    expect(reviewInterval(3, "2026-10-20", "hesitation", "2026-10-19")).toBe(3); // max(3, ceil(2 × 1.2)=3)
     expect(reviewInterval(10, "2026-10-20", "mistake", "2026-10-12")).toBe(5);
     expect(reviewInterval(10, "2026-10-20", "perfect", "2026-10-20")).toBe(20);
   });
