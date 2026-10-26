@@ -82,7 +82,7 @@ function Progress() {
           <section className="glass-card space-y-3 p-4" style={card}>
             <div className="flex items-baseline justify-between"><h2 className="label-caps">Next 7 days</h2><span className="text-xs" style={muted}>reviews per day, if all go well</span></div>
             {quiet && <p className="text-sm" style={muted}>No reviews due in the next 7 days.</p>}
-            <div className="flex h-28 items-end gap-2" role="list">
+            {!quiet && <div className="flex h-28 items-end gap-2" role="list">
               {week.map((w) => (
                 <div key={w.day} role="listitem" aria-label={`${fmtDay(w.day)}: ${w.total} reviews`} className="flex flex-1 flex-col items-center gap-1">
                   <span className="text-xs font-semibold">{w.total}</span>
