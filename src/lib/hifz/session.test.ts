@@ -16,7 +16,7 @@ describe("forecast", () => {
     const f = forecast([], D, juzAmma, 10, 7);
     expect(f[0].total).toBe(0);
     for (const d of f.slice(1)) expect(d.total).toBeGreaterThan(0);
-    expect(f.every((d) => d.newLines >= 9)).toBe(true);
+    expect(f[0].newLines).toBeGreaterThanOrEqual(9); // later days may pause new lines, exactly as Today would
   });
   test("perfect seeds are spread across 30 days", () => {
     const pk: Record<number, string[]> = {};
