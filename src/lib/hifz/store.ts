@@ -1,6 +1,8 @@
 // Local-first Hifz state. The review log is the only source of truth: ayah/page state is
 // always recomputed from the full log, never stored or merged directly. Cloud backup is optional (sync.ts).
 import {
+  GRADUATE_AT,
+  MANZIL_FIRST,
   WORD_ERROR_PULL,
   WORD_ERROR_WINDOW_DAYS,
   addDays,
@@ -15,12 +17,25 @@ import {
   type Grade,
   type PageItem,
 } from "./scheduler";
+import type { Goal } from "./layout";
 
-export type HifzPlan = { targets: string[]; dailyNewAyahs: number; direction: "forward" | "backward"; updatedAt: string };
+export type HifzPlan = {
+  targets: string[];
+  dailyNewAyahs: number;
+  direction: "forward" | "backward";
+  updatedAt: string;
+  goal?: Goal;
+  paceLines?: number; // real mushaf lines per day; 15 = full page
+};
 
 export type HifzEvent = {
   id: string; // UUID
-  kind: "learn" | "ayah" | "page" | "chain"; // "chain" = joined-chunk review: logged, never moves intervals
+  // "chain" = joined-chunk review and "placement" = placement-test prompt: logged, never move intervals.
+  // "seed" = onboarding seed for one page's memorized ayahs (keys), from a placement grade.
+  kind: "learn" | "ayah" | "page" | "chain" | "placement" | "seed";
+  session?: "placement" | "seed";
+  keys?: string[];
+  dueOffset?: number; // seed only: days until the page's first manzil review
   key: string; // ayah key ("2:255") or page number as text
   page: number;
   grade?: Grade;
@@ -51,6 +66,14 @@ export function derive(events: HifzEvent[]): Derived {
     } else if (e.kind === "ayah" && ayahs[e.key] && e.grade) {
       ayahs[e.key] = gradeAyah(ayahs[e.key], e.grade, e.day);
       if (e.grade === "perfect") for (const w of Object.keys(wordErrors)) if (w.startsWith(e.key + ":")) delete wordErrors[w];
+    } else if (e.kind === "seed" && e.grade && e.keys) {
+      const known = e.grade === "perfect" || e.grade === "hesitation";
+      for (const k of e.keys)
+        ayahs[k] = known
+          ? { key: k, page: e.page, stage: "manzil", interval: GRADUATE_AT, due: addDays(e.day, GRADUATE_AT), graduated: true }
+          : { key: k, page: e.page, stage: "sabqi", interval: 1, due: addDays(e.day, 1), graduated: false };
+      if (known) pages[e.page] = { page: e.page, inManzil: true, interval: MANZIL_FIRST, due: addDays(e.day, Math.max(1, e.dueOffset ?? MANZIL_FIRST)) };
+      else if (pages[e.page]) pages[e.page] = { ...pages[e.page], inManzil: false };
     } else if (e.kind === "page" && pages[e.page]?.inManzil && e.grade) {
       const r = gradePage(pages[e.page], onPage(e.page), e.grade, e.errorKeys ?? [], e.day);
       pages[e.page] = r.page;
@@ -104,6 +127,19 @@ export function recordEvent(e: Omit<HifzEvent, "id" | "at" | "day">, now = new D
   const s = loadHifz();
   saveHifz({ ...s, events: [...s.events, ev] });
   return ev;
+}
+
+/** Append many events at once (one write), with strictly increasing timestamps so replay order is stable. */
+export function recordEvents(es: Omit<HifzEvent, "id" | "at" | "day">[], now = new Date()): HifzEvent[] {
+  const day = localDay(now);
+  const out = es.map((e, i) => ({ ...e, id: crypto.randomUUID(), at: new Date(now.getTime() + i).toISOString(), day }));
+  const s = loadHifz();
+  saveHifz({ ...s, events: [...s.events, ...out] });
+  return out;
+}
+
+export function savePlan(plan: HifzPlan) {
+  saveHifz({ ...loadHifz(), plan });
 }
 
 export { addDays };
