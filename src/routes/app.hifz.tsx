@@ -309,7 +309,7 @@ function Workspace({ chapter, maxAyah, start, size, words, reciterId, onNext, on
     const lo = Math.max(1, Math.min(...mine) - 2), hi = Math.min(15, Math.max(...mine) + 2);
     return all.filter((l) => l.line >= lo && l.line <= hi).map((l) => ({ ...l, context: !mine.includes(l.line) }));
   });
-  const wordCls = "arabic px-[0.15em] text-[clamp(17px,5.6vw,28px)] leading-[1.9]";
+  const wordCls = "arabic px-[0.15em] text-[clamp(14px,4.3vw,26px)] leading-[1.9]";
   const renderWord = (w: MWord) => {
     const id = wid(w);
     if (!chunkSet.has(w.key)) {
