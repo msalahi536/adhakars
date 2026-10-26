@@ -128,6 +128,7 @@ describe("early reviews", () => {
     expect(reviewInterval(10, "2026-10-20", "hesitation", "2026-10-15")).toBe(10); // max(10, 5 × 1.2): never shortens
     expect(reviewInterval(4, "2026-10-20", "hesitation", "2026-10-19")).toBe(4); // max(4, ceil(3 × 1.2)=4)
     expect(reviewInterval(3, "2026-10-20", "hesitation", "2026-10-19")).toBe(3); // max(3, ceil(2 × 1.2)=3)
+    expect(reviewInterval(10, "2026-10-20", "hesitation", "2026-10-19")).toBe(11); // 9 days elapsed → ceil(10.8)
     expect(reviewInterval(10, "2026-10-20", "mistake", "2026-10-12")).toBe(5);
     expect(reviewInterval(10, "2026-10-20", "perfect", "2026-10-20")).toBe(20);
   });
