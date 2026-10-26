@@ -45,4 +45,7 @@
 - Hifz onboarding seeds only via "placement"/"seed" log events (pure rules in `src/lib/hifz/placement.ts`, static per-ayah Madani layout in `src/data/hifz-layout.json`), so sync replay rebuilds placement like any review.
 - Hifz daily session rules (queue, backlog guard, drills, Salah logs, forecast) live only in pure `src/lib/hifz/session.ts`; the Today screen freezes its queue per local day so sessions pause and resume while every grade is logged immediately.
 - Hifz sabaq completes only when every ayah of today's frozen sabaq is in the replayed log (graded at L4); the catch-up cap and heatmap states are pure rules in `session.ts`/`progress.ts`, so UI never decides scheduling.
-- The Hifz daily reminder is device-local notifications only (`src/lib/hifz/reminder.ts`), rescheduled on every Hifz open and session change; permission is asked only when the user turns it on.
+- The Hifz daily reminder is a fixed entry in the shared reminder list (`src/lib/notifications.ts`), with only its content built in `src/lib/hifz/reminder.ts`, so one permission flow and one schedule cover every reminder.
+- Every local-notification scheduler plans only a few days ahead, and `src/lib/notification-budget.ts` trims the furthest-away pending notifications (never prayer alerts) so iOS's 64-pending limit is never hit.
+- Hifz reviews before their due date grow intervals only from the days actually elapsed, so repeated practice can't inflate a schedule.
+- Tajweed coloring parses Quran.com word tajweed markup through pure `src/lib/tajweed-rules.ts` (never raw HTML) and appears only where full text is meant to be read.
