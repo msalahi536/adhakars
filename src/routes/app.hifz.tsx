@@ -358,7 +358,7 @@ function Workspace({ chapter, maxAyah, start, size, words, reciterId, onNext, on
   };
 
   // One font size for the whole page, shrunk so the widest real mushaf line fits without wrapping.
-  const rowSig = rows.map((r) => r.id).join();
+  const rowSig = rows.map((r) => `${r.id}:${r.words.length}`).join();
   useLayoutEffect(() => {
     const el = fitRef.current;
     if (!el) return;
@@ -393,7 +393,7 @@ function Workspace({ chapter, maxAyah, start, size, words, reciterId, onNext, on
             <div
               key={l.id}
               data-line={l.line}
-              className="flex flex-nowrap items-center justify-center overflow-hidden whitespace-nowrap"
+              className="flex flex-nowrap items-center justify-center whitespace-nowrap"
               style={{ minHeight: 56, borderBottom: `1px solid color-mix(in oklab, var(--border) ${l.context ? 35 : 90}%, transparent)` }}
             >
               {l.words.map(renderWord)}
