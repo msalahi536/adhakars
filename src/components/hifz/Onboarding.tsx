@@ -173,7 +173,7 @@ export function HifzOnboarding({ chapters, onSkip, onDone }: Props) {
       </section>
     );
 
-  if (step === "known") return <KnownStep estimate={estimate} chapters={chapters} known={known} toggle={toggle} setKnown={setKnown} pages={checkedPages.length} name={name} Steps={<Steps i={1} />}
+  if (step === "known") return <KnownStep ammaOnly={goalType === "juz-amma"} estimate={estimate} chapters={chapters} known={known} toggle={toggle} setKnown={setKnown} pages={checkedPages.length} name={name} Steps={<Steps i={1} />}
     onBack={() => setStep("goal")}
     onNext={() => { saveGoal(); if (checkedPages.length) setStep("test"); else finishSeeding([]); }} />;
 
@@ -219,11 +219,11 @@ export function HifzOnboarding({ chapters, onSkip, onDone }: Props) {
   );
 }
 
-function KnownStep({ estimate, chapters, known, toggle, setKnown, pages, name, Steps, onBack, onNext }: {
+function KnownStep({ estimate, chapters, known, toggle, setKnown, pages, name, Steps, onBack, onNext, ammaOnly }: {
   estimate: React.ReactNode; chapters: MChapter[]; known: Set<string>; toggle: (k: string[]) => void; setKnown: React.Dispatch<React.SetStateAction<Set<string>>>;
-  pages: number; name: (c: number) => string; Steps: React.ReactNode; onBack: () => void; onNext: () => void;
+  pages: number; name: (c: number) => string; Steps: React.ReactNode; onBack: () => void; onNext: () => void; ammaOnly: boolean;
 }) {
-  const [tab, setTab] = useState<"juz" | "surah" | "page">("juz");
+  const [tab, setTab] = useState<"juz" | "surah" | "page">(ammaOnly ? "surah" : "juz");
   const [part, setPart] = useState<number | null>(null);
   const [range, setRange] = useState({ a: 1, b: 1 });
   const has = (keys: string[]) => keys.length > 0 && keys.every((k) => known.has(k));
@@ -231,24 +231,38 @@ function KnownStep({ estimate, chapters, known, toggle, setKnown, pages, name, S
   const juzKeys = useMemo(() => Array.from({ length: 30 }, (_, i) => ayahsOfJuz(i + 1)), []);
   const pageKeys = useMemo(() => Array.from({ length: 604 }, (_, i) => ayahsOfPage(i + 1)), []);
   const cell = (full: boolean, partial: boolean) => (full ? on : partial ? { ...soft, borderColor: "var(--accent)", boxShadow: "inset 0 0 0 1.5px var(--accent)" } : soft);
+  // Juz 'Amma goal: only its surahs, An-Nas first, so nobody has to know juz or surah numbers.
+  const list = ammaOnly ? chapters.filter((c) => c.id >= 78).sort((a, b) => b.id - a.id) : chapters;
+  const lastTen = useMemo(() => Array.from({ length: 10 }, (_, i) => surahAyahs(105 + i)).flat(), []);
+  const juzName = (j: number) => { const k = juzKeys[j - 1]?.[0]; return k ? name(+k.split(":")[0]) : ""; };
 
   return (
     <section className="glass-card space-y-4 p-5" style={card}>
       {Steps}
       <h2 className="text-xl font-semibold">What have you already memorized?</h2>
-      <p className="text-sm" style={muted}>Check what you know. A short test next sets how strong each page starts.</p>
-      <div className="grid grid-cols-3 gap-1.5 rounded-full p-1" style={soft}>
-        {(["juz", "surah", "page"] as const).map((t) => <button key={t} onClick={() => setTab(t)} className="min-h-10 rounded-full text-sm font-semibold capitalize" style={tab === t ? on : {}}>{t}</button>)}
-      </div>
+      <p className="text-sm" style={muted}>Tick the surahs you already know by heart. Nothing yet? Just tap Continue.</p>
+      {ammaOnly ? (
+        <button onClick={() => toggle(lastTen)} className="min-h-12 w-full rounded-xl text-sm font-semibold" style={cell(has(lastTen), some(lastTen))}>
+          {has(lastTen) ? "✓ " : ""}I know the last 10 surahs (Al-Fil to An-Nas)
+        </button>
+      ) : (
+        <div className="grid grid-cols-3 gap-1.5 rounded-full p-1" style={soft}>
+          {(["surah", "juz", "page"] as const).map((t) => <button key={t} onClick={() => setTab(t)} className="min-h-10 rounded-full text-sm font-semibold capitalize" style={tab === t ? on : {}}>{t}</button>)}
+        </div>
+      )}
 
       {tab === "juz" && (
-        <div className="grid grid-cols-5 gap-1.5">
-          {juzKeys.map((k, i) => <button key={i} onClick={() => toggle(k)} aria-pressed={has(k)} className="min-h-12 rounded-xl text-sm font-semibold" style={cell(has(k), some(k))}>{i + 1}</button>)}
+        <div className="grid grid-cols-3 gap-1.5">
+          {juzKeys.map((k, i) => (
+            <button key={i} onClick={() => toggle(k)} aria-pressed={has(k)} className="min-h-14 rounded-xl px-1 text-sm font-semibold leading-tight" style={cell(has(k), some(k))}>
+              Juz {i + 1}<span className="block truncate text-[10px] font-normal opacity-80">starts {juzName(i + 1)}</span>
+            </button>
+          ))}
         </div>
       )}
       {tab === "surah" && (
         <div className="max-h-80 space-y-1 overflow-y-auto rounded-xl p-2" style={soft}>
-          {chapters.map((c) => {
+          {list.map((c) => {
             const keys = surahAyahs(c.id);
             return (
               <div key={c.id}>
