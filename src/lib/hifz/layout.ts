@@ -64,6 +64,9 @@ export function goalAyahs(g: Goal): string[] {
 
 /** Days to finish the not-yet-memorized part of a goal at a pace of N real mushaf lines per day. */
 export function daysToFinish(goal: string[], memorized: Set<string>, linesPerDay: number): number {
-  const lines = countLines(goal.filter((k) => !memorized.has(k)));
+  const lines = countLines(remainingGoal(goal, memorized));
   return lines === 0 ? 0 : Math.ceil(lines / Math.max(1, linesPerDay));
 }
+
+/** The part of a goal still to memorize, in goal order: known ayahs never count toward lines, days or finish. */
+export const remainingGoal = (goal: string[], known: Set<string>) => goal.filter((k) => !known.has(k));

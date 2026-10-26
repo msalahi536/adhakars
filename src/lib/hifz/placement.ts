@@ -1,12 +1,14 @@
 // Pure placement-test rules: which pages to test, how untested pages inherit, and the seed review logs.
 // Seeding is only ever expressed as log events, so sync replay rebuilds it like any other review.
-import type { Grade } from "./scheduler";
+import { addDays, type Grade } from "./scheduler";
+import type { Derived } from "./store";
 import { juzOfAyah, pageOfAyah, surahOf } from "./layout";
 
 export const SAMPLE_MIN = 3;
 export const SAMPLE_MAX = 20;
 export const STAGGER_DAYS = 30;
 export const HESITATION_WITHIN = 3;
+export const NEED_WORK_DAYS = 5;
 
 /** About one prompt per two checked pages (3–20), spread evenly across everything checked. */
 export function samplePages(pages: number[]): number[] {
@@ -44,17 +46,28 @@ export function groupByPage(keys: string[]): Record<number, string[]> {
 
 export type SeedPlan = { page: number; keys: string[]; grade: Grade; dueOffset: number };
 
-/** Perfect pages' first dues spread evenly over 30 days; Hesitation pages within 3 days; Mistake/Blank go to sabqi. */
+/** Perfect pages' first dues spread evenly over 30 days; Hesitation within 3 days; Mistake/Blank go to sabqi spread over 5 days. */
 export function seedPlan(pageKeys: Record<number, string[]>, grades: Record<number, Grade>): SeedPlan[] {
   const pages = Object.keys(pageKeys).map(Number).sort((a, b) => a - b);
   const perfect = pages.filter((p) => grades[p] === "perfect");
   const hes = pages.filter((p) => grades[p] === "hesitation");
+  const work = pages.filter((p) => grades[p] === "mistake" || grades[p] === "blank");
   return pages.map((p) => {
     const g = grades[p] ?? "hesitation";
     const dueOffset =
       g === "perfect" ? 1 + Math.floor((perfect.indexOf(p) * STAGGER_DAYS) / perfect.length)
       : g === "hesitation" ? 1 + (hes.indexOf(p) % HESITATION_WITHIN)
-      : 1;
+      : 1 + Math.floor((work.indexOf(p) * NEED_WORK_DAYS) / work.length);
     return { page: p, keys: pageKeys[p], grade: g, dueOffset };
+  });
+}
+
+/** Real review load per day: manzil pages due that day plus distinct pages with sabqi ayahs due that day. */
+export function dailyLoad(d: Derived, today: string, days: number): { day: string; pages: number }[] {
+  return Array.from({ length: days }, (_, i) => {
+    const day = addDays(today, i + 1);
+    const manzil = Object.values(d.pages).filter((p) => p.inManzil && p.due === day).map((p) => p.page);
+    const sabqi = Object.values(d.ayahs).filter((a) => a.stage === "sabqi" && a.due === day).map((a) => a.page);
+    return { day, pages: new Set([...manzil, ...sabqi]).size };
   });
 }
