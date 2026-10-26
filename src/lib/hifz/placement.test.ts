@@ -18,7 +18,7 @@ describe("layout", () => {
     const keys = ayahsOfPage(3);
     expect(countLines(keys)).toBe(15);
     expect(daysToFinish(keys, new Set(), 15)).toBe(1);
-    expect(daysToFinish(keys, new Set(), 5)).toBe(3);
+    expect(daysToFinish(keys, new Set(), 5)).toBe(4); // ends at ayah boundaries: 4, 5, 5, 3 lines
   });
 });
 
