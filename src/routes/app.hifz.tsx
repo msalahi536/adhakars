@@ -8,6 +8,9 @@ import { quranPlayer } from "@/lib/quran-player";
 import { getDisplay } from "@/lib/theme";
 import { fadeHidden, firstLetter, hifzChapters, hifzPage, hifzWords, pageLines, type MChapter, type MWord } from "@/lib/hifz/mushaf";
 import { derive, loadHifz, recordEvent } from "@/lib/hifz/store";
+import { HifzOnboarding } from "@/components/hifz/Onboarding";
+
+const SKIP_KEY = "hifz:onboarding-skipped";
 import type { Grade } from "@/lib/hifz/scheduler";
 
 export const Route = createFileRoute("/app/hifz")({
@@ -58,9 +61,12 @@ function Hifz() {
   const [err, setErr] = useState("");
   const [begun, setBegun] = useState(false);
   const [reciterId, setReciterId] = useState(7);
+  // First visit opens setup; it's skippable and can be re-run from Hifz settings.
+  const [onboarding, setOnboarding] = useState(false);
 
   useEffect(() => {
     setReciterId(savedReciter());
+    try { if (!loadHifz().plan && !localStorage.getItem(SKIP_KEY)) setOnboarding(true); } catch { /* storage blocked */ }
     hifzChapters().then(setChapters).catch(() => setErr("Connect to the internet once to load the surah list."));
   }, []);
   useEffect(() => {
@@ -68,6 +74,9 @@ function Hifz() {
     setErr("");
     hifzWords(chapter).then(setWords).catch(() => setErr("Connect to the internet once to load this surah. After that it works offline."));
   }, [chapter]);
+
+  const pendingBegin = useRef(false);
+  useEffect(() => { if (words && pendingBegin.current) { pendingBegin.current = false; setBegun(true); } }, [words]);
 
   const ch = chapters.find((c) => c.id === chapter);
   const max = ch?.verses ?? 7;
@@ -83,7 +92,24 @@ function Hifz() {
       </header>
       <main className="scroll-area">
         <div className="mx-auto max-w-md space-y-4 px-4 py-4" style={{ color: "var(--foreground)" }}>
-          {!begun ? (
+          {onboarding ? (
+            <HifzOnboarding
+              chapters={chapters}
+              onSkip={() => { try { localStorage.setItem(SKIP_KEY, "1"); } catch { /* ignore */ } setOnboarding(false); }}
+              onDone={(k) => {
+                setOnboarding(false);
+                if (k) { const [c, a] = k.split(":").map(Number); setChapter(c); setStart(a); pendingBegin.current = true; }
+              }}
+            />
+          ) : !begun ? (
+            <>
+            <section className="glass-card flex items-center justify-between gap-3 p-4" style={{ background: "var(--surface)", border: "1px solid var(--border)" }}>
+              <div>
+                <h2 className="label-caps">Hifz settings</h2>
+                <p className="text-xs" style={{ color: "var(--muted-foreground)" }}>Goal, pace, what you know and the placement test.</p>
+              </div>
+              <button onClick={() => setOnboarding(true)} className="min-h-11 shrink-0 rounded-full px-4 text-sm font-semibold" style={{ background: "var(--background)", border: "1px solid var(--border)" }}>Run setup</button>
+            </section>
             <section className="glass-card space-y-4 p-5" style={{ background: "var(--surface)", border: "1px solid var(--border)" }}>
               <h2 className="label-caps">Choose what to memorize</h2>
               <label className="block text-sm">
@@ -127,6 +153,7 @@ function Hifz() {
                 {words ? "Start" : "Loading surah…"}
               </button>
             </section>
+            </>
           ) : (
             words && (
               <Workspace
