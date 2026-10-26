@@ -1134,6 +1134,15 @@ function Settings() {
                 </div>
                 <span className="settings-chevron">›</span>
               </Link>
+              <Link to="/app/licenses" className="settings-row">
+                <span className="settings-icon">
+                  <FileText size={17} strokeWidth={1.8} />
+                </span>
+                <div className="min-w-0 flex-1">
+                  <div className="settings-row-title">Open-source licenses</div>
+                </div>
+                <span className="settings-chevron">›</span>
+              </Link>
             </div>
           </section>
 
