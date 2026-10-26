@@ -11,7 +11,8 @@ import { derive, loadHifz, recordEvent } from "@/lib/hifz/store";
 import { HifzOnboarding } from "@/components/hifz/Onboarding";
 
 const SKIP_KEY = "hifz:onboarding-skipped";
-import type { Grade } from "@/lib/hifz/scheduler";
+import { capGrade, type Grade } from "@/lib/hifz/scheduler";
+import { goalAyahs, remainingGoal } from "@/lib/hifz/layout";
 
 export const Route = createFileRoute("/app/hifz")({
   head: () => ({
@@ -45,6 +46,16 @@ function savedReciter(): number {
   }
 }
 
+/** The plan's next chunk start: first goal ayah not yet learned (Juz 'Amma goes An-Nas backward). */
+function planNext(): { c: number; a: number } | null {
+  const st = loadHifz();
+  if (!st.plan?.goal) return null;
+  const k = remainingGoal(goalAyahs(st.plan.goal), new Set(Object.keys(derive(st.events).ayahs)))[0];
+  if (!k) return null;
+  const [c, a] = k.split(":").map(Number);
+  return { c, a };
+}
+
 function buzz() {
   if (!getDisplay().haptics) return;
   Haptics.impact({ style: ImpactStyle.Medium }).catch(() => navigator.vibrate?.(15));
@@ -63,14 +74,20 @@ function Hifz() {
   const [reciterId, setReciterId] = useState(7);
   // First visit opens setup; it's skippable and can be re-run from Hifz settings.
   const [onboarding, setOnboarding] = useState(false);
+  const [fromPlan, setFromPlan] = useState(false);
 
   useEffect(() => {
     setReciterId(savedReciter());
-    try { if (!loadHifz().plan && !localStorage.getItem(SKIP_KEY)) setOnboarding(true); } catch { /* storage blocked */ }
+    try {
+      const st = loadHifz();
+      if (!st.plan && !localStorage.getItem(SKIP_KEY)) setOnboarding(true);
+      const next = planNext();
+      if (next) { setChapter(next.c); setStart(next.a); setFromPlan(true); }
+    } catch { /* storage blocked */ }
     hifzChapters().then(setChapters).catch(() => setErr("Connect to the internet once to load the surah list."));
   }, []);
   useEffect(() => {
-    setWords(null);
+    if (!words || words[0]?.key.split(":")[0] !== String(chapter)) setWords(null);
     setErr("");
     hifzWords(chapter).then(setWords).catch(() => setErr("Connect to the internet once to load this surah. After that it works offline."));
   }, [chapter]);
@@ -98,7 +115,7 @@ function Hifz() {
               onSkip={() => { try { localStorage.setItem(SKIP_KEY, "1"); } catch { /* ignore */ } setOnboarding(false); }}
               onDone={(k) => {
                 setOnboarding(false);
-                if (k) { const [c, a] = k.split(":").map(Number); setChapter(c); setStart(a); pendingBegin.current = true; }
+                if (k) { const [c, a] = k.split(":").map(Number); setChapter(c); setStart(a); setFromPlan(true); pendingBegin.current = true; }
               }}
             />
           ) : !begun ? (
@@ -112,13 +129,14 @@ function Hifz() {
             </section>
             <section className="glass-card space-y-4 p-5" style={{ background: "var(--surface)", border: "1px solid var(--border)" }}>
               <h2 className="label-caps">Choose what to memorize</h2>
+              {fromPlan && <p className="text-xs" style={{ color: "var(--muted-foreground)" }}>Next chunk from your plan. Change the surah or ayah to pick something else.</p>}
               <label className="block text-sm">
                 Surah
                 <select
                   className="mt-1 w-full rounded-xl px-3 py-3 text-base"
                   style={{ background: "var(--background)", border: "1px solid var(--border)", color: "var(--foreground)" }}
                   value={chapter}
-                  onChange={(e) => { setChapter(+e.target.value); setStart(1); }}
+                  onChange={(e) => { setChapter(+e.target.value); setStart(1); setFromPlan(false); }}
                 >
                   {(chapters.length ? chapters : [{ id: 1, name: "Al-Fatihah", arabic: "", verses: 7 }]).map((c) => (
                     <option key={c.id} value={c.id}>{c.id}. {c.name} {c.arabic}</option>
@@ -306,8 +324,9 @@ function Workspace({ chapter, maxAyah, start, size, words, reciterId, onNext, on
     if (level === 3 && g !== "perfect") setPass((p) => p);
   }
 
-  function logGrade(g: Grade) {
+  function logGrade(picked: Grade) {
     buzz();
+    const g = capGrade(picked, aids, errors.size);
     const errWords = [...errors];
     const pageOf = (k: string) => words.find((w) => w.key === k)?.page ?? 0;
     if (chain) {
@@ -528,8 +547,8 @@ function Workspace({ chapter, maxAyah, start, size, words, reciterId, onNext, on
       {checking && (
         <section className="glass-card space-y-3 p-4" style={card}>
           <h2 className="label-caps">How did you recite it?</h2>
-          {aids && <p className="text-xs" style={{ color: "var(--muted-foreground)" }}>You used a hint, so the best grade is Hesitation.</p>}
-          <GradeRow onGrade={logGrade} capped={aids} />
+          {(aids || errors.size > 0) && <p className="text-xs" style={{ color: "var(--muted-foreground)" }}>{aids ? "You used a hint" : "You marked a word wrong"}, so the best grade is Hesitation.</p>}
+          <GradeRow onGrade={logGrade} capped={aids || errors.size > 0} />
           <p className="text-xs" style={{ color: "var(--muted-foreground)" }}>{errors.size} word{errors.size === 1 ? "" : "s"} marked wrong</p>
         </section>
       )}
