@@ -8,7 +8,7 @@ import { addDays, localDay } from "@/lib/hifz/scheduler";
 import { forecast } from "@/lib/hifz/session";
 import { countLines, daysToFinish, goalAyahs, pageOfAyah, remainingGoal } from "@/lib/hifz/layout";
 import { lastReview, pagesByJuz, pageStates, type PageInfo, type PageState } from "@/lib/hifz/progress";
-import { rescheduleHifzReminder } from "@/lib/hifz/reminder";
+import { rescheduleHifzReminder } from "@/lib/notifications";
 
 export const Route = createFileRoute("/app/hifz_/progress")({
   head: () => ({
