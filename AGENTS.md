@@ -41,3 +41,4 @@
 
 - Hifz stores only an append-only review log (UUID events) locally; ayah/page state is always re-derived by replaying the merged log through pure `scheduler.ts` rules, and optional cloud backup unions logs by UUID, so devices never conflict and no account is required.
 - Open-source notices live only in `src/data/licenses.ts`.
+- Hifz chain (joined-chunk) reviews are logged as their own event kind that replay ignores for intervals, so joining never double-grades an ayah.

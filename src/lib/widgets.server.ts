@@ -56,7 +56,11 @@ export function pickIndex(
 }
 
 export async function buildWidgetPayload(now = new Date()) {
-  const [{ data: content }, { data: schedule }] = await Promise.all([
+  // If the private backend key isn't available (e.g. the editor preview), serve empty content instead of failing.
+  let content: unknown[] | null = null;
+  let schedule: { widget_type: string; rotation_mode: string; current_content_id: string | null }[] | null = null;
+  try {
+    const [c, s] = await Promise.all([
     supabaseAdmin
       .from("widget_content")
       .select("*")
@@ -65,6 +69,11 @@ export async function buildWidgetPayload(now = new Date()) {
       .order("created_at", { ascending: true }),
     supabaseAdmin.from("widget_schedule").select("*"),
   ]);
+    content = c.data;
+    schedule = s.data;
+  } catch (e) {
+    console.warn("widgets: content unavailable", e instanceof Error ? e.message : e);
+  }
   const rows = (content ?? []) as ContentRow[];
   const byCat = (c: string) => rows.filter((r) => r.category === c);
   const sched = (t: string) => (schedule ?? []).find((s) => s.widget_type === t);
