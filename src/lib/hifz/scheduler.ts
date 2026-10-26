@@ -51,13 +51,13 @@ export function newAyah(key: string, page: number, day: string): AyahItem {
 
 /**
  * Reviewed before its due date: growth is earned only for the days actually elapsed since the last review
- * (last review = due − interval). Perfect: max(current, elapsed × 2); Hesitation: elapsed × 1.2 (at least 1).
+ * (last review = due − interval). Perfect: max(current, elapsed × 2); Hesitation: max(current, ceil(elapsed × 1.2)) — never shortens.
  * Mistake/Blank and on-time or late reviews use the normal multipliers.
  */
 export function reviewInterval(current: number, due: string, grade: Grade, day: string): number {
   if (day >= due || grade === "mistake" || grade === "blank") return nextAyahInterval(current, grade);
   const elapsed = Math.max(0, daysBetween(addDays(due, -current), day));
-  return grade === "perfect" ? Math.max(current, elapsed * 2) : Math.max(1, Math.ceil(elapsed * 1.2));
+  return grade === "perfect" ? Math.max(current, elapsed * 2) : Math.max(current, Math.ceil(elapsed * 1.2));
 }
 
 export function gradeAyah(a: AyahItem, grade: Grade, day: string): AyahItem {

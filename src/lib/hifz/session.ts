@@ -138,14 +138,15 @@ export function forecast(events: HifzEvent[], today: string, goal: Goal | undefi
   const push = (day: string, e: EventInput) => sim.push({ ...e, id: `sim-${n}`, at: `${day}T23:00:00.${String(n++ % 1000).padStart(3, "0")}Z`, day });
   for (let i = 0; i < days; i++) {
     const day = addDays(today, i + 1);
-    const d = derive(sim);
-    const manzil = Object.values(d.pages).filter((p) => p.inManzil && p.due <= day).map((p) => p.page);
-    const groups = sabqiGroups(d, day);
+    // Same queue (including the catch-up cap) Today will build that day.
+    const q = buildQueue(derive(sim), day, goal, paceLines);
+    const manzil = q.manzil;
+    const groups = q.sabqi;
     const sabqiPages = new Set(groups.map((g) => g.page).filter((p) => !manzil.includes(p)));
     const h = manzil.filter((p) => hesSeed.has(p)).length;
     for (const p of manzil) { push(day, { kind: "page", session: "session", key: String(p), page: p, grade: "perfect" }); hesSeed.delete(p); }
     for (const g of groups) for (const k of g.keys) push(day, { kind: "ayah", session: "session", key: k, page: g.page, grade: "perfect" });
-    const fresh = nextSabaq(goal, derive(sim), paceLines);
+    const fresh = q.sabaq;
     for (const k of fresh) push(day, { kind: "learn", key: k, page: pageOfAyah(k) });
     out.push({ day, manzil: manzil.length - h, sabqi: sabqiPages.size, hesitationSeed: h, total: manzil.length + sabqiPages.size, newLines: new Set(fresh.flatMap(linesOfAyah)).size });
   }
