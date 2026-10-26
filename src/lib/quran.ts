@@ -15,7 +15,7 @@ export type Chapter = {
   translated_name: { name: string };
 };
 
-export type Word = { position: number; text: string; isEnd: boolean };
+export type Word = { position: number; text: string; isEnd: boolean; tj?: string };
 export type Verse = {
   key: string;
   number: number;
@@ -222,12 +222,12 @@ export async function getChapters(): Promise<Chapter[]> {
 }
 
 export async function getVerses(chapter: number): Promise<Verse[]> {
-  type Raw = { verse_key: string; verse_number: number; page_number?: number; words: { position: number; text_uthmani: string; char_type_name: string }[]; translations: { text: string }[] };
+  type Raw = { verse_key: string; verse_number: number; page_number?: number; words: { position: number; text_uthmani: string; text_uthmani_tajweed?: string; char_type_name: string }[]; translations: { text: string }[] };
   const raw: Raw[] = [];
   let page = 1;
   for (;;) {
     const res = await get<{ verses: Raw[]; pagination: { next_page: number | null } }>(
-      `/verses/by_chapter/${chapter}?language=en&words=true&word_fields=text_uthmani&translations=20&fields=page_number&per_page=50&page=${page}`,
+      `/verses/by_chapter/${chapter}?language=en&words=true&word_fields=text_uthmani,text_uthmani_tajweed&translations=20&fields=page_number&per_page=50&page=${page}`,
     );
     raw.push(...res.verses);
     if (!res.pagination.next_page) break;
@@ -238,7 +238,7 @@ export async function getVerses(chapter: number): Promise<Verse[]> {
   return raw.map((v, i) => ({
     key: v.verse_key,
     number: v.verse_number,
-    words: v.words.map((w) => ({ position: w.position, text: w.text_uthmani, isEnd: w.char_type_name === "end" })),
+    words: v.words.map((w) => ({ position: w.position, text: w.text_uthmani, isEnd: w.char_type_name === "end", tj: w.text_uthmani_tajweed })),
     translation: stripTags(v.translations[0]?.text ?? ""),
     transliteration: stripTags(translit[i]?.text ?? ""),
     page: v.page_number,
