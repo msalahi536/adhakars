@@ -27,11 +27,11 @@ const card = { background: "var(--surface)", border: "1px solid var(--border)" }
 const muted = { color: "var(--muted-foreground)" };
 
 const STYLE: Record<PageState | "none", { bg: string; fg: string; mark: string; label: string }> = {
-  strong: { bg: "var(--hifz-strong)", fg: "white", mark: "", label: "Strong" },
+  strong: { bg: "var(--hifz-strong)", fg: "var(--hifz-on-dark)", mark: "", label: "Strong" },
   good: { bg: "color-mix(in oklab, var(--hifz-strong) 62%, transparent)", fg: "var(--foreground)", mark: "", label: "Good" },
   light: { bg: "color-mix(in oklab, var(--hifz-strong) 30%, transparent)", fg: "var(--foreground)", mark: "", label: "Settling" },
-  weak: { bg: "var(--hifz-weak)", fg: "black", mark: "•", label: "Due soon / weak" },
-  overdue: { bg: "var(--hifz-overdue)", fg: "white", mark: "!", label: "Overdue / repeated errors" },
+  weak: { bg: "var(--hifz-weak)", fg: "var(--hifz-on-light)", mark: "•", label: "Due soon / weak" },
+  overdue: { bg: "var(--hifz-overdue)", fg: "var(--hifz-on-dark)", mark: "!", label: "Overdue / repeated errors" },
   none: { bg: "var(--hifz-none)", fg: "var(--muted-foreground)", mark: "", label: "Not memorized" },
 };
 const GRADE: Record<string, string> = { blank: "Blank", mistake: "Mistake", hesitation: "Hesitation", perfect: "Perfect" };

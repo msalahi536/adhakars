@@ -39,6 +39,7 @@ import { Route as AppSleepRouteImport } from './routes/app.sleep'
 import { Route as AppTafsirRouteImport } from './routes/app.tafsir'
 import { Route as AppTasbihRouteImport } from './routes/app.tasbih'
 import { Route as AppTermsRouteImport } from './routes/app.terms'
+import { Route as AppHifzProgressRouteImport } from './routes/app.hifz_.progress'
 import { Route as AppHifzTodayRouteImport } from './routes/app.hifz_.today'
 import { Route as AppMoreZakatRouteImport } from './routes/app.more_.zakat'
 
@@ -192,6 +193,11 @@ const AppTermsRoute = AppTermsRouteImport.update({
   path: '/terms',
   getParentRoute: () => AppRoute,
 } as any)
+const AppHifzProgressRoute = AppHifzProgressRouteImport.update({
+  id: '/hifz_/progress',
+  path: '/hifz/progress',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppHifzTodayRoute = AppHifzTodayRouteImport.update({
   id: '/hifz_/today',
   path: '/hifz/today',
@@ -234,6 +240,7 @@ export interface FileRoutesByFullPath {
   '/app/tasbih': typeof AppTasbihRoute
   '/app/terms': typeof AppTermsRoute
   '/app/': typeof AppIndexRoute
+  '/app/hifz/progress': typeof AppHifzProgressRoute
   '/app/hifz/today': typeof AppHifzTodayRoute
   '/app/more/zakat': typeof AppMoreZakatRoute
 }
@@ -267,6 +274,7 @@ export interface FileRoutesByTo {
   '/app/tasbih': typeof AppTasbihRoute
   '/app/terms': typeof AppTermsRoute
   '/app': typeof AppIndexRoute
+  '/app/hifz/progress': typeof AppHifzProgressRoute
   '/app/hifz/today': typeof AppHifzTodayRoute
   '/app/more/zakat': typeof AppMoreZakatRoute
 }
@@ -302,6 +310,7 @@ export interface FileRoutesById {
   '/app/tasbih': typeof AppTasbihRoute
   '/app/terms': typeof AppTermsRoute
   '/app/': typeof AppIndexRoute
+  '/app/hifz_/progress': typeof AppHifzProgressRoute
   '/app/hifz_/today': typeof AppHifzTodayRoute
   '/app/more_/zakat': typeof AppMoreZakatRoute
 }
@@ -338,6 +347,7 @@ export interface FileRouteTypes {
     | '/app/tasbih'
     | '/app/terms'
     | '/app/'
+    | '/app/hifz/progress'
     | '/app/hifz/today'
     | '/app/more/zakat'
   fileRoutesByTo: FileRoutesByTo
@@ -371,6 +381,7 @@ export interface FileRouteTypes {
     | '/app/tasbih'
     | '/app/terms'
     | '/app'
+    | '/app/hifz/progress'
     | '/app/hifz/today'
     | '/app/more/zakat'
   id:
@@ -405,6 +416,7 @@ export interface FileRouteTypes {
     | '/app/tasbih'
     | '/app/terms'
     | '/app/'
+    | '/app/hifz_/progress'
     | '/app/hifz_/today'
     | '/app/more_/zakat'
   fileRoutesById: FileRoutesById
@@ -633,6 +645,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppTermsRouteImport
       parentRoute: typeof AppRoute
     }
+    '/app/hifz_/progress': {
+      id: '/app/hifz_/progress'
+      path: '/hifz/progress'
+      fullPath: '/app/hifz/progress'
+      preLoaderRoute: typeof AppHifzProgressRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/app/hifz_/today': {
       id: '/app/hifz_/today'
       path: '/hifz/today'
@@ -672,6 +691,7 @@ interface AppRouteChildren {
   AppTasbihRoute: typeof AppTasbihRoute
   AppTermsRoute: typeof AppTermsRoute
   AppIndexRoute: typeof AppIndexRoute
+  AppHifzProgressRoute: typeof AppHifzProgressRoute
   AppHifzTodayRoute: typeof AppHifzTodayRoute
   AppMoreZakatRoute: typeof AppMoreZakatRoute
 }
@@ -698,6 +718,7 @@ const AppRouteChildren: AppRouteChildren = {
   AppTasbihRoute: AppTasbihRoute,
   AppTermsRoute: AppTermsRoute,
   AppIndexRoute: AppIndexRoute,
+  AppHifzProgressRoute: AppHifzProgressRoute,
   AppHifzTodayRoute: AppHifzTodayRoute,
   AppMoreZakatRoute: AppMoreZakatRoute,
 }
