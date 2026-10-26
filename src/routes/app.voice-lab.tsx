@@ -66,7 +66,7 @@ function VoiceLab() {
 
   const load = async () => {
     if (asr.current || busy) return;
-    setBusy(true); setStatus("Downloading model (first time only, about 70 MB)…");
+    setBusy(true); setStatus("Downloading model (first time only)…");
     const t0 = performance.now();
     try {
       const tf = await import("@huggingface/transformers");
@@ -74,7 +74,7 @@ function VoiceLab() {
       const files: Record<string, number> = {};
       const make = (device: "webgpu" | "wasm") => tf.pipeline("automatic-speech-recognition", MODEL, {
         device,
-        dtype: { encoder_model: "q4", decoder_model_merged: "fp16" } as never,
+        dtype: "q4" as never,
         progress_callback: (p: { status: string; file?: string; loaded?: number; total?: number }) => {
           if (p.status === "progress" && p.file && p.total) {
             files[p.file] = (p.loaded ?? 0) / p.total;
