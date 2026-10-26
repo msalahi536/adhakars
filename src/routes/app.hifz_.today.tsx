@@ -168,10 +168,10 @@ function Today() {
               <span className="text-sm" style={muted}>about {minutes} min</span>
             </div>
             {([
-              ["Manzil", "Whole pages you know", count("manzil"), "pages"],
-              ["Sabqi", "Recent ayahs, page by page", count("sabqi"), "groups"],
-              ["Transitions", "Ayah-to-ayah drills", count("drill"), "drills"],
-              ["Sabaq", sabaqItem ? `${countLines(sabaqItem.keys)} new lines` : q.backlog.paused ? "Paused" : "Nothing new planned", count("sabaq"), ""],
+              ["Manzil", "Whole pages you know", count("manzil"), count("manzil") === 1 ? "page" : "pages"],
+              ["Sabqi", "Recent ayahs, page by page", count("sabqi"), count("sabqi") === 1 ? "group" : "groups"],
+              ["Transitions", "Ayah-to-ayah drills", count("drill"), count("drill") === 1 ? "drill" : "drills"],
+              ["Sabaq", q.backlog.paused ? "Paused while catching up" : sabaqItem ? "Today's new lines" : "Nothing new planned", count("sabaq") && sabaqItem ? countLines(sabaqItem.keys) : 0, "lines"],
             ] as const).map(([t, sub, n, unit], i) => (
               <div key={t} className="flex items-center gap-3 rounded-2xl p-3" style={soft}>
                 <span className="grid h-8 w-8 shrink-0 place-items-center rounded-full text-sm font-semibold" style={on}>{i + 1}</span>
