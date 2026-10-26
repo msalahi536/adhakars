@@ -58,6 +58,7 @@ export function pickIndex(
 export async function buildWidgetPayload(now = new Date()) {
   // If the private backend key isn't available (e.g. the editor preview), serve empty content instead of failing.
   let content: unknown[] | null = null;
+  let degraded = false;
   let schedule: { widget_type: string; rotation_mode: string; current_content_id: string | null }[] | null = null;
   try {
     const [c, s] = await Promise.all([
@@ -71,9 +72,13 @@ export async function buildWidgetPayload(now = new Date()) {
   ]);
     content = c.data;
     schedule = s.data;
+    if (c.error || s.error) throw new Error(c.error?.message || s.error?.message);
   } catch (e) {
-    console.warn("widgets: content unavailable", e instanceof Error ? e.message : e);
+    // Loud on purpose: an empty widget feed on the live app must never be silent.
+    console.error("[widgets] FEED FALLBACK: serving empty widget data", e instanceof Error ? e.message : e);
+    degraded = true;
   }
+  if (!degraded && !(content ?? []).length) console.error("[widgets] FEED EMPTY: no active widget content rows");
   const rows = (content ?? []) as ContentRow[];
   const byCat = (c: string) => rows.filter((r) => r.category === c);
   const sched = (t: string) => (schedule ?? []).find((s) => s.widget_type === t);
@@ -104,6 +109,7 @@ export async function buildWidgetPayload(now = new Date()) {
 
   return {
     date: now.toISOString().slice(0, 10),
+    degraded,
     quran_verse: q && { arabic: numberVerseMarkers(q.arabic_text, q.reference), translation: q.translation, reference: q.reference },
     daily_dhikr: dh && {
       arabic: dh.arabic_text,

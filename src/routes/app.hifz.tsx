@@ -1,12 +1,12 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { Haptics, ImpactStyle } from "@capacitor/haptics";
 import { Eye, Lightbulb, Pause, Play, RotateCcw, Square } from "lucide-react";
 import { HeaderBackButton } from "@/components/HeaderBackButton";
 import { findReciter, getChapterAudio, reciterName, type ChapterAudio, type Timing } from "@/lib/quran";
 import { quranPlayer } from "@/lib/quran-player";
 import { getDisplay } from "@/lib/theme";
-import { fadeHidden, firstLetter, hifzChapters, hifzWords, toLines, type MChapter, type MWord } from "@/lib/hifz/mushaf";
+import { fadeHidden, firstLetter, hifzChapters, hifzPage, hifzWords, pageLines, type MChapter, type MWord } from "@/lib/hifz/mushaf";
 import { derive, loadHifz, recordEvent } from "@/lib/hifz/store";
 import type { Grade } from "@/lib/hifz/scheduler";
 
@@ -180,6 +180,15 @@ function Workspace({ chapter, maxAyah, start, size, words, reciterId, onNext, on
   const [aids, setAids] = useState(false);
   const [errors, setErrors] = useState<Set<string>>(new Set());
   const [saved, setSaved] = useState<string>("");
+  const [outlines, setOutlines] = useState(false);
+  const fitRef = useRef<HTMLDivElement | null>(null);
+  const [fit, setFit] = useState(24);
+  const [pageWords, setPageWords] = useState<Record<number, MWord[]>>({});
+  useEffect(() => {
+    const pages = [...new Set(words.filter((w) => w.key.startsWith(`${chapter}:`) && [...prevKeys, ...keys].includes(w.key)).map((w) => w.page))];
+    for (const p of pages) hifzPage(p).then((ws) => setPageWords((m) => ({ ...m, [p]: ws }))).catch(() => { /* offline: falls back to this surah's words */ });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [start, size, chapter]);
 
   const chain = phase === "chain" || phase === "chainCheck";
   const activeKeys = chain ? [...prevKeys, ...keys] : keys;
@@ -291,43 +300,85 @@ function Workspace({ chapter, maxAyah, start, size, words, reciterId, onNext, on
   }
 
   // ---- rendering ----
+  // Every view (encode, L1–L4, check) renders the same real Madani 15-line rows; only word visibility changes,
+  // and hidden words keep their space, so line breaks never move between levels.
   let idx = -1;
-  const lines = toLines(chunkWords);
+  const chunkSet = new Set(activeKeys);
+  const pagesUsed = [...new Set(chunkWords.map((w) => w.page))];
+  const rows = pagesUsed.flatMap((p) => {
+    const all = pageWords[p] ? pageLines(pageWords[p], p) : pageLines(words.filter((w) => w.page === p), p);
+    const mine = all.filter((l) => l.words.some((w) => chunkSet.has(w.key))).map((l) => l.line);
+    const lo = Math.max(1, Math.min(...mine) - 2), hi = Math.min(15, Math.max(...mine) + 2);
+    return all.filter((l) => l.line >= lo && l.line <= hi).map((l) => ({ ...l, context: !mine.includes(l.line) }));
+  });
+  const wordCls = "arabic shrink-0 px-[0.15em] leading-[1.9]";
   const renderWord = (w: MWord) => {
+    const id = wid(w);
+    if (!chunkSet.has(w.key)) {
+      return <span key={id} aria-hidden className={wordCls} style={{ opacity: 0.28, filter: "blur(1.2px)" }}>{w.text}</span>;
+    }
     if (w.end) {
       return (
-        <span key={wid(w)} className="arabic inline-flex h-11 min-w-11 items-center justify-center rounded-full text-lg" style={{ border: "1.5px solid var(--accent)", color: "var(--accent)" }}>
+        <span key={id} className="arabic mx-[0.1em] inline-flex h-[1.5em] min-w-[1.5em] shrink-0 items-center justify-center rounded-full text-[0.65em]" style={{ border: "1.5px solid var(--accent)", color: "var(--accent)" }}>
           {w.text}
         </span>
       );
     }
     idx += 1;
-    const id = wid(w);
     const isErr = errors.has(id);
     let shown: React.ReactNode = w.text;
     let hidden = false;
     if (!checking && !revealed.has(id)) {
-      if (effLevel === 2) shown = <>{firstLetter(w.text)}<span style={{ opacity: 0.35 }}>…</span></>;
+      if (effLevel === 2) { const f = firstLetter(w.text); shown = <>{f}<span style={{ visibility: "hidden" }}>{w.text.slice(f.length)}</span></>; }
       if (effLevel === 3 && fadeHidden(idx, pass)) hidden = true;
       if (effLevel === 4) hidden = true;
     }
     if (hidden) {
-      return <span key={id} aria-hidden className="inline-block h-11 rounded-md" style={{ width: `${Math.max(28, w.text.length * 11)}px`, borderBottom: "2px solid var(--border)" }} />;
+      // Keeps the word's width so the line is unchanged; outlines are an opt-in aid.
+      return (
+        <span key={id} aria-hidden className={`${wordCls} relative`}>
+          <span style={{ visibility: "hidden" }}>{w.text}</span>
+          {outlines && <span className="absolute inset-x-[0.15em] bottom-[0.35em] top-[0.35em] rounded-md" style={{ border: "1.5px dashed color-mix(in oklab, var(--foreground) 30%, transparent)" }} />}
+        </span>
+      );
     }
     return checking ? (
       <button
         key={id}
         onClick={() => toggleError(id)}
         aria-pressed={isErr}
-        className="arabic min-h-12 rounded-lg px-1.5 text-[28px] leading-[1.9]"
+        className={`${wordCls} min-h-12 rounded-lg`}
         style={isErr ? { background: "color-mix(in oklab, var(--destructive) 18%, transparent)", color: "var(--destructive)", textDecoration: "underline" } : {}}
       >
         {w.text}
       </button>
     ) : (
-      <span key={id} className="arabic px-1 text-[28px] leading-[1.9]">{shown}</span>
+      <span key={id} className={wordCls}>{shown}</span>
     );
   };
+
+  // One font size for the whole page, shrunk so the widest real mushaf line fits without wrapping.
+  const rowSig = rows.map((r) => `${r.id}:${r.words.length}`).join();
+  useLayoutEffect(() => {
+    const el = fitRef.current;
+    if (!el) return;
+    const measure = () => {
+      el.style.fontSize = "28px";
+      let f = 1;
+      el.querySelectorAll<HTMLElement>("[data-line]").forEach((l) => {
+        // Sum children: a centred overflow spills both ways, so scrollWidth under-reports it.
+        const w = [...l.children].reduce((a, c) => a + c.getBoundingClientRect().width, 0);
+        if (w > l.clientWidth) f = Math.min(f, l.clientWidth / w);
+      });
+      const px = Math.max(12, Math.floor(28 * f * 0.98));
+      el.style.fontSize = `${px}px`;
+      setFit(px);
+    };
+    measure();
+    const ro = new ResizeObserver(measure);
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, [rowSig]);
 
   const card = { background: "var(--surface)", border: "1px solid var(--border)" };
   const label = `${keys[0]}${keys.length > 1 ? `–${keys[keys.length - 1].split(":")[1]}` : ""}`;
@@ -340,17 +391,27 @@ function Workspace({ chapter, maxAyah, start, size, words, reciterId, onNext, on
       </div>
 
       {/* Mushaf lines */}
-      <section className="glass-card p-4" style={card}>
-        <div dir="rtl" lang="ar" className="space-y-1">
-          {lines.map((l) => (
-            <div key={l.id} className="flex flex-wrap items-center justify-center gap-x-1 gap-y-1" style={{ minHeight: 56, borderBottom: "1px dashed color-mix(in oklab, var(--border) 60%, transparent)" }}>
+      <section className="glass-card px-2 py-4" style={card}>
+        <div ref={fitRef} dir="rtl" lang="ar" style={{ fontSize: fit }}>
+          {rows.map((l) => (
+            <div
+              key={l.id}
+              data-line={l.line}
+              className="flex flex-nowrap items-center justify-center whitespace-nowrap"
+              style={{ minHeight: 56, borderBottom: `1px solid color-mix(in oklab, var(--border) ${l.context ? 35 : 90}%, transparent)` }}
+            >
               {l.words.map(renderWord)}
             </div>
           ))}
         </div>
-        <p className="mt-2 text-center text-[11px]" style={{ color: "var(--muted-foreground)" }}>
-          Page {lines[0]?.page} · Madani 15-line layout{checking ? " · Tap any word you got wrong" : ""}
-        </p>
+        <div className="mt-2 flex items-center justify-between gap-2 px-2 text-[11px]" style={{ color: "var(--muted-foreground)" }}>
+          <span>Page {pagesUsed.join("–")} · Madani 15-line{checking ? " · Tap any word you got wrong" : ""}</span>
+          {effLevel >= 3 && !checking && (
+            <label className="flex min-h-11 items-center gap-1.5">
+              <input type="checkbox" checked={outlines} onChange={(e) => setOutlines(e.target.checked)} /> Word outlines
+            </label>
+          )}
+        </div>
       </section>
 
       {/* Listen */}
