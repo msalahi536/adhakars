@@ -26,6 +26,18 @@ describe("forecast", () => {
     const dues = new Set(Object.values(derive(evs).pages).map((p) => p.due));
     expect(dues.size).toBe(30);
   });
+  test("forecast bars apply the catch-up cap, matching Today's queue each day", () => {
+    const pk = groupByPage(Array.from({ length: 40 }, (_, i) => ayahsOfPage(i + 2)).flat());
+    const g = Object.fromEntries(Object.keys(pk).map((p) => [p, "perfect" as const]));
+    const evs = seedPlan(pk, g).map((s) => ev({ kind: "seed", session: "seed", key: String(s.page), page: s.page, grade: s.grade, keys: s.keys, dueOffset: 1 }, "2026-09-01"));
+    const day1 = buildQueue(derive(evs), "2026-10-27", juzAmma, 10);
+    expect(day1.backlog.paused).toBe(true);
+    const f = forecast(evs, D, juzAmma, 10, 7);
+    expect(f[0].total).toBe(day1.manzil.length);
+    expect(f[0].newLines).toBe(0);
+    for (const d of f) expect(d.total).toBeLessThanOrEqual(day1.backlog.limit);
+    expect(f.reduce((s, d) => s + d.manzil + d.hesitationSeed, 0)).toBeGreaterThanOrEqual(40);
+  });
 });
 
 describe("backlog guard", () => {
