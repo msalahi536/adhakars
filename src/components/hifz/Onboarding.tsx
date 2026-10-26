@@ -196,7 +196,6 @@ export function HifzOnboarding({ chapters, onSkip, onDone }: Props) {
       />
     );
 
-  const lines = pace === 0 ? "1 new page" : `${pace} new lines`;
   return (
     <section className="glass-card space-y-4 p-5 text-center" style={card}>
       <Steps i={3} />
