@@ -213,11 +213,10 @@ function Qibla() {
     setStep("Getting your location…");
     // Use a saved fix instantly (Qibla cache or Salah location) so the compass
     // never waits on GPS; the live watcher refines it afterwards.
-    let pos = await getPosition();
-    if (!pos.ok) {
-      const saved = savedPrayerLocation();
-      if (saved) pos = { ok: true, coords: saved, source: "cached", at: Date.now() };
-    }
+    const saved = savedPrayerLocation();
+    const pos = saved
+      ? ({ ok: true, coords: saved, source: "cached", at: Date.now() } as const)
+      : await getPosition();
     if (!pos.ok) {
       setError(pos.error);
       setPhase("error");
