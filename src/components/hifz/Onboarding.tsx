@@ -89,7 +89,7 @@ export function HifzOnboarding({ chapters, onSkip, onDone }: Props) {
   const fullyKnown = goalKeys.length > 0 && remaining.length === 0;
   const estimate = fullyKnown ? (
     <div className="rounded-xl p-3 text-sm" style={{ background: "color-mix(in oklab, var(--accent) 14%, transparent)" }}>
-      You already know this whole goal. Pick a new goal to keep going.
+      Masha'Allah, you already know this whole goal. Pick a bigger one to keep going, for example a custom range from Tabarak (Juz 29).
       <button onClick={() => setStep("goal")} className="mt-2 min-h-11 w-full rounded-full font-semibold" style={on}>Pick a new goal</button>
     </div>
   ) : (
@@ -268,7 +268,7 @@ function KnownStep({ estimate, chapters, known, toggle, setKnown, pages, name, S
               <div key={c.id}>
                 <div className="flex min-h-11 items-center gap-3 px-2 text-sm">
                   <input type="checkbox" checked={has(keys)} ref={(el) => { if (el) el.indeterminate = !has(keys) && some(keys); }} onChange={() => toggle(keys)} aria-label={c.name} />
-                  <span className="flex-1">{c.id}. {c.name}</span>
+                  <span className="flex-1">{c.name}</span><span className="arabic">{c.arabic}</span>
                   <button onClick={() => { setPart(part === c.id ? null : c.id); setRange({ a: 1, b: c.verses }); }} className="min-h-9 rounded-full px-3 text-xs font-semibold" style={soft}>Part</button>
                 </div>
                 {part === c.id && (
@@ -313,6 +313,7 @@ function PlacementTest({ steps, page, keys, index, total, name, onGrade, onSkipT
   const [err, setErr] = useState("");
   const [checking, setChecking] = useState(false);
   const [errors, setErrors] = useState<Set<string>>(new Set());
+  const [picked, setPicked] = useState<Grade | null>(null);
   useEffect(() => { hifzPage(page).then(setWords).catch(() => setErr("Connect to the internet to load this page.")); }, [page]);
 
   // Random start ayah inside the page; recite about 3 ayahs (or to the page end). Only that span is shown and graded.
@@ -356,7 +357,7 @@ function PlacementTest({ steps, page, keys, index, total, name, onGrade, onSkipT
 
   return (
     <>
-      <section className="glass-card space-y-3 p-5" style={card}>
+      <section className="glass-card space-y-3 p-5 animate-in fade-in slide-in-from-bottom-2 duration-500" style={card}>
         {steps}
         <div className="flex items-baseline justify-between">
           <h2 className="text-xl font-semibold">Quick check</h2>
@@ -369,7 +370,7 @@ function PlacementTest({ steps, page, keys, index, total, name, onGrade, onSkipT
       </section>
       <section className="glass-card px-2 py-4" style={card}>
         {err ? <p className="p-3 text-sm" style={muted}>{err}</p> : !words ? <p className="p-3 text-sm" style={muted}>Loading page…</p> : (
-          <div ref={fitRef} dir="rtl" lang="ar">
+          <div ref={fitRef} dir="rtl" lang="ar" key={checking ? "c" : "h"} className="animate-in fade-in duration-500">
             {rows.map((l) => (
               <div key={l.id} data-line={l.line} className="flex flex-nowrap items-center justify-center whitespace-nowrap" style={{ minHeight: 56, borderBottom: "1px solid color-mix(in oklab, var(--border) 90%, transparent)" }}>
                 {l.words.map(word)}
@@ -386,13 +387,17 @@ function PlacementTest({ steps, page, keys, index, total, name, onGrade, onSkipT
           <>
             <div className="grid grid-cols-4 gap-1.5">
               {GRADES.map((g) => {
-                const off = g.g === "perfect" && errors.size > 0;
+                const off = (g.g === "perfect" && errors.size > 0) || (picked !== null && picked !== g.g);
                 return (
-                  <button key={g.g} disabled={off} onClick={() => { buzz(); onGrade({ page, grade: capGrade(g.g, false, errors.size), errorWords: [...errors] }); }} className="min-h-12 rounded-xl text-[12px] font-semibold disabled:opacity-40" style={g.g === "perfect" ? on : soft}>{g.label}</button>
+                  <button key={g.g} disabled={off || picked !== null} onClick={() => {
+                    buzz(); setPicked(g.g);
+                    const r = { page, grade: capGrade(g.g, false, errors.size), errorWords: [...errors] };
+                    setTimeout(() => onGrade(r), 900);
+                  }} className="min-h-12 rounded-xl text-[12px] font-semibold transition-opacity duration-300 disabled:opacity-40" style={picked === g.g ? { ...on, opacity: 1 } : g.g === "perfect" ? on : soft}>{picked === g.g ? "✓ " : ""}{g.label}</button>
                 );
               })}
             </div>
-            <p className="text-xs" style={muted}>{errors.size} word{errors.size === 1 ? "" : "s"} marked wrong{errors.size ? ", so the best grade is Hesitation" : ""}</p>
+            <p className="text-xs" style={muted} aria-live="polite">{picked ? (picked === "perfect" || picked === "hesitation" ? "Saved. Next check coming up…" : "No worries, we'll schedule this page for review. Next check coming up…") : <>{errors.size} word{errors.size === 1 ? "" : "s"} marked wrong{errors.size ? ", so the best grade is Hesitation" : ""}</>}</p>
           </>
         )}
         <button onClick={onSkipTest} className="min-h-11 w-full text-sm underline" style={muted}>Skip the rest of the test</button>
