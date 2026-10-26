@@ -248,6 +248,7 @@ function Workspace({ chapter, maxAyah, start, size, words, reciterId, onNext, on
   }, [start]);
 
   const [phase, setPhase] = useState<Phase>("study");
+  const tajweed = useTajweed();
   const [level, setLevel] = useState(1);
   const [pass, setPass] = useState(1);
   const [suggest, setSuggest] = useState(false);
