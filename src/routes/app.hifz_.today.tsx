@@ -20,7 +20,7 @@ export const Route = createFileRoute("/app/hifz_/today")({
       { name: "twitter:card", content: "summary" },
     ],
   }),
-  validateSearch: (s: Record<string, unknown>): { practice?: number } => (Number(s.practice) > 0 ? { practice: Number(s.practice) } : {}),
+  validateSearch: (s: { practice?: unknown }): { practice?: number } => (Number(s.practice) > 0 ? { practice: Number(s.practice) } : {}),
   component: Today,
 });
 
