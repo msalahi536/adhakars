@@ -1,5 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
+import { createPortal } from "react-dom";
 import { HeaderBackButton } from "@/components/HeaderBackButton";
 import { hifzPage, type MWord } from "@/lib/hifz/mushaf";
 import { derive, loadHifz, type HifzState } from "@/lib/hifz/store";
@@ -138,10 +139,10 @@ function PageSheet({ page, info, st, onClose }: { page: number; info?: PageInfo;
   const last = lastReview(st.events, page);
   const span = info ? (info.keys.length === 1 ? info.keys[0] : `${info.keys[0]} – ${info.keys[info.keys.length - 1]}`) : "";
   const wordText = (id: string) => { const [c, a, p] = id.split(":"); return words.find((w) => w.key === `${c}:${a}` && w.pos === +p)?.text; };
-  return (
-    <div className="fixed inset-0 z-50 flex items-end" role="dialog" aria-modal="true" aria-label={`Page ${page}`}>
+  return createPortal(
+    <div className="fixed inset-0 flex items-end" style={{ zIndex: 300 }} role="dialog" aria-modal="true" aria-label={`Page ${page}`}>
       <button aria-label="Close" className="absolute inset-0" style={{ background: "color-mix(in oklab, black 45%, transparent)" }} onClick={onClose} />
-      <div className="relative mx-auto max-h-[80vh] w-full max-w-md space-y-3 overflow-y-auto rounded-t-3xl p-5 pb-8" style={{ background: "var(--surface)", color: "var(--foreground)" }}>
+      <div className="relative mx-auto max-h-[80vh] w-full max-w-md space-y-3 overflow-y-auto rounded-t-3xl p-5"  style={{ background: "var(--surface)", color: "var(--foreground)", paddingBottom: "calc(env(safe-area-inset-bottom) + 24px)" }}>
         <div className="mx-auto h-1.5 w-10 rounded-full" style={{ background: "var(--border)" }} />
         <div className="flex items-baseline justify-between"><h2 className="text-xl font-semibold">Page {page}</h2>{info && <span className="text-sm" style={muted}>{STYLE[info.state].label}</span>}</div>
         {!info ? (
@@ -172,7 +173,8 @@ function PageSheet({ page, info, st, onClose }: { page: number; info?: PageInfo;
           </>
         )}
       </div>
-    </div>
+    </div>,
+    document.body,
   );
 }
 
