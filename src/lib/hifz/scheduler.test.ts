@@ -107,3 +107,23 @@ describe("sync merge", () => {
     expect(derive(twice.events).ayahs["1:1"].interval).toBe(2);
   });
 });
+
+describe("early reviews", () => {
+  test("practicing a page Perfect 5 times in one day doesn't raise its interval", () => {
+    const evs: HifzEvent[] = [];
+    let i = 0;
+    const e = (x: Omit<HifzEvent, "id" | "at" | "day">, day: string): HifzEvent => ({ ...x, id: `er${++i}`, at: `${day}T1${i % 10}:00:00.${String(i).padStart(3, "0")}Z`, day });
+    evs.push(e({ kind: "seed", session: "seed", key: "50", page: 50, grade: "perfect", keys: ["3:1"], dueOffset: 7 }, "2026-10-01"));
+    const before = derive(evs).pages[50];
+    for (let n = 0; n < 5; n++) evs.push(e({ kind: "page", session: "session", key: "50", page: 50, grade: "perfect" }, "2026-10-03"));
+    const after = derive(evs).pages[50];
+    expect(after.interval).toBe(before.interval);
+  });
+  test("early Perfect earns elapsed × 2, early Hesitation elapsed × 1.2; on-time unchanged", () => {
+    expect(reviewInterval(10, "2026-10-20", "perfect", "2026-10-18")).toBe(16); // 8 days elapsed
+    expect(reviewInterval(10, "2026-10-20", "perfect", "2026-10-12")).toBe(10); // 2 days → max(10, 4)
+    expect(reviewInterval(10, "2026-10-20", "hesitation", "2026-10-15")).toBe(6); // 5 × 1.2
+    expect(reviewInterval(10, "2026-10-20", "mistake", "2026-10-12")).toBe(5);
+    expect(reviewInterval(10, "2026-10-20", "perfect", "2026-10-20")).toBe(20);
+  });
+});
