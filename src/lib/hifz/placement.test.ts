@@ -1,9 +1,9 @@
 process.env.TZ = "America/Los_Angeles";
 import { describe, expect, test } from "bun:test";
-import { groupByPage, inheritGrades, samplePages, seedPlan } from "./placement";
+import { dailyLoad, groupByPage, inheritGrades, samplePages, seedPlan } from "./placement";
 import { derive, mergeHifz, type HifzEvent } from "./store";
-import { addDays } from "./scheduler";
-import { ayahsOfPage, countLines, daysToFinish, goalAyahs, pageOfAyah, surahAyahs } from "./layout";
+import { addDays, capGrade } from "./scheduler";
+import { ayahsOfPage, countLines, daysToFinish, goalAyahs, pageOfAyah, remainingGoal, surahAyahs } from "./layout";
 import type { Grade } from "./scheduler";
 
 const D = "2026-10-26";
@@ -74,5 +74,33 @@ describe("seeding", () => {
     expect(Object.keys(load)).toHaveLength(30);
     expect(Math.max(...counts) - Math.min(...counts)).toBeLessThanOrEqual(1);
     expect(Object.keys(load).every((day) => day > D && day <= addDays(D, 30))).toBe(true);
+  });
+});
+
+describe("step 4 fixes", () => {
+  test("goal excludes known ayahs", () => {
+    const goal = goalAyahs({ type: "juz-amma" });
+    const known = new Set(ayahsOfPage(604));
+    const left = remainingGoal(goal, known);
+    expect(left.some((k) => known.has(k))).toBe(false);
+    expect(left[0]).toBe("111:1"); // An-Nas, Al-Falaq, Al-Ikhlas known → next is Al-Masad
+    expect(daysToFinish(goal, known, 5)).toBe(Math.ceil(countLines(left) / 5));
+    expect(daysToFinish(goal, new Set(goal), 5)).toBe(0);
+  });
+
+  test("a tapped word blocks Perfect", () => {
+    expect(capGrade("perfect", false, 1)).toBe("hesitation");
+    expect(capGrade("perfect", true, 0)).toBe("hesitation");
+    expect(capGrade("perfect", false, 0)).toBe("perfect");
+    expect(capGrade("mistake", false, 3)).toBe("mistake");
+  });
+
+  test("need-work seeds are spread over 5 days", () => {
+    const pk: Record<number, string[]> = {};
+    const grades: Record<number, "mistake"> = {};
+    for (let p = 2; p < 12; p++) { pk[p] = ayahsOfPage(p); grades[p] = "mistake"; }
+    const d = derive(seedEvents(seedPlan(pk, grades)));
+    const week = dailyLoad(d, D, 7).map((w) => w.pages);
+    expect(week).toEqual([2, 2, 2, 2, 2, 0, 0]);
   });
 });
