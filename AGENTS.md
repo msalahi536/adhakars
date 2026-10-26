@@ -42,3 +42,4 @@
 - Hifz stores only an append-only review log (UUID events) locally; ayah/page state is always re-derived by replaying the merged log through pure `scheduler.ts` rules, and optional cloud backup unions logs by UUID, so devices never conflict and no account is required.
 - Open-source notices live only in `src/data/licenses.ts`.
 - Hifz chain (joined-chunk) reviews are logged as their own event kind that replay ignores for intervals, so joining never double-grades an ayah.
+- Hifz onboarding seeds only via "placement"/"seed" log events (pure rules in `src/lib/hifz/placement.ts`, static per-ayah Madani layout in `src/data/hifz-layout.json`), so sync replay rebuilds placement like any review.
