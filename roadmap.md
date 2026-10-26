@@ -40,3 +40,6 @@
 
 - [x] Player: shuffle/repeat engaged state clearly visible (accent tint + ring)
 - [x] Salah dismiss button reads "Tap to mute next adhan"
+
+- [x] Hifz Step 1: data model, local storage, merge/backup
+- [ ] Hifz Step 2+ (waiting for owner testing)

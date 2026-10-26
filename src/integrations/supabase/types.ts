@@ -100,6 +100,24 @@ export type Database = {
         }
         Relationships: []
       }
+      hifz_backups: {
+        Row: {
+          state: Json
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          state?: Json
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          state?: Json
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       isnad_names: {
         Row: {
           ar: string

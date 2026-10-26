@@ -22,6 +22,13 @@
       "when": 1792553873452,
       "tag": "0002_remove_test_giveaway_entries",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1792991626879,
+      "tag": "0003_hifz_backups",
+      "breakpoints": true
     }
   ]
 }
