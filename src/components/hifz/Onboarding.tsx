@@ -5,10 +5,10 @@ import { Lightbulb } from "lucide-react";
 import { Haptics, ImpactStyle } from "@capacitor/haptics";
 import { getDisplay } from "@/lib/theme";
 import { hifzPage, pageLines, type MChapter, type MWord } from "@/lib/hifz/mushaf";
-import { ayahsOfJuz, ayahsOfPage, countLines, daysToFinish, goalAyahs, pageOfAyah, surahAyahs, surahLength, type Goal } from "@/lib/hifz/layout";
-import { groupByPage, inheritGrades, samplePages, seedPlan } from "@/lib/hifz/placement";
+import { ayahsOfJuz, ayahsOfPage, countLines, daysToFinish, goalAyahs, pageOfAyah, remainingGoal, surahAyahs, surahLength, type Goal } from "@/lib/hifz/layout";
+import { dailyLoad, groupByPage, inheritGrades, samplePages, seedPlan } from "@/lib/hifz/placement";
 import { derive, loadHifz, recordEvents, savePlan } from "@/lib/hifz/store";
-import { addDays, localDay, type Grade } from "@/lib/hifz/scheduler";
+import { addDays, capGrade, localDay, type Grade } from "@/lib/hifz/scheduler";
 
 const PACES: { v: number; label: string }[] = [3, 5, 7, 10, 15].map((v) => ({ v, label: `${v} lines` })).concat([{ v: 0, label: "Full page" }]);
 const GRADES: { g: Grade; label: string }[] = [
@@ -40,7 +40,7 @@ export function HifzOnboarding({ chapters, onSkip, onDone }: Props) {
   const [pace, setPace] = useState(5);
   const [known, setKnown] = useState<Set<string>>(new Set());
   const [results, setResults] = useState<Result[]>([]);
-  const [summary, setSummary] = useState<{ ok: number; work: number; review: number } | null>(null);
+  const [summary, setSummary] = useState<{ ok: number; work: number; week: { day: string; pages: number }[] } | null>(null);
 
   const goal: Goal =
     goalType === "surahs" ? { type: "surahs", surahs }
@@ -48,7 +48,8 @@ export function HifzOnboarding({ chapters, onSkip, onDone }: Props) {
     : goalType === "custom" ? { type: "custom", from: `${from.c}:${from.a}`, to: `${to.c}:${to.a}` }
     : { type: "juz-amma" };
   const goalKeys = useMemo(() => goalAyahs(goal), [JSON.stringify(goal)]); // eslint-disable-line react-hooks/exhaustive-deps
-  const remaining = goalKeys.filter((k) => !known.has(k));
+  // Recomputed whenever the goal or what they know changes; known ayahs never count.
+  const remaining = remainingGoal(goalKeys, known);
   const days = pace === 0 ? new Set(remaining.map(pageOfAyah)).size : daysToFinish(goalKeys, known, pace);
   const finish = new Date(addDays(localDay(new Date()), days) + "T12:00:00");
 
@@ -72,13 +73,10 @@ export function HifzOnboarding({ chapters, onSkip, onDone }: Props) {
       ...plan.map((s) => ({ kind: "seed" as const, session: "seed" as const, key: String(s.page), page: s.page, grade: s.grade, keys: s.keys, dueOffset: s.dueOffset })),
     ]);
     const d = derive(loadHifz().events);
-    const today = localDay(new Date()), end = addDays(today, 30);
-    const due30 = Object.values(d.pages).filter((p) => p.inManzil && p.due <= end).length;
     setSummary({
+      week: dailyLoad(d, localDay(new Date()), 7),
       ok: plan.filter((s) => s.grade === "perfect" || s.grade === "hesitation").length,
       work: plan.filter((s) => s.grade === "mistake" || s.grade === "blank").length,
-      // Manzil pages spread over 30 days, plus need-work pages, which are reviewed in sabqi straight away.
-      review: due30 + plan.length === 0 ? 0 : Math.max(1, Math.round(due30 / 30 + plan.filter((x) => x.grade === "mistake" || x.grade === "blank").length)),
     });
     setStep("finish");
   }
@@ -86,6 +84,21 @@ export function HifzOnboarding({ chapters, onSkip, onDone }: Props) {
   function saveGoal() {
     savePlan({ targets: goalKeys.slice(0, 1), dailyNewAyahs: 0, direction: goal.type === "whole" ? direction : "backward", updatedAt: new Date().toISOString(), goal, paceLines: pace });
   }
+
+  const fullyKnown = goalKeys.length > 0 && remaining.length === 0;
+  const estimate = fullyKnown ? (
+    <div className="rounded-xl p-3 text-sm" style={{ background: "color-mix(in oklab, var(--accent) 14%, transparent)" }}>
+      You already know this whole goal. Pick a new goal to keep going.
+      <button onClick={() => setStep("goal")} className="mt-2 min-h-11 w-full rounded-full font-semibold" style={on}>Pick a new goal</button>
+    </div>
+  ) : (
+    <>
+      <p className="text-sm" aria-live="polite">
+        {remaining.length === 0 ? "Choose what to memorize." : <>About <b>{days} day{days === 1 ? "" : "s"}</b> · finish around <b>{finish.toLocaleDateString(undefined, { day: "numeric", month: "long", year: "numeric" })}</b></>}
+      </p>
+      <p className="text-xs" style={muted}>{countLines(remaining)} lines left to memorize in the real 15-line mushaf{known.size ? ", not counting what you know" : ""}.</p>
+    </>
+  );
 
   const name = (c: number) => chapters.find((x) => x.id === c)?.name ?? `Surah ${c}`;
   const Skip = () => (
@@ -153,16 +166,13 @@ export function HifzOnboarding({ chapters, onSkip, onDone }: Props) {
           <div className="grid grid-cols-3 gap-1.5">
             {PACES.map((p) => <button key={p.v} onClick={() => setPace(p.v)} className="min-h-11 rounded-xl text-sm font-semibold" style={pace === p.v ? on : soft}>{p.label}</button>)}
           </div>
-          <p className="mt-2 text-sm" aria-live="polite">
-            {remaining.length === 0 ? "Choose what to memorize." : <>About <b>{days} day{days === 1 ? "" : "s"}</b> · finish around <b>{finish.toLocaleDateString(undefined, { day: "numeric", month: "long", year: "numeric" })}</b></>}
-          </p>
-          <p className="text-xs" style={muted}>Based on the real 15-line mushaf ({countLines(remaining)} lines to go).</p>
+          <div className="mt-2">{estimate}</div>
         </div>
         <button disabled={!goalKeys.length} onClick={() => { saveGoal(); setStep("known"); }} className="min-h-12 w-full rounded-full text-sm font-semibold disabled:opacity-50" style={on}>Continue</button>
       </section>
     );
 
-  if (step === "known") return <KnownStep chapters={chapters} known={known} toggle={toggle} setKnown={setKnown} pages={checkedPages.length} name={name} Steps={<Steps i={1} />}
+  if (step === "known") return <KnownStep estimate={estimate} chapters={chapters} known={known} toggle={toggle} setKnown={setKnown} pages={checkedPages.length} name={name} Steps={<Steps i={1} />}
     onBack={() => setStep("goal")}
     onNext={() => { saveGoal(); if (checkedPages.length) setStep("test"); else finishSeeding([]); }} />;
 
@@ -195,16 +205,19 @@ export function HifzOnboarding({ chapters, onSkip, onDone }: Props) {
       ) : (
         <p className="text-base">Starting fresh. Every ayah you learn will be scheduled for you.</p>
       )}
-      <div className="rounded-2xl p-4 text-sm" style={soft}>
-        Daily load: about <b>{summary?.review ?? 0} page{summary?.review === 1 ? "" : "s"} review</b> + <b>{lines}</b>
+      <div className="space-y-1 rounded-2xl p-4 text-left text-sm" style={soft}>
+        <div className="label-caps mb-1">Your first week</div>
+        {(summary?.week ?? []).map((w, i) => (
+          <div key={w.day} className="flex justify-between gap-2"><span>Day {i + 1}</span><span><b>{w.pages}</b> page{w.pages === 1 ? "" : "s"} review{fullyKnown ? "" : <> + <b>{lines}</b></>}</span></div>
+        ))}
       </div>
-      <button onClick={() => onDone(remaining[0] ?? null)} className="min-h-12 w-full rounded-full text-sm font-semibold" style={on}>Start today's session</button>
+      {fullyKnown ? estimate : <button onClick={() => onDone(remaining[0] ?? null)} className="min-h-12 w-full rounded-full text-sm font-semibold" style={on}>Start today's session</button>}
     </section>
   );
 }
 
-function KnownStep({ chapters, known, toggle, setKnown, pages, name, Steps, onBack, onNext }: {
-  chapters: MChapter[]; known: Set<string>; toggle: (k: string[]) => void; setKnown: React.Dispatch<React.SetStateAction<Set<string>>>;
+function KnownStep({ estimate, chapters, known, toggle, setKnown, pages, name, Steps, onBack, onNext }: {
+  estimate: React.ReactNode; chapters: MChapter[]; known: Set<string>; toggle: (k: string[]) => void; setKnown: React.Dispatch<React.SetStateAction<Set<string>>>;
   pages: number; name: (c: number) => string; Steps: React.ReactNode; onBack: () => void; onNext: () => void;
 }) {
   const [tab, setTab] = useState<"juz" | "surah" | "page">("juz");
@@ -264,6 +277,7 @@ function KnownStep({ chapters, known, toggle, setKnown, pages, name, Steps, onBa
         </div>
       )}
 
+      <div className="rounded-xl p-3" style={soft}>{estimate}</div>
       <p className="text-sm">{known.size ? <>{pages} page{pages === 1 ? "" : "s"} · {known.size} ayahs checked</> : <span style={muted}>Nothing yet? That's fine, tap Continue.</span>}</p>
       {part === null && known.size > 0 && tab === "surah" && <p className="text-xs" style={muted}>Partly memorized surahs: tap Part to set an ayah range.</p>}
       <div className="grid grid-cols-[auto_1fr] gap-2">
@@ -284,11 +298,15 @@ function PlacementTest({ steps, page, keys, index, total, name, onGrade, onSkipT
   const [errors, setErrors] = useState<Set<string>>(new Set());
   useEffect(() => { hifzPage(page).then(setWords).catch(() => setErr("Connect to the internet to load this page.")); }, [page]);
 
-  const mine = new Set(keys);
+  // Random start ayah inside the page; recite about 3 ayahs (or to the page end). Only that span is shown and graded.
+  const [startAt] = useState(() => Math.floor(Math.random() * Math.max(1, keys.length)));
+  const span = keys.slice(startAt, startAt + 3);
+  const mine = new Set(span);
   const wid = (w: MWord) => `${w.key}:${w.pos}`;
   const cue = words?.find((w) => mine.has(w.key) && !w.end);
   const rows = words ? pageLines(words, page).filter((l) => l.words.some((w) => mine.has(w.key))) : [];
-  const [c, a] = (keys[0] ?? "1:1").split(":");
+  const [c, a] = (span[0] ?? "1:1").split(":");
+  const last = span[span.length - 1]?.split(":")[1];
 
   const fitRef = useRef<HTMLDivElement | null>(null);
   useLayoutEffect(() => {
@@ -329,7 +347,7 @@ function PlacementTest({ steps, page, keys, index, total, name, onGrade, onSkipT
         </div>
         <p className="text-sm" style={muted}>
           <Lightbulb size={14} className="mr-1 inline" />
-          {checking ? "Tap any word you got wrong, then grade yourself." : <>Continue from here: {name(+c)}, ayah {a} (page {page}). Recite aloud, then reveal.</>}
+          {checking ? "Tap any word you got wrong, then grade yourself." : <>Continue from here: {name(+c)}, ayah {a}{last && last !== a ? `–${last}` : ""} (page {page}). Recite aloud, then reveal.</>}
         </p>
       </section>
       <section className="glass-card px-2 py-4" style={card}>
@@ -350,11 +368,14 @@ function PlacementTest({ steps, page, keys, index, total, name, onGrade, onSkipT
         ) : (
           <>
             <div className="grid grid-cols-4 gap-1.5">
-              {GRADES.map((g) => (
-                <button key={g.g} onClick={() => { buzz(); onGrade({ page, grade: g.g, errorWords: [...errors] }); }} className="min-h-12 rounded-xl text-[12px] font-semibold" style={g.g === "perfect" ? on : soft}>{g.label}</button>
-              ))}
+              {GRADES.map((g) => {
+                const off = g.g === "perfect" && errors.size > 0;
+                return (
+                  <button key={g.g} disabled={off} onClick={() => { buzz(); onGrade({ page, grade: capGrade(g.g, false, errors.size), errorWords: [...errors] }); }} className="min-h-12 rounded-xl text-[12px] font-semibold disabled:opacity-40" style={g.g === "perfect" ? on : soft}>{g.label}</button>
+                );
+              })}
             </div>
-            <p className="text-xs" style={muted}>{errors.size} word{errors.size === 1 ? "" : "s"} marked wrong</p>
+            <p className="text-xs" style={muted}>{errors.size} word{errors.size === 1 ? "" : "s"} marked wrong{errors.size ? ", so the best grade is Hesitation" : ""}</p>
           </>
         )}
         <button onClick={onSkipTest} className="min-h-11 w-full text-sm underline" style={muted}>Skip the rest of the test</button>
