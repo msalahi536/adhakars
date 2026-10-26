@@ -16,7 +16,7 @@ describe("forecast", () => {
     const f = forecast([], D, juzAmma, 10, 7);
     expect(f[0].total).toBe(0);
     for (const d of f.slice(1)) expect(d.total).toBeGreaterThan(0);
-    expect(f[0].newLines).toBeGreaterThanOrEqual(9); // later days may pause new lines, exactly as Today would
+    expect(f.every((d) => d.newLines >= 9)).toBe(true);
   });
   test("perfect seeds are spread across 30 days", () => {
     const pk: Record<number, string[]> = {};
@@ -69,6 +69,35 @@ describe("backlog guard", () => {
         for (const x of dropped) expect(x >= kept).toBe(true);
       }
     }
+  });
+  test("beginner at 10 lines/day completing every session is never paused in 30 days", () => {
+    const f = forecast([], D, juzAmma, 10, 30);
+    expect(f.every((d) => d.newLines > 0)).toBe(true);
+  });
+  test("skipping 5 days triggers the guard", () => {
+    // 30 days of perfect sessions, then 5 days skipped.
+    const f = forecast([], "2026-09-01", juzAmma, 10, 1);
+    let evs: HifzEvent[] = [];
+    let day = "2026-09-01";
+    for (let i = 0; i < 30; i++) {
+      const q = buildQueue(derive(evs), day, juzAmma, 10);
+      for (const p of q.manzil) evs.push(ev({ kind: "page", session: "session", key: String(p), page: p, grade: "perfect" }, day));
+      for (const g of q.sabqi) for (const k of g.keys) evs.push(ev({ kind: "ayah", session: "session", key: k, page: g.page, grade: "perfect" }, day));
+      for (const k of q.sabaq) evs.push(ev({ kind: "learn", key: k, page: pageOfAyah(k) }, day));
+      expect(q.backlog.paused).toBe(false);
+      day = new Date(Date.parse(day + "T12:00:00Z") + 864e5).toISOString().slice(0, 10);
+    }
+    const back = new Date(Date.parse(day + "T12:00:00Z") + 5 * 864e5).toISOString().slice(0, 10);
+    expect(f.length).toBe(1);
+    expect(buildQueue(derive(evs), back, juzAmma, 10).backlog.paused).toBe(true);
+  });
+  test("reviews due today on schedule never trip the guard", () => {
+    const pk = groupByPage(Array.from({ length: 40 }, (_, i) => ayahsOfPage(i + 2)).flat());
+    const g = Object.fromEntries(Object.keys(pk).map((p) => [p, "perfect" as const]));
+    const evs = seedPlan(pk, g).map((s) => ev({ kind: "seed", session: "seed", key: String(s.page), page: s.page, grade: s.grade, keys: s.keys, dueOffset: 1 }, "2026-10-25"));
+    const q = buildQueue(derive(evs), D, juzAmma, 10);
+    expect(q.backlog.paused).toBe(false);
+    expect(q.manzil.length).toBe(40);
   });
   test("normal day keeps new lines", () => {
     const q = buildQueue(derive([]), D, juzAmma, 10);
