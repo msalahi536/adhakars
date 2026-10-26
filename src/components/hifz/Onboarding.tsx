@@ -6,8 +6,9 @@ import { Haptics, ImpactStyle } from "@capacitor/haptics";
 import { getDisplay } from "@/lib/theme";
 import { hifzPage, pageLines, type MChapter, type MWord } from "@/lib/hifz/mushaf";
 import { ayahsOfJuz, ayahsOfPage, countLines, daysToFinish, goalAyahs, pageOfAyah, remainingGoal, surahAyahs, surahLength, type Goal } from "@/lib/hifz/layout";
-import { dailyLoad, groupByPage, inheritGrades, samplePages, seedPlan } from "@/lib/hifz/placement";
-import { derive, loadHifz, recordEvents, savePlan } from "@/lib/hifz/store";
+import { groupByPage, inheritGrades, samplePages, seedPlan } from "@/lib/hifz/placement";
+import { loadHifz, recordEvents, savePlan } from "@/lib/hifz/store";
+import { forecast, type DayLoad } from "@/lib/hifz/session";
 import { addDays, capGrade, localDay, type Grade } from "@/lib/hifz/scheduler";
 
 const PACES: { v: number; label: string }[] = [3, 5, 7, 10, 15].map((v) => ({ v, label: `${v} lines` })).concat([{ v: 0, label: "Full page" }]);
@@ -40,7 +41,7 @@ export function HifzOnboarding({ chapters, onSkip, onDone }: Props) {
   const [pace, setPace] = useState(5);
   const [known, setKnown] = useState<Set<string>>(new Set());
   const [results, setResults] = useState<Result[]>([]);
-  const [summary, setSummary] = useState<{ ok: number; work: number; week: { day: string; pages: number }[] } | null>(null);
+  const [summary, setSummary] = useState<{ ok: number; work: number; week: DayLoad[] } | null>(null);
 
   const goal: Goal =
     goalType === "surahs" ? { type: "surahs", surahs }
@@ -72,9 +73,9 @@ export function HifzOnboarding({ chapters, onSkip, onDone }: Props) {
       ...res.map((r) => ({ kind: "placement" as const, session: "placement" as const, key: String(r.page), page: r.page, grade: r.grade, errorWords: r.errorWords })),
       ...plan.map((s) => ({ kind: "seed" as const, session: "seed" as const, key: String(s.page), page: s.page, grade: s.grade, keys: s.keys, dueOffset: s.dueOffset })),
     ]);
-    const d = derive(loadHifz().events);
+    // Simulated day by day assuming Perfect grades, including repeat sabqi reviews and reviews of each day's new lines.
     setSummary({
-      week: dailyLoad(d, localDay(new Date()), 7),
+      week: forecast(loadHifz().events, localDay(new Date()), goal, pace, 7),
       ok: plan.filter((s) => s.grade === "perfect" || s.grade === "hesitation").length,
       work: plan.filter((s) => s.grade === "mistake" || s.grade === "blank").length,
     });
@@ -208,7 +209,10 @@ export function HifzOnboarding({ chapters, onSkip, onDone }: Props) {
       <div className="space-y-1 rounded-2xl p-4 text-left text-sm" style={soft}>
         <div className="label-caps mb-1">Your first week</div>
         {(summary?.week ?? []).map((w, i) => (
-          <div key={w.day} className="flex justify-between gap-2"><span>Day {i + 1}</span><span><b>{w.pages}</b> page{w.pages === 1 ? "" : "s"} review{fullyKnown ? "" : <> + <b>{lines}</b></>}</span></div>
+          <div key={w.day} className="py-0.5">
+            <div className="flex justify-between gap-2"><span>Day {i + 1}</span><span><b>{w.total}</b> page{w.total === 1 ? "" : "s"} review{w.newLines ? <> + <b>{pace === 0 ? "1 page" : `${w.newLines} lines`}</b> new</> : ""}</span></div>
+            {w.total > 0 && <div className="text-right text-[11px]" style={muted}>{[w.manzil && `${w.manzil} manzil`, w.sabqi && `${w.sabqi} sabqi`, w.hesitationSeed && `${w.hesitationSeed} Hesitation seed`].filter(Boolean).join(" · ")}</div>}
+          </div>
         ))}
       </div>
       {fullyKnown ? estimate : <button onClick={() => onDone(remaining[0] ?? null)} className="min-h-12 w-full rounded-full text-sm font-semibold" style={on}>Start today's session</button>}
