@@ -16,6 +16,8 @@ export type Queue = {
 
 export const BACKLOG_FACTOR = 2;
 export const MIN_NORMAL_LOAD = 2;
+/** The guard never trips below this many overdue items. */
+export const BACKLOG_FLOOR = 10;
 
 const ayahOrder = (a: string, b: string) => {
   const [x, y] = a.split(":").map(Number), [u, v] = b.split(":").map(Number);
@@ -62,8 +64,10 @@ export function buildQueue(d: Derived, today: string, goal: Goal | undefined, pa
   const allManzil = Object.values(d.pages).filter((p) => p.inManzil && p.due <= today);
   const allSabqi = sabqiGroups(d, today);
   const due = allManzil.length + allSabqi.length;
-  const limit = Math.ceil(BACKLOG_FACTOR * normalLoad(d));
-  const paused = due > limit;
+  // Backlog = missed reviews only (due before today). On-schedule reviews due today never count.
+  const overdue = allManzil.filter((p) => p.due < today).length + allSabqi.filter((g) => g.keys.some((k) => d.ayahs[k].due < today)).length;
+  const limit = Math.max(BACKLOG_FLOOR, Math.ceil(BACKLOG_FACTOR * normalLoad(d)));
+  const paused = overdue > limit;
   let manzil = allManzil.sort((a, b) => a.due.localeCompare(b.due) || a.page - b.page).map((p) => p.page);
   let sabqi = allSabqi;
   if (paused) {
