@@ -2,7 +2,7 @@ import { Gift } from "lucide-react";
 import { giveawayActive } from "@/lib/giveaway";
 import { useEffect, useState } from "react";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { BedDouble, Compass, ChevronRight, HandHeart, Moon, ShieldCheck, Landmark, MoonStar, BookOpen, CalendarDays, X, ScrollText, Library } from "lucide-react";
+import { BedDouble, Compass, ChevronRight, HandHeart, Moon, ShieldCheck, Landmark, MoonStar, BookOpen, CalendarDays, X, ScrollText, Library, GraduationCap } from "lucide-react";
 import {
   getConsistency,
   getLifetime,
