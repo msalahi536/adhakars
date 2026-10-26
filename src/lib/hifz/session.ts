@@ -1,6 +1,6 @@
 // Pure daily-session rules: today's queue (Manzil → Sabqi → Sabaq), backlog guard, transition drills,
 // Salah logging and the first-week forecast. No I/O; everything is expressed as log events.
-import { countLines, goalAyahs, linesOfAyah, pageOfAyah, remainingGoal, surahLength, type Goal } from "./layout";
+import { countLines, dayChunk, goalAyahs, linesOfAyah, pageOfAyah, remainingGoal, surahLength, type Goal } from "./layout";
 import { addDays, capGrade, daysBetween, type Grade } from "./scheduler";
 import { derive, type Derived, type HifzEvent } from "./store";
 
@@ -51,13 +51,7 @@ export function normalLoad(d: Derived): number {
 export function nextSabaq(goal: Goal | undefined, d: Derived, paceLines: number): string[] {
   if (!goal) return [];
   const left = remainingGoal(goalAyahs(goal), new Set(Object.keys(d.ayahs)));
-  const out: string[] = [];
-  const firstPage = left[0] ? pageOfAyah(left[0]) : 0;
-  for (const k of left) {
-    if (paceLines === 0 ? pageOfAyah(k) !== firstPage : out.length > 0 && countLines([...out, k]) > paceLines) break;
-    out.push(k);
-  }
-  return out;
+  return dayChunk(left, paceLines);
 }
 
 export function buildQueue(d: Derived, today: string, goal: Goal | undefined, paceLines: number): Queue {

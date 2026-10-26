@@ -62,10 +62,39 @@ export function goalAyahs(g: Goal): string[] {
   return all.slice(Math.min(i, j), Math.max(i, j) + 1);
 }
 
-/** Days to finish the not-yet-memorized part of a goal at a pace of N real mushaf lines per day. */
+/**
+ * One day's new ayahs from the front of `left`: ends at the ayah boundary nearest the line target (it may go
+ * slightly over; ties stay under). An ayah longer than the pace is assigned alone, so a day is never empty.
+ * pace 0 = the rest of the first ayah's page.
+ */
+export function dayChunk(left: string[], paceLines: number, from = 0): string[] {
+  const out: string[] = [];
+  if (from >= left.length) return out;
+  if (paceLines === 0) {
+    const pg = pageOfAyah(left[from]);
+    for (let i = from; i < left.length && pageOfAyah(left[i]) === pg; i++) out.push(left[i]);
+    return out;
+  }
+  const lines = new Set<string>();
+  for (let i = from; i < left.length; i++) {
+    const k = left[i];
+    const before = lines.size;
+    const add = linesOfAyah(k).filter((l) => !lines.has(l));
+    const after = before + add.length;
+    if (out.length > 0 && after > paceLines && after - paceLines >= paceLines - before) break;
+    out.push(k);
+    add.forEach((l) => lines.add(l));
+    if (after >= paceLines) break;
+  }
+  return out;
+}
+
+/** Days to finish the not-yet-memorized part of a goal, chunked day by day with the same rule as the daily sabaq. */
 export function daysToFinish(goal: string[], memorized: Set<string>, linesPerDay: number): number {
-  const lines = countLines(remainingGoal(goal, memorized));
-  return lines === 0 ? 0 : Math.ceil(lines / Math.max(1, linesPerDay));
+  const left = remainingGoal(goal, memorized);
+  let days = 0;
+  for (let i = 0; i < left.length; days++) i += dayChunk(left, linesPerDay, i).length;
+  return days;
 }
 
 /** The part of a goal still to memorize, in goal order: known ayahs never count toward lines, days or finish. */

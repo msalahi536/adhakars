@@ -18,7 +18,7 @@ describe("layout", () => {
     const keys = ayahsOfPage(3);
     expect(countLines(keys)).toBe(15);
     expect(daysToFinish(keys, new Set(), 15)).toBe(1);
-    expect(daysToFinish(keys, new Set(), 5)).toBe(3);
+    expect(daysToFinish(keys, new Set(), 5)).toBe(4); // ends at ayah boundaries: 4, 5, 5, 3 lines
   });
 });
 
@@ -84,7 +84,7 @@ describe("step 4 fixes", () => {
     const left = remainingGoal(goal, known);
     expect(left.some((k) => known.has(k))).toBe(false);
     expect(left[0]).toBe("111:1"); // An-Nas, Al-Falaq, Al-Ikhlas known → next is Al-Masad
-    expect(daysToFinish(goal, known, 5)).toBe(Math.ceil(countLines(left) / 5));
+    expect(daysToFinish(goal, known, 5)).toBe(daysToFinish(left, new Set(), 5)); // known ayahs add no days
     expect(daysToFinish(goal, new Set(goal), 5)).toBe(0);
   });
 
