@@ -20,7 +20,7 @@ export type HifzPlan = { targets: string[]; dailyNewAyahs: number; direction: "f
 
 export type HifzEvent = {
   id: string; // UUID
-  kind: "learn" | "ayah" | "page";
+  kind: "learn" | "ayah" | "page" | "chain"; // "chain" = joined-chunk review: logged, never moves intervals
   key: string; // ayah key ("2:255") or page number as text
   page: number;
   grade?: Grade;
