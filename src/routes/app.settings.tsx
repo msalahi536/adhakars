@@ -1121,7 +1121,7 @@ function Settings() {
                 <div className="min-w-0 flex-1">
                   <div className="settings-row-title">Version</div>
                 </div>
-                <span className="text-sm opacity-70">{APP_VERSION}</span>
+                <VoiceLabUnlock version={APP_VERSION} />
               </div>
               <Link to="/app/privacy" className="settings-row">
                 <span className="settings-icon">
