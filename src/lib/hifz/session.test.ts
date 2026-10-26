@@ -52,7 +52,7 @@ describe("backlog guard", () => {
       expect(q.manzil.length + q.sabqi.length).toBeLessThanOrEqual(q.backlog.limit);
       if (q.backlog.paused) {
         const d = derive(evs);
-        const kept = Math.max(...q.manzil.map((p) => d.pages[p].due));
+        const kept = q.manzil.map((p) => d.pages[p].due).sort().pop()!;
         const dropped = Object.values(d.pages).filter((p) => !q.manzil.includes(p.page)).map((p) => p.due);
         for (const x of dropped) expect(x >= kept).toBe(true);
       }
