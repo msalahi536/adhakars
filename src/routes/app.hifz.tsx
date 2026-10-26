@@ -87,7 +87,7 @@ function Hifz() {
     hifzChapters().then(setChapters).catch(() => setErr("Connect to the internet once to load the surah list."));
   }, []);
   useEffect(() => {
-    if (!words || words[0]?.key.split(":")[0] !== String(chapter)) setWords(null);
+    setWords(null);
     setErr("");
     hifzWords(chapter).then(setWords).catch(() => setErr("Connect to the internet once to load this surah. After that it works offline."));
   }, [chapter]);
