@@ -38,3 +38,6 @@
 - AI search returns only references (verse keys, hadith ids); text comes from the source API.
 - Read subdirectory AGENTS.md files before editing there.
 - App AI uses the owner's GEMINI_API_KEY via `src/lib/gemini.server.ts`, by request.
+
+- Hifz state is local-first in `src/lib/hifz/store.ts` with pure rules in `scheduler.ts` (tested); optional cloud backup stores one merged JSON row per user, so the app never requires an account.
+- Open-source notices live only in `src/data/licenses.ts`.
