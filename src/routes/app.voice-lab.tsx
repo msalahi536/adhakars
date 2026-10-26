@@ -101,7 +101,12 @@ function VoiceLab() {
       r.ondataavailable = (e) => e.data.size && chunks.current.push(e.data);
       r.onstop = () => { stream.getTracks().forEach((t) => t.stop()); void recognize(new Blob(chunks.current, { type: r.mimeType })); };
       rec.current = r; started.current = Date.now(); r.start(); setRecording(true);
-    } catch { setStatus("Microphone permission was denied."); }
+    } catch (e) {
+      const name = (e as { name?: string })?.name ?? "";
+      setStatus(name === "NotAllowedError"
+        ? "Microphone access is blocked. Install the latest app build, or allow the microphone for this app in your phone's Settings."
+        : `Couldn't start the microphone${name ? ` (${name})` : ""}.`);
+    }
   };
   const stop = () => { rec.current?.stop(); setRecording(false); };
 

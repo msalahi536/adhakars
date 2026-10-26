@@ -35,6 +35,8 @@
 	</array>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>The microphone is used to hear your Quran recitation for memorization checks. Your voice is processed on this phone and never uploaded.</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>Used to find the direction of the Qibla and calculate local prayer times.</string>
 	<key>UILaunchStoryboardName</key>
