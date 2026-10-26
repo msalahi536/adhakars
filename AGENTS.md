@@ -44,3 +44,5 @@
 - Hifz chain (joined-chunk) reviews are logged as their own event kind that replay ignores for intervals, so joining never double-grades an ayah.
 - Hifz onboarding seeds only via "placement"/"seed" log events (pure rules in `src/lib/hifz/placement.ts`, static per-ayah Madani layout in `src/data/hifz-layout.json`), so sync replay rebuilds placement like any review.
 - Hifz daily session rules (queue, backlog guard, drills, Salah logs, forecast) live only in pure `src/lib/hifz/session.ts`; the Today screen freezes its queue per local day so sessions pause and resume while every grade is logged immediately.
+- Hifz sabaq completes only when every ayah of today's frozen sabaq is in the replayed log (graded at L4); the catch-up cap and heatmap states are pure rules in `session.ts`/`progress.ts`, so UI never decides scheduling.
+- The Hifz daily reminder is device-local notifications only (`src/lib/hifz/reminder.ts`), rescheduled on every Hifz open and session change; permission is asked only when the user turns it on.
