@@ -1,6 +1,7 @@
 import { useEffect, useState, type ReactNode } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { HeaderBackButton } from "@/components/HeaderBackButton";
+import { VoiceLabUnlock } from "@/components/VoiceLabUnlock";
 import { getDisplay, setDisplay, themes } from "@/lib/theme";
 import {
   setSeed,
@@ -1121,7 +1122,7 @@ function Settings() {
                 <div className="min-w-0 flex-1">
                   <div className="settings-row-title">Version</div>
                 </div>
-                <span className="text-sm opacity-70">{APP_VERSION}</span>
+                <VoiceLabUnlock version={APP_VERSION} />
               </div>
               <Link to="/app/privacy" className="settings-row">
                 <span className="settings-icon">
