@@ -327,7 +327,7 @@ function PlacementTest({ steps, page, keys, index, total, name, onGrade, onSkipT
   const cls = "arabic shrink-0 px-[0.15em] leading-[1.9]";
   const word = (w: MWord) => {
     const id = wid(w);
-    if (!mine.has(w.key)) return <span key={id} aria-hidden className={cls} style={{ opacity: 0.28, filter: "blur(1.2px)" }}>{w.text}</span>;
+    if (!mine.has(w.key)) return <span key={id} aria-hidden className={cls} style={{ opacity: 0.3, filter: "blur(6px)", userSelect: "none" }}>{w.text}</span>;
     if (w.end) return <span key={id} className="arabic mx-[0.1em] inline-flex h-[1.5em] min-w-[1.5em] shrink-0 items-center justify-center rounded-full text-[0.65em]" style={{ border: "1.5px solid var(--accent)", color: "var(--accent)" }}>{w.text}</span>;
     if (checking) {
       const bad = errors.has(id);

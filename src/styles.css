@@ -5164,3 +5164,13 @@ body.has-adhkar-mini.adhkar-tucked .quran-player:not(.rec-panel), body.has-adhka
 .qp-seg button { padding: 8px 6px; border-radius: 10px; font-size: 13px; font-weight: 600; color: var(--muted-foreground); transition: background .18s ease, color .18s ease; }
 .qp-seg button.is-on { background: var(--card); color: var(--accent); box-shadow: 0 2px 8px color-mix(in oklab, var(--foreground) 10%, transparent); }
 
+
+/* Hifz heatmap states (shared across themes; text marks keep them readable without color). */
+:root {
+  --hifz-strong: oklch(0.52 0.13 155);
+  --hifz-weak: oklch(0.78 0.15 75);
+  --hifz-overdue: oklch(0.58 0.2 27);
+  --hifz-on-dark: oklch(0.99 0 0);
+  --hifz-on-light: oklch(0.22 0.02 75);
+  --hifz-none: color-mix(in oklab, var(--muted-foreground) 22%, transparent);
+}

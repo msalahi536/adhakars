@@ -4,9 +4,10 @@ import { HeaderBackButton } from "@/components/HeaderBackButton";
 import { RecallBlock } from "@/components/hifz/RecallBlock";
 import { hifzChapters, type MChapter } from "@/lib/hifz/mushaf";
 import { derive, loadHifz, recordEvents } from "@/lib/hifz/store";
-import { localDay, type Grade } from "@/lib/hifz/scheduler";
-import { buildQueue, drillEvent, pickDrills, salahEvents, type Drill, type EventInput, type SalahOutcome } from "@/lib/hifz/session";
+import { daysBetween, localDay, type Grade } from "@/lib/hifz/scheduler";
+import { buildQueue, drillEvent, pickDrills, sabaqProgress, salahEvents, type Drill, type EventInput, type SalahOutcome } from "@/lib/hifz/session";
 import { countLines, surahAyahs } from "@/lib/hifz/layout";
+import { rescheduleHifzReminder } from "@/lib/hifz/reminder";
 
 export const Route = createFileRoute("/app/hifz_/today")({
   head: () => ({
@@ -19,8 +20,22 @@ export const Route = createFileRoute("/app/hifz_/today")({
       { name: "twitter:card", content: "summary" },
     ],
   }),
+  validateSearch: (s: { practice?: unknown }): { practice?: number } => (Number(s.practice) > 0 ? { practice: Number(s.practice) } : {}),
   component: Today,
 });
+
+const CATCHUP = "hifz:catchup";
+/** "Catching up: day X of ~N": day counts from the first capped day; N re-estimates from what's still due. */
+function catchUpDay(paused: boolean, days: number): { day: number; of: number } | null {
+  try {
+    if (!paused) { localStorage.removeItem(CATCHUP); return null; }
+    const today = localDay(new Date());
+    let start = localStorage.getItem(CATCHUP);
+    if (!start) { start = today; localStorage.setItem(CATCHUP, start); }
+    const day = daysBetween(start, today) + 1;
+    return { day, of: day - 1 + days };
+  } catch { return null; }
+}
 
 type Item =
   | { t: "manzil"; page: number }
@@ -65,7 +80,16 @@ function Today() {
   const [salahOpen, setSalahOpen] = useState(false);
   const [chapters, setChapters] = useState<MChapter[]>([]);
   const navigate = useNavigate();
-  useEffect(() => { setSnap(loadSnapshot()); hifzChapters().then(setChapters).catch(() => {}); }, []);
+  const { practice } = Route.useSearch();
+  useEffect(() => {
+    let s = loadSnapshot();
+    // Sabaq completes only once every new ayah has been graded at L4 in the recall loop.
+    const cur = s.items[s.done];
+    if (cur?.t === "sabaq" && sabaqProgress(cur.keys, derive(loadHifz().events)).done) { s = { ...s, done: s.done + 1 }; saveSnapshot(s); }
+    setSnap(s);
+    hifzChapters().then(setChapters).catch(() => {});
+    void rescheduleHifzReminder();
+  }, []);
 
   const st = useMemo(() => (snap ? loadHifz() : null), [snap]);
   const q = useMemo(() => (st ? buildQueue(derive(st.events), localDay(new Date()), st.plan?.goal, st.plan?.paceLines ?? 5) : null), [st]);
@@ -89,7 +113,7 @@ function Today() {
     const next = { ...snap, done: snap.done + 1 };
     saveSnapshot(next);
     setSnap(next);
-    if (next.done >= items.length) setRunning(false);
+    if (next.done >= items.length) { setRunning(false); void rescheduleHifzReminder(); }
   };
 
   function grade(g: Grade, errorWords: string[]) {
@@ -104,6 +128,10 @@ function Today() {
     }
   }
 
+  const d0 = derive(st.events);
+  const sabaqProg = sabaqItem ? sabaqProgress(sabaqItem.keys, d0) : null;
+  const catchUp = catchUpDay(q.backlog.paused, q.backlog.days);
+
   const header = (
     <header className="page-header relative overflow-hidden" style={{ background: "var(--grad-header)", color: "var(--header-fg)" }}>
       <HeaderBackButton />
@@ -113,6 +141,39 @@ function Today() {
       </div>
     </header>
   );
+
+  if (practice) {
+    const keys = Object.values(d0.ayahs).filter((a) => a.page === practice).map((a) => a.key).sort((a, b) => { const [x, y] = a.split(":").map(Number), [u, v] = b.split(":").map(Number); return x - u || y - v; });
+    const inManzil = !!d0.pages[practice]?.inManzil;
+    return (
+      <>
+        {header}
+        <main className="scroll-area">
+          <div className="mx-auto max-w-md space-y-4 px-4 py-4" style={{ color: "var(--foreground)" }}>
+            <section className="glass-card p-4" style={card}>
+              <div className="label-caps">Practice · {inManzil ? "manzil page" : "sabqi"}</div>
+              <h2 className="mt-1 text-xl font-semibold">Page {practice}</h2>
+              <p className="mt-1 text-sm" style={muted}>Recite the memorized ayahs from the cue. Your grade is saved as a review.</p>
+            </section>
+            {keys.length ? (
+              <RecallBlock
+                keys={keys}
+                cue
+                onGrade={(g, errorWords) => {
+                  if (inManzil) {
+                    const errorKeys = [...new Set(errorWords.map((w) => w.split(":").slice(0, 2).join(":")))];
+                    recordEvents([{ kind: "page", session: "session", key: String(practice), page: practice, grade: g, errorKeys, errorWords }]);
+                  } else recordEvents(keys.map((k) => ({ kind: "ayah", session: "session", key: k, page: practice, grade: g, errorWords: errorWords.filter((w) => w.startsWith(k + ":")) })));
+                  void rescheduleHifzReminder();
+                  navigate({ to: "/app/hifz/progress" });
+                }}
+              />
+            ) : <p className="text-sm" style={muted}>Nothing memorized on this page yet.</p>}
+          </div>
+        </main>
+      </>
+    );
+  }
 
   if (running && current) {
     const label =
@@ -137,8 +198,10 @@ function Today() {
             </section>
             {current.t === "sabaq" ? (
               <section className="glass-card space-y-3 p-4" style={card}>
-                <p className="text-sm">{countLines(current.keys)} new lines today. You'll learn them with the recall loop: listen, hide step by step, then recite.</p>
-                <button onClick={() => { advance([]); navigate({ to: "/app/hifz", search: { session: 1 } as never }); }} className="min-h-12 w-full rounded-full text-sm font-semibold" style={on}>Start new lines</button>
+                <p className="text-sm">{countLines(current.keys)} new lines today. You'll learn them with the recall loop: listen, hide step by step, then recite and grade at the last level.</p>
+                {sabaqProg && sabaqProg.lines > 0 && <p className="text-sm font-semibold">{sabaqProg.lines} of {sabaqProg.total} lines done</p>}
+                <p className="text-xs" style={muted}>This step is complete once every chunk is graded at the hidden level. New ayahs join your reviews only when graded.</p>
+                <button onClick={() => navigate({ to: "/app/hifz", search: { session: 1 } as never })} className="min-h-12 w-full rounded-full text-sm font-semibold" style={on}>{sabaqProg && sabaqProg.lines > 0 ? "Continue new lines" : "Start new lines"}</button>
               </section>
             ) : (
               <RecallBlock
@@ -175,7 +238,7 @@ function Today() {
               ["Manzil", "Whole pages you know", count("manzil"), count("manzil") === 1 ? "page" : "pages"],
               ["Sabqi", "Recent ayahs, page by page", count("sabqi"), count("sabqi") === 1 ? "group" : "groups"],
               ["Transitions", "Ayah-to-ayah drills", count("drill"), count("drill") === 1 ? "drill" : "drills"],
-              ["Sabaq", q.backlog.paused ? "Paused while catching up" : sabaqItem ? "Today's new lines" : "Nothing new planned", count("sabaq") && sabaqItem ? countLines(sabaqItem.keys) : 0, "lines"],
+              ["Sabaq", q.backlog.paused ? "Paused while catching up" : sabaqItem ? "Today's new lines" : "Nothing new planned", count("sabaq") && sabaqProg ? (sabaqProg.lines ? `${sabaqProg.lines} of ${sabaqProg.total}` : sabaqProg.total) : 0, "lines"],
             ] as const).map(([t, sub, n, unit], i) => (
               <div key={t} className="flex items-center gap-3 rounded-2xl p-3" style={soft}>
                 <span className="grid h-8 w-8 shrink-0 place-items-center rounded-full text-sm font-semibold" style={on}>{i + 1}</span>
@@ -185,7 +248,8 @@ function Today() {
             ))}
             {q.backlog.paused && (
               <p className="rounded-xl p-3 text-sm" style={{ background: "color-mix(in oklab, var(--accent) 14%, transparent)" }}>
-                Catching up first: {q.backlog.due} reviews are due. New lines resume when review is under {q.backlog.limit}.
+                {catchUp && <span className="block font-semibold">Catching up: day {catchUp.day} of ~{catchUp.of}</span>}
+                {q.backlog.due} reviews are due, so today shows the {q.backlog.limit} most overdue and weakest. The rest move to the next days, and new lines resume once you're caught up.
               </p>
             )}
             {left.length ? (
@@ -203,6 +267,7 @@ function Today() {
             {salahOpen && <SalahLogger chapters={chapters} onClose={() => { setSalahOpen(false); setSnap({ ...snap }); }} />}
           </section>
 
+          <Link to="/app/hifz/progress" className="glass-card flex min-h-14 items-center justify-between p-4 text-sm font-semibold" style={card}>Progress and forecast <span aria-hidden>→</span></Link>
           <Link to="/app/hifz" className="block text-center text-sm underline" style={muted}>Memorize something else</Link>
         </div>
       </main>
@@ -222,12 +287,14 @@ function SalahLogger({ chapters, onClose }: { chapters: MChapter[]; onClose: () 
   const [to, setTo] = useState(0);
   const [prayer, setPrayer] = useState("Fajr");
   const [msg, setMsg] = useState("");
+  const [offer, setOffer] = useState<{ keys: string[]; o: SalahOutcome } | null>(null);
   useEffect(() => { setFrom(ayahs[0] ?? 1); setTo(ayahs[ayahs.length - 1] ?? 1); }, [c]); // eslint-disable-line react-hooks/exhaustive-deps
 
   if (!surahs.length) return <p className="text-sm" style={muted}>Once you've memorized something, you can log it here.</p>;
-  const save = (o: SalahOutcome) => {
-    const r = salahEvents(d, surahAyahs(c, Math.min(from, to), Math.max(from, to)), o, prayer.toLowerCase());
-    if (!r.ok) { setMsg(r.error); return; }
+  const save = (o: SalahOutcome, only?: string[]) => {
+    const r = salahEvents(d, only ?? surahAyahs(c, Math.min(from, to), Math.max(from, to)), o, prayer.toLowerCase());
+    setOffer(null);
+    if (!r.ok) { setMsg(r.error); if (r.memorized?.length) setOffer({ keys: r.memorized, o }); return; }
     recordEvents(r.events);
     setMsg(`Logged ${r.events.length} ayah${r.events.length === 1 ? "" : "s"} from ${prayer}.`);
     setTimeout(onClose, 900);
@@ -251,6 +318,20 @@ function SalahLogger({ chapters, onClose }: { chapters: MChapter[]; onClose: () 
         ))}
       </div>
       {msg && <p className="text-sm" aria-live="polite">{msg}</p>}
+      {offer && (
+        <button onClick={() => save(offer.o, offer.keys)} className="min-h-12 w-full rounded-full text-sm font-semibold" style={on}>
+          Log only the memorized ones ({rangeLabel(offer.keys)})
+        </button>
+      )}
     </div>
   );
+}
+
+/** "2:1–3", or a short list when the memorized ayahs aren't contiguous. */
+function rangeLabel(keys: string[]): string {
+  const n = keys.map((k) => +k.split(":")[1]);
+  const c = keys[0].split(":")[0];
+  const contiguous = n.every((x, i) => i === 0 || x === n[i - 1] + 1);
+  if (keys.length === 1) return keys[0];
+  return contiguous ? `${c}:${n[0]}–${n[n.length - 1]}` : `${c}:${n.slice(0, 4).join(", ")}${n.length > 4 ? "…" : ""}`;
 }

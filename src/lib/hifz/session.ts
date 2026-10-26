@@ -1,7 +1,7 @@
 // Pure daily-session rules: today's queue (Manzil → Sabqi → Sabaq), backlog guard, transition drills,
 // Salah logging and the first-week forecast. No I/O; everything is expressed as log events.
 import { countLines, goalAyahs, linesOfAyah, pageOfAyah, remainingGoal, surahLength, type Goal } from "./layout";
-import { addDays, capGrade, type Grade } from "./scheduler";
+import { addDays, capGrade, daysBetween, type Grade } from "./scheduler";
 import { derive, type Derived, type HifzEvent } from "./store";
 
 export type EventInput = Omit<HifzEvent, "id" | "at" | "day">;
@@ -10,7 +10,7 @@ export type Queue = {
   manzil: number[];
   sabqi: SabqiGroup[];
   sabaq: string[]; // today's new ayahs (empty when paused by the backlog guard)
-  backlog: { paused: boolean; due: number; limit: number };
+  backlog: { paused: boolean; due: number; limit: number; days: number }; // days = ~days to catch up at the cap
   minutes: number;
 };
 
@@ -59,14 +59,35 @@ export function nextSabaq(goal: Goal | undefined, d: Derived, paceLines: number)
 }
 
 export function buildQueue(d: Derived, today: string, goal: Goal | undefined, paceLines: number): Queue {
-  const manzil = Object.values(d.pages).filter((p) => p.inManzil && p.due <= today).sort((a, b) => a.due.localeCompare(b.due) || a.page - b.page).map((p) => p.page);
-  const sabqi = sabqiGroups(d, today);
-  const due = manzil.length + sabqi.length;
+  const allManzil = Object.values(d.pages).filter((p) => p.inManzil && p.due <= today);
+  const allSabqi = sabqiGroups(d, today);
+  const due = allManzil.length + allSabqi.length;
   const limit = Math.ceil(BACKLOG_FACTOR * normalLoad(d));
   const paused = due > limit;
+  let manzil = allManzil.sort((a, b) => a.due.localeCompare(b.due) || a.page - b.page).map((p) => p.page);
+  let sabqi = allSabqi;
+  if (paused) {
+    // Catch-up cap: only `limit` reviews today, most overdue first, then weakest. The rest rolls to the next days.
+    const units = [
+      ...allManzil.map((p) => ({ m: p.page as number | null, g: null as SabqiGroup | null, over: daysBetween(p.due, today), str: p.interval })),
+      ...allSabqi.map((g) => {
+        const its = g.keys.map((k) => d.ayahs[k]);
+        return { m: null, g, over: Math.max(...its.map((a) => daysBetween(a.due, today))), str: Math.min(...its.map((a) => a.interval)) };
+      }),
+    ].sort((a, b) => b.over - a.over || a.str - b.str).slice(0, limit);
+    const keepM = new Set(units.map((u) => u.m)), keepG = new Set(units.map((u) => u.g));
+    manzil = manzil.filter((p) => keepM.has(p));
+    sabqi = allSabqi.filter((g) => keepG.has(g));
+  }
   const sabaq = paused ? [] : nextSabaq(goal, d, paceLines);
   const minutes = Math.round(manzil.length * 3 + sabqi.reduce((s, g) => s + g.keys.length, 0) * 1 + countLines(sabaq) * 1.5 + 2);
-  return { manzil, sabqi, sabaq, backlog: { paused, due, limit }, minutes };
+  return { manzil, sabqi, sabaq, backlog: { paused, due, limit, days: paused ? Math.ceil(due / limit) : 0 }, minutes };
+}
+
+/** Sabaq is done only when every new ayah has been graded at L4 (graded ayahs are the only ones in the schedule). */
+export function sabaqProgress(keys: string[], d: Derived) {
+  const learned = keys.filter((k) => d.ayahs[k]);
+  return { lines: countLines(learned), total: countLines(keys), done: keys.length > 0 && learned.length === keys.length, remaining: keys.filter((k) => !d.ayahs[k]) };
 }
 
 // ---- transition drills ----
@@ -97,11 +118,11 @@ export function drillEvent(drill: Drill, grade: Grade, errorWords: string[] = []
 export const SALAH_OUTCOMES = { smooth: "perfect", stumbled: "hesitation", forgot: "mistake" } as const;
 export type SalahOutcome = keyof typeof SALAH_OUTCOMES;
 
-/** Only already-memorized ayahs can be logged; anything else rejects the whole entry. */
-export function salahEvents(d: Derived, keys: string[], outcome: SalahOutcome, prayer: string): { ok: true; events: EventInput[] } | { ok: false; error: string } {
+/** Only already-memorized ayahs can be logged; a mixed range is refused but offers the memorized subset. */
+export function salahEvents(d: Derived, keys: string[], outcome: SalahOutcome, prayer: string): { ok: true; events: EventInput[] } | { ok: false; error: string; memorized?: string[] } {
   if (!keys.length) return { ok: false, error: "Pick at least one ayah." };
   const missing = keys.filter((k) => !d.ayahs[k]);
-  if (missing.length) return { ok: false, error: `Only memorized ayahs can be logged. Not yet memorized: ${missing.slice(0, 3).join(", ")}${missing.length > 3 ? "…" : ""}` };
+  if (missing.length) return { ok: false, error: `Only memorized ayahs can be logged. Not yet memorized: ${missing.slice(0, 3).join(", ")}${missing.length > 3 ? "…" : ""}`, memorized: keys.filter((k) => d.ayahs[k]) };
   return { ok: true, events: keys.map((k) => ({ kind: "ayah", session: "salah", prayer, key: k, page: pageOfAyah(k), grade: SALAH_OUTCOMES[outcome] })) };
 }
 

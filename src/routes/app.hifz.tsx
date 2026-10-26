@@ -13,8 +13,9 @@ import { HifzOnboarding } from "@/components/hifz/Onboarding";
 const SKIP_KEY = "hifz:onboarding-skipped";
 import { capGrade, type Grade } from "@/lib/hifz/scheduler";
 import { goalAyahs, remainingGoal } from "@/lib/hifz/layout";
-import { nextSabaq } from "@/lib/hifz/session";
-import { Link } from "@tanstack/react-router";
+import { nextSabaq, sabaqProgress } from "@/lib/hifz/session";
+import { Link, useNavigate } from "@tanstack/react-router";
+import { HifzSettings } from "@/components/hifz/HifzSettings";
 
 export const Route = createFileRoute("/app/hifz")({
   head: () => ({
@@ -63,6 +64,9 @@ function buzz() {
   Haptics.impact({ style: ImpactStyle.Medium }).catch(() => navigator.vibrate?.(15));
 }
 
+// Context lines at L4: only the line shapes remain, never readable text.
+const HEAVY_BLUR = { opacity: 0.3, filter: "blur(6px)", userSelect: "none" } as const;
+
 type Phase = "study" | "check" | "chainOffer" | "chain" | "chainCheck" | "done";
 
 function Hifz() {
@@ -77,6 +81,8 @@ function Hifz() {
   // First visit opens setup; it's skippable and can be re-run from Hifz settings.
   const [onboarding, setOnboarding] = useState(false);
   const [fromPlan, setFromPlan] = useState(false);
+  const sessionMode = useRef(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
     setReciterId(savedReciter());
@@ -90,6 +96,7 @@ function Hifz() {
         const n = nextSabaq(st.plan?.goal, derive(st.events), st.plan?.paceLines ?? 5).length;
         setSize(Math.max(1, Math.min(3, n)));
         pendingBegin.current = true;
+        sessionMode.current = true;
       }
     } catch { /* storage blocked */ }
     hifzChapters().then(setChapters).catch(() => setErr("Connect to the internet once to load the surah list."));
@@ -128,15 +135,11 @@ function Hifz() {
             />
           ) : !begun ? (
             <>
-            <section className="glass-card flex items-center justify-between gap-3 p-4" style={{ background: "var(--surface)", border: "1px solid var(--border)" }}>
-              <div>
-                <h2 className="label-caps">Hifz settings</h2>
-                <p className="text-xs" style={{ color: "var(--muted-foreground)" }}>Goal, pace, what you know and the placement test.</p>
-              </div>
-              <button onClick={() => setOnboarding(true)} className="min-h-11 shrink-0 rounded-full px-4 text-sm font-semibold" style={{ background: "var(--background)", border: "1px solid var(--border)" }}>Run setup</button>
-            </section>
             <Link to="/app/hifz/today" className="glass-card flex min-h-14 items-center justify-between p-4 text-sm font-semibold" style={{ background: "var(--accent)", color: "var(--accent-foreground)" }}>
               Today's session <span aria-hidden>→</span>
+            </Link>
+            <Link to="/app/hifz/progress" className="glass-card flex min-h-14 items-center justify-between p-4 text-sm font-semibold" style={{ background: "var(--surface)", border: "1px solid var(--border)" }}>
+              Progress and forecast <span aria-hidden>→</span>
             </Link>
             <section className="glass-card space-y-4 p-5" style={{ background: "var(--surface)", border: "1px solid var(--border)" }}>
               <h2 className="label-caps">Choose what to memorize</h2>
@@ -182,6 +185,7 @@ function Hifz() {
                 {words ? "Start" : "Loading surah…"}
               </button>
             </section>
+            <HifzSettings chapters={chapters} onSetup={() => setOnboarding(true)} />
             </>
           ) : (
             words && (
@@ -193,7 +197,21 @@ function Hifz() {
                 size={size}
                 words={words}
                 reciterId={reciterId}
-                onNext={() => setStart((s) => Math.min(max, s + size))}
+                onNext={() => {
+                  if (!sessionMode.current) return setStart((s) => Math.min(max, s + size));
+                  // Today's sabaq: move to the next ungraded chunk; back to Today once every chunk is graded.
+                  let rem: string[] = [];
+                  try {
+                    const snap = JSON.parse(localStorage.getItem("hifz:today") || "null");
+                    const item = snap?.items?.find((i: { t: string }) => i.t === "sabaq");
+                    if (item) rem = sabaqProgress(item.keys, derive(loadHifz().events)).remaining;
+                  } catch { /* storage blocked */ }
+                  if (!rem.length) { navigate({ to: "/app/hifz/today" }); return; }
+                  const [c, a] = rem[0].split(":").map(Number);
+                  let run = 0;
+                  while (run < rem.length && rem[run] === `${c}:${a + run}`) run++;
+                  setChapter(c); setStart(a); setSize(Math.max(1, Math.min(3, run)));
+                }}
                 onExit={() => setBegun(false)}
               />
             )
@@ -372,7 +390,7 @@ function Workspace({ chapter, maxAyah, start, size, words, reciterId, onNext, on
   const renderWord = (w: MWord) => {
     const id = wid(w);
     if (!chunkSet.has(w.key)) {
-      return <span key={id} aria-hidden className={wordCls} style={{ opacity: 0.28, filter: "blur(1.2px)" }}>{w.text}</span>;
+      return <span key={id} aria-hidden className={wordCls} style={effLevel >= 4 ? HEAVY_BLUR : { opacity: 0.28, filter: "blur(1.2px)" }}>{w.text}</span>;
     }
     if (w.end) {
       return (
