@@ -1,6 +1,7 @@
 process.env.TZ = "America/Los_Angeles";
 import { describe, expect, test } from "bun:test";
-import { buildQueue, drillEvent, forecast, pickDrills, salahEvents } from "./session";
+import { buildQueue, drillEvent, forecast, pickDrills, sabaqProgress, salahEvents } from "./session";
+import { pageStates } from "./progress";
 import { derive, type HifzEvent } from "./store";
 import { ayahsOfPage, pageOfAyah } from "./layout";
 import { groupByPage, seedPlan } from "./placement";
@@ -36,7 +37,26 @@ describe("backlog guard", () => {
     const q = buildQueue(derive(evs), D, juzAmma, 10);
     expect(q.backlog.paused).toBe(true);
     expect(q.sabaq).toEqual([]);
-    expect(q.manzil.length).toBe(40);
+    expect(q.backlog.due).toBe(40);
+    expect(q.manzil.length).toBe(q.backlog.limit);
+    expect(q.backlog.days).toBe(Math.ceil(40 / q.backlog.limit));
+  });
+  test("catch-up queue never exceeds the cap and takes the most overdue first", () => {
+    for (const count of [10, 40, 120]) {
+      const evs = Array.from({ length: count }, (_, i) => {
+        const p = i + 2;
+        // older seeds are more overdue
+        return ev({ kind: "seed", session: "seed", key: String(p), page: p, grade: "perfect", keys: ayahsOfPage(p), dueOffset: 1 }, `2026-0${1 + (i % 9)}-01`);
+      });
+      const q = buildQueue(derive(evs), D, juzAmma, 10);
+      expect(q.manzil.length + q.sabqi.length).toBeLessThanOrEqual(q.backlog.limit);
+      if (q.backlog.paused) {
+        const d = derive(evs);
+        const kept = Math.max(...q.manzil.map((p) => d.pages[p].due));
+        const dropped = Object.values(d.pages).filter((p) => !q.manzil.includes(p.page)).map((p) => p.due);
+        for (const x of dropped) expect(x >= kept).toBe(true);
+      }
+    }
   });
   test("normal day keeps new lines", () => {
     const q = buildQueue(derive([]), D, juzAmma, 10);
@@ -45,7 +65,26 @@ describe("backlog guard", () => {
   });
 });
 
+describe("sabaq", () => {
+  test("is not done until every new ayah is graded", () => {
+    const keys = ["114:1", "114:2", "114:3"];
+    expect(sabaqProgress(keys, derive([])).done).toBe(false);
+    const part = derive([ev({ kind: "learn", key: "114:1", page: 604 }), ev({ kind: "ayah", key: "114:1", page: 604, grade: "perfect" })]);
+    const p = sabaqProgress(keys, part);
+    expect(p.done).toBe(false);
+    expect(p.remaining).toEqual(["114:2", "114:3"]);
+    const all = derive(keys.flatMap((k) => [ev({ kind: "learn", key: k, page: 604 }), ev({ kind: "ayah", key: k, page: 604, grade: "hesitation" })]));
+    expect(sabaqProgress(keys, all).done).toBe(true);
+  });
+});
+
 describe("salah logger", () => {
+  test("offers the memorized subset of a mixed range", () => {
+    const d = derive(["2:1", "2:2", "2:3"].map((k) => ev({ kind: "learn", key: k, page: 2 })));
+    const r = salahEvents(d, ["2:1", "2:2", "2:3", "2:4", "2:5"], "smooth", "isha");
+    expect(r.ok).toBe(false);
+    expect(!r.ok && r.memorized).toEqual(["2:1", "2:2", "2:3"]);
+  });
   test("rejects unmemorized ayahs", () => {
     const d = derive([ev({ kind: "learn", key: "112:1", page: 604 })]);
     expect(salahEvents(d, ["112:1", "112:2"], "smooth", "fajr").ok).toBe(false);
@@ -67,5 +106,20 @@ describe("transition drills", () => {
     expect(ds.length).toBeGreaterThanOrEqual(3);
     expect(ds.length).toBeLessThanOrEqual(5);
     expect(ds[0]).toEqual({ prev: "113:2", next: "113:3" });
+  });
+});
+
+describe("heatmap states", () => {
+  test("gray, overdue, weak and strong", () => {
+    const evs = [
+      ev({ kind: "seed", session: "seed", key: "10", page: 10, grade: "perfect", keys: ayahsOfPage(10), dueOffset: 1 }, "2026-10-01"),
+      ev({ kind: "learn", key: "114:1", page: 604 }, "2026-10-25"),
+      ev({ kind: "seed", session: "seed", key: "20", page: 20, grade: "perfect", keys: ayahsOfPage(20), dueOffset: 30 }, "2026-10-20"),
+    ];
+    const s = pageStates(derive(evs), D);
+    expect(s[1]).toBeUndefined();
+    expect(s[10].state).toBe("overdue");
+    expect(s[604].state).toBe("weak");
+    expect(["strong", "good", "light"]).toContain(s[20].state);
   });
 });
