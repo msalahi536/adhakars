@@ -39,5 +39,5 @@
 - Read subdirectory AGENTS.md files before editing there.
 - App AI uses the owner's GEMINI_API_KEY via `src/lib/gemini.server.ts`, by request.
 
-- Hifz state is local-first in `src/lib/hifz/store.ts` with pure rules in `scheduler.ts` (tested); optional cloud backup stores one merged JSON row per user, so the app never requires an account.
+- Hifz stores only an append-only review log (UUID events) locally; ayah/page state is always re-derived by replaying the merged log through pure `scheduler.ts` rules, and optional cloud backup unions logs by UUID, so devices never conflict and no account is required.
 - Open-source notices live only in `src/data/licenses.ts`.
