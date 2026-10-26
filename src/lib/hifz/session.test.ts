@@ -3,7 +3,7 @@ import { describe, expect, test } from "bun:test";
 import { buildQueue, drillEvent, forecast, pickDrills, sabaqProgress, salahEvents } from "./session";
 import { pageStates } from "./progress";
 import { derive, type HifzEvent } from "./store";
-import { ayahsOfPage, pageOfAyah } from "./layout";
+import { ayahsOfPage, countLines, dayChunk, daysToFinish, goalAyahs, pageOfAyah } from "./layout";
 import { groupByPage, seedPlan } from "./placement";
 
 const D = "2026-10-26";
@@ -101,6 +101,40 @@ describe("backlog guard", () => {
     const q = buildQueue(derive([]), D, juzAmma, 10);
     expect(q.backlog.paused).toBe(false);
     expect(q.sabaq[0]).toBe("114:1");
+  });
+});
+
+describe("daily chunk boundaries", () => {
+  const baqarah = goalAyahs({ type: "surahs", surahs: [2] });
+  test("3-line pace assigns 2:282 alone, never stalls or skips it", () => {
+    const from = baqarah.indexOf("2:282");
+    expect(countLines(["2:282"])).toBeGreaterThan(3);
+    const before = dayChunk(baqarah, 3, from - 3);
+    expect(before.includes("2:282") && before.length > 1).toBe(false);
+    expect(dayChunk(baqarah, 3, from)).toEqual(["2:282"]);
+    expect(dayChunk(baqarah, 3, from + 1)[0]).toBe("2:283");
+    // the plan itself picks it once everything before is known
+    const known = baqarah.slice(0, from).map((k) => ev({ kind: "learn", key: k, page: pageOfAyah(k) }));
+    expect(buildQueue(derive(known), D, { type: "surahs", surahs: [2] }, 3).sabaq).toEqual(["2:282"]);
+  });
+  test("each day ends at the ayah boundary nearest the target", () => {
+    for (let i = 0; i < baqarah.length; ) {
+      const c = dayChunk(baqarah, 5, i);
+      expect(c.length).toBeGreaterThan(0);
+      const n = countLines(c);
+      if (c.length > 1) {
+        const less = countLines(c.slice(0, -1));
+        expect(Math.abs(n - 5)).toBeLessThan(Math.abs(less - 5) + 1); // dropping the last ayah wouldn't be closer
+      }
+      const next = baqarah[i + c.length];
+      if (next && n < 5) expect(countLines([...c, next]) - 5).toBeGreaterThanOrEqual(5 - n); // adding one more wouldn't be closer
+      i += c.length;
+    }
+  });
+  test("finish estimate uses the same daily chunks", () => {
+    let days = 0;
+    for (let i = 0; i < baqarah.length; days++) i += dayChunk(baqarah, 5, i).length;
+    expect(daysToFinish(baqarah, new Set(), 5)).toBe(days);
   });
 });
 

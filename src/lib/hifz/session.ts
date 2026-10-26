@@ -1,6 +1,6 @@
 // Pure daily-session rules: today's queue (Manzil → Sabqi → Sabaq), backlog guard, transition drills,
 // Salah logging and the first-week forecast. No I/O; everything is expressed as log events.
-import { countLines, goalAyahs, linesOfAyah, pageOfAyah, remainingGoal, surahLength, type Goal } from "./layout";
+import { countLines, dayChunk, goalAyahs, linesOfAyah, pageOfAyah, remainingGoal, surahLength, type Goal } from "./layout";
 import { addDays, capGrade, daysBetween, type Grade } from "./scheduler";
 import { derive, type Derived, type HifzEvent } from "./store";
 
