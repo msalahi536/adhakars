@@ -1,6 +1,6 @@
 process.env.TZ = "America/Los_Angeles";
 import { describe, expect, test } from "bun:test";
-import { enterManzil, gradeAyah, gradePage, isDue, localDay, newAyah, nextAyahInterval, pageReady, pageStrength } from "./scheduler";
+import { enterManzil, gradeAyah, gradePage, isDue, localDay, newAyah, nextAyahInterval, pageReady, pageStrength, reviewInterval } from "./scheduler";
 import { derive, mergeHifz, type HifzEvent } from "./store";
 
 const D = "2026-10-26";
