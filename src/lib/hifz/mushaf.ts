@@ -54,6 +54,7 @@ export async function hifzWords(chapter: number): Promise<MWord[]> {
   }
   write(k, out);
   return out;
+  }
 }
 
 /** Every word on one Madani 15-line page (all surahs on it), cached for offline use. */
@@ -74,6 +75,7 @@ export async function hifzPage(page: number): Promise<MWord[]> {
       out.push({ key: v.verse_key, pos: w.position, text: w.text_uthmani, end: w.char_type_name === "end", page: w.page_number, line: w.line_number, tj: w.text_uthmani_tajweed });
   write(k, out);
   return out;
+  }
 }
 
 /** All 15 lines of a page with their words; lines without words (surah headers, basmala) stay empty. */
