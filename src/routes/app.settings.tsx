@@ -929,6 +929,11 @@ function Settings() {
                               )}
                             </div>
                           )}
+                          {r.id === HIFZ_REMINDER_ID && (
+                            <div className="text-xs" style={{ color: "var(--muted-foreground)" }}>
+                              "Hifz: X reviews due today". Skipped once today's session is done.
+                            </div>
+                          )}
                         </div>
                       </div>
                     );
