@@ -1,57 +1,109 @@
+process.env.TZ = "America/Los_Angeles";
 import { describe, expect, test } from "bun:test";
-import { enterManzil, gradeAyah, gradePage, newAyah, nextAyahInterval, pageReady, pageStrength, pullForward } from "./scheduler";
-import { emptyState, mergeHifz } from "./store";
+import { enterManzil, gradeAyah, gradePage, isDue, localDay, newAyah, nextAyahInterval, pageReady, pageStrength } from "./scheduler";
+import { derive, mergeHifz, type HifzEvent } from "./store";
 
-const T = "2026-10-26", N = "2026-10-26T00:00:00Z";
+const D = "2026-10-26";
+let n = 0;
+const ev = (e: Partial<HifzEvent> & Pick<HifzEvent, "kind" | "key" | "page">, day: string, id?: string): HifzEvent => ({
+  id: id ?? `id-${++n}`,
+  at: `${day}T12:00:${String(n % 60).padStart(2, "0")}Z`,
+  day,
+  ...e,
+});
+const days = (start: string, i: number) => {
+  const d = new Date(start + "T00:00:00Z");
+  d.setUTCDate(d.getUTCDate() + i);
+  return d.toISOString().slice(0, 10);
+};
 
-describe("hifz rules", () => {
-  test("new ayah starts at 1 day; perfect doubles 1→2→4→8", () => {
-    let a = newAyah("1:1", 1, T, N);
-    expect(a.interval).toBe(1);
-    const seen = [];
-    for (let i = 0; i < 3; i++) { a = gradeAyah(a, "perfect", T, N); seen.push(a.interval); }
-    expect(seen).toEqual([2, 4, 8]);
+describe("ayah intervals", () => {
+  test("new ayah starts at 1; perfect 1→2→4→8", () => {
+    let a = newAyah("1:1", 1, D);
+    const seen = [a.interval];
+    for (let i = 0; i < 3; i++) seen.push((a = gradeAyah(a, "perfect", D)).interval);
+    expect(seen).toEqual([1, 2, 4, 8]);
   });
-  test("blank resets, mistake halves (min 1), hesitation ×1.2 ceil", () => {
-    expect(nextAyahInterval(8, "blank")).toBe(1);
-    expect(nextAyahInterval(8, "mistake")).toBe(4);
-    expect(nextAyahInterval(1, "mistake")).toBe(1);
-    expect(nextAyahInterval(8, "hesitation")).toBe(10);
+  test("mistake at 1 stays 1", () => expect(nextAyahInterval(1, "mistake")).toBe(1));
+  test("hesitation at 1 becomes 2", () => expect(nextAyahInterval(1, "hesitation")).toBe(2));
+  test("blank resets to 1", () => expect(nextAyahInterval(8, "blank")).toBe(1));
+  test("exactly 14 graduates", () => expect(gradeAyah({ ...newAyah("1:1", 1, D), interval: 7 }, "perfect", D)).toMatchObject({ interval: 14, graduated: true }));
+  test("13 × 1.2 → 16 graduates", () => expect(gradeAyah({ ...newAyah("1:1", 1, D), interval: 13 }, "hesitation", D)).toMatchObject({ interval: 16, graduated: true }));
+});
+
+describe("pages", () => {
+  const grad = (key: string) => ({ ...newAyah(key, 1, D), interval: 16, graduated: true });
+  test("never exceeds 30 days", () => {
+    let p = enterManzil(1, D);
+    for (let i = 0; i < 10; i++) p = gradePage(p, [grad("1:1")], "perfect", [], D).page;
+    expect(p.interval).toBe(30);
   });
-  test("graduates at 14 days", () => {
-    const a = gradeAyah({ ...newAyah("1:1", 1, T, N), interval: 7 }, "perfect", T, N);
-    expect(a.graduated).toBe(true);
-    expect(gradeAyah({ ...newAyah("1:1", 1, T, N), interval: 6 }, "perfect", T, N).graduated).toBe(false);
+  test("non-graduated ayah keeps page out of manzil", () => expect(pageReady([grad("1:1"), newAyah("1:2", 1, D)])).toBe(false));
+  test("only memorized ayahs are judged", () => {
+    // Page 1 has ayahs 1:1–1:7; only 1:1 and 1:2 are memorized and both graduated.
+    const evs: HifzEvent[] = [];
+    for (const k of ["1:1", "1:2"]) {
+      evs.push(ev({ kind: "learn", key: k, page: 1 }, D));
+      for (let i = 0; i < 4; i++) evs.push(ev({ kind: "ayah", key: k, page: 1, grade: "perfect" }, days(D, i + 1)));
+    }
+    expect(derive(evs).pages[1]?.inManzil).toBe(true);
   });
-  test("page enters manzil only when all ayahs graduated; strength is weakest", () => {
-    const g = { ...newAyah("1:1", 1, T, N), interval: 16, graduated: true };
-    const s = { ...newAyah("1:2", 1, T, N), interval: 4 };
-    expect(pageReady([g, s])).toBe(false);
-    expect(pageReady([g])).toBe(true);
-    expect(pageStrength([g, s])).toBe(4);
-  });
-  test("manzil starts at 7 and caps at 30", () => {
-    const p = enterManzil(1, T, N);
-    expect(p.interval).toBe(7);
-    expect(gradePage({ ...p, interval: 20 }, [], "perfect", [], T, N).page.interval).toBe(30);
+  test("strength drops for overdue items", () => {
+    const a = { ...newAyah("1:1", 1, D), interval: 10, due: D };
+    expect(pageStrength([a], D)).toBe(10);
+    expect(pageStrength([a], days(D, 4))).toBe(6);
   });
   test("page mistake sends tapped ayahs to sabqi at 1 day", () => {
-    const g = { ...newAyah("1:1", 1, T, N), interval: 16, graduated: true, stage: "manzil" as const };
-    const r = gradePage(enterManzil(1, T, N), [g, { ...g, key: "1:2" }], "mistake", ["1:2"], T, N);
-    expect(r.ayahs[1]).toMatchObject({ stage: "sabqi", interval: 1, graduated: false });
-    expect(r.ayahs[0].interval).toBe(16);
+    const r = gradePage(enterManzil(1, D), [grad("1:1"), grad("1:2")], "mistake", ["1:2"], D);
+    expect(r.ayahs[1]).toMatchObject({ stage: "sabqi", interval: 1 });
     expect(r.page.inManzil).toBe(false);
   });
-  test("3 taps on a word pulls page review to today", () => {
-    const p = enterManzil(1, T, N);
-    expect(pullForward(p, 2, T, N).due).not.toBe(T);
-    expect(pullForward(p, 3, T, N).due).toBe(T);
+});
+
+describe("due today", () => {
+  test("flips at local midnight, not UTC", () => {
+    const item = { due: "2026-10-26" };
+    // 05:00 UTC Oct 26 is still 22:00 Oct 25 in Los Angeles.
+    expect(localDay(new Date("2026-10-26T05:00:00Z"))).toBe("2026-10-25");
+    expect(isDue(item, new Date("2026-10-26T05:00:00Z"))).toBe(false);
+    expect(isDue(item, new Date("2026-10-26T07:00:00Z"))).toBe(true);
   });
-  test("merge keeps newest item and unions reviews", () => {
-    const a = { ...emptyState(), ayahs: { "1:1": { ...newAyah("1:1", 1, T, "2026-01-01"), interval: 2 } }, reviews: [{ id: "x", at: "1" } as never] };
-    const b = { ...emptyState(), ayahs: { "1:1": { ...newAyah("1:1", 1, T, "2026-02-01"), interval: 8 } }, reviews: [{ id: "y", at: "2" } as never] };
-    const m = mergeHifz(a, b);
-    expect(m.ayahs["1:1"].interval).toBe(8);
-    expect(m.reviews.length).toBe(2);
+});
+
+describe("repeated word errors", () => {
+  const setup = () => {
+    const evs: HifzEvent[] = [];
+    evs.push(ev({ kind: "learn", key: "1:1", page: 1 }, D));
+    for (let i = 0; i < 4; i++) evs.push(ev({ kind: "ayah", key: "1:1", page: 1, grade: "perfect" }, days(D, i + 1)));
+    return evs; // page 1 in manzil, due 7 days after D+4
+  };
+  const tap = (day: string) => ev({ kind: "page", key: "1", page: 1, grade: "hesitation", errorWords: ["1:1:2"] }, day);
+  test("3 taps within 30 days pull the page to today", () => {
+    const evs = [...setup(), tap(days(D, 5)), tap(days(D, 6)), tap(days(D, 7))];
+    expect(derive(evs).pages[1].due).toBe(days(D, 7));
+  });
+  test("taps older than 30 days don't count", () => {
+    const evs = [...setup(), tap(days(D, 5)), tap(days(D, 40)), tap(days(D, 41))];
+    expect(derive(evs).pages[1].due).not.toBe(days(D, 41));
+  });
+  test("a Perfect review of the ayah resets its count", () => {
+    const evs = [...setup(), tap(days(D, 5)), tap(days(D, 6)), ev({ kind: "ayah", key: "1:1", page: 1, grade: "perfect" }, days(D, 6)), tap(days(D, 7))];
+    expect(derive(evs).wordErrors["1:1:2"]).toHaveLength(1);
+  });
+});
+
+describe("sync merge", () => {
+  test("two devices' offline reviews recompute in order", () => {
+    const learn = ev({ kind: "learn", key: "2:255", page: 42 }, D, "learn");
+    const phone = { plan: null, events: [learn, ev({ kind: "ayah", key: "2:255", page: 42, grade: "perfect" }, days(D, 1), "a")] };
+    const tablet = { plan: null, events: [learn, ev({ kind: "ayah", key: "2:255", page: 42, grade: "perfect" }, days(D, 3), "b")] };
+    // 1 → perfect 2 → perfect 4
+    expect(derive(mergeHifz(phone, tablet).events).ayahs["2:255"].interval).toBe(4);
+  });
+  test("same log synced twice doesn't double-count", () => {
+    const s = { plan: null, events: [ev({ kind: "learn", key: "1:1", page: 1 }, D, "l"), ev({ kind: "ayah", key: "1:1", page: 1, grade: "perfect" }, days(D, 1), "r")] };
+    const twice = mergeHifz(mergeHifz(s, s), s);
+    expect(twice.events).toHaveLength(2);
+    expect(derive(twice.events).ayahs["1:1"].interval).toBe(2);
   });
 });
