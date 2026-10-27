@@ -70,7 +70,8 @@ function VoiceLab() {
     const t0 = performance.now();
     try {
       const tf = await import("@huggingface/transformers");
-      const gpu = typeof navigator !== "undefined" && "gpu" in navigator;
+      // WebGPU in iOS WebViews can hang during decoding, so the lab uses WASM, which is reliable everywhere.
+      const gpu = false;
       const files: Record<string, number> = {};
       const make = (device: "webgpu" | "wasm") => tf.pipeline("automatic-speech-recognition", MODEL, {
         device,
@@ -112,17 +113,26 @@ function VoiceLab() {
 
   const recognize = async (blob: Blob) => {
     if (!asr.current) return;
-    setBusy(true); setStatus("Recognizing on this device…");
+    setBusy(true); setStatus("Preparing audio…");
+    let tick: ReturnType<typeof setInterval> | undefined;
     try {
       const audio = await toMono16k(blob);
+      if (audio.length < 8000) throw new Error("The recording was too short. Hold Start, recite, then tap Stop.");
       const t0 = performance.now();
-      const out = await asr.current(audio, { language: "arabic", task: "transcribe", chunk_length_s: 30, stride_length_s: 5 });
+      tick = setInterval(() => setStatus(`Recognizing on this device… ${Math.round((performance.now() - t0) / 1000)}s`), 500);
+      const opts = audio.length > 16000 * 28
+        ? { language: "arabic", task: "transcribe", chunk_length_s: 30, stride_length_s: 5, max_new_tokens: 220 }
+        : { language: "arabic", task: "transcribe", max_new_tokens: 220 };
+      const out = await Promise.race([
+        asr.current(audio, opts),
+        new Promise<never>((_, rej) => setTimeout(() => rej(new Error("It took over 90 seconds, so this phone is too slow for on-device recognition with this model.")), 90000)),
+      ]);
       const ms = Math.round(performance.now() - t0);
       const heard = (Array.isArray(out) ? out.map((o) => o.text).join(" ") : out.text).trim();
       setResult({ heard, ms, secs: audio.length / 16000, diff: compareWords(text, heard) });
       setStatus("Ready");
     } catch (e) { setStatus(`Recognition failed: ${(e as Error).message}`); }
-    finally { setBusy(false); }
+    finally { if (tick) clearInterval(tick); setBusy(false); }
   };
 
   return (
