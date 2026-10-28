@@ -144,12 +144,8 @@ function useAudio() {
 
 /** The example word with its first letter highlighted. */
 function ExampleWord({ text, className = "" }: { text: string; className?: string }) {
-  const m = text.match(/^(.[\u064B-\u065F\u0670\u06D6-\u06ED]*)(.*)$/su);
-  return (
-    <span dir="rtl" className={className} style={ar}>
-      <span className="text-primary">{m?.[1]}</span>{m?.[2]}
-    </span>
-  );
+  // One run of text: splitting it into spans breaks letter joining on phones.
+  return <span dir="rtl" className={className} style={ar}>{text}</span>;
 }
 
 function ListenButton({ url, label }: { url?: string; label: string }) {
@@ -318,7 +314,7 @@ function Pick({ step, onAnswer, onNext }: { step: Extract<Step, { kind: "pick" |
         hint ? <p className="mt-3 text-xs text-muted-foreground">Hint: it's called {item.name}</p>
           : <button onClick={() => setHint(true)} className="mt-3 text-xs text-primary underline-offset-2 hover:underline">Need a hint?</button>
       )}
-      <div dir="rtl" className="mt-6 grid w-full grid-cols-2 gap-3">
+      <div dir="rtl" className={`mt-6 grid w-full gap-3 ${step.options.length === 3 ? "grid-cols-3" : "grid-cols-2"}`}>
         {step.options.map((o) => {
           const tone = picked ? (o.id === item.id ? "border-primary bg-primary/10 scale-[1.02]" : o.id === picked.id ? "border-destructive bg-destructive/5" : "opacity-40") : "";
           return (
