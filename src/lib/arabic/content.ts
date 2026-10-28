@@ -1,3 +1,4 @@
+import EXAMPLES from "@/data/arabic-letter-examples.json";
 // Arabic Companion content model: levels → units → lessons → exercises → items.
 // Audio: recorded files only (never text-to-speech). A missing `audio` shows an "audio coming" state.
 
@@ -11,6 +12,7 @@ export type Item = {
   meaning?: string;
   family?: string; // look-alike shape family
   audio?: string; // recorded clip URL
+  example?: { ar: string; tr: string; en: string; audio: string }; // real recited Quran word starting with this letter
 };
 
 export type ExerciseType =
@@ -43,7 +45,14 @@ export const HEAVY = ["خ", "ص", "ض", "غ", "ط", "ق", "ظ"];
 // Letters that never join to the following letter.
 export const NON_JOINING = ["ا", "د", "ذ", "ر", "ز", "و"];
 
-const L = (ar: string, name: string, tr: string, family: string): Item => ({ id: `l:${ar}`, type: "letter", ar, name, tr, family });
+const EX = EXAMPLES as Record<string, { ar: string; tr: string; en: string; audio: string }>;
+const L = (ar: string, name: string, tr: string, family: string): Item => {
+  const e = EX[ar];
+  return {
+    id: `l:${ar}`, type: "letter", ar, name, tr, family,
+    example: e && { ...e, audio: `https://audio.qurancdn.com/${e.audio}` },
+  };
+};
 const LETTERS: Item[] = [
   L("ب", "Bā’", "ba", "ba"), L("ت", "Tā’", "ta", "ba"), L("ث", "Thā’", "tha", "ba"),
   L("ج", "Jīm", "ja", "jim"), L("ح", "Ḥā’", "ḥa", "jim"), L("خ", "Khā’", "kha", "jim"),
