@@ -49,3 +49,4 @@
 - Every local-notification scheduler plans only a few days ahead, and `src/lib/notification-budget.ts` trims the furthest-away pending notifications (never prayer alerts) so iOS's 64-pending limit is never hit.
 - Hifz reviews before their due date grow intervals only from the days actually elapsed, so repeated practice can't inflate a schedule.
 - Tajweed coloring parses Quran.com word tajweed markup through pure `src/lib/tajweed-rules.ts` (never raw HTML) and appears only where full text is meant to be read.
+- Arabic Companion is a lesson engine: content in `src/lib/arabic/content.ts`, pure unlock/review/error rules in `engine.ts` replaying an append-only local log with the Hifz interval rules; letter audio is recorded files only, never text-to-speech.
