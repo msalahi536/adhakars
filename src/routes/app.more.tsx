@@ -40,7 +40,7 @@ export const Route = createFileRoute("/app/more")({
 });
 
 type Tile = {
-  to: "/app/sleep" | "/app/qibla" | "/app/about" | "/app/period" | "/app/ruqyah" | "/app/hajj" | "/app/fasting" | "/app/duas" | "/app/tasbih" | "/app/hadith" | "/app/tafsir" | "/app/hifz";
+  to: "/app/sleep" | "/app/qibla" | "/app/about" | "/app/period" | "/app/ruqyah" | "/app/hajj" | "/app/fasting" | "/app/duas" | "/app/tasbih" | "/app/hadith" | "/app/tafsir" | "/app/hifz" | "/app/arabic";
 
   title: string;
   subtitle: string;
@@ -58,6 +58,7 @@ const tiles: Tile[] = [
   { to: "/app/ruqyah", title: "Ruqyah Companion", subtitle: "Daily protection and authentic ruqyah", Icon: ShieldCheck },
   { to: "/app/hajj", title: "Hajj & Umrah Companion", subtitle: "Station-by-station guide and du‘as", Icon: Landmark },
   { to: "/app/fasting", title: "Fasting Companion", subtitle: "Hijri fasting calendar and Ramadan", Icon: MoonStar },
+  { to: "/app/arabic", title: "Arabic Companion (beta)", subtitle: "Learn to read Arabic, letter by letter", Icon: GraduationCap },
   { to: "/app/sleep", title: "Sleep & Wake", subtitle: "17 sleep + 7 wake adhkar", Icon: BedDouble },
 
   { to: "/app/about", title: "About & Support", subtitle: "The project and contact", Icon: HandHeart },
