@@ -1,0 +1,170 @@
+{
+"ب": {
+"ar": "بِسْمِ",
+"tr": "bis'mi",
+"en": "In (the) name",
+"audio": "wbw/001_001_001.mp3"
+},
+"ل": {
+"ar": "لِلَّهِ",
+"tr": "lillahi",
+"en": "(be) to Allah",
+"audio": "wbw/001_002_002.mp3"
+},
+"ر": {
+"ar": "رَبِّ",
+"tr": "rabbi",
+"en": "the Lord",
+"audio": "wbw/001_002_003.mp3"
+},
+"م": {
+"ar": "مَـٰلِكِ",
+"tr": "māliki",
+"en": "(The) Master",
+"audio": "wbw/001_004_001.mp3"
+},
+"ي": {
+"ar": "يَوْمِ",
+"tr": "yawmi",
+"en": "(of the) Day",
+"audio": "wbw/001_004_002.mp3"
+},
+"ء": {
+"ar": "إِيَّاكَ",
+"tr": "iyyāka",
+"en": "You Alone",
+"audio": "wbw/001_005_001.mp3"
+},
+"ن": {
+"ar": "نَعْبُدُ",
+"tr": "naʿbudu",
+"en": "we worship",
+"audio": "wbw/001_005_002.mp3"
+},
+"و": {
+"ar": "وَإِيَّاكَ",
+"tr": "wa-iyyāka",
+"en": "and You Alone",
+"audio": "wbw/001_005_003.mp3"
+},
+"ص": {
+"ar": "صِرَٰطَ",
+"tr": "ṣirāṭa",
+"en": "(The) path",
+"audio": "wbw/001_007_001.mp3"
+},
+"ع": {
+"ar": "عَلَيْهِمْ",
+"tr": "ʿalayhim",
+"en": "on them",
+"audio": "wbw/001_007_004.mp3"
+},
+"غ": {
+"ar": "غَيْرِ",
+"tr": "ghayri",
+"en": "not (of)",
+"audio": "wbw/001_007_005.mp3"
+},
+"ق": {
+"ar": "قُلْ",
+"tr": "qul",
+"en": "Say",
+"audio": "wbw/112_001_001.mp3"
+},
+"ه": {
+"ar": "هُوَ",
+"tr": "huwa",
+"en": "He",
+"audio": "wbw/112_001_002.mp3"
+},
+"ك": {
+"ar": "كُفُوًا",
+"tr": "kufuwan",
+"en": "equivalent",
+"audio": "wbw/112_004_004.mp3"
+},
+"ش": {
+"ar": "شَرِّ",
+"tr": "sharri",
+"en": "(the) evil",
+"audio": "wbw/113_002_002.mp3"
+},
+"خ": {
+"ar": "خَلَقَ",
+"tr": "khalaqa",
+"en": "He created",
+"audio": "wbw/113_002_004.mp3"
+},
+"ف": {
+"ar": "فِى",
+"tr": "fī",
+"en": "in",
+"audio": "wbw/113_004_004.mp3"
+},
+"ح": {
+"ar": "حَاسِدٍ",
+"tr": "ḥāsidin",
+"en": "(of) an envier",
+"audio": "wbw/113_005_003.mp3"
+},
+"ج": {
+"ar": "جَآءَ",
+"tr": "jāa",
+"en": "comes",
+"audio": "wbw/110_001_002.mp3"
+},
+"د": {
+"ar": "دِينِ",
+"tr": "dīni",
+"en": "(the) religion",
+"audio": "wbw/110_002_005.mp3"
+},
+"ت": {
+"ar": "تَوَّابًۢا",
+"tr": "tawwāban",
+"en": "Oft-Returning",
+"audio": "wbw/110_003_008.mp3"
+},
+"س": {
+"ar": "سَيَصْلَىٰ",
+"tr": "sayaṣlā",
+"en": "He will be burnt",
+"audio": "wbw/111_003_001.mp3"
+},
+"ذ": {
+"ar": "ذَاتَ",
+"tr": "dhāta",
+"en": "of",
+"audio": "wbw/111_003_003.mp3"
+},
+"ط": {
+"ar": "طَعَامِ",
+"tr": "ṭaʿāmi",
+"en": "feed",
+"audio": "wbw/107_003_004.mp3"
+},
+"ظ": {
+"ar": "ظَهْرَكَ",
+"tr": "ẓahraka",
+"en": "your back",
+"audio": "wbw/094_003_003.mp3"
+},
+"ض": {
+"ar": "ضَآلًّۭا",
+"tr": "ḍāllan",
+"en": "lost",
+"audio": "wbw/093_007_002.mp3"
+},
+"ث": {
+"ar": "ثُمَّ",
+"tr": "thumma",
+"en": "Then",
+"audio": "wbw/095_005_001.mp3"
+},
+"ز": {
+"ar": "زُلْزِلَتِ",
+"tr": "zul'zilati",
+"en": "is shaken",
+"audio": "wbw/099_001_002.mp3"
+}
+}
