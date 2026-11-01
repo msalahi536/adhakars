@@ -5178,77 +5178,85 @@ body.has-adhkar-mini.adhkar-tucked .quran-player:not(.rec-panel), body.has-adhka
 
 /* Fresh, isolated recitation page. No retired Hifz styles or scheduling. */
 .recite-page {
-  --rc-paper: oklch(0.96 0.024 85); --rc-ink: oklch(0.28 0.042 135);
-  --rc-olive: oklch(0.46 0.068 125); --rc-gold: oklch(0.62 0.083 83);
-  --rc-muted: oklch(0.55 0.03 120); --rc-mist: oklch(0.82 0.025 100);
-  --rc-line: color-mix(in oklab, var(--rc-olive) 23%, transparent);
-  --rc-shadow: 0 -8px 40px color-mix(in oklab, var(--rc-ink) 12%, transparent);
-  --background: var(--rc-paper); --foreground: var(--rc-ink); --primary: var(--rc-olive);
-  --primary-foreground: var(--rc-paper); --accent: var(--rc-line); --accent-foreground: var(--rc-ink);
-  --border: var(--rc-line); --input: var(--rc-line); --ring: var(--rc-gold);
-  --nav-active: var(--rc-olive); --nav-inactive: var(--rc-muted); --nav-border: var(--rc-line);
-  position: fixed; inset: 0; z-index: 250; overflow-y: auto; background: var(--rc-paper); color: var(--rc-ink);
-  overscroll-behavior: contain; padding-bottom: 210px; font-family: inherit;
+  --rc-paper: var(--surface, var(--background)); --rc-ink: var(--foreground);
+  --rc-olive: var(--accent); --rc-gold: var(--translit); --rc-muted: var(--muted-foreground);
+  --rc-flower: color-mix(in oklab, var(--destructive) 38%, var(--rc-paper));
+  --rc-strip-ink: var(--accent-foreground);
+  --rc-line: color-mix(in oklab, var(--rc-olive) 25%, transparent);
+  --rc-shadow: 0 8px 30px color-mix(in oklab, var(--foreground) 12%, transparent);
+  position: fixed; inset: 0; z-index: 250; overflow: hidden; background: var(--background); color: var(--rc-ink);
+  font-family: inherit; touch-action: pan-y;
 }
-.rc-canvas { position: relative; max-width: 600px; margin: auto; min-height: 100%; }
-.rc-landscape { position: absolute; inset: 0 0 auto; height: 180px; pointer-events: none; overflow: hidden; mask-image: linear-gradient(to bottom, black 45%, transparent); }
-.rc-landscape img { width: 100%; height: 100%; object-fit: cover; object-position: center 30%; opacity: .72; }
-.rc-header { position: relative; display: flex; align-items: center; justify-content: space-between; padding: calc(env(safe-area-inset-top, 0px) + 18px) 20px 14px; text-align: center; }
-.rc-header button { border-radius: 50%; background: color-mix(in oklab, var(--rc-paper) 80%, transparent); width: 40px; height: 40px; font-family: Georgia, serif; font-size: 18px; }
-.rc-header h1 { font-family: Georgia, serif; font-size: 22px; font-weight: 500; margin-top: 4px; }
-.rc-header h1 span { font-size: 14px; font-family: inherit; }
-.rc-eyebrow { font-size: 10px; letter-spacing: 2px; color: var(--rc-muted); }
-.rc-top-controls { position: relative; max-width: 380px; margin: auto; padding: 0 20px; }
-.rc-top-controls legend { display: none; }
-.rc-choice { display: flex; gap: 3px; border: 1px solid var(--rc-line); padding: 3px; border-radius: 7px; background: color-mix(in oklab, var(--rc-paper) 88%, transparent); }
-.rc-choice button { flex: 1; padding: 7px 5px; font-size: 12px; white-space: normal; height: auto; min-height: 34px; }
-.rc-choice button.is-on { background: var(--rc-olive); color: var(--rc-paper); }
-.rc-page-select { display: flex; justify-content: center; align-items: center; gap: 12px; margin: 7px 0 0; font-size: 11px; color: var(--rc-muted); }
-.rc-page-select input { width: 46px; text-align: center; background: transparent; border-bottom: 1px solid var(--rc-line); color: var(--rc-ink); padding: 4px 0; }
-.rc-paper { position: relative; padding: 0 24px 20px; }
-.rc-margins { display: flex; justify-content: space-between; padding: 5px 4px 9px; font-size: 10px; color: var(--rc-muted); }
-.rc-mushaf { width: 100%; }
-.rc-line { display: flex; justify-content: space-between; align-items: center; gap: 1px; min-height: 39px; width: 100%; }
-.rc-short-line { justify-content: center; gap: 9px; }
-.rc-arabic, .rc-word, .rc-ayah-end { font-family: 'Amiri', 'Noto Naskh Arabic', serif; }
-.rc-word { display: inline-flex; position: relative; font-family: inherit; font-size: var(--rc-size); font-weight: 400; height: 39px; min-width: 0; padding: 0; border-radius: 0; flex: 0 1 auto; line-height: 1.55; color: var(--rc-ink); overflow: visible; }
-.rc-word:hover { background: transparent; color: var(--rc-ink); }
-.rc-word-ink { transition: opacity .45s ease, filter .45s ease; }
-.rc-pending .rc-word-ink { filter: blur(8px); opacity: .22; user-select: none; }
-.rc-in_progress .rc-word-ink { filter: blur(3px); opacity: .6; }
-.rc-peek .rc-word-ink { filter: none; opacity: .7; }
-.rc-correct .rc-word-ink { animation: rc-ink .5s ease both; }
-.rc-wrong::after { content: ''; position: absolute; inset: 3px -3px; border: 1.4px solid var(--rc-olive); border-radius: 48% 43% 51% 42%; transform: rotate(-7deg); pointer-events: none; }
+.recite-page.rc-night { --rc-paper: oklch(.25 .022 80); --rc-ink: oklch(.88 .025 85); --rc-muted: oklch(.72 .028 85); --rc-olive: color-mix(in oklab, var(--accent) 65%, var(--rc-muted)); }
+.rc-canvas { position: absolute; top: calc(env(safe-area-inset-top, 0px) + 38px); bottom: calc(env(safe-area-inset-bottom, 0px) + 135px); left: 50%; transform: translateX(-50%); width: min(calc(100% - 24px), 540px); display: flex; flex-direction: column; }
+.rc-margins { display: flex; justify-content: space-between; align-items: center; padding: 0 21px 10px; height: 38px; flex: none; color: var(--rc-ink); }
+.rc-margins span { border: 1px solid var(--rc-olive); border-radius: 45% / 20%; padding: 1px 14px; font-size: 16px; line-height: 1.4; background: var(--rc-paper); }
+.rc-paper { position: relative; flex: 1; min-height: 0; padding: 29px 30px; background: var(--rc-paper); }
+.rc-ornamental-frame { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; overflow: visible; }
+.rc-frame-rail { fill: none; stroke: var(--rc-olive); stroke-width: 12; }
+.rc-frame-leaf { fill: var(--rc-paper); stroke: var(--rc-olive); stroke-width: 1.3; }
+.rc-frame-vein { fill: none; stroke: var(--rc-olive); stroke-width: 1; }
+.rc-frame-flower { fill: var(--rc-flower); stroke: var(--rc-olive); stroke-width: .45; }
+.rc-frame-seed { fill: var(--rc-gold); }
+.rc-frame-inner { fill: none; stroke: var(--rc-olive); stroke-width: 1.5; }
+.rc-frame-hairline { fill: none; stroke: var(--rc-gold); stroke-width: .7; }
+.rc-page-oval { position: absolute; bottom: -5px; left: 50%; transform: translateX(-50%); font-family: var(--font-arabic); font-size: 19px; line-height: 1.2; padding: 3px 18px; border: 1.5px solid var(--rc-olive); border-radius: 50%; background: var(--rc-paper); color: var(--rc-ink); }
+.rc-mushaf { width: 100%; height: 100%; display: grid; grid-template-columns: minmax(0, 1fr); grid-template-rows: repeat(15, minmax(0, 1fr)); color: var(--rc-ink); }
+.rc-line { display: flex; justify-content: space-between; align-items: center; gap: 2px; width: 100%; min-height: 0; }
+.rc-short-line { justify-content: center; gap: 8px; }
+.rc-arabic, .rc-tajweed-text { font-family: var(--font-arabic); }
+.recite-page .rc-word { display: inline-flex; position: relative; font-family: inherit; font-size: var(--rc-line-size, var(--rc-size)); font-weight: 400; height: 100%; min-width: 0; padding: 0 1px; border-radius: 0; flex: 0 0 auto; line-height: 1.5; color: var(--rc-ink); overflow: visible; letter-spacing: 0; }
+.recite-page .rc-word:hover { background: transparent; color: var(--rc-ink); }
+.rc-word-ink { transition: opacity .4s ease, filter .4s ease; padding-inline: 1px; }
+.rc-pending .rc-word-ink, .rc-in_progress .rc-word-ink { opacity: .08; user-select: none; }
+.rc-hide-mist .rc-pending .rc-word-ink { filter: blur(4px); opacity: .17; }
+.rc-hide-blank .rc-pending .rc-word-ink { opacity: 0; }
+.rc-hide-blank .rc-line { background: linear-gradient(to bottom, transparent calc(100% - 1px), var(--rc-line) 0); }
+.recite-page .rc-peek .rc-word-ink { opacity: 1; filter: none; }
+.rc-wrong::after { content: ''; position: absolute; inset: 3px -3px; border: 1.2px solid var(--rc-olive); border-radius: 48% 43% 51% 42%; transform: rotate(-7deg); pointer-events: none; }
 .rc-skipped .rc-word-ink { text-decoration: underline; text-decoration-color: var(--rc-gold); text-underline-offset: 5px; }
-.rc-word-note { position: absolute; top: -5px; right: -1px; font-family: 'Amiri', serif; font-size: 10px; line-height: 1; color: var(--rc-olive); background: var(--rc-paper); z-index: 1; }
+.rc-word-note { position: absolute; top: -3px; right: 0; font-family: var(--font-arabic); font-size: 9px; line-height: 1; color: var(--rc-olive); background: var(--rc-paper); pointer-events: none; }
 .rc-skipped .rc-word-note { color: var(--rc-gold); font-family: inherit; font-size: 8px; }
-.rc-ayah-end { font-family: inherit; font-size: var(--rc-size); color: var(--rc-muted); min-width: 18px; }
-.rc-ayah-end.is-finished { color: var(--rc-gold); text-shadow: 0 0 8px color-mix(in oklab, var(--rc-gold) 35%, transparent); }
-.rc-surah-frame { display: flex; align-items: center; justify-content: space-between; border: 3px double var(--rc-gold); outline: 1px solid var(--rc-gold); outline-offset: -6px; min-height: 39px; color: var(--rc-ink); margin: 2px 0; padding: 0 9px; position: relative; }
-.rc-surah-frame .rc-arabic { font-size: 24px; }
-.rc-rosette { color: var(--rc-gold); font-family: 'Amiri', serif; font-size: 30px; line-height: 1; }
-.rc-bismillah { min-height: 39px; text-align: center; font-size: 24px; line-height: 1.5; }
-.rc-disclaimer { font-size: 9px; text-align: center; color: var(--rc-muted); margin-top: 14px; line-height: 1.5; }
-.rc-caption, .rc-translation { font-family: sans-serif; font-size: 13px; line-height: 1.6; text-align: center; color: var(--rc-muted); }
-.rc-caption { padding: 12px; border-top: 1px solid var(--rc-line); margin-top: 14px; }
-.rc-verse { margin: 16px 0; border-bottom: 1px solid var(--rc-line); padding-bottom: 14px; }
-.rc-verse-words { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; }
-.rc-dock { position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); width: min(100%, 600px); z-index: 2; padding: 10px 18px 0; background: linear-gradient(to bottom, transparent, var(--rc-paper) 22%); }
-.rc-horizon { position: relative; width: 100%; height: 68px; background: var(--rc-olive); color: var(--rc-paper); border-radius: 8px; display: flex; flex-direction: column; gap: 6px; touch-action: manipulation; user-select: none; box-shadow: var(--rc-shadow); }
-.rc-horizon:hover { background: var(--rc-olive); }
-.rc-horizon > span:nth-child(2) { display: flex; align-items: center; gap: 7px; font-size: 12px; }
-.rc-horizon-bars { display: flex; align-items: center; gap: 3px; height: 20px; }
-.rc-horizon-bars i { width: 2px; background: var(--rc-paper); opacity: .45; border-radius: 2px; }
-.rc-dock-progress { position: absolute; right: 12px; bottom: 9px; font-size: 10px; opacity: .75; }
-.rc-nav-wrap { height: calc(72px + env(safe-area-inset-bottom, 0px)); transition: height .3s ease, opacity .3s ease, transform .3s ease; }
-.recite-page .bottom-nav { position: static; margin: 0 -18px; width: calc(100% + 36px); transform: none; background: transparent; border-radius: 0; box-shadow: none; padding-bottom: env(safe-area-inset-bottom, 0px); }
-.rc-focus .rc-nav-wrap { height: env(safe-area-inset-bottom, 0px); opacity: 0; transform: translateY(25px); pointer-events: none; overflow: hidden; }
-.rc-focus .rc-header { padding-bottom: 18px; }
-.rc-focus .rc-paper { padding-top: 10px; }
-.rc-focus .rc-margins { margin-top: 38px; }
-.rc-focus { padding-bottom: 105px; }
-.rc-pause-tools { display: grid; grid-template-columns: repeat(4, 1fr); gap: 2px; margin-bottom: 7px; background: var(--rc-paper); }
-.rc-pause-tools button { flex-direction: column; height: 49px; gap: 4px; font-size: 9px; padding: 4px 0; }
+.rc-ayah-end { font-family: inherit; font-size: var(--rc-line-size, var(--rc-size)); color: var(--rc-olive); flex-shrink: 0; }
+.rc-surah-frame { display: flex; align-items: center; justify-content: space-between; border: 3px double var(--rc-olive); outline: 1px solid var(--rc-gold); outline-offset: -6px; color: var(--rc-ink); padding: 0 8px; min-height: 0; }
+.rc-surah-frame .rc-arabic { font-size: 23px; }
+.rc-rosette { color: var(--rc-olive); font-family: var(--font-arabic); font-size: 27px; line-height: 1; }
+.rc-bismillah { text-align: center; font-size: 22px; line-height: 1.5; display: grid; place-items: center; }
+.rc-header { position: absolute; z-index: 3; inset: 0 0 auto; padding: calc(env(safe-area-inset-top, 0px) + 6px) 14px 6px; display: flex; align-items: center; justify-content: space-between; background: color-mix(in oklab, var(--rc-paper) 90%, transparent); backdrop-filter: blur(12px); opacity: 0; transform: translateY(-10px); transition: opacity .25s, transform .25s; pointer-events: none; }
+.rc-header h1 { font-size: 14px; }
+.rc-header button { color: var(--rc-ink); font-family: inherit; font-size: 19px; }
+.rc-controls-visible .rc-header { opacity: 1; transform: none; pointer-events: auto; }
+.rc-dock { position: absolute; bottom: 0; left: 50%; transform: translateX(-50%); width: min(100%, 570px); z-index: 2; padding: 12px 18px calc(env(safe-area-inset-bottom, 0px) + 18px); }
+.recite-page .rc-horizon { position: relative; width: 100%; height: 90px; background: color-mix(in oklab, var(--rc-olive) 83%, var(--rc-paper)); color: var(--rc-strip-ink); border-radius: 24px; display: flex; flex-direction: column; justify-content: flex-start; padding: 17px 20px; gap: 10px; touch-action: manipulation; user-select: none; box-shadow: var(--rc-shadow); backdrop-filter: blur(14px); border: 1px solid color-mix(in oklab, var(--rc-olive) 40%, transparent); }
+.recite-page .rc-horizon:hover { background: var(--rc-olive); }
+.rc-horizon > span:nth-child(2) { align-self: flex-start; font-size: 15px; line-height: 1; }
+.rc-horizon-bars { display: flex; align-items: center; justify-content: center; gap: 4px; height: 25px; width: 100%; }
+.rc-horizon-bars i { width: 2px; height: var(--bar-height); background: currentColor; opacity: .45; border-radius: 2px; }
+.rc-horizon-bars.is-sounding i { animation: rc-wave .7s ease-in-out var(--bar-delay) infinite alternate; }
+@keyframes rc-wave { to { transform: scaleY(.4); opacity: .85; } }
+.rc-dock-progress { position: absolute; right: 20px; bottom: 17px; font-size: 15px; font-variant-numeric: tabular-nums; }
+.rc-nav-wrap { height: 0; opacity: 0; overflow: hidden; pointer-events: none; transition: height .25s, opacity .25s; }
+.rc-controls-visible .rc-nav-wrap { height: 68px; opacity: 1; pointer-events: auto; }
+.recite-page .bottom-nav { position: static; margin: 8px -18px 0; width: calc(100% + 36px); transform: none; background: var(--rc-paper); border-radius: 0; box-shadow: none; padding: 0; }
+.rc-page-select { display: flex; justify-content: center; align-items: center; gap: 12px; font-size: 11px; color: var(--rc-muted); background: var(--rc-paper); border-radius: 8px; margin-bottom: 8px; }
+.rc-page-select input { width: 44px; text-align: center; background: transparent; border-bottom: 1px solid var(--rc-line); color: var(--rc-ink); padding: 4px 0; }
+.rc-pause-tools { display: grid; grid-template-columns: repeat(4, 1fr); background: var(--rc-paper); }
+.rc-pause-tools button { flex-direction: column; height: 48px; gap: 3px; font-size: 10px; padding: 3px; }
+.rc-reflow { overflow-y: auto; }
+.rc-reflow .rc-mushaf { display: block; height: auto; font-family: var(--font-arabic); }
+.rc-reflow .rc-word { height: 45px; }
+.rc-verse { margin: 12px 0; padding-bottom: 12px; }
+.rc-verse-words { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; }
+.rc-translation { font-family: var(--font-sans); font-size: 13px; line-height: 1.6; color: var(--rc-muted); margin-top: 12px; text-align: center; }
+.rc-choice { display: flex; gap: 3px; border: 1px solid var(--rc-line); padding: 3px; border-radius: 7px; }
+.rc-choice button { flex: 1; padding: 7px 5px; font-size: 12px; white-space: normal; height: auto; min-height: 34px; }
+.rc-choice button.is-on { background: var(--rc-olive); color: var(--rc-strip-ink); }
+.rc-eyebrow { font-size: 10px; color: var(--rc-muted); }
+.rc-disclaimer { font-size: 11px; line-height: 1.6; color: var(--rc-muted); margin-top: 20px; text-align: center; }
+.rc-color-guide { display: grid; gap: 12px; }
+.rc-color-guide li { display: flex; gap: 10px; align-items: center; font-size: 12px; }
+.rc-color-guide small { display: block; color: var(--rc-muted); }
+.rc-swatch { width: 16px; height: 16px; border-radius: 50%; flex: none; }
 .rc-backdrop { position: fixed; inset: 0; z-index: 10; display: flex; align-items: flex-end; justify-content: center; background: color-mix(in oklab, var(--rc-ink) 28%, transparent); }
 .rc-backdrop > div { width: min(100%, 600px); }
 .rc-sheet { max-height: 85dvh; overflow-y: auto; background: var(--rc-paper); color: var(--rc-ink); border-radius: 8px 8px 0 0; padding: 24px 24px calc(24px + env(safe-area-inset-bottom, 0px)); box-shadow: var(--rc-shadow); }
@@ -5276,17 +5284,7 @@ body.has-adhkar-mini.adhkar-tucked .quran-player:not(.rec-panel), body.has-adhka
 .rc-mark-row small { font-size: 10px; }
 .rc-audio-error { color: var(--rc-ink); font-size: 11px; background: var(--rc-paper); padding: 8px; }
 .rc-loading { min-height: 450px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 16px; font-size: 13px; }
-.rc-dev { margin: 10px 24px; color: var(--rc-muted); font-size: 10px; }
-.rc-dev button { font-size: 10px; margin-top: 8px; }
-@keyframes rc-ink { from { opacity: .2; } to { opacity: 1; } }
-.rc-no-motion *, .rc-no-motion *::before { animation: none !important; transition: none !important; }
+
+.rc-tj-necessary { background: var(--tj-necessary); }.rc-tj-obligatory { background: var(--tj-obligatory); }.rc-tj-permissible { background: var(--tj-permissible); }.rc-tj-normal { background: var(--tj-normal); }.rc-tj-ghunnah { background: var(--tj-ghunnah); }.rc-tj-qalqalah { background: var(--tj-qalqalah); }.rc-tj-silent { background: var(--tj-silent); }
+@media (max-height: 650px) { .rc-canvas { top: 14px; bottom: 110px; }.rc-margins { height: 30px; }.rc-bismillah { font-size: 16px; }.rc-surah-frame .rc-arabic { font-size: 16px; }.recite-page .rc-horizon { height: 78px; } }
 @media (prefers-reduced-motion: reduce) { .recite-page *, .recite-page *::before { animation: none !important; transition: none !important; } }
-@media (min-width: 700px) { .rc-paper { padding-inline: 40px; } .rc-line, .rc-bismillah { min-height: 48px; } .rc-word { height: 48px; } .rc-landscape { height: 220px; } }
-/* Keep QPC glyphs separated even where their ink extends beyond the advance width. */
-.recite-page button { border-radius: 6px; }
-.recite-page .rc-header button { border-radius: 50%; }
-.recite-page .rc-word { font-size: var(--rc-line-size, var(--rc-size)); flex-shrink: 0; padding-inline: 1px; border-radius: 0; }
-.rc-word-ink { padding-inline: 1px; }
-.rc-line { gap: 5px; }
-.rc-ayah-end { font-size: var(--rc-line-size, var(--rc-size)); flex-shrink: 0; }
-.recite-page .rc-nav-wrap .bottom-nav { border: 0; border-radius: 0; }

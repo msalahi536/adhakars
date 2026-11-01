@@ -1,5 +1,7 @@
 # Roadmap
 
+- [x] Replace only fresh recite page with themed ornamental Madani mushaf, hidden-word controls and settings; reveal/marks/auto-hide tested, 15 rows and no overflow in Rose, Ocean and evening
+
 - [x] Fresh standalone Hifz recite page from uploaded brief, isolated from retired Hifz
 - [x] Use existing artwork only; skip new background images, night mode and rising-sun effects
 - [x] Verify self-check through all 12 ayahs of page 562, word marks, settings persistence, page navigation, qari playback and no clipped lines; 134 tests pass

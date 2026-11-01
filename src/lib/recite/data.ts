@@ -2,12 +2,12 @@ import { queryOptions } from "@tanstack/react-query";
 import { getChapters, stripTags } from "@/lib/quran";
 import type { RecitePage, ReciteVerse } from "./model";
 const API = "https://api.quran.com/api/v4";
-type RawVerse = { verse_key: string; verse_number: number; juz_number: number; translations?: { text: string }[]; words: { position: number; page_number: number; line_number: number; text_uthmani: string; code_v2: string; char_type_name: string; audio_url?: string; translation?: { text: string }; transliteration?: { text: string } }[] };
+type RawVerse = { verse_key: string; verse_number: number; juz_number: number; translations?: { text: string }[]; words: { position: number; page_number: number; line_number: number; text_uthmani: string; text_uthmani_tajweed?: string; code_v2: string; char_type_name: string; audio_url?: string; translation?: { text: string }; transliteration?: { text: string } }[] };
 export async function fetchRecitePage(page: number): Promise<RecitePage> {
   const verses: ReciteVerse[] = [];
   let cursor: number | null = 1;
   while (cursor) {
-    const res = await fetch(`${API}/verses/by_page/${page}?words=true&word_fields=text_uthmani,code_v2,line_number,page_number,audio_url&fields=page_number,juz_number&translations=20&language=en&per_page=50&page=${cursor}`);
+    const res = await fetch(`${API}/verses/by_page/${page}?words=true&word_fields=text_uthmani,text_uthmani_tajweed,code_v2,line_number,page_number,audio_url&fields=page_number,juz_number&translations=20&language=en&per_page=50&page=${cursor}`);
     if (!res.ok) throw new Error("This page could not be loaded. Please check your connection.");
     const data = await res.json() as { verses: RawVerse[]; pagination: { next_page: number | null } };
     for (const v of data.verses) verses.push({
@@ -15,7 +15,7 @@ export async function fetchRecitePage(page: number): Promise<RecitePage> {
       translation: stripTags(v.translations?.[0]?.text ?? ""),
       words: v.words.filter((w) => w.page_number === page).map((w) => ({
         key: `${v.verse_key}:${w.position}`, verse: v.verse_key, position: w.position, page: w.page_number, line: w.line_number,
-        text: w.text_uthmani, glyph: w.code_v2, end: w.char_type_name === "end",
+        text: w.text_uthmani, glyph: w.code_v2, tajweed: w.text_uthmani_tajweed, end: w.char_type_name === "end",
         audio: w.audio_url ? `https://audio.qurancdn.com/${w.audio_url}` : null,
         translation: stripTags(w.translation?.text ?? ""), transliteration: w.transliteration?.text ?? "",
       })),
