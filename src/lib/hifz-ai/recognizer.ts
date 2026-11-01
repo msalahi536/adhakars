@@ -10,6 +10,7 @@
  */
 import * as ort from "onnxruntime-web";
 import { NMEL, SR, StreamingFbank } from "./fbank";
+import { cachedAsset, MODEL_URL } from "./assets";
 
 export interface ModelConfig {
   file: string;
@@ -25,40 +26,14 @@ export interface Emission {
   prob: number;
 }
 
-const MODEL_CACHE = "hifz-ai-model-v3.2";
 /** Keep in sync with package.json ("onnxruntime-web": "1.20.1"). */
 export const ORT_VERSION = "1.20.1";
 /** Default model location: served from the app's own public folder. */
-export const DEFAULT_MODEL_URL = "/hifz-ai/model/zipformer_p_arabic_v3.2_chunk16.int8.onnx";
+export const DEFAULT_MODEL_URL = MODEL_URL;
 
 /** Download the model once and keep it in Cache Storage (works offline afterwards). */
 async function fetchModel(url: string, onProgress?: (p: number) => void): Promise<ArrayBuffer> {
-  try {
-    const cache = await caches.open(MODEL_CACHE);
-    const hit = await cache.match(url);
-    if (hit) return hit.arrayBuffer();
-    const res = await fetch(url);
-    if (!res.ok || !res.body) throw new Error(`model download failed (${res.status})`);
-    const total = Number(res.headers.get("content-length")) || 0;
-    const reader = res.body.getReader();
-    const parts: BlobPart[] = [];
-    let got = 0;
-    for (;;) {
-      const { done, value } = await reader.read();
-      if (done) break;
-      parts.push(value);
-      got += value.length;
-      if (total && onProgress) onProgress(got / total);
-    }
-    const blob = new Blob(parts);
-    await cache.put(url, new Response(blob)).catch(() => undefined);
-    return blob.arrayBuffer();
-  } catch (e) {
-    // Cache Storage unavailable (some WebViews): plain download
-    const res = await fetch(url);
-    if (!res.ok) throw e;
-    return res.arrayBuffer();
-  }
+  return (await cachedAsset(url, onProgress)).arrayBuffer();
 }
 
 export class QuranRecognizer {
@@ -87,8 +62,8 @@ export class QuranRecognizer {
     const r = new QuranRecognizer();
     const variant = opts.variant ?? "chunk16";
     const [cfgAll, tokTxt, model] = await Promise.all([
-      fetch(opts.configUrl ?? "/hifz-ai/model/model-config.json").then((x) => x.json()),
-      fetch(opts.tokensUrl ?? "/hifz-ai/model/tokens.txt").then((x) => x.text()),
+      cachedAsset(opts.configUrl ?? "/hifz-ai/model/model-config.json").then((x) => x.json()),
+      cachedAsset(opts.tokensUrl ?? "/hifz-ai/model/tokens.txt").then((x) => x.text()),
       fetchModel(opts.modelUrl, opts.onProgress),
     ]);
     r.cfg = cfgAll[variant];
@@ -98,8 +73,11 @@ export class QuranRecognizer {
     }
     // threads need cross-origin isolation (SharedArrayBuffer); one core is already ~15x faster than real time
     ort.env.wasm.numThreads = (globalThis as any).crossOriginIsolated ? Math.min(4, (navigator.hardwareConcurrency || 2) - 1) || 1 : 1;
-    // the .wasm runtime files are loaded from the CDN matching the installed onnxruntime-web version
-    ort.env.wasm.wasmPaths ??= `https://cdn.jsdelivr.net/npm/onnxruntime-web@${ORT_VERSION}/dist/`;
+    // Cache the matching runtime locally too: no CDN dependency on later offline use.
+    ort.env.wasm.wasmBinary = await (await cachedAsset("/hifz-ai/runtime/ort-wasm-simd-threaded.wasm")).arrayBuffer();
+    const runtime = await (await cachedAsset("/hifz-ai/runtime/ort-wasm-simd-threaded.mjs")).text();
+    const runtimeUrl = URL.createObjectURL(new Blob([runtime], { type: "text/javascript" }));
+    ort.env.wasm.wasmPaths = { mjs: runtimeUrl };
     r.session = await ort.InferenceSession.create(model, { executionProviders: ["wasm"], graphOptimizationLevel: "all" });
     r.restart();
     return r;
