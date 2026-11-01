@@ -1,10 +1,10 @@
 # Roadmap
 
-- [ ] Add My Mushaf memory map and slipping review nudges.
-- [ ] Add optional Salah portions with saved light reviews.
-- [ ] Add prayer-time-gated sleep preview and unrecorded morning voice recall.
-- [ ] Add voice answers to every drill and Quran-source 15-line position quizzes.
-- [ ] Test real preview flows and capture every new screen.
+- [x] Add My Mushaf memory map and slipping review nudges; checked 604 buttons/30 juz rows and page 312 Review now opens manzil session.
+- [x] Add optional Salah portions with source surah/ranges and saved engine light reviews; browser readback confirmed salah history.
+- [x] Add prayer-time-gated sleep preview and unrecorded morning recall; real audio played three times, saved next-day passage, after-Fajr recall left Hifz state byte-identical. Recorded input scored Solid 99/100 and Good 80 on a later run with dropped opening words; accuracy/phone haptics remain unverified.
+- [x] Add voice answers using drillRange and startListening to every drill, plus Quran-source 15-line position quizzes; real Al-Ikhlas voice answer advanced drill 1 to 2, position answer highlighted source line 13.
+- [x] Capture each screen in walkthrough collection; phone-sized preview has no browser errors, latest build OK, 27 focused tests pass.
 
 - [x] Add beta-only Quran Follow the imam and Find an ayah modes with themed Madani pages, direct word highlights, English crossfade/size, wake lock and eight-second/early-stop search. Browser recorded Al-Ikhlas follow locked to 112:2 and turned to page 604; search returned incorrect 2:60, an engine accuracy limitation (not claimed accurate). Both source-text result and Open in mushaf flows/screenshots checked; 25 tests pass. Real-phone recognition/wake lock unverified.
 
