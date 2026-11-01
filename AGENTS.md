@@ -3,7 +3,7 @@
 - Beta Hifz records attempts once; third clean lesson credits lines, page reviews need one. Results show mastery, hesitations and drift apart from self-marks. Ranges share a mic and cached models/keys. Quran voice memoizes Madani pages, reserves lesson-sized heading rows for Basmala, and mutates highlights directly. Search delegates stopping/confidence to engine sessions and meters their streams; all mics stop on exit.
 - Daily editor uses encrypted, server-verified sessions; dated snapshots override only their UTC day with rotation fallback. Browsing reuses Quran/hadith clients with cancellable updates, preserving widget contracts.
 - Hifz qari playback uses cancellable generation tokens and settled segment waits; stage changes invalidate playback before mic startup so repeat loops cannot restart audio after a stop.
-- Hifz AI notices live in a browser-independent module so Settings attribution never imports the inference runtime; the free model is not part of paid entitlements.
+- Hifz AI notices are runtime-independent; free checking has no paid entitlement. Enhancements live in components: ephemeral recording/replay, caller-owned mic reuse, shared echo/tafsir, engine drills and local milestone keys preserve engine state and layouts.
 
 - Hifz home dialogs portal above navigation; practice screens call engine exports with Quran-source ranges. Sleep previews save device-only passages for unrecorded morning recall; page labels use source surah names.
 
