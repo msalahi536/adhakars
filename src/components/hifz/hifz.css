@@ -105,3 +105,6 @@
 .hz-drill-words .hz-diff { color: var(--accent); font-weight: 700; }
 .hz-drill-actions { display: flex; gap: 10px; }
 .hz-drill-actions button { flex: 1; height: 44px; border-radius: 14px; font-weight: 700; }
+
+/* Word highlighted while the qari recites it (sabaq listen phase). */
+.rc-word.rc-listening .rc-word-ink { color: var(--m-gold); transition: color .15s ease; }

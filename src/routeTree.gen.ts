@@ -41,6 +41,7 @@ import { Route as AppTafsirRouteImport } from './routes/app.tafsir'
 import { Route as AppTasbihRouteImport } from './routes/app.tasbih'
 import { Route as AppTermsRouteImport } from './routes/app.terms'
 import { Route as AppVoiceLabRouteImport } from './routes/app.voice-lab'
+import { Route as AppHifzReciteRouteImport } from './routes/app.hifz.recite'
 import { Route as AppMoreZakatRouteImport } from './routes/app.more_.zakat'
 
 const IndexRoute = IndexRouteImport.update({
@@ -203,6 +204,11 @@ const AppVoiceLabRoute = AppVoiceLabRouteImport.update({
   path: '/voice-lab',
   getParentRoute: () => AppRoute,
 } as any)
+const AppHifzReciteRoute = AppHifzReciteRouteImport.update({
+  id: '/recite',
+  path: '/recite',
+  getParentRoute: () => AppHifzRoute,
+} as any)
 const AppMoreZakatRoute = AppMoreZakatRouteImport.update({
   id: '/more_/zakat',
   path: '/more/zakat',
@@ -226,7 +232,7 @@ export interface FileRoutesByFullPath {
   '/app/fasting': typeof AppFastingRoute
   '/app/hadith': typeof AppHadithRoute
   '/app/hajj': typeof AppHajjRoute
-  '/app/hifz': typeof AppHifzRoute
+  '/app/hifz': typeof AppHifzRouteWithChildren
   '/app/licenses': typeof AppLicensesRoute
   '/app/more': typeof AppMoreRoute
   '/app/period': typeof AppPeriodRoute
@@ -242,6 +248,7 @@ export interface FileRoutesByFullPath {
   '/app/terms': typeof AppTermsRoute
   '/app/voice-lab': typeof AppVoiceLabRoute
   '/app/': typeof AppIndexRoute
+  '/app/hifz/recite': typeof AppHifzReciteRoute
   '/app/more/zakat': typeof AppMoreZakatRoute
 }
 export interface FileRoutesByTo {
@@ -260,7 +267,7 @@ export interface FileRoutesByTo {
   '/app/fasting': typeof AppFastingRoute
   '/app/hadith': typeof AppHadithRoute
   '/app/hajj': typeof AppHajjRoute
-  '/app/hifz': typeof AppHifzRoute
+  '/app/hifz': typeof AppHifzRouteWithChildren
   '/app/licenses': typeof AppLicensesRoute
   '/app/more': typeof AppMoreRoute
   '/app/period': typeof AppPeriodRoute
@@ -276,6 +283,7 @@ export interface FileRoutesByTo {
   '/app/terms': typeof AppTermsRoute
   '/app/voice-lab': typeof AppVoiceLabRoute
   '/app': typeof AppIndexRoute
+  '/app/hifz/recite': typeof AppHifzReciteRoute
   '/app/more/zakat': typeof AppMoreZakatRoute
 }
 export interface FileRoutesById {
@@ -296,7 +304,7 @@ export interface FileRoutesById {
   '/app/fasting': typeof AppFastingRoute
   '/app/hadith': typeof AppHadithRoute
   '/app/hajj': typeof AppHajjRoute
-  '/app/hifz': typeof AppHifzRoute
+  '/app/hifz': typeof AppHifzRouteWithChildren
   '/app/licenses': typeof AppLicensesRoute
   '/app/more': typeof AppMoreRoute
   '/app/period': typeof AppPeriodRoute
@@ -312,6 +320,7 @@ export interface FileRoutesById {
   '/app/terms': typeof AppTermsRoute
   '/app/voice-lab': typeof AppVoiceLabRoute
   '/app/': typeof AppIndexRoute
+  '/app/hifz/recite': typeof AppHifzReciteRoute
   '/app/more_/zakat': typeof AppMoreZakatRoute
 }
 export interface FileRouteTypes {
@@ -349,6 +358,7 @@ export interface FileRouteTypes {
     | '/app/terms'
     | '/app/voice-lab'
     | '/app/'
+    | '/app/hifz/recite'
     | '/app/more/zakat'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -383,6 +393,7 @@ export interface FileRouteTypes {
     | '/app/terms'
     | '/app/voice-lab'
     | '/app'
+    | '/app/hifz/recite'
     | '/app/more/zakat'
   id:
     | '__root__'
@@ -418,6 +429,7 @@ export interface FileRouteTypes {
     | '/app/terms'
     | '/app/voice-lab'
     | '/app/'
+    | '/app/hifz/recite'
     | '/app/more_/zakat'
   fileRoutesById: FileRoutesById
 }
@@ -659,6 +671,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppVoiceLabRouteImport
       parentRoute: typeof AppRoute
     }
+    '/app/hifz/recite': {
+      id: '/app/hifz/recite'
+      path: '/recite'
+      fullPath: '/app/hifz/recite'
+      preLoaderRoute: typeof AppHifzReciteRouteImport
+      parentRoute: typeof AppHifzRoute
+    }
     '/app/more_/zakat': {
       id: '/app/more_/zakat'
       path: '/more/zakat'
@@ -669,6 +688,17 @@ declare module '@tanstack/react-router' {
   }
 }
 
+interface AppHifzRouteChildren {
+  AppHifzReciteRoute: typeof AppHifzReciteRoute
+}
+
+const AppHifzRouteChildren: AppHifzRouteChildren = {
+  AppHifzReciteRoute: AppHifzReciteRoute,
+}
+
+const AppHifzRouteWithChildren =
+  AppHifzRoute._addFileChildren(AppHifzRouteChildren)
+
 interface AppRouteChildren {
   AppAboutRoute: typeof AppAboutRoute
   AppArabicRoute: typeof AppArabicRoute
@@ -677,7 +707,7 @@ interface AppRouteChildren {
   AppFastingRoute: typeof AppFastingRoute
   AppHadithRoute: typeof AppHadithRoute
   AppHajjRoute: typeof AppHajjRoute
-  AppHifzRoute: typeof AppHifzRoute
+  AppHifzRoute: typeof AppHifzRouteWithChildren
   AppLicensesRoute: typeof AppLicensesRoute
   AppMoreRoute: typeof AppMoreRoute
   AppPeriodRoute: typeof AppPeriodRoute
@@ -704,7 +734,7 @@ const AppRouteChildren: AppRouteChildren = {
   AppFastingRoute: AppFastingRoute,
   AppHadithRoute: AppHadithRoute,
   AppHajjRoute: AppHajjRoute,
-  AppHifzRoute: AppHifzRoute,
+  AppHifzRoute: AppHifzRouteWithChildren,
   AppLicensesRoute: AppLicensesRoute,
   AppMoreRoute: AppMoreRoute,
   AppPeriodRoute: AppPeriodRoute,

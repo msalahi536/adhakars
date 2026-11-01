@@ -49,7 +49,7 @@ type Tile = {
 };
 
 const tiles: Tile[] = [
-  { to: "/app/hifz", title: "Hifz · Recite", subtitle: "A word at a time, at your pace", Icon: BookOpen },
+  { to: "/app/hifz", title: "Hifz Companion", subtitle: "Memorize the Quran, page by page", Icon: BookOpen },
   { to: "/app/hadith", title: "Hadith Library", subtitle: "40,000+ hadith by book and topic", Icon: ScrollText },
   { to: "/app/tafsir", title: "Tafsir Library", subtitle: "20 classical tafsir books, verse by verse", Icon: Library },
   { to: "/app/duas", title: "Dua Library", subtitle: "50 authentic duas for every feeling", Icon: BookOpen },
