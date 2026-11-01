@@ -2,6 +2,7 @@ import { useEffect, useState, type ReactNode } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { HeaderBackButton } from "@/components/HeaderBackButton";
 import { VoiceLabUnlock } from "@/components/VoiceLabUnlock";
+import { AI_CREDIT } from "@/lib/hifz-ai/notices";
 import { getDisplay, setDisplay, themes } from "@/lib/theme";
 import {
   setSeed,
@@ -1145,6 +1146,13 @@ function Settings() {
                 </div>
                 <span className="settings-chevron">›</span>
               </Link>
+              <div className="settings-row">
+                <span className="settings-icon"><Info size={17} strokeWidth={1.8} /></span>
+                <div className="min-w-0 flex-1">
+                  <div className="settings-row-title">Acknowledgements</div>
+                  <div className="settings-row-desc">{AI_CREDIT}</div>
+                </div>
+              </div>
             </div>
           </section>
 

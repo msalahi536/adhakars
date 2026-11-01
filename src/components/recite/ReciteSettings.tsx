@@ -23,7 +23,8 @@ export function ReciteSettings({ settings, change, close }: { settings: Settings
     <div className="rc-settings-rule" aria-hidden="true"><span /></div>
     <div className="rc-settings-content">
       <label className="rc-setting"><Label icon={BookOpen}>Mushaf</Label><select aria-label="Mushaf" value={settings.layout === "mushaf" ? "mushaf" : "ayah"} onChange={(e) => change({ layout: e.target.value === "mushaf" ? "mushaf" : "ayah" })}><option value="mushaf">Madani · 15 lines</option><option value="indopak" disabled>Indo-Pak · 16 lines — unavailable</option><option value="ayah">Uthmani text</option></select></label>
-      <Choice icon={Headphones} label="Recitation mode" value={settings.mode} onChange={(mode) => change({ mode })} options={[{ value: "self", label: "Self check" }, { value: "ai", label: "AI check · soon" }]} />
+      <Choice icon={Headphones} label="Recitation mode" value={settings.mode} onChange={(mode) => change({ mode })} options={[{ value: "self", label: "Self check" }, { value: "ai", label: "AI check" }]} />
+      <Toggle icon={Info} label="Show unclear words" checked={settings.showUnclearWords} change={(showUnclearWords) => change({ showUnclearWords })} />
       <Toggle icon={ALargeSmall} label="Tajweed colors" checked={settings.tajweed} change={(tajweed) => change({ tajweed })} />
       <Toggle icon={Moon} label="Night reading" checked={settings.theme === "night"} change={(night) => change({ theme: night ? "night" : "auto" })} />
       <Button className="rc-guide-toggle" variant="ghost" aria-expanded={guide} onClick={() => setGuide(!guide)}><Label icon={BookOpen}>Color guide</Label></Button>
