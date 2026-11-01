@@ -13,7 +13,6 @@ export const SOURCE_MAX = {
   jumuah: 1, // repeating weekly
   streak: 2,
   fasting: 4,
-  hifz: 3, // daily reminder × 3 days
   period: 20,
   fertility: 12,
 } as const;

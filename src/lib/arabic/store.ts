@@ -1,5 +1,5 @@
-// Local-first Arabic Companion log (append-only, UUID events), same approach as Hifz.
-import { localDay } from "@/lib/hifz/scheduler";
+// Local-first Arabic Companion log (append-only, UUID events).
+import { localDay } from "./review";
 import type { ArabicEvent } from "./engine";
 
 const KEY = "arabic:log:v1";

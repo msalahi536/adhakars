@@ -4,7 +4,7 @@ import { Check, ChevronLeft, Lock, Mic, Play, Square, Volume2, X, Sparkles, Rota
 import { CURRICULUM, LESSONS, ITEMS, type Item, type Lesson } from "@/lib/arabic/content";
 import { buildLesson, derive, dueItems, lessonStatus, scoreOf, todayLocal, type ArabicEvent, type Step } from "@/lib/arabic/engine";
 import { loadLog, record } from "@/lib/arabic/store";
-import type { Grade } from "@/lib/hifz/scheduler";
+import type { Grade } from "@/lib/arabic/review";
 import { Portal } from "@/components/Portal";
 
 export const Route = createFileRoute("/app/arabic")({
