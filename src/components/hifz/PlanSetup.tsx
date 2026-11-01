@@ -61,6 +61,24 @@ export function PlanSetup({ existing, done }: { existing?: HifzPlan; done: () =>
   const setOrder = (order: MemorizationOrder) => setPlan((p) => ({ ...p, order }));
   const toggleIn = (list: number[], value: number) =>
     list.includes(value) ? list.filter((v) => v !== value) : [...list, value];
+  const pickerSelection = step === 1 ? orderSurahs : chosenSurahs;
+  function openSurahPicker() {
+    const phase = document.documentElement.dataset.visualPhase === "evening" ? "evening" : "morning";
+    const backdrop = document.querySelector(`.app-background-${phase}`);
+    setSurahScenery(backdrop ? getComputedStyle(backdrop).backgroundImage : undefined);
+    setSurahSearch("");
+    setPickSurahs(true);
+  }
+  function togglePickerSurah(id: number) {
+    if (step === 1) {
+      const next = toggleIn(orderSurahs, id);
+      setOrderSurahs(next);
+      setOrder({ kind: "surahs", surahs: next });
+    } else {
+      setStartingFresh(false);
+      setChosenSurahs((list) => toggleIn(list, id));
+    }
+  }
 
   const steps = ["Already know", "Order", "Daily time", "Pace", "Summary"];
   const canNext =
@@ -104,47 +122,12 @@ export function PlanSetup({ existing, done }: { existing?: HifzPlan; done: () =>
                 </Button>
               ))}
             </div>
-            <Button variant="outline" className="hz-wide hz-pick-surahs" onClick={() => {
-              const phase = document.documentElement.dataset.visualPhase === "evening" ? "evening" : "morning";
-              const backdrop = document.querySelector(`.app-background-${phase}`);
-              setSurahScenery(backdrop ? getComputedStyle(backdrop).backgroundImage : undefined);
-              setSurahSearch(""); setPickSurahs(true);
-            }} aria-haspopup="dialog">
+            <Button variant="outline" className="hz-wide hz-pick-surahs" onClick={openSurahPicker} aria-haspopup="dialog">
               <BookOpen />
               Pick surahs instead
               <ChevronRight className={pickSurahs ? "hz-picker-open" : ""} />
             </Button>
             {chosenSurahs.length > 0 && <p className="mt-3 mb-0 text-center text-sm font-semibold text-card-foreground" role="status">{chosenSurahs.length} {chosenSurahs.length === 1 ? "surah" : "surahs"} selected</p>}
-            <Dialog open={pickSurahs} onOpenChange={setPickSurahs}>
-              <DialogContent className="hz-surah-dialog hz-setup" aria-describedby={undefined} onOpenAutoFocus={(event) => event.preventDefault()}>
-                <div className="hz-surah-scenery" aria-hidden="true" style={{ backgroundImage: surahScenery }} />
-                <header className="hz-surah-dialog-header">
-                  <Button variant="ghost" className="hz-surah-back" aria-label="Back to setup" onClick={() => setPickSurahs(false)}><ChevronLeft /></Button>
-                  <DialogTitle>Choose Surahs</DialogTitle>
-                </header>
-                <p className="hz-surah-instruction">Select the surahs you’ve memorized.</p>
-                <label className="hz-surah-search"><Search /><input aria-label="Search surahs" placeholder="Search surahs…" value={surahSearch} onChange={(e) => setSurahSearch(e.target.value)} /></label>
-                <div className="hz-surah-dialog-list">
-                {searchChapters(chapters, surahSearch).map((c) => (
-                  <Button
-                    variant="ghost"
-                    key={c.id}
-                    aria-pressed={chosenSurahs.includes(c.id)}
-                    aria-label={`${c.id}. ${c.name_simple}`}
-                    className={`hz-surah-row ${chosenSurahs.includes(c.id) ? "is-on" : ""}`}
-                    onClick={() => { setStartingFresh(false); setChosenSurahs((list) => toggleIn(list, c.id)); }}
-                  >
-                    <span className="hz-surah-checkbox">{chosenSurahs.includes(c.id) && <Check />}</span>
-                    <span className="hz-surah-english">{c.id}. {c.name_simple}</span>
-                    <span className="hz-surah-arabic" lang="ar" dir="rtl">{c.name_arabic}</span>
-                    <ChevronRight className="hz-surah-chevron" />
-                  </Button>
-                ))}
-                {searchChapters(chapters, surahSearch).length === 0 && <p className="hz-surah-empty">No surahs found</p>}
-                </div>
-                <footer className="hz-surah-dialog-footer"><span>{chosenSurahs.length} selected</span><Button className="hz-primary" onClick={() => setPickSurahs(false)}>Done</Button></footer>
-              </DialogContent>
-            </Dialog>
             <div className="hz-choice-divider"><span>or</span></div>
             <Button variant="ghost" className="hz-wide hz-fresh-choice" aria-pressed={startingFresh} onClick={() => { setChosenJuz([]); setChosenSurahs([]); setStartingFresh((value) => !value); }}>
               <span className="hz-fresh-icon"><Sprout /></span>
@@ -168,33 +151,39 @@ export function PlanSetup({ existing, done }: { existing?: HifzPlan; done: () =>
                 <span className="hz-order-copy"><strong>From Al-Baqarah</strong><span>From the front of the mushaf to the end.</span></span>
                 <span className="hz-order-check">{plan.order.kind === "forward" && <Check />}</span>
               </Button>
-              <Button variant="ghost" aria-pressed={plan.order.kind === "surahs"} className={`hz-card ${plan.order.kind === "surahs" ? "is-on" : ""}`} onClick={() => setOrder({ kind: "surahs", surahs: orderSurahs })}>
+              <Button variant="ghost" aria-haspopup="dialog" aria-pressed={plan.order.kind === "surahs"} className={`hz-card ${plan.order.kind === "surahs" ? "is-on" : ""}`} onClick={() => { setOrder({ kind: "surahs", surahs: orderSurahs }); openSurahPicker(); }}>
                 <span className="hz-order-icon"><List /></span>
                 <span className="hz-order-copy"><strong>Choose surahs</strong><span>Your own list, in your own order.</span></span>
                 <span className="hz-order-check">{plan.order.kind === "surahs" && <Check />}</span>
               </Button>
             </div>
-            {plan.order.kind === "surahs" && (
-              <div className="hz-surah-pick">
-                {chapters.map((c) => (
-                  <Button
-                    variant="ghost"
-                    key={c.id}
-                    aria-pressed={orderSurahs.includes(c.id)}
-                    className={`hz-surah-chip ${orderSurahs.includes(c.id) ? "is-on" : ""}`}
-                    onClick={() => {
-                      const next = toggleIn(orderSurahs, c.id);
-                      setOrderSurahs(next);
-                      setOrder({ kind: "surahs", surahs: next });
-                    }}
-                  >
-                    {c.id}. {c.name_simple}
-                  </Button>
-                ))}
-              </div>
-            )}
+            {plan.order.kind === "surahs" && orderSurahs.length > 0 && <p className="mt-3 mb-0 text-center text-sm font-semibold text-card-foreground" role="status">{orderSurahs.length} {orderSurahs.length === 1 ? "surah" : "surahs"} selected</p>}
           </section>
         )}
+
+        <Dialog open={pickSurahs} onOpenChange={setPickSurahs}>
+          <DialogContent className="hz-surah-dialog hz-setup" aria-describedby={undefined} onOpenAutoFocus={(event) => event.preventDefault()}>
+            <div className="hz-surah-scenery" aria-hidden="true" style={{ backgroundImage: surahScenery }} />
+            <header className="hz-surah-dialog-header">
+              <Button variant="ghost" className="hz-surah-back" aria-label="Back to setup" onClick={() => setPickSurahs(false)}><ChevronLeft /></Button>
+              <DialogTitle>Choose Surahs</DialogTitle>
+            </header>
+            <p className="hz-surah-instruction">{step === 1 ? "Select the surahs you want to memorize." : "Select the surahs you’ve memorized."}</p>
+            <label className="hz-surah-search"><Search /><input aria-label="Search surahs" placeholder="Search surahs…" value={surahSearch} onChange={(e) => setSurahSearch(e.target.value)} /></label>
+            <div className="hz-surah-dialog-list">
+              {searchChapters(chapters, surahSearch).map((c) => (
+                <Button variant="ghost" key={c.id} aria-pressed={pickerSelection.includes(c.id)} aria-label={`${c.id}. ${c.name_simple}`} className={`hz-surah-row ${pickerSelection.includes(c.id) ? "is-on" : ""}`} onClick={() => togglePickerSurah(c.id)}>
+                  <span className="hz-surah-checkbox">{pickerSelection.includes(c.id) && <Check />}</span>
+                  <span className="hz-surah-english">{c.id}. {c.name_simple}</span>
+                  <span className="hz-surah-arabic" lang="ar" dir="rtl">{c.name_arabic}</span>
+                  <ChevronRight className="hz-surah-chevron" />
+                </Button>
+              ))}
+              {searchChapters(chapters, surahSearch).length === 0 && <p className="hz-surah-empty">No surahs found</p>}
+            </div>
+            <footer className="hz-surah-dialog-footer"><span>{pickerSelection.length} selected</span><Button className="hz-primary" onClick={() => setPickSurahs(false)}>Done</Button></footer>
+          </DialogContent>
+        </Dialog>
 
         {step === 2 && (
           <section>

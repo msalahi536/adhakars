@@ -1,5 +1,7 @@
 # Roadmap
 
+- [x] Reuse the Hifz known-surah popup for starting-point surah choices; phone screenshot, search, selection count, retention, Done and Next verified.
+
 - [x] Match the Hifz back button’s frosted finish to Settings; phone visuals and back navigation verified.
 
 - [x] Give the surah popup a calm, light theme-matched background; phone visual check passed.
