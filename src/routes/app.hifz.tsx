@@ -17,6 +17,7 @@ import { ReciteStrip } from "@/components/mushaf/ReciteStrip";
 import { getPresetId, resolveVisualPhase, type VisualPhase } from "@/lib/theme-store";
 import { TajweedText } from "@/lib/tajweed";
 import "@/components/recite/supplied-mushaf.css";
+import { mushafThemeId } from "@/components/recite/mushaf-theme";
 
 export const Route = createFileRoute("/app/hifz")({
   head: () => ({ meta: [
@@ -49,8 +50,6 @@ function Recite() {
   const [audioError, setAudioError] = useState("");
   const [peek, setPeek] = useState<string | null>(null);
   const audio = useRef<HTMLAudioElement | null>(null);
-  const longTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const longUsed = useRef(false);
   const swipe = useRef<{ x: number; y: number } | null>(null);
   const transitionTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -68,14 +67,14 @@ function Recite() {
   useEffect(() => { setSaved(readRecite()); setHydrated(true); }, []);
   useEffect(() => {
     const sync = () => {
-      const preset = getPresetId();
-      setAppTheme(preset === "lavender" ? "twilight" : preset === "dark-red" ? "darkred" : preset);
+      setAppTheme(mushafThemeId(getPresetId()));
       setMorningOrEvening(resolveVisualPhase("/app/hifz"));
     };
     sync();
     window.addEventListener("adhkar:theme-change", sync);
+    window.addEventListener("adhkar:visual-phase-change", sync);
     window.addEventListener("storage", sync);
-    return () => { window.removeEventListener("adhkar:theme-change", sync); window.removeEventListener("storage", sync); };
+    return () => { window.removeEventListener("adhkar:theme-change", sync); window.removeEventListener("adhkar:visual-phase-change", sync); window.removeEventListener("storage", sync); };
   }, []);
   useEffect(() => { if (hydrated) saveRecite(saved); }, [saved, hydrated]);
   useLayoutEffect(() => {
@@ -110,7 +109,7 @@ function Recite() {
     const id = setInterval(() => setSaved((s) => ({ ...s, seconds: { ...s.seconds, [s.page]: (s.seconds[s.page] ?? 0) + 1 } })), 1000);
     return () => clearInterval(id);
   }, [active]);
-  useEffect(() => () => { audio.current?.pause(); if (transitionTimer.current) clearTimeout(transitionTimer.current); if (longTimer.current) clearTimeout(longTimer.current); }, []);
+  useEffect(() => () => { audio.current?.pause(); if (transitionTimer.current) clearTimeout(transitionTimer.current); }, []);
   function stopAudio() { audio.current?.pause(); setPlaying(false); }
   function changePage(pageNumber: number) {
     if (pageNumber < 1 || pageNumber > 604) return;
@@ -160,7 +159,6 @@ function Recite() {
     }
   }
   function horizon() {
-    if (longUsed.current) { longUsed.current = false; return; }
     if (mode === "ai") { setSheet("ai"); return; }
     if (status === "paused") { setStatus("active"); return; }
     if (status === "ready") setStatus("active");
