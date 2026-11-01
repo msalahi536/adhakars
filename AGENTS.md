@@ -1,5 +1,7 @@
 # Architecture Decisions
 
+- Hifz pace and finish-date estimates use only the approved plan engine; chosen pace dates are uncapped and time-budget constraints appear separately as warnings with capped alternatives, preventing inverted pace comparisons.
+
 - Hifz known-surah and starting-order choices render one shared setup dialog with independent selections; pure tested surah-order helpers preserve tap order and handle reordering before saving to the engine, keeping review and learning goals separate.
 
 - Recitation meters share six frequency bands and one smoothing mapper for live spectra and decoded device envelopes, so lines follow actual tone.
