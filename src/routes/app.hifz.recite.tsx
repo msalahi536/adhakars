@@ -333,6 +333,9 @@ function Recite() {
     const clean = resultClean || override;
     if (!clean) { prepareAttempt(); return; }
     const progress = nextCleanPass(cleanPasses, true, !sabaq);
+    const completedMarks = { ...latest.current.marks };
+    for (const word of targetWords) completedMarks[word.key] = "correct";
+    update({ marks: completedMarks });
     setCleanPasses(progress.count); setSheet(null); setAttemptStarted(false); setAiCorrection(null); ai.reset();
     if (progress.done) {
       if (sabaq) finishSabaq();
