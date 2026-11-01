@@ -32,7 +32,7 @@ export const MadaniPage = memo(function MadaniPage({ page, font, chapters, ready
     <div className="qv-page-labels"><MushafLabel text={`الجزء ${toArabicDigits(first?.juz ?? 1)}`} height={24} /><MushafLabel text={`سُورَةُ ${chapters.find((c) => c.id === first?.chapter)?.name_arabic ?? ""}`} height={24} /></div>
     <MushafFrame scale={.5} className="qv-frame"><div ref={body} className={`qv-madani-body ${page.page <= 2 ? "qv-opening-page" : ""}`} style={{fontFamily:font}} data-page={page.page}>
       {madaniSlots(page).map(({line,header,basmala,words}) => {
-        if (header) return <div key={line} data-line={line} className="qv-slot qv-cartouche"><SurahCartouche name={`سُورَةُ ${chapters.find((c) => c.id === header)?.name_arabic ?? ""}`} height="var(--qv-line-height, 24px)" /></div>;
+        if (header) return <div key={line} data-line={line} className="qv-slot qv-cartouche"><SurahCartouche name={`سُورَةُ ${chapters.find((c) => c.id === header)?.name_arabic ?? ""}`} height={48} /></div>;
         if (basmala) return <div key={line} data-line={line} className="qv-slot qv-bismillah" dir="rtl">بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ</div>;
         return <div key={line} data-line={line} className="qv-slot qv-madani-line" dir="rtl">{words.map((w) => w.end ? <span key={w.key} className="qv-ayah-marker"><AyahMarker number={Number(w.verse.split(":")[1])} size={18} /></span> : <span key={w.key} data-follow-word={w.key}>{w.glyph}</span>)}</div>;
       })}

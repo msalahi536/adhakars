@@ -12,6 +12,7 @@ export function distinctMatches<T extends { sura: number; aya: number }>(matches
 }
 export function paintPosition(root: HTMLElement | null, key: string, locked: boolean) {
   const previous = root?.querySelector<HTMLElement>(".qv-current-word");
+  if (!locked) { previous?.classList.add("qv-word-dim"); return; }
   const current = root?.querySelector<HTMLElement>(`[data-follow-word="${key}"]`);
   if (previous !== current) previous?.classList.remove("qv-current-word", "qv-word-dim");
   (current ?? previous)?.classList.add("qv-current-word");

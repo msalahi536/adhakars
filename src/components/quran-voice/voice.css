@@ -17,7 +17,7 @@
 .qv-madani-line .qv-word-dim { opacity:.35; }
 .qv-ayah-marker { display:inline-flex !important; align-items:center; justify-content:center; font-family:var(--font-arabic); }
 .qv-cartouche { display:grid; grid-template-columns:minmax(0,1fr); align-items:center; min-height:0; min-width:0; font-family:var(--font-arabic); }
-.qv-cartouche > div { max-height:100%; }
+.qv-cartouche > div { height:var(--qv-line-height,24px) !important; max-height:100%; font-size:min(22px,calc(var(--qv-line-height,24px) * .46)) !important; }
 .qv-bismillah { font-family:var(--font-arabic); font-size:min(19px,calc(var(--qv-line-height,24px) * .65)); line-height:1; display:grid; place-items:center; min-height:0; color:var(--m-ink); }
 .qv-page-number { position:absolute; bottom:-12px; left:50%; transform:translateX(-50%); pointer-events:none; }
 .qv-dock { position:absolute; bottom:calc(18px + env(safe-area-inset-bottom,0px)); left:18px; right:18px; display:flex; flex-direction:column; align-items:center; gap:10px; }
