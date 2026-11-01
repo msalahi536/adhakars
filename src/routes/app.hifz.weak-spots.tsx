@@ -1,0 +1,3 @@
+import { createFileRoute } from "@tanstack/react-router";
+import { WeakSpots } from "@/components/hifz/WeakSpots";
+export const Route = createFileRoute("/app/hifz/weak-spots")({ head: () => ({ meta: [{ title: "My weak spots — Sahih Al-Adhkar" }, { name: "description", content: "Gentle focused Quran practice for words, ayah starts and similar ayat." }, { property: "og:title", content: "My weak spots — Sahih Al-Adhkar" }, { property: "og:description", content: "Practice the Quran passages that need a little more attention." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }] }), component: WeakSpots });

@@ -190,6 +190,7 @@ export function HifzHome({ state, update, reset }: { state: HifzState; update: (
 
         {/* Actions */}
         <PracticeCards state={state} q={q} today={today} names={names} update={update}/>
+        <Button variant="ghost" className="hz-row-btn" onClick={() => void navigate({ to: "/app/hifz/weak-spots" })}><Target /><span>My weak spots<small>Words, ayah starts and similar ayat</small></span><ChevronRight /></Button>
         <Button variant="ghost" className="hz-row-btn" onClick={()=>void navigate({to:"/app/hifz/mushaf"})}><BookOpen/><span>My Mushaf<small>Your memory, page by page</small></span><ChevronRight/></Button>
         <Button variant="ghost" className="hz-row-btn" onClick={()=>void navigate({to:"/app/hifz/drills"})}><Target/><span>Voice quizzes<small>A few words, then recall</small></span><ChevronRight/></Button>
         <Button variant="ghost" className="hz-row-btn" onClick={()=>void navigate({to:"/app/hifz/lines"})}><Layers/><span>Where is it on the page?<small>Remember the ayah’s starting line</small></span><ChevronRight/></Button>
