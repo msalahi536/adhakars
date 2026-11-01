@@ -265,12 +265,17 @@ export function PlanSetup({ existing, done }: { existing?: HifzPlan; done: () =>
               {selectedEstimate.firstJuz && <small>First juz done by {monthYear(selectedEstimate.firstJuz)}</small>}
               {selectedEstimate.timeWarning && <small className="hz-finish-warning">{selectedEstimate.timeWarning}</small>}
             </div>
-            {goalEstimates && <div className="hz-time-summary hz-goal-summary" role="status">
-              <div className="hz-time-summary-heading"><div><span>{goalEstimates.label} at this pace</span><strong>{humanDuration(goalEstimates.goal.days)}</strong></div></div>
-              <small>Done around {monthYear(goalEstimates.goal.finish)}</small>
-              <div className="hz-goal-full"><span>Entire Quran at this pace</span><strong>{humanDuration(goalEstimates.full.days)}</strong><small>Done around {monthYear(goalEstimates.full.finish)}</small></div>
+            {goalEstimates && <div className="hz-goal-summary" role="status">
+              <div className="hz-goal-card">
+                <header><span className="hz-goal-icon"><BookOpen aria-hidden="true" /></span><div><span>{goalEstimates.label}</span><strong>{humanDuration(goalEstimates.goal.days)}</strong></div></header>
+                <div className="hz-goal-date"><CalendarDays aria-hidden="true" /><span>Done around<br />{monthYear(goalEstimates.goal.finish)}</span></div>
+              </div>
+              <div className="hz-goal-card">
+                <header><span className="hz-goal-icon"><ChartNoAxesColumnIncreasing aria-hidden="true" /></span><div><span>This pace</span><strong>{humanDuration(goalEstimates.full.days)}</strong><small>Entire Quran</small></div></header>
+                <div className="hz-goal-date"><CalendarDays aria-hidden="true" /><span>Done around<br />{monthYear(goalEstimates.full.finish)}</span></div>
+              </div>
             </div>}
-            <Button variant="link" className="hz-customize-link" onClick={() => setCustomizePace(true)}><SlidersHorizontal aria-hidden="true" /> Customize pace</Button>
+            <Button variant={goalEstimates ? "ghost" : "link"} className={goalEstimates ? "hz-customize-row" : "hz-customize-link"} onClick={() => setCustomizePace(true)}><SlidersHorizontal aria-hidden="true" /> Customize pace {goalEstimates && <ChevronRight aria-hidden="true" />}</Button>
           </section>
         )}
 
