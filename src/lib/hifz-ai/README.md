@@ -8,7 +8,7 @@ Runs fully on the phone (no server, no per-use cost). Free feature only (model l
 - `checker.ts` — compares what was heard with the answer key, per word.
 - `fbank.ts` — audio features (bit-identical to the reference Python).
 - `public/hifz-ai/ayat/NNN.json` — answer key per surah (loaded on demand, ~10–60 KB gzipped).
-- `public/hifz-ai/model/` — `model-config.json`, `tokens.txt`, and the model file `zipformer_p_arabic_v3.2_chunk16.int8.onnx` (73 MB, downloaded once, then cached offline).
+- `public/hifz-ai/model/` — `model-config.json` and `tokens.txt`; the 73 MB model is hosted through `model.onnx.asset.json` and cached on device. Matching ORT 1.20.1 WASM uses `runtime.wasm.asset.json`; its companion module is in `public/hifz-ai/runtime/`.
 
 Dependency: `"onnxruntime-web": "1.20.1"` (keep `ORT_VERSION` in recognizer.ts the same).
 
@@ -32,6 +32,8 @@ Show `AI_DISCLAIMER` near AI feedback, and `AI_CREDIT` in Settings → Acknowled
 Never sell, gate, or advertise a paid plan around this feature.
 
 ## Native notes (later)
+- The recite integration dynamically imports the runtime after download consent; `prepareChecker` caches the model, runtime, configuration, tokens and all 114 answer keys. Cache eviction/restricted storage can require another download. Speech is never uploaded.
+- Pages containing several surahs expose a passage selector; one listener checks one surah range at a time. AI results are transient and do not rewrite self-check progress.
 - iOS: `NSMicrophoneUsageDescription`; haptics are muted while recording unless `setAllowHapticsAndSystemSoundsDuringRecording(true)` is set natively.
 - Android: `RECORD_AUDIO` permission; WebView must grant `onPermissionRequest` for audio capture.
 - Long term: move the model file to Cloudflare R2 (free egress) and pass its URL as `modelUrl`.

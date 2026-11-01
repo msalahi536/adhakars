@@ -149,6 +149,11 @@ function Recite() {
   const [aiRangeIndex, setAiRangeIndex] = useState(0);
   useEffect(() => { setAiRangeIndex(0); }, [saved.page]);
   useEffect(() => { if (ai.phase === "finished") setSheet("ai"); }, [ai.phase]);
+  useEffect(() => {
+    if (mode !== "ai") return;
+    if (ai.phase === "listening") setStatus("active");
+    else if (ai.phase === "finished" || ai.phase === "error") setStatus("paused");
+  }, [ai.phase, mode]);
 
   useEffect(() => { setSaved(readRecite()); setHydrated(true); }, []);
   useEffect(() => {
@@ -676,7 +681,7 @@ function Recite() {
       <Mic className="rc-sheet-icon" />
       <h2>{ai.phase === "error" ? "Let’s try again" : ai.phase === "loading" ? ai.progress >= 1 ? "Preparing checker…" : "Downloading checker…" : "Download recitation checker"}</h2>
       {ai.phase === "download" && <><p>Download recitation checker (73 MB, one time, works offline after)</p><p>Wi-Fi recommended.</p><Button className="rc-primary" onClick={() => void ai.confirm()}>Download &amp; start</Button><Button variant="ghost" onClick={ai.cancel}>Not now</Button></>}
-      {ai.phase === "loading" && <><progress className="rc-ai-progress" aria-label="Checker download progress" max={1} value={ai.progress} /><p role="status">{Math.round(ai.progress * 100)}%</p><Button variant="ghost" onClick={ai.cancel} disabled>Preparing on this device</Button></>}
+      {ai.phase === "loading" && <><progress className="rc-ai-progress" aria-label="Checker download progress" max={1} value={ai.progress} /><p role="status">{Math.round(ai.progress * 100)}%</p></>}
       {ai.phase === "error" && <><p role="alert">{ai.error}</p><Button className="rc-primary" onClick={() => void ai.confirm()}>Retry</Button><Button variant="ghost" onClick={ai.cancel}>Close</Button></>}
     </section></div>}
     {sessionEnded && activeSession && !sheet && <div className="rc-backdrop"><div onClick={(e) => e.stopPropagation()}>

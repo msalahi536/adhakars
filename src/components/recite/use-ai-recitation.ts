@@ -18,6 +18,7 @@ export function useAiRecitation(page: number, enabled: boolean, keys: string[]) 
   const [result, setResult] = useState<CheckResult | null>(null);
   const [error, setError] = useState("");
   const session = useRef<ListenSession | null>(null);
+  const cleanup = useRef<Promise<unknown>>(Promise.resolve());
   const generation = useRef(0);
   const starting = useRef(false);
   const previous = useRef<ReturnType<typeof mapAiWords>["statuses"]>({});
@@ -29,7 +30,7 @@ export function useAiRecitation(page: number, enabled: boolean, keys: string[]) 
       generation.current++;
       const current = session.current; session.current = null;
       current?.stream.getTracks().forEach((t) => t.stop());
-      if (current) void current.stop().catch(() => undefined);
+      if (current) cleanup.current = current.stop().catch(() => undefined);
       setStream(null);
     };
   }, [page, enabled]);
@@ -44,6 +45,8 @@ export function useAiRecitation(page: number, enabled: boolean, keys: string[]) 
     const id = generation.current;
     setPhase("loading"); setError(""); setProgress(0); setResult(null); previous.current = {};
     try {
+      await cleanup.current;
+      if (id !== generation.current) return;
       const ai = await import("@/lib/hifz-ai");
       await ai.prepareChecker((p) => { if (id === generation.current) setProgress(p); });
       if (id !== generation.current) return;
@@ -69,7 +72,9 @@ export function useAiRecitation(page: number, enabled: boolean, keys: string[]) 
     const id = generation.current;
     session.current = null; setPhase("stopping"); setStream(null); feedback("micStop");
     try {
-      const final = await current.stop();
+      const finalizing = current.stop();
+      cleanup.current = finalizing.catch(() => undefined);
+      const final = await finalizing;
       if (id === generation.current) { receive(final); setPhase("finished"); }
     } catch (error) {
       if (id === generation.current) { setError(friendlyError(error)); setPhase("error"); }
