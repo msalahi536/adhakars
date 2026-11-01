@@ -1,5 +1,8 @@
 # Roadmap
 
+- [x] Hide all Hifz/Quran voice/Echo, Voice Lab and Arabic beta tools behind seven Settings version taps only; no public Join/Leave beta or code field. Direct visits and unlock/relock verified; 3 tests pass.
+- [ ] Add teacher-qualified tajweed tips, explicit adult-only signed-in private problem reports/deletion, and public acknowledgements/licenses; omit the cancelled public beta code screen and preserve layouts/gestures.
+
 - [x] Strengthen shared privacy/terms for Hifz AI, local replay, external services, adult-only reports, feedback, third-party licenses and non-waivable rights. All four pages verified with November 1, 2026 date and no browser errors. Sample consent/upload/deletion workflow is not implemented; hosting policies, full shipped-asset licenses and legal enforceability require external review before claiming compliance.
 
 - [x] Add memory-only AI recording, timed replay and Correct/You mistake clips.
