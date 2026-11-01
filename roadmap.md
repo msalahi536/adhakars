@@ -1,5 +1,7 @@
 # Roadmap
 
+- [ ] Simplify Hifz to time-first automatic pace selection, cached effective finish estimates, selected summary and optional custom bottom sheet; verify rules and saved choices.
+
 - [x] Apply exact approved Hifz timeline engine and rebuild pace/date/custom selection before time-budget confirmation; calculation tests and complete phone setup/save verified, including both warning choices.
 
 - [x] Match the daily-time setup to reference: frosted heading, no label, rounded time rows and fading bars; phone screenshot, all six options, Next, Back and retained selection verified.

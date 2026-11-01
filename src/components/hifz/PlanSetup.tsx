@@ -72,6 +72,7 @@ export function PlanSetup({ existing, done }: { existing?: HifzPlan; done: () =>
   const dateTimeline = useMemo(() => targetDate ? paceForFinishDate(draft, q, targetDate) : null, [JSON.stringify(draft), q, targetDate]);
   const automaticKey = JSON.stringify({ ...draft, dailyMinutes: 0, newLinesPerDay: 0 });
   const automaticPaces = useMemo(() => step >= 2 ? new Map(TIME_OPTIONS.map((minutes) => [minutes, bestAutomaticPace(draft, q, minutes)])) : new Map(), [step >= 2, automaticKey, q]);
+  const cardEstimates = useMemo(() => customLines === undefined ? automaticPaces : new Map(TIME_OPTIONS.map((minutes) => [minutes, effectiveTimeline(buildTimeline({ ...draft, newLinesPerDay: customLines }, q, minutes))])), [automaticPaces, customLines, automaticKey, q]);
   const chosenLines = customLines ?? automaticPaces.get(plan.dailyMinutes)?.lines ?? plan.newLinesPerDay;
   const selectedEstimate = useMemo(() => effectiveTimeline(buildTimeline({ ...draft, newLinesPerDay: chosenLines }, q, plan.dailyMinutes)), [JSON.stringify(draft), chosenLines, q]);
   useEffect(() => {
@@ -240,16 +241,18 @@ export function PlanSetup({ existing, done }: { existing?: HifzPlan; done: () =>
             <p className="hz-sub">Review always comes first; new memorization gets what is left.</p>
             </header>
             <div className="hz-cards">
-              {TIME_OPTIONS.map((m) => (
+              {TIME_OPTIONS.map((m) => {
+                const estimate = cardEstimates.get(m);
+                return (
                 <Button variant="ghost" key={m} aria-label={`${m} min`} aria-pressed={plan.dailyMinutes === m} data-minutes={m} className={`hz-card hz-time ${plan.dailyMinutes === m ? "is-on" : ""}`} onClick={() => setPlan((p) => ({ ...p, dailyMinutes: m, newLinesPerDay: customLines ?? automaticPaces.get(m)?.lines ?? p.newLinesPerDay }))}>
                   <span className="hz-time-copy">
                   <strong>{m} min</strong>
-                  {automaticPaces.get(m) && <span className="hz-time-estimate">{paceLabel(customLines ?? automaticPaces.get(m).lines)} · finish around {monthYear(customLines === undefined ? automaticPaces.get(m).finish : effectiveTimeline(buildTimeline({ ...draft, newLinesPerDay: customLines }, q, m)).finish)}</span>}
+                  {estimate && <span className="hz-time-estimate">{paceLabel(estimate.lines)} · finish around {monthYear(estimate.finish)}</span>}
                   <span className="hz-time-track" aria-hidden="true"><span className="hz-time-fill" /></span>
                   </span>
                   {plan.dailyMinutes === m && <span className="hz-time-check"><Check /></span>}
                 </Button>
-              ))}
+              ); })}
             </div>
             <div className="hz-time-summary" role="status">
               <strong>You’ll finish around {monthYear(selectedEstimate.finish)}</strong>
