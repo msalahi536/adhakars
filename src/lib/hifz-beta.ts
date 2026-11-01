@@ -2,6 +2,12 @@ import { useEffect, useState } from "react";
 
 export const HIFZ_BETA_KEY = "hifz_beta";
 const CHANGE_EVENT = "hifz-beta-change";
+export function setHifzBeta(enabled: boolean, storage?: Pick<Storage, "setItem">) {
+  try { (storage ?? window.localStorage).setItem(HIFZ_BETA_KEY, enabled ? "1" : "0"); if (!storage) window.dispatchEvent(new Event(CHANGE_EVENT)); return true; } catch { return false; }
+}
+export function joinHifzBeta(code: string, storage?: Pick<Storage, "setItem">) {
+  return code.trim().toUpperCase() === "HIFZBETA" && setHifzBeta(true, storage);
+}
 export function readHifzBeta(storage?: Pick<Storage, "getItem">): boolean {
   try { return (storage ?? window.localStorage).getItem(HIFZ_BETA_KEY) === "1"; }
   catch { return false; }
