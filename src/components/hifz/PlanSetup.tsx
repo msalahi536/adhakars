@@ -58,6 +58,7 @@ export function PlanSetup({ existing, done }: { existing?: HifzPlan; done: () =>
     existing?.order.kind === "surahs" ? existing.order.surahs : [],
   );
   const [advanced, setAdvanced] = useState(false);
+  const [allMilestones, setAllMilestones] = useState(false);
   const [paceMode, setPaceMode] = useState<"pace" | "date">("pace");
   const [targetDate, setTargetDate] = useState("");
   const [customizePace, setCustomizePace] = useState(false);
@@ -339,18 +340,23 @@ export function PlanSetup({ existing, done }: { existing?: HifzPlan; done: () =>
                   <span key={m.juz} className={`hz-milestone ${i === 0 ? "is-first" : ""}`}>Juz {m.juz} · {shortDate(m.date)}</span>
                 ))}
               </div>
+              {summary.juzMilestones.length > 8 && <Button variant="link" className="hz-see-juz" onClick={() => setAllMilestones(true)}>See all juz completion dates <ChevronRight /></Button>}
               <div className="hz-plan-time">
                 <header><ChartNoAxesColumnIncreasing aria-hidden="true" /><div><h2>Daily time needed</h2><p>As your hifz grows</p></div><span className="hz-plan-budget">Your goal: {plan.dailyMinutes} min</span></header>
               <MinutesChart points={summary.minutesByMonth} budget={plan.dailyMinutes} />
               </div>
               {summary.shortOnTime && <p className="hz-warning">{summary.shortOnTime.message}</p>}
-              <Button variant="ghost" className="hz-wide hz-plan-advanced" aria-expanded={advanced} onClick={() => setAdvanced((v) => !v)}>
-                <SlidersHorizontal /> Advanced options <ChevronRight className={advanced ? "hz-picker-open" : ""} />
+              <Button variant="ghost" className="hz-wide hz-plan-advanced" aria-haspopup="dialog" onClick={() => setAdvanced(true)}>
+                <SlidersHorizontal /> Advanced options <ChevronRight />
               </Button>
-              {advanced && (
-                <div className="hz-advanced">
+              <Sheet open={advanced} onOpenChange={setAdvanced}>
+                <SheetContent side="bottom" className="hz-setup hz-plan-popup" aria-describedby={undefined}>
+                  <header className="hz-plan-popup-heading"><div className="hz-sheet-handle" /><span className="hz-popup-icon"><SlidersHorizontal /></span><SheetTitle>Advanced options</SheetTitle><p>Customize your study schedule and pace.</p></header>
+                <div className="hz-popup-fields">
+                <div className="hz-popup-group">
                   <fieldset className="hz-field">
-                    <legend>Study days</legend>
+                    <legend><CalendarDays /> Study days</legend>
+                    <p>Choose which days to study.</p>
                     <div className="hz-days">
                       {DAY_NAMES.map((name, i) => (
                         <Button variant="ghost" key={name} aria-pressed={plan.studyDays.includes(i)} className={`hz-day ${plan.studyDays.includes(i) ? "is-on" : ""}`}
@@ -365,15 +371,28 @@ export function PlanSetup({ existing, done }: { existing?: HifzPlan; done: () =>
                       onChange={(e) => setPlan((p) => ({ ...p, consolidateEvery: e.target.checked ? 20 : 0, consolidateDays: e.target.checked ? 3 : 0 }))} />
                     <span>Review-only days after each juz</span>
                   </label>
+                  </div>
+                  <div className="hz-popup-group">
                   <fieldset className="hz-field">
-                    <legend>Strength</legend>
+                    <legend><Layers /> Strength</legend>
+                    <p>Set the difficulty of your plan.</p>
                     <div className="hz-days">
                       <Button variant="ghost" aria-pressed={plan.targetRetention === 0.93} className={`hz-day ${plan.targetRetention === 0.93 ? "is-on" : ""}`} onClick={() => setPlan((p) => ({ ...p, targetRetention: 0.93 }))}>Standard</Button>
                       <Button variant="ghost" aria-pressed={plan.targetRetention === 0.96} className={`hz-day ${plan.targetRetention === 0.96 ? "is-on" : ""}`} onClick={() => setPlan((p) => ({ ...p, targetRetention: 0.96 }))}>Strong</Button>
                     </div>
                   </fieldset>
+                  </div>
                 </div>
-              )}
+                <footer><Button className="hz-primary" onClick={() => setAdvanced(false)}>Save changes <Check /></Button></footer>
+                </SheetContent>
+              </Sheet>
+              <Sheet open={allMilestones} onOpenChange={setAllMilestones}>
+                <SheetContent side="bottom" className="hz-setup hz-plan-popup hz-juz-popup" aria-describedby={undefined}>
+                  <header className="hz-plan-popup-heading"><div className="hz-sheet-handle" /><span className="hz-popup-icon"><BookOpen /></span><SheetTitle>Juz completion dates</SheetTitle></header>
+                  <div className="hz-juz-completion-list">{summary.juzMilestones.map((m) => <div key={m.juz}><span>Juz {m.juz}</span><strong>{monthYear(m.date)}</strong></div>)}</div>
+                  <footer><Button className="hz-primary" onClick={() => setAllMilestones(false)}>Done <Check /></Button></footer>
+                </SheetContent>
+              </Sheet>
             </div>
           </section>
         )}

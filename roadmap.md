@@ -1,5 +1,7 @@
 # Roadmap
 
+- [ ] Make Advanced options a reference-style popup, slim plan heading, and show all juz completion dates; phone-check controls and saving.
+
 - [x] Show separate Juz Amma/selected-surah and whole-Quran estimates on daily-time setup; 9 tests pass and both phone flows verified.
 
 - [x] Match Your plan references: frosted heading, goal overview, milestone pills, time chart and rounded actions; phone screenshots compared, advanced toggle and plan saving verified, 6 tests pass.
