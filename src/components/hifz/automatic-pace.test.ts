@@ -35,8 +35,8 @@ test("chosen finish date and duration appear in the selected summary", () => {
 
 test("a chosen date does not hide a daily-time limitation", () => {
   const timeline = buildTimeline({ ...plan, newLinesPerDay: 45 }, q, 20);
-  const selected = selectedFinishEstimate(timeline, plan.startDate, "2026-11-02");
-  expect(selected.finish).toBe("2026-11-02");
+  const selected = selectedFinishEstimate(timeline, plan.startDate, "2026-10-31");
+  expect(selected.finish).toBe("2026-10-31");
   expect(selected.timeWarning).toBeTruthy();
   expect(selected.timeWarning).toBe(timeline.shortOnTime?.message);
 });
