@@ -449,7 +449,7 @@ function Salah() {
             : next ? formatCountdown(next.at.getTime() - now.getTime()) : "--:--:--"}
         </div>
         {settings.location && clockChange && (
-          <div className="salah-clock-change">
+          <div className="salah-next-label salah-clock-change">
             Clocks go {clockChange.shiftMinutes > 0 ? "back" : "forward"} {Math.abs(clockChange.shiftMinutes) === 60 ? "1 hour" : `${Math.abs(clockChange.shiftMinutes)} min`} at {clockChangeLabel(clockChange)} tonight
           </div>
         )}
