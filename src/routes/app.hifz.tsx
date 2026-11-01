@@ -12,7 +12,7 @@ import { freshRecite, markedWords, nextWord, pageWords, readRecite, revealed, re
 import { getChapterAudio } from "@/lib/quran";
 import { quranPlayer } from "@/lib/quran-player";
 import { recitationPlayer } from "@/lib/recitation-player";
-import { triggerHaptic } from "@/lib/theme";
+import { play as playFeedback, configureHifzFeedback, cancelHifzFeedback } from "@/lib/hifzHaptics";
 import { MushafThemeProvider, MushafFrame, MushafLabel, MushafPageNumber, SurahCartouche, AyahMarker, toArabicDigits } from "@/components/mushaf/MushafPage";
 import { ReciteStrip } from "@/components/mushaf/ReciteStrip";
 import { getPresetId, resolveVisualPhase, type VisualPhase } from "@/lib/theme-store";
@@ -93,6 +93,21 @@ function Recite() {
     return () => { window.removeEventListener("adhkar:theme-change", sync); window.removeEventListener("adhkar:visual-phase-change", sync); window.removeEventListener("storage", sync); };
   }, []);
   useEffect(() => { if (hydrated) saveRecite(saved); }, [saved, hydrated]);
+  useEffect(() => {
+    configureHifzFeedback({ haptics: saved.settings.haptics, sounds: saved.settings.sounds });
+    return cancelHifzFeedback;
+  }, [saved.settings.haptics, saved.settings.sounds]);
+  useEffect(() => {
+    const pulse = () => {
+      const strip = stripElement.current;
+      if (!strip) return;
+      strip.classList.remove("rc-feedback-pulse");
+      void strip.offsetWidth;
+      strip.classList.add("rc-feedback-pulse");
+    };
+    window.addEventListener("hifz:feedback-pulse", pulse);
+    return () => window.removeEventListener("hifz:feedback-pulse", pulse);
+  }, []);
   useLayoutEffect(() => {
     const measure = () => setDimensions({ strip: stripElement.current?.offsetHeight ?? 92, labels: labelsElement.current?.offsetHeight ?? 24 });
     const observer = new ResizeObserver(measure);
@@ -156,7 +171,7 @@ function Recite() {
     stopAudio(); setStatus("ready"); setSheet(null); setGradeAyah(null); setPeek(null);
     if (transitionTimer.current) clearTimeout(transitionTimer.current);
     update({ page: pageNumber });
-    void triggerHaptic("light");
+    playFeedback("pageTurn");
   }
   async function finishDrag(target: number | null, dx: number, width: number) {
     const paper = paperElement;
@@ -221,16 +236,16 @@ function Recite() {
     if (!pending || !page) return;
     if (transitionTimer.current) clearTimeout(transitionTimer.current);
     const updated = all ? revealAyah(words, current.marks) : revealNext(words, current.marks);
-    update({ marks: updated }); void triggerHaptic("light");
+    update({ marks: updated }); playFeedback("reveal");
     if (words.filter((w) => w.verse === pending.verse).every((w) => revealed(updated[w.key]))) {
-      setStatus("paused"); setGradeAyah(pending.verse);
+      setStatus("paused"); setGradeAyah(pending.verse); playFeedback("ayahComplete");
     }
   }
   function horizon() {
     if (mode === "ai") { setSheet("ai"); return; }
     if (status === "paused") { setStatus("active"); return; }
     if (status === "ready") setStatus("active");
-    if (!next) { setSheet("complete"); setStatus("paused"); return; }
+    if (!next) { setSheet("complete"); setStatus("paused"); playFeedback("pageComplete"); return; }
     if (transitionTimer.current) clearTimeout(transitionTimer.current);
     if (!saved.settings.mist) { commitReveal(false); return; }
     update({ marks: { ...saved.marks, [next.key]: "in_progress" } });
@@ -239,14 +254,21 @@ function Recite() {
   function mark(word: ReciteWord) {
     const state = saved.marks[word.key];
     if (state === "unsure") { void playWord(word); return; }
-    if (revealed(state)) { update({ marks: { ...saved.marks, [word.key]: state === "wrong" ? "correct" : "wrong" } }); return; }
+    if (revealed(state)) { markState(word, state === "wrong" ? "correct" : "wrong"); return; }
     if (saved.settings.hints === "peek") { setPeek(word.key); setTimeout(() => setPeek(null), 1500); }
     else if (saved.settings.hints === "letter") setPeek(word.key);
+  }
+  function markState(word: ReciteWord, state: WordState) {
+    update({ marks: { ...saved.marks, [word.key]: state } });
+    if (state === "wrong") playFeedback("wrong");
+    else if (state === "skipped") playFeedback("skip");
+    else if (state === "unsure") playFeedback("unsure");
+    else if (state === "correct") playFeedback("reveal");
   }
   function grade(value: "Easy" | "Okay" | "Hard") {
     if (!gradeAyah) return;
     update({ grades: { ...saved.grades, [gradeAyah]: value } }); setGradeAyah(null);
-    if (!next) { setSheet("complete"); setStatus("paused"); } else setStatus("active");
+    if (!next) { setSheet("complete"); setStatus("paused"); playFeedback("pageComplete"); } else setStatus("active");
   }
   const wordNode = (word: ReciteWord) => {
     if (word.end) return saved.settings.numbers ? <span key={word.key} className="rc-ayah-end" aria-label={`Ayah ${word.verse.split(":")[1]}`}><AyahMarker number={Number(word.verse.split(":")[1])} size={18} done={words.filter((w) => w.verse === word.verse).every((w) => revealed(saved.marks[w.key]))} /></span> : null;
@@ -326,7 +348,7 @@ function Recite() {
         {sheet === "navigation" && <PageNavigation page={saved.page} chapter={first?.chapter} juz={first?.juz} chapters={chapters} go={changePage} close={() => setSheet(null)} />}
         {sheet === "ai" && <section className="rc-sheet" role="dialog" aria-modal="true" aria-label="AI check"><Mic className="rc-sheet-icon" /><h2>AI recitation checking is coming soon.</h2><p>Self check</p><Button className="rc-primary" onClick={() => { setSaved((s) => ({ ...s, settings: { ...s.settings, mode: "self" } })); setSheet(null); }}>Use self check</Button></section>}
         {gradeAyah && <section className="rc-sheet" role="dialog" aria-modal="true" aria-label="Ayah self check"><span className="rc-eyebrow">AYAH {gradeAyah}</span><h2>How did it go?</h2><div className="rc-grade-options">{(["Easy", "Okay", "Hard"] as const).map((g) => <Button variant="outline" key={g} onClick={() => grade(g)}>{g}</Button>)}</div><div className="rc-check-words" dir="rtl">{words.filter((w) => w.verse === gradeAyah).map((w) => <Button variant="ghost" className={`rc-arabic ${saved.marks[w.key] === "wrong" ? "rc-check-wrong" : ""}`} key={w.key} onClick={() => mark(w)} aria-label={`Mark ${w.key} as mistake`}>{w.text}</Button>)}</div></section>}
-        {sheet === "marks" && <section className="rc-sheet rc-marks" role="dialog" aria-modal="true" aria-label="Review marks"><header><h2>Review marks</h2><Button variant="ghost" size="icon" aria-label="Close marks" onClick={() => setSheet(null)}><X /></Button></header>{!marks.length && <p>No marks on this page.</p>}{marks.map((w) => <div className="rc-mark-row" key={w.key}><Button variant="ghost" className="rc-arabic" onClick={() => void playWord(w)}>{w.text}<Play /></Button><small>{w.verse}</small><select aria-label={`State for ${w.key}`} value={saved.marks[w.key]} onChange={(e) => update({ marks: { ...saved.marks, [w.key]: e.target.value as WordState } })}>{["wrong", "skipped", "unsure", "correct"].map((s) => <option key={s}>{s}</option>)}</select></div>)}</section>}
+        {sheet === "marks" && <section className="rc-sheet rc-marks" role="dialog" aria-modal="true" aria-label="Review marks"><header><h2>Review marks</h2><Button variant="ghost" size="icon" aria-label="Close marks" onClick={() => setSheet(null)}><X /></Button></header>{!marks.length && <p>No marks on this page.</p>}{marks.map((w) => <div className="rc-mark-row" key={w.key}><Button variant="ghost" className="rc-arabic" onClick={() => void playWord(w)}>{w.text}<Play /></Button><small>{w.verse}</small><select aria-label={`State for ${w.key}`} value={saved.marks[w.key]} onChange={(e) => markState(w, e.target.value as WordState)}>{["wrong", "skipped", "unsure", "correct"].map((s) => <option key={s}>{s}</option>)}</select></div>)}</section>}
         {sheet === "complete" && <section className="rc-sheet rc-complete" role="dialog" aria-modal="true" aria-label="Page complete"><Check className="rc-sheet-icon" /><h2>Page complete</h2><p>{visible} words · {marks.length} marks · {Math.ceil((saved.seconds[saved.page] ?? 0) / 60)} min</p><Button className="rc-primary" onClick={() => setSheet("marks")}>Review marks</Button><Button variant="outline" disabled={saved.page === 604} onClick={() => changePage(saved.page + 1)}>Next page</Button></section>}
       </div>
     </div>}
