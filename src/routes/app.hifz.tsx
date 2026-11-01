@@ -67,8 +67,13 @@ function Recite() {
       paper.querySelectorAll<HTMLElement>(".rc-line").forEach((line) => {
         line.style.setProperty("--rc-line-size", `${saved.settings.size}px`);
         const items = [...line.children] as HTMLElement[];
-        const width = items.reduce((n, el) => n + el.scrollWidth, 0) + Math.max(0, items.length - 1) * 5;
-        if (width > line.clientWidth) line.style.setProperty("--rc-line-size", `${Math.max(16, saved.settings.size * line.clientWidth / width)}px`);
+        let size = saved.settings.size;
+        for (let attempt = 0; attempt < 5; attempt++) {
+          const width = items.reduce((n, el) => n + el.getBoundingClientRect().width, 0) + Math.max(0, items.length - 1) * 5;
+          if (width <= line.clientWidth) break;
+          size *= (line.clientWidth - 3) / width;
+          line.style.setProperty("--rc-line-size", `${size}px`);
+        }
       });
     };
     fit();
