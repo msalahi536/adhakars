@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight, Check, BookOpen, Sprout, Circle, Search, Layers, List, ArrowUp, ArrowDown, X, Minus, Plus, CalendarDays, SlidersHorizontal, Clock, ChartNoAxesColumnIncreasing } from "lucide-react";
@@ -29,8 +29,6 @@ import { bestAutomaticPace, DAILY_MINUTES, effectiveTimeline, selectedFinishEsti
 const DAY_NAMES = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 const TIME_OPTIONS = DAILY_MINUTES;
 
-const fmtDate = (iso: string) =>
-  new Date(iso + "T12:00:00Z").toLocaleDateString(undefined, { month: "long", year: "numeric" });
 const shortDate = (iso: string) => new Date(iso + "T12:00:00Z").toLocaleDateString("en-US", { month: "short", year: "numeric", timeZone: "UTC" });
 
 export function PlanSetup({ existing, done }: { existing?: HifzPlan; done: () => void }) {
@@ -38,6 +36,8 @@ export function PlanSetup({ existing, done }: { existing?: HifzPlan; done: () =>
   const chapters = useSuspenseQuery(reciteChaptersOptions).data;
   const today = todayISO();
   const [step, setStep] = useState(0);
+  const setupScroll = useRef<HTMLElement>(null);
+  useEffect(() => { setupScroll.current?.scrollTo({ top: 0 }); }, [step]);
   const [plan, setPlan] = useState<HifzPlan>(() => existing ?? defaultPlan(today));
   const [pickSurahs, setPickSurahs] = useState(false);
   const [surahSearch, setSurahSearch] = useState("");
@@ -125,7 +125,7 @@ export function PlanSetup({ existing, done }: { existing?: HifzPlan; done: () =>
   }
 
   return (
-    <main className={`scroll-area hz-setup ${step === 0 ? "hz-known-step" : step === 1 ? "hz-order-step" : step === 2 ? "hz-time-step" : "hz-summary-step"}`}>
+    <main ref={setupScroll} className={`scroll-area hz-setup ${step === 0 ? "hz-known-step" : step === 1 ? "hz-order-step" : step === 2 ? "hz-time-step" : "hz-summary-step"}`}>
       <div className="mx-auto max-w-md px-5 py-4">
         <div className="hz-steps" aria-label={`Step ${step + 1} of ${steps.length}: ${steps[step]}`}>
           {steps.map((label, i) => (
