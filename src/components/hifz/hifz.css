@@ -12,7 +12,7 @@
 
 /* First setup step: reference-style frosted selection tray over app artwork. */
 .hz-known-step { padding-bottom: calc(var(--bottom-nav-height, 90px) + env(safe-area-inset-bottom) + 20px); color: var(--foreground); }
-.hz-setup > div { padding-top: calc(env(safe-area-inset-top, 0px) + 76px); }
+main.hz-setup > div { padding-top: calc(env(safe-area-inset-top, 0px) + 76px); }
 .hz-known-step > div { padding: calc(env(safe-area-inset-top, 0px) + 76px) 16px 16px; }
 .hz-known-step .hz-steps { padding: 8px 0 0; margin-bottom: 12px; }
 .hz-known-content { position: relative; isolation: isolate; }

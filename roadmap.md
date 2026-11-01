@@ -1,7 +1,7 @@
 # Roadmap
 
-- [ ] Replace Hifz known-surah dropdown with a searchable frosted selection popup.
-- [ ] Move Hifz setup below Settings and respect phone top safe areas.
+- [x] Replace Hifz known-surah dropdown with a searchable frosted selection popup; search, selection retention, Done and Next verified.
+- [x] Move Hifz setup below Settings and respect phone top safe areas; phone-width visual check passed.
 
 - [x] Improve the Hifz already-memorized setup step with reference-inspired readable choices, clear selected states and theme-aware surfaces.
 
