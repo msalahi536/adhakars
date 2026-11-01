@@ -25,7 +25,8 @@ export function selectedFinishEstimate(timeline: Timeline, startDate: string, ta
     ...effective,
     finish: targetDate,
     days: daysBetween(startDate, targetDate) + 1,
-    timeWarning: effective.finish > targetDate ? timeline.shortOnTime?.message : undefined,
+    timeWarning: effective.finish > targetDate && effective.finish.slice(0, 7) !== targetDate.slice(0, 7)
+      ? timeline.shortOnTime?.message : undefined,
   };
 }
 

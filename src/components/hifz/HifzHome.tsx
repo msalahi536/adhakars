@@ -22,6 +22,7 @@ import {
   type HifzReminderPrefs,
 } from "@/lib/hifz/reminders";
 import { PlanSetup } from "./PlanSetup";
+import { selectedFinishEstimate } from "./automatic-pace";
 
 const STEP_META: Record<Step["type"], { label: string; Icon: LucideIcon }> = {
   manzil: { label: "Manzil – old review", Icon: BookOpen },
@@ -50,7 +51,8 @@ export function HifzHome({ state, update, reset }: { state: HifzState; update: (
   const today = todayISO();
   const session = useMemo(() => buildSession(state, q, today), [state, q, today]);
   const st = useMemo(() => stats(state, q, today), [state, q, today]);
-  const timeline = useMemo(() => buildTimeline(state.plan, q), [state, q]);
+  const timeline = useMemo(() => buildTimeline(state.plan, q, state.plan.dailyMinutes), [state, q]);
+  const finishEstimate = useMemo(() => selectedFinishEstimate(timeline, state.plan.startDate), [timeline, state.plan.startDate]);
   const weakCount = Object.keys(state.weakSpots).length;
   const [sheet, setSheet] = useState<"juz" | "salah" | "reminders" | "plan" | null>(null);
   const [juzOpen, setJuzOpen] = useState<number | null>(null);
@@ -143,7 +145,7 @@ export function HifzHome({ state, update, reset }: { state: HifzState; update: (
           <div className="hz-stat-row">
             <div className="hz-stat"><b>{pct}%</b><span>of the Quran</span></div>
             <div className="hz-stat"><b>{st.pagesMemorized}</b><span>pages</span></div>
-            <div className="hz-stat"><b>{humanDuration(timeline.calendarDays)}</b><span>to finish</span></div>
+            <div className="hz-stat"><b>{humanDuration(finishEstimate.days)}</b><span>to finish</span></div>
           </div>
           {nextMilestone && (
             <p className="hz-next-milestone"><CalendarDays />

@@ -353,7 +353,7 @@ export function PlanSetup({ existing, done }: { existing?: HifzPlan; done: () =>
                 <header><ChartNoAxesColumnIncreasing aria-hidden="true" /><div><h2>Daily time needed</h2><p>As your hifz grows</p></div><span className="hz-plan-budget">Your goal: {plan.dailyMinutes} min</span></header>
               <MinutesChart points={summary.minutesByMonth} budget={plan.dailyMinutes} />
               </div>
-              {summary.shortOnTime && <p className="hz-warning">{summary.shortOnTime.message}</p>}
+              {selectedEstimate.timeWarning && <p className="hz-warning">{selectedEstimate.timeWarning}</p>}
               <Button variant="ghost" className="hz-wide hz-plan-advanced" aria-haspopup="dialog" onClick={() => setAdvanced(true)}>
                 <SlidersHorizontal /> Advanced options <ChevronRight />
               </Button>
