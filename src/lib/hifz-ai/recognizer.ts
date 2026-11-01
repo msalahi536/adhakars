@@ -51,7 +51,7 @@ export class QuranRecognizer {
   private heardSinceReset = false;
 
   /** Pause length (s) after which the model's memory is reset. */
-  resetAfterPause = 1.0;
+  resetAfterPause = 0.35; // short ayah-end pauses: the model can drop the next word without a fresh start
 
   static async create(opts: {
     modelUrl: string; // the .onnx file (host it yourself; see README)
