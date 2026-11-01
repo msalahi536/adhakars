@@ -36,6 +36,13 @@
       "when": 1793496814439,
       "tag": "0004_retire_hifz_backups",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1793561862928,
+      "tag": "0005_daily_widget_editor_assignments",
+      "breakpoints": true
     }
   ]
 }
