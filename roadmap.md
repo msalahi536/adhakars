@@ -1,8 +1,8 @@
 # Roadmap
 
-- [ ] Remove Hifz Sounds option and silence saved sound preferences; restyle Aa sheet with reference-inspired icon rows, switches, compact segmented controls and fixed header.
+- [x] Removed Hifz Sounds option and silenced saved sound preferences; reference-inspired Aa icon rows, switches, compact choices and fixed header verified on phone.
 
-- [ ] Hide Hifz entry and direct page behind exact device flag; seven Settings version taps toggle without clearing progress; verify enabled and disabled flows.
+- [x] Hifz entry and direct page gated by exact hifz_beta="1"; phone checks confirm seventh-tap unlock/relock, hidden default, direct URL redirect and preserved progress; 51 targeted tests pass.
 
 - [x] Hifz haptic-first dispatcher and saved Haptics/Sounds defaults, 13 local sound effects and strip fallback; 47 targeted tests pass and phone browser verifies reveal, wrong marks, pulses, sounds and persistence. Physical native haptic feel still needs a device check; future AI/microphone events have patterns but are not active features.
 
