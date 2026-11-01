@@ -1,6 +1,6 @@
 # Architecture Decisions
 
-- Beta Hifz records attempts once; third clean lesson credits lines, page reviews need one. Results show mastery, hesitations and drift apart from self-marks. Ranges share a mic and cached models/keys. Quran voice memoizes Madani pages, reserves lesson-sized heading rows for Basmala, and mutates highlights directly. Search delegates stopping/confidence to engine sessions and meters their streams; all mics stop on exit.
+- Beta Hifz records once; three clean lesson passes credit lines, reviews need one. Results separate mastery, hesitation, drift and self-marks. Ranges share mic/models/keys. Quran voice uses fixed heading/Basmala/word slots, direct highlights and memory/Cache Storage word-page indexes; locked positions turn with adjacent pages/fonts prefetched. Search uses engine confidence/stopping and live streams; mics stop on exit.
 - Daily editor uses encrypted, server-verified sessions; dated snapshots override only their UTC day with rotation fallback. Browsing reuses Quran/hadith clients with cancellable updates, preserving widget contracts.
 - Hifz qari playback uses cancellable generation tokens and settled segment waits; stage changes invalidate playback before mic startup so repeat loops cannot restart audio after a stop.
 - Hifz AI notices live in a browser-independent module so Settings attribution never imports the inference runtime; the free model is not part of paid entitlements.
