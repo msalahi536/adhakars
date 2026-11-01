@@ -39,7 +39,7 @@
 .hz-fresh-check { flex: none; opacity: .5; }
 .hz-known-step .hz-nav { margin-top: 24px; justify-content: center; }
 .hz-known-step .hz-nav > span { display: none; }
-.hz-known-step .hz-primary { height: 44px; min-width: 108px; font-size: 16px; }
+.hz-known-step .hz-primary { height: 50px; min-width: 132px; font-size: 18px; }
 @media (prefers-reduced-motion: reduce) { .hz-known-step .hz-juz-tile { transition: none; } }
 
 .hz-juz-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 8px; margin-bottom: 12px; }
@@ -62,7 +62,7 @@
 
 .hz-wide { width: 100%; margin-top: 10px; border-radius: 14px; color: var(--foreground); }
 .hz-nav { display: flex; justify-content: space-between; align-items: center; margin-top: 18px; padding-bottom: calc(env(safe-area-inset-bottom) + 12px); }
-.hz-setup .hz-primary { border-radius: 14px; background: linear-gradient(135deg, color-mix(in oklab, var(--accent) 84%, var(--accent-foreground)) 0%, var(--accent) 42%, color-mix(in oklab, var(--accent) 70%, var(--card-foreground)) 100%); color: var(--accent-foreground); border: 1px solid color-mix(in oklab, var(--accent-foreground) 22%, var(--accent)); box-shadow: 0 6px 14px color-mix(in oklab, var(--accent) 20%, transparent), inset 0 1px 0 color-mix(in oklab, var(--accent-foreground) 32%, transparent); font-weight: 700; padding: 0 22px; height: 44px; transition: filter .2s ease, transform .2s ease; }
+.hz-setup .hz-primary { border-radius: 20px; background: linear-gradient(165deg, color-mix(in oklab, var(--surface) 18%, transparent), transparent 48%), linear-gradient(135deg, var(--accent) 0%, color-mix(in oklab, var(--accent) 82%, var(--preset-ink-strong, var(--card-foreground))) 48%, var(--preset-ink-strong, var(--card-foreground)) 100%); color: var(--surface-deep-fg, var(--accent-foreground)); border: 1px solid color-mix(in oklab, var(--surface) 26%, var(--accent)); box-shadow: 0 7px 18px color-mix(in oklab, var(--accent) 22%, transparent), inset 0 2px 1px color-mix(in oklab, var(--surface) 28%, transparent), inset 0 -1px 1px color-mix(in oklab, var(--preset-ink-strong, var(--card-foreground)) 25%, transparent); font-weight: 600; padding: 0 26px; height: 50px; gap: 12px; transition: filter .2s ease, transform .2s ease; }
 .hz-setup .hz-primary:hover { filter: brightness(1.06); }
 .hz-setup .hz-primary:active { transform: translateY(1px); filter: brightness(.96); }
 .hz-setup .hz-primary:disabled { background: var(--muted); color: var(--text-muted, var(--muted-foreground)); border-color: var(--border); box-shadow: none; opacity: .65; }
