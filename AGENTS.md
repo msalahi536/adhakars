@@ -1,6 +1,6 @@
 # Architecture Decisions
 
-- Hifz AI starts only from beta-gated recite; each stopped attempt records bridge-derived performance once, crediting new lines only at the third clean lesson pass. Whole-page reviews need one clean pass; hesitation/mastery and similar-ayah comparison share the result sheet, while transient AI marks preserve self-marks. Multi-surah ranges share a mic; models/keys cache locally and sessions stop on exit.
+- Beta-gated Hifz records each AI attempt once; third clean lesson pass credits lines, whole-page reviews need one. Shared results show mastery, hesitations and drift without replacing self-marks; multi-surah ranges share a mic and cache models/keys. Quran voice integration memoizes themed Madani pages and mutates word highlights directly; all microphones stop on exit.
 - Daily editor uses encrypted, server-verified sessions; dated snapshots override only their UTC day with rotation fallback. Browsing reuses Quran/hadith clients with cancellable updates, preserving widget contracts.
 - Hifz qari playback uses cancellable generation tokens and settled segment waits; stage changes invalidate playback before mic startup so repeat loops cannot restart audio after a stop.
 - Hifz AI notices live in a browser-independent module so Settings attribution never imports the inference runtime; the free model is not part of paid entitlements.
