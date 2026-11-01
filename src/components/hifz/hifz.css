@@ -37,7 +37,8 @@
 .hz-fresh-copy strong { display: block; font-size: 14px; font-weight: 600; line-height: 1.4; }
 .hz-fresh-copy small { display: block; margin-top: 4px; font-size: 12px; font-weight: 400; color: var(--card-foreground); opacity: .8; }
 .hz-fresh-check { flex: none; opacity: .5; }
-.hz-known-step .hz-nav { margin-top: 24px; }
+.hz-known-step .hz-nav { margin-top: 24px; justify-content: center; }
+.hz-known-step .hz-nav > span { display: none; }
 .hz-known-step .hz-primary { height: 44px; min-width: 108px; font-size: 16px; }
 @media (prefers-reduced-motion: reduce) { .hz-known-step .hz-juz-tile { transition: none; } }
 
@@ -64,6 +65,7 @@
 .hz-setup .hz-primary { border-radius: 14px; background: linear-gradient(135deg, color-mix(in oklab, var(--accent) 84%, var(--accent-foreground)) 0%, var(--accent) 42%, color-mix(in oklab, var(--accent) 70%, var(--card-foreground)) 100%); color: var(--accent-foreground); border: 1px solid color-mix(in oklab, var(--accent-foreground) 22%, var(--accent)); box-shadow: 0 6px 14px color-mix(in oklab, var(--accent) 20%, transparent), inset 0 1px 0 color-mix(in oklab, var(--accent-foreground) 32%, transparent); font-weight: 700; padding: 0 22px; height: 44px; transition: filter .2s ease, transform .2s ease; }
 .hz-setup .hz-primary:hover { filter: brightness(1.06); }
 .hz-setup .hz-primary:active { transform: translateY(1px); filter: brightness(.96); }
+.hz-setup .hz-primary:disabled { background: var(--muted); color: var(--text-muted, var(--muted-foreground)); border-color: var(--border); box-shadow: none; opacity: .65; }
 
 .hz-summary { display: flex; flex-direction: column; gap: 10px; }
 .hz-big-finish { font-size: 17px; color: var(--foreground); margin: 0; }
