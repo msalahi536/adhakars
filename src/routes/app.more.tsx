@@ -40,7 +40,7 @@ export const Route = createFileRoute("/app/more")({
 });
 
 type Tile = {
-  to: "/app/sleep" | "/app/qibla" | "/app/about" | "/app/period" | "/app/ruqyah" | "/app/hajj" | "/app/fasting" | "/app/duas" | "/app/tasbih" | "/app/hadith" | "/app/tafsir" | "/app/arabic";
+  to: "/app/sleep" | "/app/qibla" | "/app/about" | "/app/period" | "/app/ruqyah" | "/app/hajj" | "/app/fasting" | "/app/duas" | "/app/tasbih" | "/app/hadith" | "/app/tafsir" | "/app/arabic" | "/app/hifz";
 
   title: string;
   subtitle: string;
@@ -48,6 +48,7 @@ type Tile = {
 };
 
 const tiles: Tile[] = [
+  { to: "/app/hifz", title: "Hifz · Recite", subtitle: "A word at a time, at your pace", Icon: BookOpen },
   { to: "/app/hadith", title: "Hadith Library", subtitle: "40,000+ hadith by book and topic", Icon: ScrollText },
   { to: "/app/tafsir", title: "Tafsir Library", subtitle: "20 classical tafsir books, verse by verse", Icon: Library },
   { to: "/app/duas", title: "Dua Library", subtitle: "50 authentic duas for every feeling", Icon: BookOpen },

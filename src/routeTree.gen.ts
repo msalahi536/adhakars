@@ -26,6 +26,7 @@ import { Route as AppEveningRouteImport } from './routes/app.evening'
 import { Route as AppFastingRouteImport } from './routes/app.fasting'
 import { Route as AppHadithRouteImport } from './routes/app.hadith'
 import { Route as AppHajjRouteImport } from './routes/app.hajj'
+import { Route as AppHifzRouteImport } from './routes/app.hifz'
 import { Route as AppLicensesRouteImport } from './routes/app.licenses'
 import { Route as AppMoreRouteImport } from './routes/app.more'
 import { Route as AppPeriodRouteImport } from './routes/app.period'
@@ -127,6 +128,11 @@ const AppHajjRoute = AppHajjRouteImport.update({
   path: '/hajj',
   getParentRoute: () => AppRoute,
 } as any)
+const AppHifzRoute = AppHifzRouteImport.update({
+  id: '/hifz',
+  path: '/hifz',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppLicensesRoute = AppLicensesRouteImport.update({
   id: '/licenses',
   path: '/licenses',
@@ -220,6 +226,7 @@ export interface FileRoutesByFullPath {
   '/app/fasting': typeof AppFastingRoute
   '/app/hadith': typeof AppHadithRoute
   '/app/hajj': typeof AppHajjRoute
+  '/app/hifz': typeof AppHifzRoute
   '/app/licenses': typeof AppLicensesRoute
   '/app/more': typeof AppMoreRoute
   '/app/period': typeof AppPeriodRoute
@@ -253,6 +260,7 @@ export interface FileRoutesByTo {
   '/app/fasting': typeof AppFastingRoute
   '/app/hadith': typeof AppHadithRoute
   '/app/hajj': typeof AppHajjRoute
+  '/app/hifz': typeof AppHifzRoute
   '/app/licenses': typeof AppLicensesRoute
   '/app/more': typeof AppMoreRoute
   '/app/period': typeof AppPeriodRoute
@@ -288,6 +296,7 @@ export interface FileRoutesById {
   '/app/fasting': typeof AppFastingRoute
   '/app/hadith': typeof AppHadithRoute
   '/app/hajj': typeof AppHajjRoute
+  '/app/hifz': typeof AppHifzRoute
   '/app/licenses': typeof AppLicensesRoute
   '/app/more': typeof AppMoreRoute
   '/app/period': typeof AppPeriodRoute
@@ -324,6 +333,7 @@ export interface FileRouteTypes {
     | '/app/fasting'
     | '/app/hadith'
     | '/app/hajj'
+    | '/app/hifz'
     | '/app/licenses'
     | '/app/more'
     | '/app/period'
@@ -357,6 +367,7 @@ export interface FileRouteTypes {
     | '/app/fasting'
     | '/app/hadith'
     | '/app/hajj'
+    | '/app/hifz'
     | '/app/licenses'
     | '/app/more'
     | '/app/period'
@@ -391,6 +402,7 @@ export interface FileRouteTypes {
     | '/app/fasting'
     | '/app/hadith'
     | '/app/hajj'
+    | '/app/hifz'
     | '/app/licenses'
     | '/app/more'
     | '/app/period'
@@ -542,6 +554,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppHajjRouteImport
       parentRoute: typeof AppRoute
     }
+    '/app/hifz': {
+      id: '/app/hifz'
+      path: '/hifz'
+      fullPath: '/app/hifz'
+      preLoaderRoute: typeof AppHifzRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/app/licenses': {
       id: '/app/licenses'
       path: '/licenses'
@@ -658,6 +677,7 @@ interface AppRouteChildren {
   AppFastingRoute: typeof AppFastingRoute
   AppHadithRoute: typeof AppHadithRoute
   AppHajjRoute: typeof AppHajjRoute
+  AppHifzRoute: typeof AppHifzRoute
   AppLicensesRoute: typeof AppLicensesRoute
   AppMoreRoute: typeof AppMoreRoute
   AppPeriodRoute: typeof AppPeriodRoute
@@ -684,6 +704,7 @@ const AppRouteChildren: AppRouteChildren = {
   AppFastingRoute: AppFastingRoute,
   AppHadithRoute: AppHadithRoute,
   AppHajjRoute: AppHajjRoute,
+  AppHifzRoute: AppHifzRoute,
   AppLicensesRoute: AppLicensesRoute,
   AppMoreRoute: AppMoreRoute,
   AppPeriodRoute: AppPeriodRoute,
