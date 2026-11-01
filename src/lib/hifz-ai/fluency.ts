@@ -67,6 +67,7 @@ export function masteryScore(result: CheckResult, hesitations: Hesitation[]): Ma
     : mistakes + skips === 0 && score >= 80 ? 3
     : mistakes + skips <= 2 && score >= 50 ? 2
     : 1;
-  const label = score >= 95 ? "Solid" : score >= 80 ? "Good" : score >= 60 ? "Shaky" : "Needs work";
+  const label = mistakes + skips === 0 && hesitations.length > 0 && score >= 80 ? "Good"
+    : score >= 95 ? "Solid" : score >= 80 ? "Good" : score >= 60 ? "Shaky" : "Needs work";
   return { score, grade, label, mistakes, skips, hesitations: hesitations.length };
 }

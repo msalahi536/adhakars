@@ -15,7 +15,9 @@ import { quranPlayer } from "@/lib/quran-player";
 import { recitationPlayer } from "@/lib/recitation-player";
 import { play as playFeedback, configureHifzFeedback, cancelHifzFeedback } from "@/lib/hifzHaptics";
 import { MushafThemeProvider, MushafFrame, MushafLabel, MushafPageNumber, SurahCartouche, AyahMarker, toArabicDigits } from "@/components/mushaf/MushafPage";
-import { ReciteStrip } from "@/components/mushaf/ReciteStrip";
+import { RecitationMic } from "@/components/recite/RecitationMic";
+import { AiResultSheet } from "@/components/recite/AiResultSheet";
+import { analyzeAttempt, recordAttempt, CLEAN_PASSES, type Attempt } from "@/components/recite/ai-performance";
 import { getPresetId, resolveVisualPhase, type VisualPhase } from "@/lib/theme-store";
 import { parseTajweed, TajweedText } from "@/lib/tajweed";
 import "@/components/recite/supplied-mushaf.css";
@@ -34,7 +36,7 @@ import { DrillSheet } from "@/components/hifz/DrillSheet";
 import { AI_DISCLAIMER } from "@/lib/hifz-ai/notices";
 import { mapAiWords } from "@/components/recite/ai-feedback";
 import { useAiRecitation } from "@/components/recite/use-ai-recitation";
-import { aiFailures, aiWordState, createAudioRun, saveAiWeakSpots, stagePassed, stageResult, type AiMarks } from "@/components/recite/lesson-ai";
+import { aiWordState, createAudioRun, stageResult, type AiMarks } from "@/components/recite/lesson-ai";
 
 export const Route = createFileRoute("/app/hifz/recite")({
   validateSearch: (s: Record<string, unknown>) => {
@@ -129,6 +131,12 @@ function Recite() {
   const correctionPhase = useRef<"recite" | "chain">("recite");
   const handledAi = useRef<unknown>(null);
   const [fallbackMessage, setFallbackMessage] = useState("");
+  const [attempt, setAttempt] = useState<Attempt | null>(null);
+  const [cleanPasses, setCleanPasses] = useState(0);
+  const [analyzing, setAnalyzing] = useState(false);
+  const analysisRun = useRef(0);
+  const latestState = useRef(hifzState); latestState.current = hifzState;
+  const liveResult = useRef<import("@/lib/hifz-ai/checker").CheckResult | null>(null);
   const today = todayISO();
 
   const pageQuery = useQuery({ ...recitePageOptions(saved.page), initialData: saved.page === 562 ? initial : undefined });
@@ -145,9 +153,12 @@ function Recite() {
 
   const sabaq = sessionItem?.kind === "sabaq" ? sessionItem : null;
   const rangeWords = sabaq && page?.page === sabaq.page ? words.filter((w) => w.line > sabaq.fromLine && w.line <= sabaq.fromLine + sabaq.lines) : [];
-  const chainWords = sabaq && page?.page === sabaq.page ? words.filter((w) => w.line <= sabaq.fromLine + sabaq.lines) : [];
+  const firstLessonVerse = rangeWords[0]?.verse;
+  const precedingVerse = page?.verses[(page.verses.findIndex((v) => v.key === firstLessonVerse)) - 1]?.key;
+  const chainWords = sabaq && page?.page === sabaq.page ? words.filter((w) => rangeWords.some((r) => r.verse === w.verse) || w.verse === precedingVerse) : [];
   const recallMode = !!sessionItem && (sessionItem.kind === "review" || sessionItem.kind === "link" || (sessionItem.kind === "sabaq" && (sabaqPhase === "recite" || sabaqPhase === "chain")));
   const ai = useAiRecitation(saved.page, mode === "ai", words.map((w) => w.key));
+  liveResult.current = ai.result;
   const aiWords = ai.result ? mapAiWords(ai.result, words.map((w) => w.key)) : null;
   const aiRanges = [...new Set(page?.verses.map((v) => v.chapter) ?? [])].map((sura) => {
     const targetWords = sabaqPhase === "chain" ? chainWords : rangeWords;
@@ -164,24 +175,23 @@ function Recite() {
   useEffect(() => {
     if (ai.phase !== "finished" || !ai.result || handledAi.current === ai.result) return;
     handledAi.current = ai.result;
-    if (!sabaq) {
-      if (sessionItem?.kind === "link") {
-        const result = stageResult(ai.result, words);
-        if (hifzState && aiFailures(result).length) persistState(saveAiWeakSpots(hifzState, result, words, today));
-        if (stagePassed(result, words)) { playFeedback("pageComplete"); advance(); }
-        else setSheet("ai");
-      } else setSheet("ai");
-      return;
-    }
-    const target = sabaqPhase === "chain" ? chainWords : rangeWords;
-    const result = stageResult(ai.result, target);
-    if (hifzState && aiFailures(result).length) persistState(saveAiWeakSpots(hifzState, result, target, today));
-    if (stagePassed(result, target)) completeAiStage(sabaqPhase === "chain" ? "chain" : "recite");
-    else {
-      correctionPhase.current = sabaqPhase === "chain" ? "chain" : "recite";
-      setAiCorrection(result); setSabaqPhase("correct"); setStatus("paused");
-    }
+    const id = ++analysisRun.current;
+    const target = sabaq ? (cleanPasses >= 2 ? chainWords : rangeWords) : words;
+    const result = ai.result;
+    setAnalyzing(true);
+    void analyzeAttempt(result, aiRanges, target.map((w) => w.key)).then((value) => {
+      if (id !== analysisRun.current) return;
+      const passes = value.clean ? Math.min(CLEAN_PASSES, cleanPasses + 1) : cleanPasses;
+      setAttempt(value); setCleanPasses(passes);
+      const state = latestState.current;
+      if (state && sessionItem) persistState(recordAttempt(state, sessionItem, value, today, !!sabaq && passes === CLEAN_PASSES));
+      setAiCorrection(stageResult(result, target));
+      setSheet("ai"); setStatus("paused");
+      if (value.drifts.length) playFeedback("drift");
+      else if (value.clean) playFeedback("ayahComplete");
+    }).finally(() => { if (id === analysisRun.current) setAnalyzing(false); });
   }, [ai.phase, ai.result]);
+  useEffect(() => () => { analysisRun.current++; }, []);
   useEffect(() => {
     if (mode !== "ai") return;
     if (ai.phase === "listening") setStatus("active");
@@ -298,7 +308,7 @@ function Recite() {
     if (targetPage && page.page !== targetPage) { changePage(targetPage, false); return; }
     preppedItem.current = key;
     trackerRef.current = createTracker();
-    setAiCorrection(null); ai.reset();
+    setAiCorrection(null); setAttempt(null); setCleanPasses(0); analysisRun.current++; ai.reset();
     sessionStartAt.current = Date.now();
     ayahStartAt.current = 0;
     lastAyah.current = null;
@@ -306,7 +316,7 @@ function Recite() {
     setStatus("active");
     if (sessionItem.kind === "drills") { setSheet("drills"); return; }
     if (sessionItem.kind === "sabaq") {
-      setSabaqPhase("listen");
+      setSabaqPhase("recite");
       // New lines visible for listening; everything else on the page stays as it was.
       const updated = { ...latest.current.marks };
       for (const w of words) if (w.line > sessionItem.fromLine && w.line <= sessionItem.fromLine + sessionItem.lines) updated[w.key] = "correct";
@@ -357,12 +367,12 @@ function Recite() {
   }
   function completeAiStage(phase: "recite" | "chain") {
     stopAudio(); setAiCorrection(null);
-    if (phase === "chain") finishSabaq();
+    if (phase === "chain") { if (mode === "ai") advance(); else finishSabaq(); }
     else { playFeedback("ayahComplete"); startRecall("chain"); }
   }
   function changePage(pageNumber: number, feedback = true) {
     if (pageNumber < 1 || pageNumber > 604 || pageNumber === latest.current.page) return;
-    stopAudio(); setStatus("ready"); setSheet(null); setGradeAyah(null); setPeek(null);
+    stopAudio(); ai.cancel(); analysisRun.current++; setAttempt(null); setCleanPasses(0); setStatus("ready"); setSheet(null); setGradeAyah(null); setPeek(null);
     if (transitionTimer.current) clearTimeout(transitionTimer.current);
     update({ page: pageNumber });
     if (feedback) playFeedback("pageTurn");
@@ -401,6 +411,23 @@ function Recite() {
     const a = new Audio(word.audio); audio.current = a; a.playbackRate = saved.settings.speed;
     a.onended = () => setPlaying(false); a.onerror = () => { setPlaying(false); setAudioError("Audio could not play. Check your connection and try again."); };
     try { await a.play(); setPlaying(true); setAudioError(""); } catch { setAudioError("Tap again to play the qari audio."); }
+  }
+
+  async function playAyah(key: string) {
+    if (micBusy.current) return;
+    stopAudio(); quranPlayer.pause(); recitationPlayer.pause();
+    const token = audioRun.current.token();
+    try {
+      const data = await getChapterAudio(saved.settings.reciter, Number(key.split(":")[0]));
+      if (!audioRun.current.current(token)) return;
+      const timing = data.timings.find((t) => t.key === key);
+      if (!timing) throw new Error("Audio unavailable");
+      const a = new Audio(data.url); audio.current = a;
+      a.onloadedmetadata = () => { a.currentTime = timing.from / 1000; };
+      a.ontimeupdate = () => { if (a.currentTime >= timing.to / 1000) stopAudio(); };
+      a.onended = () => setPlaying(false); a.onerror = () => { setPlaying(false); setAudioError("Ayah audio couldn’t play. Please retry."); };
+      await a.play(); setPlaying(true);
+    } catch { setAudioError("Ayah audio couldn’t play. Please retry."); }
   }
 
   /** Sabaq listen phase: the qari recites each verse in the new lines 3 times, highlighting words. */
@@ -487,7 +514,8 @@ function Recite() {
     }
   }
   function horizon() {
-    if (sabaq && (sabaqPhase === "listen" || sabaqPhase === "read" || sabaqPhase === "correct")) return;
+    if (analyzing) return;
+    if (mode === "self" && sabaq && (sabaqPhase === "listen" || sabaqPhase === "read" || sabaqPhase === "correct")) return;
     if (mode === "ai") {
       if (ai.phase === "listening") { void ai.stop(); return; }
       if (ai.phase === "loading" || ai.phase === "stopping") return;
@@ -606,10 +634,12 @@ function Recite() {
   const wordNode = (word: ReciteWord) => {
     if (word.end) return saved.settings.numbers ? <span key={word.key} className="rc-ayah-end" aria-label={`Ayah ${word.verse.split(":")[1]}`}><AyahMarker number={Number(word.verse.split(":")[1])} size={18} done={words.filter((w) => w.verse === word.verse).every((w) => revealed(saved.marks[w.key]))} /></span> : null;
     const aiStatus = mode === "ai" ? (aiCorrection?.statuses[word.key] ?? aiWords?.statuses[word.key]) : undefined;
-    const memoryTest = !sabaq || ["recite", "chain", "correct"].includes(sabaqPhase);
-    const state: WordState = mode === "ai" && memoryTest ? aiWordState(aiStatus) : saved.marks[word.key] ?? "pending";
-    const hint = mode === "self" && (peek === word.key || isOpeningWord(word, words, saved.settings.hideAmount));
-    return <Button variant="ghost" key={word.key} className={`rc-word rc-${state} ${aiStatus === "wrong" || aiStatus === "skipped" ? `rc-ai-${aiStatus}` : ""} ${hint ? "rc-peek" : ""} ${audioWord === word.key ? "rc-listening" : ""}`} onPointerUp={(e) => {
+    const targetWords = sabaq ? (cleanPasses >= 2 ? chainWords : rangeWords) : words;
+    const memoryTest = targetWords.some((w) => w.key === word.key);
+    const hesitated = sheet === "ai" && attempt?.hes.some((h) => h.key === word.key);
+    const state: WordState = mode === "ai" && memoryTest ? aiWordState(aiStatus) : (mode === "ai" && !memoryTest ? "correct" : saved.marks[word.key] ?? "pending");
+    const hint = peek === "all" || (mode === "self" && (peek === word.key || isOpeningWord(word, words, saved.settings.hideAmount)));
+    return <Button variant="ghost" key={word.key} className={`rc-word rc-${state} ${aiStatus === "wrong" || aiStatus === "skipped" ? `rc-ai-${aiStatus}` : ""} ${hesitated ? "rc-hesitated" : ""} ${hint ? "rc-peek" : ""} ${audioWord === word.key ? "rc-listening" : ""}`} onPointerUp={(e) => {
       const start = pointer.current;
       if (mode === "ai" && (aiStatus === "wrong" || aiStatus === "skipped") && start && start.id === e.pointerId && pageGesture(start, e.clientX, e.clientY, e.timeStamp) === "tap") { e.stopPropagation(); pointer.current = null; void playWord(word); return; }
       if (mode !== "self" || !revealed(state) || !start || start.id !== e.pointerId || pageGesture(start, e.clientX, e.clientY, e.timeStamp) !== "tap") return;
@@ -638,8 +668,8 @@ function Recite() {
 
   return <Portal><MushafThemeProvider theme={appTheme} mode={morningOrEvening} className={`recite-page rc-supplied rc-hide-${saved.settings.hideStyle} ${controls ? "rc-controls-visible" : ""} ${saved.settings.theme === "night" ? "rc-night" : ""}`} style={{ "--rc-size": `${saved.settings.size}px`, "--rc-strip-height": `${dimensions.strip}px`, "--rc-label-height": `${dimensions.labels}px`, "--m-font-quran": "var(--font-arabic)" } as CSSProperties}><main onPointerDownCapture={() => { touching.current = true; setTouchActivity((v) => v + 1); }} onPointerUpCapture={() => { touching.current = false; setTouchActivity((v) => v + 1); }} onPointerCancelCapture={() => { touching.current = false; setTouchActivity((v) => v + 1); }}>
     <header className="rc-header" aria-hidden={!controls} inert={!controls}><Button variant="ghost" size="icon" aria-label="Exit Hifz" onClick={() => { saveActiveSession(null); void navigate({ to: activeSession ? "/app/hifz" : "/app/more" }); }}><ChevronLeft /></Button><Button variant="ghost" className="rc-title" aria-label="Go to page" onClick={() => setSheet("navigation")}>{chapter?.name_simple ?? "Quran"} · {saved.page}</Button><Button variant="ghost" size="icon" aria-label="Page settings" onClick={() => setSheet("settings")}>Aa</Button></header>
-    {activeSession && !sessionEnded && <div className="hz-session-progress" aria-live="polite">Step {Math.min(itemIndex + 1, sessionTotal)} of {sessionTotal}{sessionItem ? ` · ${sessionItem.kind === "review" ? sessionItem.stage : sessionItem.kind}` : ""}</div>}
-    {sabaq && phaseInfo && !sessionEnded && <div className="hz-phase-bar" role="status">
+    {activeSession && !sessionEnded && <div className="rc-lesson-pill">{chapter?.name_simple} · {sessionItem?.kind === "review" ? "Review" : "Lesson"}{sabaq && <span className="rc-pass-dots" aria-label={`${cleanPasses} of 3 clean recitations`}>{[1, 2, 3].map((n) => <i key={n} className={cleanPasses >= n ? "is-filled" : ""} />)}</span>}</div>}
+    {mode === "self" && sabaq && phaseInfo && !sessionEnded && <div className="hz-phase-bar" role="status">
       <span>{phaseInfo.label}</span><small>{phaseInfo.hint}</small>
       {sabaqPhase === "listen" && <Button variant="ghost" size="sm" onClick={() => { stopAudio(); setSabaqPhase("read"); }}>Skip</Button>}
       {sabaqPhase === "read" && <Button variant="ghost" size="sm" onClick={() => {
@@ -706,11 +736,17 @@ function Recite() {
       {audioError && <p className="rc-audio-error" role="alert">{audioError}</p>}
       {fallbackMessage && <p className="rc-audio-error" role="status">{fallbackMessage}</p>}
       {sabaq && sabaqPhase === "listen" && !playing && <Button variant="outline" onClick={() => void playSabaqListen()}><Play size={15} /> Play the new lines 3×</Button>}
-      {recallMode && sessionItem?.kind === "review" && next && <Button variant="ghost" onClick={blankOut} style={{ fontSize: 12, opacity: .8 }}>I can't recall</Button>}
+      {mode === "self" && recallMode && sessionItem?.kind === "review" && next && <Button variant="ghost" onClick={blankOut} style={{ fontSize: 12, opacity: .8 }}>I can't recall</Button>}
       <div className="rc-strip-wrap" ref={stripElement} aria-hidden={controls} inert={controls || !page || pageQuery.isPending || (saved.settings.layout === "mushaf" && !font) || !!gradeAyah || !!sheet}>
-        <ReciteStrip stream={ai.stream} state={mode === "ai" && ai.phase === "listening" ? "listening" : status === "paused" ? "paused" : "idle"} label={mode === "ai" ? ai.phase === "listening" ? "Listening… · Tap to stop" : ai.phase === "loading" ? "Loading checker…" : ai.phase === "stopping" ? "Finishing check…" : "Tap to recite" : status === "paused" ? "Resume recitation" : "Tap to reveal"} time={`${Math.floor((saved.seconds[saved.page] ?? 0) / 60)}:${String((saved.seconds[saved.page] ?? 0) % 60).padStart(2, "0")}`} onTap={horizon} onLongPress={() => { if (status !== "paused" && mode === "self") { setStatus("active"); commitReveal(true); } }} />
+        <RecitationMic stream={ai.stream} busy={analyzing || ai.phase === "loading" || ai.phase === "stopping"} playing={playing} start={horizon} listen={() => { if (playing) stopAudio(); else if (sabaq) void playSabaqListen(); else void listen(); }} peek={() => { const target = sabaq ? (cleanPasses >= 2 ? chainWords : rangeWords) : words; setPeek("all"); setTimeout(() => setPeek(null), 1500); if (mode === "self" && target[0]) mark(target[0]); }} onSilence={(lastVoice) => {
+          const result = liveResult.current;
+          if (ai.phase !== "listening" || !result || Date.now() - lastVoice < 1500) return;
+          const target = sabaq ? (cleanPasses >= 2 ? chainWords : rangeWords) : words;
+          const last = target.at(-1)?.key;
+          const lastResult = result.words.at(-1);
+          if (last && lastResult && lastResult.status !== "pending" && lastResult.status !== "in_progress" && result.reachedIndex >= result.words.length - 1) void ai.stop();
+        }} />
       </div>
-      {mode === "ai" && (controls || ai.phase === "listening") && (!sabaq || sabaqPhase === "recite" || sabaqPhase === "chain") && !sheet && <Button className="rc-floating-mic" disabled={ai.phase === "loading" || ai.phase === "stopping" || !font} onClick={horizon}><Mic size={17} />{ai.phase === "listening" ? "Done" : "Tap to recite"}</Button>}
       {mode === "ai" && <div className="rc-ai-footer">
         {!sessionItem && aiRanges.length > 1 && <select aria-label="Passage to check" disabled={ai.phase === "listening" || ai.phase === "loading" || ai.phase === "stopping"} value={aiRangeIndex} onChange={(e) => setAiRangeIndex(Number(e.target.value))}>{aiRanges.map((r, i) => <option key={r.sura} value={i}>{chapters.find((c) => c.id === r.sura)?.name_simple} · {r.first}–{r.last}</option>)}</select>}
         <p>{AI_DISCLAIMER}</p>
@@ -721,7 +757,11 @@ function Recite() {
       <div onClick={(e) => e.stopPropagation()}>
         {sheet === "settings" && <ReciteSettings settings={saved.settings} change={(settings) => setSaved((s) => ({ ...s, settings: { ...s.settings, ...settings } }))} close={() => setSheet(null)} />}
         {sheet === "navigation" && <PageNavigation page={saved.page} chapter={first?.chapter} juz={first?.juz} chapters={chapters} go={changePage} close={() => setSheet(null)} />}
-        {sheet === "ai" && <section className="rc-sheet" role="dialog" aria-modal="true" aria-label="Recitation result"><Mic className="rc-sheet-icon" /><h2>Recitation checked</h2><p>{Object.values(aiWords?.statuses ?? {}).filter((s) => s === "wrong").length} wrong · {Object.values(aiWords?.statuses ?? {}).filter((s) => s === "skipped").length} skipped · {Object.values(aiWords?.statuses ?? {}).filter((s) => s === "unsure").length} unclear</p><p>{AI_DISCLAIMER}</p><Button className="rc-primary" onClick={() => { ai.reset(); setSheet(null); }}>Recite again</Button>{sessionItem?.kind === "link" && <Button variant="outline" onClick={advance}>I recited it right, continue</Button>}{sessionItem?.kind === "review" && <Button variant="outline" onClick={() => setSheet("sessionGrade")}>Continue to self check</Button>}<Button variant="ghost" onClick={() => setSheet(null)}>Review page</Button></section>}
+        {sheet === "ai" && attempt && <AiResultSheet attempt={attempt} passes={cleanPasses} lesson={!!sabaq} chapters={chapters} close={() => setSheet(null)} again={() => { setAttempt(null); setAiCorrection(null); ai.reset(); setSheet(null); if (sabaq) setSabaqPhase(cleanPasses >= 2 ? "chain" : "recite"); }} next={() => {
+          if (sabaq && cleanPasses < CLEAN_PASSES) { setAttempt(null); setAiCorrection(null); ai.reset(); setSheet(null); setSabaqPhase(cleanPasses >= 2 ? "chain" : "recite"); }
+          else if (activeSession) { playFeedback("pageComplete"); advance(); }
+          else { ai.reset(); setAttempt(null); setSheet(null); }
+        }} wordAudio={(key) => { const word = words.find((w) => w.key === key); if (word) void playWord(word); }} ayahAudio={(key) => void playAyah(key)} />}
         {gradeAyah && <section className="rc-sheet" role="dialog" aria-modal="true" aria-label="Ayah self check"><span className="rc-eyebrow">AYAH {gradeAyah}</span><h2>How did it go?</h2><div className="rc-grade-options">{(["Easy", "Okay", "Hard"] as const).map((g) => <Button variant="outline" key={g} onClick={() => grade(g)}>{g}</Button>)}</div><div className="rc-check-words" dir="rtl">{words.filter((w) => w.verse === gradeAyah).map((w) => <Button variant="ghost" className={`rc-arabic ${saved.marks[w.key] === "wrong" ? "rc-check-wrong" : ""}`} key={w.key} onClick={() => mark(w)} aria-label={`Mark ${w.key} as mistake`}>{w.text}</Button>)}</div></section>}
         {sheet === "marks" && <section className="rc-sheet rc-marks" role="dialog" aria-modal="true" aria-label="Review marks"><header><h2>Review marks</h2><Button variant="ghost" size="icon" aria-label="Close marks" onClick={() => setSheet(null)}><X /></Button></header>{!marks.length && <p>No marks on this page.</p>}{marks.map((w) => <div className="rc-mark-row" key={w.key}><Button variant="ghost" className="rc-arabic" onClick={() => void playWord(w)}>{w.text}<Play /></Button><small>{w.verse}</small><select aria-label={`State for ${w.key}`} value={saved.marks[w.key]} onChange={(e) => markState(w, e.target.value as WordState)}>{["wrong", "skipped", "unsure", "correct"].map((s) => <option key={s}>{s}</option>)}</select></div>)}</section>}
         {sheet === "complete" && <section className="rc-sheet rc-complete" role="dialog" aria-modal="true" aria-label="Page complete"><Check className="rc-sheet-icon" /><h2>Page complete</h2><p>{visible} words · {marks.length} marks · {Math.ceil((saved.seconds[saved.page] ?? 0) / 60)} min</p><Button className="rc-primary" onClick={() => setSheet("marks")}>Review marks</Button><Button variant="outline" disabled={saved.page === 604} onClick={() => changePage(saved.page + 1)}>Next page</Button></section>}
