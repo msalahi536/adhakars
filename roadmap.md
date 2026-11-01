@@ -1,5 +1,13 @@
 # Roadmap
 
+- [x] Add memory-only AI recording, timed replay and Correct/You mistake clips.
+- [x] Add retained-stream hands-free reviews, pause and final page summary.
+- [x] Add shared beta Echo mode in lesson listening and Quran reader, silence-only optional checking.
+- [x] Add lesson translations, source-selected tafsir and idle word meanings.
+- [x] Add engine-backed My weak spots with sequential AI drill practice.
+- [x] Add once-only milestone moments and explicitly shared image cards.
+- [x] Test central flows and capture all seven requested screenshots. Recorded lesson scored Solid 100; full-page review scored Good 83–88 and auto-turned 604→603 with one mic permission; Pause/Resume retained the mic without a summary. Tafsir, echo playback, weak-spot browsing, recorded review readback and share image verified. 36 tests pass. Actual-phone behavior and optional Echo recognition accuracy remain unverified.
+
 - [x] Replace Quran voice search with engine-managed confident/15-second sessions, live bars, repeated-phrase locations and uncertain guesses. Trimmed recorded Al-Ikhlas auto-stopped at confident 112:1; Open in mushaf reached page 604. Early mic stop showed the uncertain message; 9 focused tests passed. Repeated-location/Maybe rules passed unit tests; controlled browser fixtures did not load and are not claimed verified.
 - [x] Restore lesson-matching 48px surah-heading rows before all three surahs on follow page 604; screenshots confirm three visible Basmala lines on phone and desktop. Preview has no browser errors and latest build is OK; actual-phone mic behavior remains unverified.
 

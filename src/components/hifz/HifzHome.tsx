@@ -24,6 +24,8 @@ import {
 import { PlanSetup } from "./PlanSetup";
 import { selectedFinishEstimate } from "./automatic-pace";
 import { PracticeCards } from "./PracticeCards";
+import { MilestoneMoment, pendingMilestones } from "./MilestoneMoment";
+import type { Milestone } from "@/lib/hifz/insights";
 
 const STEP_META: Record<Step["type"], { label: string; Icon: LucideIcon }> = {
   manzil: { label: "Manzil – old review", Icon: BookOpen },
@@ -60,6 +62,8 @@ export function HifzHome({ state, update, reset }: { state: HifzState; update: (
   const [juzOpen, setJuzOpen] = useState<number | null>(null);
   const [reminders, setReminders] = useState<HifzReminderPrefs>(getHifzReminders);
   const [reminderError, setReminderError] = useState("");
+  const [celebrations, setCelebrations] = useState<Milestone[]>([]);
+  useEffect(() => { setCelebrations(pendingMilestones(state, q, names)); }, [state, q, chapters]);
 
   useEffect(() => {
     void rescheduleHifzReminders(state, q);
@@ -106,6 +110,7 @@ export function HifzHome({ state, update, reset }: { state: HifzState; update: (
 
   return (
     <main className="scroll-area hz-home">
+      {celebrations[0] && <MilestoneMoment moment={celebrations[0]} done={() => setCelebrations((items) => items.slice(1))} />}
       <div className="hz-home-content">
         <div className="hz-home-heading">
           <h1 className="app-page-title">Your<br />Memorization</h1>
@@ -190,6 +195,7 @@ export function HifzHome({ state, update, reset }: { state: HifzState; update: (
 
         {/* Actions */}
         <PracticeCards state={state} q={q} today={today} names={names} update={update}/>
+        <Button variant="ghost" className="hz-row-btn" onClick={() => void navigate({ to: "/app/hifz/weak-spots" })}><Target /><span>My weak spots<small>Words, ayah starts and similar ayat</small></span><ChevronRight /></Button>
         <Button variant="ghost" className="hz-row-btn" onClick={()=>void navigate({to:"/app/hifz/mushaf"})}><BookOpen/><span>My Mushaf<small>Your memory, page by page</small></span><ChevronRight/></Button>
         <Button variant="ghost" className="hz-row-btn" onClick={()=>void navigate({to:"/app/hifz/drills"})}><Target/><span>Voice quizzes<small>A few words, then recall</small></span><ChevronRight/></Button>
         <Button variant="ghost" className="hz-row-btn" onClick={()=>void navigate({to:"/app/hifz/lines"})}><Layers/><span>Where is it on the page?<small>Remember the ayah’s starting line</small></span><ChevronRight/></Button>

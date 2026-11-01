@@ -46,6 +46,8 @@ export async function startListening(opts: {
   onProgress?: (p: number) => void;
   onError?: (error: unknown) => void;
   stream?: MediaStream;
+  /** Caller owns the supplied stream across consecutive pages. Errors still stop it. */
+  keepStream?: boolean;
   passages?: { sura: number; first: number; last: number }[];
 }): Promise<ListenSession> {
   const passages = opts.passages ?? [opts];
@@ -124,7 +126,7 @@ export async function startListening(opts: {
       stopped ??= (async () => {
       node.disconnect();
       src.disconnect();
-      stream.getTracks().forEach((t) => t.stop());
+      if (!opts.keepStream) stream.getTracks().forEach((t) => t.stop());
       await queue;
       if (failure) throw failure;
       for (const e of await rec.flush()) {

@@ -47,6 +47,7 @@ import { Route as AppHifzLinesRouteImport } from './routes/app.hifz.lines'
 import { Route as AppHifzMushafRouteImport } from './routes/app.hifz.mushaf'
 import { Route as AppHifzReciteRouteImport } from './routes/app.hifz.recite'
 import { Route as AppHifzSleepRouteImport } from './routes/app.hifz.sleep'
+import { Route as AppHifzWeakSpotsRouteImport } from './routes/app.hifz.weak-spots'
 import { Route as AppMoreZakatRouteImport } from './routes/app.more_.zakat'
 
 const IndexRoute = IndexRouteImport.update({
@@ -239,6 +240,11 @@ const AppHifzSleepRoute = AppHifzSleepRouteImport.update({
   path: '/sleep',
   getParentRoute: () => AppHifzRoute,
 } as any)
+const AppHifzWeakSpotsRoute = AppHifzWeakSpotsRouteImport.update({
+  id: '/weak-spots',
+  path: '/weak-spots',
+  getParentRoute: () => AppHifzRoute,
+} as any)
 const AppMoreZakatRoute = AppMoreZakatRouteImport.update({
   id: '/more_/zakat',
   path: '/more/zakat',
@@ -284,6 +290,7 @@ export interface FileRoutesByFullPath {
   '/app/hifz/mushaf': typeof AppHifzMushafRoute
   '/app/hifz/recite': typeof AppHifzReciteRoute
   '/app/hifz/sleep': typeof AppHifzSleepRoute
+  '/app/hifz/weak-spots': typeof AppHifzWeakSpotsRoute
   '/app/more/zakat': typeof AppMoreZakatRoute
 }
 export interface FileRoutesByTo {
@@ -324,6 +331,7 @@ export interface FileRoutesByTo {
   '/app/hifz/mushaf': typeof AppHifzMushafRoute
   '/app/hifz/recite': typeof AppHifzReciteRoute
   '/app/hifz/sleep': typeof AppHifzSleepRoute
+  '/app/hifz/weak-spots': typeof AppHifzWeakSpotsRoute
   '/app/more/zakat': typeof AppMoreZakatRoute
 }
 export interface FileRoutesById {
@@ -366,6 +374,7 @@ export interface FileRoutesById {
   '/app/hifz/mushaf': typeof AppHifzMushafRoute
   '/app/hifz/recite': typeof AppHifzReciteRoute
   '/app/hifz/sleep': typeof AppHifzSleepRoute
+  '/app/hifz/weak-spots': typeof AppHifzWeakSpotsRoute
   '/app/more_/zakat': typeof AppMoreZakatRoute
 }
 export interface FileRouteTypes {
@@ -409,6 +418,7 @@ export interface FileRouteTypes {
     | '/app/hifz/mushaf'
     | '/app/hifz/recite'
     | '/app/hifz/sleep'
+    | '/app/hifz/weak-spots'
     | '/app/more/zakat'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -449,6 +459,7 @@ export interface FileRouteTypes {
     | '/app/hifz/mushaf'
     | '/app/hifz/recite'
     | '/app/hifz/sleep'
+    | '/app/hifz/weak-spots'
     | '/app/more/zakat'
   id:
     | '__root__'
@@ -490,6 +501,7 @@ export interface FileRouteTypes {
     | '/app/hifz/mushaf'
     | '/app/hifz/recite'
     | '/app/hifz/sleep'
+    | '/app/hifz/weak-spots'
     | '/app/more_/zakat'
   fileRoutesById: FileRoutesById
 }
@@ -774,6 +786,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppHifzSleepRouteImport
       parentRoute: typeof AppHifzRoute
     }
+    '/app/hifz/weak-spots': {
+      id: '/app/hifz/weak-spots'
+      path: '/weak-spots'
+      fullPath: '/app/hifz/weak-spots'
+      preLoaderRoute: typeof AppHifzWeakSpotsRouteImport
+      parentRoute: typeof AppHifzRoute
+    }
     '/app/more_/zakat': {
       id: '/app/more_/zakat'
       path: '/more/zakat'
@@ -790,6 +809,7 @@ interface AppHifzRouteChildren {
   AppHifzMushafRoute: typeof AppHifzMushafRoute
   AppHifzReciteRoute: typeof AppHifzReciteRoute
   AppHifzSleepRoute: typeof AppHifzSleepRoute
+  AppHifzWeakSpotsRoute: typeof AppHifzWeakSpotsRoute
 }
 
 const AppHifzRouteChildren: AppHifzRouteChildren = {
@@ -798,6 +818,7 @@ const AppHifzRouteChildren: AppHifzRouteChildren = {
   AppHifzMushafRoute: AppHifzMushafRoute,
   AppHifzReciteRoute: AppHifzReciteRoute,
   AppHifzSleepRoute: AppHifzSleepRoute,
+  AppHifzWeakSpotsRoute: AppHifzWeakSpotsRoute,
 }
 
 const AppHifzRouteWithChildren =
