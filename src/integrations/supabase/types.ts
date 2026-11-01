@@ -232,6 +232,27 @@ export type Database = {
         }
         Relationships: []
       }
+      widget_daily_assignments: {
+        Row: {
+          content: Json
+          date: string
+          updated_at: string
+          widget_type: string
+        }
+        Insert: {
+          content: Json
+          date: string
+          updated_at?: string
+          widget_type: string
+        }
+        Update: {
+          content?: Json
+          date?: string
+          updated_at?: string
+          widget_type?: string
+        }
+        Relationships: []
+      }
       widget_schedule: {
         Row: {
           current_content_id: string | null

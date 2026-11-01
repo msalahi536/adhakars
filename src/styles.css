@@ -35,6 +35,31 @@
 }
 
 /* ===== Dawn base — warm cream + olive accent, light cards ===== */
+.daily-editor {
+  --radius: 0.5rem;
+  --background: #f7f9f8;
+  --foreground: #172d27;
+  --card: #ffffff;
+  --card-foreground: #172d27;
+  --muted: #e9efec;
+  --muted-foreground: #586e65;
+  --primary: #206b56;
+  --primary-foreground: #ffffff;
+  --accent: #b18035;
+  --accent-foreground: #ffffff;
+  --secondary: #e9efec;
+  --secondary-foreground: #172d27;
+  --border: #d5e1da;
+  --input: #d5e1da;
+  --ring: #206b56;
+  --popover: #ffffff;
+  --popover-foreground: #172d27;
+  font-family: var(--font-sans);
+  letter-spacing: 0;
+}
+.daily-editor input { min-width: 0; font-size: 16px; }
+.daily-select { width: 100%; border: 1px solid var(--input); border-radius: 6px; background: var(--card); color: var(--foreground); padding: 8px 10px; font-size: 16px; }
+
 :root,
 [data-theme="dawn"] {
   --radius: 1.5rem;
