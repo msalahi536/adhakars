@@ -1,7 +1,7 @@
 # Roadmap
 
-- [ ] Fix Hifz measured layout/page-number clearance and inner padding; stationary overlays hide strip while controls show.
-- [ ] Move page/surah/juz navigation into title sheet; add Arabic/reversed drag swipes, adjacent preloading, boundary resistance and progress checks.
+- [x] Hifz measured layout: 22px page-number clearance and equal inner padding; stationary overlays hide strip while controls show, verified on phone.
+- [x] Title sheet page/surah/juz navigation; Arabic/reversed drag swipes, adjacent data/font caching, boundary resistance and saved reveal-state restoration verified; 26 targeted tests pass.
 
 - [x] Hifz frame scale 0.5, 12px margins and no gap to strip; shared QCF V2 sizing, opacity 0.14 and 48px cartouche verified at 393/501/1280px; font failure shows loading without fallback; 20 targeted tests pass.
 

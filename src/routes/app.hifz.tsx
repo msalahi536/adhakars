@@ -62,8 +62,7 @@ function Recite() {
   const transitionTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const stripElement = useRef<HTMLDivElement | null>(null);
   const labelsElement = useRef<HTMLDivElement | null>(null);
-  const navElement = useRef<HTMLDivElement | null>(null);
-  const [dimensions, setDimensions] = useState({ strip: 92, labels: 24, nav: 68 });
+  const [dimensions, setDimensions] = useState({ strip: 92, labels: 24 });
   const drag = useRef<{ axis: "pending" | "horizontal" | "vertical"; lastX: number; lastTime: number; velocity: number } | null>(null);
   const turning = useRef(false);
   const [dragging, setDragging] = useState(false);
@@ -95,9 +94,9 @@ function Recite() {
   }, []);
   useEffect(() => { if (hydrated) saveRecite(saved); }, [saved, hydrated]);
   useLayoutEffect(() => {
-    const measure = () => setDimensions({ strip: stripElement.current?.offsetHeight ?? 92, labels: labelsElement.current?.offsetHeight ?? 24, nav: navElement.current?.offsetHeight ?? 68 });
+    const measure = () => setDimensions({ strip: stripElement.current?.offsetHeight ?? 92, labels: labelsElement.current?.offsetHeight ?? 24 });
     const observer = new ResizeObserver(measure);
-    for (const el of [stripElement.current, labelsElement.current, navElement.current]) if (el) observer.observe(el);
+    for (const el of [stripElement.current, labelsElement.current]) if (el) observer.observe(el);
     measure();
     return () => observer.disconnect();
   }, []);
@@ -320,7 +319,7 @@ function Recite() {
         <ReciteStrip state={status === "paused" ? "paused" : "idle"} label={mode === "ai" ? "Tap to recite" : status === "paused" ? "Resume recitation" : "Tap to reveal"} time={`${Math.floor((saved.seconds[saved.page] ?? 0) / 60)}:${String((saved.seconds[saved.page] ?? 0) % 60).padStart(2, "0")}`} onTap={horizon} onLongPress={() => { if (status !== "paused" && mode === "self") { setStatus("active"); commitReveal(true); } }} />
       </div>
     </div>
-    <div className="rc-nav-wrap" ref={navElement} aria-hidden={!controls} inert={!controls}><BottomNav /></div>
+    <div className="rc-nav-wrap" aria-hidden={!controls} inert={!controls}><BottomNav /></div>
     {(sheet || gradeAyah) && <div className="rc-backdrop" onClick={() => { if (!gradeAyah) setSheet(null); }}>
       <div onClick={(e) => e.stopPropagation()}>
         {sheet === "settings" && <ReciteSettings settings={saved.settings} change={(settings) => setSaved((s) => ({ ...s, settings: { ...s.settings, ...settings } }))} close={() => setSheet(null)} />}

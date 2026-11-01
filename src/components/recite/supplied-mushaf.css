@@ -11,7 +11,7 @@
   --nav-bg: var(--m-paper); --nav-border: var(--rc-line);
   --nav-active: var(--m-mark); --nav-inactive: var(--m-ink);
 }
-.rc-supplied .rc-canvas { top: calc(env(safe-area-inset-top, 0px) + 48px); bottom: calc(env(safe-area-inset-bottom, 0px) + 30px + var(--rc-strip-height, 92px) + 22px); width: calc(100% - 24px); z-index: 1; touch-action: none; }
+.rc-supplied .rc-canvas { top: calc(env(safe-area-inset-top, 0px) + 48px); bottom: calc(env(safe-area-inset-bottom, 0px) + 30px + var(--rc-strip-height, 92px) + 22px); width: calc(100% - 24px); display: grid; grid-template-rows: var(--rc-label-height, 24px) minmax(0, 1fr); z-index: 1; touch-action: none; }
 .rc-supplied .rc-art-frame, .rc-supplied .rc-art-frame > div { pointer-events: auto; }
 .rc-supplied .rc-canvas img, .rc-supplied .rc-labels, .rc-supplied .rc-cartouche, .rc-supplied .rc-page-badge, .rc-supplied .rc-ayah-end { pointer-events: none; }
 .rc-supplied .rc-header { z-index: 5; background: color-mix(in oklab, var(--m-paper) 85%, transparent); transform: translateY(-8px); transition: opacity 280ms ease, transform 360ms cubic-bezier(.22, 1, .36, 1); }
@@ -62,6 +62,7 @@
 .rc-supplied .rc-loading { min-height: 0; height: 100%; }
 .rc-supplied .rc-reflow { overflow: visible; }
 .rc-supplied .rc-reflow .rc-art-frame > div { overflow-y: auto; }
+.rc-supplied .rc-setting input[type="number"] { width: 100%; min-height: 42px; padding: 8px 12px; border: 1px solid var(--rc-line); border-radius: 4px; background: var(--m-paper); color: var(--m-ink); }
 @media (prefers-reduced-motion: reduce) {
   .rc-supplied .rc-header, .rc-supplied .rc-nav-wrap, .rc-supplied .rc-strip-wrap { transition: none; }
   .rc-supplied .rc-page-select, .rc-supplied .rc-pause-tools { animation: none; }
