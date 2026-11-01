@@ -77,7 +77,7 @@ export function PlanSetup({ existing, done }: { existing?: HifzPlan; done: () =>
             <span key={label} className={`hz-step-dot ${i === step ? "is-on" : i < step ? "is-done" : ""}`} />
           ))}
         </div>
-        <p className="label-caps hz-step-label">{steps[step]}</p>
+        {step > 0 && <p className="label-caps hz-step-label">{steps[step]}</p>}
 
         {step === 0 && (
           <section className="hz-known-content">

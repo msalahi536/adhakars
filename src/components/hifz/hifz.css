@@ -13,7 +13,7 @@
 /* First setup step: reference-style frosted selection tray over app artwork. */
 .hz-known-step { padding-bottom: calc(var(--bottom-nav-height, 90px) + env(safe-area-inset-bottom) + 20px); color: var(--foreground); }
 .hz-known-step > div { padding: calc(env(safe-area-inset-top) + 22px) 16px 16px; }
-.hz-known-step .hz-step-label { color: var(--foreground); opacity: .8; margin: 12px 0 22px; }
+.hz-known-step .hz-steps { padding: 8px 0 0; margin-bottom: 12px; }
 .hz-known-content { position: relative; isolation: isolate; }
 .hz-known-heading { padding: 16px 12px; margin: 0 0 22px; border-radius: 24px; background: color-mix(in oklab, var(--surface-card, var(--card)) 52%, transparent); backdrop-filter: blur(14px) saturate(115%); border: 1px solid color-mix(in oklab, var(--surface) 58%, transparent); box-shadow: inset 0 1px 0 color-mix(in oklab, var(--surface) 60%, transparent); }
 .hz-known-content .hz-title { font-family: var(--font-display); font-size: 26px; line-height: 1.15; font-weight: 700; text-align: center; margin: 0 0 10px; color: var(--card-foreground); }
@@ -39,7 +39,7 @@
 .hz-fresh-check { flex: none; opacity: .5; }
 .hz-known-step .hz-nav { margin-top: 24px; justify-content: center; }
 .hz-known-step .hz-nav > span { display: none; }
-.hz-known-step .hz-primary { height: 50px; min-width: 132px; font-size: 18px; }
+.hz-known-step .hz-primary { height: 44px; min-width: 112px; font-size: 16px; }
 @media (prefers-reduced-motion: reduce) { .hz-known-step .hz-juz-tile { transition: none; } }
 
 .hz-juz-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 8px; margin-bottom: 12px; }
@@ -62,7 +62,7 @@
 
 .hz-wide { width: 100%; margin-top: 10px; border-radius: 14px; color: var(--foreground); }
 .hz-nav { display: flex; justify-content: space-between; align-items: center; margin-top: 18px; padding-bottom: calc(env(safe-area-inset-bottom) + 12px); }
-.hz-setup .hz-primary { border-radius: 20px; background: linear-gradient(165deg, color-mix(in oklab, var(--surface) 18%, transparent), transparent 48%), linear-gradient(135deg, var(--accent) 0%, color-mix(in oklab, var(--accent) 82%, var(--preset-ink-strong, var(--card-foreground))) 48%, var(--preset-ink-strong, var(--card-foreground)) 100%); color: var(--surface-deep-fg, var(--accent-foreground)); border: 1px solid color-mix(in oklab, var(--surface) 26%, var(--accent)); box-shadow: 0 7px 18px color-mix(in oklab, var(--accent) 22%, transparent), inset 0 2px 1px color-mix(in oklab, var(--surface) 28%, transparent), inset 0 -1px 1px color-mix(in oklab, var(--preset-ink-strong, var(--card-foreground)) 25%, transparent); font-weight: 600; padding: 0 26px; height: 50px; gap: 12px; transition: filter .2s ease, transform .2s ease; }
+.hz-setup .hz-primary { border-radius: 16px; background: linear-gradient(165deg, color-mix(in oklab, var(--surface) 18%, transparent), transparent 48%), linear-gradient(135deg, var(--accent) 0%, color-mix(in oklab, var(--accent) 82%, var(--preset-ink-strong, var(--card-foreground))) 48%, var(--preset-ink-strong, var(--card-foreground)) 100%); color: var(--surface-deep-fg, var(--accent-foreground)); border: 1px solid color-mix(in oklab, var(--surface) 26%, var(--accent)); box-shadow: 0 7px 18px color-mix(in oklab, var(--accent) 22%, transparent), inset 0 2px 1px color-mix(in oklab, var(--surface) 28%, transparent), inset 0 -1px 1px color-mix(in oklab, var(--preset-ink-strong, var(--card-foreground)) 25%, transparent); font-weight: 600; padding: 0 22px; height: 44px; gap: 10px; transition: filter .2s ease, transform .2s ease; }
 .hz-setup .hz-primary:hover { filter: brightness(1.06); }
 .hz-setup .hz-primary:active { transform: translateY(1px); filter: brightness(.96); }
 .hz-setup .hz-primary:disabled { background: var(--muted); color: var(--text-muted, var(--muted-foreground)); border-color: var(--border); box-shadow: none; opacity: .65; }
