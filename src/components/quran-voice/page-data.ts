@@ -13,7 +13,7 @@ function chapterCoordinates(chapter: number) {
   const task = (async () => {
     const verses: RawVerse[] = []; let cursor: number | null = 1;
     while (cursor) {
-      const response = await fetch(`${API}/verses/by_chapter/${chapter}?words=true&word_fields=text_uthmani,page_number,line_number&fields=juz_number&translations=20&language=en&per_page=300&page=${cursor}`);
+      const response = await fetch(`${API}/verses/by_chapter/${chapter}?words=true&word_fields=page_number,line_number&fields=juz_number&translations=20&language=en&per_page=300&page=${cursor}`);
       if (!response.ok) throw new Error("Page coordinates unavailable");
       const data = await response.json() as {verses:RawVerse[];pagination:{next_page:number|null}};
       verses.push(...data.verses);cursor=data.pagination.next_page;
