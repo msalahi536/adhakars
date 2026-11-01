@@ -151,6 +151,8 @@ function SelectionDialog({ type, date, library, onClose, onSaved }: { type: Dail
   const [pageInfo, setPageInfo] = useState({ page: 1, lastPage: 1, total: 0 });
   const [activeQuery, setActiveQuery] = useState("");
   const request = useRef(0);
+  const scrollArea = useRef<HTMLDivElement>(null);
+  const [expanded, setExpanded] = useState<string[]>([]);
   const [selected, setSelected] = useState<DailyContent | null>(null);
   const [dates, setDates] = useState([date]);
   const [rangeStart, setRangeStart] = useState(date); const [rangeEnd, setRangeEnd] = useState(date);
@@ -168,7 +170,7 @@ function SelectionDialog({ type, date, library, onClose, onSaved }: { type: Dail
   const lookup = useCallback(async (page: number, append: boolean, query: string) => {
     const id = ++request.current;
     setBusy(true); setError("");
-    if (!append) { setResults([]); setPageInfo({ page: 1, lastPage: 1, total: 0 }); }
+    if (!append) { setResults([]); setExpanded([]); scrollArea.current?.scrollTo({ top: 0 }); setPageInfo({ page: 1, lastPage: 1, total: 0 }); }
     try {
       let items: DailyContent[];
       let info: typeof pageInfo;
@@ -208,7 +210,7 @@ function SelectionDialog({ type, date, library, onClose, onSaved }: { type: Dail
   const shown = source === "lookup" ? results : library.filter((i) => i.category === (type === "sunnah" ? "sunnah_of_day" : "quran_verse") && `${i.translation} ${i.reference ?? ""} ${i.arabic_text}`.toLowerCase().includes(q.toLowerCase())).map((i) => ({ arabic_text: i.arabic_text, translation: i.translation, reference: i.reference ?? "" }));
   return <Dialog open onOpenChange={(open) => { if (!open && !busy) onClose(); }}><DialogContent className="daily-editor flex max-h-[92dvh] flex-col overflow-hidden rounded-lg bg-background text-foreground sm:max-w-2xl">
     <DialogHeader><DialogTitle className="font-display text-3xl">Choose {names[type].toLowerCase()}</DialogTitle><DialogDescription>{formatDate(date)}</DialogDescription></DialogHeader>
-    <div className="min-h-0 flex-1 space-y-5 overflow-y-auto pr-1">
+    <div ref={scrollArea} className="min-h-0 flex-1 space-y-5 overflow-y-auto pr-1">
       {!selected ? <>
         <div className="flex gap-2"><Button variant={source === "lookup" ? "default" : "outline"} onClick={() => { setSource("lookup"); setQ(""); }}>{type === "sunnah" ? "Hadith library" : "Browse Quran"}</Button><Button variant={source === "library" ? "default" : "outline"} onClick={() => { setSource("library"); setQ(""); }}>Saved selections</Button></div>
         <form onSubmit={(e) => { e.preventDefault(); if (source === "lookup") void lookup(1, false, q); }} className="space-y-3">
@@ -220,7 +222,13 @@ function SelectionDialog({ type, date, library, onClose, onSaved }: { type: Dail
         {source === "lookup" && shown.length > 0 && <p className="text-xs text-muted-foreground">{activeQuery ? "Search results" : type === "sunnah" ? "Hadiths" : "Verses"} · {shown.length} of {pageInfo.total}</p>}
         {busy && <p role="status" className="text-sm text-muted-foreground">Loading {type === "sunnah" ? "hadiths" : "verses"}…</p>}
         {!busy && !shown.length && !error && <p className="py-6 text-center text-sm text-muted-foreground">{source === "lookup" ? "No matches found. Try another topic or phrase." : "No saved selections found."}</p>}
-        <div className="space-y-3">{shown.map((item, i) => <article key={`${item.reference}-${i}`} className="rounded-lg border border-border bg-card p-4"><p className="text-xs font-medium text-primary">{item.reference}</p><p dir="rtl" className="my-3 font-arabic text-xl leading-loose">{item.arabic_text}</p><p className="whitespace-pre-line text-sm leading-relaxed">{item.translation}</p><Button variant="outline" className="mt-4 w-full" disabled={!item.reference} onClick={() => { setSelected(item); setError(""); }}><Check className="mr-2 h-4 w-4" />Select</Button></article>)}</div>
+        <div className="space-y-3">{shown.map((item, i) => {
+          const key = `${item.reference}-${i}`;
+          const compact = type === "sunnah" && !expanded.includes(key);
+          return <article key={key} className="rounded-lg border border-border bg-card p-4"><p className="text-xs font-medium text-primary">{item.reference}</p><p dir="rtl" className={`my-3 font-arabic text-xl leading-loose ${compact ? "line-clamp-3" : ""}`}>{item.arabic_text}</p><p className={`whitespace-pre-line text-sm leading-relaxed ${compact ? "line-clamp-4" : ""}`}>{item.translation}</p>
+            {type === "sunnah" && <Button variant="ghost" size="sm" className="mt-2" aria-expanded={!compact} onClick={() => setExpanded((previous) => compact ? [...previous, key] : previous.filter((value) => value !== key))}>{compact ? "Read full hadith" : "Show less"}</Button>}
+            <Button variant="outline" className="mt-3 w-full" disabled={!item.reference} onClick={() => { setSelected(item); setError(""); scrollArea.current?.scrollTo({ top: 0 }); }}><Check className="mr-2 h-4 w-4" />Select</Button></article>;
+        })}</div>
         {source === "lookup" && pageInfo.page < pageInfo.lastPage && <Button variant="outline" className="w-full" disabled={busy} onClick={() => void lookup(pageInfo.page + 1, true, activeQuery)}>{busy ? "Loading…" : type === "sunnah" ? "Load more hadiths" : "Load more verses"}</Button>}
       </> : <>
         <div className="flex items-center justify-between"><p className="text-sm font-medium text-primary">{selected.reference}</p><Button variant="ghost" size="icon" aria-label="Choose another" onClick={() => setSelected(null)}><X className="h-4 w-4" /></Button></div>
@@ -232,7 +240,7 @@ function SelectionDialog({ type, date, library, onClose, onSaved }: { type: Dail
           <p className="mt-1 text-xs text-muted-foreground">Existing selections on these dates will be replaced.</p>
         </div>
       </>}
-      {error && <div role="alert" className="space-y-2 text-sm text-destructive"><p>{error}</p>{!selected && source === "lookup" && <Button variant="outline" disabled={busy} onClick={() => void lookup(pageInfo.page, results.length > 0, activeQuery)}>Retry</Button>}</div>}
+      {error && <div role="alert" className="space-y-2 text-sm text-destructive"><p>{error}</p>{!selected && source === "lookup" && <Button variant="outline" disabled={busy} onClick={() => void lookup(results.length ? pageInfo.page + 1 : 1, results.length > 0, activeQuery)}>Retry</Button>}</div>}
     </div>
     {selected && <Button disabled={busy || !dates.length} onClick={async () => { setBusy(true); setError(""); try { await save({ data: { type, dates, content: selected } }); await onSaved(dates.length); } catch (e) { setError(e instanceof Error && e.message === "Please sign in again" ? "Your sign-in session was lost. Sign out and sign in again, then retry saving." : "Couldn't save. Please try again."); } finally { setBusy(false); } }}>{busy ? "Saving…" : `Save for ${dates.length} ${dates.length === 1 ? "day" : "days"}`}</Button>}
   </DialogContent></Dialog>;
