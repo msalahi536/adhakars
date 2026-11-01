@@ -49,10 +49,7 @@ export function PlanSetup({ existing, done }: { existing?: HifzPlan; done: () =>
   );
   const draft: HifzPlan = { ...plan, alreadyMemorized: known };
   const timelines = useMemo(() => compareTimelines(draft, q), [JSON.stringify(draft)]);
-  const summary = useMemo(
-    () => timelines.find((t) => t.lines === draft.newLinesPerDay) ?? timelines[2],
-    [timelines, draft.newLinesPerDay],
-  );
+  const summary = useMemo(() => buildTimeline(draft, q), [JSON.stringify(draft)]);
 
   const setOrder = (order: MemorizationOrder) => setPlan((p) => ({ ...p, order }));
   const toggleIn = (list: number[], value: number) =>

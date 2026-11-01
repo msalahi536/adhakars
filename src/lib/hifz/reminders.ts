@@ -123,7 +123,7 @@ export async function toggleHifzReminder(
   prefs[which].enabled = on;
   if (on) {
     const result = await requestNotificationPermission();
-    if (result !== "granted") {
+    if (!result.granted) {
       prefs[which].enabled = false;
       setHifzReminders(prefs);
       return { ok: false, error: "Notifications are not allowed. You can enable them in your device settings." };

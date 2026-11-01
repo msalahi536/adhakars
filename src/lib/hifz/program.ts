@@ -5,7 +5,8 @@
  */
 import { queryOptions } from "@tanstack/react-query";
 import { buildQuranIndex, juzPages, type HifzState, type QuranIndex, type Session, type WeakSpot } from "./index";
-import type { Grade, Performance } from "./engine";
+import type { Grade } from "./types";
+import type { Performance } from "./engine";
 import type { RecitePage, ReciteWord } from "@/lib/recite/model";
 
 const API = "https://api.quran.com/api/v4";
