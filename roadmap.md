@@ -1,5 +1,7 @@
 # Roadmap
 
+- [ ] Correct daily editor session cookie for embedded preview saving; verify iframe sign-in/save/read-back and preserve defaults.
+
 - [x] Build restricted daily Quran/Sunnah editor: secure server session, source lookup, yearly calendar and date/week/range assignments. Seven tests pass; mobile source searches, both saved selections/read-back, refresh session, restore rotation and sign-out verified. Test assignments removed. Native same-day cache/refresh behavior unchanged; publish required.
 
 - [x] Fix Hifz lesson flow: cancellable 3× qari/auto-Read/Skip, AI default and Self fallback, hidden/reached AI words, multi-surah correction/override/weak spots, resumed waveform and reachable action. 50 tests pass; actual recorded audio through browser mic verified live updates, stopped qari, Correct → override → Chain → saved sabaq. Skip, decline, denied mic, stationary page and fallback Session complete verified. Model flagged errors on qari recording, so accuracy/clean-pass end-to-end and actual iPhone microphone/haptics remain unverified; clean-pass rules covered by tests.

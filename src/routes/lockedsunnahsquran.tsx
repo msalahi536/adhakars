@@ -203,7 +203,7 @@ function SelectionDialog({ type, date, library, onClose, onSaved }: { type: Dail
       </>}
       {error && <p role="alert" className="text-sm text-destructive">{error}</p>}
     </div>
-    {selected && <Button disabled={busy || !dates.length} onClick={async () => { setBusy(true); setError(""); try { await save({ data: { type, dates, content: selected } }); await onSaved(dates.length); } catch { setError("Couldn't save. Please try again."); } finally { setBusy(false); } }}>{busy ? "Saving…" : `Save for ${dates.length} ${dates.length === 1 ? "day" : "days"}`}</Button>}
+    {selected && <Button disabled={busy || !dates.length} onClick={async () => { setBusy(true); setError(""); try { await save({ data: { type, dates, content: selected } }); await onSaved(dates.length); } catch (e) { setError(e instanceof Error && e.message === "Please sign in again" ? "Your sign-in session was lost. Sign out and sign in again, then retry saving." : "Couldn't save. Please try again."); } finally { setBusy(false); } }}>{busy ? "Saving…" : `Save for ${dates.length} ${dates.length === 1 ? "day" : "days"}`}</Button>}
   </DialogContent></Dialog>;
 }
 
