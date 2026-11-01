@@ -1,6 +1,6 @@
 # Architecture Decisions
 
-- Hifz pace and finish-date estimates use only the approved plan engine; chosen pace dates are uncapped and time-budget constraints appear separately as warnings with capped alternatives, preventing inverted pace comparisons.
+- Hifz setup caches automatic pace candidates per plan when time selection opens, ranks the approved engine's effective finish dates with smaller-pace tie breaks, and keeps custom overrides in a bottom sheet; estimates use no independent simulation.
 
 - Hifz known-surah and starting-order choices render one shared setup dialog with independent selections; pure tested surah-order helpers preserve tap order and handle reordering before saving to the engine, keeping review and learning goals separate.
 
