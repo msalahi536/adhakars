@@ -12,7 +12,7 @@ export const MadaniPage = memo(function MadaniPage({ page, font, chapters, ready
     const el = body.current; if (!el) return;
     const fit = () => {
       const lines = [...el.querySelectorAll<HTMLElement>(".qv-madani-line")];
-      let lo = 1, hi = el.clientWidth;
+      let lo = 1, hi = Math.min(el.clientWidth, (el.clientHeight - 16) / 15 * .82);
       const apply = (size: number) => el.style.setProperty("--qv-glyph-size", `${size}px`);
       for (let n = 0; n < 18; n++) {
         const mid = (lo + hi) / 2; apply(mid);
