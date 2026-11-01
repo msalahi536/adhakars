@@ -8,6 +8,7 @@ import { PrayerCalculationPopup } from "@/components/prayer/PrayerCalculationPop
 import { Portal } from "@/components/Portal";
 import { SALAH_PRAYERS, getSalahItems, isItemComplete, type SalahPrayer } from "@/data/salah";
 import { getCounts } from "@/lib/storage";
+import { clockChangeLabel, findClockChange } from "@/lib/clock-change";
 
 import {
   DEFAULT_PRAYER_SETTINGS,
@@ -414,6 +415,8 @@ function Salah() {
 
   // Countdown urgency: amber inside 30 minutes, red inside 10 minutes.
   const msLeft = next ? next.at.getTime() - now.getTime() : null;
+  // On daylight-saving nights the real time left differs from clock math by the shift.
+  const clockChange = useMemo(() => (next ? findClockChange(now, next.at) : null), [next, now]);
   const urgencyColor =
     msLeft === null || msLeft < 0
       ? null
@@ -445,6 +448,11 @@ function Salah() {
             ? formatCountdown(sampleSeconds * 1000)
             : next ? formatCountdown(next.at.getTime() - now.getTime()) : "--:--:--"}
         </div>
+        {settings.location && clockChange && (
+          <div className="salah-clock-change">
+            Clocks go {clockChange.shiftMinutes > 0 ? "back" : "forward"} {Math.abs(clockChange.shiftMinutes) === 60 ? "1 hour" : `${Math.abs(clockChange.shiftMinutes)} min`} at {clockChangeLabel(clockChange)} tonight
+          </div>
+        )}
         <button
           onClick={toggleDismissNext}
           disabled={!nextSalah}
