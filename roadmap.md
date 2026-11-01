@@ -1,5 +1,7 @@
 # Roadmap
 
+- [ ] Connect hidden on-device Hifz checker, download/progress/offline cache, mic waveform, word feedback, retry, settings and attribution; verify integration and device limitations.
+
 - [x] Aligned Home and Your plan realistic estimates and suppressed repeated date warnings; 11 tests pass and saved 45-minute phone flow shows July 2034 / 7 yr 8 mo consistently.
 
 - [x] Made reminder tracks/thumbs larger and clearly contrasted; added frosted Edit plan back arrow. Phone screenshots and return without saved-plan changes verified; native reminder activation remains device-only.
