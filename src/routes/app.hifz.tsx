@@ -83,7 +83,7 @@ function Recite() {
     fit();
     const observer = new ResizeObserver(fit); observer.observe(paper);
     return () => observer.disconnect();
-  }, [paperElement, font, page, saved.settings.size, saved.settings.layout]);
+  }, [paperElement, font, page, saved.settings.size, saved.settings.layout, saved.settings.tajweed]);
   useEffect(() => {
     let canceled = false;
     setFont(null);
@@ -206,7 +206,7 @@ function Recite() {
       {controls && <div className="rc-page-select"><Button variant="ghost" size="icon" aria-label="Previous page" disabled={saved.page === 1} onClick={() => changePage(saved.page - 1)}><ChevronLeft /></Button><label>Page <input type="number" aria-label="Mushaf page number" min="1" max="604" value={saved.page} onChange={(e) => changePage(Number(e.target.value))} /> / 604</label><Button variant="ghost" size="icon" aria-label="Next page" disabled={saved.page === 604} onClick={() => changePage(saved.page + 1)}><ChevronRight /></Button></div>}
       {controls && status === "paused" && !gradeAyah && !sheet && <div className="rc-pause-tools"><Button variant="ghost" onClick={() => setStatus("active")}><Play />Resume</Button><Button variant="ghost" onClick={() => { stopAudio(); update({ marks: restartPage(words, saved.marks), grades: Object.fromEntries(Object.entries(saved.grades).filter(([key]) => !page?.verses.some((v) => v.key === key))), seconds: { ...saved.seconds, [saved.page]: 0 } }); setStatus("ready"); }}><RotateCcw />Restart page</Button><Button variant="ghost" onClick={() => void listen()}>{playing ? <Pause /> : <Play />}Qari</Button><Button variant="ghost" onClick={() => setSheet("marks")}><Flag />Marks</Button></div>}
       {audioError && <p className="rc-audio-error" role="alert">{audioError}</p>}
-      <Button className="rc-horizon" disabled={!page || pageQuery.isPending || !!gradeAyah || !!sheet} onClick={horizon}
+      <Button className="rc-horizon" aria-label={mode === "ai" ? "Tap to recite" : status === "paused" ? "Resume recitation" : "Tap to reveal"} disabled={!page || pageQuery.isPending || !!gradeAyah || !!sheet} onClick={horizon}
         onPointerDown={() => { longUsed.current = false; if (active && mode === "self") longTimer.current = setTimeout(() => { longUsed.current = true; commitReveal(true); }, 650); }}
         onPointerUp={() => { if (longTimer.current) clearTimeout(longTimer.current); }} onPointerLeave={() => { if (longTimer.current) clearTimeout(longTimer.current); }} onPointerCancel={() => { if (longTimer.current) clearTimeout(longTimer.current); }}>
         <span className={`rc-horizon-bars ${playing ? "is-sounding" : ""}`} aria-hidden="true">{Array.from({ length: 39 }, (_, i) => <i key={i} style={{ "--bar-height": `${5 + Math.sin(i * 0.4) ** 2 * (22 - Math.abs(i - 19) * .85)}px`, "--bar-delay": `${i * 35}ms` } as CSSProperties} />)}</span><span>{mode === "ai" ? "Tap to recite" : status === "paused" ? "Paused" : "Tap to reveal"}</span><span className="rc-dock-progress">{Math.floor((saved.seconds[saved.page] ?? 0) / 60)}:{String((saved.seconds[saved.page] ?? 0) % 60).padStart(2, "0")}</span>
