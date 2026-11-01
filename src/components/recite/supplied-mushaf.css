@@ -120,3 +120,45 @@
 .rc-supplied .rc-ai-footer p { margin: 3px 0 0; font-size: 9px; line-height: 11px; }
 .rc-supplied .rc-ai-footer select { position: absolute; bottom: 106px; right: 0; max-width: 100%; color: var(--m-ink); background: var(--m-paper); font-size: 11px; border: 1px solid var(--rc-line); border-radius: 4px; }
 .rc-supplied .rc-ai-progress { width: 100%; height: 8px; accent-color: var(--m-mark); }
+
+/* The lesson controls float; the printed page keeps its original fixed bounds. */
+.rc-supplied .rc-mic-dock { position: absolute; bottom: calc(env(safe-area-inset-bottom, 0px) + 32px); left: 50%; transform: translateX(-50%); z-index: 7; }
+.rc-supplied .rc-mic-tools { display: grid; grid-template-columns: 44px 76px 44px; gap: 18px; align-items: center; height: 92px; }
+.rc-supplied .rc-round-mic { width: 76px; height: 76px; border-radius: 50%; background: var(--m-mark); color: var(--m-strip-text); box-shadow: var(--rc-shadow); border: 1px solid var(--m-gold); transform: scale(var(--rc-voice-scale, 1)); transition: transform 90ms linear, background 180ms ease; padding: 0; }
+.rc-supplied .rc-round-mic svg { width: 28px; height: 28px; stroke-width: 1.6; }
+.rc-supplied .rc-round-mic.is-listening { outline: 5px solid color-mix(in oklab, var(--m-mark) 15%, transparent); outline-offset: 5px; }
+.rc-supplied .rc-round-mic.is-listening svg { width: 22px; height: 22px; }
+.rc-supplied .rc-mic-side { width: 44px; height: 44px; border-radius: 50%; background: color-mix(in oklab, var(--m-paper) 92%, transparent); color: var(--m-ink); border: 1px solid var(--rc-line); box-shadow: var(--rc-shadow); backdrop-filter: blur(12px); }
+.rc-supplied .rc-mic-side svg { width: 20px; height: 20px; stroke-width: 1.6; }
+.rc-supplied .rc-mic-loading { animation: rc-mic-spin 1s linear infinite; }
+@keyframes rc-mic-spin { to { transform: rotate(360deg); } }
+.rc-supplied .rc-lesson-heading { position: absolute; top: calc(env(safe-area-inset-top, 0px) + 7px); left: 60px; right: 60px; z-index: 4; text-align: center; pointer-events: none; }
+.rc-supplied .rc-lesson-pill { display: inline-block; max-width: 100%; border-radius: 20px; border: 1px solid var(--rc-line); padding: 5px 12px; background: color-mix(in oklab, var(--m-paper) 90%, transparent); backdrop-filter: blur(12px); color: var(--m-ink); font-size: 11px; line-height: 1.4; }
+.rc-supplied .rc-pass-dots { height: 10px; display: flex; align-items: center; justify-content: center; gap: 5px; }
+.rc-supplied .rc-pass-dots span { width: 5px; height: 5px; border: 1px solid var(--m-mark); border-radius: 50%; background: var(--m-paper); transition: background 200ms ease; }
+.rc-supplied .rc-pass-dots span.is-filled { background: var(--m-mark); }
+.rc-supplied .rc-lesson-hint { margin: 0; font-size: 10px; line-height: 1.4; color: var(--rc-muted); opacity: 0; transition: opacity 400ms ease; }
+.rc-supplied .rc-lesson-hint.is-visible { opacity: 1; }
+.rc-supplied.rc-controls-visible .rc-lesson-heading { opacity: 0; }
+.rc-supplied .rc-loop-nav { bottom: calc(env(safe-area-inset-bottom, 0px) + 146px); }
+.rc-supplied .rc-loop-notice { position: absolute; bottom: calc(env(safe-area-inset-bottom, 0px) + 8px); margin: 0; left: 16px; right: 16px; z-index: 8; text-align: center; font-size: 10px; color: var(--rc-muted); }
+.rc-supplied .rc-loop-result { width: 100%; max-height: 52dvh; text-align: center; padding-top: 10px; }
+.rc-supplied .rc-result-handle { width: 32px; height: 3px; margin: 0 auto 14px; background: var(--rc-line); border-radius: 2px; }
+.rc-supplied .rc-result-check { display: block; width: 48px; height: 48px; margin: 0 auto 5px; stroke-width: 1.4; color: var(--m-mark); }
+.rc-supplied .rc-result-mistake { width: 30px; height: 30px; color: var(--rc-ai-error); }
+.rc-supplied .rc-loop-result h2 { margin: 0; font-size: 28px; }
+.rc-supplied .rc-loop-result p { margin: 5px 0 16px; }
+.rc-supplied .rc-result-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 16px; }
+.rc-supplied .rc-result-actions button { height: 44px; }
+.rc-supplied .rc-result-override { font-size: 11px; margin-top: 4px; color: var(--rc-muted); }
+.rc-supplied .rc-result-words { max-height: 18dvh; overflow-y: auto; margin-top: 14px; }
+.rc-supplied .rc-result-words > div { display: flex; align-items: center; gap: 12px; padding: 6px 0; border-bottom: 1px solid var(--rc-line); text-align: left; }
+.rc-supplied .rc-result-words .rc-arabic { font-size: 22px; flex: 1; }
+.rc-supplied .rc-result-words small { font-size: 11px; color: var(--rc-muted); }
+.rc-supplied .rc-ai-wrong .rc-word-ink { color: var(--rc-ai-error); }
+.rc-supplied .rc-ai-wrong::after { display: none; }
+.rc-supplied .rc-bismillah { min-height: 30px; overflow: hidden; }
+@media (prefers-reduced-motion: reduce) {
+  .rc-supplied .rc-round-mic, .rc-supplied .rc-lesson-hint { transition: none; }
+  .rc-supplied .rc-mic-loading { animation: none; }
+}
