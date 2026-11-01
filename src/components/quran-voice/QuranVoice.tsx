@@ -39,6 +39,8 @@ function FollowImam({mode,initialPage}: {mode:"follow"|"mushaf"; initialPage:num
   const [large, setLarge] = useState(false);
   const [tip, setTip] = useState(false);
   const [translation, setTranslation] = useState<VerseHit|null>(null);
+  const [previousTranslation, setPreviousTranslation] = useState<VerseHit|null>(null);
+  const translationRef = useRef<VerseHit|null>(null);
   const [verseError, setVerseError] = useState(false);
   const [locked, setLocked] = useState(true);
   const [ayah, setAyah] = useState<{sura:number;aya:number}|null>(null);
@@ -85,7 +87,8 @@ function FollowImam({mode,initialPage}: {mode:"follow"|"mushaf"; initialPage:num
         return (await r.json() as {verse:{page_number:number}}).verse.page_number;
       }),
     ]).then(([verse,target]) => {
-      if (!active) return; setTranslation(verse);
+      if (!active) return;
+      setPreviousTranslation(translationRef.current); translationRef.current=verse; setTranslation(verse);
       if (target !== loadedPage.current) {
         setPage(target);
         if (!matchMedia("(prefers-reduced-motion: reduce)").matches) root.current?.animate([{opacity:.4,transform:"translateX(16px)"},{opacity:1,transform:"translateX(0)"}],{duration:280,easing:"ease-out"});
@@ -111,7 +114,7 @@ function FollowImam({mode,initialPage}: {mode:"follow"|"mushaf"; initialPage:num
     <div className="qv-page-slot" ref={root}>
       {pageData.data && font && chapters.data ? <MadaniPage page={pageData.data} font={font} chapters={chapters.data} ready={renderHighlight} /> : <div className="qv-loading">{pageData.error || fontError ? <><p>Couldn’t load this mushaf page.</p><Button variant="outline" onClick={()=>{void pageData.refetch();setFontRetry((n)=>n+1);}}>Retry</Button></> : <><Loader2 className="animate-spin" /><span>Loading mushaf…</span></>}</div>}
     </div>
-    {english && <section className="qv-translation" aria-live="polite">{verseError ? <p className="qv-status">Translation unavailable. Checking the next ayah…</p> : translation ? <p key={translation.key}>{translation.translation}</p> : <p className="qv-status">{mode === "follow" ? "English · Sahih International" : pageData.data?.verses[0]?.translation}</p>}</section>}
+    {english && <section className="qv-translation" aria-live="polite">{verseError ? <p className="qv-status">Translation unavailable. Checking the next ayah…</p> : translation ? <><p key={`previous-${translation.key}`} className="qv-translation-previous" aria-hidden="true">{previousTranslation?.translation}</p><p key={translation.key}>{translation.translation}</p></> : <p className="qv-status">{mode === "follow" ? "English · Sahih International" : pageData.data?.verses[0]?.translation}</p>}</section>}
     <footer className="qv-dock"><div className="qv-follow-options"><label htmlFor="qv-english">English</label><Switch id="qv-english" checked={english} onCheckedChange={setEnglish}/>{english && <Button variant="ghost" size="icon" aria-label={large?"Smaller English text":"Larger English text"} aria-pressed={large} onClick={()=>setLarge(!large)}><Expand size={16}/></Button>}</div>
       {mode === "follow" && <Button className="qv-action" onClick={idle?start:()=>void voice.stop()} disabled={voice.phase === "finishing" || voice.phase === "loading"}>{idle?<AudioLines size={18}/>:<StopCircle size={18}/>} {idle?"Start following":voice.phase==="finishing"?"Stopping…":"Stop following"}</Button>}
       {!locked && voice.phase === "active" && <span className="qv-status">Listening for the next ayah</span>}

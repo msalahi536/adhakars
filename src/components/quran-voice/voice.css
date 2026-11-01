@@ -23,6 +23,8 @@
 .qv-follow-options { display:flex; align-items:center; gap:10px; font-size:12px; }
 .qv-translation { position:absolute; bottom:calc(110px + env(safe-area-inset-bottom,0px)); left:24px; right:24px; height:90px; overflow-y:auto; text-align:center; }
 .qv-translation p { font-size:15px; line-height:1.65; margin:0; animation:qv-crossfade 280ms ease both; }
+.qv-translation .qv-translation-previous { position:absolute; inset:0; animation:qv-fadeout 280ms ease both; pointer-events:none; }
+@keyframes qv-fadeout { from{opacity:1} to{opacity:0;visibility:hidden} }
 .qv-follow.is-large .qv-translation { height:145px; }
 .qv-follow.is-large .qv-translation p { font-size:21px; }
 @keyframes qv-crossfade { from{opacity:0;transform:translateY(3px)} to{opacity:1;transform:translateY(0)} }
