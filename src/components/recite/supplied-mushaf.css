@@ -8,6 +8,8 @@
   --background: var(--m-bg); --foreground: var(--m-ink); --card: var(--m-paper);
   --accent: var(--m-accent); --accent-foreground: var(--m-strip-text);
   --muted-foreground: var(--rc-muted); --border: var(--rc-line);
+  --nav-bg: var(--m-paper); --nav-border: var(--rc-line);
+  --nav-active: var(--m-mark); --nav-inactive: var(--m-ink);
 }
 .rc-supplied .rc-canvas { top: calc(env(safe-area-inset-top, 0px) + 48px); bottom: calc(env(safe-area-inset-bottom, 0px) + 148px); }
 .rc-supplied .rc-labels { display: flex; justify-content: space-between; align-items: center; padding: 0 12px 9px; flex: none; }
@@ -26,8 +28,9 @@
 .rc-supplied .rc-dock { bottom: calc(env(safe-area-inset-bottom, 0px) + 30px); padding: 0 18px; }
 .rc-supplied .rc-strip-wrap { width: 100%; }
 .rc-supplied .rc-nav-wrap { position: absolute; bottom: 0; width: 100%; z-index: 4; height: 0; }
-.rc-supplied.rc-controls-visible .rc-nav-wrap { height: calc(env(safe-area-inset-bottom, 0px) + 64px); }
+.rc-supplied.rc-controls-visible .rc-nav-wrap { height: calc(env(safe-area-inset-bottom, 0px) + var(--bottom-nav-row)); }
 .rc-supplied .bottom-nav { margin: 0; width: 100%; color: var(--m-ink); background: var(--m-paper); }
+.rc-supplied .bottom-nav-row { background: var(--m-paper) !important; border-color: var(--rc-line) !important; box-shadow: none; }
 .rc-supplied.rc-controls-visible .rc-dock { bottom: calc(env(safe-area-inset-bottom, 0px) + 76px); }
 .rc-supplied.rc-controls-visible .rc-canvas { bottom: calc(env(safe-area-inset-bottom, 0px) + 252px); }
 .rc-supplied .rc-loading { min-height: 0; height: 100%; }
