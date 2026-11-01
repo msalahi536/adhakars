@@ -11,8 +11,9 @@ import {positionPages} from "./practice-rules";
 export function LineQuiz({state,q}:{state:HifzState;q:QuranIndex}) {
  const today=todayISO();const navigate=useNavigate();const pages=drillPages(state,q,today,5);
  const queries=useQueries({queries:pages.map(recitePageOptions)});
+ const ready=queries.every((r)=>r.isSuccess);
  const loaded=queries.flatMap((r)=>r.data?[r.data]:[]);
- const quizzes=useMemo(()=>positionQuiz(positionPages(loaded),today,5),[today,queries.map((r)=>r.dataUpdatedAt).join(",")]);
+ const quizzes=useMemo(()=>ready?positionQuiz(positionPages(loaded),today,5):[],[today,ready]);
  const [index,setIndex]=useState(0);const [picked,setPicked]=useState<number|null>(null);const quiz=quizzes[index];
  const verse=loaded.find((p)=>p.page===quiz?.page)?.verses.find((v)=>v.key===quiz?.verse);
  return <main className="hp-page"><header className="hz-home-header"><HeaderBackButton onBack={()=>void navigate({to:"/app/hifz"})}/></header><div className="hp-content"><div className="hp-heading"><MapPin/><h1>Where is it on the page?</h1><p>{quiz?`Page ${quiz.page} · ${index+1} of ${quizzes.length}`:"A little spatial recall"}</p></div>
