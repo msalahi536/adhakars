@@ -1,6 +1,6 @@
 # Roadmap
 
-- [ ] Make reminder switches clearly visible and add a frosted back arrow that closes Edit plan without saving; verify both on a phone-sized screen.
+- [x] Made reminder tracks/thumbs larger and clearly contrasted; added frosted Edit plan back arrow. Phone screenshots and return without saved-plan changes verified; native reminder activation remains device-only.
 
 - [x] Matched action rows with larger dark text and soft circular icons; body-portaled Salah/Juz/reminder popups clear navigation, named surah choices replace page-only grids, Salah save and Start verified; 4 targeted tests and build pass.
 
