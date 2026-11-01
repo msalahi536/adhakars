@@ -4,6 +4,7 @@ import { useHifzBeta } from "@/lib/hifz-beta";
 import { loadState, saveState, type HifzState } from "@/lib/hifz";
 import { PlanSetup } from "@/components/hifz/PlanSetup";
 import { HifzHome } from "@/components/hifz/HifzHome";
+import { HeaderBackButton } from "@/components/HeaderBackButton";
 import "@/components/hifz/hifz.css";
 
 export const Route = createFileRoute("/app/hifz")({
@@ -33,10 +34,11 @@ function HifzEntry() {
   useEffect(() => { setState(loadState()); }, []);
   if (state === undefined) return null;
   const reload = () => setState(loadState());
-  if (!state) return <PlanSetup done={reload} />;
+  if (!state) return <><div className="hz-entry-back"><HeaderBackButton /></div><PlanSetup done={reload} /></>;
   return (
     <>
       <header className="page-header relative overflow-hidden" style={{ background: "var(--grad-header)", color: "var(--header-fg)" }}>
+        <HeaderBackButton />
         <div className="relative mx-auto max-w-md px-16 pb-6 pt-9 text-center">
           <div className="label-caps" style={{ color: "var(--header-sub)", opacity: 1 }}>Hifz</div>
           <h1 className="app-page-title mt-2">Your memorization</h1>
