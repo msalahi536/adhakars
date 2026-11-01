@@ -1,5 +1,7 @@
 # Roadmap
 
+- [ ] Strengthen shared privacy/terms for Hifz AI, local audio replay, external services, adult-only reports and non-waivable rights; verify all four legal pages and flag unverified reporting/license safeguards.
+
 - [x] Add memory-only AI recording, timed replay and Correct/You mistake clips.
 - [x] Add retained-stream hands-free reviews, pause and final page summary.
 - [x] Add shared beta Echo mode in lesson listening and Quran reader, silence-only optional checking.
