@@ -9,7 +9,7 @@ import { PopupHandle } from "./PopupHandle";
 import { pageRecitationLabel } from "./page-label";
 import {
   BookOpen, CalendarDays, ChevronRight, Flame, Layers, Link2, MoonStar, Play,
-  Settings2, Sparkles, Bell, ChartNoAxesColumnIncreasing, Check, Target, X, type LucideIcon,
+  Settings2, Sparkles, Bell, ChartNoAxesColumnIncreasing, Check, Target, type LucideIcon,
 } from "lucide-react";
 import {
   buildSession, buildTimeline, humanDuration, recordSalah, saveState, stats, todayISO,
