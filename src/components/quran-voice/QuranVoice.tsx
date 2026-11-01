@@ -9,11 +9,12 @@ import { MushafThemeProvider } from "@/components/mushaf/MushafPage";
 import { getPresetId, resolveVisualPhase } from "@/lib/theme-store";
 import { getVerseByKey, type VerseHit } from "@/lib/quran";
 import { loadPageFont, reciteChaptersOptions, recitePageOptions } from "@/lib/recite/data";
-import type { FollowPosition } from "@/lib/hifz-ai/follow";
+import type { FollowPosition, SearchAnswer } from "@/lib/hifz-ai";
 import { MadaniPage } from "./MadaniPage";
-import { distinctMatches, englishByDefault, paintPosition } from "./rules";
+import { englishByDefault, paintPosition, searchPresentation } from "./rules";
 import { useVoiceSession, type Match } from "./useVoiceSession";
 import { VoiceConsent } from "./VoiceConsent";
+import { VoiceBars } from "./VoiceBars";
 import "./voice.css";
 
 export function QuranVoice({mode, initialPage = 1}: {mode:"follow"|"search"|"mushaf"; initialPage?:number}) {
@@ -126,14 +127,15 @@ function FollowImam({mode,initialPage}: {mode:"follow"|"mushaf"; initialPage:num
 type Result = {match:Match;verse:VerseHit;page:number};
 function VoiceSearch({onOpen}:{onOpen:(page:number)=>void}) {
   const [results,setResults]=useState<Result[]|null>(null);
+  const [answer,setAnswer]=useState<SearchAnswer|null>(null);
   const [loading,setLoading]=useState(false);
   const [error,setError]=useState("");
   const requestId=useRef(0);
   useEffect(()=>()=>{requestId.current++;},[]);
   const chapters=useQuery(reciteChaptersOptions);
-  const receive=useCallback((matches:Match[])=>{
-    const id=++requestId.current; setLoading(true);setError("");
-    void Promise.all(distinctMatches(matches).map(async(match)=>{
+  const receive=useCallback((answer:SearchAnswer)=>{
+    const id=++requestId.current; setAnswer(answer);setLoading(true);setError("");
+    void Promise.all(searchPresentation(answer).matches.map(async(match)=>{
       const key=`${match.sura}:${match.aya}`;
       const [verse,response]=await Promise.all([getVerseByKey(key),fetch(`https://api.quran.com/api/v4/verses/by_key/${key}?fields=page_number`)]);
       if(!response.ok) throw new Error("Could not load ayah");
@@ -143,14 +145,27 @@ function VoiceSearch({onOpen}:{onOpen:(page:number)=>void}) {
   },[]);
   const voice=useVoiceSession("search",()=>undefined,receive);
   const active=voice.phase==="active";
-  const start=()=>{requestId.current++;setResults(null);setError("");setLoading(false);void voice.request();};
+  const start=()=>{requestId.current++;setAnswer(null);setResults(null);setError("");setLoading(false);void voice.request();};
+  const samePhrase=answer ? searchPresentation(answer).samePhrase : [];
+  const name=(sura:number)=>chapters.data?.find((c)=>c.id===sura)?.name_simple ?? `Surah ${sura}`;
+  const openOccurrence=async(sura:number,aya:number)=>{
+    const id=requestId.current;
+    try {
+      const response=await fetch(`https://api.quran.com/api/v4/verses/by_key/${sura}:${aya}?fields=page_number`);
+      if(!response.ok) throw new Error("Could not load ayah");
+      const {verse}=await response.json() as {verse:{page_number:number}};
+      if(id===requestId.current)onOpen(verse.page_number);
+    } catch {if(id===requestId.current)setError("Couldn’t load the ayah. Check your connection and try again.");}
+  };
   return <main><header className="qv-header"><Back/><h1>Find an ayah</h1><span className="w-9"/></header>
     <div className="qv-search-content"><div className="qv-search-title"><AudioLines className="qv-voice-emblem"/><h1>Find an ayah</h1><p>Recite a few words</p></div>
-      {(active || voice.phase==="finishing" || loading) && <p className="qv-status" role="status">{active?`Listening · ${voice.remaining}s`:"Finding your ayah…"}</p>}
+      {active && <VoiceBars stream={voice.stream}/>}
+      {(active || voice.phase==="finishing" || loading) && <p className="qv-status" role="status">{active?"Keep reciting…":"Finding your ayah…"}</p>}
       {error && <p role="alert">{error}</p>}
-      {results?.length===0 && <p className="qv-status">Couldn’t find that, try reciting a little more.</p>}
-      {results?.map((result,i)=><div key={result.verse.key}>{i===1 && <h2 className="qv-also">Also similar</h2>}<article className="qv-match"><h2>{chapters.data?.find((c)=>c.id===result.match.sura)?.name_simple ?? `Surah ${result.match.sura}`} · ayah {result.match.aya}</h2><p className="qv-match-arabic" lang="ar" dir="rtl">{result.verse.text}</p><p className="qv-match-english">{result.verse.translation}</p><Button variant={i===0?"default":"outline"} onClick={()=>onOpen(result.page)}>Open in mushaf</Button></article></div>)}
-    </div><footer className="qv-dock"><Button className="qv-action" disabled={voice.phase==="finishing"||loading} onClick={active?()=>void voice.stop():start}>{active?<StopCircle size={18}/>:<Mic size={18}/>} {active?"Stop recording":voice.phase==="finishing"?"Finding…":"Recite a few words"}</Button></footer>
+      {answer && !answer.confident && <><p className="qv-status" role="status">Not sure yet. Recite a little more</p>{!!results?.length && <h2 className="qv-also">Maybe</h2>}</>}
+      {results?.map((result)=><article key={result.verse.key} className={`qv-match ${answer?.confident ? "":"qv-guess"}`}><h2>{name(result.match.sura)} · ayah {result.match.aya}</h2><p className="qv-match-arabic" lang="ar" dir="rtl">{result.verse.text}</p><p className="qv-match-english">{result.verse.translation}</p><Button variant={answer?.confident?"default":"outline"} onClick={()=>onOpen(result.page)}>Open in mushaf</Button></article>)}
+      {answer?.confident && samePhrase.length>0 && <details className="qv-occurrences"><summary>These words also appear in {samePhrase.length} other places</summary>{samePhrase.map((m)=><Button key={`${m.sura}:${m.aya}`} variant="ghost" onClick={()=>void openOccurrence(m.sura,m.aya)}>{name(m.sura)} · ayah {m.aya}<span aria-hidden="true">→</span></Button>)}</details>}
+    </div><footer className="qv-dock"><Button className="qv-action" disabled={voice.phase==="finishing"||voice.phase==="loading"||loading} onClick={active?()=>void voice.stop():start}>{active?<StopCircle size={18}/>:<Mic size={18}/>} {active?"Stop listening":voice.phase==="finishing"?"Finding…":"Recite a few words"}</Button></footer>
     <VoiceConsent {...voice} begin={()=>void voice.begin()}/>
   </main>;
 }

@@ -16,7 +16,7 @@
 .qv-ayah-marker { display:inline-flex !important; align-items:center; justify-content:center; font-family:var(--font-arabic); }
 .qv-cartouche { display:grid; grid-template-columns:minmax(0,1fr); align-items:center; min-height:0; min-width:0; font-family:var(--font-arabic); }
 .qv-cartouche > div { max-height:100%; }
-.qv-bismillah { font-family:var(--font-arabic); font-size:18px; display:grid; place-items:center; }
+.qv-bismillah { font-family:var(--font-arabic); font-size:19px; line-height:1.5; display:grid; place-items:center; min-height:0; color:var(--m-ink); }
 .qv-page-number { position:absolute; bottom:-12px; left:50%; transform:translateX(-50%); pointer-events:none; }
 .qv-dock { position:absolute; bottom:calc(18px + env(safe-area-inset-bottom,0px)); left:18px; right:18px; display:flex; flex-direction:column; align-items:center; gap:10px; }
 .qv-action { min-width:180px; min-height:44px; border-radius:8px; gap:8px; }
@@ -47,6 +47,15 @@
 .qv-match-english { font-size:14px; line-height:1.7; }
 .qv-match button { width:100%; margin-top:14px; }
 .qv-also { margin:24px 0 0; font-size:14px; font-weight:600; }
+.qv-match.qv-guess { padding:14px 16px; background:transparent; }
+.qv-guess h2 { font-size:16px; margin-bottom:8px; }
+.qv-guess .qv-match-arabic { font-size:20px; margin:8px 0; }
+.qv-guess .qv-match-english { font-size:12px; }
+.qv-occurrences { margin:16px 0; font-size:13px; }
+.qv-occurrences summary { cursor:pointer; line-height:1.6; }
+.qv-occurrences button { display:flex; width:100%; justify-content:space-between; margin-top:6px; }
+.qv-live-bars { display:flex; align-items:center; justify-content:center; gap:5px; height:42px; margin:14px auto; }
+.qv-live-bars span { width:5px; height:38px; border-radius:5px; background:var(--m-mark); transform:scaleY(var(--qv-level,.12)); }
 .qv-entry-actions { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
 .qv-entry-actions button { justify-content:flex-start; gap:8px; height:42px; border-radius:8px; font-size:12px; }
 @media(min-width:700px) { .qv-page-slot { max-width:620px; margin:auto; } .qv-translation { max-width:620px; margin:auto; } }

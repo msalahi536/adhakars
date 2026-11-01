@@ -27,7 +27,7 @@ export const MadaniPage = memo(function MadaniPage({ page, font, chapters, ready
   const first = page.verses[0];
   return <div className="qv-madani-page">
     <div className="qv-page-labels"><MushafLabel text={`الجزء ${toArabicDigits(first?.juz ?? 1)}`} height={24} /><MushafLabel text={`سُورَةُ ${chapters.find((c) => c.id === first?.chapter)?.name_arabic ?? ""}`} height={24} /></div>
-    <MushafFrame scale={.5} className="qv-frame"><div ref={body} className="qv-madani-body" style={{fontFamily:font}}>
+    <MushafFrame scale={.5} className="qv-frame"><div ref={body} className="qv-madani-body" style={{fontFamily:font, gridTemplateRows:Array.from({length:15},(_,i)=>page.verses.some((v)=>v.number===1 && v.words[0]?.line===i+3)?"48px":"minmax(0,1fr)").join(" ")}}>
       {Array.from({length:15}, (_, i) => {
         const line = i + 1;
         const start = page.verses.find((v) => v.number === 1 && v.words[0]?.line === line + 2);

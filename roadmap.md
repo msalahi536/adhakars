@@ -1,5 +1,8 @@
 # Roadmap
 
+- [x] Replace Quran voice search with engine-managed confident/15-second sessions, live bars, repeated-phrase locations and uncertain guesses. Trimmed recorded Al-Ikhlas auto-stopped at confident 112:1; Open in mushaf reached page 604. Early mic stop showed the uncertain message; 9 focused tests passed. Repeated-location/Maybe rules passed unit tests; controlled browser fixtures did not load and are not claimed verified.
+- [x] Restore lesson-matching 48px surah-heading rows before all three surahs on follow page 604; screenshots confirm three visible Basmala lines on phone and desktop. Preview has no browser errors and latest build is OK; actual-phone mic behavior remains unverified.
+
 - [x] Add My Mushaf memory map and slipping review nudges; checked 604 buttons/30 juz rows and page 312 Review now opens manzil session.
 - [x] Add optional Salah portions with source surah/ranges and saved engine light reviews; browser readback confirmed salah history.
 - [x] Add prayer-time-gated sleep preview and unrecorded morning recall; real audio played three times, saved next-day passage, after-Fajr recall left Hifz state byte-identical. Recorded input scored Solid 99/100 and Good 80 on a later run with dropped opening words; accuracy/phone haptics remain unverified.
