@@ -1,6 +1,6 @@
 # Roadmap
 
-- [ ] Match the Hifz back button’s frosted finish to Settings.
+- [x] Match the Hifz back button’s frosted finish to Settings; phone visuals and back navigation verified.
 
 - [x] Give the surah popup a calm, light theme-matched background; phone visual check passed.
 - [x] Add the shared left-side back button to Hifz setup and home; return to More verified.
