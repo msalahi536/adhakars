@@ -62,7 +62,34 @@ export class Follower {
     return this.position();
   }
 
+  static BACK_Q = 8; // recent letters used to spot a reciter going back to repeat
+  static BACK_RANGE = 160; // how far back to look (a few ayat)
+
+  /** Did the reciter go back to repeat? Jump back if the stretch just behind clearly fits better. */
+  private wentBack(nNew: number): boolean {
+    const S = this.ix.S;
+    const r = this.buf.slice(-Follower.BACK_Q);
+    if (r.length < Follower.BACK_Q) return false;
+    const pos = this.pos as number;
+    const loC = Math.max(0, pos - r.length - 2);
+    const hiC = Math.min(S.length, pos + nNew * 3 + 12);
+    const [costC] = fit(r, S.slice(loC, hiC), true);
+    const loB = Math.max(0, pos - Follower.BACK_RANGE);
+    const hiB = pos - 4;
+    if (hiB - loB < r.length) return false;
+    const [costB, , bB] = fit(r, S.slice(loB, hiB)); // ties: the latest spot (closest to where he was)
+    if (costB + 2 <= costC && costB / r.length <= 0.25) {
+      this.pos = loB + bB;
+      this.lost = 0;
+      this.conf = 1 - costB / r.length;
+      if (!this.inFatiha(this.pos)) this.resume = this.pos;
+      return true;
+    }
+    return false;
+  }
+
   private track(nNew: number) {
+    if (this.wentBack(nNew)) return;
     const S = this.ix.S;
     const pos = this.pos as number;
     const q = this.buf.slice(-Follower.LOCAL_Q);
