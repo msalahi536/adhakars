@@ -9,7 +9,7 @@
  * (Al-Fatiha each rakah, then back to where he left off, or on to a new surah).
  * Repeated phrases resolve toward where he just was. Never highlights ahead of the reciter.
  */
-import { fit, loadQuranIndex, skel, type Hit, type QuranIndex } from "./quran-index";
+import { fit, judgeSearch, loadQuranIndex, skel, type Hit, type QuranIndex, type SearchAnswer } from "./quran-index";
 import { getRecognizer } from "./listen";
 import { openMic } from "./mic";
 
@@ -167,6 +167,62 @@ export async function startFollowing(opts: {
       stopped = true;
       await queue;
       await mic.close();
+    },
+  };
+}
+
+/**
+ * Voice search, Shazam-style: listens and answers as soon as it is sure (usually 2-4 s of recitation),
+ * then stops the mic by itself. Gives up after `maxSeconds` with its best guess (confident = false).
+ *
+ *   const s = await startVoiceSearch({ onAnswer: (a) => show(a), onListening: (heard) => ... })
+ *   s.stop() // optional: stop early (answers with the best guess so far)
+ */
+export async function startVoiceSearch(opts: {
+  onAnswer: (a: SearchAnswer) => void;
+  onError?: (e: unknown) => void;
+  onProgress?: (p: number) => void;
+  maxSeconds?: number;
+}): Promise<{ stream: MediaStream; stop(): Promise<void> }> {
+  const [rec, ix] = await Promise.all([getRecognizer(undefined, opts.onProgress), loadQuranIndex()]);
+  rec.restart();
+  let heard = "";
+  let queue = Promise.resolve();
+  let done = false;
+  let sure = 0;
+  let mic: Awaited<ReturnType<typeof openMic>>;
+  const finish = async (a: SearchAnswer) => {
+    if (done) return;
+    done = true;
+    await mic.close();
+    opts.onAnswer(a);
+  };
+  const timer = setTimeout(() => void queue.then(() => finish(judgeSearch(ix, heard))), (opts.maxSeconds ?? 15) * 1000);
+  mic = await openMic((samples) => {
+    if (done) return;
+    queue = queue
+      .then(async () => {
+        const em = await rec.accept(samples);
+        if (!em.length || done) return;
+        heard += em.map((e) => e.token).join("");
+        const a = judgeSearch(ix, heard);
+        sure = a.confident ? sure + 1 : 0;
+        if (sure >= 2) { clearTimeout(timer); await finish(a); } // sure twice in a row
+      })
+      .catch((e) => {
+        clearTimeout(timer);
+        done = true;
+        void mic.close();
+        opts.onError?.(e);
+      });
+  });
+  return {
+    stream: mic.stream,
+    async stop() {
+      clearTimeout(timer);
+      await queue;
+      for (const e of await rec.flush()) heard += e.token;
+      await finish(judgeSearch(ix, heard));
     },
   };
 }

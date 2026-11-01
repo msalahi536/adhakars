@@ -162,8 +162,40 @@ export function loadQuranIndex(url = "/hifz-ai/quran-index.json"): Promise<Quran
   return shared;
 }
 
-/** Voice search: where in the Quran is this recitation? Returns up to `top` places, best first. */
-export async function findInQuran(phonemes: string, top = 3): Promise<{ sura: number; aya: number; word: number; score: number }[]> {
-  const ix = await loadQuranIndex();
-  return ix.search(skel(phonemes).slice(-40), top).filter((h) => h.score >= 0.6).map((h) => ({ ...ix.where(h.start), score: h.score }));
+export interface SearchAnswer {
+  confident: boolean; // true = clear answer; false = keep listening (or "recite a little more")
+  matches: { sura: number; aya: number; word: number; score: number }[]; // best first
+  samePhrase: { sura: number; aya: number; word: number }[]; // other places with exactly the same words
+}
+
+/**
+ * Voice search: where in the Quran is this recitation? Only confident with enough sounds (about 3+ words)
+ * and a clear lead over the next different place. Two words alone match too many ayat.
+ */
+export function judgeSearch(ix: QuranIndex, phonemes: string, top = 3): SearchAnswer {
+  const q = Array.from(skel(phonemes)).slice(0, 48);
+  const hits = q.length >= 5 ? ix.search(q, Math.max(top, 8)) : [];
+  // a match can begin on the previous ayah's last letter when it equals the first one heard: skip it
+  // (or on a letter shared by two words, which the index stores once under the earlier word): report the next word
+  const begin = (h: Hit) => {
+    const p = h.start;
+    if (p + 1 >= ix.S.length) return p;
+    if (ix.S[p] !== q[0] && ix.S[p + 1] === q[0]) return p + 1;
+    const lastOfWord = ix.wordOf[p] !== ix.wordOf[p + 1];
+    return lastOfWord && ix.S[p] === q[0] ? p + 1 : p;
+  };
+  const text = (h: Hit) => ix.S.slice(h.start, h.end).join("");
+  const good = hits.filter((h) => h.score >= 0.6);
+  const [a] = good;
+  const twins = a ? good.filter((h) => h !== a && text(h) === text(a)) : [];
+  const b = good.find((h) => h !== a && text(h) !== text(a));
+  const matches = [a, ...good.filter((h) => h !== a && !twins.includes(h))].filter(Boolean).slice(0, top).map((h) => ({ ...ix.where(begin(h)), score: h.score }));
+  // the same words exist in several places: keep listening, the next words usually tell them apart
+  const unique = twins.length === 0 || q.length >= 30;
+  const confident = !!a && q.length >= 8 && a.score >= 0.7 && unique && (!b || a.score - b.score >= 0.12);
+  return { confident, matches, samePhrase: twins.map((h) => ix.where(begin(h))) };
+}
+
+export async function findInQuran(phonemes: string, top = 3): Promise<SearchAnswer> {
+  return judgeSearch(await loadQuranIndex(), phonemes, top);
 }
