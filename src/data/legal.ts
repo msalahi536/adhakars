@@ -1,66 +1,62 @@
 export type LegalSection = { heading: string; body: string };
 
-export const LEGAL_UPDATED = "Last updated: September 2026";
+export const LEGAL_UPDATED = "Last updated: November 1, 2026";
 
 export const PRIVACY_INTRO =
-  "Sahih Al-Adhkar is built so that your worship, your health information, and your habits stay yours. We do not collect, transmit, sell, or store your personal data. There are no analytics, no advertising, no data brokers, and no tracking of any kind.";
+  "Sahih Al-Adhkar is designed to keep worship progress and sensitive health entries on your device. Some features contact external services, and information you choose to submit may be processed online. This notice explains those distinctions; it does not promise that every network request is anonymous.";
 
 export const PRIVACY_SECTIONS: LegalSection[] = [
   {
-    heading: "OUR CORE PROMISE",
-    body: "Everything you enter into this app is stored only in your device's local storage. We operate no user accounts, no user profiles, and no personal database. We cannot read your data, we cannot recover it, and we have nothing to hand over to advertisers, data brokers, insurers, employers, or any third party.",
+    heading: "WHO IS RESPONSIBLE",
+    body: "This notice covers the Sahih Al-Adhkar app and sahihaladhkar.com, operated by Mohammad Salahi. For privacy questions, requests or concerns, contact msalahi536@gmail.com. External websites, app stores and service providers have their own policies.",
   },
   {
-    heading: "WHAT IS STORED ON YOUR DEVICE",
-    body: "Your dhikr counts, streaks, lifetime totals, saved duas, tasbih sessions, prayer settings, fasting logs, Ruqyah and Hajj progress, reminder times, theme and display preferences, and any Period Companion entries are saved locally on your device. This information never leaves your device and is never sent to us or to anyone else.",
+    heading: "WORSHIP PROGRESS AND DEVICE STORAGE",
+    body: "Dhikr counts, streaks, saved duas, tasbih sessions, prayer settings, fasting logs, Ruqyah and Hajj progress, reminders, appearance preferences and Hifz progress are ordinarily stored on your device. Personal appearance photos are stored on the device and are not sent for remote photo analysis. We do not automatically upload this local progress. Device or browser backups, shared devices, explicit exports and operating-system services are outside that promise. Local storage is not a substitute for device security or a guaranteed backup.",
   },
   {
     heading: "PERIOD AND MENSTRUAL HEALTH DATA",
-    body: "The Period Companion is designed as a private, on-device tool. The dates you log, your cycle history, predictions, and any related notes are stored only in your device's local storage. This health information is never uploaded to a server, never synced to a cloud account, never backed up by us, never shared with third parties, and never used for advertising, profiling, research, or any commercial purpose. No one but you, and anyone with physical access to your unlocked device, can see it. If your device is shared, please protect it with a passcode.",
+    body: "Period Companion dates, cycle history, predictions and notes are stored locally. The app does not intentionally upload these entries or use them for advertising, profiling or model training. Someone with access to your unlocked device or its backups may see them. Protect your device with a passcode and consider operating-system backup settings. Predictions and devotional guidance are estimates, not medical advice, contraception, fertility guidance or a diagnosis.",
   },
   {
-    heading: "HEALTH AND MEDICAL INFORMATION DISCLAIMER",
-    body: "Cycle lengths, period predictions, purity and prayer-resumption guidance, and fasting information are provided for devotional planning and general education only. They are estimates based on the dates you enter. This app is not a medical device, not a diagnostic tool, and not a contraceptive or fertility method. It must not be used to prevent or achieve pregnancy or to diagnose or treat any condition. Always consult a qualified healthcare professional about your health.",
+    heading: "MICROPHONE AND RECITATION",
+    body: "Hifz checking, Follow the imam and voice ayah search process microphone audio on your device. They require microphone permission; you may refuse it or revoke it in device settings. Model and answer-key downloads require an internet connection but do not require sending your recitation to a recognition service. During an AI attempt, the app may make a temporary recording in memory for Replay and word clips. It is discarded when its result is dismissed, replaced or the feature is closed. Explicit debug exports save a recording and diagnostic details to a file you choose to keep or share; they are not automatically sent to us. Voice recordings can reveal your identity or background conversations, so record only yourself in a suitable private setting. Recognition is not used to identify you or create a voice identity profile.",
   },
   {
-    heading: "COOKIES AND LOCAL STORAGE",
-    body: "This app does not use advertising cookies, tracking cookies, pixels, fingerprinting, or third-party analytics cookies. It uses your device's local storage only to remember your progress, settings, and preferences so the app works between sessions. This data stays on your device and is cleared when you reset your progress, clear your browser data, or uninstall the app.",
+    heading: "OPTIONAL RECITATION PROBLEM REPORTS",
+    body: "If sample reporting is made available, it must default off and accept reports only from people who confirm they are 18 or older. Enabling it alone must not upload audio: a separate Report a problem action is required for each submission. Before sending, the report must identify the recording, what the checker heard, word comparisons, passage, technical diagnostics and optional note included. A submitted report may also contain an account identifier and consent/submission dates. Reports are for investigating recitation-checker problems, not advertising, voice identification or unrelated AI training. They must be private, not sold or publicly shared; authorized operators and contracted hosting providers may process them for that purpose, and disclosure may be required by law. When available, Delete my samples must remove active reports and files; requests can also be sent to the contact address. Already downloaded copies and provider backups may not disappear immediately. If these controls are not available, do not submit audio; use a written description instead. Do not include someone else's voice, a child's recording or sensitive background conversations.",
   },
   {
-    heading: "LOCATION AND DEVICE SENSORS",
-    body: "The Qibla Finder and prayer times use your device location and motion sensors to calculate the direction of the Ka'bah and the times of prayer. These calculations happen entirely on your device. Your location is never stored on our servers, never logged, and never transmitted to us. You may deny or revoke location permission at any time in your device settings; only location-based features will stop working.",
+    heading: "LOCATION, PRAYER TIMES AND SENSORS",
+    body: "Saved coordinates, the selected calculation method and prayer source help prayer times, alerts, widgets and Qibla remain aligned. Qibla uses device sensors and coordinates locally. Fetching prayer timetables or resolving a place can send coordinates or a place query to the selected provider, including Aladhan, Waktu Solat for JAKIM, Open-Meteo geocoding or BigDataCloud reverse geocoding. Providers can also receive your IP address and routine request metadata. These requests are not anonymous merely because you have no account. You may deny or revoke location permission and use available manual location controls.",
   },
   {
-    heading: "NOTIFICATIONS AND REMINDERS",
-    body: "Adhkar, prayer, suhoor, and iftar reminders are scheduled locally on your device using your device clock. No reminder content, schedule, or delivery data is sent to any server.",
+    heading: "QURAN, HADITH, AUDIO AND OTHER ONLINE SERVICES",
+    body: "Quran text, recitation audio, translations and tafsir are requested from Quran.com / Quran Foundation and audio providers; hadith browsing uses the app's source services. Requests can reveal requested passages or searches, IP address and technical metadata to those providers. Online AI search is separate from on-device recitation checking: submitted queries can be processed by the configured AI provider. Do not include health entries, private recordings or other sensitive information in online search. Hosting, content delivery and service providers may keep operational or security logs. We do not sell personal information or use recitation or health entries for targeted advertising.",
   },
   {
-    heading: "NETWORK REQUESTS",
-    body: "The app needs an internet connection to load. A connection is used to load the app itself, to fetch prayer time calculation data where you have enabled it, or to open a link you have tapped. These requests do not carry your personal content, your health data, or your progress.",
+    heading: "ACCOUNTS, ADMINISTRATION AND OPTIONAL SUBMISSIONS",
+    body: "Most devotional features do not require an account. Restricted administration uses authenticated sessions, and optional online features such as giveaway entries can store the details you provide, including email, consent and referral information, on our backend. Feedback and suggestions you submit can also be stored and reviewed by authorized operators; do not include unnecessary sensitive details. Do not assume clearing local progress deletes a submitted entry or server-held information. Giveaway participation is optional; any prize and promotional email terms should be stated when you enter. Contact us about access, correction or deletion of information you submitted.",
   },
   {
-    heading: "THIRD PARTIES AND APP STORES",
-    body: "If you install the app from the Apple App Store or Google Play, those stores may collect their own download, crash, and device data under their own privacy policies, which we do not control. We receive no personal data from them beyond anonymous, aggregate install figures.",
+    heading: "COOKIES, NOTIFICATIONS AND APP STORES",
+    body: "Local storage remembers progress and preferences; authenticated features may use session cookies or similar security storage. Device reminders are scheduled locally and depend on permissions, the device clock and operating-system limits. External hosting, linked sites and app stores can process their own device, download, crash or request data under their own policies. This notice does not override those policies or guarantee that external services use no tracking technologies.",
   },
   {
-    heading: "DELETING YOUR DATA",
-    body: "You are in full control. You can erase everything at any time using Reset all progress in Settings, by clearing your browser site data, or by uninstalling the app. Because we hold nothing, deletion on your device is complete and permanent, and cannot be undone by us.",
+    heading: "RETENTION, SECURITY AND DELETION",
+    body: "Local information remains until removed through the relevant app controls, cleared from browser/device storage or otherwise deleted. Uninstalling or clearing browser data may not remove device backups, exported files or separately submitted online information. Server-held submissions should be retained only as needed for their stated purpose, security or legal obligations; ask the contact address about a particular record. We do not promise a fixed retention period or immediate backup erasure that has not been verified with the relevant provider. Reasonable safeguards reduce risk but no device, network or storage system is perfectly secure. Do not send passwords or unnecessary sensitive information in a report or email.",
   },
   {
-    heading: "CHILDREN",
-    body: "This app is intended for a general audience and does not knowingly collect data from anyone, including children, because it collects no personal data at all.",
+    heading: "CHILDREN AND ADULT-ONLY AUDIO REPORTS",
+    body: "Children may use suitable devotional reading tools with appropriate adult supervision, but recitation sample reporting is adults-only (18+). We do not knowingly accept children's recordings through that feature. If a child's information or recording has been submitted, contact us so we can investigate and remove it. A checkbox is a user declaration, not verified age identification. Other online features may have separate age and eligibility requirements.",
   },
   {
-    heading: "YOUR RIGHTS",
-    body: "Privacy laws such as the GDPR and CCPA give you rights to access, correct, export, and delete your personal data, and not to have it sold. Because all of your data remains on your device and we never receive or sell it, you exercise these rights directly and instantly through your own device.",
+    heading: "YOUR PRIVACY RIGHTS",
+    body: "Depending on where you live and the laws that apply, you may have rights to access, correct, delete or receive a copy of submitted personal information, object to or restrict processing, withdraw consent, or complain to a privacy regulator. Contact msalahi536@gmail.com; we may need limited information to verify that a request concerns you. Local information can be managed on your device. Withdrawal does not undo processing that was lawful before withdrawal. Necessary service processing, legal obligations and applicable exceptions may still apply. Information handled by hosting or other providers may be processed outside your country; applicable transfer requirements must be assessed for those services.",
   },
   {
-    heading: "CHANGES",
-    body: "If this policy changes, the updated version will appear here with a new date. Continued use after an update means you accept the revised policy.",
-  },
-  {
-    heading: "CONTACT",
-    body: "Questions about privacy can be sent to msalahi536@gmail.com",
+    heading: "CHANGES AND CONTACT",
+    body: "Material changes will be reflected here with a new date and, where required, a separate notice or renewed consent before new optional processing. Continuing to use the app is not a substitute for legally required privacy consent. Questions and requests: msalahi536@gmail.com.",
   },
 ];
 
@@ -70,11 +66,11 @@ export const TERMS_INTRO =
 export const TERMS_SECTIONS: LegalSection[] = [
   {
     heading: "THE APP",
-    body: "Sahih Al-Adhkar is provided free of charge, as is and as available, without warranty of any kind, express or implied, including any warranty of accuracy, fitness for a particular purpose, uninterrupted availability, or non-infringement. It is offered as a benefit to the community and is not a substitute for scholarly guidance. For any ruling or religious question, please return to the people of knowledge.",
+    body: "To the extent permitted by law, Sahih Al-Adhkar is provided free of charge, as is and as available, without express or implied warranties of accuracy, fitness for a particular purpose, uninterrupted availability or non-infringement. Mandatory warranties and statutory rights that cannot be excluded remain unaffected. It is offered as a benefit to the community and is not a substitute for scholarly guidance. For any ruling or religious question, please return to the people of knowledge.",
   },
   {
     heading: "RELIGIOUS CONTENT AND ACCURACY",
-    body: "Every dhikr, dua, and narration in this app is presented with its source so that you can verify it, and weak narrations are marked where identified. Translations and explanations are provided for understanding and are not formal legal rulings or fatwas. Scholars differ on many matters, including those relating to menstruation, purity, prayer, fasting, Ruqyah, and Hajj. Every effort has been made to be accurate; if you find a mistake, please report it and it will be corrected.",
+    body: "Sources and grading are shown where available so you can verify religious content; missing labels do not establish authenticity. Translations and explanations are provided for understanding and are not formal legal rulings or fatwas. Scholars differ on many matters, including those relating to menstruation, purity, prayer, fasting, Ruqyah, and Hajj. Errors, incomplete references and translation differences are possible. Please report suspected errors for review; no correction deadline is guaranteed.",
   },
   {
     heading: "HEALTH AND MEDICAL DISCLAIMER",
@@ -82,43 +78,51 @@ export const TERMS_SECTIONS: LegalSection[] = [
   },
   {
     heading: "PRAYER TIMES, QIBLA AND CALCULATIONS",
-    body: "Prayer times, Hijri dates, Qibla direction, and cycle predictions are produced by astronomical and statistical calculation and depend on your device's clock, location accuracy, sensor calibration, and chosen settings. Magnetic interference, poor GPS signal, and local conventions can affect results. Please verify against your local mosque or a trusted local authority. We accept no liability for missed, early, or late worship arising from reliance on these calculations.",
+    body: "Prayer times, Hijri dates, Qibla direction, and cycle predictions use calculations, provider timetables or estimates and depend on your device's clock, location accuracy, sensor calibration, and chosen settings. Magnetic interference, poor GPS signal, and local conventions can affect results. Please verify against your local mosque or a trusted local authority. Verify important times and directions locally; notifications and widgets may be delayed or unavailable. The liability provisions below apply only to the extent permitted by law.",
   },
   {
-    heading: "INTELLECTUAL PROPERTY",
-    body: "The Sahih Al-Adhkar name, logo, branding, domain names, original written commentary, curated content selections and arrangements, translations, artwork, illustrations, photography, colour palettes, typography, iconography, visual themes, user interface designs, layouts, animations, and underlying source code are owned by us and protected by copyright, trademark, and other intellectual property laws. Classical Arabic religious texts themselves remain in the public domain; our selection, arrangement, presentation, and commentary do not.",
+    heading: "INTELLECTUAL PROPERTY AND THIRD-PARTY LICENSES",
+    body: "We claim rights only in original branding, code, artwork and arrangements that we own or are licensed to use. Quran text, reciter recordings, translations, tafsir, hadith editions, mushaf fonts, libraries and model weights may belong to their respective rightsholders and are subject to their own licenses and terms. See the acknowledgements and Open-source licenses notices. Our terms do not override open-source license permissions, mandatory statutory rights or third-party ownership, and do not grant reuse rights we do not hold. Attribution alone does not grant a license or imply endorsement.",
   },
   {
     heading: "PERMITTED AND PROHIBITED USE",
-    body: "You may use the app personally and freely for your own worship, and you may share links to it. You may not, without our written permission, copy, clone, reproduce, republish, scrape, data-mine, harvest, mirror, frame, reverse engineer, decompile, disassemble, or attempt to derive the source code of the app; create derivative or substantially similar apps, templates, or websites from our designs or code; remove or alter any branding or notices; use our name, logo, or designs in a way that suggests endorsement or affiliation; sell, sublicense, or commercially exploit any part of the app; or introduce malicious code, attempt unauthorised access, or interfere with the service.",
+    body: "You may use the app for personal devotional and educational purposes and share links. Do not upload unlawful content, another person's voice without permission, children's recordings to adult-only reports, or material that infringes others' rights. Do not attempt unauthorized access, bypass access controls, distribute malware, abuse network services or falsely claim affiliation. Copying or commercial exploitation of our original protected material requires permission except where applicable law or an applicable third-party license permits it. Restrictions do not prohibit reverse engineering or other acts that cannot lawfully be restricted.",
   },
   {
-    heading: "ENFORCEMENT",
-    body: "Unauthorised copying of our designs, content, or code is a violation of these terms and of applicable copyright law. We reserve the right to pursue all available remedies, including DMCA takedown notices to hosting providers, domain registrars, and app stores, platform reports, and legal action.",
+    heading: "BETA AND AUTOMATIC RECITATION FEEDBACK",
+    body: "Hifz, Follow the imam, voice search and automatic tajweed tips are experimental aids, not certification of correct Quran recitation, memorization, pronunciation or tajweed. Scores, word matches, hesitation detection and similar-ayah suggestions can be wrong or incomplete, even when marked Solid or clean. Tajweed hints do not reliably assess all articulation or recitation rules. Learn and verify recitation with a qualified teacher; do not rely on the app for examinations, religious rulings or safety-critical decisions. Beta features may change or lose compatibility. The licensed recitation-checking feature is offered free; no accuracy, latency or device-support guarantee is made.",
   },
   {
-    heading: "YOUR DATA AND YOUR CONTENT",
-    body: "Anything you enter, including counts, logs, saved duas, and Period Companion entries, is stored on your device only. You are responsible for that content and for keeping your device secure. We do not review, store, access, or back up it. Clearing your browser data, resetting progress, changing devices, or uninstalling the app will permanently erase it, and we cannot recover it for you.",
+    heading: "YOUR DATA, RECORDINGS AND OPTIONAL REPORTS",
+    body: "You retain any rights you have in your entries and recordings. You are responsible for device security and for the content you intentionally export or submit. Submitting a problem report gives us limited permission to store, listen to, analyze and reproduce it internally only as needed to investigate and improve recitation checking, subject to the Privacy Policy and your deletion rights; it does not transfer ownership or authorize sale, public publication, voice identification or unrelated model training. Do not submit third-party or children's audio. Local data, exported recordings and online submissions have different deletion controls. We cannot guarantee recovery of lost local progress or remove copies you have independently shared.",
+  },
+  {
+    heading: "ZAKAT, FINANCIAL ESTIMATES AND OTHER GUIDANCE",
+    body: "Zakat calculations and other financial or devotional estimates depend on your inputs, chosen assumptions, valuations and differing scholarly views. They are educational aids, not personalized legal, tax, investment or financial advice. Verify obligations with a qualified scholar and, where relevant, a qualified professional. AI-generated search matches and external content must be checked against their cited source.",
   },
   {
     heading: "AVAILABILITY AND CHANGES TO THE APP",
-    body: "We may add, change, suspend, or discontinue any feature at any time without notice, and we do not guarantee uninterrupted or error-free operation. Updates may change how features behave.",
+    body: "Subject to applicable notice requirements and mandatory rights, we may add, change, suspend or discontinue features, and we do not guarantee uninterrupted or error-free operation. Updates may change how features behave.",
   },
   {
     heading: "THIRD-PARTY LINKS AND STORES",
     body: "The app may link to external websites or be distributed through the Apple App Store and Google Play. We do not control and are not responsible for third-party content, services, or policies. Your use of those platforms is governed by their own terms.",
   },
   {
-    heading: "LIMITATION OF LIABILITY",
-    body: "To the fullest extent permitted by law, we shall not be liable for any indirect, incidental, special, consequential, punitive, or exemplary damages, or for any loss of data, progress, counts, streaks, logs, profits, goodwill, or for any personal injury, health outcome, religious consequence, or decision made in reliance on the app. Your sole and exclusive remedy for dissatisfaction is to stop using the app. Where liability cannot be excluded by law, it is limited to the amount you paid us, which is zero. Some jurisdictions do not allow certain exclusions, so parts of this section may not apply to you.",
+    heading: "LIMITATION OF LIABILITY AND MANDATORY RIGHTS",
+    body: "To the extent permitted by applicable law, we exclude liability for indirect, incidental, special or consequential losses arising from use of an as-is educational service, including lost local data or interrupted features. These exclusions do not apply where unlawful and do not exclude or limit liability for fraud, intentional misconduct, gross negligence where protected, death or personal injury caused by negligence where protected, or any non-waivable consumer, privacy or other statutory rights. We do not impose a zero-dollar cap on liabilities that the law requires us to bear. Your legal remedies remain available where they cannot lawfully be excluded.",
   },
   {
-    heading: "INDEMNITY",
-    body: "You agree to indemnify and hold us harmless from any claim, demand, loss, or expense, including reasonable legal fees, arising from your misuse of the app or your breach of these terms.",
+    heading: "RESPONSIBILITY FOR MISUSE",
+    body: "You are responsible for unlawful misuse and content you submit. To the extent legally enforceable, you may be responsible for reasonable direct losses caused by your unlawful conduct or infringement of another person's rights. This does not make you responsible for our negligence or impose an indemnity that mandatory consumer law prohibits.",
+  },
+  {
+    heading: "DISPUTES AND APPLICABLE LAW",
+    body: "Contact msalahi536@gmail.com to try to resolve a concern. These terms do not require mandatory arbitration, waive class proceedings or remove a court, consumer-protection law or remedy that you are entitled to use. Applicable law and jurisdiction are determined by the relevant legal rules; no exclusive forum or governing jurisdiction is asserted here.",
   },
   {
     heading: "CHANGES TO THESE TERMS",
-    body: "These terms may be updated from time to time. The current version always appears here with its date. Continued use of the app means you accept the current terms.",
+    body: "These terms may be updated with a new date. Material changes will be notified where required; separate agreement will be obtained where legally necessary. Changes do not retrospectively remove accrued rights.",
   },
   {
     heading: "SEVERABILITY",

@@ -9,12 +9,12 @@ export const Route = createFileRoute("/privacy")({
       {
         name: "description",
         content:
-          "Sahih Al-Adhkar does not collect, transmit, or store any personal data. Period, prayer, and progress data stays on your device. No analytics, no advertising, no tracking.",
+          "How Sahih Al-Adhkar handles local progress, microphone audio, optional submissions and external services.",
       },
       { property: "og:title", content: "Privacy Policy, Sahih Al-Adhkar" },
       {
         property: "og:description",
-        content: "No data collection. No tracking. Everything stays on your device.",
+        content: "Privacy information for local worship progress, microphone use, external services and optional submissions.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
