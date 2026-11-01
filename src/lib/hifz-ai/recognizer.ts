@@ -11,6 +11,7 @@
 import * as ort from "onnxruntime-web";
 import { NMEL, SR, StreamingFbank } from "./fbank";
 import { cachedAsset, MODEL_URL } from "./assets";
+import runtimeAsset from "./runtime.wasm.asset.json";
 
 export interface ModelConfig {
   file: string;
@@ -74,7 +75,7 @@ export class QuranRecognizer {
     // threads need cross-origin isolation (SharedArrayBuffer); one core is already ~15x faster than real time
     ort.env.wasm.numThreads = (globalThis as any).crossOriginIsolated ? Math.min(4, (navigator.hardwareConcurrency || 2) - 1) || 1 : 1;
     // Cache the matching runtime locally too: no CDN dependency on later offline use.
-    ort.env.wasm.wasmBinary = await (await cachedAsset("/hifz-ai/runtime/ort-wasm-simd-threaded.wasm")).arrayBuffer();
+    ort.env.wasm.wasmBinary = await (await cachedAsset(runtimeAsset.url)).arrayBuffer();
     const runtime = await (await cachedAsset("/hifz-ai/runtime/ort-wasm-simd-threaded.mjs")).text();
     const runtimeUrl = URL.createObjectURL(new Blob([runtime], { type: "text/javascript" }));
     ort.env.wasm.wasmPaths = { mjs: runtimeUrl };
