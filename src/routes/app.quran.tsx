@@ -15,8 +15,11 @@ import { getDisplay, setDisplay, triggerHaptic, type DisplayPrefs } from "@/lib/
 import { TajweedLegend, TajweedText, useTajweed } from "@/lib/tajweed";
 import { guessVerses } from "@/lib/quran-search.functions";
 import { quranPlayer, SPEEDS, useQuranPlayer } from "@/lib/quran-player";
+import { useHifzBeta } from "@/lib/hifz-beta";
+import { Button } from "@/components/ui/button";
+import { QuranVoice } from "@/components/quran-voice/QuranVoice";
 
-type Search = { s?: number; v?: number; view?: "reciters"; tab?: "all" };
+type Search = { s?: number; v?: number; view?: "reciters"; tab?: "all"; voice?: "follow" | "search" | "mushaf"; page?: number };
 
 export const Route = createFileRoute("/app/quran")({
   validateSearch: (q: Record<string, unknown>): Search => {
@@ -27,6 +30,9 @@ export const Route = createFileRoute("/app/quran")({
     if (out.s && Number.isInteger(v) && v >= 1 && v <= 286) out.v = v;
     if (q.view === "reciters") out.view = "reciters";
     if (q.tab === "all") out.tab = "all";
+    if (q.voice === "follow" || q.voice === "search" || q.voice === "mushaf") out.voice = q.voice;
+    const page = Number(q.page);
+    if (Number.isInteger(page) && page >= 1 && page <= 604) out.page = page;
     return out;
   },
   head: () => ({
@@ -83,7 +89,11 @@ function useFavs() {
 type Last = { s: number; v: number; t?: number; d?: number; r?: number; mode?: "read" | "listen"; ao?: boolean };
 
 function QuranPage() {
-  const { s, v, view, tab } = Route.useSearch();
+  const { s, v, view, tab, voice, page } = Route.useSearch();
+  const beta = useHifzBeta();
+  const navigate = useNavigate();
+  useEffect(() => { if (voice && beta.checked && !beta.enabled) void navigate({to:"/app/quran",search:{},replace:true}); }, [voice,beta.checked,beta.enabled,navigate]);
+  if (voice) return beta.enabled ? <QuranVoice key={`${voice}:${page??1}`} mode={voice} initialPage={page} /> : null;
   if (view === "reciters") return <ReciterPicker back={s} tab={tab} />;
   return s ? <Reader key={`${s}:${v ?? ""}`} chapterId={s} verse={v} /> : <Home />;
 }
@@ -155,6 +165,7 @@ function SurahArt({ name }: { name: string }) {
 
 function Home() {
   const navigate = useNavigate();
+  const beta = useHifzBeta();
   const [prefs, setPrefs] = usePrefs();
   const [chapters, setChapters] = useState<Chapter[] | null>(null);
   const [error, setError] = useState(false);
@@ -220,6 +231,8 @@ function Home() {
               <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search reciter, surah, verse (24:32) or topic…" />
             </label>
           </div>
+
+          {beta.enabled && !t && <div className="qv-entry-actions"><Button variant="outline" onClick={()=>void navigate({to:"/app/quran",search:{voice:"follow"}})}><Play size={16}/>Follow the imam</Button><Button variant="outline" onClick={()=>void navigate({to:"/app/quran",search:{voice:"search"}})}><Search size={16}/>Find an ayah</Button></div>}
 
           {reciterHits.length > 0 && (
             <div className="quran-card divide-y">
