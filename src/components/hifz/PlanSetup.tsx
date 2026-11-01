@@ -108,6 +108,7 @@ export function PlanSetup({ existing, done }: { existing?: HifzPlan; done: () =>
               Pick surahs instead
               <ChevronRight className={pickSurahs ? "hz-picker-open" : ""} />
             </Button>
+            {chosenSurahs.length > 0 && <p className="mt-3 mb-0 text-center text-sm font-semibold text-card-foreground" role="status">{chosenSurahs.length} {chosenSurahs.length === 1 ? "surah" : "surahs"} selected</p>}
             <Dialog open={pickSurahs} onOpenChange={setPickSurahs}>
               <DialogContent className="hz-surah-dialog hz-setup" aria-describedby={undefined} onOpenAutoFocus={(event) => event.preventDefault()}>
                 <header className="hz-surah-dialog-header">
