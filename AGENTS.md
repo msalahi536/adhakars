@@ -1,5 +1,7 @@
 # Architecture Decisions
 
+- Hifz known-surah and starting-order choices render one shared setup dialog with independent selections, keeping search, scenery and selection UI consistent without mixing review and learning goals.
+
 - Recitation meters share six frequency bands and one smoothing mapper for live spectra and decoded device envelopes, so lines follow actual tone.
 
 - Personal appearance is manual and device-only, with independent phase defaults and page overrides in local storage and compressed photos in IndexedDB; no remote photo analysis is permitted.
