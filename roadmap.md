@@ -1,8 +1,8 @@
 # Roadmap
 
-- [ ] Fresh standalone Hifz recite page from uploaded brief, isolated from retired Hifz
-- [ ] Use existing artwork only; skip new background images, night mode and rising-sun effects
-- [ ] Verify word states, self-check, settings, audio, persistence and page navigation
+- [x] Fresh standalone Hifz recite page from uploaded brief, isolated from retired Hifz
+- [x] Use existing artwork only; skip new background images, night mode and rising-sun effects
+- [x] Verify self-check through all 12 ayahs of page 562, word marks, settings persistence, page navigation, qari playback and no clipped lines; 134 tests pass
 
 - [done] Frosted backdrop for Quran search bar when scrolling up (verified at phone size)
 - [done] Add reciter photos from user-uploaded Shuyookh_Profile_PNGs.zip (59 portraits wired via CDN assets)
