@@ -836,7 +836,7 @@ function Recite() {
     {understand && <Understanding keys={[...new Set(rangeWords.map((w) => w.verse))]} close={() => setUnderstand(false)} />}
     {echo && <EchoMode keys={[...new Set(rangeWords.map((w) => w.verse))]} reciter={saved.settings.reciter} close={() => setEcho(false)} highlight={echoHighlight} />}
     {meaning && <WordMeaning word={meaning} play={() => void playWord(meaning)} close={() => setMeaning(null)} />}
-    {celebrations[0] && !handsFree && <MilestoneMoment moment={celebrations[0]} done={() => setCelebrations((m) => m.slice(1))} />}
+    {celebrations[0] && !handsFree && !sheet && <MilestoneMoment moment={celebrations[0]} done={() => setCelebrations((m) => m.slice(1))} />}
     {showReviewSummary && <div className="rc-backdrop"><section className="rc-sheet rc-result-sheet" role="dialog" aria-label="Hands-free summary"><h2>Review summary</h2>{reviewSummary.map((entry, n) => <section key={n} className="hx-ayah-block"><h3>Page {entry.page} · {entry.attempt.m.label} {entry.attempt.m.score}</h3>{entry.attempt.result.words.filter((w) => w.status === "wrong" || w.status === "skipped").map((w) => <p key={w.key} dir="rtl">{w.text} · {w.key}</p>)}{entry.attempt.clean && <p>Clean recitation</p>}</section>)}<Button onClick={() => { setShowReviewSummary(false); setHandsFree(false); ai.cancel(); advance(); }}>Continue</Button></section></div>}
     {sessionEnded && activeSession && !sheet && <div className="rc-backdrop"><div onClick={(e) => e.stopPropagation()}>
       <section className="rc-sheet rc-complete" role="dialog" aria-modal="true" aria-label="Session complete">
