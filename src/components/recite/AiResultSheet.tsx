@@ -24,7 +24,7 @@ export function AiResultSheet({ attempt, passes, lesson, chapters, again, next, 
     void Promise.all([getVerseByKey(source), getVerseByKey(destination)]).then((v) => { if (!canceled) setAyat(v); }).catch(() => { if (!canceled) setError(true); });
     return () => { canceled = true; };
   }, [compare, source, destination, retry]);
-  const diff = ayat?.[0] && ayat[1] ? diffAyat(ayat[0].text.split(/\s+/), ayat[1].text.split(/\s+/)) : null;
+  const diff = ayat?.[0] && ayat[1] ? diffAyat(ayat[0].text.trim().split(/\s+/), ayat[1].text.trim().split(/\s+/)) : null;
   const mistakes = attempt.result.words.filter((w) => w.status === "wrong" || w.status === "skipped");
   if (compare) return <section className="rc-sheet rc-result-sheet" role="dialog" aria-modal="true" aria-label="Spot the difference">
     <header><Button variant="ghost" size="icon" aria-label="Back to result" onClick={() => setCompare(false)}><ArrowLeft /></Button><h2>Spot the difference</h2></header>
