@@ -1,5 +1,7 @@
 # Roadmap
 
+- [x] Smooth Hifz controls entrance; phone touch checks confirm an eased fade/slide, stationary page and reveal strip, partial tab-bar coverage, and working settings/toggle.
+
 - [x] Fix Hifz pointer taps and word-mark exceptions; phone touch checks verified show/hide, Aa settings, 4-second idle timeout/settings hold, swipe navigation, strip isolation and no nav overlap; 20 targeted tests pass.
 
 - [x] Integrate supplied immutable mushaf components/artwork only on Hifz; all 16 theme/phase pairs checked, 15 rows without overflow, reveal/grading/navigation and saved settings verified on phone and desktop; 16 targeted tests pass.
