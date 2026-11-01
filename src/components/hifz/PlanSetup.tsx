@@ -79,8 +79,10 @@ export function PlanSetup({ existing, done }: { existing?: HifzPlan; done: () =>
 
         {step === 0 && (
           <section className="hz-known-content">
+            <header className="hz-known-heading">
             <h1 className="hz-title">What do you already know?</h1>
             <p className="hz-sub">Tap every juz you have fully memorized. These pages go straight into review.</p>
+            </header>
             <div className="hz-juz-grid">
               {Array.from({ length: 30 }, (_, i) => i + 1).map((j) => (
                 <Button
