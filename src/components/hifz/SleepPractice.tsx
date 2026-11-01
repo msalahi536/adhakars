@@ -17,6 +17,7 @@ export function SleepPractice({state,mode}:{state:HifzState;mode:"preview"|"reca
  const q=useSuspenseQuery(quranIndexOptions).data;const today=todayISO();const navigate=useNavigate();
  const [saved,setSaved]=useState<SleepPreview|null>(null);const [hydrated,setHydrated]=useState(false);
  const [playing,setPlaying]=useState(false);const [pass,setPass]=useState(0);const [error,setError]=useState("");
+ const [recalling,setRecalling]=useState(false);
  const audio=useRef<HTMLAudioElement|null>(null);const run=useRef(createAudioRun());
  useEffect(()=>{try{setSaved(JSON.parse(localStorage.getItem(SLEEP_PREVIEW_KEY)||"null"));}catch{}setHydrated(true);return()=>{run.current.cancel();audio.current?.pause();};},[]);
  const tonight=sleepBoost(state,q,today).tonight;const target=mode==="preview"?tonight:saved?.forDate===today&&saved.previewedOn===addDays(today,-1)?saved:null;
@@ -30,7 +31,7 @@ export function SleepPractice({state,mode}:{state:HifzState;mode:"preview"|"reca
   }catch{setError("Couldn’t load the recitation. Check your connection and retry.");}finally{setPlaying(false);}
  }
  return <main className="hp-page"><header className="hz-home-header"><HeaderBackButton onBack={()=>void navigate({to:"/app/hifz"})}/></header><div className="hp-content"><div className="hp-heading"><MoonStar/><h1>{mode==="preview"?"Tonight’s preview":"Morning recall"}</h1><p>{mode==="preview"?"A little listening before sleep. No testing.":"Recall last night’s preview. No grading pressure."}</p></div>
- {!hydrated||page.isPending&&target?<p className="hp-empty">Loading your lines…</p>:!target?<p className="hp-empty">{mode==="recall"?"No preview saved from last night.":"No new lesson to preview."}</p>:page.error?<Button onClick={()=>void page.refetch()}>Retry loading</Button>:<section className="hp-practice-surface"><p className="hp-note">Page {target.page} · lines {target.fromLine+1}–{Math.min(15,target.fromLine+target.lines)}</p><p className="hp-arabic" dir="rtl">{words.map((w)=>w.text).join(" ")}</p>
- {mode==="preview"?<><div className="hp-practice-actions"><Button onClick={()=>void listen()}>{playing?<Square size={18}/>:<Headphones size={18}/>} {playing?"Stop preview":"Listen 3 times"}</Button></div><p className="hp-status">{pass?`${pass} of 3 plays`:""}</p>{error&&<p role="alert" className="hp-note">{error}</p>}</>:<PracticeVoice ranges={ranges} wordKeys={words.map((w)=>w.key)} noPressure/>}</section>}
+ {!hydrated||page.isPending&&target?<p className="hp-empty">Loading your lines…</p>:!target?<p className="hp-empty">{mode==="recall"?"No preview saved from last night.":"No new lesson to preview."}</p>:page.error?<Button onClick={()=>void page.refetch()}>Retry loading</Button>:<section className="hp-practice-surface"><p className="hp-note">Page {target.page} · lines {target.fromLine+1}–{Math.min(15,target.fromLine+target.lines)}</p><p className={`hp-arabic ${recalling?"hp-recall-hidden":""}`} dir="rtl" aria-hidden={recalling}>{words.map((w)=>w.text).join(" ")}</p>
+ {mode==="preview"?<><div className="hp-practice-actions"><Button onClick={()=>void listen()}>{playing?<Square size={18}/>:<Headphones size={18}/>} {playing?"Stop preview":"Listen 3 times"}</Button></div><p className="hp-status">{pass?`${pass} of 3 plays`:""}</p>{error&&<p role="alert" className="hp-note">{error}</p>}</>:<PracticeVoice ranges={ranges} wordKeys={words.map((w)=>w.key)} noPressure onListening={setRecalling}/>}</section>}
  </div></main>;
 }

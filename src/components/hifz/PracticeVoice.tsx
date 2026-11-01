@@ -8,9 +8,10 @@ import {quranPlayer} from "@/lib/quran-player";
 import {recitationPlayer} from "@/lib/recitation-player";
 import {cleanRecitation} from "@/components/recite/ai-performance";
 import {play} from "@/lib/hifzHaptics";
-export function PracticeVoice({ranges,wordKeys,onCorrect,noPressure=false}:{ranges:AiRange[];wordKeys:string[];onCorrect?:()=>void;noPressure?:boolean}) {
+export function PracticeVoice({ranges,wordKeys,onCorrect,noPressure=false,onListening}:{ranges:AiRange[];wordKeys:string[];onCorrect?:()=>void;noPressure?:boolean;onListening?:(active:boolean)=>void}) {
  const ai=useAiRecitation(ranges[0]?.sura??0,true,wordKeys);
  const processed=useRef<CheckResult|null>(null);
+ useEffect(()=>{onListening?.(ai.phase==="listening"||ai.phase==="stopping");},[ai.phase,onListening]);
  const success=ai.result?cleanRecitation(ai.result,[...new Set([...wordKeys,...ai.result.words.map((w)=>w.key)])]):false;
  useEffect(()=>{
   if(ai.phase!=="finished"||!ai.result||processed.current===ai.result)return;

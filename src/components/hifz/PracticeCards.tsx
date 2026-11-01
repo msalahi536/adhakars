@@ -11,7 +11,8 @@ import {reviewItems,sleepWindow,SLEEP_PREVIEW_KEY,type SleepPreview} from "./pra
 import "./practice.css";
 export function PracticeCards({state,q,today,names,update}:{state:HifzState;q:QuranIndex;today:string;names:Record<number,string>;update:(s:HifzState)=>void}) {
  const navigate=useNavigate(); const slipping=useMemo(()=>slippingSoon(state,today),[state,today]);
- const candidates=slippingSoon(state,today,Number.POSITIVE_INFINITY).slice(0,5).map((p)=>p.page);
+ const candidateKeys=Object.fromEntries(Object.values(state.pages).filter((p)=>p.memory).map((p)=>[p.page,["candidate"]]));
+ const candidates=salahPlan(state,today,candidateKeys).map((p)=>p.page);
  // Engine ranking selects from source-backed candidates, not fabricated page/ayah ranges.
  const queries=useQueries({queries:candidates.map(recitePageOptions)});
  const pageVerses=Object.fromEntries(queries.flatMap((r)=>r.data?[[r.data.page,r.data.verses.map((v)=>v.key)]]:[]));

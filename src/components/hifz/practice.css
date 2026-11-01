@@ -64,3 +64,7 @@
 .hp-line-board button:disabled {opacity:1;}
 .hp-line-board button.is-right:disabled {background:var(--memory-good);color:var(--memory-on-good);}
 .hp-detail.hz-home-popup {background:var(--card) !important;backdrop-filter:none;}
+.hp-recall-hidden {visibility:hidden;}
+.hp-line-board button.is-right:disabled {background:var(--memory-good) !important;color:var(--memory-on-good) !important;}
+.hp-page .hz-drill-words {text-align:center;}
+.hp-page .hz-drill-words span.hz-hidden-word {display:none;}
