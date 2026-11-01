@@ -26,7 +26,16 @@ export async function fetchRecitePage(page: number): Promise<RecitePage> {
 }
 export const recitePageOptions = (page: number) => queryOptions({ queryKey: ["fresh-recitation-page", page], queryFn: () => fetchRecitePage(page), staleTime: Infinity });
 export const reciteChaptersOptions = queryOptions({ queryKey: ["fresh-recitation-chapters"], queryFn: getChapters, staleTime: Infinity });
-export async function loadPageFont(page: number): Promise<string | null> {
+const pageFonts = new Map<number, Promise<string | null>>();
+export function loadPageFont(page: number): Promise<string | null> {
+  const cached = pageFonts.get(page);
+  if (cached) return cached;
+  const pending = fetchPageFont(page);
+  pageFonts.set(page, pending);
+  void pending.then((name) => { if (!name) pageFonts.delete(page); });
+  return pending;
+}
+async function fetchPageFont(page: number): Promise<string | null> {
   try {
     const name = `RecitePage${page}`;
     const font = new FontFace(name, `url(https://static.qurancdn.com/fonts/quran/hafs/v2/woff2/p${page}.woff2)`);
@@ -34,4 +43,14 @@ export async function loadPageFont(page: number): Promise<string | null> {
     document.fonts.add(loaded);
     return name;
   } catch { return null; }
+}
+
+export async function reciteDestinationPage(kind: "surah" | "juz", id: number): Promise<number> {
+  const path = kind === "surah" ? `by_chapter/${id}` : `by_juz/${id}`;
+  const res = await fetch(`${API}/verses/${path}?fields=page_number&per_page=1&page=1`);
+  if (!res.ok) throw new Error("This destination could not be loaded. Please try again.");
+  const data = await res.json() as { verses: { page_number: number }[] };
+  const page = data.verses[0]?.page_number;
+  if (!page || page < 1 || page > 604) throw new Error("This destination is unavailable.");
+  return page;
 }

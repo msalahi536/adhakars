@@ -11,7 +11,7 @@
   --nav-bg: var(--m-paper); --nav-border: var(--rc-line);
   --nav-active: var(--m-mark); --nav-inactive: var(--m-ink);
 }
-.rc-supplied .rc-canvas { top: calc(env(safe-area-inset-top, 0px) + 48px); bottom: calc(env(safe-area-inset-bottom, 0px) + 122px); width: calc(100% - 24px); z-index: 1; touch-action: none; }
+.rc-supplied .rc-canvas { top: calc(env(safe-area-inset-top, 0px) + 48px); bottom: calc(env(safe-area-inset-bottom, 0px) + 30px + var(--rc-strip-height, 92px) + 22px); width: calc(100% - 24px); display: grid; grid-template-rows: var(--rc-label-height, 24px) minmax(0, 1fr); z-index: 1; touch-action: none; }
 .rc-supplied .rc-art-frame, .rc-supplied .rc-art-frame > div { pointer-events: auto; }
 .rc-supplied .rc-canvas img, .rc-supplied .rc-labels, .rc-supplied .rc-cartouche, .rc-supplied .rc-page-badge, .rc-supplied .rc-ayah-end { pointer-events: none; }
 .rc-supplied .rc-header { z-index: 5; background: color-mix(in oklab, var(--m-paper) 85%, transparent); transform: translateY(-8px); transition: opacity 280ms ease, transform 360ms cubic-bezier(.22, 1, .36, 1); }
@@ -21,10 +21,13 @@
 .rc-supplied .rc-header button:hover { background: color-mix(in oklab, var(--m-mark) 10%, var(--m-paper)); border-color: color-mix(in oklab, var(--m-mark) 30%, transparent); }
 .rc-supplied .rc-header button:active { transform: scale(.94); }
 .rc-supplied .rc-header button svg { width: 20px; height: 20px; stroke-width: 1.75; }
+.rc-supplied .rc-header .rc-title { position: absolute; left: 50%; transform: translateX(-50%); width: auto; max-width: calc(100% - 116px); padding: 0 10px; border: 0; border-radius: 8px; background: transparent; box-shadow: none; font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.rc-supplied .rc-header .rc-title:active { transform: translateX(-50%); }
 .rc-supplied .rc-labels { display: flex; justify-content: space-between; align-items: center; padding: 0 12px; flex: none; }
 .rc-supplied .rc-paper { padding: 0; background: var(--m-paper); }
 .rc-supplied .rc-art-frame { width: 100%; height: 100%; }
-.rc-supplied .rc-mushaf { padding: 0; }
+.rc-supplied .rc-mushaf { padding: 12px 0; }
+.rc-supplied .rc-paper { will-change: transform; }
 .rc-supplied .rc-line { gap: 0; }
 .rc-supplied .rc-word { padding: 0; }
 .rc-supplied .rc-word-ink { padding: 0; opacity: 1; color: var(--m-ink); }
@@ -39,7 +42,7 @@
 .rc-supplied .rc-qcf-tj-silent { --rc-word-tajweed: var(--tj-silent); }
 .rc-supplied .rc-cartouche { display: grid; align-items: center; min-height: 0; }
 .rc-supplied .rc-cartouche > div { max-height: 100%; }
-.rc-supplied .rc-page-badge { position: absolute; bottom: -9px; left: 50%; transform: translateX(-50%); }
+.rc-supplied .rc-page-badge { position: absolute; bottom: -12px; left: 50%; transform: translateX(-50%); height: 24px; display: flex; align-items: center; }
 .rc-supplied .rc-ayah-end { display: inline-flex; justify-content: center; align-items: center; font-family: var(--font-arabic); }
 .rc-supplied .rc-pending .rc-word-ink, .rc-supplied .rc-in_progress .rc-word-ink { opacity: 0.14; }
 .rc-supplied.rc-hide-blank .rc-pending .rc-word-ink { opacity: 0; }
@@ -47,25 +50,24 @@
 .rc-supplied .rc-peek .rc-word-ink { opacity: 1; filter: none; }
 .rc-supplied.rc-night .rc-paper { filter: brightness(.78); }
 .rc-supplied .rc-dock { bottom: calc(env(safe-area-inset-bottom, 0px) + 30px); padding: 0 18px; }
-.rc-supplied .rc-strip-wrap { width: 100%; }
+.rc-supplied .rc-strip-wrap { width: 100%; opacity: 1; transition: opacity 200ms ease; }
+.rc-supplied.rc-controls-visible .rc-strip-wrap { opacity: 0; pointer-events: none; }
 .rc-supplied .rc-strip-wrap > button { display: block; }
 .rc-supplied .rc-nav-wrap { position: absolute; bottom: calc(env(safe-area-inset-bottom, 0px) + 8px); width: 100%; z-index: 5; height: var(--bottom-nav-row); overflow: visible; transform: translateY(18px); transition: opacity 280ms ease, transform 420ms cubic-bezier(.22, 1, .36, 1); }
 .rc-supplied.rc-controls-visible .rc-nav-wrap { height: var(--bottom-nav-row); transform: translateY(0); }
 .rc-supplied .bottom-nav { margin: 0 auto; width: calc(100% - 56px); color: var(--m-ink); background: transparent; }
 .rc-supplied .bottom-nav-row { border-radius: 18px; background: color-mix(in oklab, var(--m-paper) 90%, transparent) !important; border-color: var(--rc-line) !important; box-shadow: var(--rc-shadow); backdrop-filter: blur(20px); }
-.rc-supplied .rc-page-select, .rc-supplied .rc-pause-tools { animation: rc-controls-enter 360ms cubic-bezier(.22, 1, .36, 1) both; }
-.rc-supplied .rc-page-select { color: var(--m-ink); background: color-mix(in oklab, var(--m-mark) 12%, var(--m-paper)); border: 1px solid color-mix(in oklab, var(--m-ink) 25%, var(--m-paper)); box-shadow: 0 3px 12px color-mix(in oklab, var(--m-ink) 10%, transparent); font-size: 12px; }
-.rc-supplied .rc-page-select button { color: var(--m-ink); }
-.rc-supplied .rc-page-select input { font-weight: 600; color: var(--m-ink); border-bottom-color: color-mix(in oklab, var(--m-ink) 55%, var(--m-paper)); }
+.rc-supplied .rc-pause-tools { animation: rc-controls-enter 360ms cubic-bezier(.22, 1, .36, 1) both; position: absolute; bottom: calc(100% + 10px); left: 18px; right: 18px; }
 @keyframes rc-controls-enter { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
 .rc-supplied .rc-loading { min-height: 0; height: 100%; }
 .rc-supplied .rc-reflow { overflow: visible; }
 .rc-supplied .rc-reflow .rc-art-frame > div { overflow-y: auto; }
+.rc-supplied .rc-setting input[type="number"] { width: 100%; min-height: 42px; padding: 8px 12px; border: 1px solid var(--rc-line); border-radius: 4px; background: var(--m-paper); color: var(--m-ink); }
 @media (prefers-reduced-motion: reduce) {
-  .rc-supplied .rc-header, .rc-supplied .rc-nav-wrap { transition: none; }
+  .rc-supplied .rc-header, .rc-supplied .rc-nav-wrap, .rc-supplied .rc-strip-wrap { transition: none; }
   .rc-supplied .rc-page-select, .rc-supplied .rc-pause-tools { animation: none; }
 }
 @media (max-height: 650px) {
-  .rc-supplied .rc-canvas { top: calc(env(safe-area-inset-top, 0px) + 44px); bottom: calc(env(safe-area-inset-bottom, 0px) + 122px); }
+  .rc-supplied .rc-canvas { top: calc(env(safe-area-inset-top, 0px) + 44px); }
   .rc-supplied .rc-bismillah { font-size: 16px; }
 }

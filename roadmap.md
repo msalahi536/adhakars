@@ -1,5 +1,8 @@
 # Roadmap
 
+- [x] Hifz measured layout: 22px page-number clearance and equal inner padding; stationary overlays hide strip while controls show, verified on phone.
+- [x] Title sheet page/surah/juz navigation; Arabic/reversed drag swipes, adjacent data/font caching, boundary resistance and saved reveal-state restoration verified; 26 targeted tests pass.
+
 - [x] Hifz frame scale 0.5, 12px margins and no gap to strip; shared QCF V2 sizing, opacity 0.14 and 48px cartouche verified at 393/501/1280px; font failure shows loading without fallback; 20 targeted tests pass.
 
 - [x] Smooth Hifz controls entrance; phone touch checks confirm an eased fade/slide, stationary page and reveal strip, partial tab-bar coverage, and working settings/toggle.

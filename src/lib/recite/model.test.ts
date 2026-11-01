@@ -18,6 +18,16 @@ test("fresh recitation starts on page 562 without retired Hifz data", () => {
   expect(freshRecite().page).toBe(562);
   expect(freshRecite().marks).toEqual({});
 });
+test("Arabic swipe direction is the default", () => {
+  expect(freshRecite().settings.swipeDirection).toBe("arabic");
+});
+test("returning to a practiced page restores its reveal marks", () => {
+  const practiced = { ...freshRecite(), marks: revealNext(words, {}) };
+  const otherPage = { ...practiced, page: 563, marks: { ...practiced.marks, "68:1:1": "wrong" as const } };
+  const returned = { ...otherPage, page: 562 };
+  expect(returned.marks["67:1:1"]).toBe("correct");
+  expect(returned.marks["68:1:1"]).toBe("wrong");
+});
 test("default hide style is faint, whole page; tajweed is off", () => {
   expect(freshRecite().settings.hideStyle).toBe("faint");
   expect(freshRecite().settings.hideAmount).toBe("page");

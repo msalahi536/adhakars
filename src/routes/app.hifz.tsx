@@ -1,11 +1,12 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useQuery, useSuspenseQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient, useSuspenseQuery } from "@tanstack/react-query";
 import { useEffect, useLayoutEffect, useRef, useState, type CSSProperties } from "react";
-import { Check, ChevronLeft, ChevronRight, Mic, Pause, Play, RotateCcw, X, Flag } from "lucide-react";
+import { Check, ChevronLeft, Mic, Pause, Play, RotateCcw, X, Flag } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Portal } from "@/components/Portal";
 import { BottomNav } from "@/components/BottomNav";
 import { ReciteSettings } from "@/components/recite/ReciteSettings";
+import { PageNavigation } from "@/components/recite/PageNavigation";
 import { loadPageFont, reciteChaptersOptions, recitePageOptions } from "@/lib/recite/data";
 import { freshRecite, markedWords, nextWord, pageWords, readRecite, revealed, revealAyah, revealNext, restartPage, saveRecite, isOpeningWord, type ReciteWord, type SavedRecite, type WordState } from "@/lib/recite/model";
 import { getChapterAudio } from "@/lib/quran";
@@ -18,7 +19,7 @@ import { getPresetId, resolveVisualPhase, type VisualPhase } from "@/lib/theme-s
 import { parseTajweed, TajweedText } from "@/lib/tajweed";
 import "@/components/recite/supplied-mushaf.css";
 import { mushafThemeId } from "@/components/recite/mushaf-theme";
-import { CONTROLS_IDLE_MS, pageGesture, type PagePointer } from "@/components/recite/page-gesture";
+import { CONTROLS_IDLE_MS, pageGesture, rubberBand, swipeTarget, type PagePointer } from "@/components/recite/page-gesture";
 
 export const Route = createFileRoute("/app/hifz")({
   head: () => ({ meta: [
@@ -32,6 +33,7 @@ export const Route = createFileRoute("/app/hifz")({
 
 function Recite() {
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const initial = useSuspenseQuery(recitePageOptions(562)).data;
   const chapters = useSuspenseQuery(reciteChaptersOptions).data;
   const [saved, setSaved] = useState<SavedRecite>(freshRecite);
@@ -44,7 +46,7 @@ function Recite() {
   const [controls, setControls] = useState(false);
   const [appTheme, setAppTheme] = useState("original");
   const [morningOrEvening, setMorningOrEvening] = useState<VisualPhase>("morning");
-  const [sheet, setSheet] = useState<"settings" | "ai" | "marks" | "complete" | null>(null);
+  const [sheet, setSheet] = useState<"settings" | "navigation" | "ai" | "marks" | "complete" | null>(null);
   const [gradeAyah, setGradeAyah] = useState<string | null>(null);
   const [loadedFont, setLoadedFont] = useState<{ page: number; name: string } | null>(null);
   const [fontAttempt, setFontAttempt] = useState(0);
@@ -58,6 +60,14 @@ function Recite() {
   const touching = useRef(false);
   const [touchActivity, setTouchActivity] = useState(0);
   const transitionTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const stripElement = useRef<HTMLDivElement | null>(null);
+  const labelsElement = useRef<HTMLDivElement | null>(null);
+  const [dimensions, setDimensions] = useState({ strip: 92, labels: 24 });
+  const drag = useRef<{ axis: "pending" | "horizontal" | "vertical"; lastX: number; lastTime: number; velocity: number } | null>(null);
+  const turning = useRef(false);
+  const [dragging, setDragging] = useState(false);
+  const [dragX, setDragX] = useState(0);
+  const turnAnimation = useRef<Animation | null>(null);
 
   const pageQuery = useQuery({ ...recitePageOptions(saved.page), initialData: saved.page === 562 ? initial : undefined });
   const page = pageQuery.data;
@@ -83,6 +93,20 @@ function Recite() {
     return () => { window.removeEventListener("adhkar:theme-change", sync); window.removeEventListener("adhkar:visual-phase-change", sync); window.removeEventListener("storage", sync); };
   }, []);
   useEffect(() => { if (hydrated) saveRecite(saved); }, [saved, hydrated]);
+  useLayoutEffect(() => {
+    const measure = () => setDimensions({ strip: stripElement.current?.offsetHeight ?? 92, labels: labelsElement.current?.offsetHeight ?? 24 });
+    const observer = new ResizeObserver(measure);
+    for (const el of [stripElement.current, labelsElement.current]) if (el) observer.observe(el);
+    measure();
+    return () => observer.disconnect();
+  }, []);
+  useEffect(() => {
+    for (const neighbor of [saved.page - 1, saved.page + 1]) {
+      if (neighbor < 1 || neighbor > 604) continue;
+      void queryClient.prefetchQuery(recitePageOptions(neighbor));
+      void loadPageFont(neighbor);
+    }
+  }, [saved.page, queryClient]);
   useEffect(() => {
     if (!controls || sheet || gradeAyah || touching.current) return;
     const timer = setTimeout(() => setControls(false), CONTROLS_IDLE_MS);
@@ -125,13 +149,41 @@ function Recite() {
     const id = setInterval(() => setSaved((s) => ({ ...s, seconds: { ...s.seconds, [s.page]: (s.seconds[s.page] ?? 0) + 1 } })), 1000);
     return () => clearInterval(id);
   }, [active]);
-  useEffect(() => () => { audio.current?.pause(); if (transitionTimer.current) clearTimeout(transitionTimer.current); }, []);
+  useEffect(() => () => { audio.current?.pause(); turnAnimation.current?.cancel(); if (transitionTimer.current) clearTimeout(transitionTimer.current); }, []);
   function stopAudio() { audio.current?.pause(); setPlaying(false); }
   function changePage(pageNumber: number) {
     if (pageNumber < 1 || pageNumber > 604) return;
     stopAudio(); setStatus("ready"); setSheet(null); setGradeAyah(null); setPeek(null);
     if (transitionTimer.current) clearTimeout(transitionTimer.current);
     update({ page: pageNumber });
+    void triggerHaptic("light");
+  }
+  async function finishDrag(target: number | null, dx: number, width: number) {
+    const paper = paperElement;
+    if (!paper) { setDragX(0); return; }
+    turning.current = true;
+    setDragging(false);
+    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const duration = reduced ? 0 : target ? 200 : 380;
+    const end = target ? Math.sign(dx) * width : 0;
+    const animation = paper.animate([{ transform: `translateX(${dx}px)`, opacity: 1 }, { transform: `translateX(${end}px)`, opacity: target ? 0 : 1 }], { duration, easing: target ? "cubic-bezier(.22,.7,.3,1)" : "cubic-bezier(.18,1.2,.3,1)", fill: "forwards" });
+    turnAnimation.current = animation;
+    try {
+      await Promise.all([animation.finished, target ? queryClient.ensureQueryData(recitePageOptions(target)) : Promise.resolve(), target ? loadPageFont(target) : Promise.resolve()]);
+      if (target) {
+        changePage(target);
+        const name = await loadPageFont(target);
+        if (name) setLoadedFont({ page: target, name });
+      }
+      animation.cancel(); setDragX(0);
+      if (target) {
+        await new Promise<void>((resolve) => requestAnimationFrame(() => resolve()));
+        const entrance = paper.animate([{ transform: `translateX(${-Math.sign(dx) * width * .12}px)`, opacity: 0 }, { transform: "translateX(0)", opacity: 1 }], { duration: reduced ? 0 : 200, easing: "cubic-bezier(.22,1,.36,1)" });
+        turnAnimation.current = entrance;
+        await entrance.finished;
+      }
+    } catch { animation.cancel(); setDragX(0); }
+    finally { turning.current = false; }
   }
   async function playWord(word: ReciteWord) {
     if (!word.audio) return;
@@ -218,24 +270,40 @@ function Recite() {
     if (bismillah) return <div key={line} className="rc-bismillah rc-arabic">بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ</div>;
     return <div key={line} className={`rc-line ${saved.page <= 2 ? "rc-short-line" : ""}`} dir="rtl">{lineItems.map(wordNode)}</div>;
   };
-  return <Portal><MushafThemeProvider theme={appTheme} mode={morningOrEvening} className={`recite-page rc-supplied rc-hide-${saved.settings.hideStyle} ${controls ? "rc-controls-visible" : ""} ${saved.settings.theme === "night" ? "rc-night" : ""}`} style={{ "--rc-size": `${saved.settings.size}px`, "--m-font-quran": "var(--font-arabic)" } as CSSProperties}><main onPointerDownCapture={() => { touching.current = true; setTouchActivity((v) => v + 1); }} onPointerUpCapture={() => { touching.current = false; setTouchActivity((v) => v + 1); }} onPointerCancelCapture={() => { touching.current = false; pointer.current = null; setTouchActivity((v) => v + 1); }}>
-    <header className="rc-header" aria-hidden={!controls} inert={!controls}><Button variant="ghost" size="icon" aria-label="Exit Hifz" onClick={() => void navigate({ to: "/app/more" })}><ChevronLeft /></Button><h1>{chapter?.name_simple ?? "Quran"} · {saved.page}</h1><Button variant="ghost" size="icon" aria-label="Page settings" onClick={() => setSheet("settings")}>Aa</Button></header>
+  return <Portal><MushafThemeProvider theme={appTheme} mode={morningOrEvening} className={`recite-page rc-supplied rc-hide-${saved.settings.hideStyle} ${controls ? "rc-controls-visible" : ""} ${saved.settings.theme === "night" ? "rc-night" : ""}`} style={{ "--rc-size": `${saved.settings.size}px`, "--rc-strip-height": `${dimensions.strip}px`, "--rc-label-height": `${dimensions.labels}px`, "--m-font-quran": "var(--font-arabic)" } as CSSProperties}><main onPointerDownCapture={() => { touching.current = true; setTouchActivity((v) => v + 1); }} onPointerUpCapture={() => { touching.current = false; setTouchActivity((v) => v + 1); }} onPointerCancelCapture={() => { touching.current = false; setTouchActivity((v) => v + 1); }}>
+    <header className="rc-header" aria-hidden={!controls} inert={!controls}><Button variant="ghost" size="icon" aria-label="Exit Hifz" onClick={() => void navigate({ to: "/app/more" })}><ChevronLeft /></Button><Button variant="ghost" className="rc-title" aria-label="Go to page" onClick={() => setSheet("navigation")}>{chapter?.name_simple ?? "Quran"} · {saved.page}</Button><Button variant="ghost" size="icon" aria-label="Page settings" onClick={() => setSheet("settings")}>Aa</Button></header>
     <div className="rc-canvas" onPointerDownCapture={(e) => {
-      if (!e.isPrimary || e.button !== 0) { pointer.current = null; return; }
+      if (!e.isPrimary || e.button !== 0 || turning.current) { pointer.current = null; return; }
       pointer.current = { id: e.pointerId, x: e.clientX, y: e.clientY, time: e.timeStamp, distance: 0 };
+      drag.current = { axis: "pending", lastX: e.clientX, lastTime: e.timeStamp, velocity: 0 };
     }} onPointerMoveCapture={(e) => {
       const start = pointer.current;
-      if (start?.id === e.pointerId) start.distance = Math.max(start.distance, Math.hypot(e.clientX - start.x, e.clientY - start.y));
+      const current = drag.current;
+      if (!start || start.id !== e.pointerId || !current) return;
+      const dx = e.clientX - start.x, dy = e.clientY - start.y;
+      start.distance = Math.max(start.distance, Math.hypot(dx, dy));
+      if (current.axis === "pending" && start.distance >= 10) {
+        current.axis = Math.abs(dx) > Math.abs(dy) * 1.3 ? "horizontal" : "vertical";
+        if (current.axis === "horizontal") { e.currentTarget.setPointerCapture(e.pointerId); setDragging(true); }
+      }
+      const elapsed = e.timeStamp - current.lastTime;
+      if (elapsed > 0) current.velocity = (e.clientX - current.lastX) / elapsed;
+      current.lastX = e.clientX; current.lastTime = e.timeStamp;
+      if (current.axis === "horizontal") setDragX(rubberBand(dx, saved.page, saved.settings.swipeDirection));
     }} onPointerUp={(e) => {
       const start = pointer.current;
+      const current = drag.current;
       pointer.current = null;
+      drag.current = null;
       if (!start || start.id !== e.pointerId) return;
-      const gesture = pageGesture(start, e.clientX, e.clientY, e.timeStamp);
-      if (gesture === "tap") setControls((v) => !v);
-      else if (gesture === "next" || gesture === "previous") changePage(saved.page + (gesture === "next" ? 1 : -1));
-    }} onPointerCancel={() => { pointer.current = null; }}>
-      <div className="rc-labels"><MushafLabel text={`الجزء ${toArabicDigits(first?.juz ?? "—")}`} height={24} /><MushafLabel text={`سُورَةُ ${chapter?.name_arabic ?? "—"}`} height={24} /></div>
-      <div className={`rc-paper ${saved.settings.layout !== "mushaf" ? "rc-reflow" : ""}`} ref={setPaperElement}>
+      if (current?.axis === "horizontal") {
+        const dx = e.clientX - start.x, dy = e.clientY - start.y, width = e.currentTarget.clientWidth;
+        const velocity = e.timeStamp - current.lastTime > 100 ? 0 : current.velocity;
+        void finishDrag(swipeTarget(saved.page, dx, dy, width, velocity, saved.settings.swipeDirection), rubberBand(dx, saved.page, saved.settings.swipeDirection), width);
+      } else if (current?.axis !== "vertical" && pageGesture(start, e.clientX, e.clientY, e.timeStamp) === "tap") setControls((v) => !v);
+    }} onPointerCancel={() => { pointer.current = null; drag.current = null; if (dragging) void finishDrag(null, dragX, paperElement?.clientWidth ?? 390); }}>
+      <div className="rc-labels" ref={labelsElement}><MushafLabel text={`الجزء ${toArabicDigits(first?.juz ?? "—")}`} height={24} /><MushafLabel text={`سُورَةُ ${chapter?.name_arabic ?? "—"}`} height={24} /></div>
+      <div className={`rc-paper ${dragging ? "rc-dragging" : ""} ${saved.settings.layout !== "mushaf" ? "rc-reflow" : ""}`} ref={setPaperElement} style={{ transform: `translateX(${dragX}px)` }}>
         <MushafFrame scale={0.5} className="rc-art-frame">
         {pageQuery.isPending ? <div className="rc-loading">Loading mushaf page…</div> : pageQuery.isError ? <div className="rc-loading">{pageQuery.error.message}<Button variant="outline" onClick={() => void pageQuery.refetch()}>Try again</Button></div> : saved.settings.layout === "mushaf" && !font ? <div className="rc-loading" role="status">Loading mushaf font…{fontFailed && <Button variant="outline" onClick={() => setFontAttempt((v) => v + 1)}>Try again</Button>}</div> : <div className={`rc-mushaf ${font && saved.settings.layout === "mushaf" ? "rc-glyphs" : ""}`} style={{ fontFamily: saved.settings.layout === "mushaf" ? font ?? undefined : undefined, gridTemplateRows: saved.settings.layout === "mushaf" ? Array.from({ length: 15 }, (_, i) => page?.verses.some((v) => v.number === 1 && v.words[0]?.line === i + 3) ? "48px" : "minmax(0, 1fr)").join(" ") : undefined }}>
           {saved.settings.layout === "mushaf" ? Array.from({ length: 15 }, (_, i) => renderLine(i + 1)) : page?.verses.map((verse) => <section className="rc-verse" key={verse.key}><div className="rc-verse-words" dir="rtl">{verse.words.map(wordNode)}</div>{saved.settings.translation && <p className="rc-translation">{verse.translation}</p>}{saved.settings.transliteration && <p className="rc-translation">{verse.words.filter((w) => !w.end).map((w) => w.transliteration).join(" ")}</p>}</section>)}
@@ -245,10 +313,9 @@ function Recite() {
       </div>
     </div>
     <div className="rc-dock">
-      {controls && <div className="rc-page-select"><Button variant="ghost" size="icon" aria-label="Previous page" disabled={saved.page === 1} onClick={() => changePage(saved.page - 1)}><ChevronLeft /></Button><label>Page <input type="number" aria-label="Mushaf page number" min="1" max="604" value={saved.page} onChange={(e) => changePage(Number(e.target.value))} /> / 604</label><Button variant="ghost" size="icon" aria-label="Next page" disabled={saved.page === 604} onClick={() => changePage(saved.page + 1)}><ChevronRight /></Button></div>}
       {controls && status === "paused" && !gradeAyah && !sheet && <div className="rc-pause-tools"><Button variant="ghost" onClick={() => setStatus("active")}><Play />Resume</Button><Button variant="ghost" onClick={() => { stopAudio(); update({ marks: restartPage(words, saved.marks), grades: Object.fromEntries(Object.entries(saved.grades).filter(([key]) => !page?.verses.some((v) => v.key === key))), seconds: { ...saved.seconds, [saved.page]: 0 } }); setStatus("ready"); }}><RotateCcw />Restart page</Button><Button variant="ghost" onClick={() => void listen()}>{playing ? <Pause /> : <Play />}Qari</Button><Button variant="ghost" onClick={() => setSheet("marks")}><Flag />Marks</Button></div>}
       {audioError && <p className="rc-audio-error" role="alert">{audioError}</p>}
-      <div className="rc-strip-wrap" inert={!page || pageQuery.isPending || (saved.settings.layout === "mushaf" && !font) || !!gradeAyah || !!sheet}>
+      <div className="rc-strip-wrap" ref={stripElement} aria-hidden={controls} inert={controls || !page || pageQuery.isPending || (saved.settings.layout === "mushaf" && !font) || !!gradeAyah || !!sheet}>
         <ReciteStrip state={status === "paused" ? "paused" : "idle"} label={mode === "ai" ? "Tap to recite" : status === "paused" ? "Resume recitation" : "Tap to reveal"} time={`${Math.floor((saved.seconds[saved.page] ?? 0) / 60)}:${String((saved.seconds[saved.page] ?? 0) % 60).padStart(2, "0")}`} onTap={horizon} onLongPress={() => { if (status !== "paused" && mode === "self") { setStatus("active"); commitReveal(true); } }} />
       </div>
     </div>
@@ -256,6 +323,7 @@ function Recite() {
     {(sheet || gradeAyah) && <div className="rc-backdrop" onClick={() => { if (!gradeAyah) setSheet(null); }}>
       <div onClick={(e) => e.stopPropagation()}>
         {sheet === "settings" && <ReciteSettings settings={saved.settings} change={(settings) => setSaved((s) => ({ ...s, settings: { ...s.settings, ...settings } }))} close={() => setSheet(null)} />}
+        {sheet === "navigation" && <PageNavigation page={saved.page} chapter={first?.chapter} juz={first?.juz} chapters={chapters} go={changePage} close={() => setSheet(null)} />}
         {sheet === "ai" && <section className="rc-sheet" role="dialog" aria-modal="true" aria-label="AI check"><Mic className="rc-sheet-icon" /><h2>AI recitation checking is coming soon.</h2><p>Self check</p><Button className="rc-primary" onClick={() => { setSaved((s) => ({ ...s, settings: { ...s.settings, mode: "self" } })); setSheet(null); }}>Use self check</Button></section>}
         {gradeAyah && <section className="rc-sheet" role="dialog" aria-modal="true" aria-label="Ayah self check"><span className="rc-eyebrow">AYAH {gradeAyah}</span><h2>How did it go?</h2><div className="rc-grade-options">{(["Easy", "Okay", "Hard"] as const).map((g) => <Button variant="outline" key={g} onClick={() => grade(g)}>{g}</Button>)}</div><div className="rc-check-words" dir="rtl">{words.filter((w) => w.verse === gradeAyah).map((w) => <Button variant="ghost" className={`rc-arabic ${saved.marks[w.key] === "wrong" ? "rc-check-wrong" : ""}`} key={w.key} onClick={() => mark(w)} aria-label={`Mark ${w.key} as mistake`}>{w.text}</Button>)}</div></section>}
         {sheet === "marks" && <section className="rc-sheet rc-marks" role="dialog" aria-modal="true" aria-label="Review marks"><header><h2>Review marks</h2><Button variant="ghost" size="icon" aria-label="Close marks" onClick={() => setSheet(null)}><X /></Button></header>{!marks.length && <p>No marks on this page.</p>}{marks.map((w) => <div className="rc-mark-row" key={w.key}><Button variant="ghost" className="rc-arabic" onClick={() => void playWord(w)}>{w.text}<Play /></Button><small>{w.verse}</small><select aria-label={`State for ${w.key}`} value={saved.marks[w.key]} onChange={(e) => update({ marks: { ...saved.marks, [w.key]: e.target.value as WordState } })}>{["wrong", "skipped", "unsure", "correct"].map((s) => <option key={s}>{s}</option>)}</select></div>)}</section>}
