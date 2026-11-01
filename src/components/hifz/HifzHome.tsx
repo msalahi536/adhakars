@@ -49,7 +49,8 @@ export function HifzHome({ state, update, reset }: { state: HifzState; update: (
     return data ? pageRecitationLabel(data, names, q.surahPages) : `Page ${page}`;
   };
   const navigate = useNavigate();
-  const today = todayISO();
+  const [today,setToday] = useState(todayISO);
+  useEffect(()=>{const id=setInterval(()=>setToday(todayISO()),30000);return()=>clearInterval(id);},[]);
   const session = useMemo(() => buildSession(state, q, today), [state, q, today]);
   const st = useMemo(() => stats(state, q, today), [state, q, today]);
   const timeline = useMemo(() => buildTimeline(state.plan, q, state.plan.dailyMinutes), [state, q]);

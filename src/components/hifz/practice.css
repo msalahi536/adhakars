@@ -48,7 +48,7 @@
 .hp-score b {width:56px;height:56px;border:3px solid var(--accent);border-radius:50%;display:grid;place-items:center;font-size:19px;}
 .hp-score strong {font-size:24px;font-family:var(--font-display);}
 .hp-line-board {border:double 4px var(--accent);padding:12px;max-width:330px;margin:20px auto;background:var(--card);}
-.hp-line-board button {display:flex;width:100%;height:26px;padding:0 6px;justify-content:flex-start;border-radius:2px;font-size:10px;color:var(--muted-foreground);gap:12px;}
+.hp-line-board button {display:flex;width:100%;height:23px;padding:0 6px;justify-content:flex-start;border-radius:2px;font-size:10px;color:var(--muted-foreground);gap:12px;}
 .hp-line-board button i {height:1px;background:var(--border);flex:1;}
 .hp-line-board button.is-right {background:color-mix(in oklab,var(--memory-good) 40%,var(--card));color:var(--foreground);}
 .hp-line-board button.is-wrong {background:color-mix(in oklab,var(--memory-weak) 20%,var(--card));}
