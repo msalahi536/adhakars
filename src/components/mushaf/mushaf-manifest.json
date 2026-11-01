@@ -1,0 +1,370 @@
+{
+  "original": {
+    "morning": {
+      "slice": {
+        "x": 78,
+        "y": 97
+      },
+      "ovalRatio": 3.226,
+      "cartoucheRatio": 5.806,
+      "tokens": {
+        "--m-bg": "#E9E3DA",
+        "--m-paper": "#FBF4EA",
+        "--m-ink": "#1C1C12",
+        "--m-accent": "#3D572B",
+        "--m-strip-a": "#738666",
+        "--m-strip-b": "#3D572B",
+        "--m-strip-text": "#FFFFFF",
+        "--m-mark": "#3D572B",
+        "--m-skip": "#D39A2E",
+        "--m-gold": "#C6A04A",
+        "--m-hidden-opacity": "0.09"
+      },
+      "markerRatio": 1.275
+    },
+    "evening": {
+      "slice": {
+        "x": 88,
+        "y": 98
+      },
+      "ovalRatio": 3.03,
+      "cartoucheRatio": 5.625,
+      "tokens": {
+        "--m-bg": "#0D1223",
+        "--m-paper": "#121932",
+        "--m-ink": "#EAE3D4",
+        "--m-accent": "#131B33",
+        "--m-strip-a": "#555B6C",
+        "--m-strip-b": "#131B33",
+        "--m-strip-text": "#FFFFFF",
+        "--m-mark": "#C9B27A",
+        "--m-skip": "#D39A2E",
+        "--m-gold": "#C6A04A",
+        "--m-hidden-opacity": "0.12"
+      },
+      "markerRatio": 1.233
+    }
+  },
+  "rose": {
+    "morning": {
+      "slice": {
+        "x": 90,
+        "y": 98
+      },
+      "ovalRatio": 3.061,
+      "cartoucheRatio": 5.669,
+      "tokens": {
+        "--m-bg": "#EBDCDD",
+        "--m-paper": "#FDEDEE",
+        "--m-ink": "#2C1919",
+        "--m-accent": "#AA4357",
+        "--m-strip-a": "#C27886",
+        "--m-strip-b": "#AA4357",
+        "--m-strip-text": "#FFFFFF",
+        "--m-mark": "#AA4357",
+        "--m-skip": "#D39A2E",
+        "--m-gold": "#C6A04A",
+        "--m-hidden-opacity": "0.09"
+      },
+      "markerRatio": 1.242
+    },
+    "evening": {
+      "slice": {
+        "x": 91,
+        "y": 100
+      },
+      "ovalRatio": 3.03,
+      "cartoucheRatio": 5.625,
+      "tokens": {
+        "--m-bg": "#EADBDB",
+        "--m-paper": "#FCEBEC",
+        "--m-ink": "#291918",
+        "--m-accent": "#974250",
+        "--m-strip-a": "#B47781",
+        "--m-strip-b": "#974250",
+        "--m-strip-text": "#FFFFFF",
+        "--m-mark": "#974250",
+        "--m-skip": "#D39A2E",
+        "--m-gold": "#C6A04A",
+        "--m-hidden-opacity": "0.09"
+      },
+      "markerRatio": 1.25
+    }
+  },
+  "twilight": {
+    "morning": {
+      "slice": {
+        "x": 91,
+        "y": 96
+      },
+      "ovalRatio": 3.093,
+      "cartoucheRatio": 5.625,
+      "tokens": {
+        "--m-bg": "#E0DBE6",
+        "--m-paper": "#F1EBF7",
+        "--m-ink": "#20191D",
+        "--m-accent": "#5B3F75",
+        "--m-strip-a": "#89759C",
+        "--m-strip-b": "#5B3F75",
+        "--m-strip-text": "#FFFFFF",
+        "--m-mark": "#5B3F75",
+        "--m-skip": "#D39A2E",
+        "--m-gold": "#C6A04A",
+        "--m-hidden-opacity": "0.09"
+      },
+      "markerRatio": 1.275
+    },
+    "evening": {
+      "slice": {
+        "x": 92,
+        "y": 100
+      },
+      "ovalRatio": 3.125,
+      "cartoucheRatio": 5.581,
+      "tokens": {
+        "--m-bg": "#DDD9E7",
+        "--m-paper": "#EEE9F8",
+        "--m-ink": "#1B1519",
+        "--m-accent": "#362358",
+        "--m-strip-a": "#6E6187",
+        "--m-strip-b": "#362358",
+        "--m-strip-text": "#FFFFFF",
+        "--m-mark": "#362358",
+        "--m-skip": "#D39A2E",
+        "--m-gold": "#C6A04A",
+        "--m-hidden-opacity": "0.09"
+      },
+      "markerRatio": 1.258
+    }
+  },
+  "ocean": {
+    "morning": {
+      "slice": {
+        "x": 94,
+        "y": 100
+      },
+      "ovalRatio": 3.0,
+      "cartoucheRatio": 5.625,
+      "tokens": {
+        "--m-bg": "#D5E5E6",
+        "--m-paper": "#E5F6F7",
+        "--m-ink": "#171D1D",
+        "--m-accent": "#1D5E6F",
+        "--m-strip-a": "#5C8B97",
+        "--m-strip-b": "#1D5E6F",
+        "--m-strip-text": "#FFFFFF",
+        "--m-mark": "#1D5E6F",
+        "--m-skip": "#D39A2E",
+        "--m-gold": "#C6A04A",
+        "--m-hidden-opacity": "0.09"
+      },
+      "markerRatio": 1.283
+    },
+    "evening": {
+      "slice": {
+        "x": 94,
+        "y": 96
+      },
+      "ovalRatio": 3.03,
+      "cartoucheRatio": 5.714,
+      "tokens": {
+        "--m-bg": "#D8E4E9",
+        "--m-paper": "#E8F5FB",
+        "--m-ink": "#13171A",
+        "--m-accent": "#04355C",
+        "--m-strip-a": "#4A6E8A",
+        "--m-strip-b": "#04355C",
+        "--m-strip-text": "#FFFFFF",
+        "--m-mark": "#04355C",
+        "--m-skip": "#D39A2E",
+        "--m-gold": "#C6A04A",
+        "--m-hidden-opacity": "0.09"
+      },
+      "markerRatio": 1.275
+    }
+  },
+  "emerald": {
+    "morning": {
+      "slice": {
+        "x": 90,
+        "y": 97
+      },
+      "ovalRatio": 3.061,
+      "cartoucheRatio": 5.669,
+      "tokens": {
+        "--m-bg": "#DDE8DE",
+        "--m-paper": "#EEFAEF",
+        "--m-ink": "#141D16",
+        "--m-accent": "#085B43",
+        "--m-strip-a": "#4D8978",
+        "--m-strip-b": "#085B43",
+        "--m-strip-text": "#FFFFFF",
+        "--m-mark": "#085B43",
+        "--m-skip": "#D39A2E",
+        "--m-gold": "#C6A04A",
+        "--m-hidden-opacity": "0.09"
+      },
+      "markerRatio": 1.258
+    },
+    "evening": {
+      "slice": {
+        "x": 88,
+        "y": 97
+      },
+      "ovalRatio": 3.061,
+      "cartoucheRatio": 5.669,
+      "tokens": {
+        "--m-bg": "#CCDED8",
+        "--m-paper": "#DBEFE8",
+        "--m-ink": "#141815",
+        "--m-accent": "#073B3C",
+        "--m-strip-a": "#4C7273",
+        "--m-strip-b": "#073B3C",
+        "--m-strip-text": "#FFFFFF",
+        "--m-mark": "#073B3C",
+        "--m-skip": "#D39A2E",
+        "--m-gold": "#C6A04A",
+        "--m-hidden-opacity": "0.09"
+      },
+      "markerRatio": 1.258
+    }
+  },
+  "sand": {
+    "morning": {
+      "slice": {
+        "x": 82,
+        "y": 98
+      },
+      "ovalRatio": 3.125,
+      "cartoucheRatio": 5.669,
+      "tokens": {
+        "--m-bg": "#E9E1D4",
+        "--m-paper": "#FBF2E4",
+        "--m-ink": "#251B11",
+        "--m-accent": "#774E1F",
+        "--m-strip-a": "#9D805E",
+        "--m-strip-b": "#774E1F",
+        "--m-strip-text": "#FFFFFF",
+        "--m-mark": "#774E1F",
+        "--m-skip": "#D39A2E",
+        "--m-gold": "#C6A04A",
+        "--m-hidden-opacity": "0.09"
+      },
+      "markerRatio": 1.242
+    },
+    "evening": {
+      "slice": {
+        "x": 88,
+        "y": 102
+      },
+      "ovalRatio": 3.0,
+      "cartoucheRatio": 5.714,
+      "tokens": {
+        "--m-bg": "#C99E75",
+        "--m-paper": "#D8AA7E",
+        "--m-ink": "#1E150E",
+        "--m-accent": "#48250D",
+        "--m-strip-a": "#7B6251",
+        "--m-strip-b": "#48250D",
+        "--m-strip-text": "#FFFFFF",
+        "--m-mark": "#48250D",
+        "--m-skip": "#D39A2E",
+        "--m-gold": "#C6A04A",
+        "--m-hidden-opacity": "0.09"
+      },
+      "markerRatio": 1.267
+    }
+  },
+  "midnight": {
+    "morning": {
+      "slice": {
+        "x": 92,
+        "y": 96
+      },
+      "ovalRatio": 3.061,
+      "cartoucheRatio": 5.714,
+      "tokens": {
+        "--m-bg": "#E6DED2",
+        "--m-paper": "#F7EFE2",
+        "--m-ink": "#18161A",
+        "--m-accent": "#20305D",
+        "--m-strip-a": "#5E6A8A",
+        "--m-strip-b": "#20305D",
+        "--m-strip-text": "#FFFFFF",
+        "--m-mark": "#20305D",
+        "--m-skip": "#D39A2E",
+        "--m-gold": "#C6A04A",
+        "--m-hidden-opacity": "0.09"
+      },
+      "markerRatio": 1.25
+    },
+    "evening": {
+      "slice": {
+        "x": 102,
+        "y": 96
+      },
+      "ovalRatio": 3.125,
+      "cartoucheRatio": 5.669,
+      "tokens": {
+        "--m-bg": "#E1D6CB",
+        "--m-paper": "#F2E6DA",
+        "--m-ink": "#151416",
+        "--m-accent": "#0F2144",
+        "--m-strip-a": "#525F78",
+        "--m-strip-b": "#0F2144",
+        "--m-strip-text": "#FFFFFF",
+        "--m-mark": "#0F2144",
+        "--m-skip": "#D39A2E",
+        "--m-gold": "#C6A04A",
+        "--m-hidden-opacity": "0.09"
+      },
+      "markerRatio": 1.25
+    }
+  },
+  "darkred": {
+    "morning": {
+      "slice": {
+        "x": 86,
+        "y": 98
+      },
+      "ovalRatio": 2.97,
+      "cartoucheRatio": 5.625,
+      "tokens": {
+        "--m-bg": "#E8DFD6",
+        "--m-paper": "#F9F0E6",
+        "--m-ink": "#23120F",
+        "--m-accent": "#6A1013",
+        "--m-strip-a": "#945355",
+        "--m-strip-b": "#6A1013",
+        "--m-strip-text": "#FFFFFF",
+        "--m-mark": "#6A1013",
+        "--m-skip": "#D39A2E",
+        "--m-gold": "#C6A04A",
+        "--m-hidden-opacity": "0.09"
+      },
+      "markerRatio": 1.308
+    },
+    "evening": {
+      "slice": {
+        "x": 92,
+        "y": 100
+      },
+      "ovalRatio": 3.0,
+      "cartoucheRatio": 5.669,
+      "tokens": {
+        "--m-bg": "#E6D5C1",
+        "--m-paper": "#F7E5CF",
+        "--m-ink": "#1E100E",
+        "--m-accent": "#4E080C",
+        "--m-strip-a": "#804D50",
+        "--m-strip-b": "#4E080C",
+        "--m-strip-text": "#FFFFFF",
+        "--m-mark": "#4E080C",
+        "--m-skip": "#D39A2E",
+        "--m-gold": "#C6A04A",
+        "--m-hidden-opacity": "0.09"
+      },
+      "markerRatio": 1.292
+    }
+  }
+}
