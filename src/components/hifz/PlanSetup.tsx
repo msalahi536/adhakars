@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
-import { ChevronLeft, ChevronRight, Check, BookOpen, Sprout, Circle, Search, Layers, List } from "lucide-react";
+import { ChevronLeft, ChevronRight, Check, BookOpen, Sprout, Circle, Search, Layers, List, ArrowUp, ArrowDown, X } from "lucide-react";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { searchChapters } from "@/lib/quran";
 import {
@@ -18,6 +18,7 @@ import {
 import { knownPages, quranIndexOptions } from "@/lib/hifz/program";
 import { reciteChaptersOptions } from "@/lib/recite/data";
 import { hasSetupChoice } from "./setup-choice";
+import { moveSurah, toggleSurahOrder } from "./surah-order";
 
 const DAY_NAMES = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 const TIME_OPTIONS = [20, 30, 45, 60, 90, 120];
@@ -33,6 +34,7 @@ export function PlanSetup({ existing, done }: { existing?: HifzPlan; done: () =>
   const [plan, setPlan] = useState<HifzPlan>(() => existing ?? defaultPlan(today));
   const [pickSurahs, setPickSurahs] = useState(false);
   const [surahSearch, setSurahSearch] = useState("");
+  const [showSurahOrder, setShowSurahOrder] = useState(false);
   const [surahScenery, setSurahScenery] = useState<string>();
   const [startingFresh, setStartingFresh] = useState(false);
   const [chosenJuz, setChosenJuz] = useState<number[]>(() => {
@@ -67,17 +69,23 @@ export function PlanSetup({ existing, done }: { existing?: HifzPlan; done: () =>
     const backdrop = document.querySelector(`.app-background-${phase}`);
     setSurahScenery(backdrop ? getComputedStyle(backdrop).backgroundImage : undefined);
     setSurahSearch("");
+    setShowSurahOrder(false);
     setPickSurahs(true);
   }
   function togglePickerSurah(id: number) {
     if (step === 1) {
-      const next = toggleIn(orderSurahs, id);
+      const next = toggleSurahOrder(orderSurahs, id);
       setOrderSurahs(next);
       setOrder({ kind: "surahs", surahs: next });
     } else {
       setStartingFresh(false);
       setChosenSurahs((list) => toggleIn(list, id));
     }
+  }
+  function movePickerSurah(id: number, direction: -1 | 1) {
+    const next = moveSurah(orderSurahs, id, direction);
+    setOrderSurahs(next);
+    setOrder({ kind: "surahs", surahs: next });
   }
 
   const steps = ["Already know", "Order", "Daily time", "Pace", "Summary"];
@@ -168,18 +176,35 @@ export function PlanSetup({ existing, done }: { existing?: HifzPlan; done: () =>
               <Button variant="ghost" className="hz-surah-back" aria-label="Back to setup" onClick={() => setPickSurahs(false)}><ChevronLeft /></Button>
               <DialogTitle>Choose Surahs</DialogTitle>
             </header>
-            <p className="hz-surah-instruction">{step === 1 ? "Select the surahs you want to memorize." : "Select the surahs you’ve memorized."}</p>
-            <label className="hz-surah-search"><Search /><input aria-label="Search surahs" placeholder="Search surahs…" value={surahSearch} onChange={(e) => setSurahSearch(e.target.value)} /></label>
+            <p className="hz-surah-instruction">{step === 1 ? "Your memorization order" : "Select the surahs you’ve memorized."}</p>
+            {step === 1 && <div className="hz-surah-tabs" role="group" aria-label="Surah selection view">
+              <Button variant="ghost" aria-pressed={!showSurahOrder} onClick={() => setShowSurahOrder(false)}>All surahs</Button>
+              <Button variant="ghost" aria-pressed={showSurahOrder} onClick={() => setShowSurahOrder(true)}>Your order · {orderSurahs.length}</Button>
+            </div>}
+            {!showSurahOrder && <label className="hz-surah-search"><Search /><input aria-label="Search surahs" placeholder="Search surahs…" value={surahSearch} onChange={(e) => setSurahSearch(e.target.value)} /></label>}
             <div className="hz-surah-dialog-list">
-              {searchChapters(chapters, surahSearch).map((c) => (
+              {showSurahOrder ? orderSurahs.map((id, index) => {
+                const chapter = chapters.find((c) => c.id === id);
+                if (!chapter) return null;
+                return <div className="hz-surah-row hz-surah-ordered is-on" key={id}>
+                  <span className="hz-surah-rank">{index + 1}</span>
+                  <span className="hz-surah-english">{chapter.name_simple}</span>
+                  <div className="hz-surah-order-actions">
+                    <Button variant="ghost" size="icon" aria-label={`Move ${chapter.name_simple} up`} title="Move earlier" disabled={index === 0} onClick={() => movePickerSurah(id, -1)}><ArrowUp /></Button>
+                    <Button variant="ghost" size="icon" aria-label={`Move ${chapter.name_simple} down`} title="Move later" disabled={index === orderSurahs.length - 1} onClick={() => movePickerSurah(id, 1)}><ArrowDown /></Button>
+                    <Button variant="ghost" size="icon" aria-label={`Remove ${chapter.name_simple}`} title="Remove surah" onClick={() => togglePickerSurah(id)}><X /></Button>
+                  </div>
+                </div>;
+              }) : searchChapters(chapters, surahSearch).map((c) => (
                 <Button variant="ghost" key={c.id} aria-pressed={pickerSelection.includes(c.id)} aria-label={`${c.id}. ${c.name_simple}`} className={`hz-surah-row ${pickerSelection.includes(c.id) ? "is-on" : ""}`} onClick={() => togglePickerSurah(c.id)}>
-                  <span className="hz-surah-checkbox">{pickerSelection.includes(c.id) && <Check />}</span>
+                  <span className={step === 1 && pickerSelection.includes(c.id) ? "hz-surah-rank" : "hz-surah-checkbox"}>{pickerSelection.includes(c.id) && (step === 1 ? pickerSelection.indexOf(c.id) + 1 : <Check />)}</span>
                   <span className="hz-surah-english">{c.id}. {c.name_simple}</span>
                   <span className="hz-surah-arabic" lang="ar" dir="rtl">{c.name_arabic}</span>
                   <ChevronRight className="hz-surah-chevron" />
                 </Button>
               ))}
-              {searchChapters(chapters, surahSearch).length === 0 && <p className="hz-surah-empty">No surahs found</p>}
+              {showSurahOrder && orderSurahs.length === 0 && <p className="hz-surah-empty">No surahs selected</p>}
+              {!showSurahOrder && searchChapters(chapters, surahSearch).length === 0 && <p className="hz-surah-empty">No surahs found</p>}
             </div>
             <footer className="hz-surah-dialog-footer"><span>{pickerSelection.length} selected</span><Button className="hz-primary" onClick={() => setPickSurahs(false)}>Done</Button></footer>
           </DialogContent>

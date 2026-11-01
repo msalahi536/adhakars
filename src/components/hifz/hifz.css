@@ -73,6 +73,13 @@ main.hz-setup > div { padding-top: calc(env(safe-area-inset-top, 0px) + 76px); }
 .hz-surah-chevron { width: 15px; height: 15px; flex: none; color: var(--foreground); }
 .hz-surah-dialog-footer { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex: none; padding: 12px 14px; border-radius: 20px; border: 1px solid var(--border); background: color-mix(in oklab, var(--surface) 55%, transparent); font-size: 14px; }
 .hz-surah-empty { text-align: center; padding: 24px 0; color: var(--card-foreground); }
+.hz-surah-tabs { display: flex; flex: none; gap: 4px; padding: 4px; border: 1px solid var(--border); border-radius: 16px; background: color-mix(in oklab, var(--surface) 70%, transparent); }
+.hz-surah-tabs > button { flex: 1; border-radius: 12px; color: var(--card-foreground); }
+.hz-surah-tabs > button[aria-pressed="true"] { background: var(--accent); color: var(--accent-foreground); }
+.hz-surah-rank { width: 26px; height: 26px; flex: none; display: grid; place-items: center; border-radius: 50%; background: var(--accent); color: var(--accent-foreground); font-size: 12px; font-weight: 700; }
+.hz-surah-order-actions { display: flex; flex: none; gap: 2px; }
+.hz-surah-order-actions > button { width: 32px; height: 36px; color: var(--card-foreground); }
+.hz-surah-order-actions svg { width: 16px; height: 16px; }
 .hz-entry-back { position: absolute; top: 32px; left: 0; z-index: 20; }
 .hz-entry-back .header-icon-button, .hz-home-header .header-icon-button { border-radius: 12px !important; background: color-mix(in oklab, var(--card) 88%, transparent) !important; color: var(--btn-fg, var(--title)) !important; border: 1px solid var(--card-border, var(--border)) !important; box-shadow: 0 2px 8px color-mix(in oklab, var(--title) 6%, transparent) !important; backdrop-filter: blur(20px) !important; }
 .hz-surah-dialog.hz-setup { isolation: isolate; overflow: hidden; background: var(--surface-card, var(--card)); }
