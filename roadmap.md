@@ -1,5 +1,7 @@
 # Roadmap
 
+- [ ] Make daily Quran/Sunnah pickers open with scrollable source content, collection/surah browsing and optional search; preserve scheduling and widget behavior.
+
 - [x] Correct missing editor session in preview: encrypted Secure/HttpOnly SameSite=None partitioned cookie, cross-site write rejection and explicit lost-session error. Both real source saves/read-back, refresh and sign-out pass; defaults untouched and test assignments removed. Actual hosted iframe retry still needs user confirmation; local cross-site reproduction is unavailable.
 
 - [x] Build restricted daily Quran/Sunnah editor: secure server session, source lookup, yearly calendar and date/week/range assignments. Seven tests pass; mobile source searches, both saved selections/read-back, refresh session, restore rotation and sign-out verified. Test assignments removed. Native same-day cache/refresh behavior unchanged; publish required.
