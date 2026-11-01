@@ -59,7 +59,7 @@ test("selected surahs retain their own estimate while full Quran includes remain
   const result = goalFinishEstimates({ ...plan, newLinesPerDay: 15, dailyMinutes: 180 }, index);
   expect(result?.goal.days).toBe(3);
   expect(result?.goal.timeline.pagesToMemorize).toBe(3);
-  expect(result?.full.timeline.pagesToMemorize).toBe(51);
+  expect(result?.full.timeline.pagesToMemorize).toBe(604);
   expect(result?.full.days).toBeGreaterThan(3);
 });
 
