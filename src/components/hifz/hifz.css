@@ -166,6 +166,10 @@ main.hz-setup > div { padding-top: calc(env(safe-area-inset-top, 0px) + 76px); }
 .hz-time-summary-duration { margin-top: 4px; font-size: 12px; line-height: 1.4; font-weight: 600; }
 .hz-time-summary small { font-size: 10px; line-height: 1.4; opacity: .75; }
 .hz-time-summary .hz-finish-warning { margin-top: 6px; opacity: 1; }
+.hz-goal-summary { margin-top: 12px; }
+.hz-goal-full { display: flex; flex-direction: column; gap: 5px; margin-top: 8px; padding-top: 12px; border-top: 1px solid var(--border); }
+.hz-goal-full > span { font-size: 12px; font-weight: 600; }
+.hz-goal-full > strong { font-size: 19px; }
 .hz-customize-link { display: flex; margin: 4px auto 0; font-size: 12px; font-weight: 600; color: var(--card-foreground); gap: 9px; }
 .hz-customize-link > svg { width: 16px; height: 16px; opacity: .7; }
 .hz-customize-sheet.hz-setup { min-height: 0; height: 92dvh; max-height: calc(100dvh - env(safe-area-inset-top) - 16px); display: flex; flex-direction: column; gap: 0; overflow: hidden; border-radius: 28px 28px 0 0; padding: 10px 20px calc(env(safe-area-inset-bottom) + 16px); background: linear-gradient(135deg, color-mix(in oklab, var(--surface) 38%, transparent), transparent 65%), var(--surface-card, var(--card)); z-index: 220; color: var(--card-foreground); }

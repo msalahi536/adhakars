@@ -28,3 +28,18 @@ export function selectedFinishEstimate(timeline: Timeline, startDate: string, ta
     timeWarning: effective.finish > targetDate ? timeline.shortOnTime?.message : undefined,
   };
 }
+
+export function goalFinishEstimates(plan: HifzPlan, q: QuranIndex) {
+  if (plan.order.kind === "forward") return null;
+  const isAmma = plan.order.kind === "juzAmmaFirst";
+  if (!isAmma && plan.order.kind !== "surahs") return null;
+  const goalIndex = isAmma ? { ...q, surahPages: { ...q.surahPages, 0: [582, 604] as [number, number] } } : q;
+  const goalOrder = isAmma ? { kind: "surahs" as const, surahs: [0] } : plan.order;
+  const goal = effectiveTimeline(buildTimeline({ ...plan, order: goalOrder }, goalIndex, plan.dailyMinutes));
+  const fullIndex = { ...q, surahPages: { ...q.surahPages, 0: [1, 604] as [number, number] } };
+  const fullOrder = plan.order.kind === "surahs"
+    ? { kind: "surahs" as const, surahs: [...plan.order.surahs, 0] }
+    : plan.order;
+  const full = effectiveTimeline(buildTimeline({ ...plan, order: fullOrder }, fullIndex, plan.dailyMinutes));
+  return { label: isAmma ? "Juz Amma" : "Selected surahs", goal, full };
+}

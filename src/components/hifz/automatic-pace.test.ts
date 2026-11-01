@@ -1,6 +1,6 @@
 import { expect, test } from "bun:test";
 import { buildTimeline, buildQuranIndex, defaultPlan } from "@/lib/hifz";
-import { AUTOMATIC_LINES, DAILY_MINUTES, bestAutomaticPace, selectedFinishEstimate } from "./automatic-pace";
+import { AUTOMATIC_LINES, DAILY_MINUTES, bestAutomaticPace, selectedFinishEstimate, goalFinishEstimates } from "./automatic-pace";
 
 const q = buildQuranIndex([{ id: 67, pages: [562, 564] }]);
 const plan = { ...defaultPlan("2026-11-01"), order: { kind: "surahs" as const, surahs: [67] }, studyDays: [0,1,2,3,4,5,6], consolidateEvery: 0 };
@@ -44,4 +44,26 @@ test("a chosen date does not hide a daily-time limitation", () => {
 test("manual pace without a chosen date retains the effective engine finish", () => {
   const timeline = buildTimeline({ ...plan, newLinesPerDay: 45 }, q, 20);
   expect(selectedFinishEstimate(timeline, plan.startDate).finish).toBe(timeline.shortOnTime?.realisticFinishDate);
+});
+
+test("Juz Amma estimate covers its 23 pages separately from all 604 pages", () => {
+  const result = goalFinishEstimates({ ...plan, order: { kind: "juzAmmaFirst" }, newLinesPerDay: 15, dailyMinutes: 180 }, q);
+  expect(result?.goal.timeline.pagesToMemorize).toBe(23);
+  expect(result?.goal.days).toBe(23);
+  expect(result?.full.timeline.pagesToMemorize).toBe(604);
+  expect(result?.full.days).toBeGreaterThan(23);
+});
+
+test("selected surahs retain their own estimate while full Quran includes remaining surahs", () => {
+  const index = buildQuranIndex([{ id: 67, pages: [562, 564] }, { id: 2, pages: [2, 49] }]);
+  const result = goalFinishEstimates({ ...plan, newLinesPerDay: 15, dailyMinutes: 180 }, index);
+  expect(result?.goal.days).toBe(3);
+  expect(result?.goal.timeline.pagesToMemorize).toBe(3);
+  expect(result?.full.timeline.pagesToMemorize).toBe(604);
+  expect(result?.full.days).toBeGreaterThan(3);
+});
+
+test("already known Juz Amma pages are excluded from its goal estimate", () => {
+  const result = goalFinishEstimates({ ...plan, order: { kind: "juzAmmaFirst" }, alreadyMemorized: [604], newLinesPerDay: 15, dailyMinutes: 180 }, q);
+  expect(result?.goal.days).toBe(22);
 });

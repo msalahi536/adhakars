@@ -24,7 +24,7 @@ import { knownPages, quranIndexOptions } from "@/lib/hifz/program";
 import { reciteChaptersOptions } from "@/lib/recite/data";
 import { hasSetupChoice } from "./setup-choice";
 import { moveSurah, toggleSurahOrder } from "./surah-order";
-import { bestAutomaticPace, DAILY_MINUTES, effectiveTimeline, selectedFinishEstimate } from "./automatic-pace";
+import { bestAutomaticPace, DAILY_MINUTES, effectiveTimeline, selectedFinishEstimate, goalFinishEstimates } from "./automatic-pace";
 
 const DAY_NAMES = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 const TIME_OPTIONS = DAILY_MINUTES;
@@ -76,6 +76,7 @@ export function PlanSetup({ existing, done }: { existing?: HifzPlan; done: () =>
   const cardEstimates = useMemo(() => customLines === undefined ? automaticPaces : new Map(TIME_OPTIONS.map((minutes) => [minutes, effectiveTimeline(buildTimeline({ ...draft, newLinesPerDay: customLines }, q, minutes))])), [automaticPaces, customLines, automaticKey, q]);
   const chosenLines = customLines ?? automaticPaces.get(plan.dailyMinutes)?.lines ?? plan.newLinesPerDay;
   const selectedEstimate = useMemo(() => selectedFinishEstimate(buildTimeline({ ...draft, newLinesPerDay: chosenLines }, q, plan.dailyMinutes), plan.startDate, paceMode === "date" && dateTimeline ? targetDate : undefined), [JSON.stringify(draft), chosenLines, q, paceMode, targetDate, dateTimeline]);
+  const goalEstimates = useMemo(() => step === 2 ? goalFinishEstimates({ ...draft, newLinesPerDay: chosenLines }, q) : null, [step, JSON.stringify(draft), chosenLines, q]);
   useEffect(() => {
     if (step >= 2 && chosenLines !== plan.newLinesPerDay) setPlan((p) => ({ ...p, newLinesPerDay: chosenLines }));
   }, [chosenLines, step, plan.newLinesPerDay]);
@@ -255,6 +256,7 @@ export function PlanSetup({ existing, done }: { existing?: HifzPlan; done: () =>
               ); })}
             </div>
             <div className="hz-time-summary" role="status">
+              {goalEstimates && <small>{plan.order.kind === "surahs" ? "Selected surahs" : "Entire Quran"}</small>}
               <div className="hz-time-summary-heading">
                 <div><span>You’ll finish around</span><strong>{monthYear(selectedEstimate.finish)}</strong></div>
               </div>
@@ -262,6 +264,11 @@ export function PlanSetup({ existing, done }: { existing?: HifzPlan; done: () =>
               {selectedEstimate.firstJuz && <small>First juz done by {monthYear(selectedEstimate.firstJuz)}</small>}
               {selectedEstimate.timeWarning && <small className="hz-finish-warning">{selectedEstimate.timeWarning}</small>}
             </div>
+            {goalEstimates && <div className="hz-time-summary hz-goal-summary" role="status">
+              <div className="hz-time-summary-heading"><div><span>{goalEstimates.label} at this pace</span><strong>{humanDuration(goalEstimates.goal.days)}</strong></div></div>
+              <small>Done around {monthYear(goalEstimates.goal.finish)}</small>
+              <div className="hz-goal-full"><span>Entire Quran at this pace</span><strong>{humanDuration(goalEstimates.full.days)}</strong><small>Done around {monthYear(goalEstimates.full.finish)}</small></div>
+            </div>}
             <Button variant="link" className="hz-customize-link" onClick={() => setCustomizePace(true)}><SlidersHorizontal aria-hidden="true" /> Customize pace</Button>
           </section>
         )}

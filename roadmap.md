@@ -1,5 +1,7 @@
 # Roadmap
 
+- [x] Show separate Juz Amma/selected-surah and whole-Quran estimates on daily-time setup; 9 tests pass and both phone flows verified.
+
 - [x] Match Your plan references: frosted heading, goal overview, milestone pills, time chart and rounded actions; phone screenshots compared, advanced toggle and plan saving verified, 6 tests pass.
 
 - [x] Reflect the chosen finish date in the summary, retain time-limit warnings and center summary text; 6 tests pass, phone screenshot and date/pace switching verified.
