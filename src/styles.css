@@ -5282,3 +5282,11 @@ body.has-adhkar-mini.adhkar-tucked .quran-player:not(.rec-panel), body.has-adhka
 .rc-no-motion *, .rc-no-motion *::before { animation: none !important; transition: none !important; }
 @media (prefers-reduced-motion: reduce) { .recite-page *, .recite-page *::before { animation: none !important; transition: none !important; } }
 @media (min-width: 700px) { .rc-paper { padding-inline: 40px; } .rc-line, .rc-bismillah { min-height: 48px; } .rc-word { height: 48px; } .rc-landscape { height: 220px; } }
+/* Keep QPC glyphs separated even where their ink extends beyond the advance width. */
+.recite-page button { border-radius: 6px; }
+.recite-page .rc-header button { border-radius: 50%; }
+.recite-page .rc-word { font-size: var(--rc-line-size, var(--rc-size)); flex-shrink: 0; padding-inline: 1px; border-radius: 0; }
+.rc-word-ink { padding-inline: 1px; }
+.rc-line { gap: 5px; }
+.rc-ayah-end { font-size: var(--rc-line-size, var(--rc-size)); flex-shrink: 0; }
+.recite-page .rc-nav-wrap .bottom-nav { border: 0; border-radius: 0; }
