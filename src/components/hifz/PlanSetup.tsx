@@ -15,6 +15,7 @@ import {
 } from "@/lib/hifz";
 import { knownPages, quranIndexOptions } from "@/lib/hifz/program";
 import { reciteChaptersOptions } from "@/lib/recite/data";
+import { hasSetupChoice } from "./setup-choice";
 
 const DAY_NAMES = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 const TIME_OPTIONS = [20, 30, 45, 60, 90, 120];
@@ -29,6 +30,7 @@ export function PlanSetup({ existing, done }: { existing?: HifzPlan; done: () =>
   const [step, setStep] = useState(0);
   const [plan, setPlan] = useState<HifzPlan>(() => existing ?? defaultPlan(today));
   const [pickSurahs, setPickSurahs] = useState(false);
+  const [startingFresh, setStartingFresh] = useState(false);
   const [chosenJuz, setChosenJuz] = useState<number[]>(() => {
     if (!existing) return [];
     return Array.from({ length: 30 }, (_, i) => i + 1).filter((j) => {
@@ -58,7 +60,7 @@ export function PlanSetup({ existing, done }: { existing?: HifzPlan; done: () =>
 
   const steps = ["Already know", "Order", "Daily time", "Pace", "Summary"];
   const canNext =
-    step === 0 ? true :
+    step === 0 ? hasSetupChoice(chosenJuz, chosenSurahs, startingFresh) :
     step === 1 ? plan.order.kind !== "surahs" || orderSurahs.length > 0 :
     step === 3 ? true : true;
 
@@ -91,7 +93,7 @@ export function PlanSetup({ existing, done }: { existing?: HifzPlan; done: () =>
                   aria-label={`Juz ${j}`}
                   aria-pressed={chosenJuz.includes(j)}
                   className={`hz-juz-tile ${chosenJuz.includes(j) ? "is-on" : ""}`}
-                  onClick={() => setChosenJuz((list) => toggleIn(list, j))}
+                  onClick={() => { setStartingFresh(false); setChosenJuz((list) => toggleIn(list, j)); }}
                 >
                   <span>{j}</span>
                   {chosenJuz.includes(j) && <Check className="hz-juz-check" />}
@@ -111,7 +113,7 @@ export function PlanSetup({ existing, done }: { existing?: HifzPlan; done: () =>
                     key={c.id}
                     aria-pressed={chosenSurahs.includes(c.id)}
                     className={`hz-surah-chip ${chosenSurahs.includes(c.id) ? "is-on" : ""}`}
-                    onClick={() => setChosenSurahs((list) => toggleIn(list, c.id))}
+                    onClick={() => { setStartingFresh(false); setChosenSurahs((list) => toggleIn(list, c.id)); }}
                   >
                     {c.id}. {c.name_simple}
                   </Button>
@@ -119,10 +121,10 @@ export function PlanSetup({ existing, done }: { existing?: HifzPlan; done: () =>
               </div>
             )}
             <div className="hz-choice-divider"><span>or</span></div>
-            <Button variant="ghost" className="hz-wide hz-fresh-choice" aria-pressed={known.length === 0} onClick={() => { setChosenJuz([]); setChosenSurahs([]); }}>
+            <Button variant="ghost" className="hz-wide hz-fresh-choice" aria-pressed={startingFresh} onClick={() => { setChosenJuz([]); setChosenSurahs([]); setStartingFresh((value) => !value); }}>
               <span className="hz-fresh-icon"><Sprout /></span>
               <span className="hz-fresh-copy"><strong>Nothing yet — I’m starting fresh</strong><small>{known.length} pages will start in review.</small></span>
-              {known.length === 0 ? <Check className="hz-fresh-check" /> : <Circle className="hz-fresh-check" />}
+              {startingFresh ? <Check className="hz-fresh-check" /> : <Circle className="hz-fresh-check" />}
             </Button>
           </section>
         )}
