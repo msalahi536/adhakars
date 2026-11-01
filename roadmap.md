@@ -1,5 +1,11 @@
 # Roadmap
 
+- [x] Matched action rows with larger dark text and soft circular icons; body-portaled Salah/Juz/reminder popups clear navigation, named surah choices replace page-only grids, Salah save and Start verified; 4 targeted tests and build pass.
+
+- [x] Enlarged dark Your Hifz text; fixed partial learning pages counted as fully memorized in Juz stats, added exact page counts and kept proportional fill; 16 tests pass.
+
+- [x] Softened Today to reference olive gradient and made heading frost slimmer/more transparent; phone screenshot and Start verified.
+
 - [x] Darkened Today with an opaque deep gradient, raised home 8px further and added the frosted heading; phone screenshot, popups and Start verified; build OK.
 
 - [x] Refined Today close-up with softer shaded gradient, relaxed lettering, tighter spacing and pale Start pill; moved content up 10px, reviewed phone screenshot and verified Start and popups.

@@ -336,7 +336,7 @@ export function stats(s: HifzState, q: QuranIndex, today: string) {
   const byJuz = Array.from({ length: 30 }, (_, i) => {
     const juz = i + 1;
     const pages = q.pages.filter((p) => p.juz === juz).map((p) => p.page);
-    const held = pages.filter((p) => s.pages[p]?.memory);
+    const held = pages.filter((p) => s.pages[p]?.stage === "sabqi" || s.pages[p]?.stage === "manzil");
     return {
       juz,
       pages: pages.length,
