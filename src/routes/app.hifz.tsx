@@ -166,18 +166,19 @@ function Recite() {
   }, [active]);
   useEffect(() => () => { audio.current?.pause(); turnAnimation.current?.cancel(); if (transitionTimer.current) clearTimeout(transitionTimer.current); }, []);
   function stopAudio() { audio.current?.pause(); setPlaying(false); }
-  function changePage(pageNumber: number) {
-    if (pageNumber < 1 || pageNumber > 604) return;
+  function changePage(pageNumber: number, feedback = true) {
+    if (pageNumber < 1 || pageNumber > 604 || pageNumber === latest.current.page) return;
     stopAudio(); setStatus("ready"); setSheet(null); setGradeAyah(null); setPeek(null);
     if (transitionTimer.current) clearTimeout(transitionTimer.current);
     update({ page: pageNumber });
-    playFeedback("pageTurn");
+    if (feedback) playFeedback("pageTurn");
   }
   async function finishDrag(target: number | null, dx: number, width: number) {
     const paper = paperElement;
     if (!paper) { setDragX(0); return; }
     turning.current = true;
     setDragging(false);
+    if (target) playFeedback("pageTurn");
     const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     const duration = reduced ? 0 : target ? 200 : 380;
     const end = target ? Math.sign(dx) * width : 0;
@@ -186,7 +187,7 @@ function Recite() {
     try {
       await Promise.all([animation.finished, target ? queryClient.ensureQueryData(recitePageOptions(target)) : Promise.resolve(), target ? loadPageFont(target) : Promise.resolve()]);
       if (target) {
-        changePage(target);
+        changePage(target, false);
         const name = await loadPageFont(target);
         if (name) setLoadedFont({ page: target, name });
       }
