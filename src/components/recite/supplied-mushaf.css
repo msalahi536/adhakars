@@ -17,6 +17,10 @@
 .rc-supplied .rc-header { z-index: 5; background: color-mix(in oklab, var(--m-paper) 85%, transparent); transform: translateY(-8px); transition: opacity 280ms ease, transform 360ms cubic-bezier(.22, 1, .36, 1); }
 .rc-supplied.rc-controls-visible .rc-header { transform: translateY(0); }
 .rc-supplied .rc-header h1 { position: absolute; left: 50%; transform: translateX(-50%); pointer-events: none; }
+.rc-supplied .rc-header button { width: 36px; height: 36px; flex: 0 0 36px; border-radius: 50%; border: 1px solid color-mix(in oklab, var(--m-mark) 16%, transparent); background: color-mix(in oklab, var(--m-paper) 82%, transparent); color: var(--m-ink); font-size: 17px; font-weight: 500; box-shadow: 0 2px 8px color-mix(in oklab, var(--m-ink) 5%, transparent); transition: background 180ms ease, border-color 180ms ease, transform 180ms ease; }
+.rc-supplied .rc-header button:hover { background: color-mix(in oklab, var(--m-mark) 10%, var(--m-paper)); border-color: color-mix(in oklab, var(--m-mark) 30%, transparent); }
+.rc-supplied .rc-header button:active { transform: scale(.94); }
+.rc-supplied .rc-header button svg { width: 20px; height: 20px; stroke-width: 1.75; }
 .rc-supplied .rc-labels { display: flex; justify-content: space-between; align-items: center; padding: 0 12px 9px; flex: none; }
 .rc-supplied .rc-paper { padding: 0; background: var(--m-paper); }
 .rc-supplied .rc-art-frame { width: 100%; height: 100%; }
@@ -32,10 +36,10 @@
 .rc-supplied.rc-night .rc-paper { filter: brightness(.78); }
 .rc-supplied .rc-dock { bottom: calc(env(safe-area-inset-bottom, 0px) + 30px); padding: 0 18px; }
 .rc-supplied .rc-strip-wrap { width: 100%; }
-.rc-supplied .rc-nav-wrap { position: absolute; bottom: env(safe-area-inset-bottom, 0px); width: 100%; z-index: 5; height: var(--bottom-nav-row); transform: translateY(18px); transition: opacity 280ms ease, transform 420ms cubic-bezier(.22, 1, .36, 1); }
+.rc-supplied .rc-nav-wrap { position: absolute; bottom: calc(env(safe-area-inset-bottom, 0px) + 8px); width: 100%; z-index: 5; height: var(--bottom-nav-row); overflow: visible; transform: translateY(18px); transition: opacity 280ms ease, transform 420ms cubic-bezier(.22, 1, .36, 1); }
 .rc-supplied.rc-controls-visible .rc-nav-wrap { height: var(--bottom-nav-row); transform: translateY(0); }
-.rc-supplied .bottom-nav { margin: 0; width: 100%; color: var(--m-ink); background: var(--m-paper); }
-.rc-supplied .bottom-nav-row { background: var(--m-paper) !important; border-color: var(--rc-line) !important; box-shadow: none; }
+.rc-supplied .bottom-nav { margin: 0 auto; width: calc(100% - 56px); color: var(--m-ink); background: transparent; }
+.rc-supplied .bottom-nav-row { border-radius: 18px; background: color-mix(in oklab, var(--m-paper) 90%, transparent) !important; border-color: var(--rc-line) !important; box-shadow: var(--rc-shadow); backdrop-filter: blur(20px); }
 .rc-supplied .rc-page-select, .rc-supplied .rc-pause-tools { animation: rc-controls-enter 360ms cubic-bezier(.22, 1, .36, 1) both; }
 @keyframes rc-controls-enter { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
 .rc-supplied .rc-loading { min-height: 0; height: 100%; }
