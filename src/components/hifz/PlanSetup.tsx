@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
-import { ChevronLeft, ChevronRight, Check } from "lucide-react";
+import { ChevronLeft, ChevronRight, Check, BookOpen, Sprout, Circle } from "lucide-react";
 import {
   buildTimeline,
   compareTimelines,
@@ -68,7 +68,7 @@ export function PlanSetup({ existing, done }: { existing?: HifzPlan; done: () =>
   }
 
   return (
-    <main className="scroll-area hz-setup">
+    <main className={`scroll-area hz-setup ${step === 0 ? "hz-known-step" : ""}`}>
       <div className="mx-auto max-w-md px-5 py-4">
         <div className="hz-steps" aria-label={`Step ${step + 1} of ${steps.length}: ${steps[step]}`}>
           {steps.map((label, i) => (
@@ -78,7 +78,7 @@ export function PlanSetup({ existing, done }: { existing?: HifzPlan; done: () =>
         <p className="label-caps hz-step-label">{steps[step]}</p>
 
         {step === 0 && (
-          <section>
+          <section className="hz-known-content">
             <h1 className="hz-title">What do you already know?</h1>
             <p className="hz-sub">Tap every juz you have fully memorized. These pages go straight into review.</p>
             <div className="hz-juz-grid">
@@ -86,16 +86,20 @@ export function PlanSetup({ existing, done }: { existing?: HifzPlan; done: () =>
                 <Button
                   variant="ghost"
                   key={j}
+                  aria-label={`Juz ${j}`}
                   aria-pressed={chosenJuz.includes(j)}
                   className={`hz-juz-tile ${chosenJuz.includes(j) ? "is-on" : ""}`}
                   onClick={() => setChosenJuz((list) => toggleIn(list, j))}
                 >
-                  {j}
+                  <span>{j}</span>
+                  {chosenJuz.includes(j) && <Check className="hz-juz-check" />}
                 </Button>
               ))}
             </div>
-            <Button variant="outline" className="hz-wide" onClick={() => setPickSurahs((v) => !v)} aria-expanded={pickSurahs}>
+            <Button variant="outline" className="hz-wide hz-pick-surahs" onClick={() => setPickSurahs((v) => !v)} aria-expanded={pickSurahs}>
+              <BookOpen />
               Pick surahs instead
+              <ChevronRight className={pickSurahs ? "hz-picker-open" : ""} />
             </Button>
             {pickSurahs && (
               <div className="hz-surah-pick">
@@ -112,10 +116,12 @@ export function PlanSetup({ existing, done }: { existing?: HifzPlan; done: () =>
                 ))}
               </div>
             )}
-            <Button variant="ghost" className="hz-wide" onClick={() => { setChosenJuz([]); setChosenSurahs([]); }}>
-              Nothing yet — I'm starting fresh
+            <div className="hz-choice-divider"><span>or</span></div>
+            <Button variant="ghost" className="hz-wide hz-fresh-choice" aria-pressed={known.length === 0} onClick={() => { setChosenJuz([]); setChosenSurahs([]); }}>
+              <span className="hz-fresh-icon"><Sprout /></span>
+              <span className="hz-fresh-copy"><strong>Nothing yet — I’m starting fresh</strong><small>{known.length} pages will start in review.</small></span>
+              {known.length === 0 ? <Check className="hz-fresh-check" /> : <Circle className="hz-fresh-check" />}
             </Button>
-            <p className="hz-note">{known.length} pages will start in review.</p>
           </section>
         )}
 

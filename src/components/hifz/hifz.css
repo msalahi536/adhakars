@@ -10,6 +10,31 @@
 .hz-sub { font-size: 13px; color: var(--muted-foreground); margin: 0 0 14px; }
 .hz-note { font-size: 12px; color: var(--muted-foreground); text-align: center; margin-top: 10px; }
 
+/* First setup step: opaque reading surfaces keep choices clear over app artwork. */
+.hz-known-step { padding-bottom: calc(var(--bottom-nav-height, 90px) + env(safe-area-inset-bottom) + 20px); color: var(--foreground); }
+.hz-known-step > div { padding-top: calc(env(safe-area-inset-top) + 22px); }
+.hz-known-step .hz-step-label { color: var(--foreground); opacity: .8; margin: 12px 0 22px; }
+.hz-known-content .hz-title { font-family: var(--font-display); font-size: 32px; line-height: 1.1; font-weight: 700; text-align: center; margin: 0 0 12px; }
+.hz-known-content .hz-sub { color: var(--foreground); font-size: 14px; line-height: 1.5; text-align: center; margin-bottom: 24px; }
+.hz-known-step .hz-juz-grid { gap: 9px; margin-bottom: 18px; }
+.hz-known-step .hz-juz-tile { position: relative; min-width: 0; width: 100%; height: 49px; padding: 0; border-radius: 14px; background: var(--surface); color: var(--foreground); border: 1px solid color-mix(in oklab, var(--foreground) 24%, var(--surface)); box-shadow: var(--card-shadow); font-size: 18px; font-weight: 700; transition: background .2s ease, border-color .2s ease, transform .2s ease; }
+.hz-known-step .hz-juz-tile.is-on { background: var(--accent); color: var(--accent-foreground); border-color: var(--accent); }
+.hz-known-step .hz-juz-tile:active { transform: scale(.94); }
+.hz-known-step .hz-juz-tile .hz-juz-check { position: absolute; right: 3px; top: 3px; width: 10px; height: 10px; }
+.hz-known-step .hz-pick-surahs { height: 48px; margin: 0; background: var(--surface); color: var(--foreground); border-color: color-mix(in oklab, var(--foreground) 24%, var(--surface)); box-shadow: var(--card-shadow); font-size: 14px; font-weight: 600; }
+.hz-picker-open { transform: rotate(90deg); }
+.hz-choice-divider { display: flex; align-items: center; gap: 16px; margin: 18px 0; color: var(--foreground); font-size: 12px; text-transform: uppercase; }
+.hz-choice-divider::before, .hz-choice-divider::after { content: ""; height: 1px; flex: 1; background: color-mix(in oklab, var(--foreground) 25%, transparent); }
+.hz-known-step .hz-fresh-choice { display: flex; width: 100%; height: auto; min-height: 76px; gap: 10px; margin: 0; padding: 14px 12px; text-align: left; white-space: normal; background: var(--surface); color: var(--foreground); border: 1px solid color-mix(in oklab, var(--foreground) 24%, var(--surface)); box-shadow: var(--card-shadow); }
+.hz-fresh-icon { display: grid; place-items: center; width: 34px; height: 40px; flex: none; color: var(--foreground); }
+.hz-fresh-copy { flex: 1; min-width: 0; }
+.hz-fresh-copy strong { display: block; font-size: 14px; font-weight: 600; line-height: 1.4; }
+.hz-fresh-copy small { display: block; margin-top: 4px; font-size: 12px; font-weight: 400; color: var(--foreground); opacity: .8; }
+.hz-fresh-check { flex: none; }
+.hz-known-step .hz-nav { margin-top: 24px; }
+.hz-known-step .hz-primary { height: 48px; min-width: 114px; box-shadow: var(--card-shadow); }
+@media (prefers-reduced-motion: reduce) { .hz-known-step .hz-juz-tile { transition: none; } }
+
 .hz-juz-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 8px; margin-bottom: 12px; }
 .hz-juz-tile { height: 44px; border-radius: 12px; border: 1px solid var(--border); background: var(--surface, var(--card)); font-weight: 700; color: var(--foreground); }
 .hz-juz-tile.is-on { background: var(--accent); color: var(--accent-foreground, var(--card)); border-color: var(--accent); }
