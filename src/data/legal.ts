@@ -28,7 +28,7 @@ export const PRIVACY_SECTIONS: LegalSection[] = [
   },
   {
     heading: "COOKIES AND LOCAL STORAGE",
-    body: "This app does not use advertising cookies, tracking cookies, pixels, fingerprinting, or third-party analytics cookies. It uses your device's local storage only to remember your progress, settings, and preferences so the app works between sessions. This data stays on your device and is cleared when you reset your progress, clear your browser data, or uninstall the app.",
+    body: "This app does not use advertising cookies, tracking cookies, pixels, fingerprinting, or third-party analytics cookies. Local storage remembers progress and preferences. If you choose to sign in for recitation reporting, authentication storage keeps that session available. Private uploaded samples are separate from local storage and must be deleted using Delete my samples.",
   },
   {
     heading: "LOCATION AND DEVICE SENSORS",
@@ -40,7 +40,7 @@ export const PRIVACY_SECTIONS: LegalSection[] = [
   },
   {
     heading: "NETWORK REQUESTS",
-    body: "The app needs an internet connection to load. A connection is used to load the app itself, to fetch prayer time calculation data where you have enabled it, or to open a link you have tapped. These requests do not carry your personal content, your health data, or your progress.",
+    body: "Network requests load the app, Quran and hadith content, audio, checker downloads, prayer data and links you choose to open. Ordinary recitation checking remains on device. Only explicit adult-consented problem reports upload recordings and checker details; account requests identify the owner of those private reports. Health entries and worship progress are not included in reports.",
   },
   {
     heading: "THIRD PARTIES AND APP STORES",
