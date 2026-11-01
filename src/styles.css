@@ -36,6 +36,7 @@
 
 /* ===== Dawn base — warm cream + olive accent, light cards ===== */
 :root {
+  --recitation-tip: #377cb1;
   --memory-strong: #246443;
   --memory-good: #a3c9a0;
   --memory-due: #e3b958;

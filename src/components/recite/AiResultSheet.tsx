@@ -4,11 +4,15 @@ import { Button } from "@/components/ui/button";
 import { getVerseByKey, type Chapter, type VerseHit } from "@/lib/quran";
 import { diffAyat } from "@/lib/hifz-ai/mutashabih";
 import type { Attempt } from "./ai-performance";
+import { TAJWEED_TIPS_DISCLAIMER } from "@/lib/hifz-ai/tajweed";
+import { SampleReport } from "@/components/hifz/SampleReport";
+import type { DebugRecording } from "@/lib/hifz-debug";
 
-export function AiResultSheet({ attempt, passes, lesson, chapters, again, next, wordAudio, ayahAudio, close }: {
+export function AiResultSheet({ attempt, passes, lesson, chapters, again, next, wordAudio, ayahAudio, close, tipsEnabled = true, recording = null, passages = [] }: {
   attempt: Attempt; passes: number; lesson: boolean; chapters: Chapter[];
   again: () => void; next: () => void; wordAudio: (key: string) => void;
   ayahAudio: (key: string) => void; close: () => void;
+  tipsEnabled?: boolean; recording?: DebugRecording | null; passages?: { sura: number; first: number; last: number }[];
 }) {
   const [compare, setCompare] = useState(false);
   const [ayat, setAyat] = useState<VerseHit[] | null>(null);
@@ -43,6 +47,8 @@ export function AiResultSheet({ attempt, passes, lesson, chapters, again, next, 
       {attempt.hes.map((h) => <p className="rc-hesitation-note" key={h.key}>{h.kind === "transition" ? `Slow start of ayah ${h.key.split(":")[1]}` : h.kind === "restart" ? `Restarted before ﴿${attempt.result.words.find((w) => w.key === h.key)?.text ?? ""}﴾` : `Paused ${h.seconds}s before ﴿${attempt.result.words.find((w) => w.key === h.key)?.text ?? ""}﴾`}</p>)}
       {attempt.driftError && <p role="status">{attempt.driftError}</p>}
     </div>
+    {tipsEnabled && !!attempt.tips?.length && <section className="rc-tajweed-tips" aria-label="Tajweed tips"><h3>Tajweed tips</h3>{attempt.tips.slice(0, 3).map((tip) => <div className="rc-tip" key={tip.key}><header><span className="rc-arabic" dir="rtl">{tip.word}</span><small>{tip.label}</small><Button variant="ghost" size="icon" title="Hear correct word" aria-label={`Hear tajweed word ${tip.key}`} onClick={() => wordAudio(tip.key)}><Play /></Button></header><p>{tip.tip}</p></div>)}<p className="rc-tip-disclaimer">{TAJWEED_TIPS_DISCLAIMER}</p></section>}
     <div className="rc-result-actions"><Button variant="outline" onClick={again}>Try again</Button><Button className="rc-primary" disabled={!attempt.clean} onClick={next}>Next<ArrowRight size={16} /></Button></div>
+    <SampleReport recording={recording} result={attempt.result} passages={passages} />
   </section>;
 }
