@@ -1,6 +1,13 @@
 import { expect, test } from "bun:test";
 import { addDays, weekDates, dateKey, assignedContent, type DailyAssignment } from "./daily-editor";
-import { credentialsMatch } from "./daily-editor.server";
+import { credentialsMatch, editorCookieOptions } from "./daily-editor.server";
+
+test("embedded editor session permits cross-site iframe cookies while isolating and protecting them", () => {
+  expect(editorCookieOptions.sameSite).toBe("none");
+  expect(editorCookieOptions.partitioned).toBe(true);
+  expect(editorCookieOptions.secure).toBe(true);
+  expect(editorCookieOptions.httpOnly).toBe(true);
+});
 
 test("week selection includes seven Monday–Sunday dates across a year boundary", () => {
   expect(weekDates("2026-12-31")).toEqual(["2026-12-28", "2026-12-29", "2026-12-30", "2026-12-31", "2027-01-01", "2027-01-02", "2027-01-03"]);

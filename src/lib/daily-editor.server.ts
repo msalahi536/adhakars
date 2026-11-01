@@ -1,6 +1,8 @@
 import { useSession, setResponseHeader, getRequest } from "@tanstack/react-start/server";
 import { createHash, timingSafeEqual } from "node:crypto";
 
+export const editorCookieOptions = { httpOnly: true, secure: true, sameSite: "none" as const, partitioned: true, path: "/" };
+
 export function credentialsMatch(input: string, expected: string) {
   return timingSafeEqual(createHash("sha256").update(input).digest(), createHash("sha256").update(expected).digest());
 }
@@ -15,7 +17,7 @@ export async function editorSession() {
   return useSession<{ editor?: boolean }>({ password, name: "daily-editor", maxAge: 60 * 60 * 12,
     // Preview runs inside a cross-site iframe. CHIPS retains the encrypted
     // session there without exposing it to scripts or other embedding sites.
-    cookie: { httpOnly: true, secure: true, sameSite: "none", partitioned: true, path: "/" } });
+    cookie: editorCookieOptions });
 }
 export async function requireEditor() {
   const session = await editorSession();
