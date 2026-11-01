@@ -1,6 +1,7 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useQuery, useQueryClient, useSuspenseQuery } from "@tanstack/react-query";
-import { useEffect, useLayoutEffect, useRef, useState, type CSSProperties } from "react";
+import { Suspense, useEffect, useLayoutEffect, useRef, useState, type CSSProperties } from "react";
+import { useHifzBeta } from "@/lib/hifz-beta";
 import { Check, ChevronLeft, Mic, Pause, Play, RotateCcw, X, Flag } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Portal } from "@/components/Portal";
@@ -27,9 +28,15 @@ export const Route = createFileRoute("/app/hifz")({
     { property: "og:title", content: "Hifz · Recite, Sahih Al-Adhkar" }, { property: "og:description", content: "Practice Quran recitation one word at a time on a real Madani mushaf page." },
     { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" },
   ] }),
-  loader: async ({ context }) => { await Promise.all([context.queryClient.ensureQueryData(recitePageOptions(562)), context.queryClient.ensureQueryData(reciteChaptersOptions)]); },
-  component: Recite,
+  component: HiddenRecite,
 });
+
+function HiddenRecite() {
+  const { enabled, checked } = useHifzBeta();
+  const navigate = useNavigate();
+  useEffect(() => { if (checked && !enabled) void navigate({ to: "/app/more", replace: true }); }, [checked, enabled, navigate]);
+  return enabled ? <Suspense fallback={null}><Recite /></Suspense> : null;
+}
 
 function Recite() {
   const navigate = useNavigate();

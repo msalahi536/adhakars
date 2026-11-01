@@ -49,3 +49,4 @@
 - Hifz mushaf rendering waits for its matching page font and fits all lines with one measured size; tajweed uses word-level indicators in QCF mode, preserving glyphs without claiming unverified character-to-glyph mappings.
 
 - Hifz feedback uses one cancellable Capacitor pattern dispatcher with batched mistake priority and a 1500ms cooldown; native-unavailable feedback pulses the strip, and optional local effects never replace qari audio. Future microphone and recognition events use the same dispatcher without implying those features are active.
+- Hifz entry and rendering share a hydration-safe device beta gate; defer recite queries until enabled and redirect disabled direct visits to More, so hidden access never flashes or clears progress.
