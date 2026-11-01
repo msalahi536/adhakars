@@ -23,17 +23,15 @@ export function MilestoneMoment({ moment, done }: { moment: Milestone; done: () 
   async function share() {
     setError("");
     const root = document.querySelector(".recite-page") ?? document.documentElement;
-    const css = getComputedStyle(root);
     const canvas = document.createElement("canvas"); canvas.width = 1080; canvas.height = 1080;
     const ctx = canvas.getContext("2d"); if (!ctx) return;
-    ctx.fillStyle = css.getPropertyValue("--m-paper").trim() || css.getPropertyValue("--background").trim();
     // Resolve themed CSS colors through the browser rather than assuming their format.
-    const probe = document.createElement("span"); root.append(probe);
-    probe.style.color = "var(--m-paper, var(--background))"; ctx.fillStyle = getComputedStyle(probe).color; ctx.fillRect(0, 0, 1080, 1080);
-    probe.style.color = "var(--m-gold, var(--accent))"; ctx.strokeStyle = getComputedStyle(probe).color; ctx.lineWidth = 4;
+    const color = (role: string) => { const probe = document.createElement("span"); probe.style.setProperty("transition", "none", "important"); probe.style.setProperty("color", role, "important"); root.append(probe); const resolved = getComputedStyle(probe).color; probe.remove(); return resolved; };
+    ctx.fillStyle = color("var(--m-paper, var(--background))"); ctx.fillRect(0, 0, 1080, 1080);
+    ctx.strokeStyle = color("var(--m-gold, var(--accent))"); ctx.lineWidth = 4;
     ctx.strokeRect(48, 48, 984, 984); ctx.strokeRect(64, 64, 952, 952);
     for (const [x,y] of [[48,48],[1032,48],[48,1032],[1032,1032]]) { ctx.save();ctx.translate(x,y);ctx.rotate(Math.PI/4);ctx.strokeRect(-12,-12,24,24);ctx.restore(); }
-    probe.style.color = "var(--m-ink, var(--foreground))"; ctx.fillStyle = getComputedStyle(probe).color; probe.remove();
+    ctx.fillStyle = color("var(--m-ink, var(--foreground))");
     ctx.textAlign = "center"; ctx.font = "34px Georgia"; ctx.fillText("Alhamdulillah", 540, 350);
     ctx.font = "50px Georgia"; ctx.fillText("I memorized", 540, 470);
     ctx.font = "54px Georgia"; const title = `${moment.kind === "surah" ? "Surah " : ""}${moment.label}`;
