@@ -1,7 +1,7 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
-import { ChevronLeft, ChevronRight, Check, BookOpen, Sprout, Circle, Search, Layers, List, ArrowUp, ArrowDown, X, Minus, Plus, CalendarDays, SlidersHorizontal, Clock } from "lucide-react";
+import { ChevronLeft, ChevronRight, Check, BookOpen, Sprout, Circle, Search, Layers, List, ArrowUp, ArrowDown, X, Minus, Plus, CalendarDays, SlidersHorizontal, Clock, ChartNoAxesColumnIncreasing } from "lucide-react";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { Sheet, SheetContent, SheetTitle } from "@/components/ui/sheet";
 import { searchChapters } from "@/lib/quran";
@@ -29,14 +29,15 @@ import { bestAutomaticPace, DAILY_MINUTES, effectiveTimeline, selectedFinishEsti
 const DAY_NAMES = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 const TIME_OPTIONS = DAILY_MINUTES;
 
-const fmtDate = (iso: string) =>
-  new Date(iso + "T12:00:00Z").toLocaleDateString(undefined, { month: "long", year: "numeric" });
+const shortDate = (iso: string) => new Date(iso + "T12:00:00Z").toLocaleDateString("en-US", { month: "short", year: "numeric", timeZone: "UTC" });
 
 export function PlanSetup({ existing, done }: { existing?: HifzPlan; done: () => void }) {
   const q = useSuspenseQuery(quranIndexOptions).data;
   const chapters = useSuspenseQuery(reciteChaptersOptions).data;
   const today = todayISO();
   const [step, setStep] = useState(0);
+  const setupScroll = useRef<HTMLElement>(null);
+  useEffect(() => { setupScroll.current?.scrollTo({ top: 0 }); }, [step]);
   const [plan, setPlan] = useState<HifzPlan>(() => existing ?? defaultPlan(today));
   const [pickSurahs, setPickSurahs] = useState(false);
   const [surahSearch, setSurahSearch] = useState("");
@@ -124,14 +125,13 @@ export function PlanSetup({ existing, done }: { existing?: HifzPlan; done: () =>
   }
 
   return (
-    <main className={`scroll-area hz-setup ${step === 0 ? "hz-known-step" : step === 1 ? "hz-order-step" : step === 2 ? "hz-time-step" : ""}`}>
+    <main ref={setupScroll} className={`scroll-area hz-setup ${step === 0 ? "hz-known-step" : step === 1 ? "hz-order-step" : step === 2 ? "hz-time-step" : "hz-summary-step"}`}>
       <div className="mx-auto max-w-md px-5 py-4">
         <div className="hz-steps" aria-label={`Step ${step + 1} of ${steps.length}: ${steps[step]}`}>
           {steps.map((label, i) => (
             <span key={label} className={`hz-step-dot ${i === step ? "is-on" : i < step ? "is-done" : ""}`} />
           ))}
         </div>
-        {step === 3 && <p className="label-caps hz-step-label">{steps[step]}</p>}
 
         {step === 0 && (
           <section className="hz-known-content">
@@ -314,23 +314,31 @@ export function PlanSetup({ existing, done }: { existing?: HifzPlan; done: () =>
 
         {step === 3 && (
           <section>
-            <h1 className="hz-title">Your plan</h1>
-            <div className="hz-summary">
+            <header className="hz-known-heading">
+              <h1 className="hz-title">Your plan</h1>
               <p className="hz-big-finish">
                 Done by <strong>{monthYear(selectedEstimate.finish)}</strong>
                 <span> ({humanDuration(selectedEstimate.days)})</span>
               </p>
-              <div className="hz-milestones">
-                {summary.juzMilestones.slice(0, 8).map((m) => (
-                  <span key={m.juz} className="hz-milestone">Juz {m.juz} · {fmtDate(m.date)}</span>
-                ))}
-                {summary.juzMilestones.length > 8 && <span className="hz-milestone">…</span>}
+            </header>
+            <div className="hz-summary">
+              <div className="hz-plan-overview">
+                <span className="hz-plan-book"><BookOpen aria-hidden="true" /></span>
+                <div className="hz-plan-goal"><strong>{summary.juzMilestones.length ? `Juz ${summary.juzMilestones[0].juz}${summary.juzMilestones.length > 1 ? ` — Juz ${summary.juzMilestones[summary.juzMilestones.length - 1].juz}` : ""}` : "Your selected pages"}</strong><small>{summary.juzMilestones.length} {summary.juzMilestones.length === 1 ? "part" : "parts"} · {humanDuration(selectedEstimate.days)}</small></div>
+                <div className="hz-plan-dates"><CalendarDays aria-hidden="true" /><span>{shortDate(plan.startDate)} —<br />{shortDate(selectedEstimate.finish)}</span></div>
               </div>
-              <p className="hz-sub">Daily time needed as your hifz grows</p>
+              <div className="hz-milestones">
+                {summary.juzMilestones.slice(0, 8).map((m, i) => (
+                  <span key={m.juz} className={`hz-milestone ${i === 0 ? "is-first" : ""}`}>Juz {m.juz} · {shortDate(m.date)}</span>
+                ))}
+              </div>
+              <div className="hz-plan-time">
+                <header><ChartNoAxesColumnIncreasing aria-hidden="true" /><div><h2>Daily time needed</h2><p>As your hifz grows</p></div><span className="hz-plan-budget">Your goal: {plan.dailyMinutes} min</span></header>
               <MinutesChart points={summary.minutesByMonth} budget={plan.dailyMinutes} />
+              </div>
               {summary.shortOnTime && <p className="hz-warning">{summary.shortOnTime.message}</p>}
-              <Button variant="ghost" className="hz-wide" aria-expanded={advanced} onClick={() => setAdvanced((v) => !v)}>
-                Advanced options
+              <Button variant="ghost" className="hz-wide hz-plan-advanced" aria-expanded={advanced} onClick={() => setAdvanced((v) => !v)}>
+                <SlidersHorizontal /> Advanced options <ChevronRight className={advanced ? "hz-picker-open" : ""} />
               </Button>
               {advanced && (
                 <div className="hz-advanced">
@@ -380,23 +388,26 @@ export function PlanSetup({ existing, done }: { existing?: HifzPlan; done: () =>
 
 /** Small line chart of the daily minutes the plan will need as memorization grows. */
 function MinutesChart({ points, budget }: { points: { atMonth: number; minutes: number }[]; budget: number }) {
-  if (points.length < 2) return null;
+  if (!points.length) return null;
   const W = 320;
-  const H = 90;
+  const H = 104;
   const max = Math.max(...points.map((p) => p.minutes), budget) * 1.1;
   const xy = points.map((p) => [
-    (p.atMonth / points[points.length - 1].atMonth) * (W - 8) + 4,
+    (p.atMonth / (points[points.length - 1].atMonth || 1)) * (W - 8) + 4,
     H - 6 - (p.minutes / max) * (H - 14),
   ]);
   const path = xy.map(([x, y], i) => `${i ? "L" : "M"}${x.toFixed(1)},${y.toFixed(1)}`).join(" ");
   const budgetY = H - 6 - (budget / max) * (H - 14);
   return (
+    <div className="hz-plan-chart">
     <svg className="hz-chart" viewBox={`0 0 ${W} ${H}`} role="img" aria-label="Daily minutes needed as your hifz grows">
+      <defs><linearGradient id="hz-plan-chart-fill" x1="0" y1="0" x2="0" y2="1"><stop className="hz-chart-stop-top" offset="0%" /><stop className="hz-chart-stop-bottom" offset="100%" /></linearGradient></defs>
       <line x1="4" x2={W - 4} y1={budgetY} y2={budgetY} className="hz-chart-budget" />
+      <path d={`${path} L${xy[xy.length - 1][0]},${H - 6} L4,${H - 6} Z`} fill="url(#hz-plan-chart-fill)" />
       <path d={path} className="hz-chart-line" fill="none" />
-      <text x={W - 6} y={budgetY - 3} className="hz-chart-label" textAnchor="end">your {budget} min</text>
-      <text x="4" y={H - 0} className="hz-chart-label">now</text>
-      <text x={W - 4} y={H - 0} className="hz-chart-label" textAnchor="end">{points[points.length - 1].atMonth} mo</text>
+      <circle cx={xy[0][0]} cy={xy[0][1]} r="2.5" className="hz-chart-start" />
     </svg>
+    <div className="hz-plan-chart-labels"><span>Now</span><span>{points[points.length - 1].minutes} min</span></div>
+    </div>
   );
 }
