@@ -3,9 +3,9 @@
 - Beta Hifz records attempts once; third clean lesson credits lines, page reviews need one. Results show mastery, hesitations and drift apart from self-marks. Ranges share a mic and cached models/keys. Quran voice memoizes Madani pages, reserves lesson-sized heading rows for Basmala, and mutates highlights directly. Search delegates stopping/confidence to engine sessions and meters their streams; all mics stop on exit.
 - Daily editor uses encrypted, server-verified sessions; dated snapshots override only their UTC day with rotation fallback. Browsing reuses Quran/hadith clients with cancellable updates, preserving widget contracts.
 - Hifz qari playback uses cancellable generation tokens and settled segment waits; stage changes invalidate playback before mic startup so repeat loops cannot restart audio after a stop.
-- Hifz AI notices are runtime-independent; free checking has no paid entitlement. Enhancements live in components: ephemeral recording/replay, caller-owned mic reuse, shared echo/tafsir, engine drills and local milestone keys preserve engine state and layouts.
+- Hifz AI notices are runtime-independent and checking is free. Component-owned replay, retained mic, echo/tafsir, engine drills and local milestone keys preserve state/layouts.
 
-- Hifz home dialogs portal above navigation; practice screens call engine exports with Quran-source ranges. Sleep previews save device-only passages for unrecorded morning recall; page labels use source surah names.
+- Hifz dialogs portal above navigation; practice uses engine exports and Quran-source ranges/names. Sleep previews save device-only passages for unrecorded recall.
 
 - Hifz setup caches automatic pace candidates per plan when time selection opens, ranks the approved engine's effective finish dates with smaller-pace tie breaks, and keeps custom overrides in a bottom sheet; the selected summary reflects an active finish-date target with any engine time-limit warning. Immediate-goal and whole-Quran comparisons use the same chosen pace and engine with scope-only index ranges, excluding known pages and preserving selected-surah order before the remaining Quran.
 - Hifz home and plan finish summaries share selectedFinishEstimate with the saved daily-minute budget; time-limit warnings compare displayed month/year so realistic dates never contradict or repeat themselves.
