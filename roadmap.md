@@ -41,4 +41,5 @@
 - [x] Player: shuffle/repeat engaged state clearly visible (accent tint + ring)
 - [x] Salah dismiss button reads "Tap to mute next adhan"
 
-- [ ] Completely remove Hifz, preserving all other features and shared functionality
+- [x] Remove Hifz screens, navigation, reminders, local progress and code; preserve Arabic review rules and Quran tajweed (129 tests pass; browser checks pass)
+- [ ] Permanently delete retired Hifz cloud backups — blocked by the backward-incompatible database migration safety setting; backups are inactive and marked deprecated
