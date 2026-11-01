@@ -1,6 +1,8 @@
 # Roadmap
 
-- [ ] Match Your Hifz darker larger text and investigate exaggerated Juz progress without altering saved memorization.
+- [ ] Match action rows to reference and replace obscured Salah/Juz/reminder panels with accessible frosted popups and named surah/ayah choices.
+
+- [x] Enlarged dark Your Hifz text; fixed partial learning pages counted as fully memorized in Juz stats, added exact page counts and kept proportional fill; 16 tests pass.
 
 - [x] Softened Today to reference olive gradient and made heading frost slimmer/more transparent; phone screenshot and Start verified.
 
