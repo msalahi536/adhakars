@@ -41,6 +41,4 @@
 - [x] Player: shuffle/repeat engaged state clearly visible (accent tint + ring)
 - [x] Salah dismiss button reads "Tap to mute next adhan"
 
-- [x] Hifz Step 1: data model, local storage, merge/backup
-- [x] Hifz Step 3: Recall Loop workspace
-- [ ] Hifz Step 4+ (waiting for owner testing)
+- [ ] Completely remove Hifz, preserving all other features and shared functionality
