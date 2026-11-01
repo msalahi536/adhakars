@@ -1,5 +1,7 @@
 # Roadmap
 
+- [x] Connect hidden free on-device Hifz checker: consent/progress, cached model/runtime/114 answer keys, mic waveform, word feedback, safe Retry and attribution. 47 tests pass; actual Al-Mulk recorded audio through browser mic reaches final results and offline restart; unchanged mushaf/gestures checked. Installed-phone microphone/haptics and recognition accuracy remain device checks, not claimed verified.
+
 - [x] Aligned Home and Your plan realistic estimates and suppressed repeated date warnings; 11 tests pass and saved 45-minute phone flow shows July 2034 / 7 yr 8 mo consistently.
 
 - [x] Made reminder tracks/thumbs larger and clearly contrasted; added frosted Edit plan back arrow. Phone screenshots and return without saved-plan changes verified; native reminder activation remains device-only.

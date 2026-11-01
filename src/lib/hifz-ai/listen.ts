@@ -8,6 +8,7 @@
 import { SR } from "./fbank";
 import { buildReference, check, loadSurah, type CheckResult } from "./checker";
 import { DEFAULT_MODEL_URL, QuranRecognizer } from "./recognizer";
+import { cachedAsset } from "./assets";
 
 let shared: Promise<QuranRecognizer> | null = null;
 
@@ -18,6 +19,15 @@ export function getRecognizer(modelUrl = DEFAULT_MODEL_URL, onProgress?: (p: num
     throw e;
   });
   return shared;
+}
+
+export async function prepareChecker(onProgress?: (p: number) => void) {
+  await getRecognizer(DEFAULT_MODEL_URL, onProgress);
+  // Cache answer keys before confirming the one-time download is ready offline.
+  for (let start = 1; start <= 114; start += 8) {
+    await Promise.all(Array.from({ length: Math.min(8, 115 - start) }, (_, i) =>
+      cachedAsset(`/hifz-ai/ayat/${String(start + i).padStart(3, "0")}.json`)));
+  }
 }
 
 export interface ListenSession {
@@ -32,6 +42,7 @@ export async function startListening(opts: {
   modelUrl?: string;
   onUpdate: (r: CheckResult) => void;
   onProgress?: (p: number) => void;
+  onError?: (error: unknown) => void;
 }): Promise<ListenSession> {
   const [rec, key] = await Promise.all([getRecognizer(opts.modelUrl, opts.onProgress), loadSurah(opts.sura)]);
   const reference = buildReference(key, opts.sura, opts.first, opts.last);
@@ -40,6 +51,7 @@ export async function startListening(opts: {
   const stream = await navigator.mediaDevices.getUserMedia({
     audio: { channelCount: 1, echoCancellation: false, noiseSuppression: true, autoGainControl: true },
   });
+  try {
   const Ctx = window.AudioContext || (window as any).webkitAudioContext;
   let ctx: AudioContext;
   try {
@@ -55,6 +67,8 @@ export async function startListening(opts: {
   let heard = "";
   let conf: number[] = [];
   let queue = Promise.resolve();
+  let failure: unknown;
+  let stopped: Promise<CheckResult> | undefined;
   let last: CheckResult = check(reference, "", false);
 
   const toMono16k = (input: Float32Array): Float32Array => {
@@ -75,6 +89,7 @@ export async function startListening(opts: {
   node.onaudioprocess = (ev) => {
     const samples = toMono16k(ev.inputBuffer.getChannelData(0));
     // keep order: each chunk waits for the previous one
+    if (failure || stopped) return;
     queue = queue.then(async () => {
       const em = await rec.accept(samples);
       if (!em.length) return;
@@ -84,6 +99,11 @@ export async function startListening(opts: {
       }
       last = check(reference, heard, false, conf);
       opts.onUpdate(last);
+    }).catch((error) => {
+      failure = error;
+      node.disconnect(); src.disconnect(); stream.getTracks().forEach((t) => t.stop());
+      void ctx.close().catch(() => undefined);
+      opts.onError?.(error);
     });
   };
   src.connect(node);
@@ -91,11 +111,13 @@ export async function startListening(opts: {
 
   return {
     stream,
-    async stop() {
+    stop() {
+      stopped ??= (async () => {
       node.disconnect();
       src.disconnect();
       stream.getTracks().forEach((t) => t.stop());
       await queue;
+      if (failure) throw failure;
       for (const e of await rec.flush()) {
         heard += e.token;
         for (let k = 0; k < e.token.length; k++) conf.push(e.prob);
@@ -104,6 +126,12 @@ export async function startListening(opts: {
       last = check(reference, heard, true, conf);
       opts.onUpdate(last);
       return last;
+      })().finally(() => { if (ctx.state !== "closed") void ctx.close().catch(() => undefined); });
+      return stopped;
     },
   };
+  } catch (error) {
+    stream.getTracks().forEach((t) => t.stop());
+    throw error;
+  }
 }

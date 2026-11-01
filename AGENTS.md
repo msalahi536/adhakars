@@ -1,5 +1,8 @@
 # Architecture Decisions
 
+- Hifz AI starts only from a beta-gated recite action via dynamic import; transient keyed feedback never overwrites self-check progress, while model/runtime/answer keys cache on device and sessions stop on page/mode exit.
+- Hifz AI notices live in a browser-independent module so Settings attribution never imports the inference runtime; the free model is not part of paid entitlements.
+
 - Hifz home uses body-portaled shared dialogs above navigation and labels page selections from Quran index verse keys with source chapter names, preserving page-based engine writes while making passages recognizable.
 
 - Hifz setup caches automatic pace candidates per plan when time selection opens, ranks the approved engine's effective finish dates with smaller-pace tie breaks, and keeps custom overrides in a bottom sheet; the selected summary reflects an active finish-date target with any engine time-limit warning. Immediate-goal and whole-Quran comparisons use the same chosen pace and engine with scope-only index ranges, excluding known pages and preserving selected-surah order before the remaining Quran.
