@@ -47,6 +47,7 @@ export function ReciteStrip({
     }
     const Ctx = window.AudioContext || (window as any).webkitAudioContext;
     const ctx: AudioContext = new Ctx();
+    void ctx.resume().catch(() => undefined);
     const src = ctx.createMediaStreamSource(stream);
     const analyser = ctx.createAnalyser();
     analyser.fftSize = 256;
