@@ -1,7 +1,7 @@
 import {useEffect,useState} from "react";
 import {useSuspenseQuery} from "@tanstack/react-query";
 import {useNavigate} from "@tanstack/react-router";
-import {loadState,type HifzState} from "@/lib/hifz";
+import {loadState,saveState,todayISO,type HifzState} from "@/lib/hifz";
 import {quranIndexOptions} from "@/lib/hifz/program";
 import {Button} from "@/components/ui/button";
 import {HeaderBackButton} from "@/components/HeaderBackButton";
@@ -18,5 +18,5 @@ export function PracticeEntry({mode}:{mode:"mushaf"|"preview"|"recall"|"lines"|"
  if(mode==="mushaf")return <MyMushaf state={state}/>;
  if(mode==="preview"||mode==="recall")return <SleepPractice state={state} mode={mode}/>;
  if(mode==="lines")return <LineQuiz state={state} q={q}/>;
- return <main className="hp-page"><header className="hz-home-header"><HeaderBackButton onBack={()=>void navigate({to:"/app/hifz"})}/></header><div className="hp-content"><DrillSheet state={state} q={q} today={new Date().toLocaleDateString("en-CA")} done={()=>void navigate({to:"/app/hifz"})}/></div></main>;
+ return <main className="hp-page"><header className="hz-home-header"><HeaderBackButton onBack={()=>void navigate({to:"/app/hifz"})}/></header><div className="hp-content"><DrillSheet state={state} q={q} today={todayISO()} done={(passed,failed)=>{const next=structuredClone(state);for(const key of passed){const spot=next.weakSpots[key];if(spot)spot.passes++;}for(const key of failed){const spot=next.weakSpots[key];if(spot){spot.fails++;spot.lastFailed=todayISO();}}saveState(next);void navigate({to:"/app/hifz"});}}/></div></main>;
 }

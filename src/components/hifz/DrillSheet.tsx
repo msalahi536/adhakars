@@ -2,7 +2,8 @@ import { useMemo, useState } from "react";
 import { useQueries } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Check, X } from "lucide-react";
-import { buildDrills, type Drill, type HifzState, type QuranIndex } from "@/lib/hifz";
+import { buildDrills, drillRange, type Drill, type HifzState, type QuranIndex } from "@/lib/hifz";
+import { PracticeVoice } from "./PracticeVoice";
 import { drillPages, pageVersesFrom } from "@/lib/hifz/program";
 import { recitePageOptions } from "@/lib/recite/data";
 
@@ -21,7 +22,7 @@ export function DrillSheet({ state, q, today, done }: {
   const ready = queries.every((r) => r.isSuccess);
   const drills = useMemo(() => {
     if (!ready) return [];
-    const pv = queries.map((r) => pageVersesFrom(r.data!));
+    const pv = queries.flatMap((r) => r.data ? [pageVersesFrom(r.data)] : []);
     return buildDrills(state, pv, today, 8);
   }, [ready, state, today]);
   const [index, setIndex] = useState(0);
@@ -33,8 +34,10 @@ export function DrillSheet({ state, q, today, done }: {
   if (!drills.length) return <section className="hz-sheet" role="dialog" aria-modal="true" aria-label="Drills"><p>No drills for today.</p><Button className="hz-start" onClick={() => done([], [])}>Continue</Button></section>;
 
   const drill = drills[Math.min(index, drills.length - 1)];
+  const range = drillRange(drill);
+  const answerKeys = queries.flatMap((r) => (r.data?.verses ?? []).filter((v) => range && v.chapter === range.sura && v.number >= range.first && v.number <= range.last).flatMap((v) => v.words.filter((w) => !w.end).map((w) => w.key)));
   const verseWords = (key: string): string[] => {
-    for (const r of queries) for (const v of r.data!.verses) if (v.key === key) return v.words.filter((w) => !w.end).map((w) => w.text);
+    for (const r of queries) for (const v of r.data?.verses ?? []) if (v.key === key) return v.words.filter((w) => !w.end).map((w) => w.text);
     return [];
   };
 
@@ -56,6 +59,7 @@ export function DrillSheet({ state, q, today, done }: {
       </header>
       <div className="hz-drill">
         <DrillBody drill={drill} revealed={revealed} verseWords={verseWords} />
+        {range && <PracticeVoice key={index} ranges={[range]} wordKeys={answerKeys} onCorrect={()=>answer(true)}/>}
         {!revealed ? (
           <Button className="hz-start" onClick={() => setRevealed(true)}>Show the answer</Button>
         ) : (
