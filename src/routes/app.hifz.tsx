@@ -37,7 +37,7 @@ function HifzEntry() {
   if (!state) return <><div className="hz-entry-back"><HeaderBackButton /></div><PlanSetup done={reload} /></>;
   return (
     <>
-      <header className="page-header relative overflow-hidden" style={{ background: "var(--grad-header)", color: "var(--header-fg)" }}>
+      <header className="page-header hz-home-header relative overflow-hidden" style={{ background: "var(--grad-header)", color: "var(--header-fg)" }}>
         <HeaderBackButton />
         <div className="relative mx-auto max-w-md px-16 pb-6 pt-9 text-center">
           <div className="label-caps" style={{ color: "var(--header-sub)", opacity: 1 }}>Hifz</div>
