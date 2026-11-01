@@ -72,10 +72,8 @@ export function useAiRecitation(page: number, enabled: boolean, keys: string[], 
       if (id !== generation.current) return;
       const range = ranges[0];
       if (!range) throw new Error("No passage selected");
-      // A cloned track lets the engine stop its session without killing our retained mic.
-      const engineStream = keep.current ? mic.clone() : mic;
       try { recorder.current = captureRecording(mic); } catch { recorder.current = null; }
-      const current = await ai.startListening({ ...range, passages: ranges, stream: engineStream,
+      const current = await ai.startListening({ ...range, passages: ranges, stream: mic, keepStream: keep.current,
         onProgress: setProgress,
         onUpdate: (value) => { if (id === generation.current) receive(value); },
         onError: (error) => { if (id === generation.current) { capture.current?.getTracks().forEach((t) => t.stop()); capture.current = null; session.current = null; setStream(null); setError(friendlyError(error)); setPhase("error"); } },

@@ -9,6 +9,9 @@
 body:has([role=dialog].hx-panel) > [data-state=open]:not([role=dialog]) { z-index:340; background:color-mix(in oklab,var(--foreground) 25%,transparent); }
 .hx-panel header { display:flex; align-items:center; gap:12px; }
 .hx-panel header h2 { flex:1; }
+[role=dialog].hx-panel > header { position:sticky; top:-24px; z-index:1; margin:-24px -24px 0; padding:24px 40px 16px 24px; background:var(--background); }
+.hx-field select { width:55%; }
+.hx-weak-page .rc-sheet { --rc-paper:var(--background); --rc-ink:var(--foreground); --rc-muted:var(--muted-foreground); --rc-shadow:none; }
 .hx-panel p { font-size:14px; line-height:1.8; }
 .hx-panel select { width:100%; padding:10px; background:var(--background); border:1px solid var(--border); border-radius:8px; color:var(--foreground); }
 .hx-field { display:flex; align-items:center; justify-content:space-between; gap:12px; padding:10px 0; border-bottom:1px solid var(--border); font-size:13px; }

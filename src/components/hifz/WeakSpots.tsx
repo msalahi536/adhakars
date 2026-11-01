@@ -12,6 +12,9 @@ import { analyzeAttempt, type Attempt } from "@/components/recite/ai-performance
 import { useAiRecitation } from "@/components/recite/use-ai-recitation";
 import { AiResultSheet } from "@/components/recite/AiResultSheet";
 import { reciteChaptersOptions } from "@/lib/recite/data";
+import { play as feedback } from "@/lib/hifzHaptics";
+import { quranPlayer } from "@/lib/quran-player";
+import { recitationPlayer } from "@/lib/recitation-player";
 import "./practice.css";
 import "./enhancements.css";
 export function WeakSpots() {
@@ -40,11 +43,19 @@ export function WeakSpots() {
       if (canceled) return; setAttempt(value);
       const current = stateRef.current; if (!current) return;
       const next = structuredClone(current); const perf = performanceFromAI(value.result, value.hes, value.drifts);
-      if (value.clean && (!spot.mixUp || part === 1)) perf.passedKeys = [...new Set([...(perf.passedKeys ?? []), spot.key])];
+      if (value.clean) {
+        feedback("pageComplete");
+        if (!spot.mixUp || part === 1) perf.passedKeys = [...new Set([...(perf.passedKeys ?? []), spot.key])];
+        else perf.passedKeys = perf.passedKeys?.filter((k) => k !== spot.key);
+      }
       recordReview(next, spot.page, perf, todayISO(), "drill"); saveState(next); setState(next);
     }); return () => { canceled = true; };
   }, [ai.phase, ai.result]);
-  async function playAyah(key: string) { audio.current?.pause(); try { const url = await getAyahAudio(key); if (url) { audio.current = new Audio(url); await audio.current.play(); } } catch { setError("Audio couldn’t play. Please retry."); } }
+  async function playAyah(key: string) { if (ai.phase === "listening") return; audio.current?.pause(); try { const url = await getAyahAudio(key); if (url) { audio.current = new Audio(url); await audio.current.play(); } } catch { setError("Audio couldn’t play. Please retry."); } }
+  async function playWord(key: string) {
+    if (ai.phase === "listening") return; audio.current?.pause();
+    try { const [s,a,w] = key.split(":"); const r = await fetch(`https://api.quran.com/api/v4/verses/by_key/${s}:${a}?words=true&word_fields=audio_url`); if (!r.ok) throw new Error("audio"); const data = await r.json() as {verse:{words:{position:number;audio_url?:string}[]}}; const url = data.verse.words.find((word) => word.position === Number(w))?.audio_url; if (url) { audio.current = new Audio(`https://audio.qurancdn.com/${url}`); await audio.current.play(); } } catch { setError("Word audio couldn’t play. Please retry."); }
+  }
   const next = () => { ai.reset(); setAttempt(null); if (spot?.mixUp && part === 0) { setPart(1); return; } setPart(0); setPosition((n) => n + 1); setComparing(true); };
   const compareA = spot?.mixUp ? texts[spot.mixUp.from] : null; const compareB = spot?.mixUp ? texts[spot.mixUp.to] : null;
   const diff = compareA && compareB ? diffAyat(compareA.words.map((w) => w.ar), compareB.words.map((w) => w.ar)) : null;
