@@ -1,6 +1,7 @@
 # Architecture Decisions
 
-- Hifz AI starts only from a beta-gated recite action via dynamic import; transient keyed feedback never overwrites self-check progress, while model/runtime/answer keys cache on device and sessions stop on page/mode exit.
+- Hifz AI starts only from a beta-gated recite action via dynamic import; transient source-tagged stage feedback never overwrites self-check marks, final stage results drive explicit progression/override and copy AI failures into engine-compatible weak spots through external lesson helpers. Multi-surah stage references share one mic session; model/runtime/answer keys cache on device and sessions stop on page/mode exit.
+- Hifz qari playback uses cancellable generation tokens and settled segment waits; stage changes invalidate playback before mic startup so repeat loops cannot restart audio after a stop.
 - Hifz AI notices live in a browser-independent module so Settings attribution never imports the inference runtime; the free model is not part of paid entitlements.
 
 - Hifz home uses body-portaled shared dialogs above navigation and labels page selections from Quran index verse keys with source chapter names, preserving page-based engine writes while making passages recognizable.

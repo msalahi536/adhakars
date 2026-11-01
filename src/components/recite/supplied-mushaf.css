@@ -55,6 +55,7 @@
 .rc-supplied .rc-strip-wrap { width: 100%; opacity: 1; transition: opacity 200ms ease; }
 .rc-supplied.rc-controls-visible .rc-strip-wrap { opacity: 0; pointer-events: none; }
 .rc-supplied .rc-strip-wrap > button { display: block; }
+.rc-supplied .rc-floating-mic { position: fixed; right: 24px; bottom: calc(env(safe-area-inset-bottom, 0px) + 104px); z-index: 6; border-radius: 24px; background: var(--m-strip-a); color: var(--m-strip-text); box-shadow: var(--rc-shadow); }
 .rc-supplied .rc-nav-wrap { position: absolute; bottom: calc(env(safe-area-inset-bottom, 0px) + 8px); width: 100%; z-index: 5; height: var(--bottom-nav-row); overflow: visible; transform: translateY(18px); transition: opacity 280ms ease, transform 420ms cubic-bezier(.22, 1, .36, 1); }
 .rc-supplied.rc-controls-visible .rc-nav-wrap { height: var(--bottom-nav-row); transform: translateY(0); }
 .rc-supplied .bottom-nav { margin: 0 auto; width: calc(100% - 56px); color: var(--m-ink); background: transparent; }

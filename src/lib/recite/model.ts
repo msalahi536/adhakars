@@ -14,7 +14,7 @@ export type ReciteSettings = {
   swipeDirection: "arabic" | "reversed";
   haptics: boolean; sounds: boolean; showUnclearWords: boolean;
 };
-export const DEFAULT_SETTINGS: ReciteSettings = { layout: "mushaf", size: 26, numbers: true, translation: false, transliteration: false, hints: "off", mist: true, theme: "auto", reciter: 7, repeat: "1", speed: 1, mode: "self", hideStyle: "faint", hideAmount: "page", tajweed: false, swipeDirection: "arabic", haptics: true, sounds: false, showUnclearWords: false };
+export const DEFAULT_SETTINGS: ReciteSettings = { layout: "mushaf", size: 26, numbers: true, translation: false, transliteration: false, hints: "off", mist: true, theme: "auto", reciter: 7, repeat: "1", speed: 1, mode: "ai", hideStyle: "faint", hideAmount: "page", tajweed: false, swipeDirection: "arabic", haptics: true, sounds: false, showUnclearWords: false };
 export type SavedRecite = { page: number; settings: ReciteSettings; marks: Marks; grades: Record<string, "Easy" | "Okay" | "Hard">; seconds: Record<number, number> };
 export const freshRecite = (): SavedRecite => ({ page: 562, settings: { ...DEFAULT_SETTINGS }, marks: {}, grades: {}, seconds: {} });
 export const pageWords = (page: RecitePage) => page.verses.flatMap((v) => v.words).filter((w) => !w.end);

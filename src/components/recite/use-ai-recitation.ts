@@ -22,12 +22,14 @@ export function useAiRecitation(page: number, enabled: boolean, keys: string[]) 
   const generation = useRef(0);
   const starting = useRef(false);
   const previous = useRef<ReturnType<typeof mapAiWords>["statuses"]>({});
-  const pendingRange = useRef<AiRange | null>(null);
+  const pendingRange = useRef<AiRange[] | null>(null);
+  const capture = useRef<MediaStream | null>(null);
   const wordKeys = useRef(keys); wordKeys.current = keys;
   useEffect(() => {
     setPhase("idle"); setResult(null); setError(""); previous.current = {};
     return () => {
       generation.current++;
+      capture.current?.getTracks().forEach((t) => t.stop()); capture.current = null;
       const current = session.current; session.current = null;
       current?.stream.getTracks().forEach((t) => t.stop());
       if (current) cleanup.current = current.stop().catch(() => undefined);
@@ -39,31 +41,39 @@ export function useAiRecitation(page: number, enabled: boolean, keys: string[]) 
     for (const event of newMistakes(previous.current, statuses)) feedback(event);
     previous.current = statuses; setResult(value);
   };
-  async function begin(range: AiRange) {
+  async function begin(ranges: AiRange[]) {
     if (starting.current || session.current) return;
     starting.current = true;
     const id = generation.current;
     setPhase("loading"); setError(""); setProgress(0); setResult(null); previous.current = {};
     try {
+      // Ask from the user's start/consent gesture, before model preparation.
+      const mic = await navigator.mediaDevices.getUserMedia({ audio: { channelCount: 1, echoCancellation: false, noiseSuppression: true, autoGainControl: true } });
+      if (id !== generation.current) { mic.getTracks().forEach((t) => t.stop()); return; }
+      capture.current = mic;
       await cleanup.current;
       if (id !== generation.current) return;
       const ai = await import("@/lib/hifz-ai");
       await ai.prepareChecker((p) => { if (id === generation.current) setProgress(p); });
       if (id !== generation.current) return;
-      const current = await ai.startListening({ ...range,
+      const range = ranges[0];
+      if (!range) throw new Error("No passage selected");
+      const current = await ai.startListening({ ...range, passages: ranges, stream: mic,
         onProgress: setProgress,
         onUpdate: (value) => { if (id === generation.current) receive(value); },
-        onError: (error) => { if (id === generation.current) { session.current = null; setStream(null); setError(friendlyError(error)); setPhase("error"); } },
+        onError: (error) => { if (id === generation.current) { capture.current?.getTracks().forEach((t) => t.stop()); capture.current = null; session.current = null; setStream(null); setError(friendlyError(error)); setPhase("error"); } },
       });
       if (id !== generation.current) { await current.stop(); return; }
       session.current = current; setStream(current.stream); setPhase("listening"); feedback("micStart");
     } catch (error) {
+      if (id === generation.current) { capture.current?.getTracks().forEach((t) => t.stop()); capture.current = null; }
       if (id === generation.current) { setError(friendlyError(error)); setPhase("error"); }
     } finally { starting.current = false; }
   }
-  async function request(range: AiRange) {
-    pendingRange.current = range;
-    if (await checkerDownloaded()) await begin(range);
+  async function request(range: AiRange | AiRange[]) {
+    const ranges = Array.isArray(range) ? range : [range];
+    pendingRange.current = ranges;
+    if (await checkerDownloaded()) await begin(ranges);
     else setPhase("download");
   }
   async function stop() {
@@ -75,12 +85,14 @@ export function useAiRecitation(page: number, enabled: boolean, keys: string[]) 
       const finalizing = current.stop();
       cleanup.current = finalizing.catch(() => undefined);
       const final = await finalizing;
+      capture.current = null;
       if (id === generation.current) { receive(final); setPhase("finished"); }
     } catch (error) {
       if (id === generation.current) { setError(friendlyError(error)); setPhase("error"); }
     }
   }
   return { phase, progress, stream, result, error, request, stop,
+    reset: () => { setResult(null); setPhase("idle"); previous.current = {}; },
     confirm: () => pendingRange.current ? begin(pendingRange.current) : Promise.resolve(),
     cancel: () => setPhase("idle"),
   };

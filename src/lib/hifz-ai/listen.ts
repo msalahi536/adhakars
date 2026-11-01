@@ -43,12 +43,18 @@ export async function startListening(opts: {
   onUpdate: (r: CheckResult) => void;
   onProgress?: (p: number) => void;
   onError?: (error: unknown) => void;
+  stream?: MediaStream;
+  passages?: { sura: number; first: number; last: number }[];
 }): Promise<ListenSession> {
-  const [rec, key] = await Promise.all([getRecognizer(opts.modelUrl, opts.onProgress), loadSurah(opts.sura)]);
-  const reference = buildReference(key, opts.sura, opts.first, opts.last);
+  const passages = opts.passages ?? [opts];
+  const [rec, references] = await Promise.all([getRecognizer(opts.modelUrl, opts.onProgress), Promise.all(passages.map(async (r) => buildReference(await loadSurah(r.sura), r.sura, r.first, r.last)))]);
+  const reference = { words: references.flatMap((r, index) => {
+    const offset = references.slice(0, index).reduce((n, part) => n + Array.from(part.norm).length, 0);
+    return r.words.map((w) => ({ ...w, s: w.s + offset, e: w.e + offset }));
+  }), norm: references.map((r) => r.norm).join("") };
   rec.restart();
 
-  const stream = await navigator.mediaDevices.getUserMedia({
+  const stream = opts.stream ?? await navigator.mediaDevices.getUserMedia({
     audio: { channelCount: 1, echoCancellation: false, noiseSuppression: true, autoGainControl: true },
   });
   try {

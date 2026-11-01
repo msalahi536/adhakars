@@ -455,7 +455,8 @@ body:has(.hz-home-popup) [data-slot="dialog-overlay"], body:has(.hz-home-popup) 
 
 /* ---- session overlays on the recite page ---- */
 .hz-phase-bar { position: fixed; top: calc(env(safe-area-inset-top) + 34px); left: 50%; transform: translateX(-50%); z-index: 45; display: flex; align-items: center; gap: 8px; padding: 8px 14px; border-radius: 999px; background: color-mix(in oklab, var(--m-paper) 88%, transparent); backdrop-filter: blur(14px); border: 1px solid color-mix(in oklab, var(--m-ink) 16%, transparent); color: var(--m-ink); font-size: 12px; font-weight: 700; box-shadow: 0 6px 20px rgba(0,0,0,.14); white-space: nowrap; max-width: calc(100vw - 24px); }
-.hz-phase-bar small { font-weight: 500; opacity: .7; }
+.hz-phase-bar small { font-weight: 500; opacity: .7; white-space: normal; }
+.hz-phase-bar:has(button + button) { flex-wrap: wrap; justify-content: center; border-radius: 16px; }
 .hz-session-progress { position: fixed; top: calc(env(safe-area-inset-top) + 10px); left: 50%; transform: translateX(-50%); z-index: 45; font-size: 10px; letter-spacing: .08em; text-transform: uppercase; color: var(--m-muted, var(--m-ink)); opacity: .75; white-space: nowrap; }
 .hz-try-first { position: fixed; bottom: calc(var(--rc-strip-height, 92px) + 44px); left: 50%; transform: translateX(-50%); z-index: 45; padding: 7px 16px; border-radius: 999px; background: color-mix(in oklab, var(--m-ink) 88%, transparent); color: var(--m-paper); font-size: 12px; font-weight: 700; animation: hz-pop .25s ease; }
 @keyframes hz-pop { from { transform: translateX(-50%) scale(.9); opacity: 0; } }
