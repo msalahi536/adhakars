@@ -74,6 +74,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         } catch {
             print("[AppDelegate] Failed to configure audio session: \(error)")
         }
+        // Hifz AI: iOS mutes haptics while the microphone records unless the app allows them.
+        // Lets mistake taps (wrong word, skip) be felt during AI recitation checking.
+        if #available(iOS 13.0, *) {
+            try? AVAudioSession.sharedInstance().setAllowHapticsAndSystemSoundsDuringRecording(true)
+        }
 
         return true
     }

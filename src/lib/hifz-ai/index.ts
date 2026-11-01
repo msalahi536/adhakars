@@ -12,3 +12,4 @@ export { startFollowing, startVoiceSearch, Follower, type FollowPosition, type F
 export { findDrifts, diffAyat, type Drift } from "./mutashabih";
 export { findHesitations, masteryScore, type Hesitation, type Mastery } from "./fluency";
 export { openMic, type Mic } from "./mic";
+export { tajweedHints, type TajweedHint, type TajweedKind } from "./tajweed";
