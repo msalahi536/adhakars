@@ -10,30 +10,21 @@ export function findClockChange(from: Date, to: Date): ClockChange | null {
   if (startOffset === endOffset || to.getTime() <= from.getTime()) return null;
   let lo = from.getTime();
   let hi = to.getTime();
-  // Narrow to the minute where the device's UTC offset flips.
-  while (hi - lo > 60_000) {
+  while (hi - lo > 1000) {
     const mid = Math.floor((lo + hi) / 2);
     if (new Date(mid).getTimezoneOffset() === startOffset) lo = mid;
     else hi = mid;
   }
-  // Positive shift means clocks go back (e.g. PDT -> PST is +60).
-  return { at: new Date(hi), shiftMinutes: endOffset - startOffset };
+  const at = new Date(Math.round(hi / 60_000) * 60_000);
+  // Positive shift means clocks go back (PDT -> PST is +60).
+  return { at, shiftMinutes: endOffset - startOffset };
 }
 
-/** Wall-clock time just before the change, e.g. "2:00 AM". */
+/** The old clock's reading at the change, e.g. "2:00 AM" when clocks fall back. */
 export function clockChangeLabel(change: ClockChange): string {
-  const before = new Date(change.at.getTime() - change.shiftMinutes * 60_000 * 0 - 1);
-  const rounded = new Date(Math.ceil(before.getTime() / 60_000) * 60_000);
-  // Show the time as it read on the old clock.
-  const oldClock = new Date(rounded.getTime());
-  const h = oldClock.getHours();
-  const m = oldClock.getMinutes();
-  // getHours on the change instant already reports the new clock, so derive
-  // the old-clock reading by adding back the shift.
-  const total = (h * 60 + m + change.shiftMinutes + 1440) % 1440;
+  const total = (((change.at.getHours() * 60 + change.at.getMinutes() + change.shiftMinutes) % 1440) + 1440) % 1440;
   const hh = Math.floor(total / 60);
   const mm = total % 60;
-  const suffix = hh >= 12 ? "PM" : "AM";
   const h12 = hh % 12 === 0 ? 12 : hh % 12;
-  return `${h12}:${String(mm).padStart(2, "0")} ${suffix}`;
+  return `${h12}:${String(mm).padStart(2, "0")} ${hh >= 12 ? "PM" : "AM"}`;
 }
