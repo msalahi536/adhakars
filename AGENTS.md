@@ -50,3 +50,4 @@
 
 - Hifz feedback uses one cancellable Capacitor pattern dispatcher with batched mistake priority and a 1500ms cooldown; native-unavailable feedback pulses the strip, and optional local effects never replace qari audio. Future microphone and recognition events use the same dispatcher without implying those features are active.
 - Hifz entry and rendering share a hydration-safe device beta gate; defer recite queries until enabled and redirect disabled direct visits to More, so hidden access never flashes or clears progress.
+- The Hifz program (plan setup, home, session flow) lives outside `src/lib/hifz/` and only calls the engine; `/app/hifz` is the program entry and `/app/hifz/recite` the mushaf page, so the parent route renders `<Outlet />` on child paths. Program state is `hifz_state_v1` (no `hifz:` prefix, so retired-Hifz cleanup never touches it); reminders use IDs 910000/911000, clear of the retired 900-range.
