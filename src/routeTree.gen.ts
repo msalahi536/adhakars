@@ -14,6 +14,7 @@ import { Route as AboutRouteImport } from './routes/about'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as AppRouteImport } from './routes/app'
 import { Route as DownloadRouteImport } from './routes/download'
+import { Route as LockedsunnahsquranRouteImport } from './routes/lockedsunnahsquran'
 import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as SuggestionsRouteImport } from './routes/suggestions'
 import { Route as TermsRouteImport } from './routes/terms'
@@ -67,6 +68,11 @@ const AppRoute = AppRouteImport.update({
 const DownloadRoute = DownloadRouteImport.update({
   id: '/download',
   path: '/download',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LockedsunnahsquranRoute = LockedsunnahsquranRouteImport.update({
+  id: '/lockedsunnahsquran',
+  path: '/lockedsunnahsquran',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PrivacyRoute = PrivacyRouteImport.update({
@@ -221,6 +227,7 @@ export interface FileRoutesByFullPath {
   '/admin': typeof AdminRoute
   '/app': typeof AppRouteWithChildren
   '/download': typeof DownloadRoute
+  '/lockedsunnahsquran': typeof LockedsunnahsquranRoute
   '/privacy': typeof PrivacyRoute
   '/suggestions': typeof SuggestionsRoute
   '/terms': typeof TermsRoute
@@ -256,6 +263,7 @@ export interface FileRoutesByTo {
   '/about': typeof AboutRoute
   '/admin': typeof AdminRoute
   '/download': typeof DownloadRoute
+  '/lockedsunnahsquran': typeof LockedsunnahsquranRoute
   '/privacy': typeof PrivacyRoute
   '/suggestions': typeof SuggestionsRoute
   '/terms': typeof TermsRoute
@@ -293,6 +301,7 @@ export interface FileRoutesById {
   '/admin': typeof AdminRoute
   '/app': typeof AppRouteWithChildren
   '/download': typeof DownloadRoute
+  '/lockedsunnahsquran': typeof LockedsunnahsquranRoute
   '/privacy': typeof PrivacyRoute
   '/suggestions': typeof SuggestionsRoute
   '/terms': typeof TermsRoute
@@ -331,6 +340,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/app'
     | '/download'
+    | '/lockedsunnahsquran'
     | '/privacy'
     | '/suggestions'
     | '/terms'
@@ -366,6 +376,7 @@ export interface FileRouteTypes {
     | '/about'
     | '/admin'
     | '/download'
+    | '/lockedsunnahsquran'
     | '/privacy'
     | '/suggestions'
     | '/terms'
@@ -402,6 +413,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/app'
     | '/download'
+    | '/lockedsunnahsquran'
     | '/privacy'
     | '/suggestions'
     | '/terms'
@@ -439,6 +451,7 @@ export interface RootRouteChildren {
   AdminRoute: typeof AdminRoute
   AppRoute: typeof AppRouteWithChildren
   DownloadRoute: typeof DownloadRoute
+  LockedsunnahsquranRoute: typeof LockedsunnahsquranRoute
   PrivacyRoute: typeof PrivacyRoute
   SuggestionsRoute: typeof SuggestionsRoute
   TermsRoute: typeof TermsRoute
@@ -480,6 +493,13 @@ declare module '@tanstack/react-router' {
       path: '/download'
       fullPath: '/download'
       preLoaderRoute: typeof DownloadRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/lockedsunnahsquran': {
+      id: '/lockedsunnahsquran'
+      path: '/lockedsunnahsquran'
+      fullPath: '/lockedsunnahsquran'
+      preLoaderRoute: typeof LockedsunnahsquranRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/privacy': {
@@ -761,6 +781,7 @@ const rootRouteChildren: RootRouteChildren = {
   AdminRoute: AdminRoute,
   AppRoute: AppRouteWithChildren,
   DownloadRoute: DownloadRoute,
+  LockedsunnahsquranRoute: LockedsunnahsquranRoute,
   PrivacyRoute: PrivacyRoute,
   SuggestionsRoute: SuggestionsRoute,
   TermsRoute: TermsRoute,
