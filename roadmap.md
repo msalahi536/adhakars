@@ -1,6 +1,6 @@
 # Roadmap
 
-- [ ] Make custom surah memorization order visible and editable; verify numbering, reordering and saved plan order.
+- [x] Make custom surah memorization order visible and editable; 8 tests pass and phone checks verify numbered taps, reordering, reopening and saved plan order.
 
 - [x] Reuse the Hifz known-surah popup for starting-point surah choices; phone screenshot, search, selection count, retention, Done and Next verified.
 
