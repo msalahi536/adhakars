@@ -1,5 +1,7 @@
 # Roadmap
 
+- [x] Improve the Hifz already-memorized setup step with reference-inspired readable choices, clear selected states and theme-aware surfaces.
+
 - [x] Hifz program screens on the src/lib/hifz engine: 5-step plan setup, home dashboard (today card, timeline, streak/forecast, juz map, weak spots, salah logger, reminders, edit plan), session flow on the recite page (manzil/sabqi review with evidence grade sheet, sabaq listen/read/recite/correct/chain, drills, link, end screen), try-first reveal lock, morning/sleep reminders (910xxx/911xxx IDs). All behind hifz_beta; verified on phone-size browser; 49 hifz/recite tests pass.
 
 
