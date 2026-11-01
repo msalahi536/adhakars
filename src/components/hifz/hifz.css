@@ -73,6 +73,13 @@ main.hz-setup > div { padding-top: calc(env(safe-area-inset-top, 0px) + 76px); }
 .hz-surah-chevron { width: 15px; height: 15px; flex: none; color: var(--foreground); }
 .hz-surah-dialog-footer { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex: none; padding: 12px 14px; border-radius: 20px; border: 1px solid var(--border); background: color-mix(in oklab, var(--surface) 55%, transparent); font-size: 14px; }
 .hz-surah-empty { text-align: center; padding: 24px 0; color: var(--card-foreground); }
+.hz-entry-back { position: absolute; top: 32px; left: 0; z-index: 20; }
+.hz-surah-dialog.hz-setup { isolation: isolate; overflow: hidden; background: var(--surface-card, var(--card)); }
+.hz-surah-dialog::before { content: ""; position: absolute; inset: 0 0 auto; height: 210px; z-index: -1; pointer-events: none; background-image: var(--screen-background); background-size: cover; background-position: center 38%; opacity: .14; mask-image: linear-gradient(to bottom, var(--foreground), transparent); }
+.hz-surah-dialog-header { padding-bottom: 6px; }
+.hz-surah-dialog .hz-surah-search { background: color-mix(in oklab, var(--accent) 5%, var(--surface-card, var(--card))); }
+.hz-surah-dialog .hz-surah-row { background: color-mix(in oklab, var(--accent) 3%, var(--surface-card, var(--card))); }
+.hz-surah-dialog .hz-surah-row:hover, .hz-surah-dialog .hz-surah-row.is-on { background: color-mix(in oklab, var(--accent) 9%, var(--surface-card, var(--card))); }
 
 .hz-cards { display: flex; flex-direction: column; gap: 10px; }
 .hz-card { display: flex; flex-direction: column; align-items: flex-start; gap: 3px; text-align: left; height: auto; padding: 14px 16px; border-radius: 18px; border: 1px solid var(--border); background: var(--surface, var(--card)); color: var(--foreground); white-space: normal; }

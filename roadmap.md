@@ -1,5 +1,8 @@
 # Roadmap
 
+- [ ] Give the surah popup a calm, light theme-matched background.
+- [ ] Add the shared left-side back button to Hifz setup and home.
+
 - [x] Replace Hifz known-surah dropdown with a searchable frosted selection popup; search, selection retention, Done and Next verified.
 - [x] Move Hifz setup below Settings and respect phone top safe areas; phone-width visual check passed.
 
