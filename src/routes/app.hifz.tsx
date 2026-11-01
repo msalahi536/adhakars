@@ -18,6 +18,7 @@ import { getPresetId, resolveVisualPhase, type VisualPhase } from "@/lib/theme-s
 import { TajweedText } from "@/lib/tajweed";
 import "@/components/recite/supplied-mushaf.css";
 import { mushafThemeId } from "@/components/recite/mushaf-theme";
+import { CONTROLS_IDLE_MS, pageGesture, type PagePointer } from "@/components/recite/page-gesture";
 
 export const Route = createFileRoute("/app/hifz")({
   head: () => ({ meta: [
@@ -50,7 +51,9 @@ function Recite() {
   const [audioError, setAudioError] = useState("");
   const [peek, setPeek] = useState<string | null>(null);
   const audio = useRef<HTMLAudioElement | null>(null);
-  const swipe = useRef<{ x: number; y: number } | null>(null);
+  const pointer = useRef<PagePointer | null>(null);
+  const touching = useRef(false);
+  const [touchActivity, setTouchActivity] = useState(0);
   const transitionTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const pageQuery = useQuery({ ...recitePageOptions(saved.page), initialData: saved.page === 562 ? initial : undefined });
@@ -77,6 +80,11 @@ function Recite() {
     return () => { window.removeEventListener("adhkar:theme-change", sync); window.removeEventListener("adhkar:visual-phase-change", sync); window.removeEventListener("storage", sync); };
   }, []);
   useEffect(() => { if (hydrated) saveRecite(saved); }, [saved, hydrated]);
+  useEffect(() => {
+    if (!controls || sheet || gradeAyah || touching.current) return;
+    const timer = setTimeout(() => setControls(false), CONTROLS_IDLE_MS);
+    return () => clearTimeout(timer);
+  }, [controls, sheet, gradeAyah, touchActivity]);
   useLayoutEffect(() => {
     const paper = paperElement;
     if (!paper) return;
@@ -184,7 +192,11 @@ function Recite() {
     if (word.end) return saved.settings.numbers ? <span key={word.key} className="rc-ayah-end" aria-label={`Ayah ${word.verse.split(":")[1]}`}><AyahMarker number={Number(word.verse.split(":")[1])} size={18} done={words.filter((w) => w.verse === word.verse).every((w) => revealed(saved.marks[w.key]))} /></span> : null;
     const state: WordState = saved.marks[word.key] ?? "pending";
     const hint = peek === word.key || isOpeningWord(word, words, saved.settings.hideAmount);
-    return <Button variant="ghost" key={word.key} className={`rc-word rc-${state} ${hint ? "rc-peek" : ""}`} onClick={(e) => { e.stopPropagation(); mark(word); }} aria-label={`Word ${word.key}, ${state}`} data-word={word.key} data-state={state}>
+    return <Button variant="ghost" key={word.key} className={`rc-word rc-${state} ${hint ? "rc-peek" : ""}`} onPointerUp={(e) => {
+      const start = pointer.current;
+      if (mode !== "self" || !revealed(state) || !start || start.id !== e.pointerId || pageGesture(start, e.clientX, e.clientY, e.timeStamp) !== "tap") return;
+      e.stopPropagation(); pointer.current = null; mark(word);
+    }} onClick={(e) => { if (e.detail === 0 && mode === "self" && revealed(state)) mark(word); }} aria-label={`Word ${word.key}, ${state}`} data-word={word.key} data-state={state}>
       <span className="rc-word-ink">{saved.settings.tajweed && word.tajweed ? <span className="rc-tajweed-text"><TajweedText markup={word.tajweed} /></span> : font && saved.settings.layout === "mushaf" ? word.glyph : word.text}</span>
       {(state === "wrong" || state === "skipped" || state === "unsure") && <span className="rc-word-note">{state === "wrong" ? word.text : state === "skipped" ? "skipped" : "?"}</span>}
     </Button>;
@@ -198,11 +210,24 @@ function Recite() {
     if (bismillah) return <div key={line} className="rc-bismillah rc-arabic">بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ</div>;
     return <div key={line} className={`rc-line ${saved.page <= 2 ? "rc-short-line" : ""}`} dir="rtl">{lineItems.map(wordNode)}</div>;
   };
-  return <Portal><MushafThemeProvider theme={appTheme} mode={morningOrEvening} className={`recite-page rc-supplied rc-hide-${saved.settings.hideStyle} ${controls ? "rc-controls-visible" : ""} ${saved.settings.theme === "night" ? "rc-night" : ""}`} style={{ "--rc-size": `${saved.settings.size}px`, "--m-font-quran": "var(--font-arabic)" } as CSSProperties}><main>
+  return <Portal><MushafThemeProvider theme={appTheme} mode={morningOrEvening} className={`recite-page rc-supplied rc-hide-${saved.settings.hideStyle} ${controls ? "rc-controls-visible" : ""} ${saved.settings.theme === "night" ? "rc-night" : ""}`} style={{ "--rc-size": `${saved.settings.size}px`, "--m-font-quran": "var(--font-arabic)" } as CSSProperties}><main onPointerDownCapture={() => { touching.current = true; setTouchActivity((v) => v + 1); }} onPointerUpCapture={() => { touching.current = false; setTouchActivity((v) => v + 1); }} onPointerCancelCapture={() => { touching.current = false; pointer.current = null; setTouchActivity((v) => v + 1); }}>
     <header className="rc-header" aria-hidden={!controls} inert={!controls}><Button variant="ghost" size="icon" aria-label="Exit Hifz" onClick={() => void navigate({ to: "/app/more" })}><ChevronLeft /></Button><h1>{chapter?.name_simple ?? "Quran"} · {saved.page}</h1><Button variant="ghost" size="icon" aria-label="Page settings" onClick={() => setSheet("settings")}>Aa</Button></header>
-    <div className="rc-canvas" onClick={() => setControls((v) => !v)}>
+    <div className="rc-canvas" onPointerDownCapture={(e) => {
+      if (!e.isPrimary || e.button !== 0) { pointer.current = null; return; }
+      pointer.current = { id: e.pointerId, x: e.clientX, y: e.clientY, time: e.timeStamp, distance: 0 };
+    }} onPointerMoveCapture={(e) => {
+      const start = pointer.current;
+      if (start?.id === e.pointerId) start.distance = Math.max(start.distance, Math.hypot(e.clientX - start.x, e.clientY - start.y));
+    }} onPointerUp={(e) => {
+      const start = pointer.current;
+      pointer.current = null;
+      if (!start || start.id !== e.pointerId) return;
+      const gesture = pageGesture(start, e.clientX, e.clientY, e.timeStamp);
+      if (gesture === "tap") setControls((v) => !v);
+      else if (gesture === "next" || gesture === "previous") changePage(saved.page + (gesture === "next" ? 1 : -1));
+    }} onPointerCancel={() => { pointer.current = null; }}>
       <div className="rc-labels"><MushafLabel text={`الجزء ${toArabicDigits(first?.juz ?? "—")}`} height={24} /><MushafLabel text={`سُورَةُ ${chapter?.name_arabic ?? "—"}`} height={24} /></div>
-      <div className={`rc-paper ${saved.settings.layout !== "mushaf" ? "rc-reflow" : ""}`} ref={setPaperElement} onTouchStart={(e) => { const t = e.touches[0]; swipe.current = { x: t.clientX, y: t.clientY }; }} onTouchEnd={(e) => { const start = swipe.current; const t = e.changedTouches[0]; if (start && Math.abs(t.clientX - start.x) > 65 && Math.abs(t.clientY - start.y) < 65) changePage(saved.page + (t.clientX < start.x ? 1 : -1)); swipe.current = null; }}>
+      <div className={`rc-paper ${saved.settings.layout !== "mushaf" ? "rc-reflow" : ""}`} ref={setPaperElement}>
         <MushafFrame scale={0.22} className="rc-art-frame">
         {pageQuery.isPending ? <div className="rc-loading">Loading mushaf page…</div> : pageQuery.isError ? <div className="rc-loading">{pageQuery.error.message}<Button variant="outline" onClick={() => void pageQuery.refetch()}>Try again</Button></div> : <div className={`rc-mushaf ${font && saved.settings.layout === "mushaf" ? "rc-glyphs" : ""}`} style={{ fontFamily: saved.settings.layout === "mushaf" ? font ?? undefined : undefined }}>
           {saved.settings.layout === "mushaf" ? Array.from({ length: 15 }, (_, i) => renderLine(i + 1)) : page?.verses.map((verse) => <section className="rc-verse" key={verse.key}><div className="rc-verse-words" dir="rtl">{verse.words.map(wordNode)}</div>{saved.settings.translation && <p className="rc-translation">{verse.translation}</p>}{saved.settings.transliteration && <p className="rc-translation">{verse.words.filter((w) => !w.end).map((w) => w.transliteration).join(" ")}</p>}</section>)}
