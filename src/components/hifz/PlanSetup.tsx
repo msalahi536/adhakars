@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
-import { ChevronLeft, ChevronRight, Check, BookOpen, Sprout, Circle, Search, Layers, List, ArrowUp, ArrowDown, X, Minus, Plus } from "lucide-react";
+import { ChevronLeft, ChevronRight, Check, BookOpen, Sprout, Circle, Search, Layers, List, ArrowUp, ArrowDown, X, Minus, Plus, CalendarDays, SlidersHorizontal } from "lucide-react";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { Sheet, SheetContent, SheetTitle } from "@/components/ui/sheet";
 import { searchChapters } from "@/lib/quran";
@@ -255,11 +255,14 @@ export function PlanSetup({ existing, done }: { existing?: HifzPlan; done: () =>
               ); })}
             </div>
             <div className="hz-time-summary" role="status">
-              <strong>You’ll finish around {monthYear(selectedEstimate.finish)}</strong>
-              <span>{humanDuration(selectedEstimate.days)}</span>
+              <div className="hz-time-summary-heading">
+                <CalendarDays aria-hidden="true" />
+                <div><span>You’ll finish around</span><strong>{monthYear(selectedEstimate.finish)}</strong></div>
+              </div>
+              <span className="hz-time-summary-duration">{humanDuration(selectedEstimate.days)}</span>
               {selectedEstimate.firstJuz && <small>First juz done by {monthYear(selectedEstimate.firstJuz)}</small>}
             </div>
-            <Button variant="link" className="hz-customize-link" onClick={() => setCustomizePace(true)}>Customize pace</Button>
+            <Button variant="link" className="hz-customize-link" onClick={() => setCustomizePace(true)}><SlidersHorizontal aria-hidden="true" /> Customize pace</Button>
           </section>
         )}
 
