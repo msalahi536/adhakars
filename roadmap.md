@@ -1,6 +1,6 @@
 # Roadmap
 
-- [ ] Fix Hifz lesson flow: cancellable 3× qari/auto-Read/Skip, beta AI defaults and safe Self fallback, hidden-to-revealed AI words, multi-surah stage pass/correction/override/weak spots, real Safari waveform and reachable action; verify full preview lesson and device limitations.
+- [x] Fix Hifz lesson flow: cancellable 3× qari/auto-Read/Skip, AI default and Self fallback, hidden/reached AI words, multi-surah correction/override/weak spots, resumed waveform and reachable action. 50 tests pass; actual recorded audio through browser mic verified live updates, stopped qari, Correct → override → Chain → saved sabaq. Skip, decline, denied mic, stationary page and fallback Session complete verified. Model flagged errors on qari recording, so accuracy/clean-pass end-to-end and actual iPhone microphone/haptics remain unverified; clean-pass rules covered by tests.
 
 - [x] Connect hidden free on-device Hifz checker: consent/progress, cached model/runtime/114 answer keys, mic waveform, word feedback, safe Retry and attribution. 47 tests pass; actual Al-Mulk recorded audio through browser mic reaches final results and offline restart; unchanged mushaf/gestures checked. Installed-phone microphone/haptics and recognition accuracy remain device checks, not claimed verified.
 
