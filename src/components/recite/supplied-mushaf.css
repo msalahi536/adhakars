@@ -41,6 +41,9 @@
 .rc-supplied .bottom-nav { margin: 0 auto; width: calc(100% - 56px); color: var(--m-ink); background: transparent; }
 .rc-supplied .bottom-nav-row { border-radius: 18px; background: color-mix(in oklab, var(--m-paper) 90%, transparent) !important; border-color: var(--rc-line) !important; box-shadow: var(--rc-shadow); backdrop-filter: blur(20px); }
 .rc-supplied .rc-page-select, .rc-supplied .rc-pause-tools { animation: rc-controls-enter 360ms cubic-bezier(.22, 1, .36, 1) both; }
+.rc-supplied .rc-page-select { color: var(--m-ink); background: color-mix(in oklab, var(--m-mark) 12%, var(--m-paper)); border: 1px solid color-mix(in oklab, var(--m-ink) 25%, var(--m-paper)); box-shadow: 0 3px 12px color-mix(in oklab, var(--m-ink) 10%, transparent); font-size: 12px; }
+.rc-supplied .rc-page-select button { color: var(--m-ink); }
+.rc-supplied .rc-page-select input { font-weight: 600; color: var(--m-ink); border-bottom-color: color-mix(in oklab, var(--m-ink) 55%, var(--m-paper)); }
 @keyframes rc-controls-enter { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
 .rc-supplied .rc-loading { min-height: 0; height: 100%; }
 .rc-supplied .rc-reflow { overflow: visible; }
