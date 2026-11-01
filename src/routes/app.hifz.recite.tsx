@@ -554,8 +554,9 @@ function Recite() {
   }).join(" · ");
   const failedWords = targetWords.filter((w) => aiCorrection ? ["wrong", "skipped"].includes(aiCorrection.statuses[w.key]) : ["wrong", "skipped"].includes(saved.marks[w.key]));
   const tomorrowSession = hifzState ? buildSession(hifzState, quranIndex, addDays(today, 1)) : null;
-  const nextLesson = tomorrowSession?.steps.find((step) => step.kind === "sabaq");
-  const nextLessonChapter = nextLesson?.kind === "sabaq" ? quranIndex.pages.find((entry) => entry.page === nextLesson.page)?.surah : undefined;
+  const nextLesson = tomorrowSession?.steps.find((step) => step.type === "sabaq");
+  const nextLessonPage = useQuery({ ...recitePageOptions(nextLesson?.type === "sabaq" ? nextLesson.page : saved.page), enabled: sheet === "lessonComplete" && nextLesson?.type === "sabaq" }).data;
+  const nextLessonChapter = nextLesson?.type === "sabaq" ? nextLessonPage?.verses.find((verse) => verse.words.some((word) => !word.end && word.line > nextLesson.fromLine))?.chapter : undefined;
   const nextLessonName = chapters.find((entry) => entry.id === nextLessonChapter)?.name_simple;
   const sessionStats = hifzState ? stats(hifzState, quranIndex, today) : null;
 
