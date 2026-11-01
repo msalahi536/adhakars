@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "@tanstack/react-router";
 import { ArrowLeft, AudioLines, Expand, Loader2, Mic, StopCircle } from "lucide-react";
 import { Portal } from "@/components/Portal";
@@ -8,13 +8,16 @@ import { Switch } from "@/components/ui/switch";
 import { MushafThemeProvider } from "@/components/mushaf/MushafPage";
 import { getPresetId, resolveVisualPhase } from "@/lib/theme-store";
 import { getVerseByKey, type VerseHit } from "@/lib/quran";
-import { loadPageFont, reciteChaptersOptions, recitePageOptions } from "@/lib/recite/data";
+import { reciteChaptersOptions } from "@/lib/recite/data";
 import type { FollowPosition, SearchAnswer } from "@/lib/hifz-ai";
 import { MadaniPage } from "./MadaniPage";
 import { englishByDefault, paintPosition, searchPresentation } from "./rules";
 import { useVoiceSession, type Match } from "./useVoiceSession";
 import { VoiceConsent } from "./VoiceConsent";
 import { VoiceBars } from "./VoiceBars";
+import { followPage } from "./page-layout";
+import { prepareWordPages, wordPages } from "./word-pages";
+import { voicePageOptions, voicePageFonts } from "./page-data";
 import "./voice.css";
 
 export function QuranVoice({mode, initialPage = 1}: {mode:"follow"|"search"|"mushaf"; initialPage?:number}) {
@@ -32,6 +35,9 @@ function Back() {
   return <Button variant="ghost" size="icon" aria-label="Back to Quran" onClick={() => void navigate({to:"/app/quran",search:{}})}><ArrowLeft size={20} /></Button>;
 }
 function FollowImam({mode,initialPage}: {mode:"follow"|"mushaf"; initialPage:number}) {
+  const queryClient = useQueryClient();
+  const [preparing, setPreparing] = useState(false);
+  const [locationError, setLocationError] = useState(false);
   const [page, setPage] = useState(initialPage);
   const [font, setFont] = useState<string|null>(null);
   const [fontError, setFontError] = useState(false);
@@ -49,10 +55,19 @@ function FollowImam({mode,initialPage}: {mode:"follow"|"mushaf"; initialPage:num
   const label = useRef<HTMLDivElement|null>(null);
   const current = useRef<FollowPosition|null>(null);
   const ayahKey = useRef("");
-  const loadedPage = useRef(page); loadedPage.current = page;
-  const pageData = useQuery(recitePageOptions(page));
+  const loadedPage = useRef(page);
+  const pageData = useQuery(voicePageOptions(page));
   const chapters = useQuery(reciteChaptersOptions);
   const names = useRef(chapters.data); names.current = chapters.data;
+  useEffect(() => {
+    if (mode === "follow") void prepareWordPages().catch(() => { /* Retry before microphone start. */ });
+  }, [mode]);
+  useEffect(() => {
+    for (const adjacent of [page - 1, page + 1]) {
+      if (adjacent < 1 || adjacent > 604) continue;
+      void queryClient.ensureQueryData(voicePageOptions(adjacent)).then(voicePageFonts).catch(() => undefined);
+    }
+  }, [page, queryClient]);
   useEffect(() => {
     const language = document.documentElement.lang || navigator.language;
     setEnglish(englishByDefault(language));
@@ -60,14 +75,25 @@ function FollowImam({mode,initialPage}: {mode:"follow"|"mushaf"; initialPage:num
   }, [mode]);
   useEffect(() => {
     let active = true; setFont(null); setFontError(false);
-    void loadPageFont(page).then((f) => { if (active) { setFont(f); setFontError(!f); } });
+    if (pageData.data) void voicePageFonts(pageData.data).then((f) => { if (active) { setFont(f); setFontError(!f); } });
     return () => { active = false; };
-  }, [page,fontRetry]);
-  const renderHighlight = useCallback(() => {
-    if (current.current) paintPosition(root.current, current.current.key, current.current.locked);
+  }, [page,pageData.data,fontRetry]);
+  const turnToWord = useCallback((p: FollowPosition) => {
+    const target = followPage(p, wordPages, loadedPage.current);
+    if (target === loadedPage.current) return;
+    loadedPage.current = target;
+    setPage(target);
+    if (!matchMedia("(prefers-reduced-motion: reduce)").matches) root.current?.animate([{opacity:.4,transform:"translateX(16px)"},{opacity:1,transform:"translateX(0)"}],{duration:280,easing:"ease-out"});
   }, []);
+  const renderHighlight = useCallback(() => {
+    const p = current.current; if (!p) return;
+    const key = `${p.sura}:${p.aya}:${p.word}`;
+    if (p.locked && !root.current?.querySelector(`[data-follow-word="${key}"]`)) turnToWord(p);
+    paintPosition(root.current, key, p.locked);
+  }, [turnToWord]);
   const onPosition = useCallback((p:FollowPosition) => {
     current.current = p;
+    turnToWord(p);
     paintPosition(root.current, `${p.sura}:${p.aya}:${p.word}`, p.locked);
     if (label.current) label.current.textContent = p.locked ? `${names.current?.find((c)=>c.id===p.sura)?.name_simple ?? `Surah ${p.sura}`} · ayah ${p.aya}` : "Finding the imam…";
     setLocked((old) => old === p.locked ? old : p.locked);
@@ -75,25 +101,15 @@ function FollowImam({mode,initialPage}: {mode:"follow"|"mushaf"; initialPage:num
     if (p.locked && ayahKey.current !== key) {
       ayahKey.current = key; setAyah({sura:p.sura,aya:p.aya});
     }
-  }, []);
+  }, [turnToWord]);
   const voice = useVoiceSession("follow",onPosition,()=>undefined);
   useEffect(() => {
     if (!ayah) return;
     let active = true; setVerseError(false);
     const key = `${ayah.sura}:${ayah.aya}`;
-    void Promise.all([
-      getVerseByKey(key),
-      fetch(`https://api.quran.com/api/v4/verses/by_key/${key}?fields=page_number`).then(async(r) => {
-        if (!r.ok) throw new Error("Page unavailable");
-        return (await r.json() as {verse:{page_number:number}}).verse.page_number;
-      }),
-    ]).then(([verse,target]) => {
+    void getVerseByKey(key).then((verse) => {
       if (!active) return;
       setPreviousTranslation(translationRef.current); translationRef.current=verse; setTranslation(verse);
-      if (target !== loadedPage.current) {
-        setPage(target);
-        if (!matchMedia("(prefers-reduced-motion: reduce)").matches) root.current?.animate([{opacity:.4,transform:"translateX(16px)"},{opacity:1,transform:"translateX(0)"}],{duration:280,easing:"ease-out"});
-      }
     }).catch(()=> { if(active) setVerseError(true); });
     return()=>{active=false;};
   }, [ayah]);
@@ -109,7 +125,15 @@ function FollowImam({mode,initialPage}: {mode:"follow"|"mushaf"; initialPage:num
     return()=>{active=false;document.removeEventListener("visibilitychange",acquire);void wake?.release();};
   },[voice.phase]);
   const idle = voice.phase !== "active" && voice.phase !== "finishing";
-  const start = () => { if (label.current) label.current.textContent="Finding the imam…"; setLocked(false); void voice.request(); };
+  const start = async () => {
+    setPreparing(true); setLocationError(false);
+    try {
+      await prepareWordPages();
+      if (label.current) label.current.textContent="Finding the imam…";
+      setLocked(false); await voice.request();
+    } catch { setLocationError(true); }
+    finally { setPreparing(false); }
+  };
   return <main className={`qv-follow ${english ? "has-english":""} ${large ? "is-large":""}`}>
     <header className="qv-header"><Back /><div ref={label} className="qv-position-pill" role="status">{mode === "mushaf" ? "Madani mushaf" : "Follow the imam"}</div><span className="w-9" /></header>
     <div className="qv-page-slot" ref={root}>
@@ -117,7 +141,8 @@ function FollowImam({mode,initialPage}: {mode:"follow"|"mushaf"; initialPage:num
     </div>
     {english && <section className="qv-translation" aria-live="polite">{verseError ? <p className="qv-status">Translation unavailable. Checking the next ayah…</p> : translation ? <><p key={`previous-${translation.key}`} className="qv-translation-previous" aria-hidden="true">{previousTranslation?.translation}</p><p key={translation.key}>{translation.translation}</p></> : <p className="qv-status">{mode === "follow" ? "English · Sahih International" : pageData.data?.verses[0]?.translation}</p>}</section>}
     <footer className="qv-dock"><div className="qv-follow-options"><label htmlFor="qv-english">English</label><Switch id="qv-english" checked={english} onCheckedChange={setEnglish}/>{english && <Button variant="ghost" size="icon" aria-label={large?"Smaller English text":"Larger English text"} aria-pressed={large} onClick={()=>setLarge(!large)}><Expand size={16}/></Button>}</div>
-      {mode === "follow" && <Button className="qv-action" onClick={idle?start:()=>void voice.stop()} disabled={voice.phase === "finishing" || voice.phase === "loading"}>{idle?<AudioLines size={18}/>:<StopCircle size={18}/>} {idle?"Start following":voice.phase==="finishing"?"Stopping…":"Stop following"}</Button>}
+      {mode === "follow" && <Button className="qv-action" onClick={idle?()=>void start():()=>void voice.stop()} disabled={preparing || voice.phase === "finishing" || voice.phase === "loading"}>{idle?<AudioLines size={18}/>:<StopCircle size={18}/>} {preparing?"Preparing mushaf…":idle?"Start following":voice.phase==="finishing"?"Stopping…":"Stop following"}</Button>}
+      {locationError && <span role="alert" className="qv-status">Couldn’t load word locations. Check your connection and try again.</span>}
       {!locked && voice.phase === "active" && <span className="qv-status">Listening for the next ayah</span>}
     </footer>
     <VoiceConsent {...voice} begin={()=>void voice.begin()}/>
