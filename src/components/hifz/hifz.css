@@ -374,6 +374,10 @@ main.hz-setup > div { padding-top: calc(env(safe-area-inset-top, 0px) + 76px); }
 .hz-home .hz-stat-row { margin: 21px 0 14px; gap: 0; }
 .hz-home .hz-stat + .hz-stat { border-left: 1px solid color-mix(in oklab, var(--accent) 12%, transparent); }
 .hz-home .hz-stat b { color: var(--title); font-size: 20px; line-height: 1.4; white-space: nowrap; }
+.hz-progress-card .hz-card-heading { font-size: 19px; color: var(--card-foreground); }
+.hz-home .hz-progress-card .hz-stat b { color: var(--card-foreground); font-size: 22px; }
+.hz-home .hz-progress-card .hz-stat span { font-size: 12px; }
+.hz-progress-card .hz-next-milestone { font-size: 13px; color: var(--card-foreground); }
 .hz-home .hz-stat span { display: block; margin-top: 4px; font-size: 10px; letter-spacing: 0; color: var(--text-muted, var(--muted-foreground)); }
 .hz-next-milestone { display: flex; align-items: center; gap: 11px; padding-top: 14px; margin: 0; border-top: 1px solid color-mix(in oklab, var(--accent) 12%, transparent); font-size: 12px; line-height: 1.4; }
 .hz-next-milestone svg { width: 19px; height: 19px; color: var(--accent); flex: none; }

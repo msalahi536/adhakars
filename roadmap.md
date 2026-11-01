@@ -1,6 +1,8 @@
 # Roadmap
 
-- [ ] Soften Today to reference olive gradient and make heading frost slimmer/more transparent; phone-check.
+- [ ] Match Your Hifz darker larger text and investigate exaggerated Juz progress without altering saved memorization.
+
+- [x] Softened Today to reference olive gradient and made heading frost slimmer/more transparent; phone screenshot and Start verified.
 
 - [x] Darkened Today with an opaque deep gradient, raised home 8px further and added the frosted heading; phone screenshot, popups and Start verified; build OK.
 
