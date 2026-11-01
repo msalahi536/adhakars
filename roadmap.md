@@ -1,6 +1,6 @@
 # Roadmap
 
-- [ ] Match memorization home references: remove top Hifz label, reveal mountains, restyle Today/progress/map/streak/actions; verify phone layout and existing flows.
+- [x] Match memorization home references: removed top Hifz label, revealed mountains, restyled Today/progress/map/streak/actions; saved-plan phone screenshots, Juz/Salah/reminder popups and Start session verified.
 
 - [x] Verify/improve Advanced checkbox, gradient choices, draggable Hifz popup handles and outside-tap dismissal; checkbox toggles, saved choices, advanced outside/drag dismissal and customization drag verified.
 - [x] Remove duplicate finish summary for Juz Amma/selected-surah setup, keeping only side-by-side estimates; phone flow and 9 estimate tests pass.

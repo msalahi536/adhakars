@@ -347,6 +347,7 @@ main.hz-setup > div { padding-top: calc(env(safe-area-inset-top, 0px) + 76px); }
 /* ---- sheets ---- */
 /* Memorization home follows the shared mountain artwork without changing other screens. */
 .hz-home-header { position: absolute; inset: 0 0 auto; z-index: 20; }
+.hz-home-header .header-icon-button { top: 50px !important; }
 .hz-home { padding-bottom: 20px; }
 .hz-home-content { width: 100%; max-width: 440px; margin: 0 auto; padding: calc(env(safe-area-inset-top, 0px) + 104px) 12px 16px; display: flex; flex-direction: column; gap: 18px; }
 .hz-home-heading { text-align: center; padding: 0 16px 28px; color: var(--title, var(--foreground)); }
