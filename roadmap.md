@@ -1,7 +1,7 @@
 # Roadmap
 
-- [ ] Follow the imam: cached word-position page lookup, locked-only synchronous turns, adjacent page/font prefetch; test Al-Bayyinah 598→599 with recorded audio.
-- [ ] Follow mushaf: non-overlapping 15 fixed slots with general surah header/Basmala exceptions; inspect 598–604, 1, 2, 187, 50 and capture 598/187/turned page.
+- [x] Follow the imam: cached word-position lookup, locked-only synchronous turns and adjacent page/font prefetch. Recorded Al-Bayyinah 1–8 turned 598→599 at 98:8:1 (standard Quran.com coordinates place all of ayah 7 on 598); no browser errors. Recognizer skipped highlights for some words in ayahs 6–7, so recognition accuracy remains unclaimed.
+- [x] Follow mushaf: fixed slots/general heading exceptions; standard coordinates paired with per-word matching QCF v2 font pages because code_v2 changes the API edition. All 11 requested pages inspected, 12 tests pass; screenshots of 598/187/turn saved. Actual-phone behavior remains unverified.
 
 - [x] Replace Quran voice search with engine-managed confident/15-second sessions, live bars, repeated-phrase locations and uncertain guesses. Trimmed recorded Al-Ikhlas auto-stopped at confident 112:1; Open in mushaf reached page 604. Early mic stop showed the uncertain message; 9 focused tests passed. Repeated-location/Maybe rules passed unit tests; controlled browser fixtures did not load and are not claimed verified.
 - [x] Restore lesson-matching 48px surah-heading rows before all three surahs on follow page 604; screenshots confirm three visible Basmala lines on phone and desktop. Preview has no browser errors and latest build is OK; actual-phone mic behavior remains unverified.

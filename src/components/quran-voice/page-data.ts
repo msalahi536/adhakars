@@ -7,6 +7,21 @@ const API = "https://api.quran.com/api/v4";
 type RawWord = { position: number; page_number: number; line_number: number; char_type_name: string; text_uthmani: string; code_v2?: string };
 type RawVerse = { verse_key: string; verse_number: number; juz_number: number; words: RawWord[]; translations?: { text: string }[] };
 const glyphs = new Map<number, Promise<Map<string, RawWord>>>();
+const coordinates = new Map<number, Promise<RawVerse[]>>();
+function chapterCoordinates(chapter: number) {
+  const previous = coordinates.get(chapter); if (previous) return previous;
+  const task = (async () => {
+    const verses: RawVerse[] = []; let cursor: number | null = 1;
+    while (cursor) {
+      const response = await fetch(`${API}/verses/by_chapter/${chapter}?words=true&word_fields=text_uthmani,page_number,line_number&fields=juz_number&translations=20&language=en&per_page=300&page=${cursor}`);
+      if (!response.ok) throw new Error("Page coordinates unavailable");
+      const data = await response.json() as {verses:RawVerse[];pagination:{next_page:number|null}};
+      verses.push(...data.verses);cursor=data.pagination.next_page;
+    }
+    return verses;
+  })();
+  coordinates.set(chapter,task);void task.catch(()=>coordinates.delete(chapter));return task;
+}
 function chapterGlyphs(chapter: number) {
   const previous = glyphs.get(chapter); if (previous) return previous;
   const task = (async () => {
@@ -32,8 +47,12 @@ export async function fetchVoicePage(page: number): Promise<RecitePage> {
     const data = await response.json() as { verses: RawVerse[]; pagination: { next_page: number | null } };
     raw.push(...data.verses); cursor = data.pagination.next_page;
   }
-  const maps = new Map(await Promise.all([...new Set(raw.map(v => Number(v.verse_key.split(":")[0])))].map(async chapter => [chapter, await chapterGlyphs(chapter)] as const)));
-  return { page, verses: raw.map(v => {
+  const chapters = [...new Set(raw.map(v => Number(v.verse_key.split(":")[0])))];
+  const maps = new Map(await Promise.all(chapters.map(async chapter => [chapter, await chapterGlyphs(chapter)] as const)));
+  // by_page selects verses using v2 boundaries even without code_v2. Read entire
+  // chapters to retain ayahs that belong on this standard page but moved in v2.
+  const standard = (await Promise.all(chapters.map(chapterCoordinates))).flat().filter(v=>v.words.some(w=>w.page_number===page));
+  return { page, verses: standard.map(v => {
     const chapter = Number(v.verse_key.split(":")[0]);
     return { key:v.verse_key, number:v.verse_number, chapter, juz:v.juz_number, translation:stripTags(v.translations?.[0]?.text ?? ""), words:v.words.filter(w=>w.page_number===page).map(w=>{
       const key = `${v.verse_key}:${w.position}`; const glyph = maps.get(chapter)?.get(key);
