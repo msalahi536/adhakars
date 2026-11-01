@@ -117,6 +117,32 @@ main.hz-setup > div { padding-top: calc(env(safe-area-inset-top, 0px) + 76px); }
 .hz-order-step .hz-primary { min-width: 116px; font-size: 16px; }
 .hz-time { flex-direction: row; justify-content: center; }
 .hz-time strong { font-size: 16px; }
+.hz-time-step { padding-bottom: calc(var(--bottom-nav-height, 90px) + env(safe-area-inset-bottom) + 20px); }
+.hz-time-step > div { padding-left: 16px; padding-right: 16px; }
+.hz-time-step .hz-steps { margin-bottom: 20px; }
+.hz-time-step .hz-step-dot { mask-image: linear-gradient(to right, var(--foreground) 65%, transparent); }
+.hz-time-step .hz-known-heading { margin-bottom: 28px; padding: 18px 10px; }
+.hz-time-step .hz-title { margin: 0 0 9px; text-align: center; font-family: var(--font-display); font-size: 24px; line-height: 1.2; color: var(--card-foreground); font-weight: 700; }
+.hz-time-step .hz-sub { margin: 0; text-align: center; color: var(--card-foreground); font-size: 12px; line-height: 1.5; }
+.hz-time-step .hz-cards { gap: 9px; }
+.hz-time-step .hz-time { position: relative; flex-direction: row; align-items: center; justify-content: space-between; min-height: 60px; padding: 10px 26px; border-radius: 25px; border: 1px solid color-mix(in oklab, var(--surface) 90%, transparent); background: color-mix(in oklab, var(--surface-card, var(--card)) 74%, transparent); backdrop-filter: blur(16px) saturate(115%); box-shadow: 0 5px 12px color-mix(in oklab, var(--foreground) 9%, transparent), inset 0 1px 0 var(--surface); color: var(--card-foreground); transition: background .2s ease, border-color .2s ease; }
+.hz-time-step .hz-time:hover { background: color-mix(in oklab, var(--surface-card, var(--card)) 85%, transparent); color: var(--card-foreground); }
+.hz-time-step .hz-time.is-on { border-color: color-mix(in oklab, var(--accent) 75%, var(--surface)); background: color-mix(in oklab, var(--accent) 10%, color-mix(in oklab, var(--surface-card, var(--card)) 88%, transparent)); box-shadow: 0 0 0 1px color-mix(in oklab, var(--accent) 24%, transparent), 0 5px 12px color-mix(in oklab, var(--foreground) 9%, transparent); }
+.hz-time-step .hz-time-copy { display: flex; flex-direction: column; gap: 7px; width: 100%; min-width: 0; }
+.hz-time-step .hz-time strong { color: var(--card-foreground); font-size: 20px; line-height: 1.2; font-weight: 700; }
+.hz-time-step .hz-time-track { display: block; width: var(--time-track-width, 100%); height: 5px; border-radius: 999px; background: color-mix(in oklab, var(--card-foreground) 14%, transparent); mask-image: linear-gradient(to right, var(--foreground) 88%, transparent); }
+.hz-time-step .hz-time-fill { display: block; width: var(--time-fill-width, 100%); height: 100%; border-radius: inherit; background: linear-gradient(to right, color-mix(in oklab, var(--accent) 50%, var(--surface)), var(--accent) 82%, color-mix(in oklab, var(--accent) 55%, transparent)); }
+.hz-time[data-minutes="20"] { --time-track-width: 46%; --time-fill-width: 27%; }
+.hz-time[data-minutes="30"] { --time-track-width: 55%; --time-fill-width: 39%; }
+.hz-time[data-minutes="45"] { --time-track-width: 68%; --time-fill-width: 54%; }
+.hz-time[data-minutes="60"] { --time-track-width: 77%; --time-fill-width: 64%; }
+.hz-time[data-minutes="90"] { --time-track-width: 89%; --time-fill-width: 73%; }
+.hz-time[data-minutes="120"] { --time-track-width: 100%; --time-fill-width: 100%; }
+.hz-time-step .hz-time-check { position: absolute; right: 20px; top: 50%; transform: translateY(-50%); width: 23px; height: 23px; display: grid; place-items: center; border-radius: 50%; background: var(--accent); color: var(--accent-foreground); }
+.hz-time-step .hz-time-check svg { width: 16px; height: 16px; }
+.hz-time-step .hz-nav { margin-top: 24px; padding-left: 4px; padding-right: 4px; }
+.hz-time-step .hz-nav > button:first-child { height: 40px; padding: 0 17px; border-radius: 22px; background: color-mix(in oklab, var(--surface-card, var(--card)) 60%, transparent); border: 1px solid var(--surface); color: var(--foreground); backdrop-filter: blur(14px); box-shadow: 0 3px 7px color-mix(in oklab, var(--foreground) 9%, transparent); font-size: 14px; font-weight: 600; }
+@media (prefers-reduced-motion: reduce) { .hz-time-step .hz-time { transition: none; } }
 .hz-warning { font-size: 12px; color: var(--destructive, #b4453a); margin-top: 6px; }
 
 .hz-wide { width: 100%; margin-top: 10px; border-radius: 14px; color: var(--foreground); }

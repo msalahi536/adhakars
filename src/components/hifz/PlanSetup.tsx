@@ -100,14 +100,14 @@ export function PlanSetup({ existing, done }: { existing?: HifzPlan; done: () =>
   }
 
   return (
-    <main className={`scroll-area hz-setup ${step === 0 ? "hz-known-step" : step === 1 ? "hz-order-step" : ""}`}>
+    <main className={`scroll-area hz-setup ${step === 0 ? "hz-known-step" : step === 1 ? "hz-order-step" : step === 2 ? "hz-time-step" : ""}`}>
       <div className="mx-auto max-w-md px-5 py-4">
         <div className="hz-steps" aria-label={`Step ${step + 1} of ${steps.length}: ${steps[step]}`}>
           {steps.map((label, i) => (
             <span key={label} className={`hz-step-dot ${i === step ? "is-on" : i < step ? "is-done" : ""}`} />
           ))}
         </div>
-        {step > 1 && <p className="label-caps hz-step-label">{steps[step]}</p>}
+        {step > 2 && <p className="label-caps hz-step-label">{steps[step]}</p>}
 
         {step === 0 && (
           <section className="hz-known-content">
@@ -212,12 +212,18 @@ export function PlanSetup({ existing, done }: { existing?: HifzPlan; done: () =>
 
         {step === 2 && (
           <section>
+            <header className="hz-known-heading">
             <h1 className="hz-title">How much time each day?</h1>
             <p className="hz-sub">Review always comes first; new memorization gets what is left.</p>
+            </header>
             <div className="hz-cards">
               {TIME_OPTIONS.map((m) => (
-                <Button variant="ghost" key={m} aria-pressed={plan.dailyMinutes === m} className={`hz-card hz-time ${plan.dailyMinutes === m ? "is-on" : ""}`} onClick={() => setPlan((p) => ({ ...p, dailyMinutes: m }))}>
+                <Button variant="ghost" key={m} aria-label={`${m} min`} aria-pressed={plan.dailyMinutes === m} data-minutes={m} className={`hz-card hz-time ${plan.dailyMinutes === m ? "is-on" : ""}`} onClick={() => setPlan((p) => ({ ...p, dailyMinutes: m }))}>
+                  <span className="hz-time-copy">
                   <strong>{m} min</strong>
+                  <span className="hz-time-track" aria-hidden="true"><span className="hz-time-fill" /></span>
+                  </span>
+                  {plan.dailyMinutes === m && <span className="hz-time-check"><Check /></span>}
                 </Button>
               ))}
             </div>
