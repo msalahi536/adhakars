@@ -605,7 +605,7 @@ function Reader({ chapterId, verse }: { chapterId: number; verse?: number }) {
 
   return (
     <>
-      {echo && <EchoMode keys={verses?.filter((a) => !verse || a.number >= verse).map((a) => a.key) ?? []} reciter={prefs.reciter} close={() => setEcho(false)} />}
+      {echo && beta.enabled && <EchoMode keys={verses?.filter((a) => !verse || a.number >= verse).map((a) => a.key) ?? []} reciter={prefs.reciter} close={() => setEcho(false)} />}
       <Header kicker={`Surah ${chapterId}${chapter ? ` · ${chapter.translated_name.name}` : ""}`} title={chapter?.name_simple ?? "…"} sub={chapter?.name_arabic} onBack={back} />
       <main className={`scroll-area ${display.large ? "quran-ar-large" : ""}`} onScroll={onReadScroll}>
         <div className={`mx-auto max-w-md space-y-3 px-5 pt-4 ${player.panelOpen ? "pb-64" : "pb-28"}`}>

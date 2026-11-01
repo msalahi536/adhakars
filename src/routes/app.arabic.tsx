@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Check, ChevronLeft, Lock, Mic, Play, Square, Volume2, X, Sparkles, RotateCcw } from "lucide-react";
 import { CURRICULUM, LESSONS, ITEMS, type Item, type Lesson } from "@/lib/arabic/content";
@@ -6,6 +6,7 @@ import { buildLesson, derive, dueItems, lessonStatus, scoreOf, todayLocal, type 
 import { loadLog, record } from "@/lib/arabic/store";
 import type { Grade } from "@/lib/arabic/review";
 import { Portal } from "@/components/Portal";
+import { useHifzBeta } from "@/lib/hifz-beta";
 
 export const Route = createFileRoute("/app/arabic")({
   head: () => ({
@@ -18,8 +19,15 @@ export const Route = createFileRoute("/app/arabic")({
       { name: "twitter:card", content: "summary" },
     ],
   }),
-  component: ArabicCompanion,
+  component: HiddenArabicCompanion,
 });
+
+function HiddenArabicCompanion() {
+  const { enabled, checked } = useHifzBeta();
+  const navigate = useNavigate();
+  useEffect(() => { if (checked && !enabled) void navigate({ to: "/app/more", replace: true }); }, [checked, enabled, navigate]);
+  return enabled ? <ArabicCompanion /> : null;
+}
 
 const ar = { fontFamily: "var(--font-arabic)" };
 const glow = { background: "radial-gradient(circle at 50% 35%, color-mix(in oklab, var(--primary) 16%, transparent), transparent 70%)" };
