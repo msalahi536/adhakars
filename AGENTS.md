@@ -5,7 +5,7 @@
 - Hifz qari playback uses cancellable generation tokens and settled segment waits; stage changes invalidate playback before mic startup so repeat loops cannot restart audio after a stop.
 - Hifz AI notices live in a browser-independent module so Settings attribution never imports the inference runtime; the free model is not part of paid entitlements.
 
-- Hifz home uses body-portaled shared dialogs above navigation and labels page selections from Quran index verse keys with source chapter names, preserving page-based engine writes while making passages recognizable.
+- Hifz home dialogs portal above navigation; practice screens call engine exports with Quran-source ranges. Sleep previews save device-only passages for unrecorded morning recall; page labels use source surah names.
 
 - Hifz setup caches automatic pace candidates per plan when time selection opens, ranks the approved engine's effective finish dates with smaller-pace tie breaks, and keeps custom overrides in a bottom sheet; the selected summary reflects an active finish-date target with any engine time-limit warning. Immediate-goal and whole-Quran comparisons use the same chosen pace and engine with scope-only index ranges, excluding known pages and preserving selected-surah order before the remaining Quran.
 - Hifz home and plan finish summaries share selectedFinishEstimate with the saved daily-minute budget; time-limit warnings compare displayed month/year so realistic dates never contradict or repeat themselves.

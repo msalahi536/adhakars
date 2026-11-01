@@ -2,7 +2,8 @@ import {useEffect,useRef} from "react";
 import {Mic,Square} from "lucide-react";
 import {Button} from "@/components/ui/button";
 import {useAiRecitation,type AiRange} from "@/components/recite/use-ai-recitation";
-import {findHesitations,masteryScore,type CheckResult} from "@/lib/hifz-ai";
+import {findHesitations,masteryScore} from "@/lib/hifz-ai/fluency";
+import type {CheckResult} from "@/lib/hifz-ai/checker";
 import {quranPlayer} from "@/lib/quran-player";
 import {recitationPlayer} from "@/lib/recitation-player";
 import {cleanRecitation} from "@/components/recite/ai-performance";
@@ -10,11 +11,11 @@ import {play} from "@/lib/hifzHaptics";
 export function PracticeVoice({ranges,wordKeys,onCorrect,noPressure=false}:{ranges:AiRange[];wordKeys:string[];onCorrect?:()=>void;noPressure?:boolean}) {
  const ai=useAiRecitation(ranges[0]?.sura??0,true,wordKeys);
  const processed=useRef<CheckResult|null>(null);
- const success=ai.result?cleanRecitation(ai.result,wordKeys):false;
+ const success=ai.result?cleanRecitation(ai.result,[...new Set([...wordKeys,...ai.result.words.map((w)=>w.key)])]):false;
  useEffect(()=>{
   if(ai.phase!=="finished"||!ai.result||processed.current===ai.result)return;
   processed.current=ai.result;
-  if(cleanRecitation(ai.result,wordKeys)&&onCorrect){play("pageComplete");onCorrect();}
+  if(cleanRecitation(ai.result,[...new Set([...wordKeys,...ai.result.words.map((w)=>w.key)])])&&onCorrect){play("pageComplete");onCorrect();}
  },[ai.phase,ai.result,onCorrect,wordKeys]);
  const start=()=>{quranPlayer.pause();recitationPlayer.pause();void ai.request(ranges);};
  const score=ai.result && ai.phase==="finished"?masteryScore(ai.result,findHesitations(ai.result)):null;

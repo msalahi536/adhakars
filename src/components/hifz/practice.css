@@ -22,6 +22,8 @@
 .hp-detail dt {font-size:12px;color:var(--muted-foreground);}
 .hp-detail dd {font-size:18px;font-weight:600;margin:5px 0;}
 .hp-detail h2 {font-family:var(--font-display);font-size:25px;}
+.hp-detail.hz-home-popup {z-index:220;background:var(--card);color:var(--card-foreground);width:calc(100% - 28px);max-width:440px;border-radius:8px;}
+.hp-detail .hz-primary {display:inline-flex !important;}
 .hp-note {font-size:13px;line-height:1.6;color:var(--muted-foreground);}
 .hp-home-nudge {display:flex;gap:12px;align-items:center;padding:18px 2px;border-block:1px solid var(--border);}
 .hp-home-nudge > svg {color:var(--accent);flex:none;}
