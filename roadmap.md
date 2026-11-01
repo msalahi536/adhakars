@@ -1,5 +1,7 @@
 # Roadmap
 
+- [x] Apply exact approved Hifz timeline engine and rebuild pace/date/custom selection before time-budget confirmation; calculation tests and complete phone setup/save verified, including both warning choices.
+
 - [x] Match the daily-time setup to reference: frosted heading, no label, rounded time rows and fading bars; phone screenshot, all six options, Next, Back and retained selection verified.
 
 - [x] Make custom surah memorization order visible and editable; 8 tests pass and phone checks verify numbered taps, reordering, reopening and saved plan order.

@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
-import { ChevronLeft, ChevronRight, Check, BookOpen, Sprout, Circle, Search, Layers, List, ArrowUp, ArrowDown, X } from "lucide-react";
+import { ChevronLeft, ChevronRight, Check, BookOpen, Sprout, Circle, Search, Layers, List, ArrowUp, ArrowDown, X, Minus, Plus } from "lucide-react";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { searchChapters } from "@/lib/quran";
 import {
@@ -10,6 +10,10 @@ import {
   createState,
   defaultPlan,
   humanDuration,
+  humanMinutes,
+  monthYear,
+  paceLabel,
+  paceForFinishDate,
   saveState,
   todayISO,
   type HifzPlan,
@@ -21,7 +25,7 @@ import { hasSetupChoice } from "./setup-choice";
 import { moveSurah, toggleSurahOrder } from "./surah-order";
 
 const DAY_NAMES = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
-const TIME_OPTIONS = [20, 30, 45, 60, 90, 120];
+const TIME_OPTIONS = [20, 30, 45, 60, 90, 120, 180];
 
 const fmtDate = (iso: string) =>
   new Date(iso + "T12:00:00Z").toLocaleDateString(undefined, { month: "long", year: "numeric" });
@@ -51,14 +55,22 @@ export function PlanSetup({ existing, done }: { existing?: HifzPlan; done: () =>
     existing?.order.kind === "surahs" ? existing.order.surahs : [],
   );
   const [advanced, setAdvanced] = useState(false);
+  const [paceMode, setPaceMode] = useState<"pace" | "date">("pace");
+  const [targetDate, setTargetDate] = useState("");
+  const [keepPace, setKeepPace] = useState(false);
 
   const known = useMemo(
     () => knownPages(q, chosenJuz, chosenSurahs),
     [q, chosenJuz, chosenSurahs],
   );
   const draft: HifzPlan = { ...plan, alreadyMemorized: known };
-  const timelines = useMemo(() => compareTimelines(draft, q), [JSON.stringify(draft)]);
-  const summary = useMemo(() => buildTimeline(draft, q), [JSON.stringify(draft)]);
+  const timelines = useMemo(() => compareTimelines(draft, q, plan.dailyMinutes), [JSON.stringify(draft), q]);
+  const summary = useMemo(() => buildTimeline(draft, q, plan.dailyMinutes), [JSON.stringify(draft), q]);
+  const dateTimeline = useMemo(() => targetDate ? paceForFinishDate(draft, q, targetDate) : null, [JSON.stringify(draft), q, targetDate]);
+  function choosePace(lines: number) {
+    setKeepPace(false);
+    setPlan((p) => ({ ...p, newLinesPerDay: Math.max(1, Math.min(150, lines)) }));
+  }
 
   const setOrder = (order: MemorizationOrder) => setPlan((p) => ({ ...p, order }));
   const toggleIn = (list: number[], value: number) =>
@@ -88,11 +100,12 @@ export function PlanSetup({ existing, done }: { existing?: HifzPlan; done: () =>
     setOrder({ kind: "surahs", surahs: next });
   }
 
-  const steps = ["Already know", "Order", "Daily time", "Pace", "Summary"];
+  const steps = ["Already know", "Order", "Pace", "Daily time", "Summary"];
   const canNext =
     step === 0 ? hasSetupChoice(chosenJuz, chosenSurahs, startingFresh) :
     step === 1 ? plan.order.kind !== "surahs" || orderSurahs.length > 0 :
-    step === 3 ? true : true;
+    step === 2 ? paceMode !== "date" || dateTimeline !== null :
+    step === 3 ? !summary.shortOnTime || keepPace : true;
 
   function finish() {
     saveState(createState(draft));
@@ -100,14 +113,14 @@ export function PlanSetup({ existing, done }: { existing?: HifzPlan; done: () =>
   }
 
   return (
-    <main className={`scroll-area hz-setup ${step === 0 ? "hz-known-step" : step === 1 ? "hz-order-step" : step === 2 ? "hz-time-step" : ""}`}>
+    <main className={`scroll-area hz-setup ${step === 0 ? "hz-known-step" : step === 1 ? "hz-order-step" : step === 3 ? "hz-time-step" : step === 2 ? "hz-pace-step" : ""}`}>
       <div className="mx-auto max-w-md px-5 py-4">
         <div className="hz-steps" aria-label={`Step ${step + 1} of ${steps.length}: ${steps[step]}`}>
           {steps.map((label, i) => (
             <span key={label} className={`hz-step-dot ${i === step ? "is-on" : i < step ? "is-done" : ""}`} />
           ))}
         </div>
-        {step > 2 && <p className="label-caps hz-step-label">{steps[step]}</p>}
+        {step === 4 && <p className="label-caps hz-step-label">{steps[step]}</p>}
 
         {step === 0 && (
           <section className="hz-known-content">
@@ -210,39 +223,67 @@ export function PlanSetup({ existing, done }: { existing?: HifzPlan; done: () =>
           </DialogContent>
         </Dialog>
 
-        {step === 2 && (
+        {step === 3 && (
           <section>
             <header className="hz-known-heading">
-            <h1 className="hz-title">How much time each day?</h1>
+            <h1 className="hz-title">How much time can you give each day?</h1>
             <p className="hz-sub">Review always comes first; new memorization gets what is left.</p>
             </header>
             <div className="hz-cards">
               {TIME_OPTIONS.map((m) => (
-                <Button variant="ghost" key={m} aria-label={`${m} min`} aria-pressed={plan.dailyMinutes === m} data-minutes={m} className={`hz-card hz-time ${plan.dailyMinutes === m ? "is-on" : ""}`} onClick={() => setPlan((p) => ({ ...p, dailyMinutes: m }))}>
+                <Button variant="ghost" key={m} aria-label={`${m === 180 ? "180+" : m} min`} aria-pressed={plan.dailyMinutes === m} data-minutes={m} className={`hz-card hz-time ${plan.dailyMinutes === m ? "is-on" : ""}`} onClick={() => { setKeepPace(false); setPlan((p) => ({ ...p, dailyMinutes: m })); }}>
                   <span className="hz-time-copy">
-                  <strong>{m} min</strong>
+                  <strong>{m === 180 ? "180+" : m} min</strong>
                   <span className="hz-time-track" aria-hidden="true"><span className="hz-time-fill" /></span>
                   </span>
                   {plan.dailyMinutes === m && <span className="hz-time-check"><Check /></span>}
                 </Button>
               ))}
             </div>
+            {summary.shortOnTime && <div className="hz-budget-warning" role="status">
+              <p>{summary.shortOnTime.message}</p>
+              <div className="hz-budget-actions">
+                <Button variant="outline" aria-pressed={keepPace} onClick={() => setKeepPace(true)}><Check /> Keep this pace</Button>
+                <Button variant="outline" onClick={() => { setKeepPace(false); setPaceMode("pace"); setStep(2); }}><ChevronLeft /> Pick a slower pace</Button>
+              </div>
+            </div>}
           </section>
         )}
 
-        {step === 3 && (
+        {step === 2 && (
           <section>
-            <h1 className="hz-title">Pick your pace</h1>
+            <header className="hz-known-heading"><h1 className="hz-title">Pick your pace</h1></header>
+            <div className="hz-surah-tabs" role="group" aria-label="Pace selection mode">
+              <Button variant="ghost" aria-pressed={paceMode === "pace"} onClick={() => setPaceMode("pace")}>Choose a pace</Button>
+              <Button variant="ghost" aria-pressed={paceMode === "date"} onClick={() => setPaceMode("date")}>Choose a finish date</Button>
+            </div>
+            {paceMode === "pace" ? <>
             <div className="hz-cards">
               {timelines.map((t) => (
-                <Button variant="ghost" key={t.lines} aria-pressed={plan.newLinesPerDay === t.lines} className={`hz-card ${plan.newLinesPerDay === t.lines ? "is-on" : ""}`} onClick={() => setPlan((p) => ({ ...p, newLinesPerDay: t.lines }))}>
+                <Button variant="ghost" key={t.lines} aria-pressed={plan.newLinesPerDay === t.lines} className={`hz-card ${plan.newLinesPerDay === t.lines ? "is-on" : ""}`} onClick={() => choosePace(t.lines)}>
                   <strong>{t.label}</strong>
                   <span>{t.note}</span>
-                  <span className="hz-finish">Finish in {humanDuration(t.calendarDays)} · {fmtDate(t.finishDate)}</span>
-                  {plan.newLinesPerDay === t.lines && t.warning && <span className="hz-warning">{t.warning}</span>}
+                  <span className="hz-finish">Finish in {t.duration} · {monthYear(t.finishDate)}</span>
+                  <span>{humanMinutes(t.minutesAtStart)} a day now, {humanMinutes(t.minutesAtPeak)} later</span>
                 </Button>
               ))}
             </div>
+            <div className="hz-custom-pace">
+              <label htmlFor="custom-lines">Custom</label>
+              <div className="hz-pace-stepper">
+                <Button variant="outline" size="icon" aria-label="Fewer lines per day" disabled={plan.newLinesPerDay <= 1} onClick={() => choosePace(plan.newLinesPerDay - 1)}><Minus /></Button>
+                <input id="custom-lines" aria-label="Lines per day" type="number" min={1} max={150} value={plan.newLinesPerDay} onChange={(e) => { const value = Number(e.target.value); if (Number.isFinite(value)) choosePace(value); }} />
+                <Button variant="outline" size="icon" aria-label="More lines per day" disabled={plan.newLinesPerDay >= 150} onClick={() => choosePace(plan.newLinesPerDay + 1)}><Plus /></Button>
+              </div>
+              <strong>{paceLabel(plan.newLinesPerDay)}</strong>
+              <p>Finish in {humanDuration(summary.calendarDays)} · {monthYear(summary.finishDate)}</p>
+              <p>{humanMinutes(summary.minutesAtStart)} a day now, {humanMinutes(summary.minutesAtPeak)} later</p>
+            </div>
+            </> : <div className="hz-custom-pace">
+              <label htmlFor="finish-date">Finish date</label>
+              <input id="finish-date" type="date" value={targetDate} min={today} onChange={(e) => { const value = e.target.value; setTargetDate(value); if (!value) return; const result = paceForFinishDate(draft, q, value); if (result) choosePace(result.newLinesPerDay); }} />
+              {targetDate && (dateTimeline ? <p role="status">{paceLabel(dateTimeline.newLinesPerDay)}, {humanMinutes(dateTimeline.minutesAtPeak)} a day at peak</p> : <p role="status">That&apos;s sooner than is realistic. Try a later date.</p>)}
+            </div>}
           </section>
         )}
 
@@ -261,8 +302,8 @@ export function PlanSetup({ existing, done }: { existing?: HifzPlan; done: () =>
                 {summary.juzMilestones.length > 8 && <span className="hz-milestone">…</span>}
               </div>
               <p className="hz-sub">Daily time needed as your hifz grows</p>
-              <MinutesChart points={summary.steadyStateMinutes} budget={plan.dailyMinutes} />
-              {summary.warning && <p className="hz-warning">{summary.warning}</p>}
+              <MinutesChart points={summary.minutesByMonth} budget={plan.dailyMinutes} />
+              {summary.shortOnTime && <p className="hz-warning">{summary.shortOnTime.message}</p>}
               <Button variant="ghost" className="hz-wide" aria-expanded={advanced} onClick={() => setAdvanced((v) => !v)}>
                 Advanced options
               </Button>

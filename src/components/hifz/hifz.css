@@ -138,6 +138,22 @@ main.hz-setup > div { padding-top: calc(env(safe-area-inset-top, 0px) + 76px); }
 .hz-time[data-minutes="60"] { --time-track-width: 77%; --time-fill-width: 64%; }
 .hz-time[data-minutes="90"] { --time-track-width: 89%; --time-fill-width: 73%; }
 .hz-time[data-minutes="120"] { --time-track-width: 100%; --time-fill-width: 100%; }
+.hz-time[data-minutes="180"] { --time-track-width: 100%; --time-fill-width: 100%; }
+.hz-pace-step { padding-bottom: calc(var(--bottom-nav-height, 90px) + env(safe-area-inset-bottom) + 20px); }
+.hz-pace-step .hz-title { margin: 0; text-align: center; font-family: var(--font-display); color: var(--card-foreground); }
+.hz-pace-step .hz-surah-tabs { margin-bottom: 16px; }
+.hz-pace-step .hz-card { background: color-mix(in oklab, var(--surface-card, var(--card)) 80%, transparent); backdrop-filter: blur(16px); }
+.hz-pace-step .hz-card strong, .hz-pace-step .hz-card span { color: var(--card-foreground); }
+.hz-custom-pace { display: flex; flex-direction: column; gap: 10px; margin-top: 20px; color: var(--card-foreground); }
+.hz-custom-pace label { font-size: 15px; font-weight: 700; }
+.hz-custom-pace p { margin: 0; font-size: 13px; line-height: 1.5; }
+.hz-custom-pace input { min-width: 0; max-width: 100%; border: 1px solid var(--border); border-radius: 12px; padding: 10px 12px; background: var(--surface-card, var(--card)); color: var(--card-foreground); }
+.hz-pace-stepper { display: flex; gap: 10px; align-items: center; }
+.hz-pace-stepper input { width: 90px; text-align: center; }
+.hz-budget-warning { margin-top: 20px; color: var(--card-foreground); font-size: 13px; line-height: 1.6; }
+.hz-budget-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+.hz-budget-actions > button { border-radius: 16px; background: var(--surface-card, var(--card)); color: var(--card-foreground); }
+.hz-budget-actions > button[aria-pressed="true"] { border-color: var(--accent); }
 .hz-time-step .hz-time-check { position: absolute; right: 20px; top: 50%; transform: translateY(-50%); width: 23px; height: 23px; display: grid; place-items: center; border-radius: 50%; background: var(--accent); color: var(--accent-foreground); }
 .hz-time-step .hz-time-check svg { width: 16px; height: 16px; }
 .hz-time-step .hz-nav { margin-top: 24px; padding-left: 4px; padding-right: 4px; }
