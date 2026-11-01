@@ -386,6 +386,7 @@ main.hz-setup > div { padding-top: calc(env(safe-area-inset-top, 0px) + 76px); }
 .hz-home .hz-map { margin-top: 17px; gap: 7px; }
 .hz-home .hz-map-tile { height: 43px; padding: 0; border-radius: 14px; font-size: 14px; background: color-mix(in oklab, var(--background) 55%, var(--surface)); border-color: color-mix(in oklab, var(--surface) 70%, transparent); color: var(--title); }
 .hz-home .hz-map-tile.is-started { border-color: var(--accent); }
+.hz-juz-progress-count { color: var(--card-foreground); font-size: 14px; margin: 8px 0 12px; }
 .hz-home .hz-map-tile.is-complete { background: linear-gradient(140deg, var(--accent), var(--title)); color: var(--surface-deep-fg); box-shadow: var(--card-shadow); }
 .hz-streak-heading { display: flex; align-items: flex-start; gap: 11px; }
 .hz-streak-heading > svg { width: 23px; height: 23px; color: var(--accent); flex: none; }

@@ -146,8 +146,8 @@ export function HifzHome({ state, update, reset }: { state: HifzState; update: (
           <header className="hz-map-heading"><h2 className="hz-card-heading"><Layers /> Progress Map</h2><span className="hz-map-label">Juz</span></header>
           <div className="hz-map">
             {st.byJuz.map((j) => (
-              <Button variant="ghost" key={j.juz} className={`hz-map-tile ${j.memorized === j.pages ? "is-complete" : j.memorized ? "is-started" : ""}`} aria-label={`Juz ${j.juz}: ${j.memorized} of ${j.pages} pages`} onClick={() => { setJuzOpen(j.juz); setSheet("juz"); }}>
-                <i style={{ opacity: j.memorized ? 0.15 + (j.strength ?? 0) * 0.6 : 0, width: `${(j.memorized / j.pages) * 100}%` }} />
+              <Button variant="ghost" key={j.juz} className={`hz-map-tile ${j.memorized === j.pages ? "is-complete" : j.memorized ? "is-started" : ""}`} title={`${j.memorized} of ${j.pages} pages memorized`} aria-label={`Juz ${j.juz}: ${j.memorized} of ${j.pages} pages`} onClick={() => { setJuzOpen(j.juz); setSheet("juz"); }}>
+                <i style={{ opacity: j.memorized ? .35 : 0, width: `${(j.memorized / j.pages) * 100}%` }} />
                 <em>{j.juz}</em>
               </Button>
             ))}
@@ -203,6 +203,7 @@ export function HifzHome({ state, update, reset }: { state: HifzState; update: (
       {sheet === "juz" && juzOpen !== null && (
         <section className="hz-sheet" role="dialog" aria-modal="true" aria-label={`Juz ${juzOpen} pages`}>
           <header><h2>Juz {juzOpen}</h2><Button variant="ghost" size="icon" aria-label="Close" onClick={() => setSheet(null)}><X /></Button></header>
+          <p className="hz-juz-progress-count">{st.byJuz.find((j) => j.juz === juzOpen)?.memorized ?? 0} of {st.byJuz.find((j) => j.juz === juzOpen)?.pages ?? 0} pages memorized</p>
           <div className="hz-page-list">
             {q.pages.filter((p) => p.juz === juzOpen).map((p) => {
               const rec = state.pages[p.page];
