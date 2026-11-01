@@ -1,5 +1,8 @@
 # Roadmap
 
+- [x] Hifz program screens on the src/lib/hifz engine: 5-step plan setup, home dashboard (today card, timeline, streak/forecast, juz map, weak spots, salah logger, reminders, edit plan), session flow on the recite page (manzil/sabqi review with evidence grade sheet, sabaq listen/read/recite/correct/chain, drills, link, end screen), try-first reveal lock, morning/sleep reminders (910xxx/911xxx IDs). All behind hifz_beta; verified on phone-size browser; 49 hifz/recite tests pass.
+
+
 - [x] Removed Hifz Sounds option and silenced saved sound preferences; reference-inspired Aa icon rows, switches, compact choices and fixed header verified on phone.
 
 - [x] Hifz entry and direct page gated by exact hifz_beta="1"; phone checks confirm seventh-tap unlock/relock, hidden default, direct URL redirect and preserved progress; 51 targeted tests pass.

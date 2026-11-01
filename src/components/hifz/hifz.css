@@ -1,0 +1,110 @@
+/* Hifz program screens: setup wizard, home dashboard, session overlays. All colors are app tokens. */
+
+.hz-setup { min-height: 100dvh; }
+.hz-steps { display: flex; gap: 6px; justify-content: center; padding: 8px 0 4px; }
+.hz-step-dot { width: 22px; height: 4px; border-radius: 2px; background: color-mix(in oklab, var(--foreground) 14%, transparent); transition: background .25s ease; }
+.hz-step-dot.is-on { background: var(--accent); }
+.hz-step-dot.is-done { background: color-mix(in oklab, var(--accent) 45%, transparent); }
+.hz-step-label { text-align: center; margin: 6px 0 2px; }
+.hz-title { font-size: 22px; font-weight: 800; margin: 10px 0 4px; color: var(--foreground); }
+.hz-sub { font-size: 13px; color: var(--muted-foreground); margin: 0 0 14px; }
+.hz-note { font-size: 12px; color: var(--muted-foreground); text-align: center; margin-top: 10px; }
+
+.hz-juz-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 8px; margin-bottom: 12px; }
+.hz-juz-tile { height: 44px; border-radius: 12px; border: 1px solid var(--border); background: var(--surface, var(--card)); font-weight: 700; color: var(--foreground); }
+.hz-juz-tile.is-on { background: var(--accent); color: var(--accent-foreground, var(--card)); border-color: var(--accent); }
+
+.hz-surah-pick { max-height: 260px; overflow-y: auto; display: flex; flex-wrap: wrap; gap: 6px; padding: 10px; border: 1px solid var(--border); border-radius: 16px; margin-bottom: 12px; background: var(--surface, var(--card)); }
+.hz-surah-chip { border: 1px solid var(--border); border-radius: 999px; padding: 4px 10px; font-size: 12px; height: auto; color: var(--foreground); }
+.hz-surah-chip.is-on { background: var(--accent); color: var(--accent-foreground, var(--card)); border-color: var(--accent); }
+
+.hz-cards { display: flex; flex-direction: column; gap: 10px; }
+.hz-card { display: flex; flex-direction: column; align-items: flex-start; gap: 3px; text-align: left; height: auto; padding: 14px 16px; border-radius: 18px; border: 1px solid var(--border); background: var(--surface, var(--card)); color: var(--foreground); white-space: normal; }
+.hz-card strong { font-size: 15px; }
+.hz-card span { font-size: 12px; color: var(--muted-foreground); }
+.hz-card.is-on { border-color: var(--accent); box-shadow: 0 0 0 1.5px var(--accent); }
+.hz-card .hz-finish { color: var(--accent); font-weight: 700; }
+.hz-time { flex-direction: row; justify-content: center; }
+.hz-time strong { font-size: 16px; }
+.hz-warning { font-size: 12px; color: var(--destructive, #b4453a); margin-top: 6px; }
+
+.hz-wide { width: 100%; margin-top: 10px; border-radius: 14px; color: var(--foreground); }
+.hz-nav { display: flex; justify-content: space-between; align-items: center; margin-top: 18px; padding-bottom: calc(env(safe-area-inset-bottom) + 12px); }
+.hz-primary { border-radius: 14px; background: var(--accent); color: var(--accent-foreground, var(--card)); font-weight: 700; padding: 0 22px; height: 44px; }
+
+.hz-summary { display: flex; flex-direction: column; gap: 10px; }
+.hz-big-finish { font-size: 17px; color: var(--foreground); margin: 0; }
+.hz-milestones { display: flex; flex-wrap: wrap; gap: 6px; }
+.hz-milestone { font-size: 11px; border: 1px solid var(--border); border-radius: 999px; padding: 3px 9px; color: var(--muted-foreground); }
+.hz-chart { width: 100%; height: auto; border: 1px solid var(--border); border-radius: 14px; background: var(--surface, var(--card)); }
+.hz-chart-line { stroke: var(--accent); stroke-width: 2; }
+.hz-chart-budget { stroke: var(--muted-foreground); stroke-dasharray: 4 3; stroke-width: 1; }
+.hz-chart-label { font-size: 9px; fill: var(--muted-foreground); }
+.hz-advanced { display: flex; flex-direction: column; gap: 12px; border: 1px solid var(--border); border-radius: 16px; padding: 12px; }
+.hz-field { border: 0; padding: 0; margin: 0; }
+.hz-field legend { font-size: 12px; font-weight: 700; color: var(--foreground); margin-bottom: 6px; }
+.hz-days { display: flex; flex-wrap: wrap; gap: 6px; }
+.hz-day { border: 1px solid var(--border); border-radius: 10px; font-size: 12px; height: 34px; padding: 0 10px; color: var(--foreground); }
+.hz-day.is-on { background: var(--accent); color: var(--accent-foreground, var(--card)); border-color: var(--accent); }
+.hz-toggle { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--foreground); }
+
+/* ---- home ---- */
+.hz-home-card { border: 1px solid var(--border); border-radius: 22px; background: var(--surface, var(--card)); box-shadow: var(--card-shadow, 0 4px 16px rgba(0,0,0,.06)); padding: 16px; color: var(--foreground); }
+.hz-hero { background: var(--surface-deep-gradient, var(--surface-deep)); color: var(--surface-deep-fg); border: none; }
+.hz-hero .label-caps { color: var(--surface-deep-muted); opacity: 1; }
+.hz-hero-steps { display: flex; flex-direction: column; gap: 8px; margin: 12px 0; }
+.hz-hero-step { display: flex; align-items: center; gap: 10px; font-size: 13px; }
+.hz-hero-step .hz-ico { display: flex; align-items: center; justify-content: center; width: 30px; height: 30px; border-radius: 10px; background: color-mix(in oklab, var(--surface-deep-fg) 12%, transparent); flex: none; }
+.hz-hero-step small { display: block; opacity: .65; font-size: 11px; }
+.hz-hero-total { display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--surface-deep-border); padding-top: 10px; font-size: 12px; color: var(--surface-deep-muted); }
+.hz-start { width: 100%; margin-top: 12px; height: 48px; border-radius: 16px; font-weight: 800; font-size: 15px; background: var(--accent); color: var(--accent-foreground, var(--card)); }
+.hz-paused { font-size: 12px; margin-top: 10px; padding: 8px 10px; border-radius: 10px; background: color-mix(in oklab, var(--surface-deep-fg) 10%, transparent); }
+
+.hz-stat-row { display: flex; justify-content: space-between; gap: 8px; margin-top: 8px; }
+.hz-stat { flex: 1; text-align: center; }
+.hz-stat b { display: block; font-size: 18px; }
+.hz-stat span { font-size: 10px; color: var(--muted-foreground); text-transform: uppercase; letter-spacing: .06em; }
+
+.hz-forecast { display: flex; gap: 5px; align-items: flex-end; height: 44px; margin-top: 10px; }
+.hz-forecast-bar { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 3px; }
+.hz-forecast-bar i { width: 100%; border-radius: 4px; background: var(--accent); min-height: 3px; display: block; }
+.hz-forecast-bar span { font-size: 9px; color: var(--muted-foreground); }
+
+.hz-map { display: grid; grid-template-columns: repeat(6, 1fr); gap: 7px; margin-top: 10px; }
+.hz-map-tile { position: relative; height: 40px; border-radius: 10px; border: 1px solid var(--border); background: var(--surface, var(--card)); overflow: hidden; font-size: 11px; font-weight: 700; color: var(--foreground); }
+.hz-map-tile i { position: absolute; inset: 0; background: var(--accent); display: block; }
+.hz-map-tile em { position: relative; font-style: normal; }
+
+.hz-row-btn { display: flex; align-items: center; gap: 10px; width: 100%; text-align: left; padding: 12px 14px; border-radius: 16px; border: 1px solid var(--border); background: var(--surface, var(--card)); color: var(--foreground); font-size: 13px; font-weight: 600; height: auto; white-space: normal; }
+.hz-row-btn small { display: block; font-weight: 400; font-size: 11px; color: var(--muted-foreground); }
+
+/* ---- sheets ---- */
+.hz-sheet { position: fixed; inset: auto 0 0 0; z-index: 60; max-height: 82dvh; overflow-y: auto; border-radius: 24px 24px 0 0; background: var(--card); color: var(--foreground); padding: 18px 18px calc(env(safe-area-inset-bottom) + 18px); box-shadow: 0 -12px 40px rgba(0,0,0,.25); }
+.hz-sheet h2 { font-size: 18px; font-weight: 800; margin: 0 0 4px; }
+.hz-sheet header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+.hz-backdrop { position: fixed; inset: 0; z-index: 55; background: color-mix(in oklab, black 40%, transparent); }
+.hz-page-list { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; margin-top: 10px; }
+.hz-page-chip { border: 1px solid var(--border); border-radius: 9px; height: 34px; font-size: 11px; color: var(--foreground); position: relative; overflow: hidden; }
+.hz-page-chip i { position: absolute; inset: 0; background: var(--accent); display: block; }
+.hz-page-chip em { position: relative; font-style: normal; }
+
+.hz-reminder-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 10px 0; border-bottom: 1px solid var(--border); }
+.hz-reminder-row:last-child { border-bottom: 0; }
+.hz-reminder-row input[type="time"] { border: 1px solid var(--border); border-radius: 10px; padding: 6px 8px; background: var(--surface, var(--card)); color: var(--foreground); font-size: 13px; }
+
+/* ---- session overlays on the recite page ---- */
+.hz-phase-bar { position: fixed; top: calc(env(safe-area-inset-top) + 34px); left: 50%; transform: translateX(-50%); z-index: 45; display: flex; align-items: center; gap: 8px; padding: 8px 14px; border-radius: 999px; background: color-mix(in oklab, var(--m-paper) 88%, transparent); backdrop-filter: blur(14px); border: 1px solid color-mix(in oklab, var(--m-ink) 16%, transparent); color: var(--m-ink); font-size: 12px; font-weight: 700; box-shadow: 0 6px 20px rgba(0,0,0,.14); white-space: nowrap; max-width: calc(100vw - 24px); }
+.hz-phase-bar small { font-weight: 500; opacity: .7; }
+.hz-session-progress { position: fixed; top: calc(env(safe-area-inset-top) + 10px); left: 50%; transform: translateX(-50%); z-index: 45; font-size: 10px; letter-spacing: .08em; text-transform: uppercase; color: var(--m-muted, var(--m-ink)); opacity: .75; white-space: nowrap; }
+.hz-try-first { position: fixed; bottom: calc(var(--rc-strip-height, 92px) + 44px); left: 50%; transform: translateX(-50%); z-index: 45; padding: 7px 16px; border-radius: 999px; background: color-mix(in oklab, var(--m-ink) 88%, transparent); color: var(--m-paper); font-size: 12px; font-weight: 700; animation: hz-pop .25s ease; }
+@keyframes hz-pop { from { transform: translateX(-50%) scale(.9); opacity: 0; } }
+
+.hz-drill { display: flex; flex-direction: column; gap: 12px; }
+.hz-drill-words { font-family: var(--font-arabic); font-size: 26px; line-height: 2; text-align: right; direction: rtl; color: var(--foreground); }
+.hz-drill-words .hz-hidden-word { opacity: .14; }
+.hz-drill-words .hz-diff { color: var(--accent); font-weight: 700; }
+.hz-drill-actions { display: flex; gap: 10px; }
+.hz-drill-actions button { flex: 1; height: 44px; border-radius: 14px; font-weight: 700; }
+
+/* Word highlighted while the qari recites it (sabaq listen phase). */
+.rc-word.rc-listening .rc-word-ink { color: var(--m-gold); transition: color .15s ease; }
