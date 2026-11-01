@@ -225,6 +225,49 @@ main.hz-setup > div { padding-top: calc(env(safe-area-inset-top, 0px) + 76px); }
 .hz-day.is-on { background: var(--accent); color: var(--accent-foreground, var(--card)); border-color: var(--accent); }
 .hz-toggle { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--foreground); }
 
+/* Reference-led plan summary; scoped so earlier steps stay unchanged. */
+.hz-summary-step { padding-bottom: calc(var(--bottom-nav-height, 90px) + env(safe-area-inset-bottom) + 24px); color: var(--card-foreground); }
+.hz-summary-step > div { padding-left: 16px; padding-right: 16px; }
+.hz-summary-step .hz-steps { margin-bottom: 20px; }
+.hz-summary-step .hz-known-heading { padding: 18px 14px; margin-bottom: 20px; text-align: center; }
+.hz-summary-step .hz-title { margin: 0 0 8px; font-family: var(--font-display); font-size: 28px; font-weight: 700; color: var(--card-foreground); }
+.hz-summary-step .hz-big-finish { font-size: 15px; line-height: 1.5; color: var(--card-foreground); }
+.hz-summary-step .hz-big-finish strong { font-weight: 800; }
+.hz-summary-step .hz-summary { gap: 18px; }
+.hz-plan-overview { display: flex; align-items: center; gap: 10px; padding: 16px 12px; border-radius: 20px; border: 1px solid var(--surface); background: color-mix(in oklab, var(--surface-card, var(--card)) 76%, transparent); backdrop-filter: blur(16px); box-shadow: var(--card-shadow); }
+.hz-plan-book { width: 38px; height: 38px; flex: none; display: grid; place-items: center; border-radius: 50%; background: color-mix(in oklab, var(--accent) 8%, transparent); color: var(--accent); }
+.hz-plan-book svg { width: 24px; height: 24px; stroke-width: 1.6; }
+.hz-plan-goal { min-width: 0; flex: 1; }
+.hz-plan-goal strong { display: block; font-size: 14px; line-height: 1.4; }
+.hz-plan-goal small { display: block; margin-top: 3px; font-size: 11px; opacity: .72; }
+.hz-plan-dates { display: flex; gap: 8px; align-items: center; border-left: 1px solid var(--border); padding-left: 10px; font-size: 11px; line-height: 1.6; flex: none; }
+.hz-plan-dates svg { width: 20px; height: 20px; color: var(--accent); stroke-width: 1.6; }
+.hz-summary-step .hz-milestones { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px 6px; }
+.hz-summary-step .hz-milestone { display: flex; align-items: center; justify-content: center; min-height: 36px; padding: 7px 4px; text-align: center; font-size: 10px; line-height: 1.4; font-weight: 600; color: var(--card-foreground); border: 1px solid var(--surface); background: color-mix(in oklab, var(--surface-card, var(--card)) 65%, transparent); backdrop-filter: blur(12px); box-shadow: var(--card-shadow); }
+.hz-summary-step .hz-milestone.is-first { background: linear-gradient(140deg, color-mix(in oklab, var(--accent) 68%, var(--surface)), var(--accent)); color: var(--accent-foreground); border-color: color-mix(in oklab, var(--surface) 40%, var(--accent)); }
+.hz-plan-time { padding: 16px 14px 12px; border-radius: 22px; background: color-mix(in oklab, var(--surface-card, var(--card)) 70%, transparent); backdrop-filter: blur(16px); box-shadow: var(--card-shadow); }
+.hz-plan-time > header { display: flex; align-items: center; gap: 9px; }
+.hz-plan-time > header > svg { width: 23px; height: 23px; color: var(--accent); flex: none; }
+.hz-plan-time > header > div { min-width: 0; flex: 1; }
+.hz-plan-time h2 { font-size: 15px; font-weight: 700; line-height: 1.3; margin: 0; }
+.hz-plan-time p { font-size: 11px; margin: 3px 0 0; opacity: .65; }
+.hz-plan-budget { flex: none; font-size: 9px; font-weight: 700; padding: 6px 8px; border-radius: 999px; color: var(--accent); background: color-mix(in oklab, var(--accent) 10%, var(--surface)); }
+.hz-plan-chart { margin-top: 16px; }
+.hz-plan-chart .hz-chart { display: block; border: 0; border-radius: 0; background: transparent; }
+.hz-plan-chart .hz-chart-line { stroke-width: 1.7; }
+.hz-plan-chart .hz-chart-budget { opacity: .6; stroke: var(--accent); stroke-dasharray: 5 4; }
+.hz-chart-stop-top { stop-color: var(--accent); stop-opacity: .28; }
+.hz-chart-stop-bottom { stop-color: var(--accent); stop-opacity: .02; }
+.hz-chart-start { fill: var(--accent); }
+.hz-plan-chart-labels { display: flex; justify-content: space-between; font-size: 10px; color: var(--card-foreground); opacity: .75; }
+.hz-summary-step .hz-plan-advanced { display: flex; justify-content: flex-start; gap: 12px; margin: 0; height: 46px; padding: 0 17px; border-radius: 24px; border: 1px solid var(--surface); background: color-mix(in oklab, var(--surface-card, var(--card)) 65%, transparent); backdrop-filter: blur(14px); box-shadow: var(--card-shadow); color: var(--card-foreground); font-size: 14px; font-weight: 600; }
+.hz-plan-advanced > svg { color: var(--accent); width: 19px; height: 19px; }
+.hz-plan-advanced > svg:last-child { margin-left: auto; transition: transform .2s ease; }
+.hz-summary-step .hz-nav { margin-top: 24px; gap: 12px; }
+.hz-summary-step .hz-nav > button:first-child { height: 42px; padding: 0 17px; border-radius: 24px; border-color: var(--surface); background: color-mix(in oklab, var(--surface-card, var(--card)) 60%, transparent); backdrop-filter: blur(14px); color: var(--card-foreground); box-shadow: var(--card-shadow); }
+.hz-summary-step .hz-nav > .hz-primary { border-radius: 22px; padding: 0 22px; font-size: 14px; }
+.hz-summary-step .hz-warning { margin: 0; color: var(--card-foreground); font-size: 11px; line-height: 1.5; }
+
 /* ---- home ---- */
 .hz-home-card { border: 1px solid var(--border); border-radius: 22px; background: var(--surface, var(--card)); box-shadow: var(--card-shadow, 0 4px 16px rgba(0,0,0,.06)); padding: 16px; color: var(--foreground); }
 .hz-hero { background: var(--surface-deep-gradient, var(--surface-deep)); color: var(--surface-deep-fg); border: none; }

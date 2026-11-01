@@ -1,5 +1,7 @@
 # Roadmap
 
+- [ ] Match Your plan references: frosted heading, goal overview, milestone pills, time chart and rounded actions; verify phone visuals and saving.
+
 - [x] Reflect the chosen finish date in the summary, retain time-limit warnings and center summary text; 6 tests pass, phone screenshot and date/pace switching verified.
 
 - [x] Match the finish summary reference with calendar icon, stacked serif date and compact details; phone screenshot and customization verified.
