@@ -1,6 +1,7 @@
 # Roadmap
 
-- [ ] Match the finish summary reference with calendar icon, stacked serif date and compact details; visually check and preserve customization.
+- [x] Match the finish summary reference with calendar icon, stacked serif date and compact details; phone screenshot and customization verified.
+- [ ] Match Customize pace popup to the new reference images and verify both tabs and saved choices.
 
 - [x] Simplify Hifz to time-first automatic pace selection, cached effective finish estimates, selected summary and custom bottom sheet; 18 tests pass, phone visuals checked, automatic and custom saved choices verified.
 
