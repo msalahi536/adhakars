@@ -30,7 +30,7 @@ export function useAiRecitation(page: number, enabled: boolean, keys: string[]) 
   const capture = useRef<MediaStream | null>(null);
   const wordKeys = useRef(keys); wordKeys.current = keys;
   useEffect(() => {
-    setPhase("idle"); setResult(null); setError(""); previous.current = {};
+    setPhase("idle"); setResult(null); setDebugAudio(null); setError(""); previous.current = {};
     return () => {
       generation.current++;
       debugCapture.current?.discard(); debugCapture.current = null;
