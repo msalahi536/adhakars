@@ -33,6 +33,7 @@ export function PlanSetup({ existing, done }: { existing?: HifzPlan; done: () =>
   const [plan, setPlan] = useState<HifzPlan>(() => existing ?? defaultPlan(today));
   const [pickSurahs, setPickSurahs] = useState(false);
   const [surahSearch, setSurahSearch] = useState("");
+  const [surahScenery, setSurahScenery] = useState<string>();
   const [startingFresh, setStartingFresh] = useState(false);
   const [chosenJuz, setChosenJuz] = useState<number[]>(() => {
     if (!existing) return [];
@@ -103,7 +104,12 @@ export function PlanSetup({ existing, done }: { existing?: HifzPlan; done: () =>
                 </Button>
               ))}
             </div>
-            <Button variant="outline" className="hz-wide hz-pick-surahs" onClick={() => { setSurahSearch(""); setPickSurahs(true); }} aria-haspopup="dialog">
+            <Button variant="outline" className="hz-wide hz-pick-surahs" onClick={() => {
+              const phase = document.documentElement.dataset.visualPhase === "evening" ? "evening" : "morning";
+              const backdrop = document.querySelector(`.app-background-${phase}`);
+              setSurahScenery(backdrop ? getComputedStyle(backdrop).backgroundImage : undefined);
+              setSurahSearch(""); setPickSurahs(true);
+            }} aria-haspopup="dialog">
               <BookOpen />
               Pick surahs instead
               <ChevronRight className={pickSurahs ? "hz-picker-open" : ""} />
@@ -111,10 +117,12 @@ export function PlanSetup({ existing, done }: { existing?: HifzPlan; done: () =>
             {chosenSurahs.length > 0 && <p className="mt-3 mb-0 text-center text-sm font-semibold text-card-foreground" role="status">{chosenSurahs.length} {chosenSurahs.length === 1 ? "surah" : "surahs"} selected</p>}
             <Dialog open={pickSurahs} onOpenChange={setPickSurahs}>
               <DialogContent className="hz-surah-dialog hz-setup" aria-describedby={undefined} onOpenAutoFocus={(event) => event.preventDefault()}>
+                <div className="hz-surah-scenery" aria-hidden="true" style={{ backgroundImage: surahScenery }} />
                 <header className="hz-surah-dialog-header">
                   <Button variant="ghost" className="hz-surah-back" aria-label="Back to setup" onClick={() => setPickSurahs(false)}><ChevronLeft /></Button>
                   <DialogTitle>Choose Surahs</DialogTitle>
                 </header>
+                <p className="hz-surah-instruction">Select the surahs you’ve memorized.</p>
                 <label className="hz-surah-search"><Search /><input aria-label="Search surahs" placeholder="Search surahs…" value={surahSearch} onChange={(e) => setSurahSearch(e.target.value)} /></label>
                 <div className="hz-surah-dialog-list">
                 {searchChapters(chapters, surahSearch).map((c) => (

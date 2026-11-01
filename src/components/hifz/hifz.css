@@ -75,7 +75,8 @@ main.hz-setup > div { padding-top: calc(env(safe-area-inset-top, 0px) + 76px); }
 .hz-surah-empty { text-align: center; padding: 24px 0; color: var(--card-foreground); }
 .hz-entry-back { position: absolute; top: 32px; left: 0; z-index: 20; }
 .hz-surah-dialog.hz-setup { isolation: isolate; overflow: hidden; background: var(--surface-card, var(--card)); }
-.hz-surah-dialog::before { content: ""; position: absolute; inset: 0 0 auto; height: 210px; z-index: -1; pointer-events: none; background-image: var(--screen-background); background-size: cover; background-position: center 38%; opacity: .14; mask-image: linear-gradient(to bottom, var(--foreground), transparent); }
+.hz-surah-scenery { position: absolute; inset: 0 0 auto; height: 230px; z-index: -1; pointer-events: none; background-size: cover; background-position: center 45%; opacity: .38; mask-image: linear-gradient(to bottom, var(--foreground) 0%, var(--foreground) 30%, transparent 100%); }
+.hz-surah-instruction { margin: -12px 0 8px; text-align: center; font-size: 13px; color: var(--card-foreground); }
 .hz-surah-dialog-header { padding-bottom: 6px; }
 .hz-surah-dialog .hz-surah-search { background: color-mix(in oklab, var(--accent) 5%, var(--surface-card, var(--card))); }
 .hz-surah-dialog .hz-surah-row { background: color-mix(in oklab, var(--accent) 3%, var(--surface-card, var(--card))); }
