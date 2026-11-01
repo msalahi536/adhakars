@@ -164,7 +164,15 @@ function Recite() {
   useEffect(() => {
     if (ai.phase !== "finished" || !ai.result || handledAi.current === ai.result) return;
     handledAi.current = ai.result;
-    if (!sabaq) { setSheet("ai"); return; }
+    if (!sabaq) {
+      if (sessionItem?.kind === "link") {
+        const result = stageResult(ai.result, words);
+        if (hifzState && aiFailures(result).length) persistState(saveAiWeakSpots(hifzState, result, words, today));
+        if (stagePassed(result, words)) { playFeedback("pageComplete"); advance(); }
+        else setSheet("ai");
+      } else setSheet("ai");
+      return;
+    }
     const target = sabaqPhase === "chain" ? chainWords : rangeWords;
     const result = stageResult(ai.result, target);
     if (hifzState && aiFailures(result).length) persistState(saveAiWeakSpots(hifzState, result, target, today));
@@ -444,11 +452,13 @@ function Recite() {
     if (playing) { stopAudio(); return; }
     const verse = next?.verse ?? first?.key;
     if (!verse) return;
+    stopAudio(); quranPlayer.pause(); recitationPlayer.pause();
+    const token = audioRun.current.token();
     try {
       const chapterAudio = await getChapterAudio(saved.settings.reciter, Number(verse.split(":")[0]));
+      if (!audioRun.current.current(token) || micBusy.current) return;
       const timing = chapterAudio.timings.find((t) => t.key === verse);
       if (!timing) throw new Error("No verse timing");
-      stopAudio(); quranPlayer.pause(); recitationPlayer.pause();
       const a = new Audio(chapterAudio.url); audio.current = a; a.playbackRate = saved.settings.speed;
       let repeats = 0;
       a.onloadedmetadata = () => { a.currentTime = timing.from / 1000; };
@@ -483,7 +493,7 @@ function Recite() {
       if (ai.phase === "loading" || ai.phase === "stopping") return;
       stopAudio(); quranPlayer.pause(); recitationPlayer.pause();
       const range = aiRanges[aiRangeIndex];
-      if (range) { micBusy.current = true; void ai.request(sabaq ? aiRanges : range); }
+      if (range) { micBusy.current = true; void ai.request(sessionItem ? aiRanges : range); }
       return;
     }
     if (recallMode && next && Date.now() - ayahStartAt.current < TRY_FIRST_MS) {
@@ -598,7 +608,7 @@ function Recite() {
     const aiStatus = mode === "ai" ? (aiCorrection?.statuses[word.key] ?? aiWords?.statuses[word.key]) : undefined;
     const memoryTest = !sabaq || ["recite", "chain", "correct"].includes(sabaqPhase);
     const state: WordState = mode === "ai" && memoryTest ? aiWordState(aiStatus) : saved.marks[word.key] ?? "pending";
-    const hint = peek === word.key || isOpeningWord(word, words, saved.settings.hideAmount);
+    const hint = mode === "self" && (peek === word.key || isOpeningWord(word, words, saved.settings.hideAmount));
     return <Button variant="ghost" key={word.key} className={`rc-word rc-${state} ${aiStatus === "wrong" || aiStatus === "skipped" ? `rc-ai-${aiStatus}` : ""} ${hint ? "rc-peek" : ""} ${audioWord === word.key ? "rc-listening" : ""}`} onPointerUp={(e) => {
       const start = pointer.current;
       if (mode === "ai" && (aiStatus === "wrong" || aiStatus === "skipped") && start && start.id === e.pointerId && pageGesture(start, e.clientX, e.clientY, e.timeStamp) === "tap") { e.stopPropagation(); pointer.current = null; void playWord(word); return; }
@@ -606,7 +616,7 @@ function Recite() {
       e.stopPropagation(); pointer.current = null; mark(word);
     }} onClick={(e) => { if (e.detail === 0 && mode === "self" && revealed(state)) mark(word); if (e.detail === 0 && (aiStatus === "wrong" || aiStatus === "skipped")) void playWord(word); }} aria-label={`Word ${word.key}, ${aiStatus ?? state}`} data-word={word.key} data-state={aiStatus ?? state} data-source={aiStatus ? "ai" : "self"}>
       <span className={`rc-word-ink ${saved.settings.layout === "mushaf" && saved.settings.tajweed && word.tajweed ? `rc-qcf-tj-${parseTajweed(word.tajweed).find((segment) => segment.group)?.group ?? "none"}` : ""}`}>{saved.settings.layout === "mushaf" ? word.glyph : saved.settings.tajweed && word.tajweed ? <span className="rc-tajweed-text"><TajweedText markup={word.tajweed} /></span> : word.text}</span>
-      {(state === "wrong" || state === "skipped" || state === "unsure") && <span className="rc-word-note">{state === "wrong" ? word.text : state === "skipped" ? "skipped" : "?"}</span>}
+      {mode === "self" && (state === "wrong" || state === "skipped" || state === "unsure") && <span className="rc-word-note">{state === "wrong" ? word.text : state === "skipped" ? "skipped" : "?"}</span>}
       {aiStatus === "unsure" && saved.settings.showUnclearWords && <span className="rc-ai-dot" aria-label="Unclear word">·</span>}
       {mode === "ai" && aiWords?.repeated.has(word.key) && <span className="rc-ai-repeat">repeated</span>}
     </Button>;
@@ -702,7 +712,7 @@ function Recite() {
       </div>
       {mode === "ai" && (controls || ai.phase === "listening") && (!sabaq || sabaqPhase === "recite" || sabaqPhase === "chain") && !sheet && <Button className="rc-floating-mic" disabled={ai.phase === "loading" || ai.phase === "stopping" || !font} onClick={horizon}><Mic size={17} />{ai.phase === "listening" ? "Done" : "Tap to recite"}</Button>}
       {mode === "ai" && <div className="rc-ai-footer">
-        {aiRanges.length > 1 && <select aria-label="Passage to check" disabled={ai.phase === "listening" || ai.phase === "loading" || ai.phase === "stopping"} value={aiRangeIndex} onChange={(e) => setAiRangeIndex(Number(e.target.value))}>{aiRanges.map((r, i) => <option key={r.sura} value={i}>{chapters.find((c) => c.id === r.sura)?.name_simple} · {r.first}–{r.last}</option>)}</select>}
+        {!sessionItem && aiRanges.length > 1 && <select aria-label="Passage to check" disabled={ai.phase === "listening" || ai.phase === "loading" || ai.phase === "stopping"} value={aiRangeIndex} onChange={(e) => setAiRangeIndex(Number(e.target.value))}>{aiRanges.map((r, i) => <option key={r.sura} value={i}>{chapters.find((c) => c.id === r.sura)?.name_simple} · {r.first}–{r.last}</option>)}</select>}
         <p>{AI_DISCLAIMER}</p>
       </div>}
     </div>
