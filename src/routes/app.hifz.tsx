@@ -15,7 +15,7 @@ import { triggerHaptic } from "@/lib/theme";
 import { MushafThemeProvider, MushafFrame, MushafLabel, MushafPageNumber, SurahCartouche, AyahMarker, toArabicDigits } from "@/components/mushaf/MushafPage";
 import { ReciteStrip } from "@/components/mushaf/ReciteStrip";
 import { getPresetId, resolveVisualPhase, type VisualPhase } from "@/lib/theme-store";
-import { TajweedText } from "@/lib/tajweed";
+import { parseTajweed, TajweedText } from "@/lib/tajweed";
 import "@/components/recite/supplied-mushaf.css";
 import { mushafThemeId } from "@/components/recite/mushaf-theme";
 import { CONTROLS_IDLE_MS, pageGesture, type PagePointer } from "@/components/recite/page-gesture";
@@ -46,7 +46,10 @@ function Recite() {
   const [morningOrEvening, setMorningOrEvening] = useState<VisualPhase>("morning");
   const [sheet, setSheet] = useState<"settings" | "ai" | "marks" | "complete" | null>(null);
   const [gradeAyah, setGradeAyah] = useState<string | null>(null);
-  const [font, setFont] = useState<string | null>(null);
+  const [loadedFont, setLoadedFont] = useState<{ page: number; name: string } | null>(null);
+  const [fontAttempt, setFontAttempt] = useState(0);
+  const [fontFailed, setFontFailed] = useState(false);
+  const font = loadedFont?.page === saved.page ? loadedFont.name : null;
   const [playing, setPlaying] = useState(false);
   const [audioError, setAudioError] = useState("");
   const [peek, setPeek] = useState<string | null>(null);
@@ -87,20 +90,21 @@ function Recite() {
   }, [controls, sheet, gradeAyah, touchActivity]);
   useLayoutEffect(() => {
     const paper = paperElement;
-    if (!paper) return;
+    if (!paper || (saved.settings.layout === "mushaf" && !font)) return;
     const fit = () => {
-      paper.querySelectorAll<HTMLElement>(".rc-line").forEach((line) => {
-        const baseSize = saved.settings.layout === "mushaf" ? Math.min(line.clientHeight * .72, line.clientWidth / 10.5) : saved.settings.size;
-        line.style.setProperty("--rc-line-size", `${baseSize}px`);
-        const items = [...line.children] as HTMLElement[];
-        let size = baseSize;
-        for (let attempt = 0; attempt < 5; attempt++) {
-          const width = items.reduce((n, el) => n + el.getBoundingClientRect().width, 0) + Math.max(0, items.length - 1) * 2;
-          if (width <= line.clientWidth) break;
-          size *= (line.clientWidth - 3) / width;
-          line.style.setProperty("--rc-line-size", `${size}px`);
-        }
-      });
+      const lines = [...paper.querySelectorAll<HTMLElement>(".rc-line")];
+      if (!lines.length) return;
+      const apply = (size: number) => lines.forEach((line) => line.style.setProperty("--rc-line-size", `${size}px`));
+      const fits = () => lines.every((line) => [...line.children].reduce((width, child) => width + child.getBoundingClientRect().width, 0) <= line.clientWidth);
+      let low = 1;
+      let high = paper.clientWidth;
+      // One size for the entire page: the widest authentic line determines it.
+      for (let attempt = 0; attempt < 18; attempt++) {
+        const size = (low + high) / 2;
+        apply(size);
+        if (fits()) low = size; else high = size;
+      }
+      apply(low);
     };
     fit();
     const observer = new ResizeObserver(fit); observer.observe(paper);
@@ -108,10 +112,14 @@ function Recite() {
   }, [paperElement, font, page, saved.settings.size, saved.settings.layout, saved.settings.tajweed]);
   useEffect(() => {
     let canceled = false;
-    setFont(null);
-    void loadPageFont(saved.page).then((name) => { if (!canceled) setFont(name); });
+    setFontFailed(false);
+    void loadPageFont(saved.page).then((name) => {
+      if (canceled) return;
+      if (name) setLoadedFont({ page: saved.page, name });
+      else setFontFailed(true);
+    });
     return () => { canceled = true; };
-  }, [saved.page]);
+  }, [saved.page, fontAttempt]);
   useEffect(() => {
     if (!active) return;
     const id = setInterval(() => setSaved((s) => ({ ...s, seconds: { ...s.seconds, [s.page]: (s.seconds[s.page] ?? 0) + 1 } })), 1000);
@@ -197,7 +205,7 @@ function Recite() {
       if (mode !== "self" || !revealed(state) || !start || start.id !== e.pointerId || pageGesture(start, e.clientX, e.clientY, e.timeStamp) !== "tap") return;
       e.stopPropagation(); pointer.current = null; mark(word);
     }} onClick={(e) => { if (e.detail === 0 && mode === "self" && revealed(state)) mark(word); }} aria-label={`Word ${word.key}, ${state}`} data-word={word.key} data-state={state}>
-      <span className="rc-word-ink">{saved.settings.tajweed && word.tajweed ? <span className="rc-tajweed-text"><TajweedText markup={word.tajweed} /></span> : font && saved.settings.layout === "mushaf" ? word.glyph : word.text}</span>
+      <span className={`rc-word-ink ${saved.settings.layout === "mushaf" && saved.settings.tajweed && word.tajweed ? `rc-qcf-tj-${parseTajweed(word.tajweed).find((segment) => segment.group)?.group ?? "none"}` : ""}`}>{saved.settings.layout === "mushaf" ? word.glyph : saved.settings.tajweed && word.tajweed ? <span className="rc-tajweed-text"><TajweedText markup={word.tajweed} /></span> : word.text}</span>
       {(state === "wrong" || state === "skipped" || state === "unsure") && <span className="rc-word-note">{state === "wrong" ? word.text : state === "skipped" ? "skipped" : "?"}</span>}
     </Button>;
   };
@@ -205,7 +213,7 @@ function Recite() {
   const renderLine = (line: number) => {
     const lineItems = lineWords(line);
     const surahStart = page?.verses.find((v) => v.number === 1 && v.words[0]?.line === line + 2);
-    if (surahStart) return <div key={line} className="rc-cartouche"><SurahCartouche name={`سُورَةُ ${chapters.find((c) => c.id === surahStart.chapter)?.name_arabic ?? ""}`} height={30} /></div>;
+    if (surahStart) return <div key={line} className="rc-cartouche"><SurahCartouche name={`سُورَةُ ${chapters.find((c) => c.id === surahStart.chapter)?.name_arabic ?? ""}`} height={48} /></div>;
     const bismillah = page?.verses.find((v) => v.number === 1 && v.chapter !== 9 && v.chapter !== 1 && v.words[0]?.line === line + 1);
     if (bismillah) return <div key={line} className="rc-bismillah rc-arabic">بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ</div>;
     return <div key={line} className={`rc-line ${saved.page <= 2 ? "rc-short-line" : ""}`} dir="rtl">{lineItems.map(wordNode)}</div>;
@@ -228,8 +236,8 @@ function Recite() {
     }} onPointerCancel={() => { pointer.current = null; }}>
       <div className="rc-labels"><MushafLabel text={`الجزء ${toArabicDigits(first?.juz ?? "—")}`} height={24} /><MushafLabel text={`سُورَةُ ${chapter?.name_arabic ?? "—"}`} height={24} /></div>
       <div className={`rc-paper ${saved.settings.layout !== "mushaf" ? "rc-reflow" : ""}`} ref={setPaperElement}>
-        <MushafFrame scale={0.22} className="rc-art-frame">
-        {pageQuery.isPending ? <div className="rc-loading">Loading mushaf page…</div> : pageQuery.isError ? <div className="rc-loading">{pageQuery.error.message}<Button variant="outline" onClick={() => void pageQuery.refetch()}>Try again</Button></div> : <div className={`rc-mushaf ${font && saved.settings.layout === "mushaf" ? "rc-glyphs" : ""}`} style={{ fontFamily: saved.settings.layout === "mushaf" ? font ?? undefined : undefined }}>
+        <MushafFrame scale={0.5} className="rc-art-frame">
+        {pageQuery.isPending ? <div className="rc-loading">Loading mushaf page…</div> : pageQuery.isError ? <div className="rc-loading">{pageQuery.error.message}<Button variant="outline" onClick={() => void pageQuery.refetch()}>Try again</Button></div> : saved.settings.layout === "mushaf" && !font ? <div className="rc-loading" role="status">Loading mushaf font…{fontFailed && <Button variant="outline" onClick={() => setFontAttempt((v) => v + 1)}>Try again</Button>}</div> : <div className={`rc-mushaf ${font && saved.settings.layout === "mushaf" ? "rc-glyphs" : ""}`} style={{ fontFamily: saved.settings.layout === "mushaf" ? font ?? undefined : undefined, gridTemplateRows: saved.settings.layout === "mushaf" ? Array.from({ length: 15 }, (_, i) => page?.verses.some((v) => v.number === 1 && v.words[0]?.line === i + 3) ? "48px" : "minmax(0, 1fr)").join(" ") : undefined }}>
           {saved.settings.layout === "mushaf" ? Array.from({ length: 15 }, (_, i) => renderLine(i + 1)) : page?.verses.map((verse) => <section className="rc-verse" key={verse.key}><div className="rc-verse-words" dir="rtl">{verse.words.map(wordNode)}</div>{saved.settings.translation && <p className="rc-translation">{verse.translation}</p>}{saved.settings.transliteration && <p className="rc-translation">{verse.words.filter((w) => !w.end).map((w) => w.transliteration).join(" ")}</p>}</section>)}
         </div>}
         </MushafFrame>
@@ -240,7 +248,7 @@ function Recite() {
       {controls && <div className="rc-page-select"><Button variant="ghost" size="icon" aria-label="Previous page" disabled={saved.page === 1} onClick={() => changePage(saved.page - 1)}><ChevronLeft /></Button><label>Page <input type="number" aria-label="Mushaf page number" min="1" max="604" value={saved.page} onChange={(e) => changePage(Number(e.target.value))} /> / 604</label><Button variant="ghost" size="icon" aria-label="Next page" disabled={saved.page === 604} onClick={() => changePage(saved.page + 1)}><ChevronRight /></Button></div>}
       {controls && status === "paused" && !gradeAyah && !sheet && <div className="rc-pause-tools"><Button variant="ghost" onClick={() => setStatus("active")}><Play />Resume</Button><Button variant="ghost" onClick={() => { stopAudio(); update({ marks: restartPage(words, saved.marks), grades: Object.fromEntries(Object.entries(saved.grades).filter(([key]) => !page?.verses.some((v) => v.key === key))), seconds: { ...saved.seconds, [saved.page]: 0 } }); setStatus("ready"); }}><RotateCcw />Restart page</Button><Button variant="ghost" onClick={() => void listen()}>{playing ? <Pause /> : <Play />}Qari</Button><Button variant="ghost" onClick={() => setSheet("marks")}><Flag />Marks</Button></div>}
       {audioError && <p className="rc-audio-error" role="alert">{audioError}</p>}
-      <div className="rc-strip-wrap" inert={!page || pageQuery.isPending || !!gradeAyah || !!sheet}>
+      <div className="rc-strip-wrap" inert={!page || pageQuery.isPending || (saved.settings.layout === "mushaf" && !font) || !!gradeAyah || !!sheet}>
         <ReciteStrip state={status === "paused" ? "paused" : "idle"} label={mode === "ai" ? "Tap to recite" : status === "paused" ? "Resume recitation" : "Tap to reveal"} time={`${Math.floor((saved.seconds[saved.page] ?? 0) / 60)}:${String((saved.seconds[saved.page] ?? 0) % 60).padStart(2, "0")}`} onTap={horizon} onLongPress={() => { if (status !== "paused" && mode === "self") { setStatus("active"); commitReveal(true); } }} />
       </div>
     </div>
