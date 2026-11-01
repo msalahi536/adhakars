@@ -1,0 +1,43 @@
+/* Integration only: supplied components and artwork remain immutable. */
+.recite-page.rc-supplied {
+  --rc-paper: var(--m-paper); --rc-ink: var(--m-ink); --rc-olive: var(--m-mark);
+  --rc-gold: var(--m-gold); --rc-strip-ink: var(--m-strip-text);
+  --rc-muted: color-mix(in oklab, var(--m-ink) 65%, var(--m-paper));
+  --rc-line: color-mix(in oklab, var(--m-mark) 25%, transparent);
+  --rc-shadow: 0 8px 30px color-mix(in oklab, var(--m-ink) 12%, transparent);
+  --background: var(--m-bg); --foreground: var(--m-ink); --card: var(--m-paper);
+  --accent: var(--m-accent); --accent-foreground: var(--m-strip-text);
+  --muted-foreground: var(--rc-muted); --border: var(--rc-line);
+  --nav-bg: var(--m-paper); --nav-border: var(--rc-line);
+  --nav-active: var(--m-mark); --nav-inactive: var(--m-ink);
+}
+.rc-supplied .rc-canvas { top: calc(env(safe-area-inset-top, 0px) + 48px); bottom: calc(env(safe-area-inset-bottom, 0px) + 148px); }
+.rc-supplied .rc-labels { display: flex; justify-content: space-between; align-items: center; padding: 0 12px 9px; flex: none; }
+.rc-supplied .rc-paper { padding: 0; background: var(--m-paper); }
+.rc-supplied .rc-art-frame { width: 100%; height: 100%; }
+.rc-supplied .rc-mushaf { padding: 4px 3px; }
+.rc-supplied .rc-cartouche { display: grid; align-items: center; min-height: 0; }
+.rc-supplied .rc-cartouche > div { max-height: 100%; }
+.rc-supplied .rc-page-badge { position: absolute; bottom: -9px; left: 50%; transform: translateX(-50%); }
+.rc-supplied .rc-ayah-end { display: inline-flex; justify-content: center; align-items: center; font-family: var(--font-arabic); }
+.rc-supplied .rc-pending .rc-word-ink, .rc-supplied .rc-in_progress .rc-word-ink { opacity: var(--m-hidden-opacity); }
+.rc-supplied.rc-hide-blank .rc-pending .rc-word-ink { opacity: 0; }
+.rc-supplied.rc-hide-mist .rc-pending .rc-word-ink { opacity: var(--m-hidden-opacity); filter: blur(4px); }
+.rc-supplied .rc-peek .rc-word-ink { opacity: 1; filter: none; }
+.rc-supplied.rc-night .rc-paper { filter: brightness(.78); }
+.rc-supplied .rc-dock { bottom: calc(env(safe-area-inset-bottom, 0px) + 30px); padding: 0 18px; }
+.rc-supplied .rc-strip-wrap { width: 100%; }
+.rc-supplied .rc-nav-wrap { position: absolute; bottom: 0; width: 100%; z-index: 4; height: 0; }
+.rc-supplied.rc-controls-visible .rc-nav-wrap { height: calc(env(safe-area-inset-bottom, 0px) + var(--bottom-nav-row)); }
+.rc-supplied .bottom-nav { margin: 0; width: 100%; color: var(--m-ink); background: var(--m-paper); }
+.rc-supplied .bottom-nav-row { background: var(--m-paper) !important; border-color: var(--rc-line) !important; box-shadow: none; }
+.rc-supplied.rc-controls-visible .rc-dock { bottom: calc(env(safe-area-inset-bottom, 0px) + 76px); }
+.rc-supplied.rc-controls-visible .rc-canvas { bottom: calc(env(safe-area-inset-bottom, 0px) + 252px); }
+.rc-supplied .rc-loading { min-height: 0; height: 100%; }
+.rc-supplied .rc-reflow { overflow: visible; }
+.rc-supplied .rc-reflow .rc-art-frame > div { overflow-y: auto; }
+@media (max-height: 650px) {
+  .rc-supplied .rc-canvas { top: calc(env(safe-area-inset-top, 0px) + 44px); bottom: calc(env(safe-area-inset-bottom, 0px) + 136px); }
+  .rc-supplied.rc-controls-visible .rc-canvas { bottom: calc(env(safe-area-inset-bottom, 0px) + 238px); }
+  .rc-supplied .rc-bismillah { font-size: 16px; }
+}
