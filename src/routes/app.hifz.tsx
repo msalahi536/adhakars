@@ -31,7 +31,7 @@ function Recite() {
   const [saved, setSaved] = useState<SavedRecite>(freshRecite);
   const latest = useRef(saved);
   latest.current = saved;
-  const paperRef = useRef<HTMLDivElement | null>(null);
+  const [paperElement, setPaperElement] = useState<HTMLDivElement | null>(null);
   const [hydrated, setHydrated] = useState(false);
   const [status, setStatus] = useState<"ready" | "active" | "paused">("ready");
   const [mode, setMode] = useState("self");
@@ -61,7 +61,7 @@ function Recite() {
   useEffect(() => { setSaved(readRecite()); setHydrated(true); }, []);
   useEffect(() => { if (hydrated) saveRecite(saved); }, [saved, hydrated]);
   useLayoutEffect(() => {
-    const paper = paperRef.current;
+    const paper = paperElement;
     if (!paper) return;
     const fit = () => {
       paper.querySelectorAll<HTMLElement>(".rc-line").forEach((line) => {
@@ -74,7 +74,7 @@ function Recite() {
     fit();
     const observer = new ResizeObserver(fit); observer.observe(paper);
     return () => observer.disconnect();
-  }, [font, page, saved.settings.size, saved.settings.layout]);
+  }, [paperElement, font, page, saved.settings.size, saved.settings.layout]);
   useEffect(() => {
     let canceled = false;
     setFont(null);
@@ -185,7 +185,7 @@ function Recite() {
       <div className="rc-landscape"><img src={DEFAULT_BACKGROUNDS.morning} width={1536} height={1024} alt="" /></div>
       <header className="rc-header"><Button variant="ghost" size="icon" aria-label={active ? "Pause recitation" : "Exit Hifz"} onClick={() => active ? (setStatus("paused"), stopAudio()) : void navigate({ to: "/app/more" })}>{active ? <X /> : <ChevronLeft />}</Button><div><span className="rc-eyebrow">{active ? "" : "HIFZ · RECITE"}</span><h1>{chapter?.name_simple ?? "Quran"} <span>· p.{saved.page}</span></h1></div><Button variant="ghost" size="icon" aria-label="Page settings" onClick={() => { if (active) setStatus("paused"); setSheet("settings"); }}>Aa</Button></header>
       {!active && <div className="rc-top-controls"><Choice label="Recitation mode" value={mode} onChange={setMode} options={[{ value: "self", label: "Self check" }, { value: "ai", label: "AI check · soon" }]} /><div className="rc-page-select"><Button variant="ghost" size="icon" aria-label="Previous page" disabled={saved.page === 1} onClick={() => changePage(saved.page - 1)}><ChevronLeft /></Button><label>Page <input type="number" aria-label="Mushaf page number" min="1" max="604" value={saved.page} onChange={(e) => changePage(Number(e.target.value))} /> / 604</label><Button variant="ghost" size="icon" aria-label="Next page" disabled={saved.page === 604} onClick={() => changePage(saved.page + 1)}><ChevronRight /></Button></div></div>}
-      <div className="rc-paper" ref={paperRef} onTouchStart={(e) => { const t = e.touches[0]; swipe.current = { x: t.clientX, y: t.clientY }; }} onTouchEnd={(e) => { const start = swipe.current; const t = e.changedTouches[0]; if (start && Math.abs(t.clientX - start.x) > 65 && Math.abs(t.clientY - start.y) < 65) changePage(saved.page + (t.clientX < start.x ? 1 : -1)); swipe.current = null; }}>
+      <div className="rc-paper" ref={setPaperElement} onTouchStart={(e) => { const t = e.touches[0]; swipe.current = { x: t.clientX, y: t.clientY }; }} onTouchEnd={(e) => { const start = swipe.current; const t = e.changedTouches[0]; if (start && Math.abs(t.clientX - start.x) > 65 && Math.abs(t.clientY - start.y) < 65) changePage(saved.page + (t.clientX < start.x ? 1 : -1)); swipe.current = null; }}>
         <div className="rc-margins"><span>الجزء {first?.juz ?? "—"}</span><span>{saved.page}</span></div>
         {pageQuery.isPending ? <div className="rc-loading">Loading mushaf page…</div> : pageQuery.isError ? <div className="rc-loading">{pageQuery.error.message}<Button variant="outline" onClick={() => void pageQuery.refetch()}>Try again</Button></div> : <>
           <div className={`rc-mushaf ${font ? "rc-glyphs" : ""}`} style={{ fontFamily: font ?? undefined }}>
