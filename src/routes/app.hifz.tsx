@@ -1,7 +1,7 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useQuery, useSuspenseQuery } from "@tanstack/react-query";
 import { useEffect, useRef, useState, type CSSProperties } from "react";
-import { Check, ChevronLeft, ChevronRight, Mic, Pause, Play, RotateCcw, X, Flag, Settings2 } from "lucide-react";
+import { Check, ChevronLeft, ChevronRight, Mic, Pause, Play, RotateCcw, X, Flag } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Portal } from "@/components/Portal";
 import { BottomNav } from "@/components/BottomNav";
@@ -12,10 +12,7 @@ import { getChapterAudio } from "@/lib/quran";
 import { quranPlayer } from "@/lib/quran-player";
 import { recitationPlayer } from "@/lib/recitation-player";
 import { triggerHaptic } from "@/lib/theme";
-import { resolveVisualPhase } from "@/lib/theme-store";
-import { fetchDay, getPrayerSettings, slotsForDay } from "@/lib/prayer-times";
-import dayImage from "@/assets/recite-day.jpg";
-import nightImage from "@/assets/recite-night.jpg";
+import { DEFAULT_BACKGROUNDS } from "@/lib/backgrounds";
 
 export const Route = createFileRoute("/app/hifz")({
   head: () => ({ meta: [
@@ -33,7 +30,6 @@ function Recite() {
   const chapters = useSuspenseQuery(reciteChaptersOptions).data;
   const [saved, setSaved] = useState<SavedRecite>(freshRecite);
   const [hydrated, setHydrated] = useState(false);
-  const [phase, setPhase] = useState("morning");
   const [status, setStatus] = useState<"ready" | "active" | "paused">("ready");
   const [mode, setMode] = useState("self");
   const [sheet, setSheet] = useState<"settings" | "ai" | "marks" | "complete" | null>(null);
@@ -57,7 +53,6 @@ function Recite() {
   const marks = markedWords(words, saved.marks);
   const first = page?.verses[0];
   const chapter = chapters.find((c) => c.id === first?.chapter);
-  const night = saved.settings.theme === "night" || (saved.settings.theme === "auto" && phase === "evening");
   const active = status === "active";
   const update = (value: Partial<SavedRecite>) => setSaved((s) => ({ ...s, ...value }));
   useEffect(() => { setSaved(readRecite()); setHydrated(true); }, []);
@@ -68,26 +63,6 @@ function Recite() {
     void loadPageFont(saved.page).then((name) => { if (!canceled) setFont(name); });
     return () => { canceled = true; };
   }, [saved.page]);
-  useEffect(() => {
-    const sync = async () => {
-      const resolved = resolveVisualPhase();
-      if (resolved === "evening") { setPhase(resolved); return; }
-      const settings = getPrayerSettings();
-      if (settings.location) {
-        const day = await fetchDay(new Date(), settings).catch(() => null);
-        if (day) {
-          const slots = slotsForDay(day);
-          const fajr = slots.find((s) => s.id === "fajr")?.at.getTime();
-          const maghrib = slots.find((s) => s.id === "maghrib")?.at.getTime();
-          if (fajr && maghrib) { setPhase(Date.now() < fajr || Date.now() >= maghrib ? "evening" : "morning"); return; }
-        }
-      }
-      setPhase(resolved);
-    };
-    void sync();
-    window.addEventListener("adhkar:visual-phase-change", sync);
-    return () => window.removeEventListener("adhkar:visual-phase-change", sync);
-  }, []);
   useEffect(() => {
     if (!active) return;
     const id = setInterval(() => setSaved((s) => ({ ...s, seconds: { ...s.seconds, [s.page]: (s.seconds[s.page] ?? 0) + 1 } })), 1000);
@@ -183,9 +158,9 @@ function Recite() {
     if (bismillah) return <div key={line} className="rc-bismillah rc-arabic">بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ</div>;
     return <div key={line} className={`rc-line ${lineItems.length < 5 ? "rc-short-line" : ""}`} dir="rtl">{lineItems.map(wordNode)}</div>;
   };
-  return <Portal><main className={`recite-page ${night ? "rc-night" : ""} ${active ? "rc-focus" : ""} ${!saved.settings.mist ? "rc-no-motion" : ""}`} style={{ "--rc-size": `${saved.settings.size}px` } as CSSProperties}>
+  return <Portal><main className={`recite-page ${active ? "rc-focus" : ""} ${!saved.settings.mist ? "rc-no-motion" : ""}`} style={{ "--rc-size": `${saved.settings.size}px` } as CSSProperties}>
     <div className="rc-canvas">
-      <div className="rc-landscape"><img src={night ? nightImage : dayImage} width={1536} height={512} alt="" />{night ? <div className="rc-stars">{Array.from({ length: Math.floor(progress * 20) }, (_, i) => <span key={i} style={{ left: `${12 + (i * 37) % 77}%`, top: `${15 + (i * 13) % 50}%` }}>✧</span>)}</div> : <span className="rc-sun" style={{ transform: `translateY(${-progress * 42}px)` }} />}</div>
+      <div className="rc-landscape"><img src={DEFAULT_BACKGROUNDS.morning} width={1536} height={1024} alt="" /></div>
       <header className="rc-header"><Button variant="ghost" size="icon" aria-label={active ? "Pause recitation" : "Exit Hifz"} onClick={() => active ? (setStatus("paused"), stopAudio()) : void navigate({ to: "/app/more" })}>{active ? <X /> : <ChevronLeft />}</Button><div><span className="rc-eyebrow">{active ? "" : "HIFZ · RECITE"}</span><h1>{chapter?.name_simple ?? "Quran"} <span>· p.{saved.page}</span></h1></div><Button variant="ghost" size="icon" aria-label="Page settings" onClick={() => { if (active) setStatus("paused"); setSheet("settings"); }}>Aa</Button></header>
       {!active && <div className="rc-top-controls"><Choice label="Recitation mode" value={mode} onChange={setMode} options={[{ value: "self", label: "Self check" }, { value: "ai", label: "AI check · soon" }]} /><div className="rc-page-select"><Button variant="ghost" size="icon" aria-label="Previous page" disabled={saved.page === 1} onClick={() => changePage(saved.page - 1)}><ChevronLeft /></Button><label>Page <input type="number" aria-label="Mushaf page number" min="1" max="604" value={saved.page} onChange={(e) => changePage(Number(e.target.value))} /> / 604</label><Button variant="ghost" size="icon" aria-label="Next page" disabled={saved.page === 604} onClick={() => changePage(saved.page + 1)}><ChevronRight /></Button></div></div>}
       <div className="rc-paper" onTouchStart={(e) => { const t = e.touches[0]; swipe.current = { x: t.clientX, y: t.clientY }; }} onTouchEnd={(e) => { const start = swipe.current; const t = e.changedTouches[0]; if (start && Math.abs(t.clientX - start.x) > 65 && Math.abs(t.clientY - start.y) < 65) changePage(saved.page + (t.clientX < start.x ? 1 : -1)); swipe.current = null; }}>

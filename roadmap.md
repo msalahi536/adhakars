@@ -1,6 +1,7 @@
 # Roadmap
 
 - [ ] Fresh standalone Hifz recite page from uploaded brief, isolated from retired Hifz
+- [ ] Use existing artwork only; skip new background images, night mode and rising-sun effects
 - [ ] Verify word states, self-check, settings, audio, persistence and page navigation
 
 - [done] Frosted backdrop for Quran search bar when scrolling up (verified at phone size)
