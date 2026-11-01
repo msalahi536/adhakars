@@ -324,7 +324,7 @@ function Recite() {
 
   useEffect(() => {
     if (!autoResume.current || !handsFree || handsPaused || sessionItem?.kind !== "review" || !page || page.page !== sessionItem.page || !font || ai.phase !== "idle") return;
-    const timer = setTimeout(() => { if (handsPaused) return; autoResume.current = false; stopAudio(); void ai.request(aiRanges); }, 100);
+    const timer = setTimeout(() => { if (handsPaused) return; autoResume.current = false; stopAudio(); quranPlayer.pause(); recitationPlayer.pause(); void ai.request(aiRanges); }, 100);
     return () => clearTimeout(timer);
   }, [saved.page, page, font, ai.phase, itemIndex, handsPaused, handsFree]);
   useEffect(() => { if (sheet !== "ai") { ai.discardRecording(); mutateHighlight(null); } }, [sheet]);
@@ -713,7 +713,7 @@ function Recite() {
     {activeSession && !sessionEnded && !handsFree && <div className="rc-lesson-pill">{chapter?.name_simple} · {sessionItem?.kind === "review" ? "Review" : "Lesson"}{sabaq && <span className="rc-pass-dots" aria-label={`${cleanPasses} of 3 clean recitations`}>{[1, 2, 3].map((n) => <i key={n} className={cleanPasses >= n ? "is-filled" : ""} />)}</span>}</div>}
     <div className="hx-mini-tools">
       {sabaq && <><Button variant="ghost" size="icon" title="What these ayat say" aria-label="What these ayat say" disabled={micBusy.current} onClick={() => setUnderstand(true)}><BookOpen size={16}/></Button><Button variant="ghost" size="icon" title="Echo mode" aria-label="Echo mode" disabled={micBusy.current} onClick={() => { stopAudio(); setEcho(true); }}><Repeat size={16}/></Button></>}
-      {mode === "ai" && sessionItem?.kind === "review" && <><Switch aria-label="Hands-free" checked={handsFree} disabled={ai.phase === "listening" || ai.phase === "loading"} onCheckedChange={(v) => { setHandsFree(v); setHandsPaused(false); if (!v) ai.cancel(); }}/>{handsFree && <Button variant="ghost" size="icon" aria-label={handsPaused ? "Resume hands-free" : "Pause hands-free"} onClick={() => { if (handsPaused) { setHandsPaused(false); void ai.request(aiRanges); } else { setHandsPaused(true); ai.pauseStream(); void ai.stop(); } }}>{handsPaused ? <Play size={16}/> : <Pause size={16}/>}</Button>}</>}
+      {mode === "ai" && sessionItem?.kind === "review" && <><Switch aria-label="Hands-free" checked={handsFree} disabled={ai.phase === "listening" || ai.phase === "loading"} onCheckedChange={(v) => { setHandsFree(v); setHandsPaused(false); if (!v) ai.cancel(); }}/>{handsFree && <Button variant="ghost" size="icon" aria-label={handsPaused ? "Resume hands-free" : "Pause hands-free"} disabled={ai.phase === "loading" || ai.phase === "stopping"} onClick={() => { if (handsPaused) { setHandsPaused(false); if (ai.phase === "listening") ai.resumeStream(); else { quranPlayer.pause(); recitationPlayer.pause(); void ai.request(aiRanges); } } else { setHandsPaused(true); ai.pauseStream(); } }}>{handsPaused ? <Play size={16}/> : <Pause size={16}/>}</Button>}</>}
     </div>
     {handsFree && sessionItem?.kind === "review" && <div className="rc-lesson-pill">Hands-free · page {reviewSummary.length + 1} of {activeSession?.items.filter((i) => i.kind === "review").length}</div>}
     {mode === "self" && sabaq && phaseInfo && !sessionEnded && <div className="hz-phase-bar" role="status">
@@ -787,7 +787,7 @@ function Recite() {
       <div className="rc-strip-wrap" ref={stripElement} aria-hidden={controls} inert={controls || !page || pageQuery.isPending || (saved.settings.layout === "mushaf" && !font) || !!gradeAyah || !!sheet}>
         <RecitationMic stream={ai.stream} busy={analyzing || ai.phase === "loading" || ai.phase === "stopping"} playing={playing} start={horizon} listen={() => { if (playing) stopAudio(); else if (sabaq) void playSabaqListen(); else void listen(); }} peek={() => { const target = sabaq ? (cleanPasses >= 2 ? chainWords : rangeWords) : words; setPeek("all"); setTimeout(() => setPeek(null), 1500); if (mode === "self" && target[0]) mark(target[0]); }} onSilence={(lastVoice) => {
           const result = liveResult.current;
-          if (ai.phase !== "listening" || !result || Date.now() - lastVoice < 1500) return;
+          if (ai.phase !== "listening" || handsPaused || !result || Date.now() - lastVoice < 1500) return;
           const target = sabaq ? (cleanPasses >= 2 ? chainWords : rangeWords) : words;
           if (target.length && pageReached(result, Date.now() - lastVoice)) void ai.stop();
         }} />

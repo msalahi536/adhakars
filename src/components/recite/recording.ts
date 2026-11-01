@@ -4,22 +4,29 @@ export function captureRecording(stream: MediaStream) {
   const chunks: Blob[] = [];
   const recorder = new MediaRecorder(stream);
   let pending: Promise<Blob | null> | null = null;
+  let resolvePending: ((blob: Blob | null) => void) | null = null;
+  let discarded = false;
+  const settle = (blob: Blob | null) => {
+    resolvePending?.(blob); resolvePending = null;
+    recorder.onstop = null; recorder.onerror = null; recorder.ondataavailable = null;
+    chunks.length = 0;
+  };
   recorder.ondataavailable = (e) => { if (e.data.size) chunks.push(e.data); };
   recorder.start(250);
   return {
     finish() {
       pending ??= new Promise<Blob | null>((resolve) => {
-        if (recorder.state === "inactive") { resolve(null); return; }
-        recorder.onstop = () => resolve(chunks.length ? new Blob(chunks, { type: recorder.mimeType }) : null);
-        recorder.onerror = () => resolve(null);
+        resolvePending = resolve;
+        if (discarded || recorder.state === "inactive") { settle(null); return; }
+        recorder.onstop = () => settle(chunks.length ? new Blob(chunks, { type: recorder.mimeType }) : null);
+        recorder.onerror = () => { if (recorder.state !== "inactive") recorder.stop(); settle(null); };
         recorder.stop();
       });
       return pending;
     },
     discard() {
-      recorder.ondataavailable = null; recorder.onstop = null;
+      discarded = true; settle(null);
       if (recorder.state !== "inactive") recorder.stop();
-      chunks.length = 0;
     },
   };
 }

@@ -76,7 +76,7 @@ export function useAiRecitation(page: number, enabled: boolean, keys: string[], 
       const current = await ai.startListening({ ...range, passages: ranges, stream: mic, keepStream: keep.current,
         onProgress: setProgress,
         onUpdate: (value) => { if (id === generation.current) receive(value); },
-        onError: (error) => { if (id === generation.current) { capture.current?.getTracks().forEach((t) => t.stop()); capture.current = null; session.current = null; setStream(null); setError(friendlyError(error)); setPhase("error"); } },
+        onError: (error) => { if (id === generation.current) { recorder.current?.discard(); recorder.current = null; capture.current?.getTracks().forEach((t) => t.stop()); capture.current = null; const failed = session.current; session.current = null; if (failed) cleanup.current = failed.stop().catch(() => undefined); setStream(null); setError(friendlyError(error)); setPhase("error"); } },
       });
       if (id !== generation.current) { await current.stop(); return; }
       session.current = current; setStream(mic); setPhase("listening"); feedback("micStart");
@@ -112,7 +112,8 @@ export function useAiRecitation(page: number, enabled: boolean, keys: string[], 
     }
   }
   return { phase, progress, stream, result, error, recording, request, stop,
-    pauseStream: () => capture.current?.getAudioTracks().forEach((t) => { t.enabled = false; }),
+    pauseStream: () => { capture.current?.getAudioTracks().forEach((t) => { t.enabled = false; }); setStream(null); },
+    resumeStream: () => { capture.current?.getAudioTracks().forEach((t) => { t.enabled = true; }); setStream(capture.current); },
     discardRecording: () => setRecording(null),
     reset: () => { setRecording(null); setResult(null); setPhase("idle"); previous.current = {}; },
     confirm: () => pendingRange.current ? begin(pendingRange.current) : Promise.resolve(),
