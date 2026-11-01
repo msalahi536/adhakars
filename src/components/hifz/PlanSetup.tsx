@@ -24,7 +24,7 @@ import { knownPages, quranIndexOptions } from "@/lib/hifz/program";
 import { reciteChaptersOptions } from "@/lib/recite/data";
 import { hasSetupChoice } from "./setup-choice";
 import { moveSurah, toggleSurahOrder } from "./surah-order";
-import { bestAutomaticPace, DAILY_MINUTES, effectiveTimeline } from "./automatic-pace";
+import { bestAutomaticPace, DAILY_MINUTES, effectiveTimeline, selectedFinishEstimate } from "./automatic-pace";
 
 const DAY_NAMES = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 const TIME_OPTIONS = DAILY_MINUTES;
@@ -74,7 +74,7 @@ export function PlanSetup({ existing, done }: { existing?: HifzPlan; done: () =>
   const automaticPaces = useMemo(() => step >= 2 ? new Map(TIME_OPTIONS.map((minutes) => [minutes, bestAutomaticPace(draft, q, minutes)])) : new Map(), [step >= 2, automaticKey, q]);
   const cardEstimates = useMemo(() => customLines === undefined ? automaticPaces : new Map(TIME_OPTIONS.map((minutes) => [minutes, effectiveTimeline(buildTimeline({ ...draft, newLinesPerDay: customLines }, q, minutes))])), [automaticPaces, customLines, automaticKey, q]);
   const chosenLines = customLines ?? automaticPaces.get(plan.dailyMinutes)?.lines ?? plan.newLinesPerDay;
-  const selectedEstimate = useMemo(() => effectiveTimeline(buildTimeline({ ...draft, newLinesPerDay: chosenLines }, q, plan.dailyMinutes)), [JSON.stringify(draft), chosenLines, q]);
+  const selectedEstimate = useMemo(() => selectedFinishEstimate(buildTimeline({ ...draft, newLinesPerDay: chosenLines }, q, plan.dailyMinutes), plan.startDate, paceMode === "date" && dateTimeline ? targetDate : undefined), [JSON.stringify(draft), chosenLines, q, paceMode, targetDate, dateTimeline]);
   useEffect(() => {
     if (step >= 2 && chosenLines !== plan.newLinesPerDay) setPlan((p) => ({ ...p, newLinesPerDay: chosenLines }));
   }, [chosenLines, step, plan.newLinesPerDay]);
@@ -261,6 +261,7 @@ export function PlanSetup({ existing, done }: { existing?: HifzPlan; done: () =>
               </div>
               <span className="hz-time-summary-duration">{humanDuration(selectedEstimate.days)}</span>
               {selectedEstimate.firstJuz && <small>First juz done by {monthYear(selectedEstimate.firstJuz)}</small>}
+              {selectedEstimate.timeWarning && <small className="hz-finish-warning">{selectedEstimate.timeWarning}</small>}
             </div>
             <Button variant="link" className="hz-customize-link" onClick={() => setCustomizePace(true)}><SlidersHorizontal aria-hidden="true" /> Customize pace</Button>
           </section>
