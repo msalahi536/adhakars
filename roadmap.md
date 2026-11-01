@@ -1,5 +1,7 @@
 # Roadmap
 
+- [x] Made reminder tracks/thumbs larger and clearly contrasted; added frosted Edit plan back arrow. Phone screenshots and return without saved-plan changes verified; native reminder activation remains device-only.
+
 - [x] Matched action rows with larger dark text and soft circular icons; body-portaled Salah/Juz/reminder popups clear navigation, named surah choices replace page-only grids, Salah save and Start verified; 4 targeted tests and build pass.
 
 - [x] Enlarged dark Your Hifz text; fixed partial learning pages counted as fully memorized in Juz stats, added exact page counts and kept proportional fill; 16 tests pass.
