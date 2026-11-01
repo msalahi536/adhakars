@@ -1,5 +1,6 @@
+import modelAsset from "./model.onnx.asset.json";
 export const MODEL_CACHE = "hifz-ai-model-v3.2";
-export const MODEL_URL = "/hifz-ai/model/zipformer_p_arabic_v3.2_chunk16.int8.onnx";
+export const MODEL_URL = modelAsset.url;
 export async function cachedAsset(url: string, onProgress?: (value: number) => void): Promise<Response> {
   let cache: Cache | undefined;
   try { cache = await caches.open(MODEL_CACHE); } catch { /* Restricted WebView: network still works. */ }
