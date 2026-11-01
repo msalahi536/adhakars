@@ -17,6 +17,7 @@ import { guessVerses } from "@/lib/quran-search.functions";
 import { quranPlayer, SPEEDS, useQuranPlayer } from "@/lib/quran-player";
 import { useHifzBeta } from "@/lib/hifz-beta";
 import { Button } from "@/components/ui/button";
+import { EchoMode } from "@/components/hifz/EchoMode";
 import { QuranVoice } from "@/components/quran-voice/QuranVoice";
 
 type Search = { s?: number; v?: number; view?: "reciters"; tab?: "all"; voice?: "follow" | "search" | "mushaf"; page?: number };
@@ -454,6 +455,8 @@ let quietUntil = 0;
 let dockSeen: "face" | "open" = "face";
 
 function Reader({ chapterId, verse }: { chapterId: number; verse?: number }) {
+  const beta = useHifzBeta();
+  const [echo, setEcho] = useState(false);
   const navigate = useNavigate();
   const [prefs] = usePrefs();
   const [favs, toggleFav] = useFavs();
@@ -602,9 +605,11 @@ function Reader({ chapterId, verse }: { chapterId: number; verse?: number }) {
 
   return (
     <>
+      {echo && <EchoMode keys={verses?.filter((a) => !verse || a.number >= verse).map((a) => a.key) ?? []} reciter={prefs.reciter} close={() => setEcho(false)} />}
       <Header kicker={`Surah ${chapterId}${chapter ? ` · ${chapter.translated_name.name}` : ""}`} title={chapter?.name_simple ?? "…"} sub={chapter?.name_arabic} onBack={back} />
       <main className={`scroll-area ${display.large ? "quran-ar-large" : ""}`} onScroll={onReadScroll}>
         <div className={`mx-auto max-w-md space-y-3 px-5 pt-4 ${player.panelOpen ? "pb-64" : "pb-28"}`}>
+          {beta.enabled && <Button variant="outline" onClick={() => { quranPlayer.pause(); setEcho(true); }}><Repeat size={16} />Echo mode</Button>}
           <button className="quran-card quran-reciter-select" onClick={() => { void triggerHaptic("light"); setSheet((o) => !o); }}>
             <Avatar r={shownReciter} size={46} eager />
             <span className="min-w-0 flex-1 text-left"><span className="block truncate text-[15px] font-semibold">{reciterName(shownReciter)}</span><span className="quran-muted block truncate text-[11.5px]">{reciterSubtitle(shownReciter)}</span></span>
