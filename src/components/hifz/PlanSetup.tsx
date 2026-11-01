@@ -1,8 +1,9 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight, Check, BookOpen, Sprout, Circle, Search, Layers, List, ArrowUp, ArrowDown, X, Minus, Plus } from "lucide-react";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
+import { Sheet, SheetContent, SheetTitle } from "@/components/ui/sheet";
 import { searchChapters } from "@/lib/quran";
 import {
   buildTimeline,
@@ -23,9 +24,10 @@ import { knownPages, quranIndexOptions } from "@/lib/hifz/program";
 import { reciteChaptersOptions } from "@/lib/recite/data";
 import { hasSetupChoice } from "./setup-choice";
 import { moveSurah, toggleSurahOrder } from "./surah-order";
+import { bestAutomaticPace, DAILY_MINUTES, effectiveTimeline } from "./automatic-pace";
 
 const DAY_NAMES = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
-const TIME_OPTIONS = [20, 30, 45, 60, 90, 120, 180];
+const TIME_OPTIONS = DAILY_MINUTES;
 
 const fmtDate = (iso: string) =>
   new Date(iso + "T12:00:00Z").toLocaleDateString(undefined, { month: "long", year: "numeric" });
@@ -57,7 +59,8 @@ export function PlanSetup({ existing, done }: { existing?: HifzPlan; done: () =>
   const [advanced, setAdvanced] = useState(false);
   const [paceMode, setPaceMode] = useState<"pace" | "date">("pace");
   const [targetDate, setTargetDate] = useState("");
-  const [keepPace, setKeepPace] = useState(false);
+  const [customizePace, setCustomizePace] = useState(false);
+  const [customLines, setCustomLines] = useState<number>();
 
   const known = useMemo(
     () => knownPages(q, chosenJuz, chosenSurahs),
@@ -67,9 +70,17 @@ export function PlanSetup({ existing, done }: { existing?: HifzPlan; done: () =>
   const timelines = useMemo(() => compareTimelines(draft, q, plan.dailyMinutes), [JSON.stringify(draft), q]);
   const summary = useMemo(() => buildTimeline(draft, q, plan.dailyMinutes), [JSON.stringify(draft), q]);
   const dateTimeline = useMemo(() => targetDate ? paceForFinishDate(draft, q, targetDate) : null, [JSON.stringify(draft), q, targetDate]);
+  const automaticKey = JSON.stringify({ ...draft, dailyMinutes: 0, newLinesPerDay: 0 });
+  const automaticPaces = useMemo(() => step >= 2 ? new Map(TIME_OPTIONS.map((minutes) => [minutes, bestAutomaticPace(draft, q, minutes)])) : new Map(), [step >= 2, automaticKey, q]);
+  const chosenLines = customLines ?? automaticPaces.get(plan.dailyMinutes)?.lines ?? plan.newLinesPerDay;
+  const selectedEstimate = useMemo(() => effectiveTimeline(buildTimeline({ ...draft, newLinesPerDay: chosenLines }, q, plan.dailyMinutes)), [JSON.stringify(draft), chosenLines, q]);
+  useEffect(() => {
+    if (step >= 2 && chosenLines !== plan.newLinesPerDay) setPlan((p) => ({ ...p, newLinesPerDay: chosenLines }));
+  }, [chosenLines, step, plan.newLinesPerDay]);
   function choosePace(lines: number) {
-    setKeepPace(false);
-    setPlan((p) => ({ ...p, newLinesPerDay: Math.max(1, Math.min(150, lines)) }));
+    const chosen = Math.max(1, Math.min(150, lines));
+    setCustomLines(chosen);
+    setPlan((p) => ({ ...p, newLinesPerDay: chosen }));
   }
 
   const setOrder = (order: MemorizationOrder) => setPlan((p) => ({ ...p, order }));
@@ -100,27 +111,26 @@ export function PlanSetup({ existing, done }: { existing?: HifzPlan; done: () =>
     setOrder({ kind: "surahs", surahs: next });
   }
 
-  const steps = ["Already know", "Order", "Pace", "Daily time", "Summary"];
+  const steps = ["Already know", "Order", "Daily time", "Summary"];
   const canNext =
     step === 0 ? hasSetupChoice(chosenJuz, chosenSurahs, startingFresh) :
     step === 1 ? plan.order.kind !== "surahs" || orderSurahs.length > 0 :
-    step === 2 ? paceMode !== "date" || dateTimeline !== null :
-    step === 3 ? !summary.shortOnTime || keepPace : true;
+    true;
 
   function finish() {
-    saveState(createState(draft));
+    saveState(createState({ ...draft, newLinesPerDay: chosenLines }));
     done();
   }
 
   return (
-    <main className={`scroll-area hz-setup ${step === 0 ? "hz-known-step" : step === 1 ? "hz-order-step" : step === 3 ? "hz-time-step" : step === 2 ? "hz-pace-step" : ""}`}>
+    <main className={`scroll-area hz-setup ${step === 0 ? "hz-known-step" : step === 1 ? "hz-order-step" : step === 2 ? "hz-time-step" : ""}`}>
       <div className="mx-auto max-w-md px-5 py-4">
         <div className="hz-steps" aria-label={`Step ${step + 1} of ${steps.length}: ${steps[step]}`}>
           {steps.map((label, i) => (
             <span key={label} className={`hz-step-dot ${i === step ? "is-on" : i < step ? "is-done" : ""}`} />
           ))}
         </div>
-        {step === 4 && <p className="label-caps hz-step-label">{steps[step]}</p>}
+        {step === 3 && <p className="label-caps hz-step-label">{steps[step]}</p>}
 
         {step === 0 && (
           <section className="hz-known-content">
@@ -223,36 +233,36 @@ export function PlanSetup({ existing, done }: { existing?: HifzPlan; done: () =>
           </DialogContent>
         </Dialog>
 
-        {step === 3 && (
+        {step === 2 && (
           <section>
             <header className="hz-known-heading">
-            <h1 className="hz-title">How much time can you give each day?</h1>
+            <h1 className="hz-title">How much time each day?</h1>
             <p className="hz-sub">Review always comes first; new memorization gets what is left.</p>
             </header>
             <div className="hz-cards">
               {TIME_OPTIONS.map((m) => (
-                <Button variant="ghost" key={m} aria-label={`${m === 180 ? "180+" : m} min`} aria-pressed={plan.dailyMinutes === m} data-minutes={m} className={`hz-card hz-time ${plan.dailyMinutes === m ? "is-on" : ""}`} onClick={() => { setKeepPace(false); setPlan((p) => ({ ...p, dailyMinutes: m })); }}>
+                <Button variant="ghost" key={m} aria-label={`${m} min`} aria-pressed={plan.dailyMinutes === m} data-minutes={m} className={`hz-card hz-time ${plan.dailyMinutes === m ? "is-on" : ""}`} onClick={() => setPlan((p) => ({ ...p, dailyMinutes: m, newLinesPerDay: customLines ?? automaticPaces.get(m)?.lines ?? p.newLinesPerDay }))}>
                   <span className="hz-time-copy">
-                  <strong>{m === 180 ? "180+" : m} min</strong>
+                  <strong>{m} min</strong>
+                  {automaticPaces.get(m) && <span className="hz-time-estimate">{paceLabel(customLines ?? automaticPaces.get(m).lines)} · finish around {monthYear(customLines === undefined ? automaticPaces.get(m).finish : effectiveTimeline(buildTimeline({ ...draft, newLinesPerDay: customLines }, q, m)).finish)}</span>}
                   <span className="hz-time-track" aria-hidden="true"><span className="hz-time-fill" /></span>
                   </span>
                   {plan.dailyMinutes === m && <span className="hz-time-check"><Check /></span>}
                 </Button>
               ))}
             </div>
-            {summary.shortOnTime && <div className="hz-budget-warning" role="status">
-              <p>{summary.shortOnTime.message}</p>
-              <div className="hz-budget-actions">
-                <Button variant="outline" aria-pressed={keepPace} onClick={() => setKeepPace(true)}><Check /> Keep this pace</Button>
-                <Button variant="outline" onClick={() => { setKeepPace(false); setPaceMode("pace"); setStep(2); }}><ChevronLeft /> Pick a slower pace</Button>
-              </div>
-            </div>}
+            <div className="hz-time-summary" role="status">
+              <strong>You’ll finish around {monthYear(selectedEstimate.finish)}</strong>
+              <span>{humanDuration(selectedEstimate.days)}</span>
+              {selectedEstimate.firstJuz && <small>First juz done by {monthYear(selectedEstimate.firstJuz)}</small>}
+            </div>
+            <Button variant="link" className="hz-customize-link" onClick={() => setCustomizePace(true)}>Customize pace</Button>
           </section>
         )}
 
-        {step === 2 && (
-          <section>
-            <header className="hz-known-heading"><h1 className="hz-title">Pick your pace</h1></header>
+        <Sheet open={customizePace} onOpenChange={setCustomizePace}>
+          <SheetContent side="bottom" className="hz-setup hz-pace-step hz-customize-sheet" aria-describedby={undefined}>
+            <SheetTitle>Customize pace</SheetTitle>
             <div className="hz-surah-tabs" role="group" aria-label="Pace selection mode">
               <Button variant="ghost" aria-pressed={paceMode === "pace"} onClick={() => setPaceMode("pace")}>Choose a pace</Button>
               <Button variant="ghost" aria-pressed={paceMode === "date"} onClick={() => setPaceMode("date")}>Choose a finish date</Button>
@@ -284,16 +294,17 @@ export function PlanSetup({ existing, done }: { existing?: HifzPlan; done: () =>
               <input id="finish-date" type="date" value={targetDate} min={today} onChange={(e) => { const value = e.target.value; setTargetDate(value); if (!value) return; const result = paceForFinishDate(draft, q, value); if (result) choosePace(result.newLinesPerDay); }} />
               {targetDate && (dateTimeline ? <p role="status">{paceLabel(dateTimeline.newLinesPerDay)}, {humanMinutes(dateTimeline.minutesAtPeak)} a day at peak</p> : <p role="status">That&apos;s sooner than is realistic. Try a later date.</p>)}
             </div>}
-          </section>
-        )}
+            <Button className="hz-primary" disabled={paceMode === "date" && !dateTimeline} onClick={() => setCustomizePace(false)}>Done <Check /></Button>
+          </SheetContent>
+        </Sheet>
 
-        {step === 4 && (
+        {step === 3 && (
           <section>
             <h1 className="hz-title">Your plan</h1>
             <div className="hz-summary">
               <p className="hz-big-finish">
-                Done by <strong>{fmtDate(summary.finishDate)}</strong>
-                <span> ({humanDuration(summary.calendarDays)})</span>
+                Done by <strong>{monthYear(selectedEstimate.finish)}</strong>
+                <span> ({humanDuration(selectedEstimate.days)})</span>
               </p>
               <div className="hz-milestones">
                 {summary.juzMilestones.slice(0, 8).map((m) => (
