@@ -1,7 +1,7 @@
 import { useEffect, useState, type ReactNode } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { HeaderBackButton } from "@/components/HeaderBackButton";
-import { VoiceLabUnlock } from "@/components/VoiceLabUnlock";
+import { VoiceLabUnlock, RecitationDebugSettings } from "@/components/VoiceLabUnlock";
 import { AI_CREDIT } from "@/lib/hifz-ai/notices";
 import { getDisplay, setDisplay, themes } from "@/lib/theme";
 import {
@@ -1119,6 +1119,7 @@ function Settings() {
                 </div>
                 <VoiceLabUnlock version={APP_VERSION} />
               </div>
+              <RecitationDebugSettings />
               <Link to="/app/privacy" className="settings-row">
                 <span className="settings-icon">
                   <FileText size={17} strokeWidth={1.8} />
