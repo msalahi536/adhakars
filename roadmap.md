@@ -1,6 +1,6 @@
 # Roadmap
 
-- [ ] Add beta-only Quran Follow the imam and Find an ayah modes, with themed Madani pages, direct word highlights, English translation, wake lock, eight-second voice search and preview screenshots.
+- [x] Add beta-only Quran Follow the imam and Find an ayah modes with themed Madani pages, direct word highlights, English crossfade/size, wake lock and eight-second/early-stop search. Browser recorded Al-Ikhlas follow locked to 112:2 and turned to page 604; search returned incorrect 2:60, an engine accuracy limitation (not claimed accurate). Both source-text result and Open in mushaf flows/screenshots checked; 25 tests pass. Real-phone recognition/wake lock unverified.
 
 - [x] Connect AI mastery, hesitation and drift results to one-mic lessons/reviews; every attempt records bridge evidence, third clean lesson pass credits lines once, whole-page review passes once. Recorded Al-Ikhlas scored Solid 100 with saved history; controlled hesitation/drift fixtures verified Good, dots, comparison/source text/audio and completion. 36 tests pass, preview has no browser errors, page stays stationary; phone checks and naturally occurring drift remain unverified.
 
