@@ -1,5 +1,7 @@
 # Roadmap
 
+- [ ] Fix Hifz lesson flow: cancellable 3× qari/auto-Read/Skip, beta AI defaults and safe Self fallback, hidden-to-revealed AI words, multi-surah stage pass/correction/override/weak spots, real Safari waveform and reachable action; verify full preview lesson and device limitations.
+
 - [x] Connect hidden free on-device Hifz checker: consent/progress, cached model/runtime/114 answer keys, mic waveform, word feedback, safe Retry and attribution. 47 tests pass; actual Al-Mulk recorded audio through browser mic reaches final results and offline restart; unchanged mushaf/gestures checked. Installed-phone microphone/haptics and recognition accuracy remain device checks, not claimed verified.
 
 - [x] Aligned Home and Your plan realistic estimates and suppressed repeated date warnings; 11 tests pass and saved 45-minute phone flow shows July 2034 / 7 yr 8 mo consistently.
