@@ -5,6 +5,7 @@
  *
  * Answer key: /hifz-ai/ayat/NNN.json  ->  { "aya": [[wordNumber, writtenText, phonemes], ...] }
  */
+import { cachedAsset } from "./assets";
 
 export type WordStatus = "pending" | "in_progress" | "correct" | "wrong" | "skipped" | "unsure";
 
@@ -52,13 +53,15 @@ const surahCache = new Map<number, Promise<SurahKey>>();
 
 export function loadSurah(sura: number, base = "/hifz-ai/ayat"): Promise<SurahKey> {
   if (!surahCache.has(sura)) {
-    const p = fetch(`${base}/${String(sura).padStart(3, "0")}.json`).then((r) => {
+    const p = cachedAsset(`${base}/${String(sura).padStart(3, "0")}.json`).then((r) => {
       if (!r.ok) throw new Error(`answer key for surah ${sura} failed to load`);
       return r.json();
-    });
+    }).catch((error) => { surahCache.delete(sura); throw error; });
     surahCache.set(sura, p);
   }
-  return surahCache.get(sura)!;
+  const result = surahCache.get(sura);
+  if (!result) throw new Error("Answer key unavailable");
+  return result;
 }
 
 const DROP = new Set(["ڇ", "ۜ", " "]);
@@ -346,6 +349,13 @@ export function check(reference: Reference, heard: string, final: boolean, conf?
       const near = [...words.slice(Math.max(0, i - 2), i), ...words.slice(i + 1, i + 3)];
       if (near.filter((x) => x.status === "skipped").length >= 3) wr.status = "skipped";
     }
+  });
+  // The model can drop a short word right after a pause (ayah start). One short word missing there,
+  // with its neighbours recited, is "unsure", not a skip: never accuse a correct reciter.
+  words.forEach((wr, i) => {
+    const near = [...words.slice(Math.max(0, i - 1), i), ...words.slice(i + 1, i + 2)];
+    if (wr.status === "skipped" && wr.key.endsWith(":1") && skeleton(wr.expected).length <= 3 &&
+        near.every((x) => x.status !== "skipped" && x.status !== "pending")) wr.status = "unsure";
   });
   const startKey = reference.words.find((w) => w.s >= start)?.key ?? reference.words[0]?.key ?? "";
   return { words, extras, reachedIndex: end, startIndex: start, startKey };
