@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
-import { ChevronLeft, ChevronRight, Check, BookOpen, Sprout, Circle, Search, Layers, List, ArrowUp, ArrowDown, X, Minus, Plus, CalendarDays, SlidersHorizontal } from "lucide-react";
+import { ChevronLeft, ChevronRight, Check, BookOpen, Sprout, Circle, Search, Layers, List, ArrowUp, ArrowDown, X, Minus, Plus, CalendarDays, SlidersHorizontal, Clock } from "lucide-react";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { Sheet, SheetContent, SheetTitle } from "@/components/ui/sheet";
 import { searchChapters } from "@/lib/quran";
@@ -268,19 +268,25 @@ export function PlanSetup({ existing, done }: { existing?: HifzPlan; done: () =>
 
         <Sheet open={customizePace} onOpenChange={setCustomizePace}>
           <SheetContent side="bottom" className="hz-setup hz-pace-step hz-customize-sheet" aria-describedby={undefined}>
+            <header className="hz-customize-header">
+            <div className="hz-sheet-handle" aria-hidden="true" />
+            <SlidersHorizontal className="hz-customize-icon" aria-hidden="true" />
             <SheetTitle>Customize pace</SheetTitle>
+            <p>Choose how you want to read and when to finish.</p>
+            </header>
             <div className="hz-surah-tabs" role="group" aria-label="Pace selection mode">
               <Button variant="ghost" aria-pressed={paceMode === "pace"} onClick={() => setPaceMode("pace")}>Choose a pace</Button>
               <Button variant="ghost" aria-pressed={paceMode === "date"} onClick={() => setPaceMode("date")}>Choose a finish date</Button>
             </div>
+            <div className="hz-customize-body">
             {paceMode === "pace" ? <>
             <div className="hz-cards">
               {timelines.map((t) => (
                 <Button variant="ghost" key={t.lines} aria-pressed={plan.newLinesPerDay === t.lines} className={`hz-card ${plan.newLinesPerDay === t.lines ? "is-on" : ""}`} onClick={() => choosePace(t.lines)}>
                   <strong>{t.label}</strong>
+                  {plan.newLinesPerDay === t.lines && <span className="hz-pace-selected"><Check /></span>}
                   <span>{t.note}</span>
-                  <span className="hz-finish">Finish in {t.duration} · {monthYear(t.finishDate)}</span>
-                  <span>{humanMinutes(t.minutesAtStart)} a day now, {humanMinutes(t.minutesAtPeak)} later</span>
+                  <span className="hz-pace-meta"><span><CalendarDays /> Finish in {t.duration}</span><span><Clock /> {humanMinutes(t.minutesAtStart)} a day</span></span>
                 </Button>
               ))}
             </div>
@@ -290,6 +296,7 @@ export function PlanSetup({ existing, done }: { existing?: HifzPlan; done: () =>
                 <Button variant="outline" size="icon" aria-label="Fewer lines per day" disabled={plan.newLinesPerDay <= 1} onClick={() => choosePace(plan.newLinesPerDay - 1)}><Minus /></Button>
                 <input id="custom-lines" aria-label="Lines per day" type="number" min={1} max={150} value={plan.newLinesPerDay} onChange={(e) => { const value = Number(e.target.value); if (Number.isFinite(value)) choosePace(value); }} />
                 <Button variant="outline" size="icon" aria-label="More lines per day" disabled={plan.newLinesPerDay >= 150} onClick={() => choosePace(plan.newLinesPerDay + 1)}><Plus /></Button>
+                <span>lines a day</span>
               </div>
               <strong>{paceLabel(plan.newLinesPerDay)}</strong>
               <p>Finish in {humanDuration(summary.calendarDays)} · {monthYear(summary.finishDate)}</p>
@@ -300,7 +307,8 @@ export function PlanSetup({ existing, done }: { existing?: HifzPlan; done: () =>
               <input id="finish-date" type="date" value={targetDate} min={today} onChange={(e) => { const value = e.target.value; setTargetDate(value); if (!value) return; const result = paceForFinishDate(draft, q, value); if (result) choosePace(result.newLinesPerDay); }} />
               {targetDate && (dateTimeline ? <p role="status">{paceLabel(dateTimeline.newLinesPerDay)}, {humanMinutes(dateTimeline.minutesAtPeak)} a day at peak</p> : <p role="status">That&apos;s sooner than is realistic. Try a later date.</p>)}
             </div>}
-            <Button className="hz-primary" disabled={paceMode === "date" && !dateTimeline} onClick={() => setCustomizePace(false)}>Done <Check /></Button>
+            </div>
+            <footer className="hz-customize-footer"><Button className="hz-primary" disabled={paceMode === "date" && !dateTimeline} onClick={() => setCustomizePace(false)}>Done <Check /></Button></footer>
           </SheetContent>
         </Sheet>
 
