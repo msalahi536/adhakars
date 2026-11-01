@@ -9,7 +9,9 @@ const date = "2026-11-01";
 const result: CheckResult = { words: [
   { key: "112:1:1", text: "قُلْ", expected: "q", heard: "q", status: "correct", at: 0, end: 0 },
   { key: "112:1:2", text: "هُوَ", expected: "h", heard: "h", status: "correct", at: 1, end: 1 },
-], times: [0, 3], extras: [], reachedIndex: 1, startIndex: 0, startKey: "112:1:1" };
+  { key: "112:1:3", text: "ٱللَّهُ", expected: "a", heard: "a", status: "correct", at: 2, end: 2 },
+  { key: "112:1:4", text: "أَحَدٌ", expected: "b", heard: "b", status: "correct", at: 3, end: 3 },
+], times: [0, 3, 3.2, 3.4], extras: [], reachedIndex: 3, startIndex: 0, startKey: "112:1:1" };
 function attempt(value = result): Attempt {
   const hes = findHesitations(value);
   return { result: value, hes, m: masteryScore(value, hes), drifts: [], clean: cleanRecitation(value, value.words.map((w) => w.key)) };
@@ -20,7 +22,7 @@ describe("AI lesson and review recording", () => {
     expect(a.m.label).toBe("Good"); expect(a.m.mistakes).toBe(0);
   });
   test("uninterrupted clean recitation receives Solid 100", () => {
-    const a = attempt({ ...result, times: [0, .3] }); expect(a.m.label).toBe("Solid"); expect(a.m.score).toBe(100);
+    const a = attempt({ ...result, times: [0, .3, .6, .9] }); expect(a.m.label).toBe("Solid"); expect(a.m.score).toBe(100);
   });
   test("three clean attempts record evidence but credit five new lines only once", () => {
     let state = createState(defaultPlan(date)); const item = { kind: "sabaq" as const, page: 604, fromLine: 0, lines: 5 };
@@ -37,7 +39,7 @@ describe("AI lesson and review recording", () => {
   });
   test("wrong or pending words cannot pass a review", () => {
     expect(cleanRecitation({ ...result, words: [{ ...result.words[0], status: "wrong" }] }, ["112:1:1"])).toBe(false);
-    expect(cleanRecitation(result, ["112:1:3"])).toBe(false);
+    expect(cleanRecitation(result, ["112:1:5"])).toBe(false);
   });
   test("drift evidence reaches the engine's similar-ayah weak spots", () => {
     const a = attempt(); a.drifts = [{ atKey: "112:1:1", wentTo: { sura: 2, aya: 123, word: 1 }, wentToEnd: { sura: 2, aya: 123, word: 3 }, heard: "x", score: .9 }];

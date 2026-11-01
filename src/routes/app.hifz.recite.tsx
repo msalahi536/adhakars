@@ -136,8 +136,7 @@ function Recite() {
   const [analyzing, setAnalyzing] = useState(false);
   const analysisRun = useRef(0);
   const latestState = useRef(hifzState); latestState.current = hifzState;
-  const liveResult = useRef(aiResultPlaceholder());
-  function aiResultPlaceholder() { return null as import("@/lib/hifz-ai/checker").CheckResult | null; }
+  const liveResult = useRef<import("@/lib/hifz-ai/checker").CheckResult | null>(null);
   const today = todayISO();
 
   const pageQuery = useQuery({ ...recitePageOptions(saved.page), initialData: saved.page === 562 ? initial : undefined });
