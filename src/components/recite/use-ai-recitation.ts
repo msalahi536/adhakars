@@ -94,6 +94,12 @@ export function useAiRecitation(page: number, enabled: boolean, keys: string[]) 
   return { phase, progress, stream, result, error, request, stop,
     reset: () => { setResult(null); setPhase("idle"); previous.current = {}; },
     confirm: () => pendingRange.current ? begin(pendingRange.current) : Promise.resolve(),
-    cancel: () => setPhase("idle"),
+    cancel: () => {
+      generation.current++;
+      capture.current?.getTracks().forEach((t) => t.stop()); capture.current = null;
+      const current = session.current; session.current = null;
+      if (current) cleanup.current = current.stop().catch(() => undefined);
+      setStream(null); setResult(null); setPhase("idle");
+    },
   };
 }
