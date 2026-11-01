@@ -15,6 +15,8 @@ export interface WordResult {
   status: WordStatus;
   expected: string;
   heard: string;
+  at?: number; // index in the heard string of this word's first sound (for timing / hesitation)
+  end?: number; // index of its last sound
 }
 
 export interface ExtraSpeech {
@@ -24,6 +26,9 @@ export interface ExtraSpeech {
 }
 
 export interface CheckResult {
+  heard?: string; // unmodified recognizer emissions, attached by the live session
+  conf?: number[]; // confidence per emitted character
+  times?: number[]; // seconds from the start, per emitted character (for hesitation detection)
   words: WordResult[];
   extras: ExtraSpeech[];
   reachedIndex: number; // how far into the reference the recitation has got
@@ -110,7 +115,7 @@ const SOFT_CLASSES = ["نں", "م۾", "ں۾", "سصث", "تطث", "دضظذز", 
 const SOFT = new Map<string, Set<string>>();
 for (const cls of SOFT_CLASSES) for (const c of cls) {
   if (!SOFT.has(c)) SOFT.set(c, new Set());
-  for (const d of cls) SOFT.get(c)?.add(d);
+  for (const d of cls) SOFT.get(c)!.add(d);
 }
 const same = (a: string, b: string) => a === b || (SOFT.get(a)?.has(b) ?? false);
 
@@ -300,7 +305,7 @@ export function check(reference: Reference, heard: string, final: boolean, conf?
     const js = [...jsSet].sort((a, b) => a - b);
     const heardTxt = js.map((j) => rec[j]).join("");
     if (!final && w.e > end) {
-      words.push({ key: w.key, text: w.text, status: "in_progress", expected, heard: heardTxt });
+      words.push({ key: w.key, text: w.text, status: "in_progress", expected, heard: heardTxt, ...(js.length ? { at: idx[js[0]], end: idx[js[js.length - 1]] } : {}) });
       return;
     }
     const expSk = skeleton(expected);
@@ -338,7 +343,7 @@ export function check(reference: Reference, heard: string, final: boolean, conf?
         if (kind === "extra" && status === "correct") status = "unsure";
       }
     }
-    words.push({ key: w.key, text: w.text, status, expected, heard: heardTxt });
+    words.push({ key: w.key, text: w.text, status, expected, heard: heardTxt, ...(js.length ? { at: idx[js[0]], end: idx[js[js.length - 1]] } : {}) });
   });
 
   // a whole passage left out: stray sounds inside a run of skips are skips too
@@ -347,6 +352,13 @@ export function check(reference: Reference, heard: string, final: boolean, conf?
       const near = [...words.slice(Math.max(0, i - 2), i), ...words.slice(i + 1, i + 3)];
       if (near.filter((x) => x.status === "skipped").length >= 3) wr.status = "skipped";
     }
+  });
+  // The model can drop a short word right after a pause (ayah start). One short word missing there,
+  // with its neighbours recited, is "unsure", not a skip: never accuse a correct reciter.
+  words.forEach((wr, i) => {
+    const near = [...words.slice(Math.max(0, i - 1), i), ...words.slice(i + 1, i + 2)];
+    if (wr.status === "skipped" && wr.key.endsWith(":1") && skeleton(wr.expected).length <= 3 &&
+        near.every((x) => x.status !== "skipped" && x.status !== "pending")) wr.status = "unsure";
   });
   const startKey = reference.words.find((w) => w.s >= start)?.key ?? reference.words[0]?.key ?? "";
   return { words, extras, reachedIndex: end, startIndex: start, startKey };

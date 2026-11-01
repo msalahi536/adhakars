@@ -22,3 +22,6 @@ export type { Performance, Session, Step } from "./engine";
 export { buildDrills } from "./drills";
 export type { Drill, PageVerses } from "./drills";
 export { loadState, saveState, todayISO } from "./storage";
+export { memoryMap, slippingSoon, memorySummary, salahPlan, sleepBoost, positionQuiz, drillRange } from "./insights";
+export type { PageMemory, MemoryLevel, SalahPortion, PositionQuiz } from "./insights";
+export { performanceFromAI } from "./ai-bridge";

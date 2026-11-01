@@ -45,13 +45,14 @@ export class QuranRecognizer {
   private fb = new StreamingFbank();
   private feats: number[] = []; // feature rows (flattened) waiting to be fed
   private framesFed = 0; // output frames so far
+  private samplesIn = 0; // real audio received (seconds = samplesIn / SR)
   private prev = -1;
   private silentSamples = 0;
   private level = -60;
   private heardSinceReset = false;
 
   /** Pause length (s) after which the model's memory is reset. */
-  resetAfterPause = 1.0;
+  resetAfterPause = 0.35; // short ayah-end pauses: the model can drop the next word without a fresh start
 
   static async create(opts: {
     modelUrl: string; // the .onnx file (host it yourself; see README)
@@ -104,6 +105,7 @@ export class QuranRecognizer {
     this.reset();
     this.fb = new StreamingFbank();
     this.framesFed = 0;
+    this.samplesIn = 0;
     this.silentSamples = 0;
     this.level = -60;
   }
@@ -113,6 +115,7 @@ export class QuranRecognizer {
    * Call `flush()` when the user stops so the last word comes out.
    */
   async accept(samples: Float32Array): Promise<Emission[]> {
+    this.samplesIn += samples.length;
     // pause tracking for memory resets, in 20 ms steps, relative to this speaker's loudness
     const hop = 320;
     for (let a = 0; a + hop <= samples.length; a += hop) {
@@ -145,7 +148,12 @@ export class QuranRecognizer {
 
   /** Push ~1 s of silence through so the final sounds are emitted. */
   async flush(): Promise<Emission[]> {
-    return this.accept(new Float32Array(Math.round(1.05 * SR)));
+    // the pushed silence isn't real audio: the last sounds happened when the user stopped
+    const now = this.samplesIn;
+    const out = await this.accept(new Float32Array(Math.round(1.05 * SR)));
+    this.samplesIn = now;
+    for (const e of out) e.time = now / SR;
+    return out;
   }
 
   private async run(): Promise<Emission[]> {
@@ -164,7 +172,7 @@ export class QuranRecognizer {
         let best = 0;
         for (let v = 1; v < vocab; v++) if (d[t * vocab + v] > d[t * vocab + best]) best = v;
         if (best !== blank && best !== this.prev) {
-          out.push({ token: this.tokens.get(best) ?? "", time: ((this.framesFed + t) * 4 * 160) / SR, prob: Math.exp(d[t * vocab + best]) });
+          out.push({ token: this.tokens.get(best) ?? "", time: this.samplesIn / SR, prob: Math.exp(d[t * vocab + best]) });
           this.heardSinceReset = true;
         }
         this.prev = best;

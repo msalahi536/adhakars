@@ -23,6 +23,8 @@ export function getRecognizer(modelUrl = DEFAULT_MODEL_URL, onProgress?: (p: num
 
 export async function prepareChecker(onProgress?: (p: number) => void) {
   await getRecognizer(DEFAULT_MODEL_URL, onProgress);
+  // Whole-Quran index (voice search, follow-along, mutashabihat), then the answer keys, so everything works offline.
+  await cachedAsset("/hifz-ai/quran-index.json");
   // Cache answer keys before confirming the one-time download is ready offline.
   for (let start = 1; start <= 114; start += 8) {
     await Promise.all(Array.from({ length: Math.min(8, 115 - start) }, (_, i) =>
@@ -72,6 +74,7 @@ export async function startListening(opts: {
 
   let heard = "";
   let conf: number[] = [];
+  const times: number[] = [];
   let queue = Promise.resolve();
   let failure: unknown;
   let stopped: Promise<CheckResult> | undefined;
@@ -101,9 +104,9 @@ export async function startListening(opts: {
       if (!em.length) return;
       for (const e of em) {
         heard += e.token;
-        for (let k = 0; k < e.token.length; k++) conf.push(e.prob);
+        for (let k = 0; k < e.token.length; k++) { conf.push(e.prob); times.push(e.time); }
       }
-      last = check(reference, heard, false, conf);
+      last = { ...check(reference, heard, false, conf), heard, conf: [...conf], times: [...times] };
       opts.onUpdate(last);
     }).catch((error) => {
       failure = error;
@@ -126,10 +129,10 @@ export async function startListening(opts: {
       if (failure) throw failure;
       for (const e of await rec.flush()) {
         heard += e.token;
-        for (let k = 0; k < e.token.length; k++) conf.push(e.prob);
+        for (let k = 0; k < e.token.length; k++) { conf.push(e.prob); times.push(e.time); }
       }
       await ctx.close();
-      last = check(reference, heard, true, conf);
+      last = { ...check(reference, heard, true, conf), heard, conf: [...conf], times: [...times] };
       opts.onUpdate(last);
       return last;
       })().finally(() => { if (ctx.state !== "closed") void ctx.close().catch(() => undefined); });

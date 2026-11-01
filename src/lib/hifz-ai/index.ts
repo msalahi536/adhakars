@@ -5,3 +5,10 @@ export { fbank, StreamingFbank, SR } from "./fbank";
 
 export { AI_DISCLAIMER, AI_CREDIT } from "./notices";
 export { checkerDownloaded } from "./assets";
+
+// Whole-Quran voice features
+export { loadQuranIndex, findInQuran, skel, type Hit, type WordRef } from "./quran-index";
+export { startFollowing, Follower, type FollowPosition, type FollowSession } from "./follow";
+export { findDrifts, diffAyat, type Drift } from "./mutashabih";
+export { findHesitations, masteryScore, type Hesitation, type Mastery } from "./fluency";
+export { openMic, type Mic } from "./mic";
