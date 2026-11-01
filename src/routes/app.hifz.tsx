@@ -1,6 +1,6 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useQuery, useSuspenseQuery } from "@tanstack/react-query";
-import { useEffect, useRef, useState, type CSSProperties } from "react";
+import { useEffect, useLayoutEffect, useRef, useState, type CSSProperties } from "react";
 import { Check, ChevronLeft, ChevronRight, Mic, Pause, Play, RotateCcw, X, Flag } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Portal } from "@/components/Portal";
@@ -29,6 +29,9 @@ function Recite() {
   const initial = useSuspenseQuery(recitePageOptions(562)).data;
   const chapters = useSuspenseQuery(reciteChaptersOptions).data;
   const [saved, setSaved] = useState<SavedRecite>(freshRecite);
+  const latest = useRef(saved);
+  latest.current = saved;
+  const paperRef = useRef<HTMLDivElement | null>(null);
   const [hydrated, setHydrated] = useState(false);
   const [status, setStatus] = useState<"ready" | "active" | "paused">("ready");
   const [mode, setMode] = useState("self");
@@ -57,6 +60,21 @@ function Recite() {
   const update = (value: Partial<SavedRecite>) => setSaved((s) => ({ ...s, ...value }));
   useEffect(() => { setSaved(readRecite()); setHydrated(true); }, []);
   useEffect(() => { if (hydrated) saveRecite(saved); }, [saved, hydrated]);
+  useLayoutEffect(() => {
+    const paper = paperRef.current;
+    if (!paper) return;
+    const fit = () => {
+      paper.querySelectorAll<HTMLElement>(".rc-line").forEach((line) => {
+        line.style.setProperty("--rc-line-size", `${saved.settings.size}px`);
+        const items = [...line.children] as HTMLElement[];
+        const width = items.reduce((n, el) => n + el.scrollWidth, 0) + Math.max(0, items.length - 1) * 5;
+        if (width > line.clientWidth) line.style.setProperty("--rc-line-size", `${Math.max(16, saved.settings.size * line.clientWidth / width)}px`);
+      });
+    };
+    fit();
+    const observer = new ResizeObserver(fit); observer.observe(paper);
+    return () => observer.disconnect();
+  }, [font, page, saved.settings.size, saved.settings.layout]);
   useEffect(() => {
     let canceled = false;
     setFont(null);
@@ -107,11 +125,14 @@ function Recite() {
     } catch { setAudioError("Qari audio is unavailable right now. Please try again."); }
   }
   function commitReveal(all: boolean) {
-    if (!next || !page) return;
-    const updated = all ? revealAyah(words, saved.marks) : revealNext(words, saved.marks);
+    const current = latest.current;
+    const pending = nextWord(words, current.marks);
+    if (!pending || !page) return;
+    if (transitionTimer.current) clearTimeout(transitionTimer.current);
+    const updated = all ? revealAyah(words, current.marks) : revealNext(words, current.marks);
     update({ marks: updated }); void triggerHaptic("light");
-    if (words.filter((w) => w.verse === next.verse).every((w) => revealed(updated[w.key]))) {
-      setStatus("paused"); setGradeAyah(next.verse);
+    if (words.filter((w) => w.verse === pending.verse).every((w) => revealed(updated[w.key]))) {
+      setStatus("paused"); setGradeAyah(pending.verse);
     }
   }
   function horizon() {
@@ -119,6 +140,7 @@ function Recite() {
     if (mode === "ai") { setSheet("ai"); return; }
     if (status !== "active") { setStatus("active"); return; }
     if (!next) { setSheet("complete"); setStatus("paused"); return; }
+    if (transitionTimer.current) clearTimeout(transitionTimer.current);
     if (!saved.settings.mist) { commitReveal(false); return; }
     update({ marks: { ...saved.marks, [next.key]: "in_progress" } });
     transitionTimer.current = setTimeout(() => commitReveal(false), 220);
@@ -153,7 +175,7 @@ function Recite() {
   const renderLine = (line: number) => {
     const lineItems = lineWords(line);
     const surahStart = page?.verses.find((v) => v.number === 1 && v.words[0]?.line === line + 2);
-    if (surahStart) return <div key={line} className="rc-surah-frame"><span className="rc-rosette">۞</span><span className="rc-arabic">{chapters.find((c) => c.id === surahStart.chapter)?.name_arabic}</span><span className="rc-rosette">۞</span></div>;
+    if (surahStart) return <div key={line} className="rc-surah-frame"><span className="rc-rosette">۞</span><span className="rc-arabic">سُورَةُ {chapters.find((c) => c.id === surahStart.chapter)?.name_arabic}</span><span className="rc-rosette">۞</span></div>;
     const bismillah = page?.verses.find((v) => v.number === 1 && v.chapter !== 9 && v.chapter !== 1 && v.words[0]?.line === line + 1);
     if (bismillah) return <div key={line} className="rc-bismillah rc-arabic">بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ</div>;
     return <div key={line} className={`rc-line ${lineItems.length < 5 ? "rc-short-line" : ""}`} dir="rtl">{lineItems.map(wordNode)}</div>;
@@ -163,7 +185,7 @@ function Recite() {
       <div className="rc-landscape"><img src={DEFAULT_BACKGROUNDS.morning} width={1536} height={1024} alt="" /></div>
       <header className="rc-header"><Button variant="ghost" size="icon" aria-label={active ? "Pause recitation" : "Exit Hifz"} onClick={() => active ? (setStatus("paused"), stopAudio()) : void navigate({ to: "/app/more" })}>{active ? <X /> : <ChevronLeft />}</Button><div><span className="rc-eyebrow">{active ? "" : "HIFZ · RECITE"}</span><h1>{chapter?.name_simple ?? "Quran"} <span>· p.{saved.page}</span></h1></div><Button variant="ghost" size="icon" aria-label="Page settings" onClick={() => { if (active) setStatus("paused"); setSheet("settings"); }}>Aa</Button></header>
       {!active && <div className="rc-top-controls"><Choice label="Recitation mode" value={mode} onChange={setMode} options={[{ value: "self", label: "Self check" }, { value: "ai", label: "AI check · soon" }]} /><div className="rc-page-select"><Button variant="ghost" size="icon" aria-label="Previous page" disabled={saved.page === 1} onClick={() => changePage(saved.page - 1)}><ChevronLeft /></Button><label>Page <input type="number" aria-label="Mushaf page number" min="1" max="604" value={saved.page} onChange={(e) => changePage(Number(e.target.value))} /> / 604</label><Button variant="ghost" size="icon" aria-label="Next page" disabled={saved.page === 604} onClick={() => changePage(saved.page + 1)}><ChevronRight /></Button></div></div>}
-      <div className="rc-paper" onTouchStart={(e) => { const t = e.touches[0]; swipe.current = { x: t.clientX, y: t.clientY }; }} onTouchEnd={(e) => { const start = swipe.current; const t = e.changedTouches[0]; if (start && Math.abs(t.clientX - start.x) > 65 && Math.abs(t.clientY - start.y) < 65) changePage(saved.page + (t.clientX < start.x ? 1 : -1)); swipe.current = null; }}>
+      <div className="rc-paper" ref={paperRef} onTouchStart={(e) => { const t = e.touches[0]; swipe.current = { x: t.clientX, y: t.clientY }; }} onTouchEnd={(e) => { const start = swipe.current; const t = e.changedTouches[0]; if (start && Math.abs(t.clientX - start.x) > 65 && Math.abs(t.clientY - start.y) < 65) changePage(saved.page + (t.clientX < start.x ? 1 : -1)); swipe.current = null; }}>
         <div className="rc-margins"><span>الجزء {first?.juz ?? "—"}</span><span>{saved.page}</span></div>
         {pageQuery.isPending ? <div className="rc-loading">Loading mushaf page…</div> : pageQuery.isError ? <div className="rc-loading">{pageQuery.error.message}<Button variant="outline" onClick={() => void pageQuery.refetch()}>Try again</Button></div> : <>
           <div className={`rc-mushaf ${font ? "rc-glyphs" : ""}`} style={{ fontFamily: font ?? undefined }}>
