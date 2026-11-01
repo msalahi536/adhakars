@@ -43,7 +43,7 @@ export function HifzHome({ state, update, reset }: { state: HifzState; update: (
   const names = Object.fromEntries(chapters.map((chapter) => [chapter.id, chapter.name_simple]));
   const labelPage = (page: number) => {
     const data = q.pages.find((p) => p.page === page);
-    return data ? pageRecitationLabel(data, names) : `Page ${page}`;
+    return data ? pageRecitationLabel(data, names, q.surahPages) : `Page ${page}`;
   };
   const navigate = useNavigate();
   const today = todayISO();
