@@ -3,6 +3,10 @@ import { useSuspenseQuery } from "@tanstack/react-query";
 import { useNavigate } from "@tanstack/react-router";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
+import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
+import { reciteChaptersOptions } from "@/lib/recite/data";
+import { PopupHandle } from "./PopupHandle";
+import { pageRecitationLabel } from "./page-label";
 import {
   BookOpen, CalendarDays, ChevronRight, Flame, Layers, Link2, MoonStar, Play,
   Settings2, Sparkles, Bell, ChartNoAxesColumnIncreasing, Check, Target, X, type LucideIcon,
@@ -35,6 +39,12 @@ function stepLine(step: Step): string {
 
 export function HifzHome({ state, update, reset }: { state: HifzState; update: (s: HifzState) => void; reset: () => void }) {
   const q = useSuspenseQuery(quranIndexOptions).data;
+  const chapters = useSuspenseQuery(reciteChaptersOptions).data;
+  const names = Object.fromEntries(chapters.map((chapter) => [chapter.id, chapter.name_simple]));
+  const labelPage = (page: number) => {
+    const data = q.pages.find((p) => p.page === page);
+    return data ? pageRecitationLabel(data, names) : `Page ${page}`;
+  };
   const navigate = useNavigate();
   const today = todayISO();
   const session = useMemo(() => buildSession(state, q, today), [state, q, today]);
@@ -86,7 +96,7 @@ export function HifzHome({ state, update, reset }: { state: HifzState; update: (
   }
 
   const nextMilestone = timeline.juzMilestones.find((m) => new Date(m.date + "T12:00:00Z").getTime() > Date.now());
-  const memorizedPages = Object.values(state.pages).filter((r) => r.memory).map((r) => r.page);
+  const memorizedPages = Object.values(state.pages).filter((r) => r.stage === "sabqi" || r.stage === "manzil").map((r) => r.page);
   const pct = Math.round(st.percentOfQuran * 1000) / 10;
 
   return (
@@ -198,49 +208,52 @@ export function HifzHome({ state, update, reset }: { state: HifzState; update: (
         </Button>
       </div>
 
-      {sheet && sheet !== "plan" && <div className="hz-backdrop" onClick={() => setSheet(null)} />}
+      <Dialog open={sheet !== null && sheet !== "plan"} onOpenChange={(open) => { if (!open) setSheet(null); }}>
+        <DialogContent className="hz-home-popup hz-setup" aria-describedby={undefined} onOpenAutoFocus={(event) => event.preventDefault()}>
+        <PopupHandle dismiss={() => setSheet(null)} />
 
       {sheet === "juz" && juzOpen !== null && (
-        <section className="hz-sheet" role="dialog" aria-modal="true" aria-label={`Juz ${juzOpen} pages`}>
-          <header><h2>Juz {juzOpen}</h2><Button variant="ghost" size="icon" aria-label="Close" onClick={() => setSheet(null)}><X /></Button></header>
+        <>
+          <header className="hz-home-popup-heading"><Layers /><DialogTitle>Juz {juzOpen}</DialogTitle></header>
           <p className="hz-juz-progress-count">{st.byJuz.find((j) => j.juz === juzOpen)?.memorized ?? 0} of {st.byJuz.find((j) => j.juz === juzOpen)?.pages ?? 0} pages memorized</p>
-          <div className="hz-page-list">
+          <div className="hz-named-pages">
             {q.pages.filter((p) => p.juz === juzOpen).map((p) => {
               const rec = state.pages[p.page];
-              const strengthValue = rec?.memory ? Math.round((st.byJuz.find((x) => x.juz === juzOpen)?.strength ?? 0) * 100) : 0;
+              const memorized = rec?.stage === "sabqi" || rec?.stage === "manzil";
               return (
-                <Button variant="ghost" key={p.page} className="hz-page-chip" aria-label={`Page ${p.page}${rec?.memory ? `, strength ${strengthValue}%` : ""}`}
+                <Button variant="ghost" key={p.page} className="hz-named-page" aria-label={labelPage(p.page)}
                   onClick={() => { setSheet(null); void navigate({ to: "/app/hifz/recite", search: { page: p.page } }); }}>
-                  {rec?.memory && <i style={{ opacity: 0.2 + (strengthValue / 100) * 0.6 }} />}
-                  <em>{p.page}</em>
+                  <BookOpen /><span><strong>{labelPage(p.page)}</strong><small>Page {p.page} · {memorized ? "Memorized" : rec?.stage === "learning" ? "Learning" : "Not memorized"}</small></span><ChevronRight />
                 </Button>
               );
             })}
           </div>
-        </section>
+        </>
       )}
 
       {sheet === "salah" && (
-        <SalahSheet memorized={memorizedPages} done={logSalah} close={() => setSheet(null)} />
+        <SalahSheet memorized={memorizedPages} labelPage={labelPage} done={logSalah} />
       )}
 
       {sheet === "reminders" && (
-        <section className="hz-sheet" role="dialog" aria-modal="true" aria-label="Hifz reminders">
-          <header><h2>Reminders</h2><Button variant="ghost" size="icon" aria-label="Close" onClick={() => setSheet(null)}><X /></Button></header>
+        <>
+          <header className="hz-home-popup-heading"><Bell /><DialogTitle>Reminders</DialogTitle><p>A little time for your Quran.</p></header>
           <div className="hz-reminder-row">
-            <span><strong style={{ fontSize: 14 }}>Morning</strong><br /><small style={{ color: "var(--muted-foreground)" }}>Review is ready: pages and minutes</small></span>
+            <span><strong>Morning review</strong><small>Your daily review reminder</small></span>
             <input aria-label="Morning reminder time" type="time" value={`${String(reminders.morning.hour).padStart(2, "0")}:${String(reminders.morning.minute).padStart(2, "0")}`} onChange={(e) => setReminderTime("morning", e.target.value)} />
             <Switch aria-label="Morning reminder" checked={reminders.morning.enabled} onCheckedChange={(on) => void toggleReminder("morning", on)} />
           </div>
           <div className="hz-reminder-row">
-            <span><strong style={{ fontSize: 14 }}>Before sleep</strong><br /><small style={{ color: "var(--muted-foreground)" }}>Only on days with new memorization</small></span>
+            <span><strong>Before sleep</strong><small>Only after new memorization</small></span>
             <input aria-label="Sleep reminder time" type="time" value={`${String(reminders.sleep.hour).padStart(2, "0")}:${String(reminders.sleep.minute).padStart(2, "0")}`} onChange={(e) => setReminderTime("sleep", e.target.value)} />
             <Switch aria-label="Before sleep reminder" checked={reminders.sleep.enabled} onCheckedChange={(on) => void toggleReminder("sleep", on)} />
           </div>
           {reminderError && <p role="alert" style={{ fontSize: 12, color: "var(--destructive, #b4453a)" }}>{reminderError}</p>}
-          <p style={{ fontSize: 11, color: "var(--muted-foreground)" }}><CalendarDays size={11} style={{ verticalAlign: -1 }} /> Reminders are planned a few days ahead and refresh each time you open Hifz.</p>
-        </section>
+          <Button className="hz-primary hz-popup-done" onClick={() => setSheet(null)}>Done</Button>
+        </>
       )}
+        </DialogContent>
+      </Dialog>
 
       {sheet === "plan" && (
         <div className="hz-backdrop" style={{ overflowY: "auto" }}>
@@ -253,23 +266,21 @@ export function HifzHome({ state, update, reset }: { state: HifzState; update: (
   );
 }
 
-function SalahSheet({ memorized, done, close }: { memorized: number[]; done: (pages: number[]) => void; close: () => void }) {
+function SalahSheet({ memorized, labelPage, done }: { memorized: number[]; labelPage: (page: number) => string; done: (pages: number[]) => void }) {
   const [picked, setPicked] = useState<number[]>([]);
   return (
-    <section className="hz-sheet" role="dialog" aria-modal="true" aria-label="I recited in salah">
-      <header><h2>Recited in salah</h2><Button variant="ghost" size="icon" aria-label="Close" onClick={close}><X /></Button></header>
-      <p style={{ fontSize: 12, color: "var(--muted-foreground)" }}>Pick the memorized pages you recited. Pages close to their review date count as a light review.</p>
+    <>
+      <header className="hz-home-popup-heading"><MoonStar /><DialogTitle>Recited in salah</DialogTitle><p>Choose the memorized passages you recited.</p></header>
       {!memorized.length && <p style={{ fontSize: 13 }}>No memorized pages yet.</p>}
-      <div className="hz-page-list">
+      <div className="hz-named-pages">
         {memorized.map((p) => (
-          <Button variant="ghost" key={p} className="hz-page-chip" aria-pressed={picked.includes(p)}
+          <Button variant="ghost" key={p} className="hz-named-page" aria-pressed={picked.includes(p)}
             onClick={() => setPicked((list) => (list.includes(p) ? list.filter((x) => x !== p) : [...list, p]))}>
-            {picked.includes(p) && <i style={{ opacity: .5 }} />}
-            <em>{p}</em>
+            <BookOpen /><span><strong>{labelPage(p)}</strong><small>Page {p}</small></span><span className="hz-passage-check">{picked.includes(p) && <Check />}</span>
           </Button>
         ))}
       </div>
-      <Button className="hz-start" disabled={!picked.length} onClick={() => done(picked)}>Save</Button>
-    </section>
+      <Button className="hz-primary hz-popup-done" disabled={!picked.length} onClick={() => done(picked)}>Save review{picked.length > 0 ? ` · ${picked.length}` : ""}</Button>
+    </>
   );
 }
