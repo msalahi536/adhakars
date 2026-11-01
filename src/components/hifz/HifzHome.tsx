@@ -3,6 +3,7 @@ import { useSuspenseQuery } from "@tanstack/react-query";
 import { useNavigate } from "@tanstack/react-router";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
+import { HeaderBackButton } from "@/components/HeaderBackButton";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { reciteChaptersOptions } from "@/lib/recite/data";
 import { PopupHandle } from "./PopupHandle";
@@ -256,7 +257,10 @@ export function HifzHome({ state, update, reset }: { state: HifzState; update: (
       </Dialog>
 
       {sheet === "plan" && (
-        <div className="hz-backdrop" style={{ overflowY: "auto" }}>
+        <div className="hz-backdrop hz-edit-plan" style={{ overflowY: "auto" }}>
+          <header className="hz-home-header">
+            <HeaderBackButton onBack={() => setSheet(null)} />
+          </header>
           <div style={{ background: "var(--background)", minHeight: "100dvh" }}>
             <PlanSetup existing={state.plan} done={() => { setSheet(null); reset(); }} />
           </div>
