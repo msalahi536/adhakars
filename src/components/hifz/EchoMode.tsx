@@ -60,10 +60,10 @@ export function EchoMode({ keys, reciter, close, highlight }: { keys: string[]; 
         if (token.current !== id) return;
         setStage("repeat"); mark.current?.(part.keys, settings.hide);
         const ranges = [...new Set(part.keys.map((key) => Number(key.split(":")[0])))].map((sura) => { const numbers = part.keys.filter((k) => Number(k.split(":")[0]) === sura).map((k) => Number(k.split(":")[1])); return { sura, first: Math.min(...numbers), last: Math.max(...numbers) }; });
-        if (settings.check) { await aiRef.current.request(ranges); if (aiRef.current.phase === "download") { setError("Download the checker below, then start Echo again."); break; } }
+        if (settings.check) { const started = await aiRef.current.request(ranges); if (token.current !== id) { aiRef.current.cancel(); return; } if (started === "download") { setError("Download the checker below, then start Echo again."); break; } }
         await wait(length * settings.gap, id);
         if (token.current !== id) return;
-        if (settings.check) { await aiRef.current.stop(); const result = aiRef.current.result; if (result) setCorrect(cleanRecitation(result, result.words.map((w) => w.key))); }
+        if (settings.check) { const result = await aiRef.current.stop(); if (result) setCorrect(cleanRecitation(result, result.words.map((w) => w.key))); aiRef.current.discardRecording(); }
       }
     } catch (e) { if (token.current === id) setError(e instanceof Error ? e.message : "Echo couldn’t start. Please retry."); }
     finally { if (token.current === id) { setRunning(false); setStage("idle"); mark.current?.([], false); } }

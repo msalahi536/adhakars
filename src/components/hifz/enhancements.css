@@ -5,6 +5,8 @@
 .hx-mini-tools { position:absolute; right:18px; top:calc(env(safe-area-inset-top,0px) + 6px); z-index:6; display:flex; align-items:center; gap:4px; }
 .hx-mini-tools button { height:32px; width:32px; color:var(--foreground); background:var(--background); }
 .hx-panel { color:var(--foreground); background:var(--background); }
+[role=dialog].hx-panel { z-index:350; width:min(calc(100% - 24px),512px); border-radius:8px; }
+body:has([role=dialog].hx-panel) > [data-state=open]:not([role=dialog]) { z-index:340; background:color-mix(in oklab,var(--foreground) 25%,transparent); }
 .hx-panel header { display:flex; align-items:center; gap:12px; }
 .hx-panel header h2 { flex:1; }
 .hx-panel p { font-size:14px; line-height:1.8; }

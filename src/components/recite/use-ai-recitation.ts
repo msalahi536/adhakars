@@ -64,6 +64,7 @@ export function useAiRecitation(page: number, enabled: boolean, keys: string[], 
       const mic = capture.current?.getAudioTracks().some((t) => t.readyState === "live") ? capture.current : await navigator.mediaDevices.getUserMedia({ audio: { channelCount: 1, echoCancellation: false, noiseSuppression: true, autoGainControl: true } });
       if (id !== generation.current) { mic.getTracks().forEach((t) => t.stop()); return; }
       capture.current = mic;
+      mic.getAudioTracks().forEach((t) => { t.enabled = true; });
       await cleanup.current;
       if (id !== generation.current) return;
       const ai = await import("@/lib/hifz-ai");
@@ -90,8 +91,8 @@ export function useAiRecitation(page: number, enabled: boolean, keys: string[], 
   async function request(range: AiRange | AiRange[]) {
     const ranges = Array.isArray(range) ? range : [range];
     pendingRange.current = ranges;
-    if (await checkerDownloaded()) await begin(ranges);
-    else setPhase("download");
+    if (await checkerDownloaded()) { await begin(ranges); return "started" as const; }
+    setPhase("download"); return "download" as const;
   }
   async function stop() {
     const current = session.current;
@@ -107,11 +108,13 @@ export function useAiRecitation(page: number, enabled: boolean, keys: string[], 
       const blob = await recordingDone;
       if (!keep.current) capture.current = null;
       if (id === generation.current) { setRecording(blob); receive(final); setPhase("finished"); }
+      return final;
     } catch (error) {
       if (id === generation.current) { setError(friendlyError(error)); setPhase("error"); }
     }
   }
   return { phase, progress, stream, result, error, recording, request, stop,
+    pauseStream: () => capture.current?.getAudioTracks().forEach((t) => { t.enabled = false; }),
     discardRecording: () => setRecording(null),
     reset: () => { setRecording(null); setResult(null); setPhase("idle"); previous.current = {}; },
     confirm: () => pendingRange.current ? begin(pendingRange.current) : Promise.resolve(),

@@ -213,7 +213,7 @@ function Recite() {
       if (handsFree && sessionItem?.kind === "review") {
         setReviewSummary((entries) => [...entries, {page:sessionItem.page, attempt:value}]);
         const nextItem = activeSession?.items[itemIndex + 1];
-        if (!handsPaused && nextItem?.kind === "review") { autoResume.current = true; advance(); }
+        if (!handsPaused && nextItem?.kind === "review") { autoResume.current = true; playFeedback("pageTurn"); advance(); }
         else { setShowReviewSummary(true); setHandsPaused(true); setStatus("paused"); }
       } else { setSheet("ai"); setStatus("paused"); }
       if (value.drifts.length) playFeedback("drift");
@@ -324,8 +324,7 @@ function Recite() {
 
   useEffect(() => {
     if (!autoResume.current || !handsFree || handsPaused || sessionItem?.kind !== "review" || !page || page.page !== sessionItem.page || !font || ai.phase !== "idle") return;
-    autoResume.current = false;
-    const timer = setTimeout(() => { if (handsPaused) return; stopAudio(); void ai.request(aiRanges); }, 100);
+    const timer = setTimeout(() => { if (handsPaused) return; autoResume.current = false; stopAudio(); void ai.request(aiRanges); }, 100);
     return () => clearTimeout(timer);
   }, [saved.page, page, font, ai.phase, itemIndex, handsPaused, handsFree]);
   useEffect(() => { if (sheet !== "ai") { ai.discardRecording(); mutateHighlight(null); } }, [sheet]);
@@ -711,10 +710,10 @@ function Recite() {
 
   return <Portal><MushafThemeProvider theme={appTheme} mode={morningOrEvening} className={`recite-page rc-supplied rc-hide-${saved.settings.hideStyle} ${controls ? "rc-controls-visible" : ""} ${saved.settings.theme === "night" ? "rc-night" : ""}`} style={{ "--rc-size": `${saved.settings.size}px`, "--rc-strip-height": `${dimensions.strip}px`, "--rc-label-height": `${dimensions.labels}px`, "--m-font-quran": "var(--font-arabic)" } as CSSProperties}><main onPointerDownCapture={() => { touching.current = true; setTouchActivity((v) => v + 1); }} onPointerUpCapture={() => { touching.current = false; setTouchActivity((v) => v + 1); }} onPointerCancelCapture={() => { touching.current = false; setTouchActivity((v) => v + 1); }}>
     <header className="rc-header" aria-hidden={!controls} inert={!controls}><Button variant="ghost" size="icon" aria-label="Exit Hifz" onClick={() => { saveActiveSession(null); void navigate({ to: activeSession ? "/app/hifz" : "/app/more" }); }}><ChevronLeft /></Button><Button variant="ghost" className="rc-title" aria-label="Go to page" onClick={() => setSheet("navigation")}>{chapter?.name_simple ?? "Quran"} · {saved.page}</Button><Button variant="ghost" size="icon" aria-label="Page settings" onClick={() => setSheet("settings")}>Aa</Button></header>
-    {activeSession && !sessionEnded && <div className="rc-lesson-pill">{chapter?.name_simple} · {sessionItem?.kind === "review" ? "Review" : "Lesson"}{sabaq && <span className="rc-pass-dots" aria-label={`${cleanPasses} of 3 clean recitations`}>{[1, 2, 3].map((n) => <i key={n} className={cleanPasses >= n ? "is-filled" : ""} />)}</span>}</div>}
+    {activeSession && !sessionEnded && !handsFree && <div className="rc-lesson-pill">{chapter?.name_simple} · {sessionItem?.kind === "review" ? "Review" : "Lesson"}{sabaq && <span className="rc-pass-dots" aria-label={`${cleanPasses} of 3 clean recitations`}>{[1, 2, 3].map((n) => <i key={n} className={cleanPasses >= n ? "is-filled" : ""} />)}</span>}</div>}
     <div className="hx-mini-tools">
       {sabaq && <><Button variant="ghost" size="icon" title="What these ayat say" aria-label="What these ayat say" disabled={micBusy.current} onClick={() => setUnderstand(true)}><BookOpen size={16}/></Button><Button variant="ghost" size="icon" title="Echo mode" aria-label="Echo mode" disabled={micBusy.current} onClick={() => { stopAudio(); setEcho(true); }}><Repeat size={16}/></Button></>}
-      {mode === "ai" && sessionItem?.kind === "review" && <><Switch aria-label="Hands-free" checked={handsFree} disabled={ai.phase === "listening" || ai.phase === "loading"} onCheckedChange={(v) => { setHandsFree(v); setHandsPaused(false); if (!v) ai.cancel(); }}/>{handsFree && <Button variant="ghost" size="icon" aria-label={handsPaused ? "Resume hands-free" : "Pause hands-free"} onClick={() => { if (handsPaused) { setHandsPaused(false); void ai.request(aiRanges); } else { setHandsPaused(true); void ai.stop(); } }}>{handsPaused ? <Play size={16}/> : <Pause size={16}/>}</Button>}</>}
+      {mode === "ai" && sessionItem?.kind === "review" && <><Switch aria-label="Hands-free" checked={handsFree} disabled={ai.phase === "listening" || ai.phase === "loading"} onCheckedChange={(v) => { setHandsFree(v); setHandsPaused(false); if (!v) ai.cancel(); }}/>{handsFree && <Button variant="ghost" size="icon" aria-label={handsPaused ? "Resume hands-free" : "Pause hands-free"} onClick={() => { if (handsPaused) { setHandsPaused(false); void ai.request(aiRanges); } else { setHandsPaused(true); ai.pauseStream(); void ai.stop(); } }}>{handsPaused ? <Play size={16}/> : <Pause size={16}/>}</Button>}</>}
     </div>
     {handsFree && sessionItem?.kind === "review" && <div className="rc-lesson-pill">Hands-free · page {reviewSummary.length + 1} of {activeSession?.items.filter((i) => i.kind === "review").length}</div>}
     {mode === "self" && sabaq && phaseInfo && !sessionEnded && <div className="hz-phase-bar" role="status">
