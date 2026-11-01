@@ -3,6 +3,7 @@ import { AyahMarker, MushafFrame, MushafLabel, MushafPageNumber, SurahCartouche,
 import type { RecitePage } from "@/lib/recite/model";
 import type { Chapter } from "@/lib/quran";
 import { madaniSlots } from "./page-layout";
+import type { VoiceWord } from "./page-data";
 
 /** Only page/font changes render this component. Live word positions mutate classes outside React. */
 export const MadaniPage = memo(function MadaniPage({ page, font, chapters, ready }: {
@@ -34,7 +35,7 @@ export const MadaniPage = memo(function MadaniPage({ page, font, chapters, ready
       {madaniSlots(page).map(({line,header,basmala,words}) => {
         if (header) return <div key={line} data-line={line} className="qv-slot qv-cartouche"><SurahCartouche name={`سُورَةُ ${chapters.find((c) => c.id === header)?.name_arabic ?? ""}`} height={48} /></div>;
         if (basmala) return <div key={line} data-line={line} className="qv-slot qv-bismillah" dir="rtl">بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ</div>;
-        return <div key={line} data-line={line} className="qv-slot qv-madani-line" dir="rtl">{words.map((w) => w.end ? <span key={w.key} className="qv-ayah-marker"><AyahMarker number={Number(w.verse.split(":")[1])} size={18} /></span> : <span key={w.key} data-follow-word={w.key}>{w.glyph}</span>)}</div>;
+        return <div key={line} data-line={line} className="qv-slot qv-madani-line" dir="rtl">{words.map((w) => w.end ? <span key={w.key} className="qv-ayah-marker"><AyahMarker number={Number(w.verse.split(":")[1])} size={18} /></span> : <span key={w.key} data-follow-word={w.key} style={{fontFamily:`RecitePage${(w as VoiceWord).glyphPage ?? page.page}`}}>{w.glyph}</span>)}</div>;
       })}
     </div></MushafFrame><div className="qv-page-number"><MushafPageNumber page={page.page} height={24} /></div>
   </div>;

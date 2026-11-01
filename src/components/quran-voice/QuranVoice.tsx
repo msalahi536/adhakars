@@ -8,7 +8,7 @@ import { Switch } from "@/components/ui/switch";
 import { MushafThemeProvider } from "@/components/mushaf/MushafPage";
 import { getPresetId, resolveVisualPhase } from "@/lib/theme-store";
 import { getVerseByKey, type VerseHit } from "@/lib/quran";
-import { loadPageFont, reciteChaptersOptions, recitePageOptions } from "@/lib/recite/data";
+import { reciteChaptersOptions } from "@/lib/recite/data";
 import type { FollowPosition, SearchAnswer } from "@/lib/hifz-ai";
 import { MadaniPage } from "./MadaniPage";
 import { englishByDefault, paintPosition, searchPresentation } from "./rules";
@@ -17,6 +17,7 @@ import { VoiceConsent } from "./VoiceConsent";
 import { VoiceBars } from "./VoiceBars";
 import { followPage } from "./page-layout";
 import { prepareWordPages, wordPages } from "./word-pages";
+import { voicePageOptions, voicePageFonts } from "./page-data";
 import "./voice.css";
 
 export function QuranVoice({mode, initialPage = 1}: {mode:"follow"|"search"|"mushaf"; initialPage?:number}) {
@@ -55,7 +56,7 @@ function FollowImam({mode,initialPage}: {mode:"follow"|"mushaf"; initialPage:num
   const current = useRef<FollowPosition|null>(null);
   const ayahKey = useRef("");
   const loadedPage = useRef(page);
-  const pageData = useQuery(recitePageOptions(page));
+  const pageData = useQuery(voicePageOptions(page));
   const chapters = useQuery(reciteChaptersOptions);
   const names = useRef(chapters.data); names.current = chapters.data;
   useEffect(() => {
@@ -64,8 +65,7 @@ function FollowImam({mode,initialPage}: {mode:"follow"|"mushaf"; initialPage:num
   useEffect(() => {
     for (const adjacent of [page - 1, page + 1]) {
       if (adjacent < 1 || adjacent > 604) continue;
-      void queryClient.prefetchQuery(recitePageOptions(adjacent));
-      void loadPageFont(adjacent);
+      void queryClient.ensureQueryData(voicePageOptions(adjacent)).then(voicePageFonts).catch(() => undefined);
     }
   }, [page, queryClient]);
   useEffect(() => {
@@ -75,9 +75,9 @@ function FollowImam({mode,initialPage}: {mode:"follow"|"mushaf"; initialPage:num
   }, [mode]);
   useEffect(() => {
     let active = true; setFont(null); setFontError(false);
-    void loadPageFont(page).then((f) => { if (active) { setFont(f); setFontError(!f); } });
+    if (pageData.data) void voicePageFonts(pageData.data).then((f) => { if (active) { setFont(f); setFontError(!f); } });
     return () => { active = false; };
-  }, [page,fontRetry]);
+  }, [page,pageData.data,fontRetry]);
   const turnToWord = useCallback((p: FollowPosition) => {
     const target = followPage(p, wordPages, loadedPage.current);
     if (target === loadedPage.current) return;
