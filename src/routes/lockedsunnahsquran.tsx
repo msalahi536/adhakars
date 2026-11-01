@@ -10,7 +10,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import { editorLogin, editorLogout, editorStatus, editorLoad, editorSave, editorClear, editorPreview } from "@/lib/daily-editor.functions";
 import { addDays, weekDates, type DailyType, type DailyContent, type DailyAssignment } from "@/lib/daily-editor";
 import { getHadiths, type HadithPage } from "@/lib/hadith.functions";
-import { getChapters, stripTags, type Chapter } from "@/lib/quran";
+import { getChapters, getVerseByKey, parseVerseRef, searchVerses, stripTags, type Chapter } from "@/lib/quran";
 
 export const Route = createFileRoute("/lockedsunnahsquran")({
   loader: () => editorStatus(),
@@ -39,10 +39,11 @@ function DailyEditorPage() {
   const login = useServerFn(editorLogin); const logout = useServerFn(editorLogout);
   async function signIn(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault(); setBusy(true); setError("");
-    const form = new FormData(e.currentTarget);
+    const element = e.currentTarget;
+    const form = new FormData(element);
     try {
       const r = await login({ data: { username: String(form.get("username")), password: String(form.get("password")) } });
-      if (r.ok) { e.currentTarget?.reset(); setAuthed(true); } else setError("Username or password is incorrect.");
+      if (r.ok) { element.reset(); setAuthed(true); } else setError("Username or password is incorrect.");
     } catch { setError("Couldn't sign in. Please try again."); } finally { setBusy(false); }
   }
   return <div className="daily-editor min-h-dvh bg-background text-foreground">
@@ -91,7 +92,7 @@ function DailyDashboard({ today, onLogout }: { today: string; onLogout: () => Pr
     </div>
     <div className="mb-6 flex flex-wrap items-center gap-2">
       <Button variant="outline" size="icon" aria-label="Previous day" onClick={() => setDate(addDays(date, -1))}><ChevronLeft className="h-4 w-4" /></Button>
-      <Input aria-label="Selected date" type="date" value={date} min="2020-01-01" max="2100-12-31" className="w-auto flex-1 sm:flex-none" onChange={(e) => { if (e.target.value) setDate(e.target.value); }} />
+      <Input aria-label="Selected date" type="date" value={date} min="2020-01-01" max="2100-12-31" className="w-[190px] flex-none" onChange={(e) => { if (e.target.value) setDate(e.target.value); }} />
       <Button variant="outline" size="icon" aria-label="Next day" onClick={() => setDate(addDays(date, 1))}><ChevronRight className="h-4 w-4" /></Button>
       <Button variant="ghost" onClick={() => { setDate(today); setView("day"); }}>Today</Button>
       <Button variant="ghost" onClick={() => { setDate(addDays(today, 1)); setView("day"); }}>Tomorrow</Button>
@@ -159,13 +160,11 @@ function SelectionDialog({ type, date, library, onClose, onSaved }: { type: Dail
         const r = await hadiths({ data: { book: book || undefined, q, page } }); setHadithPage(r);
         setResults(r.items.filter((h) => h.hadithArabic && h.hadithEnglish).map((h) => ({ arabic_text: stripTags(h.hadithArabic ?? ""), translation: stripTags(h.hadithEnglish ?? ""), reference: `${h.bookName} ${h.hadithNumber}${h.status ? " · " + h.status : ""}` })));
       } else {
-        const ref = q.trim().match(/^(\d{1,3}):(\d{1,3})$/);
-        const key = ref ? `${Number(ref[1])}:${Number(ref[2])}` : `${chapter}:${ayah}`;
+        const ref = parseVerseRef(q, chapters);
+        const key = ref ?? `${chapter}:${ayah}`;
         if (q.trim() && !ref) {
-          const r = await fetch(`https://api.quran.com/api/v4/search?q=${encodeURIComponent(q.trim())}&size=20&language=en`);
-          if (!r.ok) throw new Error();
-          const json = await r.json() as { search: { results: { verse_key: string; text: string; translations?: { text: string }[] }[] } };
-          setResults(await Promise.all((json.search?.results ?? []).map((v) => fetchVerse(v.verse_key))));
+          const hits = await searchVerses(q.trim(), 20);
+          setResults(await Promise.all(hits.map((v) => fetchVerse(v.key))));
         } else setResults([await fetchVerse(key)]);
       }
     } catch { setError("Couldn't load results. Please try again."); } finally { setBusy(false); }
@@ -209,11 +208,8 @@ function SelectionDialog({ type, date, library, onClose, onSaved }: { type: Dail
 }
 
 async function fetchVerse(key: string): Promise<DailyContent> {
-  if (!/^\d{1,3}:\d{1,3}$/.test(key)) throw new Error("Invalid verse");
-  const r = await fetch(`https://api.quran.com/api/v4/verses/by_key/${key}?fields=text_uthmani&translations=20`);
-  if (!r.ok) throw new Error("Verse unavailable");
-  const json = await r.json() as { verse: { text_uthmani: string; verse_key: string; translations: { text: string }[] } };
-  const v = json.verse;
-  if (!v?.text_uthmani || !v.translations?.[0]?.text) throw new Error("Verse unavailable");
-  return { arabic_text: v.text_uthmani, translation: stripTags(v.translations[0].text), reference: `Quran ${v.verse_key}` };
+  if (!parseVerseRef(key)) throw new Error("Invalid verse");
+  const v = await getVerseByKey(key);
+  if (!v.text || !v.translation) throw new Error("Verse unavailable");
+  return { arabic_text: v.text, translation: v.translation, reference: `Quran ${v.key}` };
 }
