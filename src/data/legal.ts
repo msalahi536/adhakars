@@ -36,7 +36,7 @@ export const PRIVACY_SECTIONS: LegalSection[] = [
   },
   {
     heading: "ACCOUNTS, ADMINISTRATION AND OPTIONAL SUBMISSIONS",
-    body: "Most devotional features do not require an account. Restricted administration uses authenticated sessions, and optional online features such as giveaway entries can store the details you provide, including email, consent and referral information, on our backend. Do not assume clearing local progress deletes a submitted entry or server-held information. Giveaway participation is optional; any prize and promotional email terms should be stated when you enter. Contact us about access, correction or deletion of information you submitted.",
+    body: "Most devotional features do not require an account. Restricted administration uses authenticated sessions, and optional online features such as giveaway entries can store the details you provide, including email, consent and referral information, on our backend. Feedback and suggestions you submit can also be stored and reviewed by authorized operators; do not include unnecessary sensitive details. Do not assume clearing local progress deletes a submitted entry or server-held information. Giveaway participation is optional; any prize and promotional email terms should be stated when you enter. Contact us about access, correction or deletion of information you submitted.",
   },
   {
     heading: "COOKIES, NOTIFICATIONS AND APP STORES",
@@ -66,7 +66,7 @@ export const TERMS_INTRO =
 export const TERMS_SECTIONS: LegalSection[] = [
   {
     heading: "THE APP",
-    body: "Sahih Al-Adhkar is provided free of charge, as is and as available, without warranty of any kind, express or implied, including any warranty of accuracy, fitness for a particular purpose, uninterrupted availability, or non-infringement. It is offered as a benefit to the community and is not a substitute for scholarly guidance. For any ruling or religious question, please return to the people of knowledge.",
+    body: "To the extent permitted by law, Sahih Al-Adhkar is provided free of charge, as is and as available, without express or implied warranties of accuracy, fitness for a particular purpose, uninterrupted availability or non-infringement. Mandatory warranties and statutory rights that cannot be excluded remain unaffected. It is offered as a benefit to the community and is not a substitute for scholarly guidance. For any ruling or religious question, please return to the people of knowledge.",
   },
   {
     heading: "RELIGIOUS CONTENT AND ACCURACY",
