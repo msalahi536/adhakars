@@ -1,5 +1,8 @@
 # Roadmap
 
+- [x] Match the finish summary reference with calendar icon, stacked serif date and compact details; phone screenshot and customization verified.
+- [x] Match Customize pace popup to the new reference images; phone top/bottom screenshots, both tabs, reachable Done and saved override verified.
+
 - [x] Simplify Hifz to time-first automatic pace selection, cached effective finish estimates, selected summary and custom bottom sheet; 18 tests pass, phone visuals checked, automatic and custom saved choices verified.
 
 - [x] Apply exact approved Hifz timeline engine and rebuild pace/date/custom selection before time-budget confirmation; calculation tests and complete phone setup/save verified, including both warning choices.
