@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { BookOpen, CalendarDays, Check, ChevronLeft, ChevronRight, Leaf, LockKeyhole, LogOut, Search, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -9,8 +9,8 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { editorLogin, editorLogout, editorStatus, editorLoad, editorSave, editorClear, editorPreview } from "@/lib/daily-editor.functions";
 import { addDays, weekDates, type DailyType, type DailyContent, type DailyAssignment } from "@/lib/daily-editor";
-import { getHadiths, type HadithPage } from "@/lib/hadith.functions";
-import { getChapters, getVerseByKey, parseVerseRef, searchVerses, stripTags, type Chapter } from "@/lib/quran";
+import { getHadithChapters, getHadiths, type HadithChapter } from "@/lib/hadith.functions";
+import { getChapters, getVerses, getVerseByKey, parseVerseRef, searchVerses, stripTags, type Chapter } from "@/lib/quran";
 
 export const Route = createFileRoute("/lockedsunnahsquran")({
   loader: () => editorStatus(),
@@ -141,34 +141,65 @@ function DailyDashboard({ today, onLogout }: { today: string; onLogout: () => Pr
 }
 
 function SelectionDialog({ type, date, library, onClose, onSaved }: { type: DailyType; date: string; library: LibraryItem[]; onClose: () => void; onSaved: (count: number) => Promise<void> }) {
-  const [source, setSource] = useState<"library" | "lookup">("library");
+  const [source, setSource] = useState<"library" | "lookup">("lookup");
   const [q, setQ] = useState(""); const [book, setBook] = useState("sahih-bukhari");
-  const [chapter, setChapter] = useState("1"); const [ayah, setAyah] = useState("1");
+  const [chapter, setChapter] = useState("1");
+  const [hadithChapter, setHadithChapter] = useState("");
+  const [hadithChapters, setHadithChapters] = useState<HadithChapter[]>([]);
   const [chapters, setChapters] = useState<Chapter[]>([]);
   const [results, setResults] = useState<DailyContent[]>([]);
-  const [hadithPage, setHadithPage] = useState<HadithPage | null>(null);
+  const [pageInfo, setPageInfo] = useState({ page: 1, lastPage: 1, total: 0 });
+  const [activeQuery, setActiveQuery] = useState("");
+  const request = useRef(0);
+  const scrollArea = useRef<HTMLDivElement>(null);
+  const [expanded, setExpanded] = useState<string[]>([]);
   const [selected, setSelected] = useState<DailyContent | null>(null);
   const [dates, setDates] = useState([date]);
   const [rangeStart, setRangeStart] = useState(date); const [rangeEnd, setRangeEnd] = useState(date);
   const [busy, setBusy] = useState(false); const [error, setError] = useState("");
   const save = useServerFn(editorSave); const hadiths = useServerFn(getHadiths);
-  useEffect(() => { if (type === "quran_verse") void getChapters().then(setChapters).catch(() => setError("Couldn't load surahs. You can still enter a verse reference.")); }, [type]);
-  async function lookup(page = 1) {
-    setBusy(true); setError(""); setResults([]);
+  const loadHadithChapters = useServerFn(getHadithChapters);
+  useEffect(() => { if (type === "quran_verse") void getChapters().then(setChapters).catch(() => setError("Couldn't load surahs. Please retry.")); }, [type]);
+  useEffect(() => {
+    if (type !== "sunnah" || !book) { setHadithChapters([]); return; }
+    let active = true;
+    setHadithChapters([]);
+    void loadHadithChapters({ data: { book } }).then((items) => { if (active) setHadithChapters(items); }).catch(() => {});
+    return () => { active = false; };
+  }, [type, book, loadHadithChapters]);
+  const lookup = useCallback(async (page: number, append: boolean, query: string) => {
+    const id = ++request.current;
+    setBusy(true); setError("");
+    if (!append) { setResults([]); setExpanded([]); scrollArea.current?.scrollTo({ top: 0 }); setPageInfo({ page: 1, lastPage: 1, total: 0 }); }
     try {
+      let items: DailyContent[];
+      let info: typeof pageInfo;
       if (type === "sunnah") {
-        const r = await hadiths({ data: { book: book || undefined, q, page } }); setHadithPage(r);
-        setResults(r.items.filter((h) => h.hadithArabic && h.hadithEnglish).map((h) => ({ arabic_text: stripTags(h.hadithArabic ?? ""), translation: stripTags(h.hadithEnglish ?? ""), reference: `${h.bookName} ${h.hadithNumber}${h.status ? " · " + h.status : ""}` })));
+        const r = await hadiths({ data: { book: book || undefined, chapter: hadithChapter ? Number(hadithChapter) : undefined, q: query, page } });
+        items = r.items.filter((h) => h.hadithArabic && h.hadithEnglish).map((h) => ({ arabic_text: stripTags(h.hadithArabic ?? ""), translation: stripTags(h.hadithEnglish ?? ""), reference: `${h.bookName} ${h.hadithNumber}${h.status ? " · " + h.status : ""}` }));
+        info = { page: r.page, lastPage: r.lastPage, total: r.total };
       } else {
-        const ref = parseVerseRef(q, chapters);
-        const key = ref ?? `${chapter}:${ayah}`;
-        if (q.trim() && !ref) {
-          const hits = await searchVerses(q.trim(), 20);
-          setResults(await Promise.all(hits.map((v) => fetchVerse(v.key))));
-        } else setResults([await fetchVerse(key)]);
+        const ref = parseVerseRef(query, chapters);
+        if (query.trim()) {
+          items = ref ? [await fetchVerse(ref)] : await Promise.all((await searchVerses(query.trim(), 20)).map((v) => fetchVerse(v.key)));
+          info = { page: 1, lastPage: 1, total: items.length };
+        } else {
+          const verses = await getVerses(Number(chapter));
+          items = verses.slice((page - 1) * 15, page * 15).map((v) => ({ arabic_text: v.words.filter((w) => !w.isEnd).map((w) => w.text).join(" "), translation: v.translation, reference: `Quran ${v.key}` }));
+          info = { page, lastPage: Math.ceil(verses.length / 15), total: verses.length };
+        }
       }
-    } catch { setError("Couldn't load results. Please try again."); } finally { setBusy(false); }
-  }
+      if (id !== request.current) return;
+      setResults((previous) => append ? [...previous, ...items] : items);
+      setPageInfo(info); setActiveQuery(query);
+    } catch { if (id === request.current) setError("Couldn't load results. Please try again."); }
+    finally { if (id === request.current) setBusy(false); }
+  }, [type, book, hadithChapter, chapter, chapters, hadiths]);
+  useEffect(() => {
+    if (source === "lookup") { setQ(""); void lookup(1, false, ""); }
+    else { request.current++; setBusy(false); setError(""); }
+    return () => { request.current++; };
+  }, [source, lookup]);
   function setRange() {
     if (!rangeStart || !rangeEnd || rangeEnd < rangeStart) { setError("Choose a valid date range."); return; }
     const list: string[] = []; let cursor = rangeStart;
@@ -179,18 +210,26 @@ function SelectionDialog({ type, date, library, onClose, onSaved }: { type: Dail
   const shown = source === "lookup" ? results : library.filter((i) => i.category === (type === "sunnah" ? "sunnah_of_day" : "quran_verse") && `${i.translation} ${i.reference ?? ""} ${i.arabic_text}`.toLowerCase().includes(q.toLowerCase())).map((i) => ({ arabic_text: i.arabic_text, translation: i.translation, reference: i.reference ?? "" }));
   return <Dialog open onOpenChange={(open) => { if (!open && !busy) onClose(); }}><DialogContent className="daily-editor flex max-h-[92dvh] flex-col overflow-hidden rounded-lg bg-background text-foreground sm:max-w-2xl">
     <DialogHeader><DialogTitle className="font-display text-3xl">Choose {names[type].toLowerCase()}</DialogTitle><DialogDescription>{formatDate(date)}</DialogDescription></DialogHeader>
-    <div className="min-h-0 flex-1 space-y-5 overflow-y-auto pr-1">
+    <div ref={scrollArea} className="min-h-0 flex-1 space-y-5 overflow-y-auto pr-1">
       {!selected ? <>
-        <div className="flex gap-2"><Button variant={source === "library" ? "default" : "outline"} onClick={() => { setSource("library"); setQ(""); }}>Saved library</Button><Button variant={source === "lookup" ? "default" : "outline"} onClick={() => { setSource("lookup"); setQ(""); }}>{type === "sunnah" ? "Hadith library" : "Find a verse"}</Button></div>
-        <form onSubmit={(e) => { e.preventDefault(); if (source === "lookup") void lookup(); }} className="space-y-3">
-          {source === "lookup" && type === "sunnah" && <select aria-label="Hadith collection" className="daily-select" value={book} onChange={(e) => setBook(e.target.value)}>{[["sahih-bukhari", "Sahih Bukhari"], ["sahih-muslim", "Sahih Muslim"], ["al-tirmidhi", "Jami at-Tirmidhi"], ["abu-dawood", "Sunan Abu Dawud"], ["sunan-nasai", "Sunan an-Nasai"], ["ibn-e-majah", "Sunan Ibn Majah"], ["", "All collections"]].map(([value, label]) => <option key={value} value={value}>{label}</option>)}</select>}
-          {source === "lookup" && type === "quran_verse" && <div className="flex gap-2"><select className="daily-select min-w-0 flex-1" aria-label="Surah" value={chapter} onChange={(e) => { setChapter(e.target.value); setAyah("1"); setQ(""); }}>{chapters.length ? chapters.map((c) => <option key={c.id} value={c.id}>{c.id}. {c.name_simple}</option>) : <option value="1">1. Al-Fatihah</option>}</select><Input aria-label="Ayah number" type="number" min={1} max={chapters.find((c) => String(c.id) === chapter)?.verses_count ?? 286} value={ayah} className="w-20" onChange={(e) => { setAyah(e.target.value); setQ(""); }} /></div>}
-          <div className="flex gap-2"><Input aria-label="Search content" maxLength={140} placeholder={source === "library" ? "Search saved selections…" : type === "sunnah" ? "Topic or hadith number, e.g. 1" : "Search words or enter 2:255"} value={q} onChange={(e) => setQ(e.target.value)} />{source === "lookup" && <Button type="submit" size="icon" aria-label="Search" disabled={busy}><Search className="h-4 w-4" /></Button>}</div>
+        <div className="flex gap-2"><Button variant={source === "lookup" ? "default" : "outline"} onClick={() => { setSource("lookup"); setQ(""); }}>{type === "sunnah" ? "Hadith library" : "Browse Quran"}</Button><Button variant={source === "library" ? "default" : "outline"} onClick={() => { setSource("library"); setQ(""); }}>Saved selections</Button></div>
+        <form onSubmit={(e) => { e.preventDefault(); if (source === "lookup") void lookup(1, false, q); }} className="space-y-3">
+          {source === "lookup" && type === "sunnah" && <><select aria-label="Hadith collection" className="daily-select" value={book} onChange={(e) => { setBook(e.target.value); setHadithChapter(""); }}>{[["sahih-bukhari", "Sahih Bukhari"], ["sahih-muslim", "Sahih Muslim"], ["al-tirmidhi", "Jami at-Tirmidhi"], ["abu-dawood", "Sunan Abu Dawud"], ["sunan-nasai", "Sunan an-Nasai"], ["ibn-e-majah", "Sunan Ibn Majah"], ["", "All collections"]].map(([value, label]) => <option key={value} value={value}>{label}</option>)}</select>{hadithChapters.length > 0 && <select aria-label="Hadith topic" className="daily-select" value={hadithChapter} onChange={(e) => setHadithChapter(e.target.value)}><option value="">All topics</option>{hadithChapters.map((c) => <option key={c.chapterNumber} value={c.chapterNumber}>{c.chapterEnglish || c.chapterArabic}</option>)}</select>}</>}
+          {source === "lookup" && type === "quran_verse" && <select className="daily-select" aria-label="Surah" value={chapter} onChange={(e) => setChapter(e.target.value)}>{chapters.length ? chapters.map((c) => <option key={c.id} value={c.id}>{c.id}. {c.name_simple} · {c.translated_name.name}</option>) : <option value="1">1. Al-Fatihah</option>}</select>}
+          <div className="flex gap-2"><Input aria-label="Search content" maxLength={140} placeholder={source === "library" ? "Search saved selections…" : type === "sunnah" ? "Search a topic or phrase…" : "Search words or a verse reference…"} value={q} onChange={(e) => setQ(e.target.value)} />{source === "lookup" && <Button type="submit" size="icon" aria-label="Search" disabled={busy}><Search className="h-4 w-4" /></Button>}</div>
+          {source === "lookup" && activeQuery && <Button variant="ghost" size="sm" onClick={() => { setQ(""); void lookup(1, false, ""); }}><ChevronLeft className="mr-1 h-4 w-4" />Back to browsing</Button>}
         </form>
-        {busy && <p className="text-sm text-muted-foreground">Searching…</p>}
-        {!busy && !shown.length && <p className="py-6 text-center text-sm text-muted-foreground">{source === "lookup" ? "No results yet." : "No saved selections found."}</p>}
-        <div className="space-y-3">{shown.map((item, i) => <article key={`${item.reference}-${i}`} className="rounded-lg border border-border bg-card p-4"><p className="text-xs font-medium text-primary">{item.reference}</p><p dir="rtl" className="my-3 font-arabic text-xl leading-loose">{item.arabic_text}</p><p className="whitespace-pre-line text-sm leading-relaxed">{item.translation}</p><Button variant="outline" className="mt-4 w-full" disabled={!item.reference} onClick={() => { setSelected(item); setError(""); }}><Check className="mr-2 h-4 w-4" />Select</Button></article>)}</div>
-        {source === "lookup" && type === "sunnah" && hadithPage && <div className="flex items-center justify-between"><Button variant="outline" disabled={busy || hadithPage.page <= 1} onClick={() => void lookup(hadithPage.page - 1)}>Previous</Button><span className="text-sm">{hadithPage.page} / {hadithPage.lastPage}</span><Button variant="outline" disabled={busy || hadithPage.page >= hadithPage.lastPage} onClick={() => void lookup(hadithPage.page + 1)}>Next</Button></div>}
+        {source === "lookup" && shown.length > 0 && <p className="text-xs text-muted-foreground">{activeQuery ? "Search results" : type === "sunnah" ? "Hadiths" : "Verses"} · {shown.length} of {pageInfo.total}</p>}
+        {busy && <p role="status" className="text-sm text-muted-foreground">Loading {type === "sunnah" ? "hadiths" : "verses"}…</p>}
+        {!busy && !shown.length && !error && <p className="py-6 text-center text-sm text-muted-foreground">{source === "lookup" ? "No matches found. Try another topic or phrase." : "No saved selections found."}</p>}
+        <div className="space-y-3">{shown.map((item, i) => {
+          const key = `${item.reference}-${i}`;
+          const compact = type === "sunnah" && !expanded.includes(key);
+          return <article key={key} className="rounded-lg border border-border bg-card p-4"><p className="text-xs font-medium text-primary">{item.reference}</p><p dir="rtl" className={`my-3 font-arabic text-xl leading-loose ${compact ? "line-clamp-3" : ""}`}>{item.arabic_text}</p><p className={`whitespace-pre-line text-sm leading-relaxed ${compact ? "line-clamp-4" : ""}`}>{item.translation}</p>
+            {type === "sunnah" && <Button variant="ghost" size="sm" className="mt-2" aria-expanded={!compact} onClick={() => setExpanded((previous) => compact ? [...previous, key] : previous.filter((value) => value !== key))}>{compact ? "Read full hadith" : "Show less"}</Button>}
+            <Button variant="outline" className="mt-3 w-full" disabled={!item.reference} onClick={() => { setSelected(item); setError(""); scrollArea.current?.scrollTo({ top: 0 }); }}><Check className="mr-2 h-4 w-4" />Select</Button></article>;
+        })}</div>
+        {source === "lookup" && pageInfo.page < pageInfo.lastPage && <Button variant="outline" className="w-full" disabled={busy} onClick={() => void lookup(pageInfo.page + 1, true, activeQuery)}>{busy ? "Loading…" : type === "sunnah" ? "Load more hadiths" : "Load more verses"}</Button>}
       </> : <>
         <div className="flex items-center justify-between"><p className="text-sm font-medium text-primary">{selected.reference}</p><Button variant="ghost" size="icon" aria-label="Choose another" onClick={() => setSelected(null)}><X className="h-4 w-4" /></Button></div>
         <p dir="rtl" className="font-arabic text-2xl leading-loose">{selected.arabic_text}</p><p className="whitespace-pre-line text-sm leading-relaxed">{selected.translation}</p>
@@ -201,7 +240,7 @@ function SelectionDialog({ type, date, library, onClose, onSaved }: { type: Dail
           <p className="mt-1 text-xs text-muted-foreground">Existing selections on these dates will be replaced.</p>
         </div>
       </>}
-      {error && <p role="alert" className="text-sm text-destructive">{error}</p>}
+      {error && <div role="alert" className="space-y-2 text-sm text-destructive"><p>{error}</p>{!selected && source === "lookup" && <Button variant="outline" disabled={busy} onClick={() => void lookup(results.length ? pageInfo.page + 1 : 1, results.length > 0, activeQuery)}>Retry</Button>}</div>}
     </div>
     {selected && <Button disabled={busy || !dates.length} onClick={async () => { setBusy(true); setError(""); try { await save({ data: { type, dates, content: selected } }); await onSaved(dates.length); } catch (e) { setError(e instanceof Error && e.message === "Please sign in again" ? "Your sign-in session was lost. Sign out and sign in again, then retry saving." : "Couldn't save. Please try again."); } finally { setBusy(false); } }}>{busy ? "Saving…" : `Save for ${dates.length} ${dates.length === 1 ? "day" : "days"}`}</Button>}
   </DialogContent></Dialog>;
