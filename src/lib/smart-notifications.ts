@@ -326,12 +326,12 @@ export const rescheduleStreakNotifications = async (): Promise<void> => {
 
 /** Everything in this file, for app open. */
 export const rescheduleSmartNotifications = async () => {
+  const n = await import("@/lib/notifications");
+  await n.clearRetiredHifz();
   await rescheduleSmartAdhkar();
   await rescheduleSunnahNotification();
   await reschedulePeriodNotifications();
   await rescheduleStreakNotifications();
-  const n = await import("@/lib/notifications");
-  await n.rescheduleHifzReminder();
   await n.enforceBudget();
 };
 

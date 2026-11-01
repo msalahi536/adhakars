@@ -17,11 +17,6 @@ export type NotificationPrefs = {
 };
 
 const PREFS_KEY = "adhkar:notifications";
-/** Fixed Hifz review reminder: lives in the same list as the other reminders, off until turned on. */
-export const HIFZ_REMINDER_ID = 900;
-const HIFZ_DEFAULT: Reminder = { id: HIFZ_REMINDER_ID, label: "Hifz review", hour: 19, minute: 0, enabled: false };
-const withHifz = (p: NotificationPrefs): NotificationPrefs =>
-  p.reminders.some((r) => r.id === HIFZ_REMINDER_ID) ? p : { ...p, reminders: [...p.reminders, HIFZ_DEFAULT] };
 
 const defaults: NotificationPrefs = {
   reminders: [
@@ -43,7 +38,7 @@ type LegacyPrefs = {
 const migrate = (parsed: LegacyPrefs): NotificationPrefs => {
   if (Array.isArray(parsed.reminders)) {
     const reminders = parsed.reminders.filter(
-      (r) => r && typeof r.id === "number" && typeof r.hour === "number",
+      (r) => r && typeof r.id === "number" && typeof r.hour === "number" && r.id !== 900,
     );
     const maxId = reminders.reduce((m, r) => Math.max(m, r.id), 0);
     return {
@@ -74,13 +69,13 @@ const migrate = (parsed: LegacyPrefs): NotificationPrefs => {
 };
 
 export const getNotificationPrefs = (): NotificationPrefs => {
-  if (typeof window === "undefined") return withHifz(defaults);
+  if (typeof window === "undefined") return defaults;
   try {
-    const raw = localStorage.getItem(PREFS_KEY);
-    if (!raw) return withHifz(defaults);
-    return withHifz(migrate(JSON.parse(raw) as LegacyPrefs));
+    const raw = window.localStorage.getItem(PREFS_KEY);
+    if (!raw) return defaults;
+    return migrate(JSON.parse(raw) as LegacyPrefs);
   } catch {
-    return withHifz(defaults);
+    return defaults;
   }
 };
 
@@ -333,10 +328,6 @@ export const scheduleReminder = async (r: Reminder, firstAt?: Date): Promise<Act
   if (!isNativePlatform()) return { ok: false, error: "Not running in the native app" };
   const plugin = await loadPlugin();
   if (!plugin) return { ok: false, error: "Notifications plugin is missing from this build." };
-  if (r.id === HIFZ_REMINDER_ID) {
-    await rescheduleHifzReminder();
-    return { ok: true };
-  }
   if (!firstAt) {
     const smart = await import("@/lib/smart-notifications");
     if (smart.usesPrayerTimes(r)) {
@@ -426,31 +417,29 @@ export const enforceBudget = async (): Promise<void> => {
   await enforceNotificationBudget(plugin, (id) => isPrayerNotifId(id) || id === JUMUAH_NOTIF_ID);
 };
 
-/** Hifz reminder: dynamic "X reviews due" bodies, re-planned on every app open and after each Hifz session change. */
-export const rescheduleHifzReminder = async (): Promise<void> => {
-  if (typeof window === "undefined" || !isNativePlatform()) return;
+/** Remove retired Hifz data and alerts only; keep all other progress and notifications. */
+export const clearRetiredHifz = async (): Promise<void> => {
+  if (typeof window === "undefined") return;
+  try {
+    const storage = window.localStorage;
+    const keys = Array.from({ length: storage.length }, (_, i) => storage.key(i));
+    for (const key of keys) if (key?.startsWith("hifz:")) storage.removeItem(key);
+    const raw = storage.getItem(PREFS_KEY);
+    if (raw) storage.setItem(PREFS_KEY, JSON.stringify(migrate(JSON.parse(raw) as LegacyPrefs)));
+  } catch {
+    // Restricted storage must not prevent the rest of the app from opening.
+  }
   const plugin = await loadPlugin();
   if (!plugin) return;
-  await cancelReminder(HIFZ_REMINDER_ID);
-  const r = getNotificationPrefs().reminders.find((x) => x.id === HIFZ_REMINDER_ID);
-  if (!r?.enabled) return;
-  const perm = await plugin.checkPermissions?.().catch(() => null);
-  if (perm && perm.display !== "granted") return;
-  await ensureChannel(plugin);
-  const [{ hifzReminderNotes, hifzTodayDone }, { loadHifz }] = await Promise.all([import("@/lib/hifz/reminder"), import("@/lib/hifz/store")]);
-  const notes = hifzReminderNotes(loadHifz(), new Date(), r.hour, r.minute, hifzTodayDone());
-  const notifications = notes.map((n, i) => ({
-    id: HIFZ_REMINDER_ID * 1000 + i,
-    title: "Hifz",
-    body: n.body,
-    schedule: { at: n.at, allowWhileIdle: true },
-    channelId: ANDROID_CHANNEL,
-    extra: { route: "/app/hifz/today" },
-  }));
-  if (notifications.length) {
-    try { await plugin.schedule({ notifications }); } catch (e) { console.error("[hifz] reminder schedule failed", e); }
+  try {
+    const pending = await plugin.getPending();
+    const retired = (pending?.notifications ?? []).filter((n: { id: number }) =>
+      n.id === 900 || (n.id >= 900000 && n.id <= 900006),
+    );
+    if (retired.length) await plugin.cancel({ notifications: retired.map((n: { id: number }) => ({ id: n.id })) });
+  } catch {
+    // Retry cancellation on the next app open/resume, without requesting permission.
   }
-  await enforceBudget();
 };
 
 
