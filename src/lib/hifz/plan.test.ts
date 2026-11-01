@@ -36,3 +36,9 @@ test("minute estimates use four minutes per line and two per review page", () =>
   expect(minutesNeeded(0, 5)).toBe(20);
   expect(minutesNeeded(30, 15)).toBe(76);
 });
+test("budget warnings start only above the approved ten-percent tolerance", () => {
+  const draft = { ...plan, newLinesPerDay: 30 };
+  expect(buildTimeline(draft, q, 120 / 1.1).shortOnTime).toBeUndefined();
+  expect(buildTimeline(draft, q, 109).shortOnTime).toBeDefined();
+  expect(buildTimeline(draft, q, 180).shortOnTime).toBeUndefined();
+});

@@ -281,7 +281,7 @@ export function PlanSetup({ existing, done }: { existing?: HifzPlan; done: () =>
             </div>
             </> : <div className="hz-custom-pace">
               <label htmlFor="finish-date">Finish date</label>
-              <input id="finish-date" type="date" value={targetDate} min={today} onChange={(e) => { const value = e.target.value; setTargetDate(value); const result = paceForFinishDate(draft, q, value); if (result) choosePace(result.newLinesPerDay); }} />
+              <input id="finish-date" type="date" value={targetDate} min={today} onChange={(e) => { const value = e.target.value; setTargetDate(value); if (!value) return; const result = paceForFinishDate(draft, q, value); if (result) choosePace(result.newLinesPerDay); }} />
               {targetDate && (dateTimeline ? <p role="status">{paceLabel(dateTimeline.newLinesPerDay)}, {humanMinutes(dateTimeline.minutesAtPeak)} a day at peak</p> : <p role="status">That&apos;s sooner than is realistic. Try a later date.</p>)}
             </div>}
           </section>
