@@ -42,7 +42,11 @@ import { Route as AppTafsirRouteImport } from './routes/app.tafsir'
 import { Route as AppTasbihRouteImport } from './routes/app.tasbih'
 import { Route as AppTermsRouteImport } from './routes/app.terms'
 import { Route as AppVoiceLabRouteImport } from './routes/app.voice-lab'
+import { Route as AppHifzDrillsRouteImport } from './routes/app.hifz.drills'
+import { Route as AppHifzLinesRouteImport } from './routes/app.hifz.lines'
+import { Route as AppHifzMushafRouteImport } from './routes/app.hifz.mushaf'
 import { Route as AppHifzReciteRouteImport } from './routes/app.hifz.recite'
+import { Route as AppHifzSleepRouteImport } from './routes/app.hifz.sleep'
 import { Route as AppMoreZakatRouteImport } from './routes/app.more_.zakat'
 
 const IndexRoute = IndexRouteImport.update({
@@ -210,9 +214,29 @@ const AppVoiceLabRoute = AppVoiceLabRouteImport.update({
   path: '/voice-lab',
   getParentRoute: () => AppRoute,
 } as any)
+const AppHifzDrillsRoute = AppHifzDrillsRouteImport.update({
+  id: '/drills',
+  path: '/drills',
+  getParentRoute: () => AppHifzRoute,
+} as any)
+const AppHifzLinesRoute = AppHifzLinesRouteImport.update({
+  id: '/lines',
+  path: '/lines',
+  getParentRoute: () => AppHifzRoute,
+} as any)
+const AppHifzMushafRoute = AppHifzMushafRouteImport.update({
+  id: '/mushaf',
+  path: '/mushaf',
+  getParentRoute: () => AppHifzRoute,
+} as any)
 const AppHifzReciteRoute = AppHifzReciteRouteImport.update({
   id: '/recite',
   path: '/recite',
+  getParentRoute: () => AppHifzRoute,
+} as any)
+const AppHifzSleepRoute = AppHifzSleepRouteImport.update({
+  id: '/sleep',
+  path: '/sleep',
   getParentRoute: () => AppHifzRoute,
 } as any)
 const AppMoreZakatRoute = AppMoreZakatRouteImport.update({
@@ -255,7 +279,11 @@ export interface FileRoutesByFullPath {
   '/app/terms': typeof AppTermsRoute
   '/app/voice-lab': typeof AppVoiceLabRoute
   '/app/': typeof AppIndexRoute
+  '/app/hifz/drills': typeof AppHifzDrillsRoute
+  '/app/hifz/lines': typeof AppHifzLinesRoute
+  '/app/hifz/mushaf': typeof AppHifzMushafRoute
   '/app/hifz/recite': typeof AppHifzReciteRoute
+  '/app/hifz/sleep': typeof AppHifzSleepRoute
   '/app/more/zakat': typeof AppMoreZakatRoute
 }
 export interface FileRoutesByTo {
@@ -291,7 +319,11 @@ export interface FileRoutesByTo {
   '/app/terms': typeof AppTermsRoute
   '/app/voice-lab': typeof AppVoiceLabRoute
   '/app': typeof AppIndexRoute
+  '/app/hifz/drills': typeof AppHifzDrillsRoute
+  '/app/hifz/lines': typeof AppHifzLinesRoute
+  '/app/hifz/mushaf': typeof AppHifzMushafRoute
   '/app/hifz/recite': typeof AppHifzReciteRoute
+  '/app/hifz/sleep': typeof AppHifzSleepRoute
   '/app/more/zakat': typeof AppMoreZakatRoute
 }
 export interface FileRoutesById {
@@ -329,7 +361,11 @@ export interface FileRoutesById {
   '/app/terms': typeof AppTermsRoute
   '/app/voice-lab': typeof AppVoiceLabRoute
   '/app/': typeof AppIndexRoute
+  '/app/hifz/drills': typeof AppHifzDrillsRoute
+  '/app/hifz/lines': typeof AppHifzLinesRoute
+  '/app/hifz/mushaf': typeof AppHifzMushafRoute
   '/app/hifz/recite': typeof AppHifzReciteRoute
+  '/app/hifz/sleep': typeof AppHifzSleepRoute
   '/app/more_/zakat': typeof AppMoreZakatRoute
 }
 export interface FileRouteTypes {
@@ -368,7 +404,11 @@ export interface FileRouteTypes {
     | '/app/terms'
     | '/app/voice-lab'
     | '/app/'
+    | '/app/hifz/drills'
+    | '/app/hifz/lines'
+    | '/app/hifz/mushaf'
     | '/app/hifz/recite'
+    | '/app/hifz/sleep'
     | '/app/more/zakat'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -404,7 +444,11 @@ export interface FileRouteTypes {
     | '/app/terms'
     | '/app/voice-lab'
     | '/app'
+    | '/app/hifz/drills'
+    | '/app/hifz/lines'
+    | '/app/hifz/mushaf'
     | '/app/hifz/recite'
+    | '/app/hifz/sleep'
     | '/app/more/zakat'
   id:
     | '__root__'
@@ -441,7 +485,11 @@ export interface FileRouteTypes {
     | '/app/terms'
     | '/app/voice-lab'
     | '/app/'
+    | '/app/hifz/drills'
+    | '/app/hifz/lines'
+    | '/app/hifz/mushaf'
     | '/app/hifz/recite'
+    | '/app/hifz/sleep'
     | '/app/more_/zakat'
   fileRoutesById: FileRoutesById
 }
@@ -691,11 +739,39 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppVoiceLabRouteImport
       parentRoute: typeof AppRoute
     }
+    '/app/hifz/drills': {
+      id: '/app/hifz/drills'
+      path: '/drills'
+      fullPath: '/app/hifz/drills'
+      preLoaderRoute: typeof AppHifzDrillsRouteImport
+      parentRoute: typeof AppHifzRoute
+    }
+    '/app/hifz/lines': {
+      id: '/app/hifz/lines'
+      path: '/lines'
+      fullPath: '/app/hifz/lines'
+      preLoaderRoute: typeof AppHifzLinesRouteImport
+      parentRoute: typeof AppHifzRoute
+    }
+    '/app/hifz/mushaf': {
+      id: '/app/hifz/mushaf'
+      path: '/mushaf'
+      fullPath: '/app/hifz/mushaf'
+      preLoaderRoute: typeof AppHifzMushafRouteImport
+      parentRoute: typeof AppHifzRoute
+    }
     '/app/hifz/recite': {
       id: '/app/hifz/recite'
       path: '/recite'
       fullPath: '/app/hifz/recite'
       preLoaderRoute: typeof AppHifzReciteRouteImport
+      parentRoute: typeof AppHifzRoute
+    }
+    '/app/hifz/sleep': {
+      id: '/app/hifz/sleep'
+      path: '/sleep'
+      fullPath: '/app/hifz/sleep'
+      preLoaderRoute: typeof AppHifzSleepRouteImport
       parentRoute: typeof AppHifzRoute
     }
     '/app/more_/zakat': {
@@ -709,11 +785,19 @@ declare module '@tanstack/react-router' {
 }
 
 interface AppHifzRouteChildren {
+  AppHifzDrillsRoute: typeof AppHifzDrillsRoute
+  AppHifzLinesRoute: typeof AppHifzLinesRoute
+  AppHifzMushafRoute: typeof AppHifzMushafRoute
   AppHifzReciteRoute: typeof AppHifzReciteRoute
+  AppHifzSleepRoute: typeof AppHifzSleepRoute
 }
 
 const AppHifzRouteChildren: AppHifzRouteChildren = {
+  AppHifzDrillsRoute: AppHifzDrillsRoute,
+  AppHifzLinesRoute: AppHifzLinesRoute,
+  AppHifzMushafRoute: AppHifzMushafRoute,
   AppHifzReciteRoute: AppHifzReciteRoute,
+  AppHifzSleepRoute: AppHifzSleepRoute,
 }
 
 const AppHifzRouteWithChildren =

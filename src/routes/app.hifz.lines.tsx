@@ -1,0 +1,3 @@
+import {createFileRoute} from "@tanstack/react-router";
+import {PracticeEntry} from "@/components/hifz/PracticeEntry";
+export const Route=createFileRoute("/app/hifz/lines")({head:()=>({meta:[{title:"Mushaf line quiz — Sahih Al-Adhkar"},{name:"description",content:"Recall where your memorized ayat begin on the Madani page."},{property:"og:title",content:"Mushaf line quiz — Sahih Al-Adhkar"},{property:"og:description",content:"A fifteen-line spatial Quran recall quiz."},{property:"og:type",content:"website"},{name:"twitter:card",content:"summary"}]}),component:()=> <PracticeEntry mode="lines"/>});

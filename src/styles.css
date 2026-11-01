@@ -35,6 +35,16 @@
 }
 
 /* ===== Dawn base — warm cream + olive accent, light cards ===== */
+:root {
+  --memory-strong: #246443;
+  --memory-good: #a3c9a0;
+  --memory-due: #e3b958;
+  --memory-slipping: #df915a;
+  --memory-weak: #be4d51;
+  --memory-on-strong: #ffffff;
+  --memory-on-good: #203b29;
+  --memory-on-warm: #40291b;
+}
 .daily-editor {
   --radius: 0.5rem;
   --background: #f7f9f8;
