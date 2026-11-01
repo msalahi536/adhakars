@@ -23,6 +23,7 @@ import {
 } from "@/lib/hifz/reminders";
 import { PlanSetup } from "./PlanSetup";
 import { selectedFinishEstimate } from "./automatic-pace";
+import { PracticeCards } from "./PracticeCards";
 
 const STEP_META: Record<Step["type"], { label: string; Icon: LucideIcon }> = {
   manzil: { label: "Manzil – old review", Icon: BookOpen },
@@ -74,7 +75,7 @@ export function HifzHome({ state, update, reset }: { state: HifzState; update: (
   }
 
   function logSalah(pages: number[]) {
-    const next = { ...state };
+    const next = structuredClone(state);
     recordSalah(next, pages, today);
     saveState(next);
     update(next);
@@ -187,6 +188,10 @@ export function HifzHome({ state, update, reset }: { state: HifzState; update: (
         </section>
 
         {/* Actions */}
+        <PracticeCards state={state} q={q} today={today} names={names} update={update}/>
+        <Button variant="ghost" className="hz-row-btn" onClick={()=>void navigate({to:"/app/hifz/mushaf"})}><BookOpen/><span>My Mushaf<small>Your memory, page by page</small></span><ChevronRight/></Button>
+        <Button variant="ghost" className="hz-row-btn" onClick={()=>void navigate({to:"/app/hifz/drills"})}><Target/><span>Voice quizzes<small>A few words, then recall</small></span><ChevronRight/></Button>
+        <Button variant="ghost" className="hz-row-btn" onClick={()=>void navigate({to:"/app/hifz/lines"})}><Layers/><span>Where is it on the page?<small>Remember the ayah’s starting line</small></span><ChevronRight/></Button>
         {weakCount > 0 && (
           <Button variant="ghost" className="hz-row-btn" onClick={() => startSession("drills")}>
             <Target size={17} /> <span>{weakCount} weak spot{weakCount === 1 ? "" : "s"}<small>Short drills to fix them</small></span>

@@ -1,0 +1,4 @@
+import {createFileRoute} from "@tanstack/react-router";
+import {PracticeEntry} from "@/components/hifz/PracticeEntry";
+export const Route=createFileRoute("/app/hifz/sleep")({validateSearch:(q:Record<string,unknown>)=>({mode:q.mode==="recall"?"recall" as const:"preview" as const}),head:()=>({meta:[{title:"Sleep preview & morning recall — Sahih Al-Adhkar"},{name:"description",content:"Optional evening Quran listening and pressure-free morning recall."},{property:"og:title",content:"Sleep preview & morning recall — Sahih Al-Adhkar"},{property:"og:description",content:"A gentle preview before sleep and recall after Fajr."},{property:"og:type",content:"website"},{name:"twitter:card",content:"summary"}]}),component:SleepRoute});
+function SleepRoute(){const {mode}=Route.useSearch();return <PracticeEntry mode={mode}/>;}

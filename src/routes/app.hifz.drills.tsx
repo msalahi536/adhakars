@@ -1,0 +1,3 @@
+import {createFileRoute} from "@tanstack/react-router";
+import {PracticeEntry} from "@/components/hifz/PracticeEntry";
+export const Route=createFileRoute("/app/hifz/drills")({head:()=>({meta:[{title:"Voice recall quizzes — Sahih Al-Adhkar"},{name:"description",content:"Practice Quran recall prompts with optional voice answers."},{property:"og:title",content:"Voice recall quizzes — Sahih Al-Adhkar"},{property:"og:description",content:"Gentle voice quizzes for your memorized Quran."},{property:"og:type",content:"website"},{name:"twitter:card",content:"summary"}]}),component:()=> <PracticeEntry mode="drills"/>});

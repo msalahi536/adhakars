@@ -1,0 +1,3 @@
+import {createFileRoute} from "@tanstack/react-router";
+import {PracticeEntry} from "@/components/hifz/PracticeEntry";
+export const Route=createFileRoute("/app/hifz/mushaf")({head:()=>({meta:[{title:"My Mushaf — Sahih Al-Adhkar"},{name:"description",content:"Your personal Quran memory map and gentle review."},{property:"og:title",content:"My Mushaf — Sahih Al-Adhkar"},{property:"og:description",content:"Your Quran memory strength by page."},{property:"og:type",content:"website"},{name:"twitter:card",content:"summary"}]}),component:()=> <PracticeEntry mode="mushaf"/>});
