@@ -33,7 +33,7 @@ function Licenses() {
               <p className="text-sm leading-relaxed">
                 {l.component}:{" "}
                 <a href={l.source} target="_blank" rel="noopener noreferrer" className="underline">{l.name}</a>{" "}
-                (Hugging Face), licensed under {l.license}
+                licensed under {l.license}
               </p>
               {l.modified && <p className="mt-2 text-sm">{l.modified}</p>}
               {l.notice && <pre className="mt-3 whitespace-pre-wrap text-[11px] leading-relaxed" style={{ color: "var(--muted-foreground)" }}>{l.notice}</pre>}
