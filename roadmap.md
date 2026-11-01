@@ -1,6 +1,6 @@
 # Roadmap
 
-- [ ] Smooth Hifz controls entrance; keep page and reveal strip stationary with the tab bar partially covering the strip.
+- [x] Smooth Hifz controls entrance; phone touch checks confirm an eased fade/slide, stationary page and reveal strip, partial tab-bar coverage, and working settings/toggle.
 
 - [x] Fix Hifz pointer taps and word-mark exceptions; phone touch checks verified show/hide, Aa settings, 4-second idle timeout/settings hold, swipe navigation, strip isolation and no nav overlap; 20 targeted tests pass.
 
