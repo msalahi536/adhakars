@@ -121,6 +121,8 @@ function Recite() {
   const [attemptStarted, setAttemptStarted] = useState(false);
   const [lessonPeek, setLessonPeek] = useState(false);
   const [resultClean, setResultClean] = useState(false);
+  const [debugSharing, setDebugSharing] = useState(false);
+  const [debugError, setDebugError] = useState("");
   const [hintVisible, setHintVisible] = useState(true);
   const acceptedAttempt = useRef(false);
   const today = todayISO();
@@ -331,6 +333,9 @@ function Recite() {
     const clean = resultClean || override;
     if (!clean) { prepareAttempt(); return; }
     const progress = nextCleanPass(cleanPasses, true, !sabaq);
+    const completedMarks = { ...latest.current.marks };
+    for (const word of targetWords) completedMarks[word.key] = "correct";
+    update({ marks: completedMarks });
     setCleanPasses(progress.count); setSheet(null); setAttemptStarted(false); setAiCorrection(null); ai.reset();
     if (progress.done) {
       if (sabaq) finishSabaq();
@@ -523,7 +528,8 @@ function Recite() {
     const aiStatus = mode === "ai" && targetKeys.has(word.key) && attemptStarted ? (aiCorrection?.statuses[word.key] ?? aiWords?.statuses[word.key]) : undefined;
     const state: WordState = lessonPeek && targetKeys.has(word.key) ? "correct" : mode === "ai" && attemptStarted && targetKeys.has(word.key) ? aiWordState(aiStatus) : saved.marks[word.key] ?? "pending";
     const hint = mode === "self" && (peek === word.key || isOpeningWord(word, words, saved.settings.hideAmount));
-    return <Button variant="ghost" key={word.key} className={`rc-word rc-${state} ${aiStatus === "wrong" || aiStatus === "skipped" ? `rc-ai-${aiStatus}` : ""} ${hint ? "rc-peek" : ""} ${audioWord === word.key ? "rc-listening" : ""}`} onPointerUp={(e) => {
+    const placeholder = mode === "ai" && attemptStarted && targetKeys.has(word.key) && !lessonPeek && (state === "pending" || state === "in_progress");
+    return <Button variant="ghost" key={word.key} className={`rc-word rc-${state} ${placeholder ? "rc-memory-placeholder" : ""} ${sheet === "ai" && aiStatus === "wrong" ? "rc-result-glow" : ""} ${aiStatus === "wrong" || aiStatus === "skipped" ? `rc-ai-${aiStatus}` : ""} ${hint ? "rc-peek" : ""} ${audioWord === word.key ? "rc-listening" : ""}`} onPointerUp={(e) => {
       const start = pointer.current;
       if (mode === "ai" && (aiStatus === "wrong" || aiStatus === "skipped") && start && start.id === e.pointerId && pageGesture(start, e.clientX, e.clientY, e.timeStamp) === "tap") { e.stopPropagation(); pointer.current = null; void playWord(word); return; }
       if (mode !== "self" || !revealed(state) || !start || start.id !== e.pointerId || pageGesture(start, e.clientX, e.clientY, e.timeStamp) !== "tap") return;
@@ -542,7 +548,7 @@ function Recite() {
     if (surahStart) return <div key={line} className="rc-cartouche"><SurahCartouche name={`سُورَةُ ${chapters.find((c) => c.id === surahStart.chapter)?.name_arabic ?? ""}`} height={48} /></div>;
     const bismillah = page?.verses.find((v) => v.number === 1 && v.chapter !== 9 && v.chapter !== 1 && v.words[0]?.line === line + 1);
     if (bismillah) return <div key={line} className="rc-bismillah rc-arabic" data-line={line}>بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ</div>;
-    return <div key={line} className={`rc-line ${saved.page <= 2 ? "rc-short-line" : ""}`} dir="rtl">{lineItems.map(wordNode)}</div>;
+    return <div key={line} className={`rc-line ${sabaq && !attemptStarted && lineItems.some((word) => targetKeys.has(word.key)) ? "rc-lesson-highlight" : ""} ${saved.page <= 2 ? "rc-short-line" : ""}`} dir="rtl">{lineItems.map(wordNode)}</div>;
   };
 
   const lessonLabel = rangeVerses.map((v) => v.chapter).filter((id, i, list) => list.indexOf(id) === i).map((id) => {
@@ -551,6 +557,10 @@ function Recite() {
   }).join(" · ");
   const failedWords = targetWords.filter((w) => aiCorrection ? ["wrong", "skipped"].includes(aiCorrection.statuses[w.key]) : ["wrong", "skipped"].includes(saved.marks[w.key]));
   const tomorrowSession = hifzState ? buildSession(hifzState, quranIndex, addDays(today, 1)) : null;
+  const nextLesson = tomorrowSession?.steps.find((step) => step.type === "sabaq");
+  const nextLessonPage = useQuery({ ...recitePageOptions(nextLesson?.type === "sabaq" ? nextLesson.page : saved.page), enabled: sheet === "lessonComplete" && nextLesson?.type === "sabaq" }).data;
+  const nextLessonChapter = nextLesson?.type === "sabaq" ? nextLessonPage?.verses.find((verse) => verse.words.some((word) => !word.end && word.line > nextLesson.fromLine))?.chapter : undefined;
+  const nextLessonName = chapters.find((entry) => entry.id === nextLessonChapter)?.name_simple;
   const sessionStats = hifzState ? stats(hifzState, quranIndex, today) : null;
 
   return <Portal><MushafThemeProvider theme={appTheme} mode={morningOrEvening} className={`recite-page rc-supplied rc-hide-${saved.settings.hideStyle} ${controls ? "rc-controls-visible" : ""} ${saved.settings.theme === "night" ? "rc-night" : ""}`} style={{ "--rc-size": `${saved.settings.size}px`, "--rc-strip-height": `${dimensions.strip}px`, "--rc-label-height": `${dimensions.labels}px`, "--m-font-quran": "var(--font-arabic)" } as CSSProperties}><main onPointerDownCapture={() => { touching.current = true; setTouchActivity((v) => v + 1); }} onPointerUpCapture={() => { touching.current = false; setTouchActivity((v) => v + 1); }} onPointerCancelCapture={() => { touching.current = false; setTouchActivity((v) => v + 1); }}>
@@ -611,14 +621,16 @@ function Recite() {
         {sheet === "navigation" && <PageNavigation page={saved.page} chapter={first?.chapter} juz={first?.juz} chapters={chapters} go={changePage} close={() => setSheet(null)} />}
         {sheet === "ai" && <section className="rc-sheet rc-loop-result" role="dialog" aria-modal="true" aria-label="Recitation result">
           <div className="rc-result-handle" />
-          {resultClean ? <Check className="rc-result-check" /> : <Mic className="rc-result-check rc-result-mistake" />}
+          {resultClean ? <Check className="rc-result-check" /> : <span className="rc-result-count">{failedWords.length || "…"}</span>}
           <h2>{resultClean ? "Perfect" : failedWords.length ? `${failedWords.length} ${failedWords.length === 1 ? "mistake" : "mistakes"}` : "A little more to recite"}</h2>
-          {resultClean && <p>{sabaq ? `${Math.min(3, cleanPasses + 1)} of 3 clean recitations` : "Recitation complete"}</p>}
-          {!!failedWords.length && <div className="rc-result-words">{failedWords.map((word) => <div key={word.key}><span dir="rtl" className="rc-arabic">{word.text}</span><small>{word.verse}</small><Button variant="ghost" size="icon" aria-label={`Hear correct word ${word.key}`} title="Hear correct word" onClick={() => void playWord(word)}><Play /></Button></div>)}</div>}
+          {resultClean && (sabaq ? <div className="rc-pass-dots rc-result-dots" aria-label={`${Math.min(3, cleanPasses + 1)} of 3 recitations complete`}>{[0, 1, 2].map((dot) => <span key={dot} className={dot <= cleanPasses ? "is-filled" : ""} />)}</div> : <p>Recitation complete</p>)}
+          {!!failedWords.length && <div className="rc-result-words">{failedWords.map((word) => <div key={word.key}><div className="rc-result-word-location"><span dir="rtl" className="rc-arabic">{word.text}</span><small>{chapters.find((entry) => entry.id === Number(word.verse.split(":")[0]))?.name_simple ?? "Quran"} · ayah {word.verse.split(":")[1]}</small></div><Button variant="ghost" size="icon" aria-label={`Hear correct word ${word.key}`} title="Hear correct word" onClick={() => void playWord(word)}><Play /></Button></div>)}</div>}
           <div className="rc-result-actions"><Button variant="outline" onClick={prepareAttempt}>Try again</Button><Button className="rc-primary" onClick={() => nextAttempt()}>Next</Button></div>
           {!resultClean && <Button variant="link" className="rc-result-override" onClick={() => nextAttempt(true)}>I recited it right</Button>}
+          {ai.hasDebug && <Button variant="link" className="rc-result-override" disabled={debugSharing} onClick={async () => { setDebugSharing(true); setDebugError(""); try { await ai.shareDebug(); } catch { setDebugError("Couldn’t share debug. Please try again."); } finally { setDebugSharing(false); } }}>Share debug</Button>}
+          {debugError && <p role="alert">{debugError}</p>}
         </section>}
-        {sheet === "lessonComplete" && <section className="rc-sheet rc-loop-result rc-complete" role="dialog" aria-modal="true" aria-label="Lesson complete"><div className="rc-result-handle" /><Check className="rc-result-check" /><h2>Lesson complete</h2><p>{lessonLabel}</p><div className="rc-pass-dots" aria-label="3 of 3 recitations complete">{[0, 1, 2].map((dot) => <span className="is-filled" key={dot} />)}</div><Button className="rc-primary" onClick={advance}>Next</Button></section>}
+        {sheet === "lessonComplete" && <section className="rc-sheet rc-loop-result rc-complete" role="dialog" aria-modal="true" aria-label="Lesson complete"><div className="rc-result-handle" /><Check className="rc-result-check rc-check-enter" /><h2>Lesson complete</h2><p>Review tomorrow{nextLessonName ? ` · next lesson: ${nextLessonName}` : " · daily practice continues"}</p><div className="rc-pass-dots" aria-label="3 of 3 recitations complete">{[0, 1, 2].map((dot) => <span className="is-filled" key={dot} />)}</div><Button className="rc-primary" onClick={advance}>Done</Button></section>}
         {gradeAyah && <section className="rc-sheet" role="dialog" aria-modal="true" aria-label="Ayah self check"><span className="rc-eyebrow">AYAH {gradeAyah}</span><h2>How did it go?</h2><div className="rc-grade-options">{(["Easy", "Okay", "Hard"] as const).map((g) => <Button variant="outline" key={g} onClick={() => grade(g)}>{g}</Button>)}</div><div className="rc-check-words" dir="rtl">{words.filter((w) => w.verse === gradeAyah).map((w) => <Button variant="ghost" className={`rc-arabic ${saved.marks[w.key] === "wrong" ? "rc-check-wrong" : ""}`} key={w.key} onClick={() => mark(w)} aria-label={`Mark ${w.key} as mistake`}>{w.text}</Button>)}</div></section>}
         {sheet === "marks" && <section className="rc-sheet rc-marks" role="dialog" aria-modal="true" aria-label="Review marks"><header><h2>Review marks</h2><Button variant="ghost" size="icon" aria-label="Close marks" onClick={() => setSheet(null)}><X /></Button></header>{!marks.length && <p>No marks on this page.</p>}{marks.map((w) => <div className="rc-mark-row" key={w.key}><Button variant="ghost" className="rc-arabic" onClick={() => void playWord(w)}>{w.text}<Play /></Button><small>{w.verse}</small><select aria-label={`State for ${w.key}`} value={saved.marks[w.key]} onChange={(e) => markState(w, e.target.value as WordState)}>{["wrong", "skipped", "unsure", "correct"].map((s) => <option key={s}>{s}</option>)}</select></div>)}</section>}
         {sheet === "complete" && <section className="rc-sheet rc-complete" role="dialog" aria-modal="true" aria-label="Page complete"><Check className="rc-sheet-icon" /><h2>Page complete</h2><p>{visible} words · {marks.length} marks · {Math.ceil((saved.seconds[saved.page] ?? 0) / 60)} min</p><Button className="rc-primary" onClick={() => setSheet("marks")}>Review marks</Button><Button variant="outline" disabled={saved.page === 604} onClick={() => changePage(saved.page + 1)}>Next page</Button></section>}

@@ -1,5 +1,7 @@
 # Roadmap
 
+- [x] Hifz beta local debug recording/ZIP export and visual polish; 43 tests/build pass. Real recorded audio exports three ZIPs with raw phonemes/conf/word states; reproduced Allah skipped (expected لَاهُ, heard empty). Six phone screenshots saved, middle-tap/stationary page/Done and desktop overflow checked. Actual iPhone recording/share/haptics remain device checks; recognition false mistakes persist and were not retuned.
+
 - [x] One-mic Hifz loop, three lesson passes/one review pass, previous-ayah linking, silence auto-stop, compact results and fixed Basmala row. 43 tests pass; real Al-Ikhlas audio auto-finishes, voice pulse/word updates and five screenshots verified; overrides complete/save 5 new lines. Self first-word tap/headphones stop/stationary page verified. Actual iPhone mic/haptics remain unverified; repeated recorded audio produced false mistakes on later passes, so clean three-pass accuracy is not claimed.
 
 - [x] Daily pickers open with source content, surah/collection/topic browsing, optional search and Load more; compact hadith previews expand fully. Signed-in phone flow verifies both selections reach scheduling, 5 scheduling tests pass and build OK; widget behavior untouched.

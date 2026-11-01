@@ -31,6 +31,7 @@ export function RecitationMic({ stream, listening, busy, self, playing, peek, di
     return () => { cancelAnimationFrame(frame); source.disconnect(); void context.close(); };
   }, [stream, listening]);
   return <div className="rc-mic-tools">
+    {listening && <span className="rc-listening-label" role="status">Listening…</span>}
     <Button variant="ghost" size="icon" className="rc-mic-side" aria-label={playing ? "Stop qari" : "Listen to lesson"} title={playing ? "Stop qari" : "Listen to lesson"} disabled={busy || listening || disabled} onClick={onListen}>{playing ? <Square /> : <Headphones />}</Button>
     <Button ref={mic} className={`rc-round-mic ${listening ? "is-listening" : ""}`} aria-label={self ? "Reveal next word" : listening ? "Stop recitation" : busy ? "Preparing recitation" : "Start recitation"} title={self ? "Reveal next word" : listening ? "Stop recitation" : "Start recitation"} disabled={busy || disabled} onClick={onTap}>{busy ? <LoaderCircle className="rc-mic-loading" /> : listening ? <Square /> : self ? <Eye /> : <Mic />}</Button>
     <Button variant="ghost" size="icon" className="rc-mic-side" aria-label={peek ? "Hide lesson" : "Peek at lesson"} title={peek ? "Hide lesson" : "Peek at lesson"} aria-pressed={peek} disabled={busy || disabled} onClick={onPeek}>{peek ? <EyeOff /> : <Eye />}</Button>

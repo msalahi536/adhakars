@@ -3,7 +3,7 @@
 - Hifz beta recite uses one mic loop and pure pass/start/silence rules; final results/override drive engine writes while AI feedback preserves self-marks. Multi-surah ranges share capture, models cache locally and sessions stop on exit.
 - Daily editor uses encrypted, server-verified sessions; dated snapshots override only their UTC day with rotation fallback. Browsing reuses Quran/hadith clients with cancellable updates, preserving widget contracts.
 - Hifz qari playback uses cancellable generation tokens and settled segment waits; stage changes invalidate playback before mic startup so repeat loops cannot restart audio after a stop.
-- Hifz AI notices live in a browser-independent module so Settings attribution never imports the inference runtime; the free model is not part of paid entitlements.
+- Hifz AI notices are browser-independent; Settings never imports inference or paid entitlements. Opt-in beta debug records the existing mic stream locally, flushes before tracks stop, keeps one attempt in memory and explicitly exports audio/raw recognition as a ZIP without uploads.
 
 - Hifz home uses body-portaled shared dialogs above navigation and labels page selections from Quran index verse keys with source chapter names, preserving page-based engine writes while making passages recognizable.
 

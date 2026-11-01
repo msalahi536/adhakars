@@ -23,6 +23,8 @@ export interface ExtraSpeech {
 }
 
 export interface CheckResult {
+  heard?: string; // unmodified recognizer emissions, attached by the live session
+  conf?: number[]; // confidence per emitted character
   words: WordResult[];
   extras: ExtraSpeech[];
   reachedIndex: number; // how far into the reference the recitation has got

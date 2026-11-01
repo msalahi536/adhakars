@@ -3,6 +3,7 @@ import type { ListenSession, CheckResult } from "@/lib/hifz-ai";
 import { checkerDownloaded } from "@/lib/hifz-ai/assets";
 import { play as feedback } from "@/lib/hifzHaptics";
 import { mapAiWords, newMistakes } from "./ai-feedback";
+import { recordDebug, debugZip, shareDebug, type DebugCapture } from "./recitation-debug";
 
 export type AiRange = { sura: number; first: number; last: number };
 function friendlyError(error: unknown) {
@@ -17,6 +18,9 @@ export function useAiRecitation(page: number, enabled: boolean, keys: string[]) 
   const [stream, setStream] = useState<MediaStream | null>(null);
   const [result, setResult] = useState<CheckResult | null>(null);
   const [error, setError] = useState("");
+  const [debugAudio, setDebugAudio] = useState<Blob | null>(null);
+  const debugCapture = useRef<DebugCapture | null>(null);
+  const debugRanges = useRef<AiRange[]>([]);
   const session = useRef<ListenSession | null>(null);
   const cleanup = useRef<Promise<unknown>>(Promise.resolve());
   const generation = useRef(0);
@@ -26,9 +30,10 @@ export function useAiRecitation(page: number, enabled: boolean, keys: string[]) 
   const capture = useRef<MediaStream | null>(null);
   const wordKeys = useRef(keys); wordKeys.current = keys;
   useEffect(() => {
-    setPhase("idle"); setResult(null); setError(""); previous.current = {};
+    setPhase("idle"); setResult(null); setDebugAudio(null); setError(""); previous.current = {};
     return () => {
       generation.current++;
+      debugCapture.current?.discard(); debugCapture.current = null;
       capture.current?.getTracks().forEach((t) => t.stop()); capture.current = null;
       const current = session.current; session.current = null;
       current?.stream.getTracks().forEach((t) => t.stop());
@@ -45,6 +50,8 @@ export function useAiRecitation(page: number, enabled: boolean, keys: string[]) 
     if (starting.current || session.current) return;
     starting.current = true;
     const id = generation.current;
+    debugCapture.current?.discard(); debugCapture.current = null;
+    setDebugAudio(null); debugRanges.current = ranges;
     setPhase("loading"); setError(""); setProgress(0); setResult(null); previous.current = {};
     try {
       // Ask from the user's start/consent gesture, before model preparation.
@@ -58,14 +65,16 @@ export function useAiRecitation(page: number, enabled: boolean, keys: string[]) 
       if (id !== generation.current) return;
       const range = ranges[0];
       if (!range) throw new Error("No passage selected");
+      debugCapture.current = recordDebug(mic);
       const current = await ai.startListening({ ...range, passages: ranges, stream: mic,
         onProgress: setProgress,
         onUpdate: (value) => { if (id === generation.current) receive(value); },
-        onError: (error) => { if (id === generation.current) { capture.current?.getTracks().forEach((t) => t.stop()); capture.current = null; session.current = null; setStream(null); setError(friendlyError(error)); setPhase("error"); } },
+        onError: (error) => { if (id === generation.current) { debugCapture.current?.discard(); debugCapture.current = null; capture.current?.getTracks().forEach((t) => t.stop()); capture.current = null; session.current = null; setStream(null); setError(friendlyError(error)); setPhase("error"); } },
       });
       if (id !== generation.current) { await current.stop(); return; }
       session.current = current; setStream(current.stream); setPhase("listening"); feedback("micStart");
     } catch (error) {
+      debugCapture.current?.discard(); debugCapture.current = null;
       if (id === generation.current) { capture.current?.getTracks().forEach((t) => t.stop()); capture.current = null; }
       if (id === generation.current) { setError(friendlyError(error)); setPhase("error"); }
     } finally { starting.current = false; }
@@ -82,20 +91,26 @@ export function useAiRecitation(page: number, enabled: boolean, keys: string[]) 
     const id = generation.current;
     session.current = null; setPhase("stopping"); setStream(null); feedback("micStop");
     try {
+      const recording = debugCapture.current; debugCapture.current = null;
+      // MediaRecorder must flush before the checker closes the shared tracks.
+      const recorded = recording ? await recording.finish().catch(() => null) : null;
       const finalizing = current.stop();
       cleanup.current = finalizing.catch(() => undefined);
       const final = await finalizing;
       capture.current = null;
-      if (id === generation.current) { receive(final); setPhase("finished"); }
+      if (id === generation.current) { setDebugAudio(recorded?.size ? recorded : null); receive(final); setPhase("finished"); }
     } catch (error) {
       if (id === generation.current) { setError(friendlyError(error)); setPhase("error"); }
     }
   }
   return { phase, progress, stream, result, error, request, stop,
-    reset: () => { setResult(null); setPhase("idle"); previous.current = {}; },
+    hasDebug: !!debugAudio && !!result,
+    shareDebug: async () => { if (debugAudio && result) await shareDebug(await debugZip(debugAudio, debugRanges.current, result, navigator.userAgent)); },
+    reset: () => { setDebugAudio(null); setResult(null); setPhase("idle"); previous.current = {}; },
     confirm: () => pendingRange.current ? begin(pendingRange.current) : Promise.resolve(),
     cancel: () => {
       generation.current++;
+      debugCapture.current?.discard(); debugCapture.current = null; setDebugAudio(null);
       capture.current?.getTracks().forEach((t) => t.stop()); capture.current = null;
       const current = session.current; session.current = null;
       if (current) cleanup.current = current.stop().catch(() => undefined);
