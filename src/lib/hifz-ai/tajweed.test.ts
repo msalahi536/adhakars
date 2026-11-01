@@ -1,0 +1,11 @@
+import { expect, test } from "bun:test";
+import { tajweedHints } from "./tajweed";
+import { masteryScore, findHesitations } from "./fluency";
+import { cleanRecitation } from "@/components/recite/ai-performance";
+import { DEFAULT_SETTINGS } from "@/lib/recite/model";
+import type { CheckResult } from "./checker";
+const result: CheckResult = { words: ["قُلْ", "حَقٌّ", "جَدْ", "قُلْ"].map((text, i) => ({ key: `112:1:${i + 1}`, text, status: "unsure", expected: "x", heard: "y" })), extras: [], reachedIndex: 3, startIndex: 0, startKey: "112:1:1" };
+test("Tajweed hints are capped at three", () => expect(tajweedHints(result, [{ sura: 112, first: 1, last: 1 }])).toHaveLength(3));
+test("Tajweed tips default on", () => expect(DEFAULT_SETTINGS.tajweedTips).toBe(true));
+test("Hints never change score or clean-pass eligibility", () => { const before = structuredClone(result); const m = masteryScore(result, findHesitations(result)); tajweedHints(result, [{ sura: 112, first: 1, last: 1 }]); expect(result).toEqual(before); expect(masteryScore(result, findHesitations(result))).toEqual(m); expect(cleanRecitation(result, result.words.map((w) => w.key))).toBe(true); });
+test("Memory mistakes never generate pronunciation tips", () => expect(tajweedHints({ ...result, words: result.words.map((w) => ({ ...w, status: "wrong" })) }, [{ sura: 112, first: 1, last: 1 }])).toEqual([]));
