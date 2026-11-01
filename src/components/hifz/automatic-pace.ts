@@ -1,4 +1,4 @@
-import { buildTimeline, type HifzPlan, type QuranIndex, type Timeline } from "@/lib/hifz";
+import { buildTimeline, daysBetween, type HifzPlan, type QuranIndex, type Timeline } from "@/lib/hifz";
 
 export const AUTOMATIC_LINES = [3, 5, 7, 10, 15, 20, 30, 45];
 export const DAILY_MINUTES = [20, 30, 45, 60, 90, 120, 180];
@@ -16,4 +16,15 @@ export function effectiveTimeline(timeline: Timeline) {
 export function bestAutomaticPace(plan: HifzPlan, q: QuranIndex, minutes: number) {
   return AUTOMATIC_LINES.map((lines) => effectiveTimeline(buildTimeline({ ...plan, newLinesPerDay: lines }, q, minutes)))
     .sort((a, b) => a.finish.localeCompare(b.finish) || a.lines - b.lines)[0];
+}
+
+export function selectedFinishEstimate(timeline: Timeline, startDate: string, targetDate?: string) {
+  const effective = effectiveTimeline(timeline);
+  if (!targetDate) return { ...effective, timeWarning: undefined };
+  return {
+    ...effective,
+    finish: targetDate,
+    days: daysBetween(startDate, targetDate) + 1,
+    timeWarning: effective.finish > targetDate ? timeline.shortOnTime?.message : undefined,
+  };
 }
