@@ -101,9 +101,9 @@ function Recite() {
   }, []);
   useEffect(() => { if (hydrated) saveRecite(saved); }, [saved, hydrated]);
   useEffect(() => {
-    configureHifzFeedback({ haptics: saved.settings.haptics, sounds: saved.settings.sounds });
+    configureHifzFeedback({ haptics: saved.settings.haptics, sounds: false });
     return cancelHifzFeedback;
-  }, [saved.settings.haptics, saved.settings.sounds]);
+  }, [saved.settings.haptics]);
   useEffect(() => {
     const pulse = () => {
       const strip = stripElement.current;
