@@ -29,11 +29,14 @@
 .rc-supplied .rc-word { padding: 0; }
 .rc-supplied .rc-word-ink { padding: 0; opacity: 1; color: var(--m-ink); }
 .rc-supplied .rc-bismillah { font-size: 19px; }
-.rc-supplied .rc-qcf-tj-nasal { color: var(--tj-nasal); }
-.rc-supplied .rc-qcf-tj-madd { color: var(--tj-madd); }
-.rc-supplied .rc-qcf-tj-qalqalah { color: var(--tj-qalqalah); }
-.rc-supplied .rc-qcf-tj-heavy { color: var(--tj-heavy); }
-.rc-supplied .rc-qcf-tj-silent { color: var(--tj-silent); }
+.rc-supplied .rc-word-ink[class*="rc-qcf-tj-"]:not(.rc-qcf-tj-none) { text-decoration: underline; text-decoration-color: var(--rc-word-tajweed); text-decoration-thickness: 2px; text-underline-offset: 5px; }
+.rc-supplied .rc-qcf-tj-necessary { --rc-word-tajweed: var(--tj-necessary); }
+.rc-supplied .rc-qcf-tj-obligatory { --rc-word-tajweed: var(--tj-obligatory); }
+.rc-supplied .rc-qcf-tj-permissible { --rc-word-tajweed: var(--tj-permissible); }
+.rc-supplied .rc-qcf-tj-normal { --rc-word-tajweed: var(--tj-normal); }
+.rc-supplied .rc-qcf-tj-ghunnah { --rc-word-tajweed: var(--tj-ghunnah); }
+.rc-supplied .rc-qcf-tj-qalqalah { --rc-word-tajweed: var(--tj-qalqalah); }
+.rc-supplied .rc-qcf-tj-silent { --rc-word-tajweed: var(--tj-silent); }
 .rc-supplied .rc-cartouche { display: grid; align-items: center; min-height: 0; }
 .rc-supplied .rc-cartouche > div { max-height: 100%; }
 .rc-supplied .rc-page-badge { position: absolute; bottom: -9px; left: 50%; transform: translateX(-50%); }
@@ -45,6 +48,7 @@
 .rc-supplied.rc-night .rc-paper { filter: brightness(.78); }
 .rc-supplied .rc-dock { bottom: calc(env(safe-area-inset-bottom, 0px) + 30px); padding: 0 18px; }
 .rc-supplied .rc-strip-wrap { width: 100%; }
+.rc-supplied .rc-strip-wrap > button { display: block; }
 .rc-supplied .rc-nav-wrap { position: absolute; bottom: calc(env(safe-area-inset-bottom, 0px) + 8px); width: 100%; z-index: 5; height: var(--bottom-nav-row); overflow: visible; transform: translateY(18px); transition: opacity 280ms ease, transform 420ms cubic-bezier(.22, 1, .36, 1); }
 .rc-supplied.rc-controls-visible .rc-nav-wrap { height: var(--bottom-nav-row); transform: translateY(0); }
 .rc-supplied .bottom-nav { margin: 0 auto; width: calc(100% - 56px); color: var(--m-ink); background: transparent; }
