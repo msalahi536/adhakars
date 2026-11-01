@@ -28,13 +28,14 @@
 .hz-picker-open { transform: rotate(90deg); }
 .hz-choice-divider { display: flex; align-items: center; gap: 16px; margin: 18px 0; color: var(--foreground); font-size: 12px; text-transform: uppercase; }
 .hz-choice-divider::before, .hz-choice-divider::after { content: ""; height: 1px; flex: 1; background: color-mix(in oklab, var(--foreground) 25%, transparent); }
-.hz-known-step .hz-fresh-choice { display: flex; width: 100%; height: auto; min-height: 72px; gap: 10px; margin: 0; padding: 12px 14px; text-align: left; white-space: normal; background: color-mix(in oklab, var(--surface-card, var(--card)) 76%, transparent); backdrop-filter: blur(16px); color: var(--card-foreground); border: 1px solid color-mix(in oklab, var(--surface) 90%, transparent); box-shadow: var(--card-shadow), 0 3px 5px color-mix(in oklab, var(--card-foreground) 6%, transparent), inset 0 1px 0 var(--surface); border-radius: 18px; }
-.hz-fresh-icon { display: grid; place-items: center; width: 40px; height: 40px; flex: none; color: var(--accent); border-radius: 50%; background: color-mix(in oklab, var(--accent) 8%, transparent); }
+.hz-known-step .hz-fresh-choice { display: flex; width: calc(100% - 8px); height: auto; min-height: 60px; gap: 10px; margin: 0 4px; padding: 9px 12px; text-align: left; white-space: normal; background: color-mix(in oklab, var(--background) 28%, transparent); backdrop-filter: blur(6px); color: var(--card-foreground); border: 1px solid color-mix(in oklab, var(--surface) 64%, transparent); box-shadow: 0 3px 8px color-mix(in oklab, var(--card-foreground) 5%, transparent); border-radius: 16px; }
+.hz-known-step .hz-fresh-choice:hover, .hz-known-step .hz-fresh-choice:active { background: color-mix(in oklab, var(--background) 38%, transparent); color: var(--card-foreground); }
+.hz-fresh-icon { display: grid; place-items: center; width: 34px; height: 34px; flex: none; color: var(--accent); border-radius: 50%; background: color-mix(in oklab, var(--background) 20%, transparent); }
 .hz-known-step .hz-fresh-icon svg { width: 23px; height: 23px; }
 .hz-fresh-copy { flex: 1; min-width: 0; }
 .hz-fresh-copy strong { display: block; font-size: 14px; font-weight: 600; line-height: 1.4; }
 .hz-fresh-copy small { display: block; margin-top: 4px; font-size: 12px; font-weight: 400; color: var(--card-foreground); opacity: .8; }
-.hz-fresh-check { flex: none; }
+.hz-fresh-check { flex: none; opacity: .5; }
 .hz-known-step .hz-nav { margin-top: 24px; }
 .hz-known-step .hz-primary { height: 44px; min-width: 108px; font-size: 16px; background: var(--accent); color: var(--accent-foreground); border: 1px solid color-mix(in oklab, var(--accent-foreground) 22%, var(--accent)); box-shadow: var(--card-shadow), inset 0 1px 0 color-mix(in oklab, var(--accent-foreground) 25%, transparent); }
 @media (prefers-reduced-motion: reduce) { .hz-known-step .hz-juz-tile { transition: none; } }
