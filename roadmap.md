@@ -1,5 +1,7 @@
 # Roadmap
 
+- [ ] Hifz haptic-first feedback, saved Haptics/Sounds settings, local sound files and visual fallback; test timing, arbitration, cancellation and page integration.
+
 - [x] Hifz measured layout: 22px page-number clearance and equal inner padding; stationary overlays hide strip while controls show, verified on phone.
 - [x] Title sheet page/surah/juz navigation; Arabic/reversed drag swipes, adjacent data/font caching, boundary resistance and saved reveal-state restoration verified; 26 targeted tests pass.
 
