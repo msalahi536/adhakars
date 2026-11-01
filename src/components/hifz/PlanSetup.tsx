@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
-import { ChevronLeft, ChevronRight, Check, BookOpen, Sprout, Circle, Search } from "lucide-react";
+import { ChevronLeft, ChevronRight, Check, BookOpen, Sprout, Circle, Search, Layers, List } from "lucide-react";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { searchChapters } from "@/lib/quran";
 import {
@@ -74,14 +74,14 @@ export function PlanSetup({ existing, done }: { existing?: HifzPlan; done: () =>
   }
 
   return (
-    <main className={`scroll-area hz-setup ${step === 0 ? "hz-known-step" : ""}`}>
+    <main className={`scroll-area hz-setup ${step === 0 ? "hz-known-step" : step === 1 ? "hz-order-step" : ""}`}>
       <div className="mx-auto max-w-md px-5 py-4">
         <div className="hz-steps" aria-label={`Step ${step + 1} of ${steps.length}: ${steps[step]}`}>
           {steps.map((label, i) => (
             <span key={label} className={`hz-step-dot ${i === step ? "is-on" : i < step ? "is-done" : ""}`} />
           ))}
         </div>
-        {step > 0 && <p className="label-caps hz-step-label">{steps[step]}</p>}
+        {step > 1 && <p className="label-caps hz-step-label">{steps[step]}</p>}
 
         {step === 0 && (
           <section className="hz-known-content">
@@ -156,19 +156,22 @@ export function PlanSetup({ existing, done }: { existing?: HifzPlan; done: () =>
 
         {step === 1 && (
           <section>
-            <h1 className="hz-title">Where do you want to start?</h1>
+            <header className="hz-known-heading"><h1 className="hz-title">Where do you want to start?</h1></header>
             <div className="hz-cards">
               <Button variant="ghost" aria-pressed={plan.order.kind === "juzAmmaFirst"} className={`hz-card ${plan.order.kind === "juzAmmaFirst" ? "is-on" : ""}`} onClick={() => setOrder({ kind: "juzAmmaFirst" })}>
-                <strong>Juz Amma first</strong>
-                <span>The short surahs first, the way most students begin.</span>
+                <span className="hz-order-icon"><BookOpen /></span>
+                <span className="hz-order-copy"><strong>Juz Amma first</strong><span>The short surahs first, the way most students begin.</span></span>
+                <span className="hz-order-check">{plan.order.kind === "juzAmmaFirst" && <Check />}</span>
               </Button>
               <Button variant="ghost" aria-pressed={plan.order.kind === "forward"} className={`hz-card ${plan.order.kind === "forward" ? "is-on" : ""}`} onClick={() => setOrder({ kind: "forward", fromPage: 2 })}>
-                <strong>From Al-Baqarah</strong>
-                <span>From the front of the mushaf to the end.</span>
+                <span className="hz-order-icon"><Layers /></span>
+                <span className="hz-order-copy"><strong>From Al-Baqarah</strong><span>From the front of the mushaf to the end.</span></span>
+                <span className="hz-order-check">{plan.order.kind === "forward" && <Check />}</span>
               </Button>
               <Button variant="ghost" aria-pressed={plan.order.kind === "surahs"} className={`hz-card ${plan.order.kind === "surahs" ? "is-on" : ""}`} onClick={() => setOrder({ kind: "surahs", surahs: orderSurahs })}>
-                <strong>Choose surahs</strong>
-                <span>Your own list, in your own order.</span>
+                <span className="hz-order-icon"><List /></span>
+                <span className="hz-order-copy"><strong>Choose surahs</strong><span>Your own list, in your own order.</span></span>
+                <span className="hz-order-check">{plan.order.kind === "surahs" && <Check />}</span>
               </Button>
             </div>
             {plan.order.kind === "surahs" && (

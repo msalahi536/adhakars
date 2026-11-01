@@ -89,6 +89,25 @@ main.hz-setup > div { padding-top: calc(env(safe-area-inset-top, 0px) + 76px); }
 .hz-card span { font-size: 12px; color: var(--muted-foreground); }
 .hz-card.is-on { border-color: var(--accent); box-shadow: 0 0 0 1.5px var(--accent); }
 .hz-card .hz-finish { color: var(--accent); font-weight: 700; }
+.hz-order-step { padding-bottom: calc(var(--bottom-nav-height, 90px) + env(safe-area-inset-bottom) + 20px); }
+.hz-order-step > div { padding-left: 16px; padding-right: 16px; }
+.hz-order-step .hz-steps { padding: 8px 0 0; margin-bottom: 20px; }
+.hz-order-step .hz-known-heading { padding: 20px 10px; margin-bottom: 24px; }
+.hz-order-step .hz-title { text-align: center; font-family: var(--font-display); font-size: 24px; line-height: 1.25; margin: 0; color: var(--card-foreground); font-weight: 700; }
+.hz-order-step .hz-cards { gap: 12px; }
+.hz-order-step .hz-card { display: flex; flex-direction: row; align-items: center; gap: 12px; min-height: 88px; padding: 14px 14px; border-radius: 25px; border: 1.5px solid color-mix(in oklab, var(--surface) 90%, transparent); background: color-mix(in oklab, var(--surface-card, var(--card)) 73%, transparent); backdrop-filter: blur(16px) saturate(115%); box-shadow: 0 5px 12px color-mix(in oklab, var(--foreground) 9%, transparent), inset 0 1px 0 var(--surface); transition: background .2s ease, border-color .2s ease, box-shadow .2s ease; }
+.hz-order-step .hz-card.is-on { background: color-mix(in oklab, var(--accent) 10%, color-mix(in oklab, var(--surface-card, var(--card)) 85%, transparent)); border-color: color-mix(in oklab, var(--accent) 44%, var(--surface)); box-shadow: 0 0 0 2px color-mix(in oklab, var(--accent) 12%, transparent), 0 5px 12px color-mix(in oklab, var(--foreground) 8%, transparent), inset 0 1px 0 var(--surface); }
+.hz-order-step .hz-order-icon { width: 44px; height: 44px; flex: none; display: grid; place-items: center; border-radius: 50%; background: color-mix(in oklab, var(--accent) 11%, transparent); color: var(--accent); }
+.hz-order-step .hz-order-icon svg { width: 25px; height: 25px; stroke-width: 1.7; }
+.hz-order-step .hz-order-copy { min-width: 0; flex: 1; display: flex; flex-direction: column; gap: 5px; }
+.hz-order-step .hz-order-copy strong { color: var(--card-foreground); font-size: 16px; line-height: 1.25; font-weight: 700; }
+.hz-order-step .hz-order-copy > span { color: var(--card-foreground); opacity: .72; font-size: 12px; line-height: 1.4; }
+.hz-order-step .hz-order-check { width: 20px; height: 20px; flex: none; display: grid; place-items: center; border-radius: 50%; border: 1.5px solid color-mix(in oklab, var(--accent) 48%, var(--surface)); }
+.hz-order-step .is-on .hz-order-check { background: var(--accent); border-color: var(--accent); color: var(--accent-foreground); }
+.hz-order-step .hz-order-check svg { width: 14px; height: 14px; }
+.hz-order-step .hz-nav { margin-top: 26px; padding: 0 4px; }
+.hz-order-step .hz-nav > button:first-child { height: 40px; padding: 0 17px; border-radius: 22px; background: color-mix(in oklab, var(--surface-card, var(--card)) 60%, transparent); border: 1px solid var(--surface); color: var(--foreground); backdrop-filter: blur(14px); box-shadow: 0 3px 7px color-mix(in oklab, var(--foreground) 9%, transparent); font-size: 14px; font-weight: 600; }
+.hz-order-step .hz-primary { min-width: 116px; font-size: 16px; }
 .hz-time { flex-direction: row; justify-content: center; }
 .hz-time strong { font-size: 16px; }
 .hz-warning { font-size: 12px; color: var(--destructive, #b4453a); margin-top: 6px; }
