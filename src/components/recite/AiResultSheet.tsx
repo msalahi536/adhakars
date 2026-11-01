@@ -4,12 +4,15 @@ import { Button } from "@/components/ui/button";
 import { getVerseByKey, type Chapter, type VerseHit } from "@/lib/quran";
 import { diffAyat } from "@/lib/hifz-ai/mutashabih";
 import type { Attempt } from "./ai-performance";
+import { ReplayButton, useRecitationReplay } from "./RecitationReplay";
 
-export function AiResultSheet({ attempt, passes, lesson, chapters, again, next, wordAudio, ayahAudio, close }: {
+export function AiResultSheet({ attempt, passes, lesson, chapters, again, next, wordAudio, ayahAudio, close, recording = null, highlight = () => undefined }: {
   attempt: Attempt; passes: number; lesson: boolean; chapters: Chapter[];
   again: () => void; next: () => void; wordAudio: (key: string) => void;
   ayahAudio: (key: string) => void; close: () => void;
+  recording?: Blob | null; highlight?: (key: string | null) => void;
 }) {
+  const replay = useRecitationReplay(recording, attempt.result, highlight);
   const [compare, setCompare] = useState(false);
   const [ayat, setAyat] = useState<VerseHit[] | null>(null);
   const [error, setError] = useState(false);
@@ -38,8 +41,10 @@ export function AiResultSheet({ attempt, passes, lesson, chapters, again, next, 
     <header><div className="rc-score" role="img" aria-label={`Mastery score ${attempt.m.score} out of 100`}><svg viewBox="0 0 44 44" aria-hidden="true"><circle className="rc-score-track" cx="22" cy="22" r="19" /><circle className="rc-score-value" cx="22" cy="22" r="19" pathLength="100" strokeDasharray={`${attempt.m.score} 100`} /></svg><span>{attempt.m.score}</span></div><h2>{attempt.m.label}</h2><Button variant="ghost" size="icon" aria-label="Close result" onClick={close}><X /></Button></header>
     {drift && <Button variant="outline" className="rc-drift-card" onClick={() => setCompare(true)}>You switched to {name(destination)}, a similar ayah<ArrowRight size={16} /></Button>}
     {lesson && <div className="rc-pass-dots" aria-label={`${passes} of 3 clean recitations`}>{[1, 2, 3].map((n) => <span key={n} className={passes >= n ? "is-filled" : ""} />)}</div>}
+    <ReplayButton available={!!recording} playing={replay.playing} play={() => void replay.play()} stop={replay.stop} />
+    {replay.error && <p role="alert">{replay.error}</p>}
     <div className="rc-result-evidence">
-      {mistakes.map((w) => <div className="rc-result-word" key={w.key}><span><small>{name(w.key)} · {w.status === "skipped" ? "Skipped" : "Mistake"}</small><span className="rc-arabic" dir="rtl">{w.text}</span></span><Button variant="ghost" size="icon" aria-label={`Hear correct word ${w.key}`} title="Hear correct word" onClick={() => wordAudio(w.key)}><Play /></Button></div>)}
+      {mistakes.map((w) => <div className="rc-result-word" key={w.key}><span><small>{name(w.key)} · {w.status === "skipped" ? "Skipped" : "Mistake"}</small><span className="rc-arabic" dir="rtl">{w.text}</span></span><div className="hx-word-actions"><Button variant="ghost" size="sm" aria-label={`Hear correct word ${w.key}`} onClick={() => { replay.stop(); wordAudio(w.key); }}><Play size={13} />Correct</Button><Button variant="ghost" size="sm" disabled={!recording} onClick={() => void replay.play(w.key)}><Play size={13} />You</Button></div></div>)}
       {attempt.hes.map((h) => <p className="rc-hesitation-note" key={h.key}>{h.kind === "transition" ? `Slow start of ayah ${h.key.split(":")[1]}` : h.kind === "restart" ? `Restarted before ﴿${attempt.result.words.find((w) => w.key === h.key)?.text ?? ""}﴾` : `Paused ${h.seconds}s before ﴿${attempt.result.words.find((w) => w.key === h.key)?.text ?? ""}﴾`}</p>)}
       {attempt.driftError && <p role="status">{attempt.driftError}</p>}
     </div>
