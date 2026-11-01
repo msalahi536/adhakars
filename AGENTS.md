@@ -39,14 +39,8 @@
 - Read subdirectory AGENTS.md files before editing there.
 - App AI uses the owner's GEMINI_API_KEY via `src/lib/gemini.server.ts`, by request.
 
-- Hifz stores only an append-only review log (UUID events) locally; ayah/page state is always re-derived by replaying the merged log through pure `scheduler.ts` rules, and optional cloud backup unions logs by UUID, so devices never conflict and no account is required.
 - Open-source notices live only in `src/data/licenses.ts`.
-- Hifz chain (joined-chunk) reviews are logged as their own event kind that replay ignores for intervals, so joining never double-grades an ayah.
-- Hifz onboarding seeds only via "placement"/"seed" log events (pure rules in `src/lib/hifz/placement.ts`, static per-ayah Madani layout in `src/data/hifz-layout.json`), so sync replay rebuilds placement like any review.
-- Hifz daily session rules (queue, backlog guard, drills, Salah logs, forecast) live only in pure `src/lib/hifz/session.ts`; the Today screen freezes its queue per local day so sessions pause and resume while every grade is logged immediately.
-- Hifz sabaq completes only when every ayah of today's frozen sabaq is in the replayed log (graded at L4); the catch-up cap and heatmap states are pure rules in `session.ts`/`progress.ts`, so UI never decides scheduling.
-- The Hifz daily reminder is a fixed entry in the shared reminder list (`src/lib/notifications.ts`), with only its content built in `src/lib/hifz/reminder.ts`, so one permission flow and one schedule cover every reminder.
 - Every local-notification scheduler plans only a few days ahead, and `src/lib/notification-budget.ts` trims the furthest-away pending notifications (never prayer alerts) so iOS's 64-pending limit is never hit.
-- Hifz reviews before their due date grow intervals only from the days actually elapsed, so repeated practice can't inflate a schedule.
 - Tajweed coloring parses Quran.com word tajweed markup through pure `src/lib/tajweed-rules.ts` (never raw HTML) and appears only where full text is meant to be read.
-- Arabic Companion is a lesson engine: content in `src/lib/arabic/content.ts`, pure unlock/review/error rules in `engine.ts` replaying an append-only local log with the Hifz interval rules; letter audio is recorded files only, never text-to-speech.
+- Arabic Companion is a lesson engine: content in `src/lib/arabic/content.ts`, pure unlock/review/error rules in `engine.ts` replaying an append-only local log with independent intervals in `review.ts`; letter audio is recorded files only, never text-to-speech.
+- Retired Hifz cleanup in the shared notification startup removes only `hifz:` storage keys and reserved Hifz alert IDs, so all other progress and schedules survive removal.

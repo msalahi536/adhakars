@@ -1,4 +1,4 @@
-// Pure tajweed markup rules (no browser imports), shared by the reader and Hifz views.
+// Pure tajweed markup rules for the Quran reader (no browser imports).
 /** Dar al-Ma'rifah color groups. Colors are CSS tokens in styles.css (--tj-*). */
 export const TAJWEED_GROUPS = [
   { id: "necessary", label: "Necessary prolongation", sub: "6 vowels" },

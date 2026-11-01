@@ -29,7 +29,6 @@ import {
   requestNotificationPermission,
   checkNotificationPermission,
   applyReminders,
-  HIFZ_REMINDER_ID,
   scheduleReminder,
   cancelReminder,
   isNativePlatform,
@@ -836,7 +835,7 @@ function Settings() {
                   )}
                   {notifPrefs.reminders.map((r, i) => {
                     const isSmart = r.id === 1 || r.id === 2;
-                    const isFixed = isSmart || r.id === HIFZ_REMINDER_ID;
+                    const isFixed = isSmart;
                     const followsPrayer = isSmart && !r.customTime && !!prayerSettings.location;
                     const prayerLabel = r.id === 1 ? "5 mins after Fajr" : "5 mins after Asr";
                     return (
@@ -928,11 +927,6 @@ function Settings() {
                                   {followsPrayer ? "Set custom time" : "Follow prayer times"}
                                 </button>
                               )}
-                            </div>
-                          )}
-                          {r.id === HIFZ_REMINDER_ID && (
-                            <div className="text-xs" style={{ color: "var(--muted-foreground)" }}>
-                              "Hifz: X reviews due today". Skipped once today's session is done.
                             </div>
                           )}
                         </div>

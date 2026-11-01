@@ -1,0 +1,1 @@
+COMMENT ON TABLE public.hifz_backups IS 'DEPRECATED: Hifz has been removed; this backup table is no longer read or written by the app.';

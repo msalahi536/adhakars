@@ -1,5 +1,4 @@
 import { favoritesFirst, toggleFavorite, useFavoriteReciters } from "@/lib/quran-favorites";
-import { HifzDueCard } from "@/components/hifz/HifzDueCard";
 import { Fragment, memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { markSurahComplete } from "@/lib/giveaway";
@@ -254,8 +253,6 @@ function Home() {
               </div>
             </section>
           )}
-
-          {!t && <HifzDueCard />}
 
           {lastChapter && !t && (
             <button className="quran-card quran-continue" onClick={() => { if (audioPct != null) void resume(); else open(lastChapter.id); }}>

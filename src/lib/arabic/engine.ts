@@ -1,6 +1,6 @@
 // Pure Arabic Companion rules: append-only answer/lesson log replayed into item review state,
-// lesson unlocks (mastery gate) and an error log. Intervals reuse the Hifz scheduler.
-import { addDays, localDay, reviewInterval, FIRST_INTERVAL, type Grade } from "@/lib/hifz/scheduler";
+// lesson unlocks (mastery gate) and an error log, using its own review rules.
+import { addDays, localDay, reviewInterval, FIRST_INTERVAL, type Grade } from "./review";
 import { ITEMS, LESSONS, type ExerciseType, type Item, type Lesson } from "./content";
 
 export type ArabicEvent = {

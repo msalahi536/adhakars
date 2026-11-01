@@ -50,7 +50,7 @@ export type DisplayPrefs = {
   quranWordHighlight: boolean;
   /** Quran full screen: turn mushaf pages instead of one continuous scroll. */
   quranFlipPages: boolean;
-  /** Tajweed colors in the Quran reader and Hifz full-text/check views; off by default. */
+  /** Tajweed colors in the Quran reader; off by default. */
   quranTajweed?: boolean;
 };
 const DISPLAY_KEY = "adhkar:display";
