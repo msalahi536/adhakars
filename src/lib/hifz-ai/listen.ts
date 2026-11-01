@@ -103,7 +103,7 @@ export async function startListening(opts: {
         heard += e.token;
         for (let k = 0; k < e.token.length; k++) conf.push(e.prob);
       }
-      last = check(reference, heard, false, conf);
+      last = { ...check(reference, heard, false, conf), heard, conf: [...conf] };
       opts.onUpdate(last);
     }).catch((error) => {
       failure = error;
@@ -129,7 +129,7 @@ export async function startListening(opts: {
         for (let k = 0; k < e.token.length; k++) conf.push(e.prob);
       }
       await ctx.close();
-      last = check(reference, heard, true, conf);
+      last = { ...check(reference, heard, true, conf), heard, conf: [...conf] };
       opts.onUpdate(last);
       return last;
       })().finally(() => { if (ctx.state !== "closed") void ctx.close().catch(() => undefined); });
