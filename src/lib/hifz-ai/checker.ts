@@ -5,6 +5,7 @@
  *
  * Answer key: /hifz-ai/ayat/NNN.json  ->  { "aya": [[wordNumber, writtenText, phonemes], ...] }
  */
+import { cachedAsset } from "./assets";
 
 export type WordStatus = "pending" | "in_progress" | "correct" | "wrong" | "skipped" | "unsure";
 
@@ -50,13 +51,15 @@ const surahCache = new Map<number, Promise<SurahKey>>();
 
 export function loadSurah(sura: number, base = "/hifz-ai/ayat"): Promise<SurahKey> {
   if (!surahCache.has(sura)) {
-    const p = fetch(`${base}/${String(sura).padStart(3, "0")}.json`).then((r) => {
+    const p = cachedAsset(`${base}/${String(sura).padStart(3, "0")}.json`).then((r) => {
       if (!r.ok) throw new Error(`answer key for surah ${sura} failed to load`);
       return r.json();
-    });
+    }).catch((error) => { surahCache.delete(sura); throw error; });
     surahCache.set(sura, p);
   }
-  return surahCache.get(sura)!;
+  const result = surahCache.get(sura);
+  if (!result) throw new Error("Answer key unavailable");
+  return result;
 }
 
 const DROP = new Set(["ڇ", "ۜ", " "]);
@@ -107,7 +110,7 @@ const SOFT_CLASSES = ["نں", "م۾", "ں۾", "سصث", "تطث", "دضظذز", 
 const SOFT = new Map<string, Set<string>>();
 for (const cls of SOFT_CLASSES) for (const c of cls) {
   if (!SOFT.has(c)) SOFT.set(c, new Set());
-  for (const d of cls) SOFT.get(c)!.add(d);
+  for (const d of cls) SOFT.get(c)?.add(d);
 }
 const same = (a: string, b: string) => a === b || (SOFT.get(a)?.has(b) ?? false);
 
