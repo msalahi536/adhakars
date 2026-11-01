@@ -138,30 +138,45 @@ export type Database = {
       }
       hifz_samples: {
         Row: {
+          consent_at: string | null
           consented_at: string
           created_at: string
+          file_path: string | null
+          first_ayah: number | null
           id: string
+          last_ayah: number | null
           note: string
           passages: Json
           path: string
+          sura: number | null
           user_id: string
         }
         Insert: {
+          consent_at?: string | null
           consented_at: string
           created_at?: string
+          file_path?: string | null
+          first_ayah?: number | null
           id?: string
+          last_ayah?: number | null
           note?: string
           passages: Json
           path: string
+          sura?: number | null
           user_id: string
         }
         Update: {
+          consent_at?: string | null
           consented_at?: string
           created_at?: string
+          file_path?: string | null
+          first_ayah?: number | null
           id?: string
+          last_ayah?: number | null
           note?: string
           passages?: Json
           path?: string
+          sura?: number | null
           user_id?: string
         }
         Relationships: []
