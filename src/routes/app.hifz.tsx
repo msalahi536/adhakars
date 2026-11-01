@@ -1,4 +1,4 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Outlet, useNavigate, useRouterState } from "@tanstack/react-router";
 import { Suspense, useEffect, useState } from "react";
 import { useHifzBeta } from "@/lib/hifz-beta";
 import { loadState, saveState, type HifzState } from "@/lib/hifz";
@@ -21,8 +21,11 @@ export const Route = createFileRoute("/app/hifz")({
 function HiddenHifz() {
   const { enabled, checked } = useHifzBeta();
   const navigate = useNavigate();
+  const onChild = useRouterState({ select: (s) => s.location.pathname !== "/app/hifz" });
   useEffect(() => { if (checked && !enabled) void navigate({ to: "/app/more", replace: true }); }, [checked, enabled, navigate]);
-  return enabled ? <Suspense fallback={null}><HifzEntry /></Suspense> : null;
+  if (!enabled) return null;
+  if (onChild) return <Outlet />;
+  return <Suspense fallback={null}><HifzEntry /></Suspense>;
 }
 
 function HifzEntry() {
