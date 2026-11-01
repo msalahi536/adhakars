@@ -12,7 +12,8 @@
 
 /* First setup step: reference-style frosted selection tray over app artwork. */
 .hz-known-step { padding-bottom: calc(var(--bottom-nav-height, 90px) + env(safe-area-inset-bottom) + 20px); color: var(--foreground); }
-.hz-known-step > div { padding: calc(env(safe-area-inset-top) + 22px) 16px 16px; }
+main.hz-setup > div { padding-top: calc(env(safe-area-inset-top, 0px) + 76px); }
+.hz-known-step > div { padding: calc(env(safe-area-inset-top, 0px) + 76px) 16px 16px; }
 .hz-known-step .hz-steps { padding: 8px 0 0; margin-bottom: 12px; }
 .hz-known-content { position: relative; isolation: isolate; }
 .hz-known-heading { padding: 16px 12px; margin: 0 0 22px; border-radius: 24px; background: color-mix(in oklab, var(--surface-card, var(--card)) 52%, transparent); backdrop-filter: blur(14px) saturate(115%); border: 1px solid color-mix(in oklab, var(--surface) 58%, transparent); box-shadow: inset 0 1px 0 color-mix(in oklab, var(--surface) 60%, transparent); }
@@ -49,6 +50,29 @@
 .hz-surah-pick { max-height: 260px; overflow-y: auto; display: flex; flex-wrap: wrap; gap: 6px; padding: 10px; border: 1px solid var(--border); border-radius: 16px; margin-bottom: 12px; background: var(--surface, var(--card)); }
 .hz-surah-chip { border: 1px solid var(--border); border-radius: 999px; padding: 4px 10px; font-size: 12px; height: auto; color: var(--foreground); }
 .hz-surah-chip.is-on { background: var(--accent); color: var(--accent-foreground, var(--card)); border-color: var(--accent); }
+
+.hz-surah-dialog.hz-setup { min-height: 0; display: flex; flex-direction: column; gap: 14px; width: calc(100% - 28px); max-width: 520px; height: min(84dvh, 840px); max-height: calc(100dvh - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px) - 32px); padding: 20px 16px; border-radius: 28px; border: 1px solid var(--border); background: color-mix(in oklab, var(--surface-card, var(--card)) 88%, transparent); color: var(--card-foreground); backdrop-filter: blur(26px) saturate(120%); -webkit-backdrop-filter: blur(26px) saturate(120%); box-shadow: var(--card-shadow); z-index: 220; }
+.hz-surah-dialog > button:last-child { display: none; }
+.hz-surah-dialog-header { display: grid; grid-template-columns: 38px 1fr 38px; align-items: center; gap: 8px; flex: none; }
+.hz-surah-dialog-header h2 { text-align: center; font-family: var(--font-display); font-size: 24px; line-height: 1.25; letter-spacing: 0; }
+.hz-surah-back { width: 38px; height: 38px; padding: 0; border-radius: 13px; border: 1px solid var(--border); background: color-mix(in oklab, var(--surface) 70%, transparent); color: var(--card-foreground); }
+.hz-surah-search { display: flex; align-items: center; gap: 10px; padding: 0 14px; height: 46px; flex: none; border-radius: 24px; border: 1px solid var(--border); background: color-mix(in oklab, var(--muted) 45%, transparent); color: var(--foreground); }
+.hz-surah-search svg { width: 20px; height: 20px; flex: none; }
+.hz-surah-search input { min-width: 0; width: 100%; background: transparent; outline: none; color: var(--card-foreground); font-size: 15px; }
+.hz-surah-search input::placeholder { color: var(--text-muted, var(--muted-foreground)); }
+.hz-surah-search:focus-within { outline: 2px solid var(--accent); outline-offset: 2px; }
+.hz-surah-dialog-list { overflow-y: auto; overscroll-behavior: contain; min-height: 0; flex: 1; display: flex; flex-direction: column; gap: 6px; padding: 2px 3px 2px 0; scrollbar-width: thin; scrollbar-color: var(--muted-foreground) transparent; }
+.hz-surah-row { width: 100%; height: auto; min-height: 48px; flex: none; display: flex; gap: 10px; padding: 9px 11px; border-radius: 14px; border: 1px solid var(--border); background: color-mix(in oklab, var(--surface) 64%, transparent); color: var(--card-foreground); text-align: left; white-space: normal; }
+.hz-surah-row:hover, .hz-surah-row.is-on { background: color-mix(in oklab, var(--accent) 12%, var(--surface-card, var(--card))); color: var(--card-foreground); }
+.hz-surah-row.is-on { border-color: var(--accent); }
+.hz-surah-checkbox { width: 18px; height: 18px; flex: none; display: grid; place-items: center; border: 1.5px solid var(--accent); border-radius: 5px; color: var(--accent-foreground); }
+.hz-surah-row.is-on .hz-surah-checkbox { background: var(--accent); }
+.hz-surah-checkbox svg { width: 13px; height: 13px; }
+.hz-surah-english { flex: 1; min-width: 0; font-size: 14px; font-weight: 600; }
+.hz-surah-arabic { max-width: 33%; font-size: 18px; font-family: var(--font-arabic); font-weight: 400; }
+.hz-surah-chevron { width: 15px; height: 15px; flex: none; color: var(--foreground); }
+.hz-surah-dialog-footer { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex: none; padding: 12px 14px; border-radius: 20px; border: 1px solid var(--border); background: color-mix(in oklab, var(--surface) 55%, transparent); font-size: 14px; }
+.hz-surah-empty { text-align: center; padding: 24px 0; color: var(--card-foreground); }
 
 .hz-cards { display: flex; flex-direction: column; gap: 10px; }
 .hz-card { display: flex; flex-direction: column; align-items: flex-start; gap: 3px; text-align: left; height: auto; padding: 14px 16px; border-radius: 18px; border: 1px solid var(--border); background: var(--surface, var(--card)); color: var(--foreground); white-space: normal; }

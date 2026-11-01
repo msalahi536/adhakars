@@ -1,7 +1,9 @@
 import { useMemo, useState } from "react";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
-import { ChevronLeft, ChevronRight, Check, BookOpen, Sprout, Circle } from "lucide-react";
+import { ChevronLeft, ChevronRight, Check, BookOpen, Sprout, Circle, Search } from "lucide-react";
+import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
+import { searchChapters } from "@/lib/quran";
 import {
   buildTimeline,
   compareTimelines,
@@ -30,6 +32,7 @@ export function PlanSetup({ existing, done }: { existing?: HifzPlan; done: () =>
   const [step, setStep] = useState(0);
   const [plan, setPlan] = useState<HifzPlan>(() => existing ?? defaultPlan(today));
   const [pickSurahs, setPickSurahs] = useState(false);
+  const [surahSearch, setSurahSearch] = useState("");
   const [startingFresh, setStartingFresh] = useState(false);
   const [chosenJuz, setChosenJuz] = useState<number[]>(() => {
     if (!existing) return [];
@@ -100,26 +103,39 @@ export function PlanSetup({ existing, done }: { existing?: HifzPlan; done: () =>
                 </Button>
               ))}
             </div>
-            <Button variant="outline" className="hz-wide hz-pick-surahs" onClick={() => setPickSurahs((v) => !v)} aria-expanded={pickSurahs}>
+            <Button variant="outline" className="hz-wide hz-pick-surahs" onClick={() => { setSurahSearch(""); setPickSurahs(true); }} aria-haspopup="dialog">
               <BookOpen />
               Pick surahs instead
               <ChevronRight className={pickSurahs ? "hz-picker-open" : ""} />
             </Button>
-            {pickSurahs && (
-              <div className="hz-surah-pick">
-                {chapters.map((c) => (
+            <Dialog open={pickSurahs} onOpenChange={setPickSurahs}>
+              <DialogContent className="hz-surah-dialog hz-setup" aria-describedby={undefined} onOpenAutoFocus={(event) => event.preventDefault()}>
+                <header className="hz-surah-dialog-header">
+                  <Button variant="ghost" className="hz-surah-back" aria-label="Back to setup" onClick={() => setPickSurahs(false)}><ChevronLeft /></Button>
+                  <DialogTitle>Choose Surahs</DialogTitle>
+                </header>
+                <label className="hz-surah-search"><Search /><input aria-label="Search surahs" placeholder="Search surahs…" value={surahSearch} onChange={(e) => setSurahSearch(e.target.value)} /></label>
+                <div className="hz-surah-dialog-list">
+                {searchChapters(chapters, surahSearch).map((c) => (
                   <Button
                     variant="ghost"
                     key={c.id}
                     aria-pressed={chosenSurahs.includes(c.id)}
-                    className={`hz-surah-chip ${chosenSurahs.includes(c.id) ? "is-on" : ""}`}
+                    aria-label={`${c.id}. ${c.name_simple}`}
+                    className={`hz-surah-row ${chosenSurahs.includes(c.id) ? "is-on" : ""}`}
                     onClick={() => { setStartingFresh(false); setChosenSurahs((list) => toggleIn(list, c.id)); }}
                   >
-                    {c.id}. {c.name_simple}
+                    <span className="hz-surah-checkbox">{chosenSurahs.includes(c.id) && <Check />}</span>
+                    <span className="hz-surah-english">{c.id}. {c.name_simple}</span>
+                    <span className="hz-surah-arabic" lang="ar" dir="rtl">{c.name_arabic}</span>
+                    <ChevronRight className="hz-surah-chevron" />
                   </Button>
                 ))}
-              </div>
-            )}
+                {searchChapters(chapters, surahSearch).length === 0 && <p className="hz-surah-empty">No surahs found</p>}
+                </div>
+                <footer className="hz-surah-dialog-footer"><span>{chosenSurahs.length} selected</span><Button className="hz-primary" onClick={() => setPickSurahs(false)}>Done</Button></footer>
+              </DialogContent>
+            </Dialog>
             <div className="hz-choice-divider"><span>or</span></div>
             <Button variant="ghost" className="hz-wide hz-fresh-choice" aria-pressed={startingFresh} onClick={() => { setChosenJuz([]); setChosenSurahs([]); setStartingFresh((value) => !value); }}>
               <span className="hz-fresh-icon"><Sprout /></span>
