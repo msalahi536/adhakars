@@ -5,7 +5,6 @@
  *
  * Answer key: /hifz-ai/ayat/NNN.json  ->  { "aya": [[wordNumber, writtenText, phonemes], ...] }
  */
-import { cachedAsset } from "./assets";
 
 export type WordStatus = "pending" | "in_progress" | "correct" | "wrong" | "skipped" | "unsure";
 
@@ -27,6 +26,8 @@ export interface CheckResult {
   words: WordResult[];
   extras: ExtraSpeech[];
   reachedIndex: number; // how far into the reference the recitation has got
+  startIndex: number; // where the recitation began (an ayah start); words before it stay "pending"
+  startKey: string; // key of the first word the reciter started from
 }
 
 interface RefWord {
@@ -49,15 +50,13 @@ const surahCache = new Map<number, Promise<SurahKey>>();
 
 export function loadSurah(sura: number, base = "/hifz-ai/ayat"): Promise<SurahKey> {
   if (!surahCache.has(sura)) {
-    const p = cachedAsset(`${base}/${String(sura).padStart(3, "0")}.json`).then((r) => {
+    const p = fetch(`${base}/${String(sura).padStart(3, "0")}.json`).then((r) => {
       if (!r.ok) throw new Error(`answer key for surah ${sura} failed to load`);
       return r.json();
-    }).catch((error) => { surahCache.delete(sura); throw error; });
+    });
     surahCache.set(sura, p);
   }
-  const result = surahCache.get(sura);
-  if (!result) throw new Error("Answer key unavailable");
-  return result;
+  return surahCache.get(sura)!;
 }
 
 const DROP = new Set(["ڇ", "ۜ", " "]);
@@ -108,7 +107,7 @@ const SOFT_CLASSES = ["نں", "م۾", "ں۾", "سصث", "تطث", "دضظذز", 
 const SOFT = new Map<string, Set<string>>();
 for (const cls of SOFT_CLASSES) for (const c of cls) {
   if (!SOFT.has(c)) SOFT.set(c, new Set());
-  for (const d of cls) SOFT.get(c)?.add(d);
+  for (const d of cls) SOFT.get(c)!.add(d);
 }
 const same = (a: string, b: string) => a === b || (SOFT.get(a)?.has(b) ?? false);
 
@@ -167,30 +166,60 @@ function bestSubstring(pat: string[], text: string[]): [number, number, number] 
 
 type Op = ["equal" | "replace" | "delete" | "insert", number, number];
 
-function alignOps(ref: string[], rec: string[], final: boolean): [number, Op[]] {
+/** Edit distance of `head` against the reference from s, with a free end on the reference side. */
+function prefixCost(head: string[], ref: string[], s: number): number {
+  const seg = ref.slice(s, s + head.length + 8);
+  let prev = Array.from({ length: seg.length + 1 }, (_, j) => j);
+  for (let i = 1; i <= head.length; i++) {
+    const cur = new Array(seg.length + 1).fill(0);
+    cur[0] = i;
+    for (let j = 1; j <= seg.length; j++) cur[j] = Math.min(prev[j] + 1, cur[j - 1] + 1, prev[j - 1] + (head[i - 1] === seg[j - 1] ? 0 : 1));
+    prev = cur;
+  }
+  return Math.min(...prev);
+}
+
+/** Where the reciter began: ayah 1 unless the opening sounds clearly match a later ayah start. */
+export function findStart(ref: string[], rec: string[], starts: number[], headLen = 20): number {
+  const head = rec.slice(0, headLen);
+  if (head.length < 8 || !starts.length) return 0;
+  const base = prefixCost(head, ref, 0);
+  let best = base;
+  let where = 0;
+  for (const st of starts) {
+    if (st > 0) {
+      const c = prefixCost(head, ref, st);
+      if (c < best) { best = c; where = st; }
+    }
+  }
+  return where && best <= 0.35 * head.length && base - best >= 0.2 * head.length ? where : 0;
+}
+
+function alignOps(ref: string[], rec: string[], final: boolean, start = 0): [number, Op[]] {
   const n = ref.length;
   const m = rec.length;
+  const INF = 1e9;
   const d: Int32Array[] = Array.from({ length: n + 1 }, () => new Int32Array(m + 1));
-  for (let i = 0; i <= n; i++) d[i][0] = i;
-  for (let j = 0; j <= m; j++) d[0][j] = j;
-  for (let i = 1; i <= n; i++) {
+  for (let i = 0; i <= n; i++) d[i][0] = i >= start ? i - start : INF;
+  for (let j = 0; j <= m; j++) d[start][j] = j;
+  for (let i = start + 1; i <= n; i++) {
     for (let j = 1; j <= m; j++) {
       d[i][j] = Math.min(d[i - 1][j] + 1, d[i][j - 1] + 1, d[i - 1][j - 1] + (ref[i - 1] === rec[j - 1] ? 0 : 1));
     }
   }
-  let end = final ? n : 0;
+  let end = final ? n : start;
   if (!final && m > 0) {
     let best = Infinity;
-    for (let i = 0; i <= n; i++) if (d[i][m] <= best) { best = d[i][m]; end = i; }
+    for (let i = start; i <= n; i++) if (d[i][m] <= best) { best = d[i][m]; end = i; }
   }
   const ops: Op[] = [];
   let i = end;
   let j = m;
-  while (i > 0 || j > 0) {
-    if (i > 0 && j > 0 && d[i][j] === d[i - 1][j - 1] + (ref[i - 1] === rec[j - 1] ? 0 : 1)) {
+  while (i > start || j > 0) {
+    if (i > start && j > 0 && d[i][j] === d[i - 1][j - 1] + (ref[i - 1] === rec[j - 1] ? 0 : 1)) {
       ops.push([ref[i - 1] === rec[j - 1] ? "equal" : "replace", i - 1, j - 1]);
       i--; j--;
-    } else if (i > 0 && d[i][j] === d[i - 1][j] + 1) {
+    } else if (i > start && d[i][j] === d[i - 1][j] + 1) {
       ops.push(["delete", i - 1, j]);
       i--;
     } else {
@@ -227,7 +256,20 @@ export function check(reference: Reference, heard: string, final: boolean, conf?
   const heardChars = Array.from(heard);
   const rconf = conf ? idx.map((i) => conf[i] ?? 1) : rec.map(() => 1);
   const ref = Array.from(reference.norm);
-  const [end, ops] = alignOps(ref, rec, final);
+  if (!final && rec.length < 8) {
+    // too little heard to know where the reciter began: judge nothing yet
+    const words = reference.words.map((w) => ({ key: w.key, text: w.text, status: "pending" as WordStatus, expected: ref.slice(w.s, w.e).join(""), heard: "" }));
+    return { words, extras: [], reachedIndex: 0, startIndex: 0, startKey: reference.words[0]?.key ?? "" };
+  }
+  // the reciter may start at any ayah of the range
+  const ayahStarts: number[] = [];
+  const seen = new Set<string>();
+  for (const w of reference.words) {
+    const aya = w.key.slice(0, w.key.lastIndexOf(":"));
+    if (!seen.has(aya)) { seen.add(aya); ayahStarts.push(w.s); }
+  }
+  const start = findStart(ref, rec, ayahStarts);
+  const [end, ops] = alignOps(ref, rec, final, start);
 
   const heardJ = new Array(ref.length).fill(-1);
   const insBefore = new Map<number, number[]>();
@@ -244,7 +286,7 @@ export function check(reference: Reference, heard: string, final: boolean, conf?
   const extras: ExtraSpeech[] = [];
   reference.words.forEach((w, k) => {
     const expected = ref.slice(w.s, w.e).join("");
-    if (w.s >= end && !final) {
+    if ((w.s >= end && !final) || w.e <= start) {
       words.push({ key: w.key, text: w.text, status: "pending", expected, heard: "" });
       return;
     }
@@ -303,5 +345,6 @@ export function check(reference: Reference, heard: string, final: boolean, conf?
       if (near.filter((x) => x.status === "skipped").length >= 3) wr.status = "skipped";
     }
   });
-  return { words, extras, reachedIndex: end };
+  const startKey = reference.words.find((w) => w.s >= start)?.key ?? reference.words[0]?.key ?? "";
+  return { words, extras, reachedIndex: end, startIndex: start, startKey };
 }
