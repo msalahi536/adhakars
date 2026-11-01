@@ -157,3 +157,74 @@ export function drillRange(d: Drill): { sura: number; first: number; last: numbe
     }
   }
 }
+
+// ---------- milestones & weak spots ----------
+
+export interface Milestone {
+  kind: "surah" | "juz" | "quarter" | "half" | "khatm";
+  id: number; // surah number, juz number, or 0
+  label: string; // e.g. "Al-Mulk", "Juz 30", "Half the Quran"
+}
+
+/**
+ * Milestones reached: a surah or juz whose every page is memorized (recent or old review stage), plus
+ * quarter / half / whole Quran. Compare with the set already celebrated to show only new ones.
+ * `surahNames`: id -> name (from Quran.com chapters).
+ */
+export function milestones(s: HifzState, q: QuranIndex, surahNames: Record<number, string>): Milestone[] {
+  const done = (p: number) => {
+    const st = s.pages[p]?.stage;
+    return st === "sabqi" || st === "manzil";
+  };
+  const out: Milestone[] = [];
+  for (const [id, [a, b]] of Object.entries(q.surahPages)) {
+    let ok = true;
+    for (let p = a; p <= b && ok; p++) ok = done(p);
+    if (ok) out.push({ kind: "surah", id: Number(id), label: surahNames[Number(id)] ?? `Surah ${id}` });
+  }
+  for (let j = 1; j <= 30; j++) {
+    const pages = q.pages.filter((p) => p.juz === j).map((p) => p.page);
+    if (pages.length && pages.every(done)) out.push({ kind: "juz", id: j, label: `Juz ${j}` });
+  }
+  const total = q.pages.filter((p) => done(p.page)).length;
+  if (total >= 151) out.push({ kind: "quarter", id: 0, label: "A quarter of the Quran" });
+  if (total >= 302) out.push({ kind: "half", id: 0, label: "Half the Quran" });
+  if (total >= 604) out.push({ kind: "khatm", id: 0, label: "The whole Quran" });
+  return out;
+}
+
+/** Milestones not celebrated yet (keys like "surah:67", "juz:30"). */
+export function newMilestones(all: Milestone[], celebrated: string[]): Milestone[] {
+  const seen = new Set(celebrated);
+  return all.filter((m) => !seen.has(`${m.kind}:${m.id}`));
+}
+
+export interface WeakSpotView {
+  key: string;
+  kind: "word" | "transition" | "mutashabih";
+  page: number;
+  fails: number;
+  passes: number;
+  lastFailed: string;
+  // what to show: a word key "sura:aya:word", the ayah you struggle to START ("sura:aya"),
+  // or the pair of similar ayat you mix up
+  word?: string;
+  ayah?: string;
+  mixUp?: { from: string; to: string };
+  strength: number; // 0..1, how close it is to being fixed (passes needed = fails + 2)
+}
+
+/** Every weak spot, worst first, ready for the "My weak spots" screen. */
+export function weakSpotList(s: HifzState, today: string): WeakSpotView[] {
+  return Object.values(s.weakSpots)
+    .map((w) => {
+      const v: WeakSpotView = { ...w, strength: Math.min(1, w.passes / (w.fails + 2)) };
+      if (w.kind === "transition") v.ayah = w.key.replace(/^t:/, "");
+      else if (w.kind === "mutashabih") {
+        const [from, to] = w.key.replace(/^m:/, "").split(">");
+        v.mixUp = { from, to };
+      } else v.word = w.key;
+      return v;
+    })
+    .sort((a, b) => b.fails - b.passes - (a.fails - a.passes) || daysBetween(a.lastFailed, today) - daysBetween(b.lastFailed, today));
+}

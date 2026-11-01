@@ -13,3 +13,4 @@ export { findDrifts, diffAyat, type Drift } from "./mutashabih";
 export { findHesitations, masteryScore, type Hesitation, type Mastery } from "./fluency";
 export { openMic, type Mic } from "./mic";
 export { tajweedHints, type TajweedHint, type TajweedKind } from "./tajweed";
+export { wordTimeline, clipFor, wordAt, REPORT_DELAY, type WordSpan } from "./replay";

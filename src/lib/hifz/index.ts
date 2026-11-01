@@ -25,3 +25,5 @@ export { loadState, saveState, todayISO } from "./storage";
 export { memoryMap, slippingSoon, memorySummary, salahPlan, sleepBoost, positionQuiz, drillRange } from "./insights";
 export type { PageMemory, MemoryLevel, SalahPortion, PositionQuiz } from "./insights";
 export { performanceFromAI } from "./ai-bridge";
+export { milestones, newMilestones, weakSpotList } from "./insights";
+export type { Milestone, WeakSpotView } from "./insights";
