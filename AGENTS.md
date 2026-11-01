@@ -4,6 +4,8 @@
 
 - Hifz known-surah and starting-order choices render one shared setup dialog with independent selections; pure tested surah-order helpers preserve tap order and handle reordering before saving to the engine, keeping review and learning goals separate.
 
+- Hifz setup popups share a pointer-captured drag handle that moves only the dialog and dismisses via its controlled state; outside taps retain Radix dismissal, and advanced review choices use the shared Checkbox for reliable touch targets.
+
 - Recitation meters share six frequency bands and one smoothing mapper for live spectra and decoded device envelopes, so lines follow actual tone.
 
 - Personal appearance is manual and device-only, with independent phase defaults and page overrides in local storage and compressed photos in IndexedDB; no remote photo analysis is permitted.
