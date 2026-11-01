@@ -1,6 +1,6 @@
 # Roadmap
 
-- [ ] Thicken Hifz frame to scale 0.5, fill available space, fit loaded QCF V2 lines, increase hidden-word visibility and cartouche size; verify rendering and font failure.
+- [x] Hifz frame scale 0.5, 12px margins and no gap to strip; shared QCF V2 sizing, opacity 0.14 and 48px cartouche verified at 393/501/1280px; font failure shows loading without fallback; 20 targeted tests pass.
 
 - [x] Smooth Hifz controls entrance; phone touch checks confirm an eased fade/slide, stationary page and reveal strip, partial tab-bar coverage, and working settings/toggle.
 
