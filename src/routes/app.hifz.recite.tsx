@@ -469,12 +469,14 @@ function Recite() {
   }
   function advance() {
     if (!activeSession) return;
-    const updated = { ...activeSession, done: Math.max(activeSession.done, itemIndex + 1), seconds: activeSession.seconds + sessionSeconds() };
+    // The preceding-ayah link is already included in the third lesson pass.
+    const nextIndex = itemIndex + (sabaq && activeSession.items[itemIndex + 1]?.kind === "link" ? 2 : 1);
+    const updated = { ...activeSession, done: Math.max(activeSession.done, nextIndex), seconds: activeSession.seconds + sessionSeconds() };
     saveActiveSession(updated);
     setActiveSession(updated);
     stopAudio();
     setSheet(null);
-    void navigate({ to: "/app/hifz/recite", search: { session: updated.date, item: itemIndex + 1 }, replace: true });
+    void navigate({ to: "/app/hifz/recite", search: { session: updated.date, item: nextIndex }, replace: true });
   }
   function finishReview(selfGrade: Grade) {
     if (!sessionItem || sessionItem.kind !== "review" || !hifzState) return;
