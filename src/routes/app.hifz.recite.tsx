@@ -16,7 +16,7 @@ import { recitationPlayer } from "@/lib/recitation-player";
 import { play as playFeedback, configureHifzFeedback, cancelHifzFeedback } from "@/lib/hifzHaptics";
 import { MushafThemeProvider, MushafFrame, MushafLabel, MushafPageNumber, SurahCartouche, AyahMarker, toArabicDigits } from "@/components/mushaf/MushafPage";
 import { RecitationMic } from "@/components/recite/RecitationMic";
-import { loopResult, nextCleanPass, shouldAutoStop } from "@/components/recite/recitation-loop";
+import { loopResult, nextCleanPass, nextLoopItem, shouldAutoStop } from "@/components/recite/recitation-loop";
 import { getPresetId, resolveVisualPhase, type VisualPhase } from "@/lib/theme-store";
 import { parseTajweed, TajweedText } from "@/lib/tajweed";
 import "@/components/recite/supplied-mushaf.css";
@@ -470,7 +470,7 @@ function Recite() {
   function advance() {
     if (!activeSession) return;
     // The preceding-ayah link is already included in the third lesson pass.
-    const nextIndex = itemIndex + (sabaq && activeSession.items[itemIndex + 1]?.kind === "link" ? 2 : 1);
+    const nextIndex = nextLoopItem(itemIndex, !!sabaq, activeSession.items[itemIndex + 1]?.kind);
     const updated = { ...activeSession, done: Math.max(activeSession.done, nextIndex), seconds: activeSession.seconds + sessionSeconds() };
     saveActiveSession(updated);
     setActiveSession(updated);

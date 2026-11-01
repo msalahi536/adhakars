@@ -4,6 +4,9 @@ import { stageResult, aiFailures } from "./lesson-ai";
 
 export const CLEAN_LESSON_PASSES = 3;
 export const END_SILENCE_MS = 1500;
+export function nextLoopItem(index: number, newLesson: boolean, nextKind?: string) {
+  return index + (newLesson && nextKind === "link" ? 2 : 1);
+}
 export function attemptedWords(result: CheckResult, words: ReciteWord[]) {
   const start = words.findIndex((w) => w.key === result.startKey);
   return words.slice(Math.max(0, start));

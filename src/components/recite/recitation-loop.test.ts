@@ -1,5 +1,5 @@
 import { expect, test } from "bun:test";
-import { loopResult, nextCleanPass, shouldAutoStop } from "./recitation-loop";
+import { loopResult, nextCleanPass, nextLoopItem, shouldAutoStop } from "./recitation-loop";
 import type { CheckResult } from "@/lib/hifz-ai/checker";
 import type { ReciteWord } from "@/lib/recite/model";
 const keys = ["112:1:1", "112:2:1", "112:3:1"];
@@ -15,6 +15,11 @@ test("three clean lesson passes required and third links previous ayah", () => {
   expect(nextCleanPass(2, true, false)).toEqual({ count: 3, done: true, linking: false });
 });
 test("one clean review passes", () => expect(nextCleanPass(0, true, true).done).toBe(true));
+test("third pass absorbs the old link without an extra screen", () => {
+  expect(nextLoopItem(0, true, "link")).toBe(2);
+  expect(nextLoopItem(0, true, "review")).toBe(1);
+  expect(nextLoopItem(0, false, "link")).toBe(1);
+});
 test("mistake does not increment clean count", () => expect(nextCleanPass(1, false, false).count).toBe(1));
 test("unsure never blocks clean result", () => expect(loopResult({ ...result, words: result.words.map((w, i) => i === 2 ? { ...w, status: "unsure" } : w) }, words).clean).toBe(true));
 test("stop only after end and at least 1500ms actual silence following voice", () => {
