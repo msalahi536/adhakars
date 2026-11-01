@@ -76,7 +76,7 @@ function Recite() {
   const [controls, setControls] = useState(false);
   const [appTheme, setAppTheme] = useState("original");
   const [morningOrEvening, setMorningOrEvening] = useState<VisualPhase>("morning");
-  const [sheet, setSheet] = useState<"settings" | "navigation" | "ai" | "marks" | "complete" | "sessionGrade" | "drills" | "sessionEnd" | null>(null);
+  const [sheet, setSheet] = useState<"settings" | "navigation" | "ai" | "marks" | "complete" | "sessionGrade" | "drills" | "sessionEnd" | "lessonComplete" | null>(null);
   const [gradeAyah, setGradeAyah] = useState<string | null>(null);
   const [loadedFont, setLoadedFont] = useState<{ page: number; name: string } | null>(null);
   const [fontAttempt, setFontAttempt] = useState(0);
@@ -491,7 +491,7 @@ function Recite() {
     recordSabaq(next, sabaq.page, sabaq.lines, perf, today);
     persistState(next);
     playFeedback("pageComplete");
-    advance();
+    setSheet("lessonComplete"); setStatus("paused");
   }
   function finishDrills(passed: string[], failed: string[]) {
     if (!hifzState) { advance(); return; }
@@ -603,7 +603,7 @@ function Recite() {
     </div>
     {(audioError || fallbackMessage) && <p className="rc-loop-notice" role="status">{audioError || fallbackMessage}</p>}
     <div className="rc-nav-wrap rc-loop-nav" aria-hidden={!controls} inert={!controls}><BottomNav /></div>
-    {(sheet || gradeAyah) && <div className="rc-backdrop" onClick={() => { if (!gradeAyah && sheet !== "drills" && sheet !== "sessionGrade" && sheet !== "sessionEnd") setSheet(null); }}>
+    {(sheet || gradeAyah) && <div className="rc-backdrop" onClick={() => { if (!gradeAyah && sheet !== "drills" && sheet !== "sessionGrade" && sheet !== "sessionEnd" && sheet !== "lessonComplete") setSheet(null); }}>
       <div onClick={(e) => e.stopPropagation()}>
         {sheet === "settings" && <ReciteSettings settings={saved.settings} change={(settings) => setSaved((s) => ({ ...s, settings: { ...s.settings, ...settings } }))} close={() => setSheet(null)} />}
         {sheet === "navigation" && <PageNavigation page={saved.page} chapter={first?.chapter} juz={first?.juz} chapters={chapters} go={changePage} close={() => setSheet(null)} />}
@@ -613,9 +613,10 @@ function Recite() {
           <h2>{resultClean ? "Perfect" : failedWords.length ? `${failedWords.length} ${failedWords.length === 1 ? "mistake" : "mistakes"}` : "A little more to recite"}</h2>
           {resultClean && <p>{sabaq ? `${Math.min(3, cleanPasses + 1)} of 3 clean recitations` : "Recitation complete"}</p>}
           {!!failedWords.length && <div className="rc-result-words">{failedWords.map((word) => <div key={word.key}><span dir="rtl" className="rc-arabic">{word.text}</span><small>{word.verse}</small><Button variant="ghost" size="icon" aria-label={`Hear correct word ${word.key}`} title="Hear correct word" onClick={() => void playWord(word)}><Play /></Button></div>)}</div>}
-          <div className="rc-result-actions"><Button variant="outline" onClick={prepareAttempt}>Try again</Button><Button className="rc-primary" onClick={() => nextAttempt()}>{resultClean && sabaq && cleanPasses === 2 ? "Finish lesson" : "Next"}</Button></div>
+          <div className="rc-result-actions"><Button variant="outline" onClick={prepareAttempt}>Try again</Button><Button className="rc-primary" onClick={() => nextAttempt()}>Next</Button></div>
           {!resultClean && <Button variant="link" className="rc-result-override" onClick={() => nextAttempt(true)}>I recited it right</Button>}
         </section>}
+        {sheet === "lessonComplete" && <section className="rc-sheet rc-loop-result rc-complete" role="dialog" aria-modal="true" aria-label="Lesson complete"><div className="rc-result-handle" /><Check className="rc-result-check" /><h2>Lesson complete</h2><p>{lessonLabel}</p><div className="rc-pass-dots" aria-label="3 of 3 recitations complete">{[0, 1, 2].map((dot) => <span className="is-filled" key={dot} />)}</div><Button className="rc-primary" onClick={advance}>Next</Button></section>}
         {gradeAyah && <section className="rc-sheet" role="dialog" aria-modal="true" aria-label="Ayah self check"><span className="rc-eyebrow">AYAH {gradeAyah}</span><h2>How did it go?</h2><div className="rc-grade-options">{(["Easy", "Okay", "Hard"] as const).map((g) => <Button variant="outline" key={g} onClick={() => grade(g)}>{g}</Button>)}</div><div className="rc-check-words" dir="rtl">{words.filter((w) => w.verse === gradeAyah).map((w) => <Button variant="ghost" className={`rc-arabic ${saved.marks[w.key] === "wrong" ? "rc-check-wrong" : ""}`} key={w.key} onClick={() => mark(w)} aria-label={`Mark ${w.key} as mistake`}>{w.text}</Button>)}</div></section>}
         {sheet === "marks" && <section className="rc-sheet rc-marks" role="dialog" aria-modal="true" aria-label="Review marks"><header><h2>Review marks</h2><Button variant="ghost" size="icon" aria-label="Close marks" onClick={() => setSheet(null)}><X /></Button></header>{!marks.length && <p>No marks on this page.</p>}{marks.map((w) => <div className="rc-mark-row" key={w.key}><Button variant="ghost" className="rc-arabic" onClick={() => void playWord(w)}>{w.text}<Play /></Button><small>{w.verse}</small><select aria-label={`State for ${w.key}`} value={saved.marks[w.key]} onChange={(e) => markState(w, e.target.value as WordState)}>{["wrong", "skipped", "unsure", "correct"].map((s) => <option key={s}>{s}</option>)}</select></div>)}</section>}
         {sheet === "complete" && <section className="rc-sheet rc-complete" role="dialog" aria-modal="true" aria-label="Page complete"><Check className="rc-sheet-icon" /><h2>Page complete</h2><p>{visible} words · {marks.length} marks · {Math.ceil((saved.seconds[saved.page] ?? 0) / 60)} min</p><Button className="rc-primary" onClick={() => setSheet("marks")}>Review marks</Button><Button variant="outline" disabled={saved.page === 604} onClick={() => changePage(saved.page + 1)}>Next page</Button></section>}
