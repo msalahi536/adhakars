@@ -1,6 +1,6 @@
 # Roadmap
 
-- [ ] Refine Today card against latest close-up and move memorization heading/content slightly upward; phone-check card and Start.
+- [x] Refined Today close-up with softer shaded gradient, relaxed lettering, tighter spacing and pale Start pill; moved content up 10px, reviewed phone screenshot and verified Start and popups.
 
 - [x] Match memorization home references: removed top Hifz label, revealed mountains, restyled Today/progress/map/streak/actions; saved-plan phone screenshots, Juz/Salah/reminder popups and Start session verified.
 
