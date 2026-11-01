@@ -1,6 +1,6 @@
 # Roadmap
 
-- [ ] Use the exact supplied mushaf components and --m-* theme palettes — waiting for src/components/mushaf/ and mushaf-theme.css, absent from the project and uploads
+- [ ] Integrate supplied immutable mushaf components/artwork only on Hifz; follow selected theme/Display style, preserve recitation state/settings and verify page controls.
 
 - [x] Replace only fresh recite page with themed ornamental Madani mushaf, hidden-word controls and settings; reveal/marks/auto-hide tested, 15 rows and no overflow in Rose, Ocean and evening
 
