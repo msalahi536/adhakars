@@ -9,7 +9,7 @@ import { BottomNav } from "@/components/BottomNav";
 import { ReciteSettings } from "@/components/recite/ReciteSettings";
 import { PageNavigation } from "@/components/recite/PageNavigation";
 import { loadPageFont, reciteChaptersOptions, recitePageOptions } from "@/lib/recite/data";
-import { freshRecite, markedWords, nextWord, pageWords, readRecite, revealed, revealAyah, revealNext, restartPage, saveRecite, isOpeningWord, type ReciteWord, type SavedRecite, type WordState } from "@/lib/recite/model";
+import { freshRecite, markedWords, nextWord, pageWords, readRecite, revealed, revealNext, saveRecite, isOpeningWord, type ReciteWord, type SavedRecite, type WordState } from "@/lib/recite/model";
 import { getChapterAudio } from "@/lib/quran";
 import { quranPlayer } from "@/lib/quran-player";
 import { recitationPlayer } from "@/lib/recitation-player";
@@ -32,7 +32,6 @@ import {
   SELF_GRADES, type ActiveSession, type SessionItem, type Tracker,
 } from "@/lib/hifz/program";
 import { DrillSheet } from "@/components/hifz/DrillSheet";
-import { AI_DISCLAIMER } from "@/lib/hifz-ai/notices";
 import { mapAiWords } from "@/components/recite/ai-feedback";
 import { useAiRecitation } from "@/components/recite/use-ai-recitation";
 import { aiFailures, aiWordState, createAudioRun, saveAiWeakSpots, type AiMarks } from "@/components/recite/lesson-ai";
@@ -148,7 +147,6 @@ function Recite() {
   const linkedVerse = previousVerse ?? (precedingIndex === 0 ? previousPage?.verses.at(-1) : undefined);
   const targetWords = sabaq ? cleanPasses === 2 && linkedVerse ? [...linkedVerse.words.filter((w) => !w.end), ...rangeWords] : rangeWords : words;
   const targetKeys = new Set(targetWords.map((w) => w.key));
-  const recallMode = !!sessionItem && attemptStarted;
   const ai = useAiRecitation(saved.page, mode === "ai", targetWords.map((w) => w.key));
   const aiWords = ai.result ? mapAiWords(ai.result, targetWords.map((w) => w.key)) : null;
   const aiRanges = targetWords.reduce<{ sura: number; first: number; last: number }[]>((ranges, w) => {
@@ -175,7 +173,7 @@ function Recite() {
     setHintVisible(true);
     const timer = setTimeout(() => setHintVisible(false), 3000);
     return () => clearTimeout(timer);
-  }, [itemIndex, saved.page]);
+  }, [itemIndex, saved.page, cleanPasses]);
   useEffect(() => {
     if (mode !== "ai") return;
     if (ai.phase === "listening") setStatus("active");
@@ -415,8 +413,8 @@ function Recite() {
             if (ms >= timing.to) { a.pause(); resolve(); }
           };
           a.onended = resolve;
-          a.onerror = () => { setAudioError("Qari audio is unavailable. Please retry."); audioRun.current.cancel(); resolve(); };
-          void a.play().catch(() => { setAudioError("Tap headphones again to play."); audioRun.current.cancel(); resolve(); });
+          a.onerror = () => { setAudioError("Qari audio is unavailable. Please retry."); stopAudio(); resolve(); };
+          void a.play().catch(() => { setAudioError("Tap headphones again to play."); stopAudio(); resolve(); });
         });
       }
       if (audioRun.current.current(token)) { setPlaying(false); setAudioWord(null); }
@@ -427,10 +425,11 @@ function Recite() {
     if (micBusy.current) return;
     stopAudio(); quranPlayer.pause(); recitationPlayer.pause();
     if (mode === "ai") { prepareAttempt(); micBusy.current = true; void ai.request(aiRanges); return; }
-    if (!attemptStarted) { prepareAttempt(); return; }
-    const pending = nextWord(targetWords, latest.current.marks);
+    if (!attemptStarted) prepareAttempt();
+    const currentMarks = attemptStarted ? latest.current.marks : Object.fromEntries(Object.entries(latest.current.marks).filter(([key]) => !targetKeys.has(key)));
+    const pending = nextWord(targetWords, currentMarks);
     if (!pending) { onAllRevealed(); return; }
-    const updated = revealNext(targetWords, latest.current.marks);
+    const updated = revealNext(targetWords, currentMarks);
     trackerRef.current.recordReveal(Date.now()); update({ marks: updated }); playFeedback("reveal");
     if (targetWords.filter((w) => w.page === saved.page).every((w) => revealed(updated[w.key]))) {
       setAiCorrection(null); setResultClean(!targetWords.some((w) => ["wrong", "skipped"].includes(updated[w.key])));
@@ -556,7 +555,7 @@ function Recite() {
     <header className="rc-header" aria-hidden={!controls} inert={!controls}><Button variant="ghost" size="icon" aria-label="Exit Hifz" onClick={() => { saveActiveSession(null); void navigate({ to: activeSession ? "/app/hifz" : "/app/more" }); }}><ChevronLeft /></Button><Button variant="ghost" className="rc-title" aria-label="Go to page" onClick={() => setSheet("navigation")}>{chapter?.name_simple ?? "Quran"} · {saved.page}</Button><Button variant="ghost" size="icon" aria-label="Page settings" onClick={() => setSheet("settings")}>Aa</Button></header>
     {!sessionEnded && <div className="rc-lesson-heading">
       <div className="rc-lesson-pill">{sabaq ? `New lesson · ${lessonLabel}` : sessionItem ? `Review · ${chapter?.name_simple ?? "Quran"} · ${saved.page}` : `Recite · ${chapter?.name_simple ?? "Quran"}`}</div>
-      {sabaq && <div className="rc-pass-dots" aria-label={`${cleanPasses} of 3 clean recitations`}>{[0, 1, 2].map((dot) => <span key={dot} className={dot < cleanPasses ? "is-filled" : ""} />)}</div>}
+      {sabaq && <div className="rc-pass-dots" aria-label={`${Math.min(3, cleanPasses + (sheet === "ai" && resultClean ? 1 : 0))} of 3 clean recitations`}>{[0, 1, 2].map((dot) => <span key={dot} className={dot < cleanPasses + (sheet === "ai" && resultClean ? 1 : 0) ? "is-filled" : ""} />)}</div>}
       <p className={`rc-lesson-hint ${hintVisible ? "is-visible" : ""}`}>{cleanPasses === 2 && linkedVerse ? "Include the ayah before, then recite from memory" : "Listen, then recite from memory"}</p>
     </div>}
     <div className="rc-canvas" onPointerDownCapture={(e) => {
