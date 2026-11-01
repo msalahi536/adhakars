@@ -1,4 +1,5 @@
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
+import { assignedContent, type DailyAssignment } from "./daily-editor";
 
 export const WIDGET_TYPE_TO_CATEGORY: Record<string, string> = {
   quran_verse: "quran_verse",
@@ -106,11 +107,23 @@ export async function buildWidgetPayload(now = new Date()) {
   const du = pick("daily_dua").item;
   const n = pick("name_of_allah").item;
   const su = pick("sunnah").item;
+  // Dated overrides are additive: a failed lookup never interrupts the existing feed.
+  let assignments: DailyAssignment[] = [];
+  try {
+    const { data, error } = await supabaseAdmin.from("widget_daily_assignments")
+      .select("date,widget_type,content").eq("date", now.toISOString().slice(0, 10));
+    if (error) throw error;
+    assignments = (data ?? []) as unknown as DailyAssignment[];
+  } catch { console.error("[widgets] Dated selections unavailable; using existing rotation"); }
+  const datedQuran = assignedContent(assignments, "quran_verse", now.toISOString().slice(0, 10));
+  const datedSunnah = assignedContent(assignments, "sunnah", now.toISOString().slice(0, 10));
+  const selectedQuran = datedQuran ?? q;
+  const selectedSunnah = datedSunnah ?? su;
 
   return {
     date: now.toISOString().slice(0, 10),
     degraded,
-    quran_verse: q && { arabic: numberVerseMarkers(q.arabic_text, q.reference), translation: q.translation, reference: q.reference },
+    quran_verse: selectedQuran && { arabic: numberVerseMarkers(selectedQuran.arabic_text, selectedQuran.reference), translation: selectedQuran.translation, reference: selectedQuran.reference },
     daily_dhikr: dh && {
       arabic: dh.arabic_text,
       transliteration: dh.transliteration,
@@ -122,7 +135,7 @@ export async function buildWidgetPayload(now = new Date()) {
     evening_adhkar: list("evening_adhkar"),
     daily_dua: du && { arabic: du.arabic_text, translation: du.translation, reference: du.reference },
     name_of_allah: n && { arabic: n.arabic_text, transliteration: n.transliteration, meaning: n.translation },
-    sunnah_of_day: su && { arabic: su.arabic_text, translation: su.translation, reference: su.reference },
+    sunnah_of_day: selectedSunnah && { arabic: selectedSunnah.arabic_text, translation: selectedSunnah.translation, reference: selectedSunnah.reference },
   };
 }
 

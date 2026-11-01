@@ -56,3 +56,12 @@ export const editorClear = createServerFn({ method: "POST" })
     if (error) throw new Error("Couldn't clear selection. Please retry.");
     return { ok: true };
   });
+
+export const editorPreview = createServerFn({ method: "POST" })
+  .inputValidator(z.object({ date: dateKey }))
+  .handler(async ({ data }) => {
+    const { requireEditor } = await import("./daily-editor.server"); await requireEditor();
+    const { buildWidgetPayload } = await import("./widgets.server");
+    const payload = await buildWidgetPayload(new Date(`${data.date}T12:00:00Z`));
+    return { quran_verse: payload.quran_verse, sunnah: payload.sunnah_of_day };
+  });
