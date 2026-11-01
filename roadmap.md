@@ -1,6 +1,6 @@
 # Roadmap
 
-- [ ] Darken Today to latest reference, raise home slightly further and frost the memorization heading; verify phone visuals.
+- [x] Darkened Today with an opaque deep gradient, raised home 8px further and added the frosted heading; phone screenshot, popups and Start verified; build OK.
 
 - [x] Refined Today close-up with softer shaded gradient, relaxed lettering, tighter spacing and pale Start pill; moved content up 10px, reviewed phone screenshot and verified Start and popups.
 
