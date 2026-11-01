@@ -69,6 +69,10 @@
   letter-spacing: 0;
 }
 .daily-editor input { min-width: 0; font-size: 16px; }
+.hifz-report-overlay { z-index: 400; background: color-mix(in oklab, var(--foreground) 35%, transparent); }
+.hifz-report-dialog { z-index: 401; border-radius: 8px !important; background: var(--surface); color: var(--foreground); letter-spacing: 0; }
+.hifz-report-dialog input { border-radius: 6px !important; }
+.acknowledgements-header h1 { font-size: 30px; overflow-wrap: anywhere; line-height: 1.15; }
 .daily-select { width: 100%; border: 1px solid var(--input); border-radius: 6px; background: var(--card); color: var(--foreground); padding: 8px 10px; font-size: 16px; }
 
 :root,
