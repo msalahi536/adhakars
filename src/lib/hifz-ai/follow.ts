@@ -33,10 +33,13 @@ export class Follower {
   private resume: number | null = null;
   private lost = 0;
   private conf = 0;
+  private afterBasmala = false;
   private readonly fatihaEnd: number;
+  private readonly basmala: string[];
 
   constructor(private ix: QuranIndex) {
     this.fatihaEnd = ix.ayaStart(2, 1);
+    this.basmala = ix.S.slice(0, ix.ayaStart(1, 2)); // 1:1, said before most surahs
   }
 
   reset() {
@@ -45,6 +48,7 @@ export class Follower {
     this.resume = null;
     this.lost = 0;
     this.conf = 0;
+    this.afterBasmala = false;
   }
 
   private inFatiha(p: number) {
@@ -57,9 +61,25 @@ export class Follower {
     if (!add.length) return this.position();
     if (this.buf.length && add[0] === this.buf[this.buf.length - 1]) add = add.slice(1);
     this.buf = [...this.buf, ...add].slice(-64);
+    if (add.length && this.basmalaJustSaid()) {
+      // "Bismillah" opens almost every surah: it is not Al-Fatiha. Drop it, keep the place,
+      // and wait for the first ayah of whatever comes next.
+      this.buf = [];
+      this.lost = 0;
+      this.afterBasmala = true;
+      return this.position();
+    }
     if (this.pos !== null && add.length) this.track(add.length);
     else if (this.pos === null && this.buf.length >= Follower.MIN_SEARCH) this.relocate(false);
     return this.position();
+  }
+
+  private basmalaJustSaid(): boolean {
+    const b = this.basmala;
+    const tail = this.buf.slice(-(b.length + 3));
+    if (tail.length < b.length - 1) return false;
+    const [cost, , end] = fit(b, tail);
+    return cost <= 2 && end >= tail.length - 1;
   }
 
   static BACK_Q = 8; // recent letters used to spot a reciter going back to repeat
@@ -132,6 +152,10 @@ export class Follower {
     const ties = hits.filter((h) => h.cost <= best.cost + 1);
     if (ties.length > 1) {
       const pref = (h: Hit): [number, number] => {
+        if (this.afterBasmala) {
+          const w = this.ix.where(h.start);
+          if (w.aya === 1 && w.word === 1) return [-1, near !== null && h.start >= near ? h.start - near : 1e6];
+        }
         if (near !== null && h.start - near >= 0 && h.start - near < 400) return [0, h.start - near];
         if (this.inFatiha(h.start)) return [1, 0];
         return [2, near !== null ? Math.abs(h.start - near) : 0];
@@ -143,6 +167,7 @@ export class Follower {
     this.pos = best.end;
     this.lost = 0;
     this.conf = best.score;
+    this.afterBasmala = false;
     if (!this.inFatiha(this.pos)) this.resume = this.pos;
   }
 
