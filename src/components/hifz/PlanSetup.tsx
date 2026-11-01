@@ -256,7 +256,6 @@ export function PlanSetup({ existing, done }: { existing?: HifzPlan; done: () =>
             </div>
             <div className="hz-time-summary" role="status">
               <div className="hz-time-summary-heading">
-                <CalendarDays aria-hidden="true" />
                 <div><span>You’ll finish around</span><strong>{monthYear(selectedEstimate.finish)}</strong></div>
               </div>
               <span className="hz-time-summary-duration">{humanDuration(selectedEstimate.days)}</span>
