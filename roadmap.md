@@ -1,5 +1,8 @@
 # Roadmap
 
+- [x] Verify/improve Advanced checkbox, gradient choices, draggable Hifz popup handles and outside-tap dismissal; checkbox toggles, saved choices, advanced outside/drag dismissal and customization drag verified.
+- [x] Remove duplicate finish summary for Juz Amma/selected-surah setup, keeping only side-by-side estimates; phone flow and 9 estimate tests pass.
+
 - [x] Make Advanced options a reference-style popup, slim plan heading, and show all juz completion dates; phone screenshots checked, all 30 dates visible and advanced choices saved correctly.
 
 - [x] Show separate Juz Amma/selected-surah and whole-Quran estimates on daily-time setup; 9 tests pass and both phone flows verified.

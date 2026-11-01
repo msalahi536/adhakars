@@ -4,6 +4,8 @@ import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight, Check, BookOpen, Sprout, Circle, Search, Layers, List, ArrowUp, ArrowDown, X, Minus, Plus, CalendarDays, SlidersHorizontal, Clock, ChartNoAxesColumnIncreasing } from "lucide-react";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { Sheet, SheetContent, SheetTitle } from "@/components/ui/sheet";
+import { Checkbox } from "@/components/ui/checkbox";
+import { PopupHandle } from "./PopupHandle";
 import { searchChapters } from "@/lib/quran";
 import {
   buildTimeline,
@@ -198,6 +200,7 @@ export function PlanSetup({ existing, done }: { existing?: HifzPlan; done: () =>
         <Dialog open={pickSurahs} onOpenChange={setPickSurahs}>
           <DialogContent className="hz-surah-dialog hz-setup" aria-describedby={undefined} onOpenAutoFocus={(event) => event.preventDefault()}>
             <div className="hz-surah-scenery" aria-hidden="true" style={{ backgroundImage: surahScenery }} />
+            <PopupHandle dismiss={() => setPickSurahs(false)} />
             <header className="hz-surah-dialog-header">
               <Button variant="ghost" className="hz-surah-back" aria-label="Back to setup" onClick={() => setPickSurahs(false)}><ChevronLeft /></Button>
               <DialogTitle>Choose Surahs</DialogTitle>
@@ -256,15 +259,14 @@ export function PlanSetup({ existing, done }: { existing?: HifzPlan; done: () =>
                 </Button>
               ); })}
             </div>
-            <div className="hz-time-summary" role="status">
-              {goalEstimates && <small>{plan.order.kind === "surahs" ? "Selected surahs" : "Entire Quran"}</small>}
+            {!goalEstimates && <div className="hz-time-summary" role="status">
               <div className="hz-time-summary-heading">
                 <div><span>You’ll finish around</span><strong>{monthYear(selectedEstimate.finish)}</strong></div>
               </div>
               <span className="hz-time-summary-duration">{humanDuration(selectedEstimate.days)}</span>
               {selectedEstimate.firstJuz && <small>First juz done by {monthYear(selectedEstimate.firstJuz)}</small>}
               {selectedEstimate.timeWarning && <small className="hz-finish-warning">{selectedEstimate.timeWarning}</small>}
-            </div>
+            </div>}
             {goalEstimates && <div className="hz-goal-summary" role="status">
               <div className="hz-goal-card">
                 <header><span className="hz-goal-icon"><BookOpen aria-hidden="true" /></span><div><span>{goalEstimates.label}</span><strong>{humanDuration(goalEstimates.goal.days)}</strong></div></header>
@@ -275,6 +277,7 @@ export function PlanSetup({ existing, done }: { existing?: HifzPlan; done: () =>
                 <div className="hz-goal-date"><CalendarDays aria-hidden="true" /><span>Done around<br />{monthYear(goalEstimates.full.finish)}</span></div>
               </div>
             </div>}
+            {goalEstimates && selectedEstimate.timeWarning && <p className="hz-note">{selectedEstimate.timeWarning}</p>}
             <Button variant={goalEstimates ? "ghost" : "link"} className={goalEstimates ? "hz-customize-row" : "hz-customize-link"} onClick={() => setCustomizePace(true)}><SlidersHorizontal aria-hidden="true" /> Customize pace {goalEstimates && <ChevronRight aria-hidden="true" />}</Button>
           </section>
         )}
@@ -282,7 +285,7 @@ export function PlanSetup({ existing, done }: { existing?: HifzPlan; done: () =>
         <Sheet open={customizePace} onOpenChange={setCustomizePace}>
           <SheetContent side="bottom" className="hz-setup hz-pace-step hz-customize-sheet" aria-describedby={undefined}>
             <header className="hz-customize-header">
-            <div className="hz-sheet-handle" aria-hidden="true" />
+            <PopupHandle dismiss={() => setCustomizePace(false)} />
             <SlidersHorizontal className="hz-customize-icon" aria-hidden="true" />
             <SheetTitle>Customize pace</SheetTitle>
             <p>Choose how you want to read and when to finish.</p>
@@ -356,7 +359,7 @@ export function PlanSetup({ existing, done }: { existing?: HifzPlan; done: () =>
               </Button>
               <Sheet open={advanced} onOpenChange={setAdvanced}>
                 <SheetContent side="bottom" className="hz-setup hz-plan-popup" aria-describedby={undefined}>
-                  <header className="hz-plan-popup-heading"><div className="hz-sheet-handle" /><span className="hz-popup-icon"><SlidersHorizontal /></span><SheetTitle>Advanced options</SheetTitle><p>Customize your study schedule and pace.</p></header>
+                  <header className="hz-plan-popup-heading"><PopupHandle dismiss={() => setAdvanced(false)} /><span className="hz-popup-icon"><SlidersHorizontal /></span><SheetTitle>Advanced options</SheetTitle><p>Customize your study schedule and pace.</p></header>
                 <div className="hz-popup-fields">
                 <div className="hz-popup-group">
                   <fieldset className="hz-field">
@@ -372,8 +375,8 @@ export function PlanSetup({ existing, done }: { existing?: HifzPlan; done: () =>
                     </div>
                   </fieldset>
                   <label className="hz-toggle">
-                    <input type="checkbox" checked={plan.consolidateEvery > 0}
-                      onChange={(e) => setPlan((p) => ({ ...p, consolidateEvery: e.target.checked ? 20 : 0, consolidateDays: e.target.checked ? 3 : 0 }))} />
+                    <Checkbox checked={plan.consolidateEvery > 0} className="hz-review-checkbox"
+                      onCheckedChange={(checked) => setPlan((p) => ({ ...p, consolidateEvery: checked === true ? 20 : 0, consolidateDays: checked === true ? 3 : 0 }))} />
                     <span>Review-only days after each juz</span>
                   </label>
                   </div>
@@ -393,7 +396,7 @@ export function PlanSetup({ existing, done }: { existing?: HifzPlan; done: () =>
               </Sheet>
               <Sheet open={allMilestones} onOpenChange={setAllMilestones}>
                 <SheetContent side="bottom" className="hz-setup hz-plan-popup hz-juz-popup" aria-describedby={undefined}>
-                  <header className="hz-plan-popup-heading"><div className="hz-sheet-handle" /><span className="hz-popup-icon"><BookOpen /></span><SheetTitle>Juz completion dates</SheetTitle></header>
+                  <header className="hz-plan-popup-heading"><PopupHandle dismiss={() => setAllMilestones(false)} /><span className="hz-popup-icon"><BookOpen /></span><SheetTitle>Juz completion dates</SheetTitle></header>
                   <div className="hz-juz-completion-list">{summary.juzMilestones.map((m) => <div key={m.juz}><span>Juz {m.juz}</span><strong>{monthYear(m.date)}</strong></div>)}</div>
                   <footer><Button className="hz-primary" onClick={() => setAllMilestones(false)}>Done <Check /></Button></footer>
                 </SheetContent>
