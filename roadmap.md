@@ -1,6 +1,6 @@
 # Roadmap
 
-- [ ] Make daily Quran/Sunnah pickers open with scrollable source content, collection/surah browsing and optional search; preserve scheduling and widget behavior.
+- [x] Daily pickers open with source content, surah/collection/topic browsing, optional search and Load more; compact hadith previews expand fully. Signed-in phone flow verifies both selections reach scheduling, 5 scheduling tests pass and build OK; widget behavior untouched.
 
 - [x] Correct missing editor session in preview: encrypted Secure/HttpOnly SameSite=None partitioned cookie, cross-site write rejection and explicit lost-session error. Both real source saves/read-back, refresh and sign-out pass; defaults untouched and test assignments removed. Actual hosted iframe retry still needs user confirmation; local cross-site reproduction is unavailable.
 
