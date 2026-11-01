@@ -13,6 +13,7 @@ import {
 import { SunnahOfTheDay } from "@/components/SunnahOfTheDay";
 import { Portal } from "@/components/Portal";
 import { TasbihIcon } from "@/components/BottomNav";
+import { useHifzBeta } from "@/lib/hifz-beta";
 
 
 // Completed days follow the active palette accent.
@@ -65,6 +66,8 @@ const tiles: Tile[] = [
 ];
 
 function More() {
+  const { enabled: hifzEnabled } = useHifzBeta();
+  const visibleTiles = tiles.filter((tile) => tile.to !== "/app/hifz" || hifzEnabled);
   const navigate = useNavigate();
   const { open, section } = Route.useSearch();
 
@@ -137,7 +140,7 @@ function More() {
            <SunnahOfTheDay />
 
            <div className="grid grid-cols-2 gap-3">
-             {tiles.slice(0, 4).map(({ to, title, subtitle, Icon }) => (
+             {visibleTiles.slice(0, 4).map(({ to, title, subtitle, Icon }) => (
                <Link
                  key={to}
                  to={to}
@@ -176,7 +179,7 @@ function More() {
            </div>
 
             <div className="grid grid-cols-2 gap-3">
-              {tiles.slice(4).map(({ to, title, subtitle, Icon }) => (
+              {visibleTiles.slice(4).map(({ to, title, subtitle, Icon }) => (
                <Link
                  key={to}
                  to={to}

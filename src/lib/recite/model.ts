@@ -44,7 +44,7 @@ export function isOpeningWord(word: ReciteWord, words: ReciteWord[], amount: Rec
 export function readRecite(): SavedRecite {
   try {
     const value = JSON.parse(localStorage.getItem(RECITE_KEY) || "null");
-    return value ? { ...freshRecite(), ...value, page: Math.max(1, Math.min(604, Number(value.page) || 562)), settings: { ...DEFAULT_SETTINGS, ...value.settings } } : freshRecite();
+    return value ? { ...freshRecite(), ...value, page: Math.max(1, Math.min(604, Number(value.page) || 562)), settings: { ...DEFAULT_SETTINGS, ...value.settings, sounds: false } } : freshRecite();
   } catch { return freshRecite(); }
 }
 export function saveRecite(value: SavedRecite) {

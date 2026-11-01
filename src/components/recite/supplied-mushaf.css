@@ -80,3 +80,32 @@
   .rc-supplied .rc-feedback-pulse { animation: rc-feedback-still 260ms linear; }
   @keyframes rc-feedback-still { from, to { outline: 2px solid var(--m-mark); outline-offset: 3px; border-radius: 18px; } }
 }
+
+/* Reference-inspired settings, scoped to the Hifz sheet only. */
+.rc-supplied .rc-settings { display: flex; flex-direction: column; height: min(85dvh, 780px); overflow: hidden; padding: 0 22px; border-radius: 18px 18px 0 0; }
+.rc-supplied .rc-settings-handle { width: 36px; height: 4px; background: var(--rc-muted); opacity: .5; border-radius: 2px; margin: 10px auto 18px; flex: none; }
+.rc-supplied .rc-settings-header { flex: none; margin: 0 0 18px; gap: 14px; }
+.rc-supplied .rc-settings-header > svg { color: var(--m-gold); width: 24px; height: 24px; }
+.rc-supplied .rc-settings-header h2 { font-size: 24px; font-weight: 600; margin: 0; flex: 1; }
+.rc-supplied .rc-settings-header button { width: 30px; height: 30px; border-radius: 50%; background: color-mix(in oklab, var(--m-ink) 7%, var(--m-paper)); }
+.rc-supplied .rc-settings-header button svg { width: 16px; height: 16px; }
+.rc-supplied .rc-settings-rule { height: 1px; margin: 0 16px 10px; background: color-mix(in oklab, var(--m-gold) 50%, transparent); flex: none; position: relative; }
+.rc-supplied .rc-settings-rule span { position: absolute; width: 6px; height: 6px; background: var(--m-gold); left: calc(50% - 3px); top: -3px; transform: rotate(45deg); outline: 4px solid var(--m-paper); }
+.rc-supplied .rc-settings-content { min-height: 0; overflow-y: auto; overscroll-behavior: contain; padding: 0 0 calc(24px + env(safe-area-inset-bottom, 0px)); scrollbar-width: thin; }
+.rc-supplied .rc-settings .rc-setting { margin: 0; padding: 12px 0; border-bottom: 1px solid var(--rc-line); gap: 8px; }
+.rc-supplied .rc-setting-label { display: flex; align-items: center; gap: 12px; font-family: Georgia, serif; font-size: 14px; line-height: 1.4; }
+.rc-supplied .rc-setting-label svg { width: 18px; height: 18px; color: var(--m-gold); stroke-width: 1.6; flex: none; }
+.rc-supplied .rc-settings .rc-setting legend { margin-bottom: 0; padding-top: 12px; float: left; width: 100%; }
+.rc-supplied .rc-settings .rc-setting select { min-height: 38px; width: 100%; padding: 7px 12px; font-family: Georgia, serif; font-size: 14px; border-radius: 7px; }
+.rc-supplied .rc-settings .rc-choice { width: 100%; border-radius: 8px; background: color-mix(in oklab, var(--m-ink) 3%, var(--m-paper)); padding: 3px; gap: 2px; }
+.rc-supplied .rc-settings .rc-choice button { font-family: Georgia, serif; font-size: 13px; line-height: 1.2; min-height: 32px; border-radius: 7px; padding: 5px 6px; color: var(--rc-muted); transition: background 180ms ease, color 180ms ease; }
+.rc-supplied .rc-settings .rc-choice button.is-on { color: var(--m-strip-text); background: var(--m-mark); }
+.rc-supplied .rc-toggle-row { display: flex; align-items: center; justify-content: space-between; min-height: 43px; gap: 12px; border-bottom: 1px solid var(--rc-line); }
+.rc-supplied .rc-toggle-row [role=switch] { background: color-mix(in oklab, var(--m-ink) 20%, var(--m-paper)); }
+.rc-supplied .rc-toggle-row [role=switch][data-state=checked] { background: var(--m-mark); }
+.rc-supplied .rc-toggle-row [role=switch] > span { background: var(--m-paper); }
+.rc-supplied .rc-guide-toggle { width: 100%; justify-content: flex-start; min-height: 43px; border-bottom: 1px solid var(--rc-line); padding: 0; border-radius: 0; }
+.rc-supplied .rc-guide-toggle .rc-setting-label { font-weight: 600; }
+.rc-supplied .rc-settings .rc-color-guide { padding: 12px 0; }
+.rc-supplied .rc-settings .rc-disclaimer { display: flex; text-align: left; gap: 10px; align-items: flex-start; font-size: 10px; margin-top: 20px; }
+.rc-supplied .rc-settings .rc-disclaimer svg { width: 15px; height: 15px; flex: none; color: var(--m-gold); }
