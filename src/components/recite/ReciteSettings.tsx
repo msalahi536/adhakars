@@ -5,6 +5,7 @@ import { useState } from "react";
 import { TAJWEED_GROUPS } from "@/lib/tajweed-rules";
 import { RECITERS, reciterName } from "@/lib/quran";
 import type { ReciteSettings as Settings } from "@/lib/recite/model";
+import { SampleConsentSettings } from "@/components/hifz/SampleConsent";
 
 function Label({ icon: Icon, children }: { icon: LucideIcon; children: React.ReactNode }) {
   return <span className="rc-setting-label"><Icon aria-hidden="true" /><span>{children}</span></span>;
@@ -25,6 +26,7 @@ export function ReciteSettings({ settings, change, close }: { settings: Settings
       <label className="rc-setting"><Label icon={BookOpen}>Mushaf</Label><select aria-label="Mushaf" value={settings.layout === "mushaf" ? "mushaf" : "ayah"} onChange={(e) => change({ layout: e.target.value === "mushaf" ? "mushaf" : "ayah" })}><option value="mushaf">Madani · 15 lines</option><option value="indopak" disabled>Indo-Pak · 16 lines — unavailable</option><option value="ayah">Uthmani text</option></select></label>
       <Choice icon={Headphones} label="Recitation mode" value={settings.mode} onChange={(mode) => change({ mode })} options={[{ value: "self", label: "Self check" }, { value: "ai", label: "AI check" }]} />
       <Toggle icon={Info} label="Show unclear words" checked={settings.showUnclearWords} change={(showUnclearWords) => change({ showUnclearWords })} />
+      <Toggle icon={Info} label="Tajweed tips" checked={settings.tajweedTips} change={(tajweedTips) => change({ tajweedTips })} />
       <Toggle icon={ALargeSmall} label="Tajweed colors" checked={settings.tajweed} change={(tajweed) => change({ tajweed })} />
       <Toggle icon={Moon} label="Night reading" checked={settings.theme === "night"} change={(night) => change({ theme: night ? "night" : "auto" })} />
       <Button className="rc-guide-toggle" variant="ghost" aria-expanded={guide} onClick={() => setGuide(!guide)}><Label icon={BookOpen}>Color guide</Label></Button>
@@ -37,6 +39,7 @@ export function ReciteSettings({ settings, change, close }: { settings: Settings
       <label className="rc-setting"><Label icon={Play}>Playback speed</Label><select aria-label="Playback speed" value={settings.speed} onChange={(e) => change({ speed: Number(e.target.value) })}>{[0.75, 1, 1.25, 1.5].map((r) => <option key={r} value={r}>{r}×</option>)}</select></label>
       <Choice icon={ArrowLeftRight} label="Swipe direction" value={settings.swipeDirection} onChange={(swipeDirection) => change({ swipeDirection })} options={[{ value: "arabic", label: "Arabic" }, { value: "reversed", label: "Reversed" }]} />
       <Toggle icon={Vibrate} label="Haptics" checked={settings.haptics} change={(haptics) => change({ haptics })} />
+      <SampleConsentSettings />
       <footer className="rc-disclaimer"><Info aria-hidden="true" /><span>AI feedback can be wrong and does not replace a qualified teacher.</span></footer>
     </div>
   </section>;

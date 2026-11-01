@@ -1,5 +1,5 @@
 import { expect, test } from "bun:test";
-import { createHifzBetaTapCounter, HIFZ_BETA_KEY, readHifzBeta, toggleHifzBeta } from "./hifz-beta";
+import { createHifzBetaTapCounter, HIFZ_BETA_KEY, readHifzBeta, toggleHifzBeta, joinHifzBeta, setHifzBeta } from "./hifz-beta";
 
 const store = (value?: string) => {
   const values = new Map<string,string>([["quran-recitation:v1", "saved-progress"]]);
@@ -22,3 +22,4 @@ test("unavailable storage keeps Hifz hidden", () => {
   const storage={getItem:()=>{throw new Error("blocked");},setItem:()=>{throw new Error("blocked");}};
   expect(readHifzBeta(storage)).toBe(false); expect(toggleHifzBeta(storage)).toBe(false);
 });
+test("HIFZBETA joins beta and leaving preserves progress", () => { const s = store(); expect(joinHifzBeta("wrong", s)).toBe(false); expect(readHifzBeta(s)).toBe(false); expect(joinHifzBeta("HIFZBETA", s)).toBe(true); expect(s.getItem("hifz_beta")).toBe("1"); setHifzBeta(false, s); expect(readHifzBeta(s)).toBe(false); expect(s.getItem("quran-recitation:v1")).toBe("saved-progress"); });

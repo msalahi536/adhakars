@@ -1,5 +1,11 @@
 # Roadmap
 
+- [x] Add score-independent tajweed tips and page indicators after AI attempts. Missing engine export replaced by conservative unsure-word practice cues, not an acoustic tajweed diagnosis.
+- [x] Add public beta-code access and leave action preserving progress; wrong/valid codes and adult checkbox verified in phone preview.
+- [x] Add adult-only consent, private explicit sample reports and delete-my-samples flow. Authenticated upload readback confirms ZIP, range and note; deletion confirms zero files/rows; no report exists before explicit send.
+- [x] Add acknowledgements, ONNX MIT license and microphone privacy copy; public page and phone heading verified.
+- [x] Verify flows, 33 focused tests and four requested phone screenshots; tips use controlled feedback with real mic capture. Actual iPhone capture/haptics and acoustic tajweed accuracy remain unverified.
+
 - [x] Follow the imam: cached word-position lookup, locked-only synchronous turns and adjacent page/font prefetch. Recorded Al-Bayyinah 1–8 turned 598→599 at 98:8:1 (standard Quran.com coordinates place all of ayah 7 on 598); no browser errors. Recognizer skipped highlights for some words in ayahs 6–7, so recognition accuracy remains unclaimed.
 - [x] Follow mushaf: fixed slots/general heading exceptions; standard coordinates paired with per-word matching QCF v2 font pages because code_v2 changes the API edition. All 11 requested pages inspected, 12 tests pass; screenshots of 598/187/turn saved. Actual-phone behavior remains unverified.
 

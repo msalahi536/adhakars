@@ -1,14 +1,18 @@
 export type LegalSection = { heading: string; body: string };
 
-export const LEGAL_UPDATED = "Last updated: September 2026";
+export const LEGAL_UPDATED = "Last updated: November 1, 2026";
 
 export const PRIVACY_INTRO =
-  "Sahih Al-Adhkar is built so that your worship, your health information, and your habits stay yours. We do not collect, transmit, sell, or store your personal data. There are no analytics, no advertising, no data brokers, and no tracking of any kind.";
+  "Sahih Al-Adhkar is built so that your worship, your health information, and your habits stay yours. Worship progress and health information stay on your device. The optional adult-only recitation reporting feature sends only samples you explicitly choose to report. We never sell or share those samples. There are no advertising trackers or data brokers.";
 
 export const PRIVACY_SECTIONS: LegalSection[] = [
   {
     heading: "OUR CORE PROMISE",
-    body: "Everything you enter into this app is stored only in your device's local storage. We operate no user accounts, no user profiles, and no personal database. We cannot read your data, we cannot recover it, and we have nothing to hand over to advertisers, data brokers, insurers, employers, or any third party.",
+    body: "Your worship progress, settings and health entries stay on your device. Hifz does not require an account. An optional account is used only to identify and delete the private recitation samples you choose to send. We do not sell or share your samples or worship data.",
+  },
+  {
+    heading: "MICROPHONE AND RECITATION",
+    body: "Recitation checking is processed entirely on your device. Audio is never uploaded unless you opt in to Help improve recitation checking, confirm that you are 18 or older, and tap Report a problem followed by Send report. An opted-in recitation is recorded temporarily on your device so you can choose whether to report it. A report contains that recording, what the AI heard, checker comparisons, the surah and ayah range, device details and your optional note. We store your consent date and account identifier with the private sample to improve checker accuracy. Samples are never sold or shared. Only users aged 18 or older may submit samples. You can turn reporting off or delete your uploaded files and report details anytime using Delete my samples in Hifz settings. Deleting local app data does not delete uploaded samples; use Delete my samples while signed in first.",
   },
   {
     heading: "WHAT IS STORED ON YOUR DEVICE",
@@ -24,7 +28,7 @@ export const PRIVACY_SECTIONS: LegalSection[] = [
   },
   {
     heading: "COOKIES AND LOCAL STORAGE",
-    body: "This app does not use advertising cookies, tracking cookies, pixels, fingerprinting, or third-party analytics cookies. It uses your device's local storage only to remember your progress, settings, and preferences so the app works between sessions. This data stays on your device and is cleared when you reset your progress, clear your browser data, or uninstall the app.",
+    body: "This app does not use advertising cookies, tracking cookies, pixels, fingerprinting, or third-party analytics cookies. Local storage remembers progress and preferences. If you choose to sign in for recitation reporting, authentication storage keeps that session available. Private uploaded samples are separate from local storage and must be deleted using Delete my samples.",
   },
   {
     heading: "LOCATION AND DEVICE SENSORS",
@@ -36,7 +40,7 @@ export const PRIVACY_SECTIONS: LegalSection[] = [
   },
   {
     heading: "NETWORK REQUESTS",
-    body: "The app needs an internet connection to load. A connection is used to load the app itself, to fetch prayer time calculation data where you have enabled it, or to open a link you have tapped. These requests do not carry your personal content, your health data, or your progress.",
+    body: "Network requests load the app, Quran and hadith content, audio, checker downloads, prayer data and links you choose to open. Ordinary recitation checking remains on device. Only explicit adult-consented problem reports upload recordings and checker details; account requests identify the owner of those private reports. Health entries and worship progress are not included in reports.",
   },
   {
     heading: "THIRD PARTIES AND APP STORES",
@@ -44,15 +48,15 @@ export const PRIVACY_SECTIONS: LegalSection[] = [
   },
   {
     heading: "DELETING YOUR DATA",
-    body: "You are in full control. You can erase everything at any time using Reset all progress in Settings, by clearing your browser site data, or by uninstalling the app. Because we hold nothing, deletion on your device is complete and permanent, and cannot be undone by us.",
+    body: "You can erase local progress using Reset all progress in Settings, clearing browser site data, or uninstalling the app. To delete private uploaded recitation samples and report details, sign in and use Delete my samples in Hifz settings. Local resets do not delete uploaded samples. Deletions cannot be undone.",
   },
   {
     heading: "CHILDREN",
-    body: "This app is intended for a general audience and does not knowingly collect data from anyone, including children, because it collects no personal data at all.",
+    body: "This app is intended for a general audience. Recitation sample collection is optional and restricted to users who confirm they are 18 or older. Samples from children are not accepted. All other recitation checking remains on device.",
   },
   {
     heading: "YOUR RIGHTS",
-    body: "Privacy laws such as the GDPR and CCPA give you rights to access, correct, export, and delete your personal data, and not to have it sold. Because all of your data remains on your device and we never receive or sell it, you exercise these rights directly and instantly through your own device.",
+    body: "Privacy laws such as the GDPR and CCPA give you rights concerning your personal data. Manage local data on your device and delete private recitation samples using Delete my samples. For questions about your optional account or reports, contact us. We never sell your personal data.",
   },
   {
     heading: "CHANGES",
@@ -98,7 +102,7 @@ export const TERMS_SECTIONS: LegalSection[] = [
   },
   {
     heading: "YOUR DATA AND YOUR CONTENT",
-    body: "Anything you enter, including counts, logs, saved duas, and Period Companion entries, is stored on your device only. You are responsible for that content and for keeping your device secure. We do not review, store, access, or back up it. Clearing your browser data, resetting progress, changing devices, or uninstalling the app will permanently erase it, and we cannot recover it for you.",
+    body: "Counts, logs, saved duas and Period Companion entries are stored on your device only. Keep your device secure; clearing local data can permanently erase progress. Adult users may separately opt in to submit private recitation reports for checker improvement. Those reports are stored only after you explicitly send them and can be deleted using Delete my samples. They are never sold or shared.",
   },
   {
     heading: "AVAILABILITY AND CHANGES TO THE APP",

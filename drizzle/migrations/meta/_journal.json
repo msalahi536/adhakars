@@ -43,6 +43,13 @@
       "when": 1793561862928,
       "tag": "0005_daily_widget_editor_assignments",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1793573869709,
+      "tag": "0006_hifz_private_samples",
+      "breakpoints": true
     }
   ]
 }

@@ -158,3 +158,12 @@
 .rc-supplied .rc-diff-word { background: color-mix(in oklab, var(--rc-hesitation) 20%, transparent); text-decoration: underline; text-decoration-color: var(--rc-hesitation); text-underline-offset: 5px; }
 .rc-supplied .rc-compare-translation { font-size: 12px; color: var(--rc-muted); line-height: 1.6; }
 @media (prefers-reduced-motion: reduce) { .rc-supplied .rc-round-mic::before { transition: none; } }
+.rc-supplied .rc-tajweed-hinted .rc-word-ink { text-decoration: underline dotted var(--recitation-tip); text-underline-offset: 8px; text-decoration-thickness: 1px; }
+.rc-supplied .rc-tajweed-tips { border-top: 1px solid var(--rc-line); margin-top: 16px; padding-top: 12px; }
+.rc-supplied .rc-tajweed-tips h3 { font-size: 14px; margin: 0 0 8px; }
+.rc-supplied .rc-tip { padding: 8px 0; }
+.rc-supplied .rc-tip header { display: flex; gap: 12px; align-items: center; }
+.rc-supplied .rc-tip .rc-arabic { font-size: 24px; }
+.rc-supplied .rc-tip small { flex: 1; font-size: 11px; color: var(--recitation-tip); }
+.rc-supplied .rc-tip p { font-size: 12px; line-height: 1.6; margin: 4px 0; }
+.rc-supplied .rc-tip-disclaimer { font-size: 10px; line-height: 1.5; color: var(--rc-muted); }

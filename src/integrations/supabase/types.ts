@@ -118,6 +118,54 @@ export type Database = {
         }
         Relationships: []
       }
+      hifz_sample_consents: {
+        Row: {
+          adult_confirmed: boolean
+          consented_at: string
+          user_id: string
+        }
+        Insert: {
+          adult_confirmed?: boolean
+          consented_at?: string
+          user_id: string
+        }
+        Update: {
+          adult_confirmed?: boolean
+          consented_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      hifz_samples: {
+        Row: {
+          consented_at: string
+          created_at: string
+          id: string
+          note: string
+          passages: Json
+          path: string
+          user_id: string
+        }
+        Insert: {
+          consented_at: string
+          created_at?: string
+          id?: string
+          note?: string
+          passages: Json
+          path: string
+          user_id: string
+        }
+        Update: {
+          consented_at?: string
+          created_at?: string
+          id?: string
+          note?: string
+          passages?: Json
+          path?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       isnad_names: {
         Row: {
           ar: string

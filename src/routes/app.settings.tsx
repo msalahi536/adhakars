@@ -2,7 +2,7 @@ import { useEffect, useState, type ReactNode } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { HeaderBackButton } from "@/components/HeaderBackButton";
 import { VoiceLabUnlock } from "@/components/VoiceLabUnlock";
-import { AI_CREDIT } from "@/lib/hifz-ai/notices";
+import { HifzBetaAccess } from "@/components/HifzBetaAccess";
 import { getDisplay, setDisplay, themes } from "@/lib/theme";
 import {
   setSeed,
@@ -1091,6 +1091,7 @@ function Settings() {
           </section>
 
           {/* ABOUT */}
+          <HifzBetaAccess />
           <section className="mb-6">
             <h2 className="label-caps mb-3">About</h2>
             <div className="settings-group">
@@ -1146,13 +1147,14 @@ function Settings() {
                 </div>
                 <span className="settings-chevron">›</span>
               </Link>
-              <div className="settings-row">
+              <Link to="/app/acknowledgements" className="settings-row">
                 <span className="settings-icon"><Info size={17} strokeWidth={1.8} /></span>
                 <div className="min-w-0 flex-1">
                   <div className="settings-row-title">Acknowledgements</div>
-                  <div className="settings-row-desc">{AI_CREDIT}</div>
+                  <div className="settings-row-desc">Quran sources, reciters and the free checker</div>
                 </div>
-              </div>
+                <span className="settings-chevron">›</span>
+              </Link>
             </div>
           </section>
 

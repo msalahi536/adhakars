@@ -3,6 +3,8 @@ import type { ListenSession, CheckResult } from "@/lib/hifz-ai";
 import { checkerDownloaded } from "@/lib/hifz-ai/assets";
 import { play as feedback } from "@/lib/hifzHaptics";
 import { mapAiWords, newMistakes } from "./ai-feedback";
+import { captureDebug, type DebugRecording } from "@/lib/hifz-debug";
+import { canReport, readSampleConsent } from "@/lib/hifz-sample-consent";
 
 export type AiRange = { sura: number; first: number; last: number };
 function friendlyError(error: unknown) {
@@ -17,6 +19,9 @@ export function useAiRecitation(page: number, enabled: boolean, keys: string[]) 
   const [stream, setStream] = useState<MediaStream | null>(null);
   const [result, setResult] = useState<CheckResult | null>(null);
   const [error, setError] = useState("");
+  const [recording, setRecording] = useState<DebugRecording | null>(null);
+  const recorder = useRef<ReturnType<typeof captureDebug> | null>(null);
+  function discardRecording() { const current = recorder.current; recorder.current = null; if (current) void current.stop().catch(() => undefined); setRecording(null); }
   const session = useRef<ListenSession | null>(null);
   const cleanup = useRef<Promise<unknown>>(Promise.resolve());
   const generation = useRef(0);
@@ -29,6 +34,7 @@ export function useAiRecitation(page: number, enabled: boolean, keys: string[]) 
     setPhase("idle"); setResult(null); setError(""); previous.current = {};
     return () => {
       generation.current++;
+      discardRecording();
       capture.current?.getTracks().forEach((t) => t.stop()); capture.current = null;
       const current = session.current; session.current = null;
       current?.stream.getTracks().forEach((t) => t.stop());
@@ -46,6 +52,7 @@ export function useAiRecitation(page: number, enabled: boolean, keys: string[]) 
     starting.current = true;
     const id = generation.current;
     setPhase("loading"); setError(""); setProgress(0); setResult(null); previous.current = {};
+    discardRecording();
     try {
       // Ask from the user's start/consent gesture, before model preparation.
       const mic = await navigator.mediaDevices.getUserMedia({ audio: { channelCount: 1, echoCancellation: false, noiseSuppression: true, autoGainControl: true } });
@@ -65,6 +72,7 @@ export function useAiRecitation(page: number, enabled: boolean, keys: string[]) 
       });
       if (id !== generation.current) { await current.stop(); return; }
       session.current = current; setStream(current.stream); setPhase("listening"); feedback("micStart");
+      if (canReport(readSampleConsent())) { try { recorder.current = captureDebug(current.stream); } catch { /* Checking still works when recording is unavailable. */ } }
     } catch (error) {
       if (id === generation.current) { capture.current?.getTracks().forEach((t) => t.stop()); capture.current = null; }
       if (id === generation.current) { setError(friendlyError(error)); setPhase("error"); }
@@ -82,20 +90,24 @@ export function useAiRecitation(page: number, enabled: boolean, keys: string[]) 
     const id = generation.current;
     session.current = null; setPhase("stopping"); setStream(null); feedback("micStop");
     try {
+      const rec = recorder.current; recorder.current = null;
+      const recorded = rec ? rec.stop().catch(() => null) : Promise.resolve(null);
       const finalizing = current.stop();
       cleanup.current = finalizing.catch(() => undefined);
       const final = await finalizing;
+      const clip = await recorded;
       capture.current = null;
-      if (id === generation.current) { receive(final); setPhase("finished"); }
+      if (id === generation.current) { setRecording(clip); receive(final); setPhase("finished"); }
     } catch (error) {
       if (id === generation.current) { setError(friendlyError(error)); setPhase("error"); }
     }
   }
-  return { phase, progress, stream, result, error, request, stop,
-    reset: () => { setResult(null); setPhase("idle"); previous.current = {}; },
+  return { phase, progress, stream, result, recording, error, request, stop,
+    reset: () => { discardRecording(); setResult(null); setPhase("idle"); previous.current = {}; },
     confirm: () => pendingRange.current ? begin(pendingRange.current) : Promise.resolve(),
     cancel: () => {
       generation.current++;
+      discardRecording();
       capture.current?.getTracks().forEach((t) => t.stop()); capture.current = null;
       const current = session.current; session.current = null;
       if (current) cleanup.current = current.stop().catch(() => undefined);
