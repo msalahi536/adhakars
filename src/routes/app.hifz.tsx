@@ -37,13 +37,8 @@ function HifzEntry() {
   if (!state) return <><div className="hz-entry-back"><HeaderBackButton /></div><PlanSetup done={reload} /></>;
   return (
     <>
-      <header className="page-header hz-home-header relative overflow-hidden" style={{ background: "var(--grad-header)", color: "var(--header-fg)" }}>
+      <header className="hz-home-header">
         <HeaderBackButton />
-        <div className="relative mx-auto max-w-md px-16 pb-6 pt-9 text-center">
-          <div className="label-caps" style={{ color: "var(--header-sub)", opacity: 1 }}>Hifz</div>
-          <h1 className="app-page-title mt-2">Your memorization</h1>
-          <p className="mt-2 text-xs opacity-90">Review first, then new lines. Every day a little.</p>
-        </div>
       </header>
       <HifzHome state={state} update={(s) => { saveState(s); setState({ ...s }); }} reset={reload} />
     </>
