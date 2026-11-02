@@ -36,13 +36,15 @@
 
 /* ===== Dawn base — warm cream + olive accent, light cards ===== */
 :root {
-  --reader-opening-paper: oklch(0.957 0.015 80);
-  --reader-opening-ink: oklch(0.214 0.009 75);
-  --reader-opening-olive: oklch(0.432 0.076 133);
+  --reader-opening-paper: oklch(0.963 0.016 83);
+  --reader-opening-ink: oklch(0.256 0.011 135);
+  --reader-opening-olive: oklch(0.483 0.055 130);
   --reader-opening-surface: oklch(0.977 0.013 80);
   --reader-opening-on-mic: oklch(0.988 0.006 90);
   --reader-opening-mic-top: oklch(0.65 0.076 110);
   --reader-opening-mic-bottom: oklch(0.42 0.05 140);
+  --reader-opening-divider: oklch(0.88 0.02 85);
+  --reader-glass-shadow: 0 8px 24px color-mix(in oklab,var(--q2-ink) 10%,transparent), inset 0 1px 0 color-mix(in oklab,var(--q2-control) 90%,transparent);
   --reader-control-shadow: 0 4px 12px color-mix(in oklab,var(--q2-ink) 9%,transparent);
   --reader-dock-shadow: 0 12px 24px color-mix(in oklab,var(--q2-ink) 17%,transparent);
   --memory-strong: #246443;
