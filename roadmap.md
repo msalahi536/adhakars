@@ -164,4 +164,4 @@
 - [x] Remove Hifz screens, navigation, reminders, local progress and code; preserve Arabic review rules and Quran tajweed (129 tests pass; browser checks pass)
 - [ ] Permanently delete retired Hifz cloud backups — blocked by the backward-incompatible database migration safety setting; backups are inactive and marked deprecated
 
-- [ ] Rebuild Arabic Companion on src/lib/arabic v2 engine: placement, home (Today/Read/Understand/progress/settings), step player (all step kinds), recording studio /app/arabic/record, reader known-word meanings, Programs subtitle
+- [x] Rebuild Arabic Companion on src/lib/arabic v2 engine: placement, home (Today/Read/Understand/progress/settings), step player (all step kinds), recording studio /app/arabic/record, reader known-word meanings, Programs subtitle
