@@ -67,7 +67,7 @@ const tiles: Tile[] = [
 
 function More() {
   const { enabled: hifzEnabled } = useHifzBeta();
-  const visibleTiles = tiles.filter((tile) => tile.to !== "/app/hifz" || hifzEnabled);
+  const visibleTiles = tiles.filter((tile) => !["/app/hifz", "/app/arabic"].includes(tile.to) || hifzEnabled);
   const navigate = useNavigate();
   const { open, section } = Route.useSearch();
 

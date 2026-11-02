@@ -1,0 +1,6 @@
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { useEffect, useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
+import { Button } from "@/components/ui/button";
+export const Route = createFileRoute("/app/report-signin")({ head: () => ({ meta: [{ title: "Report sign-in — Sahih Al-Adhkar" }, { name: "description", content: "Return to optional private recitation reports after signing in." }, { property: "og:title", content: "Report sign-in — Sahih Al-Adhkar" }, { property: "og:description", content: "Sign-in for optional private reports." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }, { name: "robots", content: "noindex" }] }), component: Callback });
+function Callback() { const navigate = useNavigate(); const [message, setMessage] = useState("Finishing sign-in…"); useEffect(() => { let canceled = false; void supabase.auth.getUser().then(({ data }) => { if (canceled) return; if (data.user) void navigate({ to: "/app/hifz/recite", replace: true }); else setMessage("Sign-in did not finish. Please retry from Hifz settings."); }); return () => { canceled = true; }; }, [navigate]); return <main className="p-6"><p role="status">{message}</p><Button variant="outline" onClick={() => void navigate({ to: "/app/more" })}>Back</Button></main>; }

@@ -3,9 +3,10 @@ import { findHesitations, masteryScore, type Hesitation, type Mastery } from "@/
 import { findDrifts, type Drift } from "@/lib/hifz-ai/mutashabih";
 import { performanceFromAI, recordReview, recordSabaq, type HifzState } from "@/lib/hifz";
 import type { SessionItem } from "@/lib/hifz/program";
+import { tajweedHints, type TajweedHint } from "@/lib/hifz-ai/tajweed";
 
 export type Passage = { sura: number; first: number; last: number };
-export type Attempt = { result: CheckResult; hes: Hesitation[]; m: Mastery; drifts: Drift[]; clean: boolean; driftError?: string };
+export type Attempt = { result: CheckResult; hes: Hesitation[]; m: Mastery; drifts: Drift[]; clean: boolean; driftError?: string; tips?: TajweedHint[]; passages?: Passage[] };
 export const CLEAN_PASSES = 3;
 export function cleanRecitation(result: CheckResult, keys: string[]) {
   const statuses = new Map(result.words.map((w) => [w.key, w.status]));
@@ -25,7 +26,9 @@ export async function analyzeAttempt(result: CheckResult, passages: Passage[], k
   let driftError: string | undefined;
   try { drifts = await findDrifts(result, passages); }
   catch { driftError = "Similar-ayah checking is unavailable. Retry when connected."; }
-  return { result, hes, m, drifts, clean: cleanRecitation(result, keys), driftError };
+  let tips: TajweedHint[] = [];
+  try { tips = await tajweedHints(result, passages, 3); } catch { /* Tips never block memory results. */ }
+  return { result, hes, m, drifts, clean: cleanRecitation(result, keys), driftError, tips, passages };
 }
 export function recordAttempt(state: HifzState, item: SessionItem, attempt: Attempt, date: string, lessonComplete: boolean) {
   const next = structuredClone(state);

@@ -21,6 +21,7 @@ import { Route as TermsRouteImport } from './routes/terms'
 import { Route as ApiWidgetsRouteImport } from './routes/api/widgets'
 import { Route as AppIndexRouteImport } from './routes/app.index'
 import { Route as AppAboutRouteImport } from './routes/app.about'
+import { Route as AppAcknowledgementsRouteImport } from './routes/app.acknowledgements'
 import { Route as AppArabicRouteImport } from './routes/app.arabic'
 import { Route as AppDuasRouteImport } from './routes/app.duas'
 import { Route as AppEveningRouteImport } from './routes/app.evening'
@@ -34,6 +35,7 @@ import { Route as AppPeriodRouteImport } from './routes/app.period'
 import { Route as AppPrivacyRouteImport } from './routes/app.privacy'
 import { Route as AppQiblaRouteImport } from './routes/app.qibla'
 import { Route as AppQuranRouteImport } from './routes/app.quran'
+import { Route as AppReportSigninRouteImport } from './routes/app.report-signin'
 import { Route as AppRuqyahRouteImport } from './routes/app.ruqyah'
 import { Route as AppSalahRouteImport } from './routes/app.salah'
 import { Route as AppSettingsRouteImport } from './routes/app.settings'
@@ -110,6 +112,11 @@ const AppAboutRoute = AppAboutRouteImport.update({
   path: '/about',
   getParentRoute: () => AppRoute,
 } as any)
+const AppAcknowledgementsRoute = AppAcknowledgementsRouteImport.update({
+  id: '/acknowledgements',
+  path: '/acknowledgements',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppArabicRoute = AppArabicRouteImport.update({
   id: '/arabic',
   path: '/arabic',
@@ -173,6 +180,11 @@ const AppQiblaRoute = AppQiblaRouteImport.update({
 const AppQuranRoute = AppQuranRouteImport.update({
   id: '/quran',
   path: '/quran',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppReportSigninRoute = AppReportSigninRouteImport.update({
+  id: '/report-signin',
+  path: '/report-signin',
   getParentRoute: () => AppRoute,
 } as any)
 const AppRuqyahRoute = AppRuqyahRouteImport.update({
@@ -263,6 +275,7 @@ export interface FileRoutesByFullPath {
   '/terms': typeof TermsRoute
   '/api/widgets': typeof ApiWidgetsRoute
   '/app/about': typeof AppAboutRoute
+  '/app/acknowledgements': typeof AppAcknowledgementsRoute
   '/app/arabic': typeof AppArabicRoute
   '/app/duas': typeof AppDuasRoute
   '/app/evening': typeof AppEveningRoute
@@ -276,6 +289,7 @@ export interface FileRoutesByFullPath {
   '/app/privacy': typeof AppPrivacyRoute
   '/app/qibla': typeof AppQiblaRoute
   '/app/quran': typeof AppQuranRoute
+  '/app/report-signin': typeof AppReportSigninRoute
   '/app/ruqyah': typeof AppRuqyahRoute
   '/app/salah': typeof AppSalahRoute
   '/app/settings': typeof AppSettingsRoute
@@ -304,6 +318,7 @@ export interface FileRoutesByTo {
   '/terms': typeof TermsRoute
   '/api/widgets': typeof ApiWidgetsRoute
   '/app/about': typeof AppAboutRoute
+  '/app/acknowledgements': typeof AppAcknowledgementsRoute
   '/app/arabic': typeof AppArabicRoute
   '/app/duas': typeof AppDuasRoute
   '/app/evening': typeof AppEveningRoute
@@ -317,6 +332,7 @@ export interface FileRoutesByTo {
   '/app/privacy': typeof AppPrivacyRoute
   '/app/qibla': typeof AppQiblaRoute
   '/app/quran': typeof AppQuranRoute
+  '/app/report-signin': typeof AppReportSigninRoute
   '/app/ruqyah': typeof AppRuqyahRoute
   '/app/salah': typeof AppSalahRoute
   '/app/settings': typeof AppSettingsRoute
@@ -347,6 +363,7 @@ export interface FileRoutesById {
   '/terms': typeof TermsRoute
   '/api/widgets': typeof ApiWidgetsRoute
   '/app/about': typeof AppAboutRoute
+  '/app/acknowledgements': typeof AppAcknowledgementsRoute
   '/app/arabic': typeof AppArabicRoute
   '/app/duas': typeof AppDuasRoute
   '/app/evening': typeof AppEveningRoute
@@ -360,6 +377,7 @@ export interface FileRoutesById {
   '/app/privacy': typeof AppPrivacyRoute
   '/app/qibla': typeof AppQiblaRoute
   '/app/quran': typeof AppQuranRoute
+  '/app/report-signin': typeof AppReportSigninRoute
   '/app/ruqyah': typeof AppRuqyahRoute
   '/app/salah': typeof AppSalahRoute
   '/app/settings': typeof AppSettingsRoute
@@ -391,6 +409,7 @@ export interface FileRouteTypes {
     | '/terms'
     | '/api/widgets'
     | '/app/about'
+    | '/app/acknowledgements'
     | '/app/arabic'
     | '/app/duas'
     | '/app/evening'
@@ -404,6 +423,7 @@ export interface FileRouteTypes {
     | '/app/privacy'
     | '/app/qibla'
     | '/app/quran'
+    | '/app/report-signin'
     | '/app/ruqyah'
     | '/app/salah'
     | '/app/settings'
@@ -432,6 +452,7 @@ export interface FileRouteTypes {
     | '/terms'
     | '/api/widgets'
     | '/app/about'
+    | '/app/acknowledgements'
     | '/app/arabic'
     | '/app/duas'
     | '/app/evening'
@@ -445,6 +466,7 @@ export interface FileRouteTypes {
     | '/app/privacy'
     | '/app/qibla'
     | '/app/quran'
+    | '/app/report-signin'
     | '/app/ruqyah'
     | '/app/salah'
     | '/app/settings'
@@ -474,6 +496,7 @@ export interface FileRouteTypes {
     | '/terms'
     | '/api/widgets'
     | '/app/about'
+    | '/app/acknowledgements'
     | '/app/arabic'
     | '/app/duas'
     | '/app/evening'
@@ -487,6 +510,7 @@ export interface FileRouteTypes {
     | '/app/privacy'
     | '/app/qibla'
     | '/app/quran'
+    | '/app/report-signin'
     | '/app/ruqyah'
     | '/app/salah'
     | '/app/settings'
@@ -604,6 +628,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppAboutRouteImport
       parentRoute: typeof AppRoute
     }
+    '/app/acknowledgements': {
+      id: '/app/acknowledgements'
+      path: '/acknowledgements'
+      fullPath: '/app/acknowledgements'
+      preLoaderRoute: typeof AppAcknowledgementsRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/app/arabic': {
       id: '/app/arabic'
       path: '/arabic'
@@ -693,6 +724,13 @@ declare module '@tanstack/react-router' {
       path: '/quran'
       fullPath: '/app/quran'
       preLoaderRoute: typeof AppQuranRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/report-signin': {
+      id: '/app/report-signin'
+      path: '/report-signin'
+      fullPath: '/app/report-signin'
+      preLoaderRoute: typeof AppReportSigninRouteImport
       parentRoute: typeof AppRoute
     }
     '/app/ruqyah': {
@@ -826,6 +864,7 @@ const AppHifzRouteWithChildren =
 
 interface AppRouteChildren {
   AppAboutRoute: typeof AppAboutRoute
+  AppAcknowledgementsRoute: typeof AppAcknowledgementsRoute
   AppArabicRoute: typeof AppArabicRoute
   AppDuasRoute: typeof AppDuasRoute
   AppEveningRoute: typeof AppEveningRoute
@@ -839,6 +878,7 @@ interface AppRouteChildren {
   AppPrivacyRoute: typeof AppPrivacyRoute
   AppQiblaRoute: typeof AppQiblaRoute
   AppQuranRoute: typeof AppQuranRoute
+  AppReportSigninRoute: typeof AppReportSigninRoute
   AppRuqyahRoute: typeof AppRuqyahRoute
   AppSalahRoute: typeof AppSalahRoute
   AppSettingsRoute: typeof AppSettingsRoute
@@ -853,6 +893,7 @@ interface AppRouteChildren {
 
 const AppRouteChildren: AppRouteChildren = {
   AppAboutRoute: AppAboutRoute,
+  AppAcknowledgementsRoute: AppAcknowledgementsRoute,
   AppArabicRoute: AppArabicRoute,
   AppDuasRoute: AppDuasRoute,
   AppEveningRoute: AppEveningRoute,
@@ -866,6 +907,7 @@ const AppRouteChildren: AppRouteChildren = {
   AppPrivacyRoute: AppPrivacyRoute,
   AppQiblaRoute: AppQiblaRoute,
   AppQuranRoute: AppQuranRoute,
+  AppReportSigninRoute: AppReportSigninRoute,
   AppRuqyahRoute: AppRuqyahRoute,
   AppSalahRoute: AppSalahRoute,
   AppSettingsRoute: AppSettingsRoute,

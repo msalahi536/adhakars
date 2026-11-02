@@ -676,9 +676,10 @@ function Recite() {
     const targetWords = sabaq ? (cleanPasses >= 2 ? chainWords : rangeWords) : words;
     const memoryTest = targetWords.some((w) => w.key === word.key);
     const hesitated = sheet === "ai" && attempt?.hes.some((h) => h.key === word.key);
+    const tipped = sheet === "ai" && saved.settings.tajweedTips && attempt?.tips?.some((h) => h.key === word.key);
     const state: WordState = mode === "ai" && memoryTest ? aiWordState(aiStatus) : (mode === "ai" && !memoryTest ? "correct" : saved.marks[word.key] ?? "pending");
     const hint = peek === "all" || (mode === "self" && (peek === word.key || isOpeningWord(word, words, saved.settings.hideAmount)));
-    return <Button variant="ghost" key={word.key} className={`rc-word rc-${state} ${aiStatus === "wrong" || aiStatus === "skipped" ? `rc-ai-${aiStatus}` : ""} ${hesitated ? "rc-hesitated" : ""} ${hint ? "rc-peek" : ""} ${audioWord === word.key ? "rc-listening" : ""}`} onPointerUp={(e) => {
+    return <Button variant="ghost" key={word.key} className={`rc-word rc-${state} ${aiStatus === "wrong" || aiStatus === "skipped" ? `rc-ai-${aiStatus}` : ""} ${hesitated ? "rc-hesitated" : ""} ${tipped ? "rc-tipped" : ""} ${hint ? "rc-peek" : ""} ${audioWord === word.key ? "rc-listening" : ""}`} onPointerUp={(e) => {
       const start = pointer.current;
       if (!micBusy.current && start && start.id === e.pointerId && pageGesture(start, e.clientX, e.clientY, e.timeStamp) === "tap" && mode === "ai" && aiStatus !== "wrong" && aiStatus !== "skipped") {
         e.stopPropagation(); pointer.current = null; setMeaning(word); return;
@@ -802,7 +803,7 @@ function Recite() {
       <div onClick={(e) => e.stopPropagation()}>
         {sheet === "settings" && <ReciteSettings settings={saved.settings} change={(settings) => setSaved((s) => ({ ...s, settings: { ...s.settings, ...settings } }))} close={() => setSheet(null)} />}
         {sheet === "navigation" && <PageNavigation page={saved.page} chapter={first?.chapter} juz={first?.juz} chapters={chapters} go={changePage} close={() => setSheet(null)} />}
-        {sheet === "ai" && attempt && <AiResultSheet attempt={attempt} passes={cleanPasses} lesson={!!sabaq} chapters={chapters} recording={ai.recording} highlight={mutateHighlight} close={() => setSheet(null)} again={() => { setAttempt(null); setAiCorrection(null); ai.reset(); setSheet(null); if (sabaq) setSabaqPhase(cleanPasses >= 2 ? "chain" : "recite"); }} next={() => {
+        {sheet === "ai" && attempt && <AiResultSheet attempt={attempt} passes={cleanPasses} lesson={!!sabaq} chapters={chapters} recording={ai.recording} showTips={saved.settings.tajweedTips} highlight={mutateHighlight} close={() => setSheet(null)} again={() => { setAttempt(null); setAiCorrection(null); ai.reset(); setSheet(null); if (sabaq) setSabaqPhase(cleanPasses >= 2 ? "chain" : "recite"); }} next={() => {
           if (sabaq && cleanPasses < CLEAN_PASSES) { setAttempt(null); setAiCorrection(null); ai.reset(); setSheet(null); setSabaqPhase(cleanPasses >= 2 ? "chain" : "recite"); }
           else if (activeSession) { playFeedback("pageComplete"); advance(); }
           else { ai.reset(); setAttempt(null); setSheet(null); }

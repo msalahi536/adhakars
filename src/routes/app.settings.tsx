@@ -1146,13 +1146,14 @@ function Settings() {
                 </div>
                 <span className="settings-chevron">›</span>
               </Link>
-              <div className="settings-row">
+              <Link to="/app/acknowledgements" className="settings-row">
                 <span className="settings-icon"><Info size={17} strokeWidth={1.8} /></span>
                 <div className="min-w-0 flex-1">
                   <div className="settings-row-title">Acknowledgements</div>
                   <div className="settings-row-desc">{AI_CREDIT}</div>
                 </div>
-              </div>
+                <span className="settings-chevron">›</span>
+              </Link>
             </div>
           </section>
 

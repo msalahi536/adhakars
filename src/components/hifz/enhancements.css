@@ -21,6 +21,12 @@ body:has([role=dialog].hx-panel) > [data-state=open]:not([role=dialog]) { z-inde
 .hx-echo-current { background:color-mix(in oklab,var(--accent) 15%,transparent); border-radius:4px; }
 .hx-status { text-align:center; color:var(--muted-foreground); font-size:12px; min-height:24px; }
 .hx-source { font-size:11px; color:var(--muted-foreground); }
+.rc-supplied { --rc-tip: #4f8db6; }
+.rc-tipped .rc-word-ink { text-decoration:underline dotted var(--rc-tip); text-decoration-thickness:1px; text-underline-offset:6px; }
+.rc-tajweed-tips { margin:16px 0; padding:12px 0; border-top:1px solid var(--rc-line); }
+.rc-ayah-tip { margin:12px 0; }
+.rc-ayah-tip header { display:flex; justify-content:space-between; align-items:center; }
+.rc-ayah-tip p { font-size:12px; line-height:1.7; }
 .hx-ayah-block { padding:16px 0; border-bottom:1px solid var(--border); }
 .hx-ayah-block .hx-arabic { font-family:var(--font-arabic); font-size:24px; line-height:2; }
 .hx-spot-row { display:flex; width:100%; height:auto; white-space:normal; text-align:start; gap:12px; padding:16px 0; border-bottom:1px solid var(--border); border-radius:0; justify-content:space-between; }

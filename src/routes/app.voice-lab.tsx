@@ -1,9 +1,10 @@
 // Hidden Voice Lab (7 taps on Version in Settings): measures on-device Quran recognition on this phone.
 // Audio never leaves the device; the model is downloaded once and cached by the browser.
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
 import { HeaderBackButton } from "@/components/HeaderBackButton";
 import { compareWords, type DiffResult } from "@/lib/voice-lab";
+import { useHifzBeta } from "@/lib/hifz-beta";
 
 export const Route = createFileRoute("/app/voice-lab")({
   head: () => ({
@@ -17,8 +18,15 @@ export const Route = createFileRoute("/app/voice-lab")({
       { name: "twitter:card", content: "summary" },
     ],
   }),
-  component: VoiceLab,
+  component: HiddenVoiceLab,
 });
+
+function HiddenVoiceLab() {
+  const { enabled, checked } = useHifzBeta();
+  const navigate = useNavigate();
+  useEffect(() => { if (checked && !enabled) void navigate({ to: "/app/more", replace: true }); }, [checked, enabled, navigate]);
+  return enabled ? <VoiceLab /> : null;
+}
 
 // Community ONNX conversion of tarteel-ai/whisper-tiny-ar-quran (Apache-2.0).
 const MODEL = "omartariq612/tarteel-ai-whisper-tiny-ar-quran-onnx";

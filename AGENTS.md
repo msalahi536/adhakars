@@ -3,7 +3,7 @@
 - Beta Hifz records attempts once; third clean lesson credits lines, page reviews need one. Results show mastery, hesitations and drift apart from self-marks. Ranges share a mic and cached models/keys. Quran voice memoizes Madani pages, reserves lesson-sized heading rows for Basmala, and mutates highlights directly. Search delegates stopping/confidence to engine sessions and meters their streams; all mics stop on exit.
 - Daily editor uses encrypted, server-verified sessions; dated snapshots override only their UTC day with rotation fallback. Browsing reuses Quran/hadith clients with cancellable updates, preserving widget contracts.
 - Hifz qari playback uses cancellable generation tokens and settled segment waits; stage changes invalidate playback before mic startup so repeat loops cannot restart audio after a stop.
-- Hifz AI notices are runtime-independent and checking is free. Component-owned replay, retained mic, echo/tafsir, engine drills and local milestone keys preserve state/layouts.
+- Hifz stays free with runtime-independent notices. Component replay/mic/echo/drills preserve layouts; tips never grade memory. Reports require adult consent, owner RLS and private deletable ZIPs.
 
 - Hifz dialogs portal above navigation; practice uses engine exports and Quran-source ranges/names. Sleep previews save device-only passages for unrecorded recall.
 
@@ -63,5 +63,5 @@
 - Hifz mushaf rendering waits for its matching page font and fits all lines with one measured size; tajweed uses word-level indicators in QCF mode, preserving glyphs without claiming unverified character-to-glyph mappings.
 
 - Hifz feedback uses one cancellable Capacitor pattern dispatcher with batched mistake priority and a 1500ms cooldown; native-unavailable feedback pulses the strip, and optional local effects never replace qari audio. Future microphone and recognition events use the same dispatcher without implying those features are active.
-- Hifz entry and rendering share a hydration-safe device beta gate; defer recite queries until enabled and redirect disabled direct visits to More, so hidden access never flashes or clears progress.
+- Hifz, Quran voice/Echo, Arabic beta and Voice Lab share the seven-version-tap device gate; defer gated rendering/queries and redirect disabled direct visits without flashing or clearing progress.
 - The Hifz program (plan setup, home, session flow) lives outside `src/lib/hifz/` and only calls the engine; `/app/hifz` is the program entry and `/app/hifz/recite` the mushaf page, so the parent route renders `<Outlet />` on child paths. Program state is `hifz_state_v1` (no `hifz:` prefix, so retired-Hifz cleanup never touches it); reminders use IDs 910000/911000, clear of the retired 900-range.
