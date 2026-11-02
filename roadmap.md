@@ -1,9 +1,9 @@
 # Roadmap
 
 - [x] Hide all Hifz/Quran voice/Echo, Voice Lab and Arabic beta tools behind seven Settings version taps only; no public Join/Leave beta or code field. Direct visits and unlock/relock verified; 3 tests pass.
-- [ ] Add teacher-qualified tajweed tips, explicit adult-only signed-in private problem reports/deletion, and public acknowledgements/licenses; omit the cancelled public beta code screen and preserve layouts/gestures.
+- [x] Add teacher-qualified tajweed tips, explicit adult-only signed-in private problem reports/deletion, and public acknowledgements/licenses; omit the cancelled public beta code screen and preserve layouts/gestures. Signed-in recorded lesson scored Solid 100, Send report succeeded and read back, UI deletion removed reports and private files; 15 focused tests pass, no browser errors, build OK. Consent/report/credits/result screenshots captured; tips screenshot uses a labeled controlled fixture because the clean recording yielded no tips. Actual-phone behavior, external OAuth round trip and full third-party license audit remain unverified.
 
-- [x] Strengthen shared privacy/terms for Hifz AI, local replay, external services, adult-only reports, feedback, third-party licenses and non-waivable rights. All four pages verified with November 1, 2026 date and no browser errors. Sample consent/upload/deletion workflow is not implemented; hosting policies, full shipped-asset licenses and legal enforceability require external review before claiming compliance.
+- [x] Strengthen shared privacy/terms for Hifz AI, local replay, external services, adult-only reports, feedback, third-party licenses and non-waivable rights. All four pages verified with November 1, 2026 date and no browser errors. Sample consent/upload/deletion workflow now verified; hosting policies, full shipped-asset licenses and legal enforceability require external review before claiming compliance.
 
 - [x] Add memory-only AI recording, timed replay and Correct/You mistake clips.
 - [x] Add retained-stream hands-free reviews, pause and final page summary.
