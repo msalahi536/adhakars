@@ -5,6 +5,7 @@ import { useState } from "react";
 import { TAJWEED_GROUPS } from "@/lib/tajweed-rules";
 import { RECITERS, reciterName } from "@/lib/quran";
 import type { ReciteSettings as Settings } from "@/lib/recite/model";
+import { SampleSettings } from "./SampleReports";
 
 function Label({ icon: Icon, children }: { icon: LucideIcon; children: React.ReactNode }) {
   return <span className="rc-setting-label"><Icon aria-hidden="true" /><span>{children}</span></span>;
@@ -25,6 +26,8 @@ export function ReciteSettings({ settings, change, close }: { settings: Settings
       <label className="rc-setting"><Label icon={BookOpen}>Mushaf</Label><select aria-label="Mushaf" value={settings.layout === "mushaf" ? "mushaf" : "ayah"} onChange={(e) => change({ layout: e.target.value === "mushaf" ? "mushaf" : "ayah" })}><option value="mushaf">Madani · 15 lines</option><option value="indopak" disabled>Indo-Pak · 16 lines — unavailable</option><option value="ayah">Uthmani text</option></select></label>
       <Choice icon={Headphones} label="Recitation mode" value={settings.mode} onChange={(mode) => change({ mode })} options={[{ value: "self", label: "Self check" }, { value: "ai", label: "AI check" }]} />
       <Toggle icon={Info} label="Show unclear words" checked={settings.showUnclearWords} change={(showUnclearWords) => change({ showUnclearWords })} />
+      <Toggle icon={BookOpen} label="Tajweed tips" checked={settings.tajweedTips} change={(tajweedTips) => change({ tajweedTips })} />
+      <SampleSettings />
       <Toggle icon={ALargeSmall} label="Tajweed colors" checked={settings.tajweed} change={(tajweed) => change({ tajweed })} />
       <Toggle icon={Moon} label="Night reading" checked={settings.theme === "night"} change={(night) => change({ theme: night ? "night" : "auto" })} />
       <Button className="rc-guide-toggle" variant="ghost" aria-expanded={guide} onClick={() => setGuide(!guide)}><Label icon={BookOpen}>Color guide</Label></Button>
