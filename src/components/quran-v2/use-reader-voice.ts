@@ -24,7 +24,7 @@ export function useReaderVoice({update,elsewhere,position,answer}:{update:(r:Che
       const engine=await import("@/lib/hifz-ai");await engine.prepareChecker(p=>{if(id===generation.current)setProgress(p);});
       if(id!==generation.current)return;
       const failure=(e:unknown)=>{if(id!==generation.current)return;release();setStream(null);setPhase("error");setError(e instanceof Error&&e.name==="NotAllowedError"?"Allow microphone access in your browser or phone settings, then retry.":"Couldn’t start listening. Please try again.");};
-      const current=intent.current.mode==="smart"?await engine.startSmartRecite({passages:intent.current.ranges,onUpdate:r=>{if(id===generation.current)callbacks.current.update(r);},onElsewhere:p=>{if(id===generation.current)callbacks.current.elsewhere(p);},onError:failure}):intent.current.mode==="follow"?await engine.startFollowing({onPosition:p=>{if(id===generation.current)callbacks.current.position(p);},onError:failure}):await engine.startVoiceSearch({maxSeconds:15,onError:failure,onAnswer:a=>{if(id===generation.current){session.current=null;setStream(null);setPhase("idle");callbacks.current.answer(a);}}});
+      const current=intent.current.mode==="smart"?await engine.startSmartRecite({passages:intent.current.ranges,keepStream:true,onUpdate:r=>{if(id===generation.current)callbacks.current.update(r);},onElsewhere:p=>{if(id===generation.current)callbacks.current.elsewhere(p);},onError:failure}):intent.current.mode==="follow"?await engine.startFollowing({onPosition:p=>{if(id===generation.current)callbacks.current.position(p);},onError:failure}):await engine.startVoiceSearch({maxSeconds:15,onError:failure,onAnswer:a=>{if(id===generation.current){session.current=null;setStream(null);setPhase("idle");callbacks.current.answer(a);}}});
       if(id!==generation.current){current.stream.getTracks().forEach(t=>t.stop());await current.stop();return;}
       session.current=current;setStream(current.stream);setPhase("active");feedback("micStart");
       if(intent.current.mode==="smart")capture.current=captureRecording(current.stream);
@@ -40,7 +40,7 @@ export function useReaderVoice({update,elsewhere,position,answer}:{update:(r:Che
     if(busy.current)return;busy.current=true;setPhase("finishing");const id=generation.current;
     const current=session.current;session.current=null;
     const blob=capture.current?.finish();capture.current=null;
-    try{const result=await current?.stop();if(id===generation.current){if(result)callbacks.current.update(result);setRecording(await blob??null);setStream(null);setPhase("idle");feedback("micStop");}}
+    try{const result=await current?.stop();if(id===generation.current){if(result)callbacks.current.update(result);setRecording(await blob??null);current?.stream.getTracks().forEach(t=>t.stop());setStream(null);setPhase("idle");feedback("micStop");}}
     finally{if(id===generation.current)busy.current=false;}
   }
   async function continueAt(ranges:Range[]){
