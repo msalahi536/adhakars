@@ -41,6 +41,7 @@ export function useReaderVoice({update,elsewhere,position,answer}:{update:(r:Che
     const current=session.current;session.current=null;
     const blob=capture.current?.finish();capture.current=null;
     try{const result=await current?.stop();if(id===generation.current){if(result)callbacks.current.update(result);setRecording(await blob??null);current?.stream.getTracks().forEach(t=>t.stop());setStream(null);setPhase("idle");feedback("micStop");}}
+    catch {if(id===generation.current){current?.stream.getTracks().forEach(t=>t.stop());setStream(null);setError("Couldn’t finish this recording. Tap the mic to retry.");setPhase("error");}}
     finally{if(id===generation.current)busy.current=false;}
   }
   async function continueAt(ranges:Range[]){
@@ -57,5 +58,6 @@ export function useReaderVoice({update,elsewhere,position,answer}:{update:(r:Che
       session.current=next;held.getTracks().forEach(t=>t.enabled=true);intent.current.ranges=ranges;
     }catch{cancel();setError("Listening stopped. Tap the mic to continue.");setPhase("error");}finally{busy.current=false;}
   }
-  return {phase,mode,progress,error,stream,recording,request,begin,stop,cancel,continueAt};
+  function discardRecording(){setRecording(null);}
+  return {phase,mode,progress,error,stream,recording,request,begin,stop,cancel,continueAt,discardRecording};
 }

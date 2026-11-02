@@ -111,6 +111,10 @@ export function UnifiedReader({chapterId=1,verse=1,initialPage,initialMode,back,
   const name=chapters.find(c=>c.id===first?.chapter)?.name_simple??"Quran";
   const [tail,setTail]=useState(1);
   useEffect(()=>setTail(1),[anchor]);
+  useEffect(()=>{
+    const node=root.current?.querySelector(".q2-load-next");if(!node||prefs.layout==="Framed mushaf")return;
+    const observer=new IntersectionObserver(entries=>{if(entries.some(e=>e.isIntersecting))setTail(n=>Math.min(n+2,604-anchor));},{root:scroll.current,rootMargin:"250px"});observer.observe(node);return()=>observer.disconnect();
+  },[tail,anchor,prefs.layout]);
   const pages=prefs.layout==="Framed mushaf"?[page]:Array.from({length:Math.min(tail+1,605-anchor)},(_,i)=>anchor+i);
   const words=current?pageWords(current):[];
   const reveal=(ayah:boolean)=>{const pending=words.find(w=>!revealed.has(w.key));if(!pending)return;setRevealed(old=>{const next=new Set(old);for(const w of words)if(w.key===pending.key||(ayah&&w.verse===pending.verse))next.add(w.key);return next;});feedback("reveal");};
@@ -139,7 +143,7 @@ export function UnifiedReader({chapterId=1,verse=1,initialPage,initialMode,back,
     {sheet==="navigation"&&<ReaderNavigation chapters={chapters} recent={recent} bookmarks={bookmarks} go={(s,v,p)=>void go(s,v,p)} close={()=>setSheet(null)}/>}
     {sheet==="settings"&&<ReaderSettings prefs={prefs} change={change} page={page} chapters={chapters} close={()=>setSheet(null)}/>}
     {sheet==="reciter"&&<ReaderReciters selected={reciter} select={id=>{setReciter(id);const existing=JSON.parse(localStorage.getItem("adhkar:quran")??"{}");localStorage.setItem("adhkar:quran",JSON.stringify({...existing,reciter:id}));setSheet(null);}} close={()=>setSheet(null)}/>}
-    {sheet==="mistakes"&&<ReaderMistakes result={result} recording={voice.recording} tips={tips} chapters={chapters} correct={correct} highlight={setHighlight} close={()=>setSheet(null)}/>}
+    {sheet==="mistakes"&&<ReaderMistakes result={result} recording={voice.recording} tips={tips} chapters={chapters} correct={correct} highlight={setHighlight} close={()=>{voice.discardRecording();setSheet(null);}}/>}
     {sheet==="search"&&<ReaderSheet title="Find an ayah" close={()=>setSheet(null)}><ReaderSearch chapters={chapters} go={go}/><Button onClick={()=>{setSheet(null);if(lesson?.stream){toast("Stop your lesson microphone first");return;}void voice.request("search");}}><Mic size={18}/>Recite anything</Button></ReaderSheet>}
     {sheet==="more"&&<ReaderSheet title="Reader" close={()=>setSheet(null)}><div className="q2-menu"><Button variant="ghost" onClick={()=>setSheet("echo")}><Repeat/>Echo mode</Button><Button variant="ghost" onClick={()=>{setSheet(null);if(lesson?.stream){toast("Stop your lesson microphone first");return;}void voice.request("follow");}}><Mic/>Follow the imam</Button><Button variant="ghost" onClick={()=>setSheet("reciter")}><Play/>Reciter</Button><Button variant="ghost" onClick={()=>{setSheet(null);if(lesson?.stream){toast("Stop your lesson microphone first");return;}void voice.request("search");}}><Search/>Find an ayah</Button><Button variant="ghost" onClick={bookmark}><Bookmark/>Bookmark this page</Button><Button variant="ghost" onClick={()=>setSheet("navigation")}><Bookmark/>Bookmarks</Button></div></ReaderSheet>}
     {sheet==="echo"&&<EchoMode modern keys={current?.verses.map(v=>v.key)??[]} reciter={reciter} close={()=>setSheet(null)} highlight={(keys,h)=>{setHidden(h);setHighlight(keys[0]?`${keys[0]}:1`:null);}}/>}
