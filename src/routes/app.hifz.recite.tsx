@@ -329,7 +329,7 @@ function Recite() {
 
   // Prepare each session item: jump to its page, hide the page fresh, reset the tracker.
   useEffect(() => {
-    if (!sessionItem || !page || sessionEnded) return;
+    if (!hydrated || !sessionItem || !page || sessionEnded) return;
     const key = `${search.session}:${itemIndex}`;
     if (preppedItem.current === key) return;
     const targetPage = sessionItem.kind === "review" || sessionItem.kind === "sabaq" ? sessionItem.page : sessionItem.kind === "link" ? sessionItem.pages[0] : null;
@@ -353,7 +353,7 @@ function Recite() {
     }
     // review / link: the whole page starts hidden
     update({ marks: restartPage(words, latest.current.marks) });
-  }, [sessionItem, page, itemIndex, search.session, sessionEnded, words.length]);
+  }, [hydrated, sessionItem, page, itemIndex, search.session, sessionEnded, words.length]);
 
   // Desirable difficulty: the 3 second "try first" window starts with each new ayah.
   useEffect(() => {
@@ -708,7 +708,7 @@ function Recite() {
     listen:()=>{if(playing)stopAudio();else if(sabaq)void playSabaqListen();else void listen();},peek:()=>{setPeek("all");setTimeout(()=>setPeek(null),1500);},onWord:w=>{if(mode==="self")mark(w);else if(w.audio)void playWord(w);},highlight:audioWord,
     peeked:peek==="all",keys:new Set((sabaq?(cleanPasses>=2?chainWords:rangeWords):words).map(w=>w.key)),onPage:changePage,
     onSilence:last=>{const result=liveResult.current;if(ai.phase==="listening"&&!handsPaused&&result&&pageReached(result,Date.now()-last))void ai.stop();},
-    tools:<>{sabaq&&<Button variant="outline" size="sm" onClick={()=>{stopAudio();setEcho(true);}}><Repeat size={14}/>Echo</Button>}{sessionItem?.kind==="review"&&<><Switch aria-label="Hands-free" checked={handsFree} onCheckedChange={setHandsFree}/><Button variant="ghost" onClick={()=>{if(handsPaused){setHandsPaused(false);ai.resumeStream();}else{setHandsPaused(true);ai.pauseStream();}}}>{handsPaused?"Resume":"Pause"}</Button></>}</>,
+    tools:<>{sabaq&&<Button variant="outline" size="sm" onClick={()=>setUnderstand(true)}><BookOpen size={14}/>Meaning</Button>}{sabaq&&<Button variant="outline" size="sm" onClick={()=>{stopAudio();setEcho(true);}}><Repeat size={14}/>Echo</Button>}{sessionItem?.kind==="review"&&<><Switch aria-label="Hands-free" checked={handsFree} onCheckedChange={setHandsFree}/><Button variant="ghost" onClick={()=>{if(handsPaused){setHandsPaused(false);ai.resumeStream();}else{setHandsPaused(true);ai.pauseStream();}}}>{handsPaused?"Resume":"Pause"}</Button></>}</>,
     overlays:<>    {(sheet || gradeAyah) && <div className="rc-backdrop" onClick={() => { if (!gradeAyah && sheet !== "drills" && sheet !== "sessionGrade" && sheet !== "sessionEnd") setSheet(null); }}>
       <div onClick={(e) => e.stopPropagation()}>
         {sheet === "settings" && <ReciteSettings settings={saved.settings} change={(settings) => setSaved((s) => ({ ...s, settings: { ...s.settings, ...settings } }))} close={() => setSheet(null)} />}
@@ -765,7 +765,7 @@ function Recite() {
     <header className="rc-header" aria-hidden={!controls} inert={!controls}><Button variant="ghost" size="icon" aria-label="Exit Hifz" onClick={() => { saveActiveSession(null); void navigate({ to: activeSession ? "/app/hifz" : "/app/more" }); }}><ChevronLeft /></Button><Button variant="ghost" className="rc-title" aria-label="Go to page" onClick={() => setSheet("navigation")}>{chapter?.name_simple ?? "Quran"} · {saved.page}</Button><Button variant="ghost" size="icon" aria-label="Page settings" onClick={() => setSheet("settings")}>Aa</Button></header>
     {activeSession && !sessionEnded && !handsFree && <div className="rc-lesson-pill">{chapter?.name_simple} · {sessionItem?.kind === "review" ? "Review" : "Lesson"}{sabaq && <span className="rc-pass-dots" aria-label={`${cleanPasses} of 3 clean recitations`}>{[1, 2, 3].map((n) => <i key={n} className={cleanPasses >= n ? "is-filled" : ""} />)}</span>}</div>}
     <div className="hx-mini-tools">
-      {sabaq && <><Button variant="ghost" size="icon" title="What these ayat say" aria-label="What these ayat say" disabled={micBusy.current} onClick={() => setUnderstand(true)}><BookOpen size={16}/></Button><Button variant="ghost" size="icon" title="Echo mode" aria-label="Echo mode" disabled={micBusy.current} onClick={() => { stopAudio(); setEcho(true); }}><Repeat size={16}/></Button></>}
+      {sabaq && <><Button variant="ghost" size="sm" title="Meaning" aria-label="Meaning" disabled={micBusy.current} onClick={() => setUnderstand(true)}><BookOpen size={16}/>Meaning</Button><Button variant="ghost" size="sm" title="Echo" aria-label="Echo" disabled={micBusy.current} onClick={() => { stopAudio(); setEcho(true); }}><Repeat size={16}/>Echo</Button></>}
       {mode === "ai" && sessionItem?.kind === "review" && <><Switch aria-label="Hands-free" checked={handsFree} disabled={ai.phase === "listening" || ai.phase === "loading"} onCheckedChange={(v) => { setHandsFree(v); setHandsPaused(false); if (!v) ai.cancel(); }}/>{handsFree && <Button variant="ghost" size="icon" aria-label={handsPaused ? "Resume hands-free" : "Pause hands-free"} disabled={ai.phase === "loading" || ai.phase === "stopping"} onClick={() => { if (handsPaused) { setHandsPaused(false); if (ai.phase === "listening") ai.resumeStream(); else { quranPlayer.pause(); recitationPlayer.pause(); void ai.request(aiRanges); } } else { setHandsPaused(true); ai.pauseStream(); } }}>{handsPaused ? <Play size={16}/> : <Pause size={16}/>}</Button>}</>}
     </div>
     {handsFree && sessionItem?.kind === "review" && <div className="rc-lesson-pill">Hands-free · page {reviewSummary.length + 1} of {activeSession?.items.filter((i) => i.kind === "review").length}</div>}

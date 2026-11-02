@@ -26,7 +26,7 @@ import { knownPages, quranIndexOptions } from "@/lib/hifz/program";
 import { reciteChaptersOptions } from "@/lib/recite/data";
 import { hasSetupChoice } from "./setup-choice";
 import { moveSurah, toggleSurahOrder } from "./surah-order";
-import { bestAutomaticPace, DAILY_MINUTES, effectiveTimeline, selectedFinishEstimate, goalFinishEstimates } from "./automatic-pace";
+import { distinctAutomaticPaces, reviewGrowth, DAILY_MINUTES, effectiveTimeline, selectedFinishEstimate, goalFinishEstimates } from "./automatic-pace";
 
 const DAY_NAMES = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 const TIME_OPTIONS = DAILY_MINUTES;
@@ -75,8 +75,9 @@ export function PlanSetup({ existing, done }: { existing?: HifzPlan; done: () =>
   const summary = useMemo(() => buildTimeline(draft, q, plan.dailyMinutes), [JSON.stringify(draft), q]);
   const dateTimeline = useMemo(() => targetDate ? paceForFinishDate(draft, q, targetDate) : null, [JSON.stringify(draft), q, targetDate]);
   const automaticKey = JSON.stringify({ ...draft, dailyMinutes: 0, newLinesPerDay: 0 });
-  const automaticPaces = useMemo(() => step >= 2 ? new Map(TIME_OPTIONS.map((minutes) => [minutes, bestAutomaticPace(draft, q, minutes)])) : new Map(), [step >= 2, automaticKey, q]);
+  const automaticPaces = useMemo(() => step >= 2 ? distinctAutomaticPaces(draft, q) : new Map(), [step >= 2, automaticKey, q]);
   const cardEstimates = useMemo(() => customLines === undefined ? automaticPaces : new Map(TIME_OPTIONS.map((minutes) => [minutes, effectiveTimeline(buildTimeline({ ...draft, newLinesPerDay: customLines }, q, minutes))])), [automaticPaces, customLines, automaticKey, q]);
+  const growth = reviewGrowth(summary.minutesByMonth, plan.dailyMinutes, plan.startDate);
   const chosenLines = customLines ?? automaticPaces.get(plan.dailyMinutes)?.lines ?? plan.newLinesPerDay;
   const selectedEstimate = useMemo(() => selectedFinishEstimate(buildTimeline({ ...draft, newLinesPerDay: chosenLines }, q, plan.dailyMinutes), plan.startDate, paceMode === "date" && dateTimeline ? targetDate : undefined), [JSON.stringify(draft), chosenLines, q, paceMode, targetDate, dateTimeline]);
   const goalEstimates = useMemo(() => step === 2 ? goalFinishEstimates({ ...draft, newLinesPerDay: chosenLines }, q) : null, [step, JSON.stringify(draft), chosenLines, q]);
@@ -352,6 +353,7 @@ export function PlanSetup({ existing, done }: { existing?: HifzPlan; done: () =>
               <div className="hz-plan-time">
                 <header><ChartNoAxesColumnIncreasing aria-hidden="true" /><div><h2>Daily time needed</h2><p>As your hifz grows</p></div><span className="hz-plan-budget">Your goal: {plan.dailyMinutes} min</span></header>
               <MinutesChart points={summary.minutesByMonth} budget={plan.dailyMinutes} />
+              {growth && <p className="hz-review-growth">Reviews grow as your hifz grows; around {monthYear(growth.date)} you’ll need ~{growth.minutes} min a day, and we’ll suggest adjusting.</p>}
               </div>
               {selectedEstimate.timeWarning && <p className="hz-warning">{selectedEstimate.timeWarning}</p>}
               <Button variant="ghost" className="hz-wide hz-plan-advanced" aria-haspopup="dialog" onClick={() => setAdvanced(true)}>
@@ -441,7 +443,7 @@ function MinutesChart({ points, budget }: { points: { atMonth: number; minutes: 
       <path d={path} className="hz-chart-line" fill="none" />
       <circle cx={xy[0][0]} cy={xy[0][1]} r="2.5" className="hz-chart-start" />
     </svg>
-    <div className="hz-plan-chart-labels"><span>Now</span><span>{points[points.length - 1].minutes} min</span></div>
+    <div className="hz-plan-chart-labels"><span>Now</span><span>{points[points.length - 1].minutes} min/day</span></div>
     </div>
   );
 }
