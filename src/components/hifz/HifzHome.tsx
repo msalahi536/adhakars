@@ -23,6 +23,7 @@ import {
 } from "@/lib/hifz/reminders";
 import { PlanSetup } from "./PlanSetup";
 import { selectedFinishEstimate } from "./automatic-pace";
+import { completedStudyDates } from "./practice-rules";
 import { PracticeCards } from "./PracticeCards";
 import { MilestoneMoment, pendingMilestones } from "./MilestoneMoment";
 import type { Milestone } from "@/lib/hifz/insights";
@@ -58,7 +59,7 @@ export function HifzHome({ state, update, reset }: { state: HifzState; update: (
   const timeline = useMemo(() => buildTimeline(state.plan, q, state.plan.dailyMinutes), [state, q]);
   const finishEstimate = useMemo(() => selectedFinishEstimate(timeline, state.plan.startDate), [timeline, state.plan.startDate]);
   const [scrolled, setScrolled] = useState(false);
-  const studyDays = Object.entries(state.dayLog).filter(([, log]) => log.newLines > 0 || log.reviews > 0);
+  const studyDays = completedStudyDates(state);
   const [sheet, setSheet] = useState<"juz" | "salah" | "reminders" | "plan" | null>(null);
   const [juzOpen, setJuzOpen] = useState<number | null>(null);
   const [reminders, setReminders] = useState<HifzReminderPrefs>(getHifzReminders);
@@ -174,7 +175,7 @@ export function HifzHome({ state, update, reset }: { state: HifzState; update: (
         </div>
         {studyDays.length > 0 && <section className="hz-home-card hz-streak-card">
           <header className="hz-streak-heading"><Flame /><div><h2>Study Streak</h2><p>{st.streak > 0 ? `${st.streak} day${st.streak === 1 ? "" : "s"} of steady study.` : `${studyDays.length} day${studyDays.length === 1 ? "" : "s"} spent with your Quran.`}</p></div></header>
-          <div className="hz-study-positives">{studyDays.slice(-7).map(([date]) => <span key={date}><Check />{new Date(date + "T12:00:00").toLocaleDateString(undefined, {month:"short",day:"numeric"})}</span>)}</div>
+          <div className="hz-study-positives">{studyDays.slice(-7).map((date) => <span key={date}><Check />{new Date(date + "T12:00:00").toLocaleDateString(undefined, {month:"short",day:"numeric"})}</span>)}</div>
         </section>}
       </div>
 

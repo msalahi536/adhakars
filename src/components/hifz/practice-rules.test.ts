@@ -1,6 +1,6 @@
 import {expect,test} from "bun:test";
 import {createState,defaultPlan} from "@/lib/hifz";
-import {sleepWindow,reviewItems,previewWords,positionPages} from "./practice-rules";
+import {sleepWindow,reviewItems,previewWords,positionPages,completedStudyDates} from "./practice-rules";
 import type {DayTimes} from "@/lib/prayer-times";
 import type {RecitePage,ReciteWord} from "@/lib/recite/model";
 const day:DayTimes={key:"2026-11-01",times:{fajr:300,sunrise:360,dhuhr:720,asr:900,maghrib:1080,isha:1200}};
@@ -20,4 +20,8 @@ test("preview selects tomorrow's lines without exceeding the page",()=>{
  const page:RecitePage={page:604,verses:[{key:"112:1",chapter:112,number:1,juz:30,translation:"",words:[word(1,2),word(2,3),word(3,15)]}]};
  expect(previewWords(page,{fromLine:2,lines:2}).map((w)=>w.line)).toEqual([3]);
  expect(positionPages([page])[0].startLines).toEqual({"112:1":2});
+});
+test("new users have no streak card; only completed study days are positive entries",()=>{
+ expect(completedStudyDates({dayLog:{}})).toEqual([]);
+ expect(completedStudyDates({dayLog:{"2026-11-01":{newLines:0,reviews:0,minutes:1},"2026-11-02":{newLines:7,reviews:0,minutes:28},"2026-11-03":{newLines:0,reviews:1,minutes:2}}})).toEqual(["2026-11-02","2026-11-03"]);
 });

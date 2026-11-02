@@ -7,7 +7,7 @@
 
 - Hifz dialogs portal above navigation; practice uses engine exports and Quran-source ranges/names. Sleep previews save device-only passages for unrecorded recall.
 
-- Hifz setup caches automatic pace candidates per plan when time selection opens, ranks the approved engine's effective finish dates with smaller-pace tie breaks, and keeps custom overrides in a bottom sheet; the selected summary reflects an active finish-date target with any engine time-limit warning. Immediate-goal and whole-Quran comparisons use the same chosen pace and engine with scope-only index ranges, excluding known pages and preserving selected-surah order before the remaining Quran.
+- Hifz setup caches automatic pace candidates per plan when time selection opens, ranks engine finish dates within distinct increasing time-choice paces, and keeps custom overrides in a bottom sheet; the selected summary reflects an active finish-date target with any engine time-limit warning. Immediate-goal and whole-Quran comparisons use the same chosen pace and engine with scope-only index ranges, excluding known pages and preserving selected-surah order before the remaining Quran.
 - Hifz home and plan finish summaries share selectedFinishEstimate with the saved daily-minute budget; time-limit warnings compare displayed month/year so realistic dates never contradict or repeat themselves.
 
 - Hifz known-surah and starting-order choices render one shared setup dialog with independent selections; pure tested surah-order helpers preserve tap order and handle reordering before saving to the engine, keeping review and learning goals separate.

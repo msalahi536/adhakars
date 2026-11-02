@@ -36,3 +36,6 @@ export function positionPages(pages:RecitePage[]) {
       return word?[[v.key,word.line]]:[];
     }))}));
 }
+export function completedStudyDates(state: Pick<HifzState, "dayLog">) {
+  return Object.entries(state.dayLog).filter(([, log]) => log.newLines > 0 || log.reviews > 0).map(([date]) => date).sort();
+}
