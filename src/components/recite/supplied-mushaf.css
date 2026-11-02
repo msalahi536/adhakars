@@ -114,12 +114,12 @@
 
 .rc-supplied { --rc-hesitation: var(--period-amber); }
 .rc-supplied .rc-hesitated .rc-word-ink { text-decoration: underline dotted var(--rc-hesitation); text-underline-offset: 6px; text-decoration-thickness: 2px; }
-.rc-supplied .rc-mic-controls { display: grid; grid-template-columns: 44px 76px 44px; align-items: center; justify-content: center; gap: 20px; height: 92px; position: relative; }
+.rc-supplied .rc-mic-controls { display: grid; grid-template-columns: 44px 76px 44px; grid-template-rows: 76px 14px; align-items: center; justify-content: center; column-gap: 20px; row-gap: 2px; height: 92px; position: relative; }
 .rc-supplied .rc-mic-controls > button { color: var(--m-ink); }
 .rc-supplied .rc-round-mic { width: 76px; height: 76px; border-radius: 50%; background: var(--m-strip-a); color: var(--m-strip-text) !important; border: 1px solid var(--m-gold); position: relative; }
 .rc-supplied .rc-round-mic::before { content: ""; position: absolute; inset: -6px; border-radius: 50%; border: 2px solid var(--m-mark); opacity: .2; transform: scale(var(--rc-voice-scale, 1)); transition: transform 90ms linear; pointer-events: none; }
 .rc-supplied .rc-round-mic.is-listening::before { opacity: .5; }
-.rc-supplied .rc-mic-caption { position: absolute; bottom: -5px; left: 0; right: 0; text-align: center; font-size: 10px; color: var(--rc-muted); }
+.rc-supplied .rc-mic-caption { grid-column: 1 / -1; position: static; text-align: center; font-size: 10px; color: var(--rc-muted); }
 .rc-supplied .rc-lesson-pill { position: absolute; top: calc(env(safe-area-inset-top, 0px) + 12px); left: 50%; transform: translateX(-50%); display: flex; align-items: center; gap: 10px; max-width: calc(100% - 110px); white-space: nowrap; font-size: 12px; color: var(--m-ink); }
 .rc-supplied .rc-pass-dots { display: flex; align-items: center; justify-content: center; gap: 7px; margin: 14px 0; }
 .rc-supplied .rc-pass-dots span, .rc-supplied .rc-pass-dots i { display: block; width: 9px; height: 9px; border-radius: 50%; border: 1px solid var(--m-mark); background: transparent; }

@@ -10,7 +10,7 @@ import { PopupHandle } from "./PopupHandle";
 import { pageRecitationLabel } from "./page-label";
 import {
   BookOpen, CalendarDays, ChevronRight, Flame, Layers, Link2, MoonStar, Play,
-  Settings2, Sparkles, Bell, ChartNoAxesColumnIncreasing, Check, Target, type LucideIcon,
+  Settings2, Sparkles, Bell, ChartNoAxesColumnIncreasing, Check, Target, Mic, ListOrdered, AudioLines, type LucideIcon,
 } from "lucide-react";
 import {
   buildSession, buildTimeline, humanDuration, recordSalah, saveState, stats, todayISO,
@@ -23,6 +23,7 @@ import {
 } from "@/lib/hifz/reminders";
 import { PlanSetup } from "./PlanSetup";
 import { selectedFinishEstimate } from "./automatic-pace";
+import { completedStudyDates } from "./practice-rules";
 import { PracticeCards } from "./PracticeCards";
 import { MilestoneMoment, pendingMilestones } from "./MilestoneMoment";
 import type { Milestone } from "@/lib/hifz/insights";
@@ -57,7 +58,8 @@ export function HifzHome({ state, update, reset }: { state: HifzState; update: (
   const st = useMemo(() => stats(state, q, today), [state, q, today]);
   const timeline = useMemo(() => buildTimeline(state.plan, q, state.plan.dailyMinutes), [state, q]);
   const finishEstimate = useMemo(() => selectedFinishEstimate(timeline, state.plan.startDate), [timeline, state.plan.startDate]);
-  const weakCount = Object.keys(state.weakSpots).length;
+  const [scrolled, setScrolled] = useState(false);
+  const studyDays = completedStudyDates(state);
   const [sheet, setSheet] = useState<"juz" | "salah" | "reminders" | "plan" | null>(null);
   const [juzOpen, setJuzOpen] = useState<number | null>(null);
   const [reminders, setReminders] = useState<HifzReminderPrefs>(getHifzReminders);
@@ -109,7 +111,7 @@ export function HifzHome({ state, update, reset }: { state: HifzState; update: (
   const pct = Math.round(st.percentOfQuran * 1000) / 10;
 
   return (
-    <main className="scroll-area hz-home">
+    <main className={`scroll-area hz-home ${scrolled ? "is-scrolled" : ""}`} onScroll={(event) => setScrolled(event.currentTarget.scrollTop > 24)}>
       {celebrations[0] && <MilestoneMoment moment={celebrations[0]} done={() => setCelebrations((items) => items.slice(1))} />}
       <div className="hz-home-content">
         <div className="hz-home-heading">
@@ -161,66 +163,20 @@ export function HifzHome({ state, update, reset }: { state: HifzState; update: (
           )}
         </section>
 
-        {/* Progress map */}
-        <section className="hz-home-card hz-map-card">
-          <header className="hz-map-heading"><h2 className="hz-card-heading"><Layers /> Progress Map</h2><span className="hz-map-label">Juz</span></header>
-          <div className="hz-map">
-            {st.byJuz.map((j) => (
-              <Button variant="ghost" key={j.juz} className={`hz-map-tile ${j.memorized === j.pages ? "is-complete" : j.memorized ? "is-started" : ""}`} title={`${j.memorized} of ${j.pages} pages memorized`} aria-label={`Juz ${j.juz}: ${j.memorized} of ${j.pages} pages`} onClick={() => { setJuzOpen(j.juz); setSheet("juz"); }}>
-                <i style={{ opacity: j.memorized ? .35 : 0, width: `${(j.memorized / j.pages) * 100}%` }} />
-                <em>{j.juz}</em>
-              </Button>
-            ))}
-          </div>
-        </section>
-
-        <section className="hz-home-card hz-streak-card">
-          <header className="hz-streak-heading">
-            <Flame />
-            <div><h2>Study Streak</h2><p>Keep the momentum going.</p></div>
-            <span>{st.streak} days</span>
-          </header>
-          <div className="hz-study-week" aria-label="Study activity this week">
-            {Array.from({ length: 7 }, (_, i) => {
-              const day = new Date(`${today}T12:00:00`);
-              day.setDate(day.getDate() - day.getDay() + i);
-              const date = `${day.getFullYear()}-${String(day.getMonth() + 1).padStart(2, "0")}-${String(day.getDate()).padStart(2, "0")}`;
-              const log = state.dayLog[date];
-              const studied = Boolean(log && (log.newLines > 0 || log.reviews > 0));
-              return <div key={date} aria-label={`${date}: ${studied ? "studied" : "not studied"}`}><span>{day.toLocaleDateString(undefined, { weekday: "narrow" })}</span><i className={studied ? "is-done" : ""}>{studied && <Check />}</i></div>;
-            })}
-          </div>
-          <details className="hz-home-forecast"><summary>Upcoming reviews</summary><div className="hz-forecast" aria-label="Reviews due over the next 7 days">{st.forecast.map((f) => <div className="hz-forecast-bar" key={f.date}><strong>{f.due}</strong><span>{new Date(f.date + "T12:00:00Z").toLocaleDateString(undefined, { weekday: "short" })}</span></div>)}</div></details>
-        </section>
-
-        {/* Actions */}
         <PracticeCards state={state} q={q} today={today} names={names} update={update}/>
-        <Button variant="ghost" className="hz-row-btn" onClick={() => void navigate({ to: "/app/hifz/weak-spots" })}><Target /><span>My weak spots<small>Words, ayah starts and similar ayat</small></span><ChevronRight /></Button>
-        <Button variant="ghost" className="hz-row-btn" onClick={()=>void navigate({to:"/app/hifz/mushaf"})}><BookOpen/><span>My Mushaf<small>Your memory, page by page</small></span><ChevronRight/></Button>
-        <Button variant="ghost" className="hz-row-btn" onClick={()=>void navigate({to:"/app/hifz/drills"})}><Target/><span>Voice quizzes<small>A few words, then recall</small></span><ChevronRight/></Button>
-        <Button variant="ghost" className="hz-row-btn" onClick={()=>void navigate({to:"/app/hifz/lines"})}><Layers/><span>Where is it on the page?<small>Remember the ayah’s starting line</small></span><ChevronRight/></Button>
-        {weakCount > 0 && (
-          <Button variant="ghost" className="hz-row-btn" onClick={() => startSession("drills")}>
-            <Target size={17} /> <span>{weakCount} weak spot{weakCount === 1 ? "" : "s"}<small>Short drills to fix them</small></span>
-            <ChevronRight size={16} style={{ marginLeft: "auto" }} />
-          </Button>
-        )}
-        <Button variant="ghost" className="hz-row-btn" onClick={() => setSheet("salah")}>
-          <MoonStar size={17} /> <span>I recited in salah<small>Counts as a light review</small></span>
-          <ChevronRight size={16} style={{ marginLeft: "auto" }} />
-        </Button>
-        <Button variant="ghost" className="hz-row-btn" onClick={() => void navigate({ to: "/app/hifz/recite" })}>
-          <BookOpen size={17} /> <span>Free recite<small>Any page, outside the program</small></span>
-          <ChevronRight size={16} style={{ marginLeft: "auto" }} />
-        </Button>
-        <Button variant="ghost" className="hz-row-btn" onClick={() => setSheet("reminders")}>
-          <Bell size={17} /> <span>Reminders<small>Morning review and before sleep</small></span>
-          <ChevronRight size={16} style={{ marginLeft: "auto" }} />
-        </Button>
-        <Button variant="ghost" className="hz-row-btn" onClick={() => setSheet("plan")}>
-          <Settings2 size={17} /> <span>Edit plan<small>Order, pace, daily time</small></span>
-          <ChevronRight size={16} style={{ marginLeft: "auto" }} />
-        </Button>
+        <div className="hz-tools-grid">
+          <Button variant="ghost" className="hz-tool" onClick={() => void navigate({ to: "/app/hifz/weak-spots" })}><Target /><span>Weak spots</span></Button>
+          <Button variant="ghost" className="hz-tool" onClick={() => void navigate({ to: "/app/hifz/mushaf" })}><BookOpen /><span>My Mushaf</span></Button>
+          <Button variant="ghost" className="hz-tool" onClick={() => void navigate({ to: "/app/hifz/drills" })}><AudioLines /><span>Voice quizzes</span></Button>
+          <Button variant="ghost" className="hz-tool" onClick={() => void navigate({ to: "/app/hifz/lines" })}><ListOrdered /><span>Line quiz</span></Button>
+          <Button variant="ghost" className="hz-tool" onClick={() => void navigate({ to: "/app/hifz/recite" })}><Mic /><span>Free recite</span></Button>
+          <Button variant="ghost" className="hz-tool" onClick={() => setSheet("reminders")}><Bell /><span>Reminders</span></Button>
+          <Button variant="ghost" className="hz-tool" onClick={() => setSheet("plan")}><Settings2 /><span>Edit plan</span></Button>
+        </div>
+        {studyDays.length > 0 && <section className="hz-home-card hz-streak-card">
+          <header className="hz-streak-heading"><Flame /><div><h2>Study Streak</h2><p>{st.streak > 0 ? `${st.streak} day${st.streak === 1 ? "" : "s"} of steady study.` : `${studyDays.length} day${studyDays.length === 1 ? "" : "s"} spent with your Quran.`}</p></div></header>
+          <div className="hz-study-positives">{studyDays.slice(-7).map((date) => <span key={date}><Check />{new Date(date + "T12:00:00").toLocaleDateString(undefined, {month:"short",day:"numeric"})}</span>)}</div>
+        </section>}
       </div>
 
       <Dialog open={sheet !== null && sheet !== "plan"} onOpenChange={(open) => { if (!open) setSheet(null); }}>

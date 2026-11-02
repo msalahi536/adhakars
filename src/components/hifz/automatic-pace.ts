@@ -44,3 +44,24 @@ export function goalFinishEstimates(plan: HifzPlan, q: QuranIndex) {
   const full = effectiveTimeline(buildTimeline({ ...plan, order: fullOrder }, fullIndex, plan.dailyMinutes));
   return { label: isAmma ? "Juz Amma" : "Selected surahs", goal, full };
 }
+/** Distinct increasing time choices, still estimated by the engine. */
+export function distinctAutomaticPaces(plan: HifzPlan, q: QuranIndex) {
+  const choices = new Map<number, ReturnType<typeof effectiveTimeline>>();
+  let previous = 0;
+  DAILY_MINUTES.forEach((minutes, index) => {
+    const maxIndex = AUTOMATIC_LINES.length - (DAILY_MINUTES.length - index);
+    const ranked = AUTOMATIC_LINES.filter((lines, i) => lines > previous && i <= maxIndex)
+      .map(lines => effectiveTimeline(buildTimeline({ ...plan, newLinesPerDay: lines }, q, minutes)))
+      .sort((a, b) => a.finish.localeCompare(b.finish) || a.lines - b.lines);
+    const selected = ranked[0];
+    if (selected) { choices.set(minutes, selected); previous = selected.lines; }
+  });
+  return choices;
+}
+export function reviewGrowth(points: Timeline["minutesByMonth"], budget: number, start: string) {
+  const first = points.find(p => p.minutes > budget);
+  if (!first) return null;
+  const date = new Date(start + "T12:00:00Z");
+  date.setUTCDate(date.getUTCDate() + first.atMonth * 30);
+  return { date: date.toISOString().slice(0, 10), minutes: Math.round(first.minutes) };
+}

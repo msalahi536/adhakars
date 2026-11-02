@@ -3,7 +3,7 @@
 .hx-word-actions button { padding:6px; font-size:11px; gap:4px; }
 .hx-word-actions svg { width:13px; }
 .hx-mini-tools { position:absolute; right:18px; top:calc(env(safe-area-inset-top,0px) + 6px); z-index:6; display:flex; align-items:center; gap:4px; }
-.hx-mini-tools button { height:32px; width:32px; color:var(--foreground); background:var(--background); }
+.hx-mini-tools button { height:32px; width:auto; padding:0 8px; gap:5px; font-size:10px; color:var(--foreground); background:var(--background); }
 .hx-panel { color:var(--foreground); background:var(--background); }
 [role=dialog].hx-panel { z-index:350; width:min(calc(100% - 24px),512px); border-radius:8px; }
 body:has([role=dialog].hx-panel) > [data-state=open]:not([role=dialog]) { z-index:340; background:color-mix(in oklab,var(--foreground) 25%,transparent); }

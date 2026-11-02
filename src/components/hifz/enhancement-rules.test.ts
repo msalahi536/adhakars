@@ -1,5 +1,10 @@
 import { describe, expect, it } from "bun:test";
-import { echoSequence, ECHO_DEFAULTS, milestoneKey, pageReached } from "./enhancement-rules";
+import { echoSequence, ECHO_DEFAULTS, milestoneKey, pageReached, sessionPageReady } from "./enhancement-rules";
+it("a saved page 604 cannot prepare a page 602 task before hydration and the page jump", () => {
+  expect(sessionPageReady(false,602,602)).toBe(false);
+  expect(sessionPageReady(true,604,602)).toBe(false);
+  expect(sessionPageReady(true,602,602)).toBe(true);
+});
 describe("Hifz enhancement rules", () => {
   it("defaults to three single repeats", () => expect(ECHO_DEFAULTS.repeats).toBe(3));
   it("defaults to two joined repeats", () => expect(ECHO_DEFAULTS.joined).toBe(2));

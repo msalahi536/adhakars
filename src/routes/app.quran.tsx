@@ -964,7 +964,7 @@ const VerseCard = memo(function VerseCard({ verse: v, active, word, translit, tr
       </div>
       <div className="min-w-0 flex-1">
         {arabic && <p className="quran-ar" dir="rtl" lang="ar" onClick={() => onPlay(v.key)}>
-          {v.words.map((w) => {
+          {v.words.filter(w => !w.isEnd).map((w) => {
             const state = w.isEnd ? "quran-end" : !wordMode ? "quran-word" : w.position < word! ? "quran-word is-done" : w.position === word ? "quran-word is-now" : "quran-word";
             return <Fragment key={w.position}><span className={state}>{tajweed && w.tj && !w.isEnd ? <TajweedText markup={w.tj} /> : w.text}</span>{" "}</Fragment>;
           })}

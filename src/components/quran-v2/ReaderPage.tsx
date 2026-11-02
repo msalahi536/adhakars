@@ -44,8 +44,8 @@ export function ReaderPage({number,chapters,layout,marks,hidden,revealed,highlig
   };
   const content=page&&<div ref={body} className={`q2-page-body ${layout==="Translation"?"q2-translation-page":""}`} style={{fontFamily:layout!=="Translation"?font??undefined:undefined}}>
     {layout==="Translation"?page.verses.map(v=><section key={v.key} className="q2-verse" data-q2-verse={v.key}>
-      <small>{chapters.find(c=>c.id===v.chapter)?.name_simple} · {v.number}</small>
-      {arabic&&<div dir="rtl" className="q2-arabic-row">{v.words.map(word)}</div>}
+      <small>{chapters.find(c=>c.id===v.chapter)?.name_simple} · ayah {v.number}</small>
+      {arabic&&<div dir="rtl" className="q2-arabic-row">{v.words.filter(w => !w.end).map(word)}</div>}
       {translit&&<p className="q2-translit" style={{fontSize:translitSize}}>{v.words.filter(w=>!w.end).map(w=>w.transliteration).join(" ")}</p>}
       {translation&&<p style={{fontSize:translationSize}}>{translations?.[v.key]??v.translation}</p>}
     </section>):Array.from({length:15},(_,i)=>{

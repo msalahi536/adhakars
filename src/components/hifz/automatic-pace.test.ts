@@ -1,6 +1,6 @@
 import { expect, test } from "bun:test";
 import { buildTimeline, buildQuranIndex, defaultPlan } from "@/lib/hifz";
-import { AUTOMATIC_LINES, DAILY_MINUTES, bestAutomaticPace, selectedFinishEstimate, goalFinishEstimates } from "./automatic-pace";
+import { AUTOMATIC_LINES, DAILY_MINUTES, bestAutomaticPace, selectedFinishEstimate, goalFinishEstimates, distinctAutomaticPaces, reviewGrowth } from "./automatic-pace";
 
 const q = buildQuranIndex([{ id: 67, pages: [562, 564] }]);
 const plan = { ...defaultPlan("2026-11-01"), order: { kind: "surahs" as const, surahs: [67] }, studyDays: [0,1,2,3,4,5,6], consolidateEvery: 0 };
@@ -88,4 +88,15 @@ test("selected surahs retain their own estimate while full Quran includes remain
 test("already known Juz Amma pages are excluded from its goal estimate", () => {
   const result = goalFinishEstimates({ ...plan, order: { kind: "juzAmmaFirst" }, alreadyMemorized: [604], newLinesPerDay: 15, dailyMinutes: 180 }, q);
   expect(result?.goal.days).toBe(22);
+});
+test("45 and 60 minutes differ and all seven time choices increase", () => {
+  const choices = distinctAutomaticPaces(plan, q);
+  expect(choices.get(60)?.lines).toBeGreaterThan(choices.get(45)?.lines ?? 0);
+  const lines = DAILY_MINUTES.map(m => choices.get(m)?.lines ?? 0);
+  expect(new Set(lines).size).toBe(7);
+  for (let i = 1; i < lines.length; i++) expect(lines[i]).toBeGreaterThan(lines[i-1]);
+});
+test("review growth reports the first forecast above the goal", () => {
+  expect(reviewGrowth([{atMonth:0,minutes:30},{atMonth:1,minutes:45},{atMonth:2,minutes:52}],45,"2026-11-01")).toEqual({date:"2026-12-31",minutes:52});
+  expect(reviewGrowth([{atMonth:0,minutes:45}],45,"2026-11-01")).toBeNull();
 });
