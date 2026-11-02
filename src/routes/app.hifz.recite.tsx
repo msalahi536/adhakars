@@ -1,6 +1,8 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useQuery, useQueryClient, useSuspenseQuery } from "@tanstack/react-query";
 import { Suspense, useEffect, useLayoutEffect, useRef, useState, type CSSProperties } from "react";
+import { useQuranV2 } from "@/lib/quran-v2";
+import { UnifiedReader } from "@/components/quran-v2/UnifiedReader";
 import { useHifzBeta } from "@/lib/hifz-beta";
 import { Check, ChevronLeft, Mic, Pause, Play, RotateCcw, X, Flag, BookOpen, Repeat, Hand } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -78,6 +80,7 @@ const SABAQ_PHASES: { id: SabaqPhase; label: string; hint: string }[] = [
 ];
 
 function Recite() {
+  const {enabled:quranV2}=useQuranV2();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const search = Route.useSearch();
@@ -697,6 +700,63 @@ function Recite() {
   const correctWrongs = sabaq ? rangeWords.filter((w) => saved.marks[w.key] === "wrong" || saved.marks[w.key] === "skipped") : [];
   const tomorrowSession = hifzState ? buildSession(hifzState, quranIndex, addDays(today, 1)) : null;
   const sessionStats = hifzState ? stats(hifzState, quranIndex, today) : null;
+
+  if(quranV2) return <UnifiedReader initialPage={saved.page} back={()=>{saveActiveSession(null);void navigate({to:activeSession?"/app/hifz":"/app/more"});}} lesson={{
+    pill:<>{chapter?.name_simple} · {sessionItem?.kind === "review" ? "Review" : "Lesson"}{sabaq&&<span className="rc-pass-dots" aria-label={`${cleanPasses} of 3 clean recitations`}>{[1,2,3].map(n=><i key={n} className={cleanPasses>=n?"is-filled":""}/>)}</span>}</>,
+    marks:mode==="ai"?Object.fromEntries(words.map(w=>[w.key,aiWordState(aiCorrection?.statuses[w.key]??aiWords?.statuses[w.key])])):saved.marks,
+    hidden:status==="active",stream:ai.stream,busy:analyzing||ai.phase==="loading"||ai.phase==="stopping",mic:horizon,
+    listen:()=>{if(playing)stopAudio();else if(sabaq)void playSabaqListen();else void listen();},peek:()=>{setPeek("all");setTimeout(()=>setPeek(null),1500);},onWord:w=>{if(mode==="self")mark(w);else if(w.audio)void playWord(w);},highlight:audioWord,
+    overlays:<>    {(sheet || gradeAyah) && <div className="rc-backdrop" onClick={() => { if (!gradeAyah && sheet !== "drills" && sheet !== "sessionGrade" && sheet !== "sessionEnd") setSheet(null); }}>
+      <div onClick={(e) => e.stopPropagation()}>
+        {sheet === "settings" && <ReciteSettings settings={saved.settings} change={(settings) => setSaved((s) => ({ ...s, settings: { ...s.settings, ...settings } }))} close={() => setSheet(null)} />}
+        {sheet === "navigation" && <PageNavigation page={saved.page} chapter={first?.chapter} juz={first?.juz} chapters={chapters} go={changePage} close={() => setSheet(null)} />}
+        {sheet === "ai" && attempt && <AiResultSheet attempt={attempt} passes={cleanPasses} lesson={!!sabaq} chapters={chapters} recording={ai.recording} showTips={saved.settings.tajweedTips} highlight={mutateHighlight} close={() => setSheet(null)} again={() => { setAttempt(null); setAiCorrection(null); ai.reset(); setSheet(null); if (sabaq) setSabaqPhase(cleanPasses >= 2 ? "chain" : "recite"); }} next={() => {
+          if (sabaq && cleanPasses < CLEAN_PASSES) { setAttempt(null); setAiCorrection(null); ai.reset(); setSheet(null); setSabaqPhase(cleanPasses >= 2 ? "chain" : "recite"); }
+          else if (activeSession) { playFeedback("pageComplete"); advance(); }
+          else { ai.reset(); setAttempt(null); setSheet(null); }
+        }} wordAudio={(key) => { const word = words.find((w) => w.key === key); if (word) void playWord(word); }} ayahAudio={(key) => void playAyah(key)} />}
+        {gradeAyah && <section className="rc-sheet" role="dialog" aria-modal="true" aria-label="Ayah self check"><span className="rc-eyebrow">AYAH {gradeAyah}</span><h2>How did it go?</h2><div className="rc-grade-options">{(["Easy", "Okay", "Hard"] as const).map((g) => <Button variant="outline" key={g} onClick={() => grade(g)}>{g}</Button>)}</div><div className="rc-check-words" dir="rtl">{words.filter((w) => w.verse === gradeAyah).map((w) => <Button variant="ghost" className={`rc-arabic ${saved.marks[w.key] === "wrong" ? "rc-check-wrong" : ""}`} key={w.key} onClick={() => mark(w)} aria-label={`Mark ${w.key} as mistake`}>{w.text}</Button>)}</div></section>}
+        {sheet === "marks" && <section className="rc-sheet rc-marks" role="dialog" aria-modal="true" aria-label="Review marks"><header><h2>Review marks</h2><Button variant="ghost" size="icon" aria-label="Close marks" onClick={() => setSheet(null)}><X /></Button></header>{!marks.length && <p>No marks on this page.</p>}{marks.map((w) => <div className="rc-mark-row" key={w.key}><Button variant="ghost" className="rc-arabic" onClick={() => void playWord(w)}>{w.text}<Play /></Button><small>{w.verse}</small><select aria-label={`State for ${w.key}`} value={saved.marks[w.key]} onChange={(e) => markState(w, e.target.value as WordState)}>{["wrong", "skipped", "unsure", "correct"].map((s) => <option key={s}>{s}</option>)}</select></div>)}</section>}
+        {sheet === "complete" && <section className="rc-sheet rc-complete" role="dialog" aria-modal="true" aria-label="Page complete"><Check className="rc-sheet-icon" /><h2>Page complete</h2><p>{visible} words · {marks.length} marks · {Math.ceil((saved.seconds[saved.page] ?? 0) / 60)} min</p><Button className="rc-primary" onClick={() => setSheet("marks")}>Review marks</Button><Button variant="outline" disabled={saved.page === 604} onClick={() => changePage(saved.page + 1)}>Next page</Button></section>}
+        {sheet === "sessionGrade" && sessionItem?.kind === "review" && <section className="rc-sheet" role="dialog" aria-modal="true" aria-label="Page review">
+          <span className="rc-eyebrow">PAGE {sessionItem.page} · {sessionItem.stage.toUpperCase()}</span>
+          <h2>How did it go?</h2>
+          <p style={{ fontSize: 13, opacity: .75 }}>{trackerRef.current.evidence(words)}</p>
+          <div className="rc-grade-options">{SELF_GRADES.map((g) => <Button variant="outline" key={g.label} onClick={() => finishReview(g.grade)}>{g.label}</Button>)}</div>
+        </section>}
+        {sheet === "drills" && hifzState && <DrillSheet state={hifzState} q={quranIndex} today={today} done={finishDrills} />}
+        {sheet === "sessionEnd" && activeSession && <section className="rc-sheet rc-complete" role="dialog" aria-modal="true" aria-label="Session complete">
+          <Check className="rc-sheet-icon" />
+          <h2>Session complete</h2>
+          <p>{activeSession.done} of {sessionTotal} steps · {Math.max(1, Math.round(activeSession.seconds / 60))} min{sessionStats ? ` · ${sessionStats.streak} day streak` : ""}</p>
+          {tomorrowSession && <p style={{ fontSize: 12, opacity: .7 }}>Tomorrow: {tomorrowSession.steps.length} steps, about {tomorrowSession.totalMinutes} min{tomorrowSession.newPaused ? ` · ${tomorrowSession.newPaused}` : ""}</p>}
+          <Button className="rc-primary" onClick={() => { saveActiveSession(null); void navigate({ to: "/app/hifz" }); }}>Done</Button>
+        </section>}
+      </div>
+    </div>}
+    {mode === "ai" && (ai.phase === "download" || ai.phase === "loading" || ai.phase === "error") && <div className="rc-backdrop"><section className="rc-sheet" role="dialog" aria-modal="true" aria-label="Recitation checker">
+      <Mic className="rc-sheet-icon" />
+      <h2>{ai.phase === "error" ? "Let’s try again" : ai.phase === "loading" ? ai.progress >= 1 ? "Preparing checker…" : "Downloading checker…" : "Download recitation checker"}</h2>
+      {ai.phase === "download" && <><p>Download recitation checker (73 MB, one time, works offline after)</p><p>Wi-Fi recommended.</p><Button className="rc-primary" onClick={() => { stopAudio(); quranPlayer.pause(); recitationPlayer.pause(); void ai.confirm(); }}>Download &amp; start</Button><Button variant="ghost" onClick={() => fallbackToSelf("No problem — continue with Self check. You can enable AI check in Aa anytime.")}>Not now</Button></>}
+      {ai.phase === "loading" && <><progress className="rc-ai-progress" aria-label="Checker download progress" max={1} value={ai.progress} /><p role="status">{Math.round(ai.progress * 100)}%</p></>}
+      {ai.phase === "error" && <><p role="alert">{ai.error}</p><Button className="rc-primary" onClick={() => void ai.confirm()}>Retry</Button><Button variant="ghost" onClick={ai.cancel}>Close</Button></>}
+    </section></div>}
+    {understand && <Understanding keys={[...new Set(rangeWords.map((w) => w.verse))]} close={() => setUnderstand(false)} />}
+    {echo && <EchoMode keys={[...new Set(rangeWords.map((w) => w.verse))]} reciter={saved.settings.reciter} close={() => setEcho(false)} highlight={echoHighlight} />}
+    {meaning && <WordMeaning word={meaning} play={() => void playWord(meaning)} close={() => setMeaning(null)} />}
+    {celebrations[0] && !handsFree && !sheet && <MilestoneMoment moment={celebrations[0]} done={() => setCelebrations((m) => m.slice(1))} />}
+    {showReviewSummary && <div className="rc-backdrop"><section className="rc-sheet rc-result-sheet" role="dialog" aria-label="Hands-free summary"><h2>Review summary</h2>{reviewSummary.map((entry, n) => <section key={n} className="hx-ayah-block"><h3>Page {entry.page} · {entry.attempt.m.label} {entry.attempt.m.score}</h3>{entry.attempt.result.words.filter((w) => w.status === "wrong" || w.status === "skipped").map((w) => <p key={w.key} dir="rtl">{w.text} · {w.key}</p>)}{entry.attempt.clean && <p>Clean recitation</p>}</section>)}<Button onClick={() => { setShowReviewSummary(false); setHandsFree(false); ai.cancel(); advance(); }}>Continue</Button></section></div>}
+    {sessionEnded && activeSession && !sheet && <div className="rc-backdrop"><div onClick={(e) => e.stopPropagation()}>
+      <section className="rc-sheet rc-complete" role="dialog" aria-modal="true" aria-label="Session complete">
+        <Check className="rc-sheet-icon" />
+        <h2>Session complete</h2>
+        <p>{activeSession.done} of {sessionTotal} steps · {Math.max(1, Math.round(activeSession.seconds / 60))} min{sessionStats ? ` · ${sessionStats.streak} day streak` : ""}</p>
+        {tomorrowSession && <p style={{ fontSize: 12, opacity: .7 }}>Tomorrow: {tomorrowSession.steps.length} steps, about {tomorrowSession.totalMinutes} min</p>}
+        <Button className="rc-primary" onClick={() => { saveActiveSession(null); void navigate({ to: "/app/hifz" }); }}>Done</Button>
+      </section>
+    </div></div>}
+</>
+  }}/>;
 
   return <Portal><MushafThemeProvider theme={appTheme} mode={morningOrEvening} className={`recite-page rc-supplied rc-hide-${saved.settings.hideStyle} ${controls ? "rc-controls-visible" : ""} ${saved.settings.theme === "night" ? "rc-night" : ""}`} style={{ "--rc-size": `${saved.settings.size}px`, "--rc-strip-height": `${dimensions.strip}px`, "--rc-label-height": `${dimensions.labels}px`, "--m-font-quran": "var(--font-arabic)" } as CSSProperties}><main onPointerDownCapture={() => { touching.current = true; setTouchActivity((v) => v + 1); }} onPointerUpCapture={() => { touching.current = false; setTouchActivity((v) => v + 1); }} onPointerCancelCapture={() => { touching.current = false; setTouchActivity((v) => v + 1); }}>
     <header className="rc-header" aria-hidden={!controls} inert={!controls}><Button variant="ghost" size="icon" aria-label="Exit Hifz" onClick={() => { saveActiveSession(null); void navigate({ to: activeSession ? "/app/hifz" : "/app/more" }); }}><ChevronLeft /></Button><Button variant="ghost" className="rc-title" aria-label="Go to page" onClick={() => setSheet("navigation")}>{chapter?.name_simple ?? "Quran"} · {saved.page}</Button><Button variant="ghost" size="icon" aria-label="Page settings" onClick={() => setSheet("settings")}>Aa</Button></header>

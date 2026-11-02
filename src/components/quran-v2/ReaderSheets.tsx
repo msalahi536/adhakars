@@ -50,7 +50,7 @@ export function ReaderReciters({selected,select,close}:{selected:number;select:(
   const [q,setQ]=useState("");return <ReaderSheet title="Choose a reciter" close={close}><label className="q2-search"><Search size={16}/><input value={q} onChange={e=>setQ(e.target.value)} placeholder="Search reciters…"/></label>{RECITERS.filter(r=>reciterName(r).toLowerCase().includes(q.toLowerCase())).map(r=><Button variant="ghost" className="q2-nav-row" key={r.id} onClick={()=>select(r.id)}><span>{reciterName(r)}</span>{selected===r.id&&<Check size={16}/>}</Button>)}</ReaderSheet>;
 }
 export function ReaderMistakes({result,recording,tips,chapters,correct,highlight,close}:{result:CheckResult|null;recording:Blob|null;tips:TajweedHint[];chapters:Chapter[];correct:(key:string)=>void;highlight:(key:string|null)=>void;close:()=>void}){
-  const empty:CheckResult={words:[],extras:[],reachedIndex:-1,startIndex:0,startKey:null};
+  const empty:CheckResult={words:[],extras:[],reachedIndex:-1,startIndex:0,startKey:""};
   const replay=useRecitationReplay(recording,result??empty,highlight);
   const words=result?.words.filter(w=>w.status==="wrong"||w.status==="skipped")??[];
   return <ReaderSheet title="Session mistakes" close={()=>{replay.stop();close();}}>
