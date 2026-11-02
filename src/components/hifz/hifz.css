@@ -470,3 +470,19 @@ body:has(.hz-home-popup) [data-slot="dialog-overlay"], body:has(.hz-home-popup) 
 
 /* Word highlighted while the qari recites it (sabaq listen phase). */
 .rc-word.rc-listening .rc-word-ink { color: var(--m-gold); transition: color .15s ease; }
+
+/* Scroll-away controls and compact, readable memorization tools. */
+.app-shell:has(.hz-home.is-scrolled) .settings-button,
+.app-shell:has(.hz-home.is-scrolled) .hz-home-header { opacity: 0; pointer-events: none; }
+.app-shell:has(main.hz-setup) .bottom-nav { display: none; }
+.hz-home .hp-salah, .hz-home .hp-home-nudge, .hz-home .hp-sleep-card { background: var(--surface-card, var(--card)); color: var(--card-foreground); border: 1px solid var(--border); border-radius: 24px; padding: 20px; box-shadow: var(--card-shadow); }
+.hz-home .hp-note { color: var(--card-foreground); }
+.hz-home .hp-sleep-card > svg { flex: none; color: var(--accent); }
+.hz-home .hp-sleep-card button { color: var(--card-foreground); padding: 0; }
+.hz-tools-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+.hz-tools-grid .hz-tool { display: flex; flex-direction: column; align-items: flex-start; gap: 12px; height: 104px; padding: 16px; border-radius: 20px; border: 1px solid var(--border); background: var(--surface-card, var(--card)); color: var(--card-foreground); box-shadow: var(--card-shadow); white-space: normal; text-align: left; }
+.hz-tool svg { width: 25px; height: 25px; color: var(--accent); }
+.hz-tool span { font-size: 15px; line-height: 1.3; }
+.hz-study-positives { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 16px; }
+.hz-study-positives span { display: flex; align-items: center; gap: 5px; font-size: 12px; }
+.hz-study-positives svg { width: 16px; color: var(--accent); }
