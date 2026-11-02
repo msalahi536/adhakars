@@ -130,7 +130,7 @@ body:has(.q2-sheet) .q2-topbar,body:has(.q2-sheet) .q2-bottom {visibility:hidden
 .q2-header-right {justify-content:flex-end;}
 .q2-header-left button,.q2-header-right button {width:42px;height:44px;flex:none;border-radius:50%;background:var(--q2-control);color:var(--q2-olive);border:1px solid color-mix(in oklab,var(--q2-control) 80%,transparent);box-shadow:var(--reader-control-shadow);font-size:21px;padding:0;}
 .q2-header-left svg,.q2-header-right svg {width:22px;height:22px;stroke-width:1.7;}
-.q2-location {padding:0!important;font-family:var(--font-display);font-size:27px!important;font-weight:600;line-height:1.1;color:var(--q2-olive);width:100%;min-width:0;}
+.q2-location {padding:0!important;display:flex;flex-direction:column;gap:3px!important;height:auto!important;white-space:normal!important;text-align:center;font-family:var(--font-display);font-size:27px!important;font-weight:600;line-height:1.1;color:var(--q2-olive);width:100%;min-width:0;}
 .q2-location small {font-family:var(--font-sans);font-size:13px;font-weight:400;color:var(--q2-olive);line-height:1.5;white-space:nowrap;}
 .q2-opening {padding:20px 4% 0;min-height:calc(100dvh - 235px);margin-bottom:100px;display:flex;flex-direction:column;justify-content:flex-start;}
 .q2-opening .q2-page-body {display:flex;flex-direction:column;justify-content:center;min-height:0;gap:0;padding:0;width:100%;}
@@ -154,7 +154,7 @@ body:has(.q2-sheet) .q2-topbar,body:has(.q2-sheet) .q2-bottom {visibility:hidden
 .q2-opening.q2-framed .q2-line {min-height:0;flex:1;line-height:1.6;}
 .q2-bottom {left:20px;right:20px;max-width:560px;bottom:calc(env(safe-area-inset-bottom,0px) + 18px);}
 .q2-actionbar {display:grid;grid-template-columns:1.5fr 1.5fr 68px 1fr 1fr 1fr;align-items:center;min-height:84px;border-radius:999px;padding:6px 9px;gap:0;background:color-mix(in oklab,var(--q2-control) 70%,transparent);border:1px solid color-mix(in oklab,var(--q2-control) 88%,transparent);box-shadow:var(--reader-glass-shadow);color:var(--q2-olive);backdrop-filter:blur(24px) saturate(140%);}
-.q2-actionbar > button:not(.q2-mic) {position:relative;width:100%;height:58px;padding:0;gap:5px;color:var(--q2-olive);min-width:0;}
+.q2-actionbar > button:not(.q2-mic) {position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;width:100%;height:58px;padding:0;gap:5px;color:var(--q2-olive);min-width:0;}
 .q2-actionbar > button:is(:nth-child(1),:nth-child(2),:nth-child(4),:nth-child(5)):after {content:"";position:absolute;right:0;top:13px;bottom:13px;width:1px;background:var(--q2-divider);opacity:.65;}
 .q2-actionbar > button:not(.q2-mic) svg {width:21px;height:21px;stroke-width:1.6;}
 .q2-actionbar small {font-size:11px;line-height:1.15;white-space:nowrap;}
