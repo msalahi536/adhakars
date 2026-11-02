@@ -1,5 +1,11 @@
 import { Capacitor } from "@capacitor/core";
 import { Haptics, ImpactStyle, NotificationType } from "@capacitor/haptics";
+import smallSound from "@/assets/recite/mistake-small.mp3.asset.json";
+import wrongSound from "@/assets/recite/mistake-word.mp3.asset.json";
+import skipSound from "@/assets/recite/mistake-skip.mp3.asset.json";
+import unsureSound from "@/assets/recite/unsure.mp3.asset.json";
+import micStartSound from "@/assets/recite/mic-start.mp3.asset.json";
+import micStopSound from "@/assets/recite/mic-stop.mp3.asset.json";
 
 export type HifzEvent = "reveal" | "wrong" | "skip" | "small" | "unsure" | "drift" | "ayahComplete" | "pageComplete" | "sessionComplete" | "milestone" | "micStart" | "micStop" | "pageTurn";
 type Step = "selection" | "Light" | "Medium" | "Heavy" | "Success";
@@ -16,11 +22,11 @@ type Timer = ReturnType<typeof setTimeout>;
 type Driver = {
   now: () => number; schedule: (fn: () => void, delay: number) => Timer; clear: (id: Timer) => void;
   available: () => boolean; step: (step: Step) => Promise<void>;
-  pulse: (event: HifzEvent) => void; sound: (event: HifzEvent) => void; stopSound: () => void;
+  sound: (event: HifzEvent) => void; stopSound: () => void;
 };
 // Injectable clock/device driver tests the patterns without requiring native hardware.
 export function createHifzFeedback(driver: Driver) {
-  let settings = { haptics: true, sounds: false };
+  let settings = { haptics: true, sounds: true };
   let timers: Timer[] = [];
   let batch: Timer | undefined;
   let pending: HifzEvent | undefined;
@@ -31,14 +37,14 @@ export function createHifzFeedback(driver: Driver) {
     cancelPattern();
     if (settings.sounds) driver.sound(event);
     if (!settings.haptics) return;
-    if (!driver.available()) { driver.pulse(event); return; }
+    if (!driver.available()) return;
     const token = generation;
     let failed = false;
     const step = (value: Step) => {
       if (token !== generation || failed) return;
       void driver.step(value).catch(() => {
         if (token !== generation || failed) return;
-        failed = true; timers.forEach(driver.clear); timers = []; driver.pulse(event);
+        failed = true; timers.forEach(driver.clear); timers = [];
       });
     };
     const pattern = PATTERNS[event];
@@ -72,6 +78,10 @@ export function createHifzFeedback(driver: Driver) {
   };
 }
 let effectAudio: HTMLAudioElement | undefined;
+export const FEEDBACK_SOUNDS: Partial<Record<HifzEvent, string>> = {
+  small: smallSound.url, wrong: wrongSound.url, skip: skipSound.url,
+  unsure: unsureSound.url, micStart: micStartSound.url, micStop: micStopSound.url,
+};
 const feedback = createHifzFeedback({
   now: () => Date.now(), schedule: (fn, delay) => setTimeout(fn, delay), clear: (id) => clearTimeout(id),
   available: () => {
@@ -79,10 +89,10 @@ const feedback = createHifzFeedback({
     return !(/iPad/.test(navigator.userAgent) || (/Macintosh/.test(navigator.userAgent) && navigator.maxTouchPoints > 1));
   },
   step: (step) => step === "selection" ? Haptics.selectionChanged() : step === "Success" ? Haptics.notification({ type: NotificationType.Success }) : Haptics.impact({ style: ImpactStyle[step] }),
-  pulse: (event) => { if (typeof window !== "undefined") window.dispatchEvent(new CustomEvent("hifz:feedback-pulse", { detail: event })); },
   sound: (event) => {
-    if (typeof Audio === "undefined") return;
-    effectAudio = new Audio(`/sounds/${event}.wav`); effectAudio.volume = 0.3;
+    const url = FEEDBACK_SOUNDS[event];
+    if (typeof Audio === "undefined" || !url) return;
+    effectAudio = new Audio(url); effectAudio.volume = 0.3;
     void effectAudio.play().catch(() => { /* Feedback must never interrupt recitation. */ });
   },
   stopSound: () => { effectAudio?.pause(); effectAudio = undefined; },

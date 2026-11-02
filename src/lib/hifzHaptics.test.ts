@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { createHifzFeedback, type HifzEvent } from "./hifzHaptics";
+import { createHifzFeedback, FEEDBACK_SOUNDS, type HifzEvent } from "./hifzHaptics";
 import { DEFAULT_SETTINGS } from "./recite/model";
 
 function rig(available = true, fails = false) {
@@ -12,7 +12,7 @@ function rig(available = true, fails = false) {
     clear: (key) => { tasks.delete(key as unknown as number); },
     available: () => available,
     step: async (value) => { if (fails) throw new Error("No motor"); steps.push({ at: time, value }); },
-    pulse: (event) => { pulses.push(event); }, sound: (event) => { sounds.push(event); }, stopSound: () => {},
+    sound: (event) => { sounds.push(event); }, stopSound: () => {},
   });
   const advance = (amount: number) => {
     const end = time + amount;
@@ -61,20 +61,25 @@ describe("Hifz haptic language", () => {
     const r=rig(); r.play("wrong"); r.cancel(); r.advance(400); expect(r.steps).toEqual([]);
     r.play("sessionComplete"); r.cancel(); r.advance(400); expect(r.steps).toEqual([{at:400,value:"Success"}]);
   });
-  test("Haptics on and Sounds off by default", () => {
-    expect(DEFAULT_SETTINGS.haptics).toBe(true); expect(DEFAULT_SETTINGS.sounds).toBe(false);
-    const r=rig(); r.play("reveal"); expect(r.steps).toHaveLength(1); expect(r.sounds).toEqual([]);
+  test("Haptics and supplied sounds on by default", () => {
+    expect(DEFAULT_SETTINGS.haptics).toBe(true); expect(DEFAULT_SETTINGS.sounds).toBe(true);
+    const r=rig(); r.play("micStart"); expect(r.steps).toHaveLength(1); expect(r.sounds).toEqual(["micStart"]);
+  });
+  test("six supplied audios map to their matching events", () => {
+    for (const [event, file] of Object.entries({wrong:"mistake-word",skip:"mistake-skip",small:"mistake-small",unsure:"unsure",micStart:"mic-start",micStop:"mic-stop"})) {
+      expect(FEEDBACK_SOUNDS[event as HifzEvent]).toEndWith(`/${file}.mp3`);
+    }
+    expect(Object.keys(FEEDBACK_SOUNDS)).toHaveLength(6);
   });
   test("Sounds adds matching effect independently of Haptics", () => {
     const r=rig(); r.configure({sounds:true}); r.play("reveal"); expect(r.sounds).toEqual(["reveal"]); expect(r.steps).toHaveLength(1);
     r.configure({haptics:false}); r.play("micStop"); expect(r.sounds).toEqual(["reveal","micStop"]); expect(r.steps).toHaveLength(1);
   });
-  test("unavailable hardware pulses strip once, not each step", () => {
-    const r=rig(false); r.play("milestone"); r.advance(400); expect(r.pulses).toEqual(["milestone"]); expect(r.steps).toEqual([]);
-    r.configure({haptics:false}); r.play("reveal"); expect(r.pulses).toEqual(["milestone"]);
+  test("unavailable hardware keeps sound feedback without visual pulses", () => {
+    const r=rig(false); r.play("micStart"); r.advance(400); expect(r.pulses).toEqual([]); expect(r.steps).toEqual([]); expect(r.sounds).toEqual(["micStart"]);
   });
-  test("native rejection cancels pattern and pulses once", async () => {
+  test("native rejection cancels pattern without a visual pulse", async () => {
     const r=rig(true,true); r.play("milestone"); await Promise.resolve(); await Promise.resolve(); r.advance(400);
-    expect(r.pulses).toEqual(["milestone"]); expect(r.steps).toEqual([]);
+    expect(r.pulses).toEqual([]); expect(r.steps).toEqual([]);
   });
 });
