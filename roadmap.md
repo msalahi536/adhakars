@@ -1,6 +1,6 @@
 # Roadmap
 
-- [ ] Polish Hifz home order/cards/header/positive streak, distinct setup paces and reachable final actions, task/lesson matching, meaning/icon labels and reader text; verify and screenshot home top-to-bottom and final setup.
+- [x] Polish Hifz home order/cards/scroll-away controls/positive streak; distinct automatic setup paces (45 min = 7 lines, 60 min = 10 in preview), hidden setup tab bar and forecast guidance; hydration-safe task page matching; meaning source font/names, labeled icons and stacked mic caption; source-word transliteration and single ayah number in both readers. Fresh plan created/read back; page602 task opened602 despite saved604 in both readers, no browser errors. Home top/middle/bottom and final setup screenshots in /tmp/browser/hifz-polish/. 47 focused tests passed before final page-ready regression; native microphone/haptics not claimed verified.
 
 - [x] Add independent quran_v2 gate and cumulative seven/ten Settings version taps; actual Settings UI verified seven enables only Hifz, ten also enables Quran v2. Unit tests cover toggle off/progress preservation. Legacy Quran reader and More retained and checked with flag off.
 - [x] Add flag-only Read & Listen card/calligraphic names and Programs section; reciter carousel/search preserved. Programs retain independent Hifz/Arabic gate.

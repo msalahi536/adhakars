@@ -42,7 +42,7 @@ import { Understanding, WordMeaning } from "@/components/hifz/Understanding";
 import { EchoMode } from "@/components/hifz/EchoMode";
 import { MilestoneMoment, pendingMilestones } from "@/components/hifz/MilestoneMoment";
 import type { Milestone } from "@/lib/hifz/insights";
-import { pageReached } from "@/components/hifz/enhancement-rules";
+import { pageReached, sessionPageReady } from "@/components/hifz/enhancement-rules";
 import "@/components/hifz/enhancements.css";
 import { useAiRecitation } from "@/components/recite/use-ai-recitation";
 import { aiWordState, createAudioRun, stageResult, type AiMarks } from "@/components/recite/lesson-ai";
@@ -334,6 +334,7 @@ function Recite() {
     if (preppedItem.current === key) return;
     const targetPage = sessionItem.kind === "review" || sessionItem.kind === "sabaq" ? sessionItem.page : sessionItem.kind === "link" ? sessionItem.pages[0] : null;
     if (targetPage && page.page !== targetPage) { changePage(targetPage, false); return; }
+    if (!sessionPageReady(hydrated, page.page, targetPage ?? null)) return;
     preppedItem.current = key;
     trackerRef.current = createTracker();
     setAiCorrection(null); setAttempt(null); setCleanPasses(0); analysisRun.current++; ai.reset();
