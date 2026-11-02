@@ -103,7 +103,8 @@ export function UnifiedReader({chapterId=1,verse=1,initialPage,initialMode,back,
   const visible=useCallback((candidate:RecitePage,ratio:number)=>{
     visiblePages.current.set(candidate.page,{data:candidate,ratio});
     const dominant=[...visiblePages.current.values()].filter(v=>v.ratio>0).sort((a,b)=>b.ratio-a.ratio||a.data.page-b.data.page)[0];
-    if(!dominant||dominant.data.page!==candidate.page)return;
+    if(!dominant)return;
+    if(currentRef.current?.page===dominant.data.page)return;
     const p=dominant.data;
     const v=p.verses[0];if(!v)return;currentRef.current=p;setPage(p.page);
     if(lesson)return;

@@ -135,7 +135,7 @@ body:has(.q2-sheet) .q2-topbar,body:has(.q2-sheet) .q2-bottom {visibility:hidden
 .q2-topbar > button:not(.q2-location) {width:44px;height:44px;flex:none;border-radius:50%;background:var(--q2-control);color:var(--q2-olive);border:1px solid color-mix(in oklab,var(--q2-control) 80%,transparent);box-shadow:var(--reader-control-shadow);font-size:20px;}
 .q2-location {padding:0!important;font-family:var(--font-display);font-size:23px!important;font-weight:600;line-height:1.1;color:var(--q2-olive);}
 .q2-location small {font-family:var(--font-sans);font-size:11px;font-weight:400;color:var(--q2-olive);line-height:1.5;white-space:nowrap;}
-.q2-opening {padding:0 6%;min-height:calc(100dvh - 225px);display:flex;flex-direction:column;justify-content:center;}
+.q2-opening {padding:0 6%;min-height:calc(100dvh - 225px);margin-bottom:125px;display:flex;flex-direction:column;justify-content:center;}
 .q2-opening .q2-page-body {display:flex;flex-direction:column;justify-content:center;min-height:0;gap:0;padding:0;width:100%;}
 .q2-opening .q2-line {min-height:54px;line-height:1.7;justify-content:center;}
 .q2-opening .q2-opening-basmala {font-size:calc(var(--q2-glyph-size,32px)*.9);}
@@ -160,7 +160,8 @@ body:has(.q2-sheet) .q2-topbar,body:has(.q2-sheet) .q2-bottom {visibility:hidden
 .q2-actionbar small {font-size:10px;line-height:1.2;}
 .q2-actionbar > button:last-child {flex:.65;}
 .q2-actionbar .q2-mic {width:68px;height:68px;border:2px solid var(--q2-control);box-shadow:var(--reader-control-shadow);background:linear-gradient(145deg,var(--q2-mic-top),var(--q2-mic-bottom));color:var(--q2-on-mic);}
-.q2-live-preview .q2-opening {min-height:0;}
+.q2-actionbar .q2-mic > svg {width:32px;height:32px;}
+.q2-live-preview .q2-opening {min-height:0;margin-bottom:0;}
 .q2-live-preview .q2-opening .q2-line {min-height:40px;}
 @media(min-width:700px){.q2-opening{padding:0 38px;}.q2-opening .q2-line{min-height:68px;}.q2-topbar{left:calc(50% - 302px);right:calc(50% - 302px);}.q2-actionbar > button:not(.q2-mic){min-width:0;}.q2-bottom{left:calc(50% - 320px);right:calc(50% - 320px);}}
 @media(max-height:700px){.q2-opening .q2-line{min-height:42px;line-height:1.45;}.q2-opening .q2-page-divider{margin-top:16px;}.q2-opening{min-height:calc(100dvh - 200px);}}
