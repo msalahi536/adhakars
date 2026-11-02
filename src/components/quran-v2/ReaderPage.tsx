@@ -9,9 +9,9 @@ import type { Chapter } from "@/lib/quran";
 import type { Marks, RecitePage, ReciteWord } from "@/lib/recite/model";
 import type { ReaderLayout } from "./reader-rules";
 
-export function ReaderPage({number,chapters,layout,marks,hidden,revealed,highlight,size,tajweed,arabic,translit,translation,translitSize,translationSize,onVisible,onWord,preview=false,translations}: {
+export function ReaderPage({number,chapters,layout,marks,hidden,revealed,highlight,size,tajweed,arabic,translit,translation,translitSize,translationSize,onVisible,onWord,preview=false,translations,peek=false,lessonKeys}: {
   number:number;chapters:Chapter[];layout:ReaderLayout;marks:Marks;hidden:boolean;revealed:Set<string>;highlight:string|null;size:number;tajweed:boolean;arabic:boolean;translit:boolean;translation:boolean;translitSize:number;translationSize:number;
-  onVisible?:(page:RecitePage)=>void;onWord?:(word:ReciteWord)=>void;preview?:boolean;translations?:Record<string,string>;
+  onVisible?:(page:RecitePage)=>void;onWord?:(word:ReciteWord)=>void;preview?:boolean;translations?:Record<string,string>;peek?:boolean;lessonKeys?:Set<string>;
 }) {
   const query=useQuery(recitePageOptions(number));
   const [font,setFont]=useState<string|null>(null);
@@ -36,9 +36,9 @@ export function ReaderPage({number,chapters,layout,marks,hidden,revealed,highlig
   const page=query.data;
   const word=(w:ReciteWord):ReactNode=>{
     if(w.end)return <span key={w.key} className="q2-marker"><AyahMarker number={Number(w.verse.split(":")[1])} size={19}/></span>;
-    const state=marks[w.key];const shown=!hidden||revealed.has(w.key)||state==="correct"||state==="wrong"||state==="skipped";
+    const state=marks[w.key];const shown=peek||!hidden||(lessonKeys&&!lessonKeys.has(w.key))||revealed.has(w.key)||state==="correct"||state==="wrong"||state==="skipped";
     const group=tajweed&&w.tajweed?parseTajweed(w.tajweed).find(s=>s.group)?.group:undefined;
-    return <Button variant="ghost" key={w.key} className={`q2-word ${shown?"":"q2-concealed"} ${state==="wrong"?"q2-wrong":state==="skipped"?"q2-skipped":""} ${highlight===w.key?"q2-highlight":""} ${group?`rc-qcf-tj-${group}`:""}`} data-q2-word={w.key} aria-label={`Word ${w.key}`} onPointerDown={e=>{if(hidden){const el=e.currentTarget;el.setAttribute("data-peek","pending");window.setTimeout(()=>{if(el.getAttribute("data-peek")==="pending")el.setAttribute("data-peek","on");},400);}}} onPointerUp={e=>e.currentTarget.removeAttribute("data-peek")} onPointerCancel={e=>e.currentTarget.removeAttribute("data-peek")} onClick={e=>{e.stopPropagation();onWord?.(w);}}>
+    return <Button variant="ghost" key={w.key} className={`q2-word ${shown?"":"q2-concealed"} ${lessonKeys?.has(w.key)?"q2-lesson-word":""} ${state==="wrong"?"q2-wrong":state==="skipped"?"q2-skipped":""} ${highlight===w.key?"q2-highlight":""} ${group?`rc-qcf-tj-${group}`:""}`} data-q2-word={w.key} aria-label={`Word ${w.key}`} onPointerDown={e=>{if(hidden){const el=e.currentTarget;el.setAttribute("data-peek","pending");window.setTimeout(()=>{if(el.getAttribute("data-peek")==="pending")el.setAttribute("data-peek","on");},400);}}} onPointerUp={e=>{e.stopPropagation();e.currentTarget.removeAttribute("data-peek");}} onPointerCancel={e=>e.currentTarget.removeAttribute("data-peek")} onClick={e=>{e.stopPropagation();onWord?.(w);}}>
       <span>{layout==="Translation"?tajweed&&w.tajweed?<TajweedText markup={w.tajweed}/>:w.text:w.glyph}</span>
     </Button>;
   };
