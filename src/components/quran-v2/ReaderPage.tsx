@@ -17,6 +17,8 @@ export function ReaderPage({number,chapters,layout,marks,hidden,revealed,highlig
   const [font,setFont]=useState<string|null>(null);
   const [failed,setFailed]=useState(false);
   const [retry,setRetry]=useState(0);
+  const [meaningFor,setMeaningFor]=useState<((text:string)=>string|undefined)|null>(null);
+  useEffect(()=>{if(layout!=="Translation"){setMeaningFor(null);return;}let live=true;void import("@/components/arabic/reader-meanings").then(m=>{const r=m.knownWordMeanings();if(live)setMeaningFor(()=>r?.meaningFor??null);});return()=>{live=false;};},[layout]);
   const root=useRef<HTMLElement|null>(null);
   const body=useRef<HTMLDivElement|null>(null);
   useEffect(()=>{let alive=true;setFont(null);setFailed(false);void loadPageFont(number).then(f=>{if(alive){setFont(f);setFailed(!f);}});return()=>{alive=false;};},[number,retry]);
