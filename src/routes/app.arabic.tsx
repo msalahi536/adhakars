@@ -1,12 +1,24 @@
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+/**
+ * Arabic Companion (v2): home, placement and settings. All curriculum, scoring and review logic
+ * lives in src/lib/arabic — this screen only renders engine data and calls engine functions.
+ */
+import { createFileRoute, Link, Outlet, useLocation, useNavigate } from "@tanstack/react-router";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Check, ChevronLeft, Lock, Mic, Play, Square, Volume2, X, Sparkles, RotateCcw } from "lucide-react";
-import { CURRICULUM, LESSONS, ITEMS, type Item, type Lesson } from "@/lib/arabic/content";
-import { buildLesson, derive, dueItems, lessonStatus, scoreOf, todayLocal, type ArabicEvent, type Step } from "@/lib/arabic/engine";
-import { loadLog, record } from "@/lib/arabic/store";
-import type { Grade } from "@/lib/arabic/review";
-import { Portal } from "@/components/Portal";
+import { Check, ChevronLeft, Lock, Settings2 } from "lucide-react";
+import {
+  LESSONS, LESSON, VOCAB_PLAN, PLACEMENT_INTRO, PLACEMENT_LETTERS, PLACEMENT_SYLLABLES, PLACEMENT_WORDS,
+  nextPart, startDay, applyPlacement, today as todayPlan, lessonSteps, vocabSteps, lessonStatus,
+  understandOpen, overview, fatihaMeter, knownAfter, recordAnswer, finishLesson, finishVocabDay,
+  newMilestones, loadState, saveState, localDay, letterSoundAudio, LETTER, LETTERS, LOOKALIKES, SOUNDALIKES,
+  startSay, wordKeyPhonemes, quranWordAudio,
+  type ArabicState, type LearnerType, type Step, type Milestone, type PlacementAnswers,
+} from "@/lib/arabic";
 import { useHifzBeta } from "@/lib/hifz-beta";
+import { configureHifzFeedback, play } from "@/lib/hifzHaptics";
+import { ArabicPlayer, type StepAnswer } from "@/components/arabic/ArabicPlayer";
+import { ArabicMilestone } from "@/components/arabic/ArabicMilestone";
+import { ListenButton, MicButton, useAudio } from "@/components/arabic/parts";
+import "@/components/arabic/arabic.css";
 
 export const Route = createFileRoute("/app/arabic")({
   head: () => ({
@@ -14,7 +26,7 @@ export const Route = createFileRoute("/app/arabic")({
       { title: "Arabic Companion, Sahih Al-Adhkar" },
       { name: "description", content: "Learn to read the Quran in Arabic, step by step, with real recitation and review." },
       { property: "og:title", content: "Arabic Companion, Sahih Al-Adhkar" },
-      { property: "og:description", content: "Learn to read Arabic letter by letter with a teacher-style lesson loop." },
+      { property: "og:description", content: "Read the Quran, then understand it — letter by letter, word by word." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
     ],
@@ -22,413 +34,355 @@ export const Route = createFileRoute("/app/arabic")({
   component: HiddenArabicCompanion,
 });
 
+const ar = { fontFamily: "var(--font-arabic)" };
+
 function HiddenArabicCompanion() {
   const { enabled, checked } = useHifzBeta();
   const navigate = useNavigate();
+  const pathname = useLocation({ select: (l) => l.pathname });
   useEffect(() => { if (checked && !enabled) void navigate({ to: "/app/more", replace: true }); }, [checked, enabled, navigate]);
-  return enabled ? <ArabicCompanion /> : null;
+  if (!enabled) return null;
+  // Child routes (the recording studio) render on their own.
+  if (pathname !== "/app/arabic") return <Outlet />;
+  return <ArabicHome />;
 }
 
-const ar = { fontFamily: "var(--font-arabic)" };
-const glow = { background: "radial-gradient(circle at 50% 35%, color-mix(in oklab, var(--primary) 16%, transparent), transparent 70%)" };
+type Session =
+  | { kind: "lesson"; title: string; steps: Step[]; lessonId: string }
+  | { kind: "vocab"; title: string; steps: Step[]; dayNo: number }
+  | { kind: "review"; title: string; steps: Step[] };
 
-function ArabicCompanion() {
-  const [log, setLog] = useState<ArabicEvent[]>([]);
-  const [active, setActive] = useState<Lesson | null>(null);
-  useEffect(() => setLog(loadLog()), []);
-  const today = todayLocal();
-  const d = useMemo(() => derive(log), [log]);
-  const due = dueItems(d, today).length;
-  const passed = LESSONS.filter((l) => d.passed.has(l.id)).length;
-  const next = LESSONS.find((l) => lessonStatus(d, l.id, today) === "open");
-  const pct = Math.round((passed / LESSONS.length) * 100);
+function ArabicHome() {
+  const day = localDay();
+  const [state, setState] = useState<ArabicState>(() => loadState(day));
+  const [session, setSession] = useState<Session | null>(null);
+  const [result, setResult] = useState<{ passed: boolean; score: number; label: string; unlocked?: string; fatihaGrew: boolean } | null>(null);
+  const [milestone, setMilestone] = useState<Milestone | null>(null);
+  const [settingsOpen, setSettingsOpen] = useState(false);
+
+  useEffect(() => { configureHifzFeedback({ sounds: state.settings.sounds }); }, [state.settings.sounds]);
+
+  const plan = useMemo(() => todayPlan(state, day), [state, day]);
+  const ov = useMemo(() => overview(state, day), [state, day]);
+  const meter = useMemo(() => fatihaMeter(knownAfter(ov.readingDay)), [ov.readingDay]);
+  const needsPlacement = !state.placement && Object.keys(state.passed).length === 0;
+
+  const update = (fn: (s: ArabicState) => void) => {
+    const s = { ...state };
+    fn(s);
+    saveState(s);
+    setState(s);
+  };
+
+  const start = () => {
+    const steps: Step[] = [...plan.reviewSteps];
+    if (plan.lesson) {
+      setSession({ kind: "lesson", title: plan.lesson.title, steps: [...steps, ...lessonSteps(plan.lesson, state, day)], lessonId: plan.lesson.id });
+    } else if (plan.vocabDay) {
+      setSession({ kind: "vocab", title: `Day ${plan.vocabDay.day}: ${plan.vocabDay.theme}`, steps: [...steps, ...vocabSteps(plan.vocabDay, state, day)], dayNo: plan.vocabDay.day });
+    } else if (steps.length) {
+      setSession({ kind: "review", title: "Review", steps });
+    }
+  };
+  const openLesson = (lessonId: string) => {
+    const lesson = LESSON.get(lessonId);
+    if (lesson) setSession({ kind: "lesson", title: lesson.title, steps: lessonSteps(lesson, state, day), lessonId });
+  };
+
+  const onAnswer = (step: Step, a: StepAnswer) => {
+    if (!("itemId" in step)) return;
+    update((s) => recordAnswer(s, step.itemId as string, a, day, a.picked));
+  };
+
+  const onDone = (score: number, minutes: number) => {
+    if (!session) return;
+    const before = meter.readable;
+    let passed = true;
+    let unlocked: string | undefined;
+    let label = "Review done";
+    if (session.kind === "lesson") {
+      const f = finishLesson(state, session.lessonId, score, minutes, day);
+      passed = f.passed; unlocked = f.unlocked;
+      label = `${LESSON.get(session.lessonId)?.title ?? "Lesson"}`;
+    } else if (session.kind === "vocab") {
+      const f = finishVocabDay(state, session.dayNo, score, minutes, day);
+      passed = f.passed; unlocked = f.unlocked;
+      label = `Day ${session.dayNo}`;
+    } else {
+      state.days[day] = (state.days[day] ?? 0) + minutes;
+    }
+    const found = newMilestones(state, day);
+    saveState(state);
+    setState({ ...state });
+    setSession(null);
+    const after = fatihaMeter(knownAfter(overview(state, day).readingDay)).readable;
+    setResult({ passed, score, label, unlocked, fatihaGrew: after > before });
+    if (found.length) setMilestone(found[0]);
+  };
+
+  if (needsPlacement) return <Placement state={state} onDone={(s) => { saveState(s); setState({ ...s }); }} />;
 
   return (
-    <div className="min-h-screen bg-background px-4 pb-36 pt-[max(1rem,env(safe-area-inset-top))] text-foreground">
-      <div className="mb-5 flex items-center gap-2">
-        <Link to="/app/more" className="rounded-full p-2 hover:bg-muted" aria-label="Back"><ChevronLeft size={22} /></Link>
-        <h1 className="text-xl font-semibold">Arabic Companion</h1>
-        <span className="rounded-full bg-muted px-2 py-0.5 text-[10px] uppercase tracking-wider text-muted-foreground">Beta</span>
+    <div className="ab-page">
+      <div className="ab-header">
+        <Link to="/app/more" className="ab-icon-btn" aria-label="Back"><ChevronLeft size={22} /></Link>
+        <h1>Arabic Companion</h1>
+        <span className="ab-beta">Beta</span>
+        <button className="ab-icon-btn" aria-label="Settings" onClick={() => setSettingsOpen(true)}><Settings2 size={19} /></button>
       </div>
 
-      <section className="relative mb-5 overflow-hidden rounded-3xl border border-border bg-card p-5" style={{ boxShadow: "0 18px 40px -24px color-mix(in oklab, var(--primary) 45%, transparent)" }}>
-        <div className="pointer-events-none absolute inset-0" style={glow} />
-        <div className="relative flex items-center gap-4">
-          <Ring pct={pct} />
-          <div className="flex-1">
-            <p className="text-xs uppercase tracking-wider text-muted-foreground">Your goal</p>
-            <p className="font-semibold leading-snug">Read al-Fatihah by yourself</p>
-            <p className="text-xs text-muted-foreground">{passed} of {LESSONS.length} lessons mastered</p>
-          </div>
-        </div>
-        {next && (
-          <button onClick={() => setActive(next)} className="relative mt-4 flex w-full items-center justify-between rounded-2xl bg-primary px-4 py-3.5 text-primary-foreground">
-            <span className="text-left">
-              <span className="block text-[11px] opacity-80">{due ? `Continue · ${due} to review first` : "Continue"}</span>
-              <span className="text-sm font-medium">{next.goal}</span>
-            </span>
-            <span dir="rtl" className="text-2xl" style={ar}>{next.title}</span>
-          </button>
+      <section className="ab-card">
+        <div className="ab-glow" />
+        <p className="ab-today-title">Today</p>
+        <p className="ab-today-main">
+          {plan.lesson ? `Lesson ${plan.lesson.day}: ${plan.lesson.title}` : plan.vocabDay ? `Understand · Day ${plan.vocabDay.day}` : plan.reviews.length ? "Review day" : "All done for today"}
+        </p>
+        <p className="ab-today-sub">{plan.minutes} min{plan.reviews.length ? ` · ${plan.reviews.length} reviews due` : ""}</p>
+        {(plan.lesson || plan.vocabDay || plan.reviews.length > 0) && (
+          <button className="ab-start" onClick={start}>{plan.doneToday ? "Practise again" : "Start"}</button>
         )}
       </section>
 
-      <p className="mb-6 px-1 text-center text-xs italic leading-relaxed text-muted-foreground">
-        “Learn the Sunnah and Arabic, and learn the Quran in Arabic, for it is Arabic.” — ʿUmar to Abu Musa
+      <section className="ab-card">
+        <p className="ab-today-title">Al-Fatiha</p>
+        <div className="ab-meter">
+          {meter.words.map((w) => <span key={w.key} className={`ab-meter-word ${w.ok ? "" : "ab-dim"}`}>{w.text}</span>)}
+        </div>
+        <p className="ab-today-sub">You can read {meter.readable} of {meter.total} words of Al-Fatiha</p>
+        <div className="ab-stats">
+          <div className="ab-stat"><b>{ov.lettersKnown}</b><small>letters known</small></div>
+          <div className="ab-stat"><b>{ov.wordsKnown}</b><small>words · ≈{Math.round(ov.quranCoverage * 100)}% of the Quran</small></div>
+          <div className="ab-stat"><b>{ov.streak}</b><small>day streak</small></div>
+        </div>
+      </section>
+
+      <p className="ab-section-title">Read · 30 lessons</p>
+      <div className="ab-path">
+        {LESSONS.map((l) => {
+          const st = lessonStatus(state, l);
+          const isNext = plan.lesson?.id === l.id;
+          return (
+            <button key={l.id} disabled={st === "locked"} onClick={() => openLesson(l.id)} className={`ab-lesson ${isNext ? "ab-next" : ""}`}>
+              <span className={`ab-dot ${st === "passed" ? "ab-passed" : st === "open" ? "ab-open" : ""}`}>{st === "passed" && <Check size={9} strokeWidth={4} />}</span>
+              <span className="ab-lesson-main">
+                <b>{l.day}. {l.title}</b>
+                <small>{st === "passed" ? "Passed — tap to revisit" : st === "locked" ? "Unlocks after the lesson above" : l.goal}</small>
+              </span>
+              {st === "locked" && <Lock size={14} style={{ color: "var(--muted-foreground)" }} />}
+            </button>
+          );
+        })}
+      </div>
+
+      <p className="ab-section-title">Understand · 60 days</p>
+      {!understandOpen(state) && <p className="ab-today-sub" style={{ marginBottom: ".5rem" }}>Opens after lesson 26</p>}
+      <div className="ab-path">
+        {VOCAB_PLAN().map((d) => {
+          const done = !!state.vocabDone[d.day];
+          const open = understandOpen(state);
+          return (
+            <button key={d.day} disabled={!open} className="ab-lesson" onClick={() => open && setSession({ kind: "vocab", title: `Day ${d.day}: ${d.theme}`, steps: vocabSteps(d, state, day), dayNo: d.day })}>
+              <span className={`ab-dot ${done ? "ab-passed" : open ? "ab-open" : ""}`}>{done && <Check size={9} strokeWidth={4} />}</span>
+              <span className="ab-lesson-main">
+                <b>Day {d.day}: {d.theme}</b>
+                <small>{done ? "Learned — tap to revisit" : open ? `${d.words.length} words` : "Locked"}</small>
+              </span>
+              {!open && <Lock size={14} style={{ color: "var(--muted-foreground)" }} />}
+            </button>
+          );
+        })}
+      </div>
+
+      <p className="ab-teacher-line">
+        Learning from a teacher is the way the Quran has always been passed on. Use this alongside a teacher or masjid class when you can.
       </p>
 
-      {CURRICULUM.map((lv) => (
-        <section key={lv.id} className="mb-6">
-          <p className="text-[11px] uppercase tracking-wider text-primary">Level {lv.id}</p>
-          <h2 className="mb-3 text-lg font-semibold">{lv.title}</h2>
-          <div className="relative space-y-2.5 pl-5">
-            <div className="absolute bottom-4 left-[9px] top-4 w-px bg-border" />
-            {lv.units.flatMap((u) => u.lessons).map((l) => {
-              const st = lessonStatus(d, l.id, today);
-              const isNext = next?.id === l.id;
-              return (
-                <button
-                  key={l.id}
-                  disabled={st === "locked" || st === "retry-tomorrow"}
-                  onClick={() => setActive(l)}
-                  className={`relative flex w-full items-center gap-3 rounded-2xl border bg-card p-3.5 text-left transition active:scale-[0.98] disabled:opacity-55 ${isNext ? "border-primary" : "border-border"}`}
-                >
-                  <span className={`absolute -left-[19px] flex h-4 w-4 items-center justify-center rounded-full border-2 ${st === "passed" ? "border-primary bg-primary text-primary-foreground" : isNext ? "border-primary bg-background" : "border-border bg-background"}`}>
-                    {st === "passed" && <Check size={9} strokeWidth={4} />}
-                  </span>
-                  <span className="flex-1">
-                    <span className="block text-sm font-medium">{l.goal}</span>
-                    <span className="text-xs text-muted-foreground">
-                      {st === "retry-tomorrow" ? "Back tomorrow with fresh practice" : st === "passed" ? "Mastered" : st === "locked" ? "Unlocks after the lesson above" : `${l.newItems.length} letters · about 8 min`}
-                    </span>
-                  </span>
-                  {st === "locked" ? <Lock size={14} className="text-muted-foreground" /> : <span dir="rtl" className="text-2xl" style={ar}>{l.title}</span>}
-                </button>
-              );
-            })}
-          </div>
-        </section>
-      ))}
-      <p className="text-center text-xs text-muted-foreground">Next: vowels, real words, tajweed and meanings.</p>
-
-      {active && (
-        <LessonRunner
-          lesson={active}
-          steps={buildLesson(active, d, today)}
-          onExit={() => { setActive(null); setLog(loadLog()); }}
+      {session && (
+        <ArabicPlayer
+          title={session.title}
+          steps={session.steps}
+          state={state}
+          onAnswer={onAnswer}
+          onDone={onDone}
+          onExit={() => setSession(null)}
         />
       )}
-    </div>
-  );
-}
 
-function Ring({ pct }: { pct: number }) {
-  const r = 26, c = 2 * Math.PI * r;
-  return (
-    <div className="relative h-16 w-16 shrink-0">
-      <svg viewBox="0 0 64 64" className="h-full w-full -rotate-90">
-        <circle cx="32" cy="32" r={r} fill="none" stroke="var(--muted)" strokeWidth="6" />
-        <circle cx="32" cy="32" r={r} fill="none" stroke="var(--primary)" strokeWidth="6" strokeLinecap="round" strokeDasharray={c} strokeDashoffset={c * (1 - pct / 100)} />
-      </svg>
-      <span className="absolute inset-0 flex items-center justify-center text-sm font-semibold">{pct}%</span>
-    </div>
-  );
-}
-
-function useAudio() {
-  const ref = useRef<HTMLAudioElement | null>(null);
-  const [playing, setPlaying] = useState(false);
-  const play = (url?: string) => {
-    if (!url) return;
-    ref.current?.pause();
-    const a = new Audio(url);
-    ref.current = a;
-    a.onended = () => setPlaying(false);
-    setPlaying(true);
-    void a.play().catch(() => setPlaying(false));
-  };
-  useEffect(() => () => ref.current?.pause(), []);
-  return { play, playing };
-}
-
-/** The example word with its first letter highlighted. */
-function ExampleWord({ text, className = "" }: { text: string; className?: string }) {
-  // One run of text: splitting it into spans breaks letter joining on phones.
-  return <span dir="rtl" className={className} style={ar}>{text}</span>;
-}
-
-function ListenButton({ url, label }: { url?: string; label: string }) {
-  const { play, playing } = useAudio();
-  if (!url) return null;
-  return (
-    <button onClick={() => play(url)} className="flex items-center gap-2 rounded-full bg-primary px-5 py-3 text-sm text-primary-foreground shadow-sm active:scale-95">
-      <Volume2 size={18} className={playing ? "animate-pulse" : ""} /> {label}
-    </button>
-  );
-}
-
-/** Letter sound card: the letter-alone clip when recorded, plus a real recited Quran word that starts with it. */
-function LetterSound({ item }: { item: Item }) {
-  return (
-    <div className="flex w-full flex-col items-center gap-3">
-      {item.audio && <ListenButton url={item.audio} label="Hear the letter" />}
-      {item.example ? (
-        <div className="w-full rounded-2xl border border-border bg-card p-4">
-          <p className="mb-1 text-[11px] uppercase tracking-wider text-muted-foreground">Hear it in the Quran</p>
-          <ExampleWord text={item.example.ar} className="block text-5xl leading-loose" />
-          <p className="mb-3 text-xs text-muted-foreground">{item.example.tr} · {item.example.en}</p>
-          <div className="flex justify-center"><ListenButton url={item.example.audio} label="Play reciter" /></div>
-        </div>
-      ) : (
-        !item.audio && <p className="text-xs text-muted-foreground">Alif never starts a word — you'll hear it stretching vowels in Level 2.</p>
-      )}
-    </div>
-  );
-}
-
-type Answer = { item: Item; correct: boolean; picked?: Item; grade?: Grade; exercise: string };
-
-function LessonRunner({ lesson, steps, onExit }: { lesson: Lesson; steps: Step[]; onExit: () => void }) {
-  const [i, setI] = useState(0);
-  const [answers, setAnswers] = useState<Answer[]>([]);
-  const [done, setDone] = useState<number | null>(null);
-  const step = steps[i];
-  const answer = (a: Answer) => setAnswers((x) => [...x, a]);
-  const next = () => {
-    if (i + 1 < steps.length) return setI(i + 1);
-    const score = scoreOf(answers.filter((a) => a.exercise !== "review"));
-    record([
-      ...answers.map((a) => ({ kind: "answer" as const, lessonId: lesson.id, itemId: a.item.id, correct: a.correct, picked: a.picked?.id, grade: a.grade })),
-      { kind: "lesson", lessonId: lesson.id, score },
-    ]);
-    setDone(score);
-  };
-  useEffect(() => {
-    const prev = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
-    return () => { document.body.style.overflow = prev; };
-  }, []);
-
-  return (
-    <Portal>
-      <div className="fixed inset-0 flex flex-col bg-background text-foreground" style={{ zIndex: 300 }}>
-        <div className="flex items-center gap-3 px-4 pb-2 pt-[max(0.75rem,env(safe-area-inset-top))]">
-          <button onClick={onExit} className="rounded-full p-2 hover:bg-muted" aria-label="Leave lesson"><X size={20} /></button>
-          <div className="h-2 flex-1 overflow-hidden rounded-full bg-muted">
-            <div className="h-full rounded-full bg-primary transition-all duration-500" style={{ width: `${((done !== null ? steps.length : i) / steps.length) * 100}%` }} />
-          </div>
-          <span dir="rtl" className="text-lg" style={ar}>{lesson.title}</span>
-        </div>
-        {done !== null ? (
-          <Result score={done} lesson={lesson} onExit={onExit} />
-        ) : (
-          <StepView key={i} step={step} onAnswer={answer} onNext={next} />
-        )}
-      </div>
-    </Portal>
-  );
-}
-
-/** Scrollable body with the main action pinned above the home indicator. */
-function Screen({ label, children, action }: { label: string; children: React.ReactNode; action: React.ReactNode }) {
-  return (
-    <>
-      <div className="flex flex-1 flex-col items-center overflow-y-auto px-5 pb-6 pt-4 text-center animate-in fade-in slide-in-from-bottom-2 duration-300">
-        <p className="mb-2 text-[11px] font-medium uppercase tracking-[0.16em] text-primary">{label}</p>
-        {children}
-      </div>
-      <div className="border-t border-border px-5 pb-[max(1rem,env(safe-area-inset-bottom))] pt-3">{action}</div>
-    </>
-  );
-}
-
-function Primary({ children, onClick, disabled }: { children: React.ReactNode; onClick: () => void; disabled?: boolean }) {
-  return <button disabled={disabled} onClick={onClick} className="w-full rounded-full bg-primary py-4 font-medium text-primary-foreground transition active:scale-[0.98] disabled:opacity-35">{children}</button>;
-}
-
-function BigLetter({ item }: { item: Item }) {
-  return (
-    <div className="relative my-3 flex h-44 w-44 items-center justify-center rounded-[2.5rem] border border-border bg-card">
-      <div className="pointer-events-none absolute inset-0 rounded-[2.5rem]" style={glow} />
-      <span className="relative text-8xl leading-none" style={ar}>{item.ar}</span>
-    </div>
-  );
-}
-
-function Result({ score, lesson, onExit }: { score: number; lesson: Lesson; onExit: () => void }) {
-  const pass = score >= lesson.mastery;
-  return (
-    <Screen label={pass ? "Lesson mastered" : "Almost there"} action={<Primary onClick={onExit}>Back to lessons</Primary>}>
-      <div className="my-6 flex h-32 w-32 items-center justify-center rounded-full border-4 border-primary text-4xl font-semibold">{Math.round(score * 100)}%</div>
-      <div dir="rtl" className="mb-4 flex gap-3 text-4xl" style={ar}>{lesson.newItems.map((id) => <span key={id}>{ITEMS[id]?.ar}</span>)}</div>
-      {pass ? (
-        <p className="max-w-xs text-sm leading-relaxed"><Sparkles size={14} className="mr-1 inline text-primary" />You can now recognise these letters. They'll come back for a quick review so they stay with you.</p>
-      ) : (
-        <p className="max-w-xs text-sm leading-relaxed">
-          You need {Math.round(lesson.mastery * 100)}% to move on. Tomorrow this lesson returns with different practice.
-          <span className="mt-4 block rounded-2xl bg-muted p-3 text-xs text-muted-foreground">“The one who recites and finds it hard, stumbling over it, has two rewards.” — Bukhari & Muslim</span>
-        </p>
-      )}
-    </Screen>
-  );
-}
-
-function StepView({ step, onAnswer, onNext }: { step: Step; onAnswer: (a: Answer) => void; onNext: () => void }) {
-  switch (step.kind) {
-    case "model":
-      return (
-        <Screen label="New letter" action={<Primary onClick={onNext}>Next</Primary>}>
-          <BigLetter item={step.item} />
-          <p className="text-2xl font-semibold">{step.item.name}</p>
-          <p className="mb-5 text-sm text-muted-foreground">Sounds like “{step.item.tr}”</p>
-          <LetterSound item={step.item} />
-        </Screen>
-      );
-    case "repeat":
-      return (
-        <Screen label="Say it back" action={<Primary onClick={onNext}>Next</Primary>}>
-          <BigLetter item={step.item} />
-          <p className="mb-5 max-w-xs text-sm text-muted-foreground">Listen to the reciter, then say “{step.item.tr}” aloud. Record yourself and compare.</p>
-          {step.item.example && <ListenButton url={step.item.example.audio} label="Reciter" />}
-          <Recorder />
-        </Screen>
-      );
-    case "review":
-    case "pick":
-      return <Pick step={step} onAnswer={onAnswer} onNext={onNext} />;
-    case "dots":
-      return <Dots step={step} onAnswer={onAnswer} onNext={onNext} />;
-    case "apply":
-    case "read":
-      return <ReadAloud item={step.item} onAnswer={onAnswer} onNext={onNext} />;
-  }
-}
-
-function Pick({ step, onAnswer, onNext }: { step: Extract<Step, { kind: "pick" | "review" }>; onAnswer: (a: Answer) => void; onNext: () => void }) {
-  const [picked, setPicked] = useState<Item | null>(null);
-  const [hint, setHint] = useState(false);
-  const { item } = step;
-  const guided = step.kind === "pick" && step.hint;
-  const choose = (o: Item) => {
-    setPicked(o);
-    navigator.vibrate?.(o.id === item.id ? 15 : [20, 40, 20]);
-    onAnswer({ item, correct: o.id === item.id, picked: o.id === item.id ? undefined : o, exercise: step.kind === "review" ? "review" : "pick" });
-  };
-  const ok = picked?.id === item.id;
-  return (
-    <Screen label={step.kind === "review" ? "Quick review" : guided ? "Practice" : "On your own"} action={<Primary disabled={!picked} onClick={onNext}>Continue</Primary>}>
-      <p className="mb-4 mt-2 text-xl font-medium">Which letter says “{item.tr}”?</p>
-      {item.example && !picked && guided && <ListenButton url={item.example.audio} label="Hear it in a word" />}
-      {guided && !picked && (
-        hint ? <p className="mt-3 text-xs text-muted-foreground">Hint: it's called {item.name}</p>
-          : <button onClick={() => setHint(true)} className="mt-3 text-xs text-primary underline-offset-2 hover:underline">Need a hint?</button>
-      )}
-      <div dir="rtl" className={`mt-6 grid w-full gap-3 ${step.options.length === 3 ? "grid-cols-3" : "grid-cols-2"}`}>
-        {step.options.map((o) => {
-          const tone = picked ? (o.id === item.id ? "border-primary bg-primary/10 scale-[1.02]" : o.id === picked.id ? "border-destructive bg-destructive/5" : "opacity-40") : "";
-          return (
-            <button key={o.id} disabled={!!picked} onClick={() => choose(o)} className={`flex h-28 items-center justify-center rounded-3xl border-2 border-border bg-card text-6xl transition-all active:scale-95 ${tone}`} style={ar}>{o.ar}</button>
-          );
-        })}
-      </div>
-      {picked && (
-        <div className={`mt-5 w-full rounded-2xl p-4 text-left text-sm leading-relaxed animate-in fade-in ${ok ? "bg-primary/10" : "bg-muted"}`}>
-          {ok ? <><b>Correct.</b> That's {item.name}.</> : (
-            <>That was <b>{picked.name}</b> (“{picked.tr}”). “{item.tr}” is <b>{item.name}</b> <span style={ar} className="text-xl">{item.ar}</span>
-              {item.family === picked.family ? " — same shape, so look at the dots." : "."}</>
-          )}
-        </div>
-      )}
-    </Screen>
-  );
-}
-
-function Dots({ step, onAnswer, onNext }: { step: Extract<Step, { kind: "dots" }>; onAnswer: (a: Answer) => void; onNext: () => void }) {
-  const [sel, setSel] = useState<Set<number>>(new Set());
-  const [checked, setChecked] = useState(false);
-  const want = step.line.map((x, k) => (x.id === step.target.id ? k : -1)).filter((k) => k >= 0);
-  const check = () => {
-    setChecked(true);
-    const correct = want.length === sel.size && want.every((k) => sel.has(k));
-    const wrong = [...sel].map((k) => step.line[k]).find((x) => x.id !== step.target.id);
-    onAnswer({ item: step.target, correct, picked: wrong, exercise: "dots" });
-  };
-  return (
-    <Screen label="Spot the dots" action={checked ? <Primary onClick={onNext}>Continue</Primary> : <Primary disabled={!sel.size} onClick={check}>Check</Primary>}>
-      <p className="mb-6 mt-2 text-xl font-medium">Tap every <span className="mx-1 text-4xl text-primary" style={ar}>{step.target.ar}</span></p>
-      <div dir="rtl" className="grid w-full grid-cols-4 gap-2.5">
-        {step.line.map((x, k) => {
-          const on = sel.has(k);
-          const tone = checked ? (x.id === step.target.id ? "border-primary bg-primary/10" : on ? "border-destructive" : "opacity-40") : on ? "border-primary bg-primary/10" : "";
-          return (
-            <button key={k} disabled={checked} onClick={() => setSel((s) => { const n = new Set(s); n.has(k) ? n.delete(k) : n.add(k); return n; })}
-              className={`flex h-20 items-center justify-center rounded-2xl border-2 border-border bg-card text-5xl transition active:scale-95 ${tone}`} style={ar}>{x.ar}</button>
-          );
-        })}
-      </div>
-    </Screen>
-  );
-}
-
-function Recorder() {
-  const [url, setUrl] = useState<string | null>(null);
-  const [rec, setRec] = useState(false);
-  const [err, setErr] = useState<string | null>(null);
-  const mr = useRef<MediaRecorder | null>(null);
-  const { play } = useAudio();
-  const start = async () => {
-    try {
-      const s = await navigator.mediaDevices.getUserMedia({ audio: true });
-      const chunks: Blob[] = [];
-      const r = new MediaRecorder(s);
-      r.ondataavailable = (e) => chunks.push(e.data);
-      r.onstop = () => { s.getTracks().forEach((t) => t.stop()); setUrl(URL.createObjectURL(new Blob(chunks, { type: r.mimeType }))); };
-      r.start(); mr.current = r; setRec(true); setErr(null);
-    } catch {
-      setErr("Microphone is blocked. Allow it in your phone's Settings to record yourself.");
-    }
-  };
-  const stop = () => { mr.current?.stop(); setRec(false); };
-  return (
-    <div className="mt-4 flex flex-col items-center gap-2">
-      <div className="flex gap-2">
-        <button onClick={rec ? stop : start} className={`flex items-center gap-2 rounded-full border px-4 py-2.5 text-sm ${rec ? "border-destructive text-destructive" : "border-border"}`}>
-          {rec ? <><Square size={14} className="animate-pulse" /> Stop</> : url ? <><RotateCcw size={14} /> Record again</> : <><Mic size={14} /> Record yourself</>}
-        </button>
-        {url && !rec && <button onClick={() => play(url)} className="flex items-center gap-2 rounded-full border border-border px-4 py-2.5 text-sm"><Play size={14} /> Hear yourself</button>}
-      </div>
-      {err && <p className="max-w-xs text-xs text-destructive">{err}</p>}
-    </div>
-  );
-}
-
-function ReadAloud({ item, onAnswer, onNext }: { item: Item; onAnswer: (a: Answer) => void; onNext: () => void }) {
-  const [shown, setShown] = useState(false);
-  const [graded, setGraded] = useState(false);
-  const grade = (g: Grade) => { onAnswer({ item, correct: g === "perfect" || g === "hesitation", grade: g, exercise: "read" }); setGraded(true); };
-  return (
-    <Screen
-      label="Read a real Quran word"
-      action={!shown ? <Primary onClick={() => setShown(true)}>Check with the reciter</Primary> : <Primary disabled={!graded} onClick={onNext}>Continue</Primary>}
-    >
-      <div className="relative my-4 w-full rounded-3xl border border-border bg-card px-4 py-8">
-        <div className="pointer-events-none absolute inset-0 rounded-3xl" style={glow} />
-        <div dir="rtl" className="relative text-7xl leading-loose" style={ar}>{item.ar}</div>
-      </div>
-      <p className="text-sm text-muted-foreground">Read it aloud using the letters you've learned.</p>
-      <Recorder />
-      {shown && (
-        <div className="mt-5 flex w-full flex-col items-center gap-3 animate-in fade-in slide-in-from-bottom-2">
-          <p className="text-lg"><b>{item.tr}</b> <span className="text-muted-foreground">· {item.meaning}</span></p>
-          <ListenButton url={item.audio} label="Hear the reciter" />
-          {!graded ? (
-            <div className="mt-2 grid w-full grid-cols-3 gap-2">
-              {([["mistake", "Needed help"], ["hesitation", "Slowly"], ["perfect", "Read it right"]] as const).map(([g, t]) => (
-                <button key={g} onClick={() => grade(g)} className="rounded-2xl border border-border bg-card px-2 py-3 text-sm active:scale-95">{t}</button>
-              ))}
+      {result && !milestone && (
+        <div className="ab-dialog" role="dialog" aria-modal="true">
+          <div className="ab-dialog-inner">
+            <div className="ab-result-ring" style={{ margin: "0 auto 1rem" }}>{Math.round(result.score * 100)}%</div>
+            <h3>{result.passed ? `${result.label} passed` : "Almost!"}</h3>
+            <p>
+              {result.passed
+                ? `${result.unlocked ? "The next step is open. " : ""}${result.fatihaGrew ? "You can read more of Al-Fatiha now. " : ""}What you learned will come back for quick reviews.`
+                : `${Math.round(result.score * 100)}%. Practise again now or tomorrow — no penalty.`}
+            </p>
+            <div className="ab-dialog-actions">
+              {!result.passed && <button onClick={() => { setResult(null); start(); }}>Practise again</button>}
+              <button className="ab-danger" onClick={() => setResult(null)}>Done</button>
             </div>
-          ) : <p className="flex items-center gap-1 text-sm text-primary"><Check size={14} /> Saved</p>}
+          </div>
         </div>
       )}
-    </Screen>
+      {milestone && <ArabicMilestone milestone={milestone} done={() => setMilestone(null)} />}
+
+      {settingsOpen && (
+        <div className="ab-sheet" onClick={(e) => { if (e.target === e.currentTarget) setSettingsOpen(false); }}>
+          <div className="ab-sheet-inner">
+            <h2>Arabic Companion settings</h2>
+            <div className="ab-setting-row">
+              <span>Daily minutes</span>
+              <span className="ab-segments">
+                {([10, 15, 20, 30] as const).map((m) => (
+                  <button key={m} className={state.settings.dailyMinutes === m ? "ab-on" : ""} onClick={() => update((s) => { s.settings.dailyMinutes = m; })}>{m}</button>
+                ))}
+              </span>
+            </div>
+            <div className="ab-setting-row">
+              <span>Kid mode<small>A parent should listen along: the AI is less reliable for children under 12</small></span>
+              <input type="checkbox" checked={state.settings.kidMode} onChange={(e) => update((s) => { s.settings.kidMode = e.target.checked; })} />
+            </div>
+            <div className="ab-setting-row">
+              <span>Sounds<small>Off by default; vibrations stay on</small></span>
+              <input type="checkbox" checked={state.settings.sounds} onChange={(e) => update((s) => { s.settings.sounds = e.target.checked; })} />
+            </div>
+            <div className="ab-setting-row">
+              <span>Show meanings of words I know in the Quran reader</span>
+              <input type="checkbox" checked={state.settings.showMeanings} onChange={(e) => update((s) => { s.settings.showMeanings = e.target.checked; })} />
+            </div>
+            <button className="ab-link-btn" onClick={() => { update((s) => { delete s.placement; }); setSettingsOpen(false); }}>Redo placement test</button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ---------- placement ----------
+
+function Placement({ state, onDone }: { state: ArabicState; onDone: (s: ArabicState) => void }) {
+  const day = localDay();
+  const [answers, setAnswers] = useState<PlacementAnswers | null>(null);
+  const [finished, setFinished] = useState<number | null>(null);
+
+  if (finished !== null) {
+    const lesson = LESSONS.find((l) => l.day === finished);
+    return (
+      <div className="ab-page" style={{ display: "flex", flexDirection: "column", justifyContent: "center" }}>
+        <div className="ab-card" style={{ textAlign: "center", padding: "2rem 1.5rem" }}>
+          <div className="ab-glow" />
+          <p className="ab-today-title">You're ready</p>
+          <p className="ab-today-main" style={{ fontSize: "1.2rem" }}>You start at lesson {finished}: {lesson?.title}</p>
+          <p className="ab-today-sub">You can open earlier lessons anytime.</p>
+          <button className="ab-start" onClick={() => onDone(state)}>Start learning</button>
+        </div>
+      </div>
+    );
+  }
+
+  if (!answers) {
+    return (
+      <div className="ab-page" style={{ display: "flex", flexDirection: "column", justifyContent: "center" }}>
+        <p className="ab-step-label" style={{ textAlign: "center" }}>Arabic Companion</p>
+        <h1 style={{ textAlign: "center", fontSize: "1.4rem", fontWeight: 600, marginBottom: "1.5rem" }}>Where should you start?</h1>
+        {PLACEMENT_INTRO.map((o) => (
+          <button key={o.id} className="ab-card" style={{ width: "100%", textAlign: "left", cursor: "pointer", color: "inherit" }}
+            onClick={() => setAnswers({ learner: o.id })}>
+            <b style={{ display: "block", fontSize: "1rem" }}>{o.label}</b>
+            <small style={{ color: "var(--muted-foreground)" }}>{o.hint}</small>
+          </button>
+        ))}
+        <button className="ab-link-btn" style={{ alignSelf: "center" }}
+          onClick={() => { const start = applyPlacement(state, { learner: "beginner" }, day); setFinished(start); }}>
+          Skip, start from the first letter
+        </button>
+      </div>
+    );
+  }
+
+  const part = nextPart(answers);
+  if (part === "done") {
+    const start = applyPlacement(state, answers, day);
+    play("sessionComplete");
+    setFinished(start);
+    return null;
+  }
+  return <PlacementPart key={part} part={part} answers={answers} onPart={(n) => setAnswers({ ...answers, [part]: n })} />;
+}
+
+function PlacementPart({ part, answers, onPart }: { part: "letters" | "syllables" | "words"; answers: PlacementAnswers; onPart: (right: number) => void }) {
+  const [i, setI] = useState(0);
+  const right = useRef(0);
+  const items = part === "letters" ? PLACEMENT_LETTERS : part === "syllables" ? PLACEMENT_SYLLABLES : PLACEMENT_WORDS;
+  const advance = (ok: boolean) => {
+    if (ok) right.current++;
+    if (i + 1 < items.length) setI(i + 1);
+    else onPart(right.current);
+  };
+  if (part === "letters") return <PlacementLetter letter={PLACEMENT_LETTERS[i]} index={i} total={items.length} onAnswer={advance} />;
+  if (part === "syllables") return <PlacementSay text={PLACEMENT_SYLLABLES[i]} index={i} total={items.length} onAnswer={advance} />;
+  const w = PLACEMENT_WORDS[i];
+  return <PlacementSay text={w.text} wordKey={w.key} index={i} total={items.length} onAnswer={advance} />;
+}
+
+function PlacementLetter({ letter, index, total, onAnswer }: { letter: string; index: number; total: number; onAnswer: (ok: boolean) => void }) {
+  const l = LETTER.get(letter)!;
+  const sound = letterSoundAudio(letter);
+  const { play: playAudio } = useAudio();
+  const [picked, setPicked] = useState<string | null>(null);
+  const choices = useMemo(() => {
+    const alikes = [...LOOKALIKES, ...SOUNDALIKES].filter((p) => p.includes(letter)).map((p) => (p[0] === letter ? p[1] : p[0]));
+    const pool = [...new Set([...alikes, ...LETTERS.map((x) => x.ar)])].filter((x) => x !== letter);
+    return [letter, ...pool.slice(0, 3)].sort(() => 0.5 - Math.random());
+  }, [letter]);
+  useEffect(() => { const t = setTimeout(() => playAudio(sound ?? l.example?.audio), 400); return () => clearTimeout(t); }, [letter]);
+  return (
+    <div className="ab-page" style={{ display: "flex", flexDirection: "column", justifyContent: "center" }}>
+      <p className="ab-step-label" style={{ textAlign: "center" }}>Placement · {index + 1} of {total}</p>
+      <h2 style={{ textAlign: "center", fontSize: "1.15rem", fontWeight: 600 }}>{sound ? "Which letter makes this sound?" : "Which letter does this word start with?"}</h2>
+      <div style={{ display: "flex", justifyContent: "center", margin: "1rem 0" }}>
+        <ListenButton url={sound ?? l.example?.audio} label="Replay" />
+      </div>
+      {!sound && l.example && <p dir="rtl" style={{ ...ar, textAlign: "center", fontSize: "2rem" }}>{l.example.ar}</p>}
+      <div className="ab-choices" dir="rtl" style={{ alignSelf: "center" }}>
+        {choices.map((c) => {
+          const tone = picked ? (c === letter ? "ab-right" : c === picked ? "ab-wrong" : "ab-faded") : "";
+          return <button key={c} disabled={!!picked} className={`ab-choice ${tone}`} onClick={() => { setPicked(c); setTimeout(() => onAnswer(c === letter), 600); }}><span style={ar}>{c}</span></button>;
+        })}
+      </div>
+    </div>
+  );
+}
+
+function PlacementSay({ text, wordKey, index, total, onAnswer }: { text: string; wordKey?: string; index: number; total: number; onAnswer: (ok: boolean) => void }) {
+  const [keyPhonemes, setKeyPhonemes] = useState<string | undefined>();
+  const [listening, setListening] = useState(false);
+  const [busy, setBusy] = useState(false);
+  const [level, setLevel] = useState(0);
+  const session = useRef<{ stop(): void; cancel(): void } | null>(null);
+  useEffect(() => { if (wordKey) void wordKeyPhonemes(wordKey).then(setKeyPhonemes); }, [wordKey]);
+  useEffect(() => () => session.current?.cancel(), []);
+  const start = async () => {
+    setBusy(true);
+    try {
+      const s = await startSay({ text, keyPhonemes, onLevel: setLevel });
+      session.current = s;
+      setListening(true); setBusy(false);
+      const r = await s.result;
+      onAnswer(r.verdict === "correct" || r.verdict === "close");
+    } catch {
+      onAnswer(false);
+    } finally { setListening(false); setBusy(false); session.current = null; }
+  };
+  return (
+    <div className="ab-page" style={{ display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center" }}>
+      <p className="ab-step-label">Placement · {index + 1} of {total}</p>
+      <h2 style={{ fontSize: "1.15rem", fontWeight: 600 }}>Read this aloud</h2>
+      <p dir="rtl" className="ab-big-text">{text}</p>
+      {wordKey && <ListenButton url={quranWordAudio(wordKey)} label="Hear it first" />}
+      <MicButton listening={listening} busy={busy} level={level} onTap={() => (listening ? session.current?.stop() : void start())} />
+      <button className="ab-link-btn" onClick={() => onAnswer(false)}>I can't read this yet</button>
+    </div>
   );
 }
