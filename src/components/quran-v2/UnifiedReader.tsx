@@ -34,6 +34,7 @@ export type ReaderLesson={pill:ReactNode;marks:Marks;hidden:boolean;stream:Media
 export function UnifiedReader({chapterId=1,verse=1,initialPage,initialMode,back,lesson}:{chapterId?:number;verse?:number;initialPage?:number;initialMode?:"follow"|"search"|"smart";back:()=>void;lesson?:ReaderLesson}){
   const client=useQueryClient();const chapters=useQuery(reciteChaptersOptions).data??[];
   const [page,setPage]=useState(initialPage??1),[loaded,setLoaded]=useState(!!initialPage);
+  const [anchor,setAnchor]=useState(initialPage??1);
   const [prefs,setPrefs]=useState<ReaderPreferences>({...DEFAULTS,layout:lesson?"Framed mushaf":"Mushaf text"});
   const [theme,setTheme]=useState("original"),[phase,setPhase]=useState<"morning"|"evening">("morning");
   const [chrome,setChrome]=useState(true),[tabbar,setTabbar]=useState(false),[hidden,setHidden]=useState(false),[revealed,setRevealed]=useState<Set<string>>(new Set());
