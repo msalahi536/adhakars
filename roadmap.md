@@ -1,4 +1,5 @@
 # Roadmap
+- [x] Restyle Quran v2 opening pages with compact authentic QPC source lines, outline ornaments, cream/olive palette and floating controls; dominant-page header verified scrolling both directions. Pages 1/2 and 15-line page3 captured at /tmp/browser/quran-opening/; phone/desktop, settings and hidden words checked without browser errors. Eight existing tests pass; build OK. Source line breaks intentionally differ from the inaccurate reference text; mic/follow/Hifz logic unchanged.
 
 - [x] Polish Hifz home order/cards/scroll-away controls/positive streak; distinct automatic setup paces (45 min = 7 lines, 60 min = 10 in preview), hidden setup tab bar and forecast guidance; hydration-safe task page matching; meaning source font/names, labeled icons and stacked mic caption; source-word transliteration and single ayah number in both readers. Fresh plan created/read back; page602 task opened602 despite saved604 in both readers, no browser errors. Home top/middle/bottom and final setup screenshots in /tmp/browser/hifz-polish/. 47 focused tests passed before final page-ready regression; native microphone/haptics not claimed verified.
 
