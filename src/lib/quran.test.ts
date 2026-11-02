@@ -1,10 +1,14 @@
 import { describe, expect, test } from "bun:test";
-import { locate, stripTags } from "./quran";
+import { locate, stripTags, spacedTransliteration } from "./quran";
 
 const timings = [
   { key: "1:1", from: 0, to: 6090, segments: [[1, 0, 580], [2, 580, 1409]] as [number, number, number][] },
   { key: "1:2", from: 6090, to: 11680, segments: [[1, 6025, 7025]] as [number, number, number][] },
 ];
+
+test("source word transliteration separates suhufan and mutahhara and excludes ayah numbers", () => {
+  expect(spacedTransliteration([{char_type_name:"word",transliteration:{text:"suhufan"}},{char_type_name:"word",transliteration:{text:"mutahhara"}},{char_type_name:"end",transliteration:{text:"٢"}}])).toBe("suhufan mutahhara");
+});
 
 describe("quran karaoke sync", () => {
   test("finds verse and word at a time", () => {

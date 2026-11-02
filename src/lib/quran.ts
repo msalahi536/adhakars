@@ -217,6 +217,10 @@ function get<T>(path: string): Promise<T> {
 
 export const stripTags = (s: string) => s.replace(/<sup[^>]*>.*?<\/sup>/g, "").replace(/<[^>]+>/g, "").trim();
 
+export function spacedTransliteration(words: { char_type_name: string; transliteration?: { text?: string | null } }[]) {
+  return words.filter(w => w.char_type_name !== "end").map(w => w.transliteration?.text?.trim()).filter(Boolean).join(" ");
+}
+
 export async function getChapters(): Promise<Chapter[]> {
   return (await get<{ chapters: Chapter[] }>("/chapters?language=en")).chapters;
 }
@@ -240,7 +244,7 @@ export async function getVerses(chapter: number): Promise<Verse[]> {
     number: v.verse_number,
     words: v.words.map((w) => ({ position: w.position, text: w.text_uthmani, isEnd: w.char_type_name === "end", tj: w.text_uthmani_tajweed })),
     translation: stripTags(v.translations[0]?.text ?? ""),
-    transliteration: v.words.filter(w => w.char_type_name !== "end").map(w => w.transliteration?.text?.trim()).filter(Boolean).join(" ") || stripTags(translit[i]?.text ?? ""),
+    transliteration: spacedTransliteration(v.words) || stripTags(translit[i]?.text ?? ""),
     page: v.page_number,
   }));
 }
