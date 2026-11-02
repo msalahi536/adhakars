@@ -164,7 +164,7 @@ export function loadQuranIndex(url = "/hifz-ai/quran-index.json"): Promise<Quran
 
 export interface SearchAnswer {
   confident: boolean; // true = clear answer; false = keep listening (or "recite a little more")
-  matches: { sura: number; aya: number; word: number; score: number }[]; // best first
+  matches: { sura: number; aya: number; word: number; score: number; now: WordRef }[]; // best first; now = where the recitation has reached
   samePhrase: { sura: number; aya: number; word: number }[]; // other places with exactly the same words
 }
 
@@ -189,7 +189,7 @@ export function judgeSearch(ix: QuranIndex, phonemes: string, top = 3): SearchAn
   const [a] = good;
   const twins = a ? good.filter((h) => h !== a && text(h) === text(a)) : [];
   const b = good.find((h) => h !== a && text(h) !== text(a));
-  const matches = [a, ...good.filter((h) => h !== a && !twins.includes(h))].filter(Boolean).slice(0, top).map((h) => ({ ...ix.where(begin(h)), score: h.score }));
+  const matches = [a, ...good.filter((h) => h !== a && !twins.includes(h))].filter(Boolean).slice(0, top).map((h) => ({ ...ix.where(begin(h)), score: h.score, now: ix.where(Math.max(begin(h), h.end - 1)) }));
   // the same words exist in several places: keep listening, the next words usually tell them apart
   const unique = twins.length === 0 || q.length >= 30;
   const confident = !!a && q.length >= 8 && a.score >= 0.7 && unique && (!b || a.score - b.score >= 0.12);

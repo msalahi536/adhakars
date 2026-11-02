@@ -14,3 +14,4 @@ export { findHesitations, masteryScore, type Hesitation, type Mastery } from "./
 export { openMic, type Mic } from "./mic";
 export { tajweedHints, type TajweedHint, type TajweedKind } from "./tajweed";
 export { wordTimeline, clipFor, wordAt, REPORT_DELAY, type WordSpan } from "./replay";
+export { startSmartRecite, detectElsewhere, type Elsewhere, type Passage } from "./smart";
