@@ -241,20 +241,9 @@ function Recite() {
   }, []);
   useEffect(() => { if (hydrated) saveRecite(saved); }, [saved, hydrated]);
   useEffect(() => {
-    configureHifzFeedback({ haptics: saved.settings.haptics, sounds: false });
+    configureHifzFeedback({ haptics: saved.settings.haptics, sounds: true });
     return cancelHifzFeedback;
   }, [saved.settings.haptics]);
-  useEffect(() => {
-    const pulse = () => {
-      const strip = stripElement.current;
-      if (!strip) return;
-      strip.classList.remove("rc-feedback-pulse");
-      void strip.offsetWidth;
-      strip.classList.add("rc-feedback-pulse");
-    };
-    window.addEventListener("hifz:feedback-pulse", pulse);
-    return () => window.removeEventListener("hifz:feedback-pulse", pulse);
-  }, []);
   useLayoutEffect(() => {
     const measure = () => setDimensions({ strip: stripElement.current?.offsetHeight ?? 92, labels: labelsElement.current?.offsetHeight ?? 24 });
     const observer = new ResizeObserver(measure);

@@ -74,15 +74,6 @@
   .rc-supplied .rc-canvas { top: calc(env(safe-area-inset-top, 0px) + 44px); }
   .rc-supplied .rc-bismillah { font-size: 16px; }
 }
-.rc-supplied .rc-feedback-pulse { animation: rc-feedback-pulse 260ms ease-out; }
-@keyframes rc-feedback-pulse {
-  0%, 100% { filter: brightness(1); }
-  40% { filter: brightness(1.18); box-shadow: 0 0 0 3px var(--m-mark); border-radius: 18px; }
-}
-@media (prefers-reduced-motion: reduce) {
-  .rc-supplied .rc-feedback-pulse { animation: rc-feedback-still 260ms linear; }
-  @keyframes rc-feedback-still { from, to { outline: 2px solid var(--m-mark); outline-offset: 3px; border-radius: 18px; } }
-}
 
 /* Reference-inspired settings, scoped to the Hifz sheet only. */
 .rc-supplied .rc-settings { display: flex; flex-direction: column; height: min(85dvh, 780px); overflow: hidden; padding: 0 22px; border-radius: 18px 18px 0 0; }
