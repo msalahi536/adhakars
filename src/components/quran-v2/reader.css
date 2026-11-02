@@ -119,3 +119,7 @@ body:has(.q2-sheet) .q2-topbar,body:has(.q2-sheet) .q2-bottom {visibility:hidden
 .q2-lesson-tools button {background:var(--surface);color:var(--foreground);font-size:11px;}
 .q2-lesson-word {background:var(--q2-glow);}
 .q2-reader:has(.q2-lesson-pill) .q2-scroll {padding-top:150px;}
+
+.q2-actionbar > button {flex-shrink:0;}
+.q2-actionbar > button:not(.q2-mic):hover {background:var(--muted);}
+.q2-reader:has(.q2-lesson-pill) .q2-frame {height:calc(100dvh - 275px);min-height:420px;}
