@@ -1,5 +1,11 @@
 # Roadmap
 
+- [ ] Add independent quran_v2 gate and cumulative seven/ten Settings version taps, preserving both flags/progress and old screens.
+- [ ] Add flag-only Read & Listen changes and Programs section, preserving reciter/search behavior.
+- [ ] Build shared themed reader: three layouts, navigation/settings previews, audio, smart mic/follow, hide/reveal, session mistakes/replay and Echo.
+- [ ] Integrate flag-only Hifz reader while preserving lesson/review grading and saved progress.
+- [ ] Verify off/on flows and capture requested reader/home/More screenshots; report device-only limitations.
+
 - [x] Hide all Hifz/Quran voice/Echo, Voice Lab and Arabic beta tools behind seven Settings version taps only; no public Join/Leave beta or code field. Direct visits and unlock/relock verified; 3 tests pass.
 - [x] Add teacher-qualified tajweed tips, explicit adult-only signed-in private problem reports/deletion, and public acknowledgements/licenses; omit the cancelled public beta code screen and preserve layouts/gestures. Signed-in recorded lesson scored Solid 100, Send report succeeded and read back, UI deletion removed reports and private files; 15 focused tests pass, no browser errors, build OK. Consent/report/credits/result screenshots captured; tips screenshot uses a labeled controlled fixture because the clean recording yielded no tips. Actual-phone behavior, external OAuth round trip and full third-party license audit remain unverified.
 
