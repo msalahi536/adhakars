@@ -104,8 +104,10 @@ export function TraceCanvas({ text, onPass }: { text: string; onPass: () => void
     octx.textAlign = "center"; octx.textBaseline = "middle";
     octx.direction = "rtl";
     octx.fillText(text, size / 2, size / 2 + size * 0.04);
-    maskRef.current = octx.getImageData(0, 0, size, size).data.filter((_, i) => i % 4 === 3).values().toArray?.() as unknown as Uint8Array
-      ?? Uint8Array.from(octx.getImageData(0, 0, size, size).data.filter((_, i) => i % 4 === 3));
+    const rgba = octx.getImageData(0, 0, size, size).data;
+    const mask = new Uint8Array(size * size);
+    for (let i = 0; i < mask.length; i++) mask[i] = rgba[i * 4 + 3];
+    maskRef.current = mask;
     // faint guide
     ctx.clearRect(0, 0, size, size);
     ctx.fillStyle = "color-mix(in oklab, var(--foreground) 14%, transparent)";
