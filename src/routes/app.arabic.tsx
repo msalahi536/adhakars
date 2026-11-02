@@ -2,7 +2,7 @@
  * Arabic Companion (v2): home, placement and settings. All curriculum, scoring and review logic
  * lives in src/lib/arabic — this screen only renders engine data and calls engine functions.
  */
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link, Outlet, useLocation, useNavigate } from "@tanstack/react-router";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Check, ChevronLeft, Lock, Settings2 } from "lucide-react";
 import {
@@ -39,8 +39,12 @@ const ar = { fontFamily: "var(--font-arabic)" };
 function HiddenArabicCompanion() {
   const { enabled, checked } = useHifzBeta();
   const navigate = useNavigate();
+  const pathname = useLocation({ select: (l) => l.pathname });
   useEffect(() => { if (checked && !enabled) void navigate({ to: "/app/more", replace: true }); }, [checked, enabled, navigate]);
-  return enabled ? <ArabicHome /> : null;
+  if (!enabled) return null;
+  // Child routes (the recording studio) render on their own.
+  if (pathname !== "/app/arabic") return <Outlet />;
+  return <ArabicHome />;
 }
 
 type Session =
