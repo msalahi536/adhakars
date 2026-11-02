@@ -113,3 +113,9 @@ body:has(.q2-sheet) .q2-topbar,body:has(.q2-sheet) .q2-bottom {visibility:hidden
 .q2-live-preview {isolation:isolate;}
 .q2-live-preview .q2-page {transform:scale(.5);transform-origin:top center;width:200%;max-width:none;margin-left:-50%;}
 .q2-live-preview .q2-page-body {min-height:380px;}
+
+.q2-reader {--rc-ink:var(--m-ink);--rc-paper:var(--m-paper);--rc-muted:var(--muted-foreground);--rc-olive:var(--accent);--rc-shadow:var(--card-shadow);}
+.q2-lesson-tools {position:absolute;top:115px;right:12px;z-index:6;display:flex;gap:5px;align-items:center;}
+.q2-lesson-tools button {background:var(--surface);color:var(--foreground);font-size:11px;}
+.q2-lesson-word {background:var(--q2-glow);}
+.q2-reader:has(.q2-lesson-pill) .q2-scroll {padding-top:150px;}

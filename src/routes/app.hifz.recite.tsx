@@ -706,6 +706,9 @@ function Recite() {
     marks:mode==="ai"?Object.fromEntries(words.map(w=>[w.key,aiWordState(aiCorrection?.statuses[w.key]??aiWords?.statuses[w.key])])):saved.marks,
     hidden:status==="active",stream:ai.stream,busy:analyzing||ai.phase==="loading"||ai.phase==="stopping",mic:horizon,
     listen:()=>{if(playing)stopAudio();else if(sabaq)void playSabaqListen();else void listen();},peek:()=>{setPeek("all");setTimeout(()=>setPeek(null),1500);},onWord:w=>{if(mode==="self")mark(w);else if(w.audio)void playWord(w);},highlight:audioWord,
+    peeked:peek==="all",keys:new Set((sabaq?(cleanPasses>=2?chainWords:rangeWords):words).map(w=>w.key)),onPage:changePage,
+    onSilence:last=>{const result=liveResult.current;if(ai.phase==="listening"&&!handsPaused&&result&&pageReached(result,Date.now()-last))void ai.stop();},
+    tools:<>{sabaq&&<Button variant="outline" size="sm" onClick={()=>{stopAudio();setEcho(true);}}><Repeat size={14}/>Echo</Button>}{sessionItem?.kind==="review"&&<><Switch aria-label="Hands-free" checked={handsFree} onCheckedChange={setHandsFree}/><Button variant="ghost" onClick={()=>{if(handsPaused){setHandsPaused(false);ai.resumeStream();}else{setHandsPaused(true);ai.pauseStream();}}}>{handsPaused?"Resume":"Pause"}</Button></>}</>,
     overlays:<>    {(sheet || gradeAyah) && <div className="rc-backdrop" onClick={() => { if (!gradeAyah && sheet !== "drills" && sheet !== "sessionGrade" && sheet !== "sessionEnd") setSheet(null); }}>
       <div onClick={(e) => e.stopPropagation()}>
         {sheet === "settings" && <ReciteSettings settings={saved.settings} change={(settings) => setSaved((s) => ({ ...s, settings: { ...s.settings, ...settings } }))} close={() => setSheet(null)} />}
