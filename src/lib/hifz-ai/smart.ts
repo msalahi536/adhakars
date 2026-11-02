@@ -67,6 +67,7 @@ export async function startSmartRecite(opts: {
   onProgress?: (p: number) => void;
   onError?: (e: unknown) => void;
   stream?: MediaStream;
+  keepStream?: boolean;
 }): Promise<ListenSession> {
   const ix = await loadQuranIndex();
   let reported = "";
@@ -77,6 +78,7 @@ export async function startSmartRecite(opts: {
     last: first.last,
     passages: opts.passages,
     stream: opts.stream,
+    keepStream: opts.keepStream,
     onProgress: opts.onProgress,
     onError: opts.onError,
     onUpdate: (r) => {
