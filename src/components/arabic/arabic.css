@@ -106,7 +106,7 @@
 .ab-segments { display: flex; gap: .4rem; }
 .ab-segments button { border-radius: 999px; border: 1px solid var(--border); background: transparent; color: var(--foreground); padding: .35rem .8rem; font-size: .8rem; }
 .ab-segments button.ab-on { background: var(--primary); border-color: var(--primary); color: var(--primary-foreground); }
-.ab-dialog { position: fixed; inset: 0; z-index: 340; display: flex; align-items: center; justify-content: center; background: color-mix(in oklab, var(--foreground) 4b0%, transparent); background: color-mix(in oklab, var(--foreground) 40%, transparent); padding: 1.5rem; }
+.ab-dialog { position: fixed; inset: 0; z-index: 340; display: flex; align-items: center; justify-content: center; background: color-mix(in oklab, var(--foreground) 40%, transparent); padding: 1.5rem; }
 .ab-dialog-inner { width: 100%; max-width: 22rem; border-radius: 1.5rem; background: var(--card); border: 1px solid var(--border); padding: 1.5rem; text-align: center; }
 .ab-dialog-inner h3 { font-size: 1rem; font-weight: 600; margin-bottom: .5rem; }
 .ab-dialog-inner p { font-size: .82rem; color: var(--muted-foreground); line-height: 1.6; margin-bottom: 1.25rem; }
