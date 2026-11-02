@@ -63,5 +63,5 @@
 - Hifz mushaf rendering waits for its matching page font and fits all lines with one measured size; tajweed uses word-level indicators in QCF mode, preserving glyphs without claiming unverified character-to-glyph mappings.
 
 - Hifz feedback uses one cancellable Capacitor dispatcher with batched mistake priority and a 1500ms cooldown; CDN sound pointers map supplied effects to events, never replacing qari audio. No visual fallback is dispatched when native haptics are unavailable.
-- Quran v2 preserves legacy screens, isolates casual mic saves and hydrates gates first. Shared-reader opening pages use source-line blocks and local outlines; visibility ranks mounted pages. Uploaded mushaf assets stay immutable.
+- Quran v2 preserves legacy screens, casual mic isolation and hydrated gates. Opening pages use source lines/outlines; visibility ranks pages. Balanced header/dock tracks center title/mic. Supplied mushaf assets stay immutable.
 - Hifz program screens stay outside `src/lib/hifz/`, calling its engine. `/app/hifz` renders `<Outlet />` for `/app/hifz/recite`; `hifz_state_v1` and reminder IDs 910000/911000 avoid retired cleanup.
