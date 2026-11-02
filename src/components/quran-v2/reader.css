@@ -123,3 +123,4 @@ body:has(.q2-sheet) .q2-topbar,body:has(.q2-sheet) .q2-bottom {visibility:hidden
 .q2-actionbar > button {flex-shrink:0;}
 .q2-actionbar > button:not(.q2-mic):hover {background:var(--muted);}
 .q2-reader:has(.q2-lesson-pill) .q2-frame {height:calc(100dvh - 275px);min-height:420px;}
+.q2-word-meaning {display:block;font-family:var(--font-sans);font-size:.55rem;font-weight:400;color:var(--muted-foreground);line-height:1.2;min-height:.7em;}

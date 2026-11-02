@@ -42,6 +42,7 @@ export function ReaderPage({number,chapters,layout,marks,hidden,revealed,highlig
     const group=tajweed&&w.tajweed?parseTajweed(w.tajweed).find(s=>s.group)?.group:undefined;
     return <Button variant="ghost" key={w.key} className={`q2-word ${shown?"":"q2-concealed"} ${lessonKeys?.has(w.key)?"q2-lesson-word":""} ${state==="wrong"?"q2-wrong":state==="skipped"?"q2-skipped":""} ${highlight===w.key?"q2-highlight":""} ${group?`rc-qcf-tj-${group}`:""}`} data-q2-word={w.key} aria-label={`Word ${w.key}`} onPointerDown={e=>{if(hidden){const el=e.currentTarget;el.setAttribute("data-peek","pending");window.setTimeout(()=>{if(el.getAttribute("data-peek")==="pending")el.setAttribute("data-peek","on");},400);}}} onPointerUp={e=>{e.stopPropagation();e.currentTarget.removeAttribute("data-peek");}} onPointerCancel={e=>e.currentTarget.removeAttribute("data-peek")} onClick={e=>{e.stopPropagation();onWord?.(w);}}>
       <span>{layout==="Translation"?tajweed&&w.tajweed?<TajweedText markup={w.tajweed}/>:w.text:w.glyph}</span>
+      {layout==="Translation"&&meaningFor&&<span className="q2-word-meaning">{meaningFor(w.text)??""}</span>}
     </Button>;
   };
   const content=page&&<div ref={body} className={`q2-page-body ${layout==="Translation"?"q2-translation-page":""}`} style={{fontFamily:layout!=="Translation"?font??undefined:undefined}}>
