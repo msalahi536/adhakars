@@ -555,7 +555,7 @@ function BuildStep({ step, report, next }: { step: Extract<Step, { kind: "build"
   const [checked, setChecked] = useState(false);
   const correct = checked && letter !== null && mark !== null && letter + mark === step.target;
   useEffect(() => { const t = setTimeout(() => playAudio(url), 400); return () => clearTimeout(t); }, [url]);
-  const check = () => { setChecked(true); report({ correct: letter + mark === step.target }); };
+  const check = () => { if (!letter || !mark) return; setChecked(true); report({ correct: letter + mark === step.target }); };
   return (
     <Body label="Build it" action={checked ? <button className="ab-primary" onClick={next}>Continue</button> : <button className="ab-primary" disabled={!letter || !mark} onClick={check}>Check</button>}>
       <p style={{ fontSize: "1.1rem", fontWeight: 500 }}>Build what you hear</p>
