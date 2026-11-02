@@ -44,6 +44,7 @@ import { Route as AppTafsirRouteImport } from './routes/app.tafsir'
 import { Route as AppTasbihRouteImport } from './routes/app.tasbih'
 import { Route as AppTermsRouteImport } from './routes/app.terms'
 import { Route as AppVoiceLabRouteImport } from './routes/app.voice-lab'
+import { Route as AppArabicRecordRouteImport } from './routes/app.arabic.record'
 import { Route as AppHifzDrillsRouteImport } from './routes/app.hifz.drills'
 import { Route as AppHifzLinesRouteImport } from './routes/app.hifz.lines'
 import { Route as AppHifzMushafRouteImport } from './routes/app.hifz.mushaf'
@@ -227,6 +228,11 @@ const AppVoiceLabRoute = AppVoiceLabRouteImport.update({
   path: '/voice-lab',
   getParentRoute: () => AppRoute,
 } as any)
+const AppArabicRecordRoute = AppArabicRecordRouteImport.update({
+  id: '/record',
+  path: '/record',
+  getParentRoute: () => AppArabicRoute,
+} as any)
 const AppHifzDrillsRoute = AppHifzDrillsRouteImport.update({
   id: '/drills',
   path: '/drills',
@@ -276,7 +282,7 @@ export interface FileRoutesByFullPath {
   '/api/widgets': typeof ApiWidgetsRoute
   '/app/about': typeof AppAboutRoute
   '/app/acknowledgements': typeof AppAcknowledgementsRoute
-  '/app/arabic': typeof AppArabicRoute
+  '/app/arabic': typeof AppArabicRouteWithChildren
   '/app/duas': typeof AppDuasRoute
   '/app/evening': typeof AppEveningRoute
   '/app/fasting': typeof AppFastingRoute
@@ -299,6 +305,7 @@ export interface FileRoutesByFullPath {
   '/app/terms': typeof AppTermsRoute
   '/app/voice-lab': typeof AppVoiceLabRoute
   '/app/': typeof AppIndexRoute
+  '/app/arabic/record': typeof AppArabicRecordRoute
   '/app/hifz/drills': typeof AppHifzDrillsRoute
   '/app/hifz/lines': typeof AppHifzLinesRoute
   '/app/hifz/mushaf': typeof AppHifzMushafRoute
@@ -319,7 +326,7 @@ export interface FileRoutesByTo {
   '/api/widgets': typeof ApiWidgetsRoute
   '/app/about': typeof AppAboutRoute
   '/app/acknowledgements': typeof AppAcknowledgementsRoute
-  '/app/arabic': typeof AppArabicRoute
+  '/app/arabic': typeof AppArabicRouteWithChildren
   '/app/duas': typeof AppDuasRoute
   '/app/evening': typeof AppEveningRoute
   '/app/fasting': typeof AppFastingRoute
@@ -342,6 +349,7 @@ export interface FileRoutesByTo {
   '/app/terms': typeof AppTermsRoute
   '/app/voice-lab': typeof AppVoiceLabRoute
   '/app': typeof AppIndexRoute
+  '/app/arabic/record': typeof AppArabicRecordRoute
   '/app/hifz/drills': typeof AppHifzDrillsRoute
   '/app/hifz/lines': typeof AppHifzLinesRoute
   '/app/hifz/mushaf': typeof AppHifzMushafRoute
@@ -364,7 +372,7 @@ export interface FileRoutesById {
   '/api/widgets': typeof ApiWidgetsRoute
   '/app/about': typeof AppAboutRoute
   '/app/acknowledgements': typeof AppAcknowledgementsRoute
-  '/app/arabic': typeof AppArabicRoute
+  '/app/arabic': typeof AppArabicRouteWithChildren
   '/app/duas': typeof AppDuasRoute
   '/app/evening': typeof AppEveningRoute
   '/app/fasting': typeof AppFastingRoute
@@ -387,6 +395,7 @@ export interface FileRoutesById {
   '/app/terms': typeof AppTermsRoute
   '/app/voice-lab': typeof AppVoiceLabRoute
   '/app/': typeof AppIndexRoute
+  '/app/arabic/record': typeof AppArabicRecordRoute
   '/app/hifz/drills': typeof AppHifzDrillsRoute
   '/app/hifz/lines': typeof AppHifzLinesRoute
   '/app/hifz/mushaf': typeof AppHifzMushafRoute
@@ -433,6 +442,7 @@ export interface FileRouteTypes {
     | '/app/terms'
     | '/app/voice-lab'
     | '/app/'
+    | '/app/arabic/record'
     | '/app/hifz/drills'
     | '/app/hifz/lines'
     | '/app/hifz/mushaf'
@@ -476,6 +486,7 @@ export interface FileRouteTypes {
     | '/app/terms'
     | '/app/voice-lab'
     | '/app'
+    | '/app/arabic/record'
     | '/app/hifz/drills'
     | '/app/hifz/lines'
     | '/app/hifz/mushaf'
@@ -520,6 +531,7 @@ export interface FileRouteTypes {
     | '/app/terms'
     | '/app/voice-lab'
     | '/app/'
+    | '/app/arabic/record'
     | '/app/hifz/drills'
     | '/app/hifz/lines'
     | '/app/hifz/mushaf'
@@ -789,6 +801,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppVoiceLabRouteImport
       parentRoute: typeof AppRoute
     }
+    '/app/arabic/record': {
+      id: '/app/arabic/record'
+      path: '/record'
+      fullPath: '/app/arabic/record'
+      preLoaderRoute: typeof AppArabicRecordRouteImport
+      parentRoute: typeof AppArabicRoute
+    }
     '/app/hifz/drills': {
       id: '/app/hifz/drills'
       path: '/drills'
@@ -841,6 +860,18 @@ declare module '@tanstack/react-router' {
   }
 }
 
+interface AppArabicRouteChildren {
+  AppArabicRecordRoute: typeof AppArabicRecordRoute
+}
+
+const AppArabicRouteChildren: AppArabicRouteChildren = {
+  AppArabicRecordRoute: AppArabicRecordRoute,
+}
+
+const AppArabicRouteWithChildren = AppArabicRoute._addFileChildren(
+  AppArabicRouteChildren,
+)
+
 interface AppHifzRouteChildren {
   AppHifzDrillsRoute: typeof AppHifzDrillsRoute
   AppHifzLinesRoute: typeof AppHifzLinesRoute
@@ -865,7 +896,7 @@ const AppHifzRouteWithChildren =
 interface AppRouteChildren {
   AppAboutRoute: typeof AppAboutRoute
   AppAcknowledgementsRoute: typeof AppAcknowledgementsRoute
-  AppArabicRoute: typeof AppArabicRoute
+  AppArabicRoute: typeof AppArabicRouteWithChildren
   AppDuasRoute: typeof AppDuasRoute
   AppEveningRoute: typeof AppEveningRoute
   AppFastingRoute: typeof AppFastingRoute
@@ -894,7 +925,7 @@ interface AppRouteChildren {
 const AppRouteChildren: AppRouteChildren = {
   AppAboutRoute: AppAboutRoute,
   AppAcknowledgementsRoute: AppAcknowledgementsRoute,
-  AppArabicRoute: AppArabicRoute,
+  AppArabicRoute: AppArabicRouteWithChildren,
   AppDuasRoute: AppDuasRoute,
   AppEveningRoute: AppEveningRoute,
   AppFastingRoute: AppFastingRoute,
