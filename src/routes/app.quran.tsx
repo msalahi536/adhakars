@@ -6,7 +6,7 @@ import { preferredTafsirBook } from "@/lib/tafsir";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { QuranFaceBubble, QuranMiniPlayer } from "@/components/QuranMiniPlayer";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { Check, ChevronDown, ChevronLeft, ChevronRight, Clock, Heart, Infinity as InfinityIcon, Info, MoreHorizontal, RotateCcw, RotateCw, SlidersHorizontal, Loader2, Maximize2, Pause, Play, Repeat, Search, Shuffle, SkipBack, SkipForward, X } from "lucide-react";
+import { Check, ChevronDown, ChevronLeft, ChevronRight, Clock, Heart, Infinity as InfinityIcon, Info, MoreHorizontal, RotateCcw, RotateCw, SlidersHorizontal, Loader2, Maximize2, Pause, Play, Repeat, Search, Shuffle, SkipBack, SkipForward, X, Mic } from "lucide-react";
 import {
   featuredRank, findReciter, getChapterAudio, getChapters, getVerses, homeReciterRow, POPULAR_RECITERS, RECITERS, reciterHasPhoto,
   reciterHasSurah, reciterName, reciterScore, reciterPhoto, reciterSubtitle, searchChapters, searchReciters, parseVerseRef, type Chapter, type Reciter, type Verse, getVerseByKey, searchVerses, type VerseHit,
@@ -19,6 +19,9 @@ import { useHifzBeta } from "@/lib/hifz-beta";
 import { Button } from "@/components/ui/button";
 import { EchoMode } from "@/components/hifz/EchoMode";
 import { QuranVoice } from "@/components/quran-voice/QuranVoice";
+import { useQuranV2 } from "@/lib/quran-v2";
+import { UnifiedReader } from "@/components/quran-v2/UnifiedReader";
+import { completedReading } from "@/components/quran-v2/reader-rules";
 
 type Search = { s?: number; v?: number; view?: "reciters"; tab?: "all"; voice?: "follow" | "search" | "mushaf"; page?: number };
 
@@ -92,11 +95,13 @@ type Last = { s: number; v: number; t?: number; d?: number; r?: number; mode?: "
 function QuranPage() {
   const { s, v, view, tab, voice, page } = Route.useSearch();
   const beta = useHifzBeta();
+  const v2 = useQuranV2();
   const navigate = useNavigate();
-  useEffect(() => { if (voice && beta.checked && !beta.enabled) void navigate({to:"/app/quran",search:{},replace:true}); }, [voice,beta.checked,beta.enabled,navigate]);
+  useEffect(() => { if (voice && beta.checked && !beta.enabled && !v2.enabled) void navigate({to:"/app/quran",search:{},replace:true}); }, [voice,beta.checked,beta.enabled,v2.enabled,navigate]);
+  if (v2.enabled && view !== "reciters" && (s || voice)) return <UnifiedReader key={`${s??1}:${v??1}:${voice??"read"}`} chapterId={s??1} verse={v} initialPage={page} initialMode={voice==="follow"?"follow":voice==="search"?"search":undefined} back={()=>void navigate({to:"/app/quran",search:{}})}/>;
   if (voice) return beta.enabled ? <QuranVoice key={`${voice}:${page??1}`} mode={voice} initialPage={page} /> : null;
   if (view === "reciters") return <ReciterPicker back={s} tab={tab} />;
-  return s ? <Reader key={`${s}:${v ?? ""}`} chapterId={s} verse={v} /> : <Home />;
+  return s ? <Reader key={`${s}:${v ?? ""}`} chapterId={s} verse={v} /> : <Home v2={v2.enabled} />;
 }
 
 /* ---------- shared bits ---------- */
@@ -164,7 +169,7 @@ function SurahArt({ name }: { name: string }) {
 
 /* ---------- home ---------- */
 
-function Home() {
+function Home({v2=false}:{v2?:boolean}) {
   const navigate = useNavigate();
   const beta = useHifzBeta();
   const [prefs, setPrefs] = usePrefs();
@@ -233,7 +238,7 @@ function Home() {
             </label>
           </div>
 
-          {beta.enabled && !t && <div className="qv-entry-actions"><Button variant="outline" onClick={()=>void navigate({to:"/app/quran",search:{voice:"follow"}})}><Play size={16}/>Follow the imam</Button><Button variant="outline" onClick={()=>void navigate({to:"/app/quran",search:{voice:"search"}})}><Search size={16}/>Find an ayah</Button></div>}
+          {v2 && !t ? <section><Button variant="ghost" className="q2-home-card" onClick={()=>void navigate({to:"/app/quran",search:{voice:"search"}})}><Mic/><span><strong>Recite anything</strong><small>We’ll find it and check you</small></span></Button><Button variant="link" className="q2-home-follow" onClick={()=>void navigate({to:"/app/quran",search:{voice:"follow"}})}>Follow the imam →</Button></section> : beta.enabled && !t && <div className="qv-entry-actions"><Button variant="outline" onClick={()=>void navigate({to:"/app/quran",search:{voice:"follow"}})}><Play size={16}/>Follow the imam</Button><Button variant="outline" onClick={()=>void navigate({to:"/app/quran",search:{voice:"search"}})}><Search size={16}/>Find an ayah</Button></div>}
 
           {reciterHits.length > 0 && (
             <div className="quran-card divide-y">
@@ -272,7 +277,7 @@ function Home() {
             <button className="quran-card quran-continue" onClick={() => { if (audioPct != null) void resume(); else open(lastChapter.id); }}>
               <SurahArt name={lastChapter.name_arabic} />
               <span className="min-w-0 flex-1 text-left">
-                <span className="quran-continue-kicker">Continue Reading</span>
+                <span className="quran-continue-kicker">{v2 && last && completedReading(last.v,lastChapter.verses_count) ? "Read again" : "Continue Reading"}</span>
                 <span className="quran-continue-title">{lastChapter.name_simple}</span>
                 <span className="quran-continue-meta">Surah {lastChapter.id} · {audioPct != null ? `${audioPct}% complete` : `Verse ${last!.v} of ${lastChapter.verses_count}`}</span>
                 <span className="quran-progress"><i style={{ width: `${Math.max(4, audioPct ?? (last!.v / lastChapter.verses_count) * 100)}%` }} /></span>
@@ -284,7 +289,7 @@ function Home() {
           {error && <p className="quran-muted text-center text-sm">Couldn't load the Quran. Check your connection and try again.</p>}
           {!chapters && !error && <div className="flex justify-center py-10"><Loader2 className="animate-spin" /></div>}
           {!t && <div className="space-y-2.5">
-            {list.map((c) => <ChapterRow key={c.id} c={c} onOpen={open} />)}
+            {list.map((c) => <ChapterRow key={c.id} c={c} onOpen={open} v2={v2} />)}
           </div>}
         </div>
       </main>
@@ -292,7 +297,7 @@ function Home() {
   );
 }
 
-function ChapterRow({ c, onOpen }: { c: Chapter; onOpen: (id: number) => void }) {
+function ChapterRow({ c, onOpen, v2=false }: { c: Chapter; onOpen: (id: number) => void; v2?:boolean }) {
   return (
               <button className="quran-chapter" onClick={() => onOpen(c.id)}>
                 <NumBadge n={c.id} />
@@ -300,7 +305,7 @@ function ChapterRow({ c, onOpen }: { c: Chapter; onOpen: (id: number) => void })
                   <span className="block text-[16px] font-semibold">{c.name_simple}</span>
                   <span className="quran-muted block text-[11px]">{c.translated_name.name} · {c.verses_count} verses · {c.revelation_place === "makkah" ? "Makki" : "Madani"}</span>
                 </span>
-                <span className="quran-chapter-ar" dir="rtl">{c.name_arabic}</span>
+                <span className={v2?"q2-surah-name":"quran-chapter-ar"} dir="rtl" aria-label={c.name_arabic}>{v2?String(c.id).padStart(3,"0"):c.name_arabic}</span>
                 <ChevronRight size={16} className="opacity-50" />
               </button>
   );

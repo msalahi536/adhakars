@@ -14,6 +14,8 @@ import { SunnahOfTheDay } from "@/components/SunnahOfTheDay";
 import { Portal } from "@/components/Portal";
 import { TasbihIcon } from "@/components/BottomNav";
 import { useHifzBeta } from "@/lib/hifz-beta";
+import { useQuranV2 } from "@/lib/quran-v2";
+import { Programs } from "@/components/quran-v2/Programs";
 
 
 // Completed days follow the active palette accent.
@@ -67,7 +69,8 @@ const tiles: Tile[] = [
 
 function More() {
   const { enabled: hifzEnabled } = useHifzBeta();
-  const visibleTiles = tiles.filter((tile) => !["/app/hifz", "/app/arabic"].includes(tile.to) || hifzEnabled);
+  const { enabled: quranV2 } = useQuranV2();
+  const visibleTiles = tiles.filter((tile) => (!["/app/hifz", "/app/arabic"].includes(tile.to) || hifzEnabled) && !(quranV2 && hifzEnabled && ["/app/hifz", "/app/arabic"].includes(tile.to)));
   const navigate = useNavigate();
   const { open, section } = Route.useSearch();
 
@@ -137,6 +140,7 @@ function More() {
 
        <main className="scroll-area">
          <div className="mx-auto max-w-md px-5 py-3 space-y-4">
+           {quranV2 && hifzEnabled && <Programs />}
            <SunnahOfTheDay />
 
            <div className="grid grid-cols-2 gap-3">
