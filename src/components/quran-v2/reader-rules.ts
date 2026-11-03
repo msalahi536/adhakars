@@ -27,7 +27,7 @@ export function topReadingWord(words: {key:string;top:number;bottom:number}[], t
 }
 export function recitationReadingWord(words: ReciteWord[], marks: Marks) {
   const text = words.filter(w => !w.end);
-  return text.find(w => marks[w.key] === "in_progress")?.key ?? text.findLast(w => ["correct","unsure","wrong","skipped"].includes(marks[w.key]))?.key;
+  return text.find(w => marks[w.key] === "in_progress")?.key ?? text.slice().reverse().find(w => ["correct","unsure","wrong","skipped"].includes(marks[w.key]))?.key;
 }
 export function visiblePageNumber(pages: {page:number;top:number;bottom:number}[], top:number, bottom:number) {
   return pages.map(p=>({...p,visible:Math.max(0,Math.min(p.bottom,bottom)-Math.max(p.top,top))}))
