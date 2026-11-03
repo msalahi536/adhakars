@@ -4,6 +4,8 @@ import type { CheckResult } from "./hifz-ai";
 import type { Passage } from "@/components/recite/ai-performance";
 
 export const RECITATION_DEBUG_KEY = "hifz_recitation_debug";
+const recordingUpdates = new WeakMap<Blob, { elapsed: number; result: CheckResult }[]>();
+export function rememberDebugUpdates(blob: Blob, updates: { elapsed: number; result: CheckResult }[]) { if (debugEnabled()) recordingUpdates.set(blob, updates); }
 export function debugEnabled(storage?: Pick<Storage, "getItem">) {
   try { return readHifzBeta(storage) && (storage ?? window.localStorage).getItem(RECITATION_DEBUG_KEY) === "1"; }
   catch { return false; }
@@ -20,7 +22,7 @@ export async function debugZip(recording: Blob, result: CheckResult, passages: P
 }
 export async function exportDebug(recording: Blob, result: CheckResult, passages: Passage[], updates: { elapsed: number; result: CheckResult }[] = []) {
   if (!debugEnabled()) throw new Error("Enable test recording in hidden Settings first.");
-  const zip = await debugZip(recording, result, passages, updates);
+  const zip = await debugZip(recording, result, passages, updates.length ? updates : recordingUpdates.get(recording) ?? []);
   const url = URL.createObjectURL(zip);
   const link = document.createElement("a"); link.href = url; link.download = "recitation-debug.zip";
   document.body.append(link); link.click(); link.remove();
