@@ -1,4 +1,5 @@
 # Roadmap
+- [ ] Restore mic-stop and mistake sound playback; verify event ordering and browser audio output.
 - [x] Match precision Quran reader reference: viewport-centered title/mic measured at 393/360/1280px, continuous frosted dock, balanced source-line opening pages and retained 15-line page3. Screenshots in /tmp/browser/precision-reader; search/settings/hide/mistakes/more/playback and mic consent checked, no browser errors; four reader tests pass. Actual-phone microphone and native safe-area behavior remain unverified.
 - [x] Restyle Quran v2 opening pages with compact authentic QPC source lines, outline ornaments, cream/olive palette and floating controls; dominant-page header verified scrolling both directions. Pages 1/2 and 15-line page3 captured at /tmp/browser/quran-opening/; phone/desktop, settings and hidden words checked without browser errors. Eight existing tests pass; build OK. Source line breaks intentionally differ from the inaccurate reference text; mic/follow/Hifz logic unchanged.
 

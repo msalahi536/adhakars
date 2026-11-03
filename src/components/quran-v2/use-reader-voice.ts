@@ -3,7 +3,7 @@ import type {CheckResult,Elsewhere,FollowPosition,FollowSession,ListenSession,Se
 import {captureRecording} from "@/components/recite/recording";
 import {quranPlayer} from "@/lib/quran-player";
 import {recitationPlayer} from "@/lib/recitation-player";
-import {play as feedback} from "@/lib/hifzHaptics";
+import {play as feedback,unlockHifzFeedbackAudio} from "@/lib/hifzHaptics";
 
 type Range={sura:number;first:number;last:number};
 export function useReaderVoice({update,elsewhere,position,answer}:{update:(r:CheckResult)=>void;elsewhere:(p:Elsewhere)=>void;position:(p:FollowPosition)=>void;answer:(a:SearchAnswer)=>void}) {
@@ -18,6 +18,7 @@ export function useReaderVoice({update,elsewhere,position,answer}:{update:(r:Che
   useEffect(()=>()=>{generation.current++;release();},[]);
   function cancel(){generation.current++;release();busy.current=false;setStream(null);setPhase("idle");setRecording(null);}
   async function begin(){
+    unlockHifzFeedbackAudio();
     if(busy.current)return;busy.current=true;const id=++generation.current;
     release();setRecording(null);setPhase("loading");setError("");setMode(intent.current.mode);quranPlayer.pause();recitationPlayer.pause();
     try{
@@ -32,11 +33,13 @@ export function useReaderVoice({update,elsewhere,position,answer}:{update:(r:Che
     finally{if(id===generation.current)busy.current=false;}
   }
   async function request(mode:"smart"|"follow"|"search",ranges:Range[]=[]){
+    unlockHifzFeedbackAudio();
     if(busy.current)return;intent.current={mode,ranges};setMode(mode);
     const {checkerDownloaded}=await import("@/lib/hifz-ai/assets");
     if(await checkerDownloaded())await begin();else setPhase("consent");
   }
   async function stop(){
+    unlockHifzFeedbackAudio();
     if(busy.current)return;busy.current=true;setPhase("finishing");const id=generation.current;
     const current=session.current;session.current=null;
     const blob=capture.current?.finish();capture.current=null;
