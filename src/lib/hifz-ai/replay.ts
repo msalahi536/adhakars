@@ -10,6 +10,8 @@ import type { CheckResult } from "./checker";
 
 /** Median delay between saying a sound and the AI reporting it, measured on real recordings. */
 export const REPORT_DELAY = 0.5;
+/** Longest stretch of the recording replayed for one word (s). */
+export const MAX_WORD = 2.2;
 
 export interface WordSpan {
   key: string;
@@ -43,7 +45,8 @@ export function clipFor(timeline: WordSpan[], result: CheckResult, key: string, 
   const before = opts.before ?? 1.2;
   const after = opts.after ?? 0.6;
   const own = timeline.find((s) => s.key === key);
-  if (own) return { from: Math.max(0, own.start - before), to: own.end + after };
+  // a word said completely differently can soak up a long stretch: play only its start
+  if (own) return { from: Math.max(0, own.start - before), to: Math.min(own.end, own.start + MAX_WORD) + after };
   const order = result.words.map((w) => w.key);
   const i = order.indexOf(key);
   if (i < 0) return null;
@@ -51,7 +54,7 @@ export function clipFor(timeline: WordSpan[], result: CheckResult, key: string, 
   const next = timeline.find((s) => order.indexOf(s.key) > i);
   if (!prev && !next) return null;
   const from = Math.max(0, (prev?.end ?? next!.start) - before);
-  const to = (next?.start ?? prev!.end) + after;
+  const to = Math.min((next?.start ?? prev!.end) + after, from + before + MAX_WORD + after);
   return { from, to };
 }
 
@@ -66,4 +69,28 @@ export function wordAt(timeline: WordSpan[], t: number): string | null {
     else hi = mid - 1;
   }
   return found;
+}
+
+type Timed = CheckResult & { heard?: string; conf?: number[]; times?: number[] };
+
+/**
+ * Join the result of one page with the pages recited before it in the same mic session.
+ * Each page restarts the AI (its clock starts again at 0), while the recording keeps running:
+ * `offset` = seconds into the recording when this page's AI started. Words already in `prev`
+ * that are recited again on this page are replaced by the new attempt.
+ */
+export function mergeResults(prev: Timed | null, cur: Timed, offset: number): Timed {
+  const times = (cur.times ?? []).map((t) => t + offset);
+  if (!prev) return { ...cur, times };
+  const shift = (prev.heard ?? "").length;
+  const mine = new Set(cur.words.map((w) => w.key));
+  const move = (n?: number) => (n === undefined ? undefined : n + shift);
+  return {
+    ...cur,
+    words: [...prev.words.filter((w) => !mine.has(w.key)), ...cur.words.map((w) => ({ ...w, at: move(w.at), end: move(w.end) }))],
+    extras: [...prev.extras.filter((x) => !mine.has(x.atKey)), ...cur.extras],
+    heard: (prev.heard ?? "") + (cur.heard ?? ""),
+    conf: [...(prev.conf ?? []), ...(cur.conf ?? [])],
+    times: [...(prev.times ?? []), ...times],
+  };
 }
