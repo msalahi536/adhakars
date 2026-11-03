@@ -64,3 +64,38 @@ describe("isti'adha and basmala never jump the reader", () => {
     expect(found?.sura).toBe(67);
   });
 });
+
+import { Attempts } from "./attempts";
+describe("start anywhere, go back and repeat", () => {
+  const k = key(67);
+  const ref = buildReference(k, 67, 1, 12);
+  const words: [string, string][] = [];
+  for (let a = 1; a <= 12; a++) for (const [w, , ph] of k[String(a)]) words.push([`67:${a}:${w}`, ph]);
+  const from = (start: string, n: number) => { const i = words.findIndex((w) => w[0] === start); return words.slice(i, i + n).map((w) => w[1]).join(""); };
+  const run = (heard: string, mode: "all" | "reached" = "reached") => {
+    const at = new Attempts(ref, mode); const ch = Array.from(heard); const conf = ch.map(() => 1);
+    for (let i = 6; i <= ch.length + 5; i += 6) at.update(ch.slice(0, i).join(""), conf.slice(0, i));
+    return at.finish(heard, conf);
+  };
+  const bad = (r: CheckResult) => r.words.filter((w) => w.status === "wrong" || w.status === "skipped").map((w) => w.key);
+  test("starting in the middle of an ayah", () => {
+    const r = run(from("67:3:6", 20));
+    expect(r.startKey).toBe("67:3:6");
+    expect(bad(r)).toEqual([]);
+  });
+  test("reciting an ayah twice", () => expect(bad(run(from("67:3:1", 18) + from("67:3:1", 18)))).toEqual([]));
+  test("going back two ayat and carrying on", () => expect(bad(run(from("67:3:1", 28) + from("67:3:1", 10)))).toEqual([]));
+  test("going back to an ayah that starts like the next one (ٱلَّذِى)", () => expect(bad(run(from("67:1:1", 19) + from("67:2:1", 18)))).toEqual([]));
+  test("a mistake, then the redo done right, clears the mistake", () => {
+    const r = run(from("67:1:1", 5) + from("67:1:7", 3) + from("67:1:1", 9));
+    expect(bad(r)).toEqual([]);
+  });
+  test("a real skip inside the redo still counts", () => {
+    const r = run(from("67:3:1", 18) + from("67:3:1", 4) + from("67:3:6", 13));
+    expect(bad(r)).toContain("67:3:5");
+  });
+  test("lessons: words never reached in any attempt are skipped", () => {
+    const r = run(from("67:1:1", 9) + from("67:1:1", 9), "all");
+    expect(r.words.find((w) => w.key === "67:2:1")!.status).toBe("skipped");
+  });
+});

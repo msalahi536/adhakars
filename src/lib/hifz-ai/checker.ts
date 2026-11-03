@@ -187,8 +187,11 @@ function prefixCost(head: string[], ref: string[], s: number): number {
   return Math.min(...prev);
 }
 
-/** Where the reciter began: ayah 1 unless the opening sounds clearly match a later ayah start. */
-export function findStart(ref: string[], rec: string[], starts: number[], headLen = 20): number {
+/**
+ * Where the reciter began: the range start unless the opening sounds clearly match a later ayah
+ * start, or (when no ayah start fits) any later word start: starting in the middle of an ayah.
+ */
+export function findStart(ref: string[], rec: string[], starts: number[], headLen = 20, wordStarts: number[] = []): number {
   const head = rec.slice(0, headLen);
   if (head.length < 8 || !starts.length) return 0;
   const base = prefixCost(head, ref, 0);
@@ -200,7 +203,16 @@ export function findStart(ref: string[], rec: string[], starts: number[], headLe
       if (c < best) { best = c; where = st; }
     }
   }
-  return where && best <= 0.35 * head.length && base - best >= 0.2 * head.length ? where : 0;
+  if (where && best <= 0.35 * head.length && base - best >= 0.2 * head.length) return where;
+  // no ayah start fits: try every word start, but only accept a clear, close match
+  let wBest = Math.min(base, where ? best : base);
+  let wWhere = 0;
+  for (const st of wordStarts) {
+    if (st <= 0) continue;
+    const c = prefixCost(head, ref, st);
+    if (c < wBest) { wBest = c; wWhere = st; }
+  }
+  return wWhere && wBest <= 0.25 * head.length && base - wBest >= 0.3 * head.length ? wWhere : 0;
 }
 
 function alignOps(ref: string[], rec: string[], final: boolean, start = 0): [number, Op[]] {
@@ -276,7 +288,7 @@ export function check(reference: Reference, heard: string, final: boolean, conf?
     const aya = w.key.slice(0, w.key.lastIndexOf(":"));
     if (!seen.has(aya)) { seen.add(aya); ayahStarts.push(w.s); }
   }
-  const start = findStart(ref, rec, ayahStarts);
+  const start = findStart(ref, rec, ayahStarts, 20, reference.words.map((w) => w.s));
   const [end, ops] = alignOps(ref, rec, final, start);
 
   const heardJ = new Array(ref.length).fill(-1);
