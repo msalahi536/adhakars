@@ -61,6 +61,17 @@ describe("Hifz haptic language", () => {
     const r=rig(); r.play("wrong"); r.cancel(); r.advance(400); expect(r.steps).toEqual([]);
     r.play("sessionComplete"); r.cancel(); r.advance(400); expect(r.steps).toEqual([{at:400,value:"Success"}]);
   });
+  test("live mistake plays before mic stop without waiting for results", () => {
+    const r=rig(); r.play("micStart"); r.advance(500);
+    r.play("wrong"); r.advance(0);
+    expect(r.sounds).toEqual(["micStart","wrong"]);
+    r.advance(500); r.play("micStop");
+    expect(r.sounds).toEqual(["micStart","wrong","micStop"]);
+  });
+  test("mic stop does not discard a simultaneous mistake", () => {
+    const r=rig(); r.play("wrong"); r.play("micStop"); r.advance(0);
+    expect(r.sounds).toEqual(["micStop","wrong"]);
+  });
   test("Haptics and supplied sounds on by default", () => {
     expect(DEFAULT_SETTINGS.haptics).toBe(true); expect(DEFAULT_SETTINGS.sounds).toBe(true);
     const r=rig(); r.play("micStart"); expect(r.steps).toHaveLength(1); expect(r.sounds).toEqual(["micStart"]);
