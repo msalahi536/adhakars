@@ -6,6 +6,7 @@ import skipSound from "@/assets/recite/mistake-skip.mp3.asset.json";
 import unsureSound from "@/assets/recite/unsure.mp3.asset.json";
 import micStartSound from "@/assets/recite/mic-start.mp3.asset.json";
 import micStopSound from "@/assets/recite/mic-stop.mp3.asset.json";
+import { createReciteFeedbackAudio } from "./recite-feedback-audio";
 
 export type HifzEvent = "reveal" | "wrong" | "skip" | "small" | "unsure" | "drift" | "ayahComplete" | "pageComplete" | "sessionComplete" | "milestone" | "micStart" | "micStop" | "pageTurn";
 type Step = "selection" | "Light" | "Medium" | "Heavy" | "Success";
@@ -32,7 +33,7 @@ export function createHifzFeedback(driver: Driver) {
   let pending: HifzEvent | undefined;
   let lastMistake = -Infinity;
   let generation = 0;
-  const cancelPattern = () => { generation++; timers.forEach(driver.clear); timers = []; driver.stopSound(); };
+  const cancelPattern = () => { generation++; timers.forEach(driver.clear); timers = []; };
   const start = (event: HifzEvent) => {
     cancelPattern();
     if (settings.sounds) driver.sound(event);
@@ -55,6 +56,7 @@ export function createHifzFeedback(driver: Driver) {
   };
   const cancel = () => {
     cancelPattern();
+    driver.stopSound();
     if (batch !== undefined) driver.clear(batch);
     batch = undefined; pending = undefined;
   };
@@ -73,15 +75,21 @@ export function createHifzFeedback(driver: Driver) {
         }, 0);
         return;
       }
-      cancel(); start(event);
+      // Mic-stop must not erase a final mistake waiting in the same batch.
+      start(event);
     },
   };
 }
-let effectAudio: HTMLAudioElement | undefined;
 export const FEEDBACK_SOUNDS: Partial<Record<HifzEvent, string>> = {
   small: smallSound.url, wrong: wrongSound.url, skip: skipSound.url,
   unsure: unsureSound.url, micStart: micStartSound.url, micStop: micStopSound.url,
 };
+const soundOutput = createReciteFeedbackAudio(FEEDBACK_SOUNDS, () => {
+  const Context = window.AudioContext ?? (window as typeof window & { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
+  if (!Context) throw new Error("Audio output unavailable");
+  return new Context();
+});
+export const unlockHifzFeedbackAudio = soundOutput.unlock;
 const feedback = createHifzFeedback({
   now: () => Date.now(), schedule: (fn, delay) => setTimeout(fn, delay), clear: (id) => clearTimeout(id),
   available: () => {
@@ -89,13 +97,8 @@ const feedback = createHifzFeedback({
     return !(/iPad/.test(navigator.userAgent) || (/Macintosh/.test(navigator.userAgent) && navigator.maxTouchPoints > 1));
   },
   step: (step) => step === "selection" ? Haptics.selectionChanged() : step === "Success" ? Haptics.notification({ type: NotificationType.Success }) : Haptics.impact({ style: ImpactStyle[step] }),
-  sound: (event) => {
-    const url = FEEDBACK_SOUNDS[event];
-    if (typeof Audio === "undefined" || !url) return;
-    effectAudio = new Audio(url); effectAudio.volume = 0.3;
-    void effectAudio.play().catch(() => { /* Feedback must never interrupt recitation. */ });
-  },
-  stopSound: () => { effectAudio?.pause(); effectAudio = undefined; },
+  sound: soundOutput.play,
+  stopSound: soundOutput.stop,
 });
 export const play = feedback.play;
 export const configureHifzFeedback = feedback.configure;

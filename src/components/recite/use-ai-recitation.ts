@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import type { ListenSession, CheckResult } from "@/lib/hifz-ai";
 import { checkerDownloaded } from "@/lib/hifz-ai/assets";
-import { play as feedback } from "@/lib/hifzHaptics";
+import { play as feedback, unlockHifzFeedbackAudio } from "@/lib/hifzHaptics";
 import { mapAiWords, newMistakes } from "./ai-feedback";
 import { captureRecording } from "./recording";
 
@@ -55,6 +55,7 @@ export function useAiRecitation(page: number, enabled: boolean, keys: string[], 
     previous.current = statuses; setResult(value);
   };
   async function begin(ranges: AiRange[]) {
+    unlockHifzFeedbackAudio();
     if (starting.current || session.current) return;
     starting.current = true;
     const id = generation.current;
@@ -87,12 +88,14 @@ export function useAiRecitation(page: number, enabled: boolean, keys: string[], 
     } finally { starting.current = false; }
   }
   async function request(range: AiRange | AiRange[]) {
+    unlockHifzFeedbackAudio();
     const ranges = Array.isArray(range) ? range : [range];
     pendingRange.current = ranges;
     if (await checkerDownloaded()) { await begin(ranges); return "started" as const; }
     setPhase("download"); return "download" as const;
   }
   async function stop() {
+    unlockHifzFeedbackAudio();
     const current = session.current;
     if (!current) return;
     const id = generation.current;

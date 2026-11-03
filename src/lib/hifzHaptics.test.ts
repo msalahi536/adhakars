@@ -61,6 +61,18 @@ describe("Hifz haptic language", () => {
     const r=rig(); r.play("wrong"); r.cancel(); r.advance(400); expect(r.steps).toEqual([]);
     r.play("sessionComplete"); r.cancel(); r.advance(400); expect(r.steps).toEqual([{at:400,value:"Success"}]);
   });
+  test("mic stop preserves a final mistake queued in the same update", () => {
+    const r = rig(); r.play("wrong"); r.play("micStop"); r.advance(0);
+    expect(r.sounds).toEqual(["micStop", "wrong"]);
+  });
+  test("haptic-only events do not stop an audible mic or mistake effect", () => {
+    let stops = 0;
+    const r = createHifzFeedback({now: () => 0, schedule: setTimeout, clear: clearTimeout,
+      available: () => false, step: async () => {}, sound: () => {}, stopSound: () => { stops++; }});
+    r.play("micStop"); r.play("reveal"); r.play("pageComplete");
+    expect(stops).toBe(0);
+    r.cancel(); expect(stops).toBe(1);
+  });
   test("Haptics and supplied sounds on by default", () => {
     expect(DEFAULT_SETTINGS.haptics).toBe(true); expect(DEFAULT_SETTINGS.sounds).toBe(true);
     const r=rig(); r.play("micStart"); expect(r.steps).toHaveLength(1); expect(r.sounds).toEqual(["micStart"]);
