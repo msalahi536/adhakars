@@ -1,4 +1,5 @@
 # Roadmap
+- [ ] Fix scrolled-page mic ranges and exact confirmed destinations; remove untouched-popup timed jumps and guard Follow the imam against stale/out-of-order locations.
 - [x] Strengthen current/done tint and short transitions without changing the AI engine or voice hook. Saved Aa swipe mode verified 50→51→50 in all three layouts, reload persistence and vertical-scroll restoration; adjacent data/fonts preload. Controlled live statuses verified explicit→inferred current movement with errors retained; screenshots at /tmp/browser/reader-paging, nine tests pass, build OK. Actual-phone live recognition is unverified.
 - [x] Fix active correct/unsure glow and inferred/current word, shared surah strips/Bismillah across layouts and scroll clipping below header. Page50/page604 and phone/desktop screenshots verified; controlled live fixture preserves wrong/skipped, 6 tests pass. AI engine and mic hook untouched.
 - [x] Guard the stopped result before merging; preview typecheck now reports build OK and 6 reader tests pass. AI engine unchanged.

@@ -20,7 +20,7 @@ import {VoiceConsent} from "@/components/quran-voice/VoiceConsent";
 import {EchoMode} from "@/components/hifz/EchoMode";
 import {ReaderPage} from "./ReaderPage";
 import {ReaderMistakes,ReaderNavigation,ReaderReciters,ReaderSettings,ReaderSheet,type ReaderPreferences,type ReadingLocation} from "./ReaderSheets";
-import {adjacentPage,ELSEWHERE_DELAY,nextLayout,pageRanges,swipeDestination,visiblePageNumber,passageContains} from "./reader-rules";
+import {adjacentPage,nextLayout,pageRanges,swipeDestination,visiblePageNumber,passageContains} from "./reader-rules";
 import {useReaderVoice} from "./use-reader-voice";
 import {SilenceMonitor} from "./SilenceMonitor";
 import "./reader.css";
@@ -72,10 +72,10 @@ export function UnifiedReader({chapterId=1,verse=1,initialPage,initialMode,back,
         const now=viewingPage();
         if(now&&(now.page===destination||[p,...p.samePhrase].some(location=>passageContains(now,location)))){setElsewhere(null);return;}
         if(adjacentPage(now?.page??page,destination))void gotoRef.current(p.sura,p.aya,destination,true);
-        else {setElsewhere({...p,page:destination});jumpTimer.current=setTimeout(()=>{if(token===locationGeneration.current)void gotoRef.current(p.sura,p.aya,destination,true);},ELSEWHERE_DELAY);}
+        else setElsewhere({...p,page:destination});
       }).catch(()=>setError("Couldn’t locate that ayah. Keep reading or retry."));
     },
-    position:(p:FollowPosition)=>{if(!p.locked)return;setHighlight(p.key);void followLocation(p.sura,p.aya,p.word).then(target=>{if(target!==currentRef.current?.page)void gotoRef.current(p.sura,p.aya,target,false);}).catch(()=>undefined);},
+    position:(p:FollowPosition)=>{if(!p.locked)return;const token=++locationGeneration.current;setHighlight(p.key);void followLocation(p.sura,p.aya,p.word).then(target=>{if(token!==locationGeneration.current)return;if(target!==viewingPage()?.page)void gotoRef.current(p.sura,p.aya,target,false);}).catch(()=>undefined);},
     answer:a=>{const top=a.matches[0];if(a.confident&&top){void gotoRef.current(top.sura,top.aya,undefined,false).then(()=>{const p=currentRef.current;if(p)void voiceRef.current.request("smart",pageRanges(p));});}else {setError("Not sure yet. Recite a little more.");setSheet("search");}},
   });
   const voiceRef=useRef(voice);voiceRef.current=voice;
