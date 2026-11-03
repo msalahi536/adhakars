@@ -1,4 +1,4 @@
-import { useLayoutEffect, useRef, useState, type ReactNode } from "react";
+import { memo, useLayoutEffect, useRef, useState, type ReactNode } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { loadPageFont, recitePageOptions } from "@/lib/recite/data";
 import { useEffect } from "react";
@@ -9,7 +9,7 @@ import type { Chapter } from "@/lib/quran";
 import type { Marks, RecitePage, ReciteWord } from "@/lib/recite/model";
 import { currentRecitationWord, hiddenWordVisible, mushafRows, recitedWord, type ReaderLayout } from "./reader-rules";
 
-export function ReaderPage({number,chapters,layout,marks,hidden,revealed,highlight,size,tajweed,arabic,translit,translation,translitSize,translationSize,onVisible,onWord,preview=false,translations,peek=false,lessonKeys,reciting=false}: {
+export const ReaderPage = memo(function ReaderPage({number,chapters,layout,marks,hidden,revealed,highlight,size,tajweed,arabic,translit,translation,translitSize,translationSize,onVisible,onWord,preview=false,translations,peek=false,lessonKeys,reciting=false}: {
   number:number;chapters:Chapter[];layout:ReaderLayout;marks:Marks;hidden:boolean;revealed:Set<string>;highlight:string|null;size:number;tajweed:boolean;arabic:boolean;translit:boolean;translation:boolean;translitSize:number;translationSize:number;
   onVisible?:(page:RecitePage,ratio:number)=>void;onWord?:(word:ReciteWord)=>void;preview?:boolean;translations?:Record<string,string>;peek?:boolean;lessonKeys?:Set<string>;reciting?:boolean;
 }) {
@@ -43,7 +43,7 @@ export function ReaderPage({number,chapters,layout,marks,hidden,revealed,highlig
     if(w.end)return <span key={w.key} className="q2-marker">{number<=2&&layout!=="Translation"?<span className="q2-opening-marker"><svg viewBox="0 0 40 40" aria-hidden="true"><path d="M20 2 26 6 33 7 34 14 38 20 34 26 33 33 26 34 20 38 14 34 7 33 6 26 2 20 6 14 7 7 14 6Z"/><circle cx="20" cy="20" r="14"/></svg><span>{toArabicDigits(w.verse.split(":")[1])}</span></span>:<AyahMarker number={Number(w.verse.split(":")[1])} size={19}/>}</span>;
     const state=marks[w.key];const shown=peek||!hidden||(lessonKeys&&!lessonKeys.has(w.key))||hiddenWordVisible(state,revealed.has(w.key));
     const group=tajweed&&w.tajweed?parseTajweed(w.tajweed).find(s=>s.group)?.group:undefined;
-    return <Button variant="ghost" key={w.key} className={`q2-word ${shown?"":"q2-concealed"} ${lessonKeys?.has(w.key)?"q2-lesson-word":""} ${state==="wrong"?"q2-wrong":state==="skipped"?"q2-skipped":""} ${recitedWord(state)?"q2-recited":""} ${currentWord===w.key?"q2-current":""} ${highlight===w.key?"q2-highlight":""} ${group?`rc-qcf-tj-${group}`:""}`} data-q2-word={w.key} aria-label={`Word ${w.key}`} onPointerDown={e=>{if(hidden){const el=e.currentTarget;el.setAttribute("data-peek","pending");window.setTimeout(()=>{if(el.getAttribute("data-peek")==="pending")el.setAttribute("data-peek","on");},400);}}} onPointerUp={e=>{e.stopPropagation();e.currentTarget.removeAttribute("data-peek");}} onPointerCancel={e=>e.currentTarget.removeAttribute("data-peek")} onClick={e=>{e.stopPropagation();onWord?.(w);}}>
+    return <Button variant="ghost" key={w.key} className={`q2-word ${shown?"":"q2-concealed"} ${lessonKeys?.has(w.key)?"q2-lesson-word":""} ${state==="wrong"?"q2-wrong":state==="skipped"?"q2-skipped":""} ${recitedWord(state)?"q2-recited":""} ${currentWord===w.key?"q2-current":""} ${highlight===w.key?"q2-highlight":""} ${group?`rc-qcf-tj-${group}`:""}`} data-q2-word={w.key} data-q2-hidden={hidden&&!peek&&(!lessonKeys||lessonKeys.has(w.key))} data-q2-revealed={revealed.has(w.key)} aria-label={`Word ${w.key}`} onPointerDown={e=>{if(hidden){const el=e.currentTarget;el.setAttribute("data-peek","pending");window.setTimeout(()=>{if(el.getAttribute("data-peek")==="pending")el.setAttribute("data-peek","on");},400);}}} onPointerUp={e=>{e.stopPropagation();e.currentTarget.removeAttribute("data-peek");}} onPointerCancel={e=>e.currentTarget.removeAttribute("data-peek")} onClick={e=>{e.stopPropagation();onWord?.(w);}}>
       <span>{layout==="Translation"?tajweed&&w.tajweed?<TajweedText markup={w.tajweed}/>:w.text:w.glyph}</span>
       {layout==="Translation"&&meaningFor&&<span className="q2-word-meaning">{meaningFor(w.text)??""}</span>}
     </Button>;
@@ -69,4 +69,4 @@ export function ReaderPage({number,chapters,layout,marks,hidden,revealed,highlig
     {query.isError?<div className="q2-loading"><p>Couldn’t load this page.</p><Button variant="outline" onClick={()=>void query.refetch()}>Retry page</Button></div>:!page||(!font&&layout!=="Translation")?<div className="q2-loading" role="status">{failed?<>The page font couldn’t load.<Button variant="outline" onClick={()=>setRetry(n=>n+1)}>Retry font</Button></>:"Loading mushaf…"}</div>:layout==="Framed mushaf"?<MushafFrame scale={.5} className="q2-frame">{content}</MushafFrame>:content}
     <footer className="q2-page-divider">{number}</footer>
   </article>;
-}
+});
