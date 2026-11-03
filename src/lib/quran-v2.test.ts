@@ -10,10 +10,10 @@ test("a fresh seven-tap unlock ends the sequence, so taps 8-10 never toggle Qura
   tap();expect(h).toBe(1);expect(q).toBe(0);
   for(let i=0;i<3;i++)tap();expect(q).toBe(0);
 });
-test("when Hifz is already on, seven taps turn it off and ten still toggle Quran", () => {
+test("with Hifz already on, seven taps turn it off and the next three toggle Quran", () => {
   let q=0,beta=false; const tap=createVersionTapCounter(()=>{beta=!beta;return beta;},()=>q++,()=>100);
-  for(let i=0;i<10;i++)tap();expect(beta).toBe(false);expect(q).toBe(1);
-  for(let i=0;i<7;i++)tap();expect(beta).toBe(true);expect(q).toBe(1);
+  for(let i=0;i<10;i++)tap();expect(beta).toBe(true);expect(q).toBe(0);
+  for(let i=0;i<7;i++)tap();expect(beta).toBe(false);expect(q).toBe(0);
   for(let i=0;i<3;i++)tap();expect(q).toBe(1);
 });
 test("a separated seven-tap sequence continues to toggle Hifz",()=>{
