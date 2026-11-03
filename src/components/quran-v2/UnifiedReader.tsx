@@ -20,7 +20,7 @@ import {VoiceConsent} from "@/components/quran-voice/VoiceConsent";
 import {EchoMode} from "@/components/hifz/EchoMode";
 import {ReaderPage} from "./ReaderPage";
 import {ReaderMistakes,ReaderNavigation,ReaderReciters,ReaderSettings,ReaderSheet,type ReaderPreferences,type ReadingLocation} from "./ReaderSheets";
-import {adjacentPage,ELSEWHERE_DELAY,nextLayout,pageRanges} from "./reader-rules";
+import {adjacentPage,ELSEWHERE_DELAY,nextLayout,pageRanges,swipeDestination} from "./reader-rules";
 import {useReaderVoice} from "./use-reader-voice";
 import {SilenceMonitor} from "./SilenceMonitor";
 import "./reader.css";
@@ -31,7 +31,7 @@ async function verseLocation(key:string):Promise<{page:number;hizb:number}>{
 
 const wordPages=new Map<string,Promise<number>>();
 function followLocation(sura:number,aya:number,word:number){const key=`${sura}:${aya}`;const cached=wordPages.get(`${key}:${word}`);if(cached)return cached;const load=fetch(`https://api.quran.com/api/v4/verses/by_key/${key}?words=true&word_fields=page_number&fields=page_number`).then(r=>r.json()).then((d:{verse:{page_number:number;words:{position:number;page_number:number}[]}})=>d.verse.words.find(w=>w.position===word)?.page_number??d.verse.page_number);wordPages.set(`${key}:${word}`,load);return load;}
-const DEFAULTS:ReaderPreferences={layout:"Mushaf text",size:26,tajweed:false,highlight:true,follow:true,arabic:true,translit:true,translation:true,translitSize:15,translationSize:16,translator:20,english:true};
+const DEFAULTS:ReaderPreferences={layout:"Mushaf text",paging:"scroll",size:26,tajweed:false,highlight:true,follow:true,arabic:true,translit:true,translation:true,translitSize:15,translationSize:16,translator:20,english:true};
 export type ReaderLesson={pill:ReactNode;marks:Marks;hidden:boolean;stream:MediaStream|null;busy:boolean;mic:()=>void;listen:()=>void;peek:()=>void;onWord:(w:ReciteWord)=>void;overlays:ReactNode;highlight?:string|null;peeked?:boolean;keys?:Set<string>;onSilence?:(last:number)=>void;onPage?:(page:number)=>void;tools?:ReactNode};
 export function UnifiedReader({chapterId=1,verse=1,initialPage,initialMode,back,lesson}:{chapterId?:number;verse?:number;initialPage?:number;initialMode?:"follow"|"search"|"smart";back:()=>void;lesson?:ReaderLesson}){
   const client=useQueryClient();const chapters=useQuery(reciteChaptersOptions).data??[];
@@ -47,7 +47,9 @@ export function UnifiedReader({chapterId=1,verse=1,initialPage,initialMode,back,
   const [hizb,setHizb]=useState(1);
   const query=useQuery(recitePageOptions(page));const current=query.data;const currentRef=useRef(current);currentRef.current=current;
   const root=useRef<HTMLDivElement|null>(null),scroll=useRef<HTMLDivElement|null>(null),audio=useRef<HTMLAudioElement|null>(null),jumpTimer=useRef<ReturnType<typeof setTimeout>|null>(null);
-  const pointer=useRef<{x:number;y:number;t:number}|null>(null),seenMarks=useRef(new Map<string,string>());
+  const pointer=useRef<{x:number;y:number;t:number;axis?:"x"|"y"}|null>(null),seenMarks=useRef(new Map<string,string>());
+  const turning=useRef(false),swiped=useRef(false),pageTurn=useRef<HTMLDivElement|null>(null);
+  const [turnDirection,setTurnDirection]=useState<"forward"|"backward"|null>(null);
   const visiblePages=useRef(new Map<number,{data:RecitePage;ratio:number}>());
   const player=useQuranPlayer();
   const gotoRef=useRef<(s:number,v?:number,p?:number,retain?:boolean)=>Promise<void>>(async()=>{});
@@ -118,10 +120,23 @@ export function UnifiedReader({chapterId=1,verse=1,initialPage,initialMode,back,
   const [tail,setTail]=useState(1);
   useEffect(()=>{setTail(1);visiblePages.current.clear();},[anchor]);
   useEffect(()=>{
-    const node=root.current?.querySelector(".q2-load-next");if(!node||prefs.layout==="Framed mushaf")return;
+    const node=root.current?.querySelector(".q2-load-next");if(!node||prefs.paging==="swipe"||prefs.layout==="Framed mushaf")return;
     const observer=new IntersectionObserver(entries=>{if(entries.some(e=>e.isIntersecting))setTail(n=>Math.min(n+2,604-anchor));},{root:scroll.current,rootMargin:"250px"});observer.observe(node);return()=>observer.disconnect();
-  },[tail,anchor,prefs.layout]);
-  const pages=prefs.layout==="Framed mushaf"?[page]:Array.from({length:Math.min(tail+1,605-anchor)},(_,i)=>anchor+i);
+  },[tail,anchor,prefs.layout,prefs.paging]);
+  const singlePage=prefs.paging==="swipe"||prefs.layout==="Framed mushaf";
+  useEffect(()=>{if(!singlePage)return;for(const n of [page-1,page+1])if(n>=1&&n<=604)void client.prefetchQuery(recitePageOptions(n));},[page,singlePage,client]);
+  useEffect(()=>{scroll.current?.scrollTo({top:0});if(prefs.paging==="scroll")setAnchor(page);},[prefs.paging]);
+  const pages=singlePage?[page]:Array.from({length:Math.min(tail+1,605-anchor)},(_,i)=>anchor+i);
+  async function turn(destination:number,dx:number){
+    if(turning.current||destination===page)return;
+    turning.current=true;
+    try{
+      await client.ensureQueryData(recitePageOptions(destination));
+      setTurnDirection(dx>0?"forward":"backward");
+      await go(0,1,destination);
+      scroll.current?.scrollTo({top:0});
+    }finally{pageTurn.current?.style.removeProperty("--q2-drag");turning.current=false;}
+  }
   const words=current?pageWords(current):[];
   const reveal=(ayah:boolean)=>{const pending=words.find(w=>!revealed.has(w.key));if(!pending)return;setRevealed(old=>{const next=new Set(old);for(const w of words)if(w.key===pending.key||(ayah&&w.verse===pending.verse))next.add(w.key);return next;});feedback("reveal");};
   const play=()=>{if(lesson){lesson.listen();return;}if(player.playing){quranPlayer.pause();return;}voice.cancel();if(first)void quranPlayer.select(reciter,first.chapter,name,true,first.key).catch(()=>setError("This reciter’s audio is unavailable. Choose another reciter."));};
@@ -131,9 +146,16 @@ export function UnifiedReader({chapterId=1,verse=1,initialPage,initialMode,back,
   return <Portal><MushafThemeProvider theme={theme} mode={phase} className={`q2-reader q2-theme-${theme} q2-phase-${phase} ${chrome?"q2-chrome-visible":""}`}><div ref={root}>
     <header className="q2-topbar" inert={!chrome}><div className="q2-header-left"><Button variant="ghost" size="icon" aria-label="Back to Quran" onClick={()=>{voice.cancel();back();}}><ChevronLeft/></Button></div><Button variant="ghost" className="q2-location" onClick={()=>setSheet("navigation")}>{voice.phase==="active"&&voice.mode==="follow"?"Following the imam":<>{name}<small>Page {page} · Juz {first?.juz??1} · Hizb {hizb}</small></>}</Button><div className="q2-header-right"><Button variant="ghost" size="icon" aria-label="Search Quran" onClick={()=>setSheet("search")}><Search size={22}/></Button><Button variant="ghost" size="icon" aria-label="Reading appearance" onClick={()=>setSheet("settings")}>Aa</Button></div></header>
     {lesson&&<><div className="q2-lesson-pill">{lesson.pill}</div><div className="q2-lesson-tools">{lesson.tools}</div><SilenceMonitor stream={lesson.stream} onSilence={last=>lesson.onSilence?.(last)}/></>}
-    <div className="q2-scroll" ref={scroll} onPointerDown={e=>{pointer.current={x:e.clientX,y:e.clientY,t:e.timeStamp};}} onPointerUp={e=>{const p=pointer.current;pointer.current=null;if(!p)return;const dx=e.clientX-p.x,dy=e.clientY-p.y;if(prefs.layout==="Framed mushaf"&&Math.abs(dx)>65&&Math.abs(dx)>Math.abs(dy)*1.3){void go(0,1,Math.max(1,Math.min(604,page+(dx>0?1:-1))));return;}if(Math.hypot(dx,dy)<10&&e.timeStamp-p.t<300){setChrome(v=>!v);setTabbar(chrome);}}}>
-      {loaded?pages.map(n=><ReaderPage key={n} number={n} chapters={chapters} {...prefs} reciting={lesson?!!lesson.stream:voice.phase==="active"} marks={lesson?.marks??marks} hidden={(lesson?.hidden??false)||hidden} revealed={revealed} highlight={lesson?.highlight??highlight} peek={lesson?.peeked} lessonKeys={lesson?.keys} translations={translationMap} onVisible={lesson?undefined:visible} onWord={w=>{if(lesson)lesson.onWord(w);else if(hidden)reveal(false);else{setChrome(v=>!v);setTabbar(chrome);}}}/>):<div className="q2-loading">Opening Quran…</div>}
-      {prefs.layout!=="Framed mushaf"&&anchor+tail<604&&<Button variant="ghost" className="q2-load-next" onClick={()=>setTail(n=>n+2)}>Next page <ChevronLeft size={15}/></Button>}
+    <div className={`q2-scroll ${singlePage?"q2-paged":""}`} ref={scroll}
+      onPointerDownCapture={e=>{if(turning.current)return;swiped.current=false;pointer.current={x:e.clientX,y:e.clientY,t:e.timeStamp};}}
+      onPointerMove={e=>{const p=pointer.current;if(!p||!singlePage)return;const dx=e.clientX-p.x,dy=e.clientY-p.y;if(!p.axis&&Math.hypot(dx,dy)>10)p.axis=Math.abs(dx)>Math.abs(dy)*1.3?"x":"y";if(p.axis!=="x")return;swiped.current=true;e.currentTarget.setPointerCapture(e.pointerId);const atEnd=swipeDestination(page,dx,0)===page;pageTurn.current?.style.setProperty("--q2-drag",`${dx*(atEnd?.15:.65)}px`);}}
+      onPointerCancel={()=>{pointer.current=null;pageTurn.current?.style.removeProperty("--q2-drag");}}
+      onPointerUpCapture={e=>{const p=pointer.current;pointer.current=null;if(!p)return;const dx=e.clientX-p.x,dy=e.clientY-p.y;pageTurn.current?.style.removeProperty("--q2-drag");if(singlePage&&swiped.current){e.stopPropagation();void turn(swipeDestination(page,dx,dy),dx);return;}if(!(e.target as HTMLElement).closest("button")&&Math.hypot(dx,dy)<10&&e.timeStamp-p.t<300){setChrome(v=>!v);setTabbar(chrome);}}}
+      onClickCapture={e=>{if(swiped.current){e.preventDefault();e.stopPropagation();swiped.current=false;}}}>
+      <div key={singlePage?page:"scroll"} ref={pageTurn} className={`q2-page-turn ${singlePage&&turnDirection?`q2-turn-${turnDirection}`:""}`} onAnimationEnd={()=>setTurnDirection(null)}>
+      {loaded?pages.map(n=><ReaderPage key={n} number={n} chapters={chapters} {...prefs} reciting={lesson?!!lesson.stream:voice.phase==="active"||voice.phase==="finishing"} marks={lesson?.marks??marks} hidden={(lesson?.hidden??false)||hidden} revealed={revealed} highlight={lesson?.highlight??highlight} peek={lesson?.peeked} lessonKeys={lesson?.keys} translations={translationMap} onVisible={lesson||singlePage?undefined:visible} onWord={w=>{if(lesson)lesson.onWord(w);else if(hidden)reveal(false);else{setChrome(v=>!v);setTabbar(chrome);}}}/>):<div className="q2-loading">Opening Quran…</div>}
+      </div>
+      {!singlePage&&anchor+tail<604&&<Button variant="ghost" className="q2-load-next" onClick={()=>setTail(n=>n+2)}>Next page <ChevronLeft size={15}/></Button>}
     </div>
     <div className="q2-bottom" inert={!chrome}>
       {elsewhere&&<section className="q2-elsewhere"><div>You’re reciting {chapters.find(c=>c.id===elsewhere.sura)?.name_simple} · ayah {elsewhere.aya}</div><Button size="sm" onClick={()=>void go(elsewhere.sura,elsewhere.aya,undefined,true)}>Go there</Button><Button variant="ghost" size="icon" aria-label="Dismiss recitation location" onClick={()=>{if(jumpTimer.current)clearTimeout(jumpTimer.current);setElsewhere(null);}}><X size={16}/></Button></section>}
