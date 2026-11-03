@@ -11,9 +11,9 @@ import {juzPages} from "@/lib/hifz";
 import type {CheckResult,TajweedHint} from "@/lib/hifz-ai";
 import {ReplayButton,useRecitationReplay} from "@/components/recite/RecitationReplay";
 import {ReaderPage} from "./ReaderPage";
-import {LAYOUTS,type ReaderLayout} from "./reader-rules";
+import {LAYOUTS,type ReaderLayout,type ReaderPaging} from "./reader-rules";
 
-export type ReaderPreferences={layout:ReaderLayout;size:number;tajweed:boolean;highlight:boolean;follow:boolean;arabic:boolean;translit:boolean;translation:boolean;translitSize:number;translationSize:number;translator:number;english:boolean};
+export type ReaderPreferences={layout:ReaderLayout;paging:ReaderPaging;size:number;tajweed:boolean;highlight:boolean;follow:boolean;arabic:boolean;translit:boolean;translation:boolean;translitSize:number;translationSize:number;translator:number;english:boolean};
 export type ReadingLocation={s:number;v:number;page:number;name:string};
 export function ReaderSheet({title,close,children}:{title:string;close:()=>void;children:React.ReactNode}){
   return <Dialog open onOpenChange={v=>{if(!v)close();}}><DialogContent className="q2-sheet" aria-describedby={undefined}><DialogTitle>{title}</DialogTitle>{children}</DialogContent></Dialog>;
@@ -41,6 +41,7 @@ export function ReaderSettings({prefs,change,page,chapters,close}:{prefs:ReaderP
   const size=(key:"size"|"translitSize"|"translationSize",label:string,min:number,max:number)=><label className="q2-slider-label">{label}<span>{prefs[key]}</span><Slider aria-label={label} min={min} max={max} step={1} value={[prefs[key]]} onValueChange={([value])=>change({[key]:value})}/></label>;
   return <ReaderSheet title="Reading appearance" close={close}>
     <div role="radiogroup" aria-label="Reader layout" className="q2-layout-options">{LAYOUTS.map((l,i)=><Button role="radio" aria-checked={prefs.layout===l} variant="outline" key={l} className={prefs.layout===l?"is-selected":""} onClick={()=>change({layout:l})}><span className={`q2-layout-icon q2-layout-icon-${i}`}><i/><i/><i/></span><span>{l}</span>{prefs.layout===l&&<Check size={16}/>}</Button>)}</div>
+    <fieldset><legend>Reading mode</legend><div role="radiogroup" aria-label="Reading mode" className="q2-segments">{([{value:"scroll",label:"Vertical scroll"},{value:"swipe",label:"Page by page (swipe)"}] as const).map(mode=><Button key={mode.value} role="radio" aria-checked={prefs.paging===mode.value} variant={prefs.paging===mode.value?"default":"outline"} onClick={()=>change({paging:mode.value})}>{mode.label}</Button>)}</div></fieldset>
     <div className="q2-live-preview"><ReaderPage number={page} chapters={chapters} {...prefs} marks={{}} hidden={false} revealed={new Set()} highlight={null} preview/></div>
     {prefs.layout==="Translation"&&<>{toggle("arabic","Arabic text")}{toggle("translit","Transliteration")}{size("translitSize","Transliteration size",12,28)}{toggle("translation","Translation")}<fieldset><legend>Translator</legend><div className="q2-segments">{[{id:20,name:"Sahih International"},{id:131,name:"Dr. Mustafa Khattab"}].map(t=><Button key={t.id} variant={prefs.translator===t.id?"default":"outline"} onClick={()=>change({translator:t.id})}>{t.name}</Button>)}</div></fieldset>{size("translationSize","Translation size",12,28)}</>}
     {size("size","Arabic text size",18,40)}{toggle("tajweed","Tajweed colors")}{toggle("highlight","Word-by-word highlight")}{toggle("follow","Follow recitation")}
