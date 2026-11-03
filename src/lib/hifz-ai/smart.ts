@@ -7,7 +7,7 @@
  */
 import type { CheckResult } from "./checker";
 import { startListening, type ListenSession } from "./listen";
-import { judgeSearch, loadQuranIndex, type QuranIndex } from "./quran-index";
+import { fit, judgeSearch, loadQuranIndex, skel, type QuranIndex } from "./quran-index";
 
 export type Passage = { sura: number; first: number; last: number };
 
@@ -16,6 +16,37 @@ export interface Elsewhere {
   aya: number;
   word: number;
   samePhrase: { sura: number; aya: number; word: number }[]; // other places with exactly these words
+}
+
+/**
+ * Said before reciting, but they are also words of the Quran: the isti'adha matches An-Nahl 16:98-99
+ * and the basmala matches Al-Fatiha 1:1 / An-Naml 27:30. Cut them out before looking for "elsewhere",
+ * or saying a'udhu billah jumps the reader to An-Nahl.
+ */
+const OPENERS = [
+  "ءَعُۥۥذُبِللَااهِسسَمِۦۦعِلعَلِۦۦمِمِنَششَيطَاانِررَجِۦۦمِ", // a'udhu billahi s-sami'i l-'alimi mina sh-shaytani r-rajim
+  "ءَعُۥۥذُبِللَااهِمِنَششَيطَاانِررَجِۦۦمِ", // a'udhu billahi mina sh-shaytani r-rajim
+  "بِسمِللَااهِررَحمَاانِررَحِۦۦمِ", // bismillahi r-rahmani r-rahim
+].map((o) => Array.from(skel(o)));
+
+/** The heard sounds with any isti'adha / basmala removed. */
+export function withoutOpeners(heard: string): string {
+  let text = heard;
+  for (let guard = 0; guard < 4; guard++) {
+    const chars = Array.from(text);
+    const sk: string[] = [];
+    const at: number[] = []; // char index of each skeleton letter
+    chars.forEach((c, i) => { const k = skel(c); if (k && sk[sk.length - 1] !== k) { sk.push(k); at.push(i); } });
+    let cut: [number, number] | null = null;
+    for (const o of OPENERS) {
+      if (sk.length < o.length * 0.7) continue;
+      const [cost, b, e] = fit(o, sk);
+      if (e > b && cost <= Math.floor(o.length * 0.25)) { cut = [at[b], e < at.length ? at[e] : chars.length]; break; }
+    }
+    if (!cut) return text;
+    text = chars.slice(0, cut[0]).join("") + chars.slice(cut[1]).join("");
+  }
+  return text;
 }
 
 const inside = (sura: number, aya: number, passages: Passage[]) =>
@@ -45,7 +76,9 @@ export function detectElsewhere(ix: QuranIndex, result: CheckResult & { heard?: 
   if (lastWord && lastWord.status !== "pending" && lastWord.at !== undefined && heard.length - lastWord.at >= 40) {
     candidates.push(heard.slice(-60));
   }
-  for (const text of candidates) {
+  for (const raw of candidates) {
+    const text = withoutOpeners(raw);
+    if (Array.from(skel(text)).length < 10) continue; // only the isti'adha / basmala: nothing to place yet
     const a = judgeSearch(ix, text);
     const top = a.matches[0];
     if (!a.confident || !top) continue;
@@ -71,6 +104,7 @@ export async function startSmartRecite(opts: {
 }): Promise<ListenSession> {
   const ix = await loadQuranIndex();
   let reported = "";
+  let seen: Elsewhere | null = null; // must be found on two updates in a row (same surah, within an ayah)
   const [first] = opts.passages;
   return startListening({
     sura: first.sura,
@@ -79,11 +113,15 @@ export async function startSmartRecite(opts: {
     passages: opts.passages,
     stream: opts.stream,
     keepStream: opts.keepStream,
+    finish: "reached", // free reading: stopping mid-page is not skipping the rest
     onProgress: opts.onProgress,
     onError: opts.onError,
     onUpdate: (r) => {
       opts.onUpdate(r);
-      const e = detectElsewhere(ix, r as CheckResult & { heard?: string }, opts.passages);
+      const found = detectElsewhere(ix, r as CheckResult & { heard?: string }, opts.passages);
+      const agrees = !!found && !!seen && found.sura === seen.sura && Math.abs(found.aya - seen.aya) <= 1;
+      seen = found;
+      const e = agrees ? found : null;
       const key = e ? `${e.sura}:${e.aya}` : "";
       if (e && key !== reported) {
         reported = key;

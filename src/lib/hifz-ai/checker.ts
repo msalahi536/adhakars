@@ -363,3 +363,22 @@ export function check(reference: Reference, heard: string, final: boolean, conf?
   const startKey = reference.words.find((w) => w.s >= start)?.key ?? reference.words[0]?.key ?? "";
   return { words, extras, reachedIndex: end, startIndex: start, startKey };
 }
+
+/**
+ * Final check for free reading: judge only as far as the reciter actually got.
+ * check(..., final = true) assumes the whole range was meant to be recited, so stopping half way
+ * down a page would mark every remaining word "skipped" (and can pull already-correct words at
+ * the end into that skip). Here the range is cut where the live alignment reached, and the rest
+ * stays "pending".
+ */
+export function checkReached(reference: Reference, heard: string, conf?: number[]): CheckResult {
+  const live = check(reference, heard, false, conf);
+  let cut = 0;
+  live.words.forEach((w, i) => { if (w.status !== "pending") cut = i + 1; });
+  if (cut === 0 || cut >= reference.words.length) return check(reference, heard, true, conf);
+  const words = reference.words.slice(0, cut);
+  const sub: Reference = { words, norm: Array.from(reference.norm).slice(0, words[words.length - 1].e).join("") };
+  const done = check(sub, heard, true, conf);
+  const rest = live.words.slice(cut);
+  return { ...done, words: [...done.words, ...rest] };
+}

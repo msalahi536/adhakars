@@ -6,9 +6,10 @@
  *   const final = await session.stop()
  */
 import { SR } from "./fbank";
-import { buildReference, check, loadSurah, type CheckResult } from "./checker";
+import { buildReference, check, checkReached, loadSurah, type CheckResult } from "./checker";
 import { DEFAULT_MODEL_URL, QuranRecognizer } from "./recognizer";
 import { cachedAsset } from "./assets";
+import { MistakeStabilizer } from "./stabilize";
 
 let shared: Promise<QuranRecognizer> | null = null;
 
@@ -49,6 +50,9 @@ export async function startListening(opts: {
   /** Caller owns the supplied stream across consecutive pages. Errors still stop it. */
   keepStream?: boolean;
   passages?: { sura: number; first: number; last: number }[];
+  /** "all" (lessons): the whole range must be recited, unreached words count as skipped.
+   *  "reached" (free reading): judge only as far as the reciter got; the rest stays pending. */
+  finish?: "all" | "reached";
 }): Promise<ListenSession> {
   const passages = opts.passages ?? [opts];
   const [rec, references] = await Promise.all([getRecognizer(opts.modelUrl, opts.onProgress), Promise.all(passages.map(async (r) => buildReference(await loadSurah(r.sura), r.sura, r.first, r.last)))]);
@@ -81,6 +85,7 @@ export async function startListening(opts: {
   let failure: unknown;
   let stopped: Promise<CheckResult> | undefined;
   let last: CheckResult = check(reference, "", false);
+  const steady = new MistakeStabilizer();
 
   const toMono16k = (input: Float32Array): Float32Array => {
     if (ratio === 1) return input.slice();
@@ -109,7 +114,7 @@ export async function startListening(opts: {
         for (let k = 0; k < e.token.length; k++) { conf.push(e.prob); times.push(e.time); }
       }
       last = { ...check(reference, heard, false, conf), heard, conf: [...conf], times: [...times] };
-      opts.onUpdate(last);
+      opts.onUpdate(steady.apply(last)); // live: a mistake shows (and buzzes) only once it is sure
     }).catch((error) => {
       failure = error;
       node.disconnect(); src.disconnect(); stream.getTracks().forEach((t) => t.stop());
@@ -134,7 +139,7 @@ export async function startListening(opts: {
         for (let k = 0; k < e.token.length; k++) { conf.push(e.prob); times.push(e.time); }
       }
       await ctx.close();
-      last = { ...check(reference, heard, true, conf), heard, conf: [...conf], times: [...times] };
+      last = { ...(opts.finish === "reached" ? checkReached(reference, heard, conf) : check(reference, heard, true, conf)), heard, conf: [...conf], times: [...times] };
       opts.onUpdate(last);
       return last;
       })().finally(() => { if (ctx.state !== "closed") void ctx.close().catch(() => undefined); });
