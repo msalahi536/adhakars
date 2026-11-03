@@ -57,7 +57,7 @@ export function useReaderVoice({update,elsewhere,position,answer}:{update:(r:Che
       const last=await current.stop();
       if(id!==generation.current)return;
       // keep the finished page: its mistakes and their timings stay in the result
-      clock.current.prev=merged(last);
+      if(last)clock.current.prev=merged(last);
       const engine=await import("@/lib/hifz-ai");
       const next=await engine.startSmartRecite({passages:ranges,stream:held,keepStream:true,onUpdate:r=>{if(id===generation.current)callbacks.current.update(merged(r));},onElsewhere:p=>{if(id===generation.current)callbacks.current.elsewhere(p);}});
       if(id!==generation.current){next.stream.getTracks().forEach(t=>t.stop());await next.stop();return;}
