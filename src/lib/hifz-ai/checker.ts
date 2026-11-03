@@ -305,7 +305,15 @@ export function check(reference: Reference, heard: string, final: boolean, conf?
     const js = [...jsSet].sort((a, b) => a - b);
     const heardTxt = js.map((j) => rec[j]).join("");
     if (!final && w.e > end) {
-      words.push({ key: w.key, text: w.text, status: "in_progress", expected, heard: heardTxt, ...(js.length ? { at: idx[js[0]], end: idx[js[js.length - 1]] } : {}) });
+      // "in progress" only once real speech matches the word's opening letters: a breath or a
+      // stray sound must not reveal a hidden word before it is said
+      const exp = skeleton(expected);
+      const got = skeleton(heardTxt);
+      const need = Math.min(2, exp.length);
+      let match = 0;
+      while (match < need && match < got.length && same(exp[match], got[match])) match++;
+      const started = js.length > 0 && match >= need;
+      words.push({ key: w.key, text: w.text, status: started ? "in_progress" : "pending", expected, heard: started ? heardTxt : "", ...(started ? { at: idx[js[0]], end: idx[js[js.length - 1]] } : {}) });
       return;
     }
     const expSk = skeleton(expected);
