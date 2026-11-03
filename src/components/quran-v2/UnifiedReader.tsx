@@ -110,7 +110,7 @@ export function UnifiedReader({chapterId=1,verse=1,initialPage,initialMode,back,
     try{
       const accepted=await voiceRef.current.resetMistakes();
       if(accepted===false)return;
-      voiceRef.current.discardRecording();audio.current?.pause();cancelHifzFeedback();
+      audio.current?.pause();cancelHifzFeedback();
       liveMarks.current={};seenMarks.current.clear();setResult(null);setMarks({});setTips([]);setHighlight(null);setElsewhere(null);locationGeneration.current++;
       debugUpdates.current=[];debugStart.current=performance.now();if(root.current)paintLiveWords(root.current,{},voiceRef.current.phase==="active");
       setConfirmReset(false);
@@ -234,6 +234,9 @@ export function UnifiedReader({chapterId=1,verse=1,initialPage,initialMode,back,
   }
   const words=current?pageWords(current):[];
   const reveal=(ayah:boolean)=>{const pending=words.find(w=>!revealed.has(w.key));if(!pending)return;setRevealed(old=>{const next=new Set(old);for(const w of words)if(w.key===pending.key||(ayah&&w.verse===pending.verse))next.add(w.key);return next;});feedback("reveal");};
+  const wordAction=useRef<(w:ReciteWord)=>void>(()=>{});
+  wordAction.current=w=>{if(lesson)lesson.onWord(w);else if(hidden)reveal(false);else{setChrome(v=>!v);setTabbar(chrome);}};
+  const onReaderWord=useCallback((w:ReciteWord)=>wordAction.current(w),[]);
   const play=()=>{if(lesson){lesson.listen();return;}if(player.playing){quranPlayer.pause();return;}voice.cancel();if(first)void quranPlayer.select(reciter,first.chapter,name,true,first.key).catch(()=>setError("This reciter’s audio is unavailable. Choose another reciter."));};
   const correct=(key:string)=>{audio.current?.pause();const w=words.find(w=>w.key===key);if(w?.audio){const a=new Audio(w.audio);audio.current=a;void a.play().catch(()=>setError("Tap again to play this word."));}};
   const bookmark=()=>{if(!first)return;const r={s:first.chapter,v:first.number,page,name};setBookmarks(old=>{const next=old.some(b=>b.page===page)?old.filter(b=>b.page!==page):[r,...old];localStorage.setItem("quran-v2:bookmarks",JSON.stringify(next));return next;});toast("Bookmark updated");};
