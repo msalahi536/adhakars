@@ -48,7 +48,7 @@ export function useReaderVoice({update,elsewhere,position,answer}:{update:(r:Che
     catch {if(id===generation.current){current?.stream.getTracks().forEach(t=>t.stop());setStream(null);setError("Couldn’t finish this recording. Tap the mic to retry.");setPhase("error");}}
     finally{if(id===generation.current)busy.current=false;}
   }
-  async function continueAt(ranges:Range[]){
+  async function continueAt(ranges:Range[],fresh=false){
     const current=session.current;if(!current||mode!=="smart"||busy.current)return;
     busy.current=true;const id=generation.current;const held=current.stream;
     // Keep the same permission/track while settling the old page's audio context.
@@ -57,7 +57,8 @@ export function useReaderVoice({update,elsewhere,position,answer}:{update:(r:Che
       const last=await current.stop();
       if(id!==generation.current)return;
       // keep the finished page: its mistakes and their timings stay in the result
-      if(last)clock.current.prev=merged(last);
+      // fresh (reset mistakes): forget everything recited so far in this session
+      clock.current.prev=fresh?null:last?merged(last):clock.current.prev;
       const engine=await import("@/lib/hifz-ai");
       const next=await engine.startSmartRecite({passages:ranges,stream:held,keepStream:true,onUpdate:r=>{if(id===generation.current)callbacks.current.update(merged(r));},onElsewhere:p=>{if(id===generation.current)callbacks.current.elsewhere(p);}});
       if(id!==generation.current){next.stream.getTracks().forEach(t=>t.stop());await next.stop();return;}
@@ -66,6 +67,11 @@ export function useReaderVoice({update,elsewhere,position,answer}:{update:(r:Che
       session.current=next;held.getTracks().forEach(t=>t.enabled=true);intent.current.ranges=ranges;
     }catch{cancel();setError("Listening stopped. Tap the mic to continue.");setPhase("error");}finally{busy.current=false;}
   }
+  /** Reset mistakes: clear the session's results; if the mic is on, keep listening from scratch on the same page(s). */
+  async function resetMistakes(){
+    clock.current.prev=null;
+    if(session.current&&mode==="smart")await continueAt(intent.current.ranges,true);
+  }
   function discardRecording(){setRecording(null);}
-  return {phase,mode,progress,error,stream,recording,request,begin,stop,cancel,continueAt,discardRecording};
+  return {phase,mode,progress,error,stream,recording,request,begin,stop,cancel,continueAt,resetMistakes,discardRecording};
 }
