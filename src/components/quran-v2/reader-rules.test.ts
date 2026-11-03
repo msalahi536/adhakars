@@ -1,6 +1,14 @@
 import {test,expect} from "bun:test";
-import {adjacentPage,completedReading,currentRecitationWord,ELSEWHERE_DELAY,nextLayout,recitedWord,swipeDestination} from "./reader-rules";
-import type {ReciteWord} from "@/lib/recite/model";
+import {adjacentPage,completedReading,currentRecitationWord,ELSEWHERE_DELAY,nextLayout,recitedWord,swipeDestination,visiblePageNumber,passageContains} from "./reader-rules";
+import type {ReciteWord,RecitePage} from "@/lib/recite/model";
+test("recitation uses the scrolled page with the most visible pixels, not a shorter neighbor",()=>{
+ expect(visiblePageNumber([{page:49,top:-200,bottom:150},{page:50,top:150,bottom:1450}],100,850)).toBe(50);
+});
+test("an ayah already on the page is not elsewhere",()=>{
+ const page={verses:[{chapter:3,number:1},{chapter:3,number:2}]} as RecitePage;
+ expect(passageContains(page,{sura:3,aya:2})).toBe(true);
+ expect(passageContains(page,{sura:2,aya:2})).toBe(false);
+});
 test("layout cycles Mushaf text, Framed mushaf, Translation",()=>{expect(nextLayout("Mushaf text")).toBe("Framed mushaf");expect(nextLayout("Framed mushaf")).toBe("Translation");expect(nextLayout("Translation")).toBe("Mushaf text");});
 test("100 percent read is complete rather than Continue",()=>{expect(completedReading(6,7)).toBe(false);expect(completedReading(7,7)).toBe(true);});
 test("elsewhere auto go waits two seconds",()=>expect(ELSEWHERE_DELAY).toBe(2000));
