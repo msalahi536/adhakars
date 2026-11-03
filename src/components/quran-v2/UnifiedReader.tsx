@@ -23,6 +23,7 @@ import {ReaderMistakes,ReaderNavigation,ReaderReciters,ReaderSettings,ReaderShee
 import {adjacentPage,nextLayout,pageRanges,swipeDestination,visiblePageNumber,passageContains,topReadingWord,recitationReadingWord,matchesSurahSearch} from "./reader-rules";
 import {useReaderVoice} from "./use-reader-voice";
 import {SilenceMonitor} from "./SilenceMonitor";
+import {debugEnabled} from "@/lib/hifz-debug";
 import "./reader.css";
 async function verseLocation(key:string):Promise<{page:number;hizb:number}>{
  const response=await fetch(`https://api.quran.com/api/v4/verses/by_key/${key}?fields=page_number,hizb_number`);
@@ -62,8 +63,10 @@ export function UnifiedReader({chapterId=1,verse=1,initialPage,initialMode,back,
   }
   const player=useQuranPlayer();
   const gotoRef=useRef<(s:number,v?:number,p?:number,retain?:boolean)=>Promise<void>>(async()=>{});
+  const debugUpdates=useRef<{elapsed:number;result:CheckResult}[]>([]),debugStart=useRef(0);
+  const sessionPassages=useRef<ReturnType<typeof pageRanges>>([]);
   const voice=useReaderVoice({
-    update:r=>{setResult(r);const next:Marks={};for(const w of r.words){next[w.key]=w.status;if((w.status==="wrong"||w.status==="skipped")&&seenMarks.current.get(w.key)!==w.status)feedback(w.status==="wrong"?"wrong":"skip");seenMarks.current.set(w.key,w.status);}setMarks(next);},
+    update:r=>{if(debugEnabled())debugUpdates.current.push({elapsed:(performance.now()-debugStart.current)/1000,result:structuredClone(r)});setResult(r);const next:Marks={};for(const w of r.words){next[w.key]=w.status;if((w.status==="wrong"||w.status==="skipped")&&seenMarks.current.get(w.key)!==w.status)feedback(w.status==="wrong"?"wrong":"skip");seenMarks.current.set(w.key,w.status);}setMarks(next);},
     elsewhere:p=>{
       const token=++locationGeneration.current;
       if(jumpTimer.current)clearTimeout(jumpTimer.current);
@@ -81,6 +84,7 @@ export function UnifiedReader({chapterId=1,verse=1,initialPage,initialMode,back,
     answer:a=>{const top=a.matches[0];if(a.confident&&top){void gotoRef.current(top.sura,top.aya,undefined,false).then(()=>{const p=currentRef.current;if(p)void voiceRef.current.request("smart",pageRanges(p));});}else {setError("Not sure yet. Recite a little more.");setSheet("search");}},
   });
   const voiceRef=useRef(voice);voiceRef.current=voice;
+  useEffect(()=>{if(voice.phase==="active"&&voice.mode==="smart"){debugStart.current=performance.now();debugUpdates.current=[];sessionPassages.current=currentRef.current?pageRanges(currentRef.current):[];}},[voice.phase,voice.mode]);
   useEffect(()=>{
     try{const saved=JSON.parse(localStorage.getItem("quran-v2:preferences")??"null");if(saved)setPrefs({...DEFAULTS,...saved,layout:lesson?"Framed mushaf":saved.layout??"Mushaf text"});setRecent(JSON.parse(localStorage.getItem("quran-v2:recent")??"[]"));setBookmarks(JSON.parse(localStorage.getItem("quran-v2:bookmarks")??"[]"));const p=JSON.parse(localStorage.getItem("adhkar:quran")??"{}");setReciter(p.reciter??7);}catch{/* Defaults remain usable. */}
     const sync=()=>{setTheme(mushafThemeId(getPresetId()));setPhase(resolveVisualPhase("/app/quran"));};sync();
@@ -96,7 +100,7 @@ export function UnifiedReader({chapterId=1,verse=1,initialPage,initialMode,back,
       const selected=data.verses.find(ayah=>ayah.chapter===s&&ayah.number===v)??data.verses[0];
       selectedReading.current=selected?.key??null;if(selected)setReadingKey(selected.key);
       requestAnimationFrame(()=>{const container=root.current?.querySelector(`[data-q2-page="${destination}"]`);const word=selected?.words.find(w=>!w.end);(word?container?.querySelector(`[data-q2-word="${word.key}"]`):container)?.scrollIntoView({behavior:retain?"smooth":"instant",block:"start"});});
-      if(retain)await voiceRef.current.continueAt(pageRanges(data));
+      if(retain){sessionPassages.current.push(...pageRanges(data));await voiceRef.current.continueAt(pageRanges(data));}
     }catch{setError("Couldn’t open that passage. Please try again.");}
   }
   gotoRef.current=go;
@@ -196,7 +200,7 @@ export function UnifiedReader({chapterId=1,verse=1,initialPage,initialMode,back,
     {sheet==="navigation"&&<ReaderNavigation chapters={chapters} recent={recent} bookmarks={bookmarks} go={(s,v,p)=>void go(s,v,p)} close={()=>setSheet(null)}/>}
     {sheet==="settings"&&<ReaderSettings prefs={prefs} change={change} page={page} chapters={chapters} close={()=>setSheet(null)}/>}
     {sheet==="reciter"&&<ReaderReciters selected={reciter} select={id=>{setReciter(id);const existing=JSON.parse(localStorage.getItem("adhkar:quran")??"{}");localStorage.setItem("adhkar:quran",JSON.stringify({...existing,reciter:id}));setSheet(null);}} close={()=>setSheet(null)}/>}
-    {sheet==="mistakes"&&<ReaderMistakes result={result} recording={voice.recording} tips={tips} chapters={chapters} correct={correct} highlight={setHighlight} close={()=>{voice.discardRecording();setSheet(null);}}/>}
+    {sheet==="mistakes"&&<ReaderMistakes result={result} recording={voice.recording} tips={tips} chapters={chapters} correct={correct} highlight={setHighlight} passages={sessionPassages.current} updates={debugUpdates.current} close={()=>{voice.discardRecording();debugUpdates.current=[];setSheet(null);}}/>}
     {sheet==="search"&&<ReaderSheet title="Find an ayah" close={()=>setSheet(null)}><ReaderSearch chapters={chapters} go={go}/><Button onClick={()=>{setSheet(null);if(lesson?.stream){toast("Stop your lesson microphone first");return;}void voice.request("search");}}><Mic size={18}/>Recite anything</Button></ReaderSheet>}
     {sheet==="more"&&<ReaderSheet title="Reader" close={()=>setSheet(null)}><div className="q2-menu"><Button variant="ghost" onClick={()=>setSheet("echo")}><Repeat/>Echo mode</Button><Button variant="ghost" onClick={()=>{setSheet(null);if(lesson?.stream){toast("Stop your lesson microphone first");return;}void voice.request("follow");}}><Mic/>Follow the imam</Button><Button variant="ghost" onClick={()=>setSheet("reciter")}><Play/>Reciter</Button><Button variant="ghost" onClick={()=>{setSheet(null);if(lesson?.stream){toast("Stop your lesson microphone first");return;}void voice.request("search");}}><Search/>Find an ayah</Button><Button variant="ghost" onClick={bookmark}><Bookmark/>Bookmark this page</Button><Button variant="ghost" onClick={()=>setSheet("navigation")}><Bookmark/>Bookmarks</Button></div></ReaderSheet>}
     {sheet==="echo"&&<EchoMode modern keys={current?.verses.map(v=>v.key)??[]} reciter={reciter} close={()=>setSheet(null)} highlight={(keys,h)=>{setHidden(h);setHighlight(keys[0]?`${keys[0]}:1`:null);}}/>}
