@@ -4,6 +4,7 @@ import { checkerDownloaded } from "@/lib/hifz-ai/assets";
 import { play as feedback, unlockHifzFeedbackAudio } from "@/lib/hifzHaptics";
 import { mapAiWords, newMistakes } from "./ai-feedback";
 import { captureRecording } from "./recording";
+import { debugEnabled, rememberDebugUpdates } from "@/lib/hifz-debug";
 
 export type AiRange = { sura: number; first: number; last: number };
 function friendlyError(error: unknown) {
@@ -20,6 +21,8 @@ export function useAiRecitation(page: number, enabled: boolean, keys: string[], 
   const [error, setError] = useState("");
   const [recording, setRecording] = useState<Blob | null>(null);
   const recorder = useRef<ReturnType<typeof captureRecording>>(null);
+  const debugUpdates = useRef<{ elapsed: number; result: CheckResult }[]>([]);
+  const debugStart = useRef(0);
   const keep = useRef(retainStream); keep.current = retainStream;
   const session = useRef<ListenSession | null>(null);
   const cleanup = useRef<Promise<unknown>>(Promise.resolve());
@@ -50,6 +53,7 @@ export function useAiRecitation(page: number, enabled: boolean, keys: string[], 
     if (current) void current.stop().catch(() => undefined);
   }, []);
   const receive = (value: CheckResult) => {
+    if (debugEnabled()) debugUpdates.current.push({ elapsed: (performance.now() - debugStart.current) / 1000, result: structuredClone(value) });
     const { statuses } = mapAiWords(value, wordKeys.current);
     for (const event of newMistakes(previous.current, statuses)) feedback(event);
     previous.current = statuses; setResult(value);
@@ -60,6 +64,7 @@ export function useAiRecitation(page: number, enabled: boolean, keys: string[], 
     starting.current = true;
     const id = generation.current;
     setPhase("loading"); setError(""); setProgress(0); setResult(null); setRecording(null); previous.current = {};
+    debugUpdates.current = [];
     try {
       // Ask from the user's start/consent gesture, before model preparation.
       const mic = capture.current?.getAudioTracks().some((t) => t.readyState === "live") ? capture.current : await navigator.mediaDevices.getUserMedia({ audio: { channelCount: 1, echoCancellation: false, noiseSuppression: true, autoGainControl: true } });
@@ -74,6 +79,7 @@ export function useAiRecitation(page: number, enabled: boolean, keys: string[], 
       const range = ranges[0];
       if (!range) throw new Error("No passage selected");
       try { recorder.current = captureRecording(mic); } catch { recorder.current = null; }
+      debugStart.current = performance.now();
       const current = await ai.startListening({ ...range, passages: ranges, stream: mic, keepStream: keep.current,
         onProgress: setProgress,
         onUpdate: (value) => { if (id === generation.current) receive(value); },
@@ -107,7 +113,7 @@ export function useAiRecitation(page: number, enabled: boolean, keys: string[], 
       const final = await finalizing;
       const blob = await recordingDone;
       if (!keep.current) capture.current = null;
-      if (id === generation.current) { setRecording(blob); receive(final); setPhase("finished"); }
+      if (id === generation.current) { receive(final); if (blob) rememberDebugUpdates(blob, debugUpdates.current); setRecording(blob); setPhase("finished"); }
       return final;
     } catch (error) {
       if (id === generation.current) { setError(friendlyError(error)); setPhase("error"); }

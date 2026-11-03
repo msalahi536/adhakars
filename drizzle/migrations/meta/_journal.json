@@ -50,6 +50,13 @@
       "when": 1793577542320,
       "tag": "0006_hifz_report_metadata_and_grants",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1793675329979,
+      "tag": "0007_restore_private_recitation_reports",
+      "breakpoints": true
     }
   ]
 }
