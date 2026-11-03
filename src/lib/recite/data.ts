@@ -30,6 +30,7 @@ export async function fetchRecitePage(page: number): Promise<RecitePage> {
     cursor = data.pagination.next_page;
   }
   }
+  verses.sort((a,b)=>a.chapter-b.chapter||a.number-b.number);
   return { page, verses };
 }
 export const recitePageOptions = (page: number) => queryOptions({ queryKey: ["fresh-recitation-page", page], queryFn: () => fetchRecitePage(page), staleTime: Infinity });
