@@ -11,7 +11,7 @@ export function useReaderVoice({update,elsewhere,position,answer}:{update:(r:Che
   const [phase,setPhase]=useState("idle"),[mode,setMode]=useState<"smart"|"follow"|"search">("smart");
   const [progress,setProgress]=useState(0),[error,setError]=useState("");
   const [stream,setStream]=useState<MediaStream|null>(null),[recording,setRecording]=useState<Blob|null>(null);
-  const session=useRef<ListenSession|FollowSession|null>(null),generation=useRef(0),busy=useRef(false);
+  const session=useRef<ListenSession|FollowSession|null>(null),generation=useRef(0),busy=useRef(false),segment=useRef(0);
   const capture=useRef<ReturnType<typeof captureRecording>>(null);
   // One recording spans every page of a mic session, but each page restarts the AI clock at 0.
   const clock=useRef<{start:number;offset:number;prev:CheckResult|null}>({start:0,offset:0,prev:null});
@@ -22,13 +22,14 @@ export function useReaderVoice({update,elsewhere,position,answer}:{update:(r:Che
   useEffect(()=>()=>{generation.current++;release();},[]);
   function cancel(){generation.current++;release();busy.current=false;setStream(null);setPhase("idle");setRecording(null);}
   async function begin(){
-    if(busy.current)return;busy.current=true;const id=++generation.current;
+    if(busy.current)return;busy.current=true;const id=++generation.current,part=++segment.current;
+    clock.current={start:performance.now(),offset:0,prev:null};
     release();setRecording(null);setPhase("loading");setError("");setMode(intent.current.mode);quranPlayer.pause();recitationPlayer.pause();
     try{
       const engine=await import("@/lib/hifz-ai");await engine.prepareChecker(p=>{if(id===generation.current)setProgress(p);});
       if(id!==generation.current)return;
       const failure=(e:unknown)=>{if(id!==generation.current)return;release();setStream(null);setPhase("error");setError(e instanceof Error&&e.name==="NotAllowedError"?"Allow microphone access in your browser or phone settings, then retry.":"Couldn’t start listening. Please try again.");};
-      const current=intent.current.mode==="smart"?await engine.startSmartRecite({passages:intent.current.ranges,keepStream:true,onUpdate:r=>{if(id===generation.current)callbacks.current.update(merged(r));},onElsewhere:p=>{if(id===generation.current)callbacks.current.elsewhere(p);},onError:failure}):intent.current.mode==="follow"?await engine.startFollowing({onPosition:p=>{if(id===generation.current)callbacks.current.position(p);},onError:failure}):await engine.startVoiceSearch({maxSeconds:15,onError:failure,onAnswer:a=>{if(id===generation.current){session.current=null;setStream(null);setPhase("idle");callbacks.current.answer(a);}}});
+      const current=intent.current.mode==="smart"?await engine.startSmartRecite({passages:intent.current.ranges,keepStream:true,onUpdate:r=>{if(id===generation.current&&part===segment.current)callbacks.current.update(merged(r));},onElsewhere:p=>{if(id===generation.current&&part===segment.current)callbacks.current.elsewhere(p);},onError:failure}):intent.current.mode==="follow"?await engine.startFollowing({onPosition:p=>{if(id===generation.current)callbacks.current.position(p);},onError:failure}):await engine.startVoiceSearch({maxSeconds:15,onError:failure,onAnswer:a=>{if(id===generation.current){session.current=null;setStream(null);setPhase("idle");callbacks.current.answer(a);}}});
       if(id!==generation.current){current.stream.getTracks().forEach(t=>t.stop());await current.stop();return;}
       session.current=current;setStream(current.stream);setPhase("active");feedback("micStart");
       if(intent.current.mode==="smart"){capture.current=captureRecording(current.stream);clock.current={start:performance.now(),offset:0,prev:null};}
@@ -50,7 +51,7 @@ export function useReaderVoice({update,elsewhere,position,answer}:{update:(r:Che
   }
   async function continueAt(ranges:Range[],fresh=false){
     const current=session.current;if(!current||mode!=="smart"||busy.current)return;
-    busy.current=true;const id=generation.current;const held=current.stream;
+    busy.current=true;const id=generation.current,part=++segment.current;const held=current.stream;
     // Keep the same permission/track while settling the old page's audio context.
     held.getTracks().forEach(t=>t.enabled=false);
     try{
@@ -60,18 +61,23 @@ export function useReaderVoice({update,elsewhere,position,answer}:{update:(r:Che
       // fresh (reset mistakes): forget everything recited so far in this session
       clock.current.prev=fresh?null:last?merged(last):clock.current.prev;
       const engine=await import("@/lib/hifz-ai");
-      const next=await engine.startSmartRecite({passages:ranges,stream:held,keepStream:true,onUpdate:r=>{if(id===generation.current)callbacks.current.update(merged(r));},onElsewhere:p=>{if(id===generation.current)callbacks.current.elsewhere(p);}});
+      clock.current.offset=(performance.now()-clock.current.start)/1000;
+      const next=await engine.startSmartRecite({passages:ranges,stream:held,keepStream:true,onUpdate:r=>{if(id===generation.current&&part===segment.current)callbacks.current.update(merged(r));},onElsewhere:p=>{if(id===generation.current&&part===segment.current)callbacks.current.elsewhere(p);}});
       if(id!==generation.current){next.stream.getTracks().forEach(t=>t.stop());await next.stop();return;}
       // the new page's AI clock started as its mic opened, just now
-      clock.current.offset=(performance.now()-clock.current.start)/1000;
       session.current=next;held.getTracks().forEach(t=>t.enabled=true);intent.current.ranges=ranges;
     }catch{cancel();setError("Listening stopped. Tap the mic to continue.");setPhase("error");}finally{busy.current=false;}
   }
   /** Reset mistakes: clear the session's results; if the mic is on, keep listening from scratch on the same page(s). */
   async function resetMistakes(){
+    if(busy.current)return false;
+    discardRecording();
     clock.current.prev=null;
     if(session.current&&mode==="smart")await continueAt(intent.current.ranges,true);
+    clock.current={start:performance.now(),offset:0,prev:null};
+    if(session.current&&mode==="smart")capture.current=captureRecording(session.current.stream);
+    return true;
   }
-  function discardRecording(){setRecording(null);}
+  function discardRecording(){capture.current?.discard();capture.current=null;setRecording(null);}
   return {phase,mode,progress,error,stream,recording,request,begin,stop,cancel,continueAt,resetMistakes,discardRecording};
 }
