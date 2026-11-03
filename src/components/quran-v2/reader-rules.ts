@@ -7,7 +7,13 @@ export function swipeDestination(page: number, dx: number, dy: number): number {
   return Math.max(1, Math.min(604, page + (dx > 0 ? 1 : -1)));
 }
 export function recitedWord(status: string | undefined) { return status === "correct" || status === "unsure"; }
-export const ELSEWHERE_DELAY = 2000;
+export function visiblePageNumber(pages: {page:number;top:number;bottom:number}[], top:number, bottom:number) {
+  return pages.map(p=>({...p,visible:Math.max(0,Math.min(p.bottom,bottom)-Math.max(p.top,top))}))
+    .filter(p=>p.visible>0).sort((a,b)=>b.visible-a.visible||a.page-b.page)[0]?.page;
+}
+export function passageContains(page:RecitePage, location:{sura:number;aya:number}) {
+  return page.verses.some(v=>v.chapter===location.sura&&v.number===location.aya);
+}
 export function pageRanges(page: RecitePage) {
   return [...new Set(page.verses.map(v=>v.chapter))].map(sura=>{
     const ayat=page.verses.filter(v=>v.chapter===sura).map(v=>v.number);
