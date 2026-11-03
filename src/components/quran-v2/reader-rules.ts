@@ -7,6 +7,28 @@ export function swipeDestination(page: number, dx: number, dy: number): number {
   return Math.max(1, Math.min(604, page + (dx > 0 ? 1 : -1)));
 }
 export function recitedWord(status: string | undefined) { return status === "correct" || status === "unsure"; }
+export function hiddenWordVisible(status: string | undefined, manuallyRevealed = false) {
+  return manuallyRevealed || status === "in_progress" || recitedWord(status) || status === "wrong" || status === "skipped";
+}
+// Decoration may occupy only empty source rows; never replace Quran words.
+export function mushafRows(page: RecitePage) {
+  const words = page.verses.flatMap(v => v.words);
+  const last = Math.max(15, ...words.map(w => w.line));
+  return Array.from({length:last}, (_, i) => {
+    const line = i + 1;
+    const text = words.filter(w => w.line === line);
+    const title = page.verses.find(v => v.number === 1 && v.words[0]?.position === 1 && v.words[0]?.line === line + (v.chapter === 9 ? 1 : 2));
+    const basmala = page.verses.find(v => v.number === 1 && v.chapter !== 1 && v.chapter !== 9 && v.words[0]?.position === 1 && v.words[0]?.line === line + 1);
+    return {line, words:text, title:text.length ? undefined : title?.chapter, basmala:!text.length && !!basmala};
+  });
+}
+export function topReadingWord(words: {key:string;top:number;bottom:number}[], top:number, bottom:number) {
+  return words.filter(w => w.bottom > top && w.top < bottom).sort((a,b)=>a.top-b.top)[0]?.key;
+}
+export function recitationReadingWord(words: ReciteWord[], marks: Marks) {
+  const text = words.filter(w => !w.end);
+  return text.find(w => marks[w.key] === "in_progress")?.key ?? text.findLast(w => ["correct","unsure","wrong","skipped"].includes(marks[w.key]))?.key;
+}
 export function visiblePageNumber(pages: {page:number;top:number;bottom:number}[], top:number, bottom:number) {
   return pages.map(p=>({...p,visible:Math.max(0,Math.min(p.bottom,bottom)-Math.max(p.top,top))}))
     .filter(p=>p.visible>0).sort((a,b)=>b.visible-a.visible||a.page-b.page)[0]?.page;

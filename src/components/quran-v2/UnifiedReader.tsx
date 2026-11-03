@@ -20,7 +20,7 @@ import {VoiceConsent} from "@/components/quran-voice/VoiceConsent";
 import {EchoMode} from "@/components/hifz/EchoMode";
 import {ReaderPage} from "./ReaderPage";
 import {ReaderMistakes,ReaderNavigation,ReaderReciters,ReaderSettings,ReaderSheet,type ReaderPreferences,type ReadingLocation} from "./ReaderSheets";
-import {adjacentPage,nextLayout,pageRanges,swipeDestination,visiblePageNumber,passageContains} from "./reader-rules";
+import {adjacentPage,nextLayout,pageRanges,swipeDestination,visiblePageNumber,passageContains,topReadingWord,recitationReadingWord} from "./reader-rules";
 import {useReaderVoice} from "./use-reader-voice";
 import {SilenceMonitor} from "./SilenceMonitor";
 import "./reader.css";
@@ -45,6 +45,8 @@ export function UnifiedReader({chapterId=1,verse=1,initialPage,initialMode,back,
   const [elsewhere,setElsewhere]=useState<(Elsewhere & {page:number})|null>(null),[recent,setRecent]=useState<ReadingLocation[]>([]),[bookmarks,setBookmarks]=useState<ReadingLocation[]>([]);
   const [reciter,setReciter]=useState(7),[error,setError]=useState(""),[translationMap,setTranslationMap]=useState<Record<string,string>>({});
   const [hizb,setHizb]=useState(1);
+  const [readingKey,setReadingKey]=useState(`${chapterId}:${verse}`);
+  const scrollFrame=useRef<number|null>(null),pendingJump=useRef(false);
   const query=useQuery(recitePageOptions(page));const current=query.data;const currentRef=useRef(current);currentRef.current=current;
   const root=useRef<HTMLDivElement|null>(null),scroll=useRef<HTMLDivElement|null>(null),audio=useRef<HTMLAudioElement|null>(null),jumpTimer=useRef<ReturnType<typeof setTimeout>|null>(null);
   const pointer=useRef<{x:number;y:number;t:number;axis?:"x"|"y"}|null>(null),seenMarks=useRef(new Map<string,string>());
@@ -61,7 +63,7 @@ export function UnifiedReader({chapterId=1,verse=1,initialPage,initialMode,back,
   const player=useQuranPlayer();
   const gotoRef=useRef<(s:number,v?:number,p?:number,retain?:boolean)=>Promise<void>>(async()=>{});
   const voice=useReaderVoice({
-    update:r=>{setResult(r);const next:Marks={};for(const w of r.words){next[w.key]=w.status;if((w.status==="wrong"||w.status==="skipped")&&seenMarks.current.get(w.key)!==w.status)feedback(w.status==="wrong"?"wrong":"skip");seenMarks.current.set(w.key,w.status);}setMarks(next);},
+    update:r=>{setResult(r);const next:Marks={};for(const w of r.words){next[w.key]=w.status;if((w.status==="wrong"||w.status==="skipped")&&seenMarks.current.get(w.key)!==w.status)feedback(w.status==="wrong"?"wrong":"skip");seenMarks.current.set(w.key,w.status);}setMarks(next);const viewed=viewingPage();const key=viewed&&recitationReadingWord(pageWords(viewed),next);if(key)setReadingKey(key.split(":").slice(0,2).join(":"));},
     elsewhere:p=>{
       const token=++locationGeneration.current;
       if(jumpTimer.current)clearTimeout(jumpTimer.current);
@@ -75,7 +77,7 @@ export function UnifiedReader({chapterId=1,verse=1,initialPage,initialMode,back,
         else setElsewhere({...p,page:destination});
       }).catch(()=>setError("Couldn’t locate that ayah. Keep reading or retry."));
     },
-    position:(p:FollowPosition)=>{if(!p.locked)return;const token=++locationGeneration.current;setHighlight(p.key);void followLocation(p.sura,p.aya,p.word).then(target=>{if(token!==locationGeneration.current)return;if(target!==viewingPage()?.page)void gotoRef.current(p.sura,p.aya,target,false);}).catch(()=>undefined);},
+    position:(p:FollowPosition)=>{if(!p.locked)return;const token=++locationGeneration.current;setHighlight(p.key);setReadingKey(`${p.sura}:${p.aya}`);void followLocation(p.sura,p.aya,p.word).then(target=>{if(token!==locationGeneration.current)return;if(target!==viewingPage()?.page)void gotoRef.current(p.sura,p.aya,target,false);}).catch(()=>undefined);},
     answer:a=>{const top=a.matches[0];if(a.confident&&top){void gotoRef.current(top.sura,top.aya,undefined,false).then(()=>{const p=currentRef.current;if(p)void voiceRef.current.request("smart",pageRanges(p));});}else {setError("Not sure yet. Recite a little more.");setSheet("search");}},
   });
   const voiceRef=useRef(voice);voiceRef.current=voice;
@@ -88,12 +90,13 @@ export function UnifiedReader({chapterId=1,verse=1,initialPage,initialMode,back,
   const change=(p:Partial<ReaderPreferences>)=>setPrefs(old=>{const next={...old,...p};localStorage.setItem("quran-v2:preferences",JSON.stringify(next));return next;});
   async function go(s:number,v=1,p?:number,retain=false){
     const navigation=++navigationGeneration.current;locationGeneration.current++;
+    pendingJump.current=true;
     if(jumpTimer.current)clearTimeout(jumpTimer.current);setElsewhere(null);setSheet(null);setError("");
     try{const destination=p??(v>1?(await verseLocation(`${s}:${v}`)).page:await reciteDestinationPage("surah",s));if(!destination)throw new Error("Missing page");
-      const data=await client.ensureQueryData(recitePageOptions(destination));if(navigation!==navigationGeneration.current)return;currentRef.current=data;setPage(destination);setAnchor(destination);setLoaded(true);if(lesson)lesson.onPage?.(destination);
-      requestAnimationFrame(()=>root.current?.querySelector(`[data-q2-page="${destination}"]`)?.scrollIntoView({behavior:retain?"smooth":"instant",block:"start"}));
+      const data=await client.ensureQueryData(recitePageOptions(destination));if(navigation!==navigationGeneration.current)return;currentRef.current=data;setPage(destination);setAnchor(destination);setLoaded(true);setReadingKey(s?`${s}:${v}`:data.verses[0]?.key??"1:1");if(lesson)lesson.onPage?.(destination);
+      requestAnimationFrame(()=>{root.current?.querySelector(`[data-q2-page="${destination}"]`)?.scrollIntoView({behavior:retain?"smooth":"instant",block:"start"});requestAnimationFrame(()=>{pendingJump.current=false;});});
       if(retain)await voiceRef.current.continueAt(pageRanges(data));
-    }catch{setError("Couldn’t open that passage. Please try again.");}
+    }catch{pendingJump.current=false;setError("Couldn’t open that passage. Please try again.");}
   }
   gotoRef.current=go;
   useEffect(()=>{if(initialPage){setPage(initialPage);setAnchor(initialPage);setLoaded(true);}else void go(chapterId,verse);},[chapterId,verse,initialPage]);
@@ -129,8 +132,21 @@ export function UnifiedReader({chapterId=1,verse=1,initialPage,initialMode,back,
     if(!quranPlayer.get().playing)localStorage.setItem("adhkar:quran:last",JSON.stringify({...location,mode:"read"}));
   },[chapters,lesson]);
   const first=current?.verses[0];
-  useEffect(()=>{if(first)void verseLocation(first.key).then(v=>setHizb(v.hizb)).catch(()=>undefined);},[first?.key]);
-  const name=first?.chapter===1?"Al-Fātiḥah":chapters.find(c=>c.id===first?.chapter)?.name_simple??"Quran";
+  useEffect(()=>{let alive=true;void verseLocation(readingKey).then(v=>{if(alive)setHizb(v.hizb);}).catch(()=>undefined);return()=>{alive=false;};},[readingKey]);
+  const readingChapter=Number(readingKey.split(":")[0]);
+  const name=readingChapter===1?"Al-Fātiḥah":chapters.find(c=>c.id===readingChapter)?.name_simple??"Quran";
+  function trackScroll(){
+    if(scrollFrame.current!==null)cancelAnimationFrame(scrollFrame.current);
+    scrollFrame.current=requestAnimationFrame(()=>{
+      scrollFrame.current=null;if(pendingJump.current)return;
+      const viewed=viewingPage();if(viewed)visible(viewed,0);
+      if(voiceRef.current.phase==="active"||lesson?.stream)return;
+      const node=scroll.current;if(!node)return;const bounds=node.getBoundingClientRect();
+      const key=topReadingWord([...node.querySelectorAll<HTMLElement>("[data-q2-word]")].map(el=>{const r=el.getBoundingClientRect();return {key:el.dataset.q2Word??"",top:r.top,bottom:r.bottom};}),bounds.top,bounds.bottom);
+      if(key)setReadingKey(key.split(":").slice(0,2).join(":"));
+    });
+  }
+  useEffect(()=>()=>{if(scrollFrame.current!==null)cancelAnimationFrame(scrollFrame.current);},[]);
   const [tail,setTail]=useState(1);
   useEffect(()=>{setTail(1);visiblePages.current.clear();},[anchor]);
   useEffect(()=>{
@@ -160,7 +176,7 @@ export function UnifiedReader({chapterId=1,verse=1,initialPage,initialMode,back,
   return <Portal><MushafThemeProvider theme={theme} mode={phase} className={`q2-reader q2-theme-${theme} q2-phase-${phase} ${chrome?"q2-chrome-visible":""}`}><div ref={root}>
     <header className="q2-topbar" inert={!chrome}><div className="q2-header-left"><Button variant="ghost" size="icon" aria-label="Back to Quran" onClick={()=>{voice.cancel();back();}}><ChevronLeft/></Button></div><Button variant="ghost" className="q2-location" onClick={()=>setSheet("navigation")}>{voice.phase==="active"&&voice.mode==="follow"?"Following the imam":<>{name}<small>Page {page} · Juz {first?.juz??1} · Hizb {hizb}</small></>}</Button><div className="q2-header-right"><Button variant="ghost" size="icon" aria-label="Search Quran" onClick={()=>setSheet("search")}><Search size={22}/></Button><Button variant="ghost" size="icon" aria-label="Reading appearance" onClick={()=>setSheet("settings")}>Aa</Button></div></header>
     {lesson&&<><div className="q2-lesson-pill">{lesson.pill}</div><div className="q2-lesson-tools">{lesson.tools}</div><SilenceMonitor stream={lesson.stream} onSilence={last=>lesson.onSilence?.(last)}/></>}
-    <div className={`q2-scroll ${singlePage?"q2-paged":""}`} ref={scroll}
+    <div className={`q2-scroll ${singlePage?"q2-paged":""}`} ref={scroll} onScroll={trackScroll}
       onPointerDownCapture={e=>{if(turning.current)return;swiped.current=false;pointer.current={x:e.clientX,y:e.clientY,t:e.timeStamp};}}
       onPointerMove={e=>{const p=pointer.current;if(!p||!singlePage)return;const dx=e.clientX-p.x,dy=e.clientY-p.y;if(!p.axis&&Math.hypot(dx,dy)>10)p.axis=Math.abs(dx)>Math.abs(dy)*1.3?"x":"y";if(p.axis!=="x")return;swiped.current=true;e.currentTarget.setPointerCapture(e.pointerId);const atEnd=swipeDestination(page,dx,0)===page;pageTurn.current?.style.setProperty("--q2-drag",`${dx*(atEnd?.15:.65)}px`);}}
       onPointerCancel={()=>{pointer.current=null;pageTurn.current?.style.removeProperty("--q2-drag");}}
