@@ -62,6 +62,6 @@
 - Hifz page gestures share pure tap/swipe/boundary rules with axis-locked dragging; adjacent query/font caches support animated turns, and page-container revealed-word exceptions keep marking and strip actions separate without modifying supplied components.
 - Hifz mushaf rendering waits for its matching page font and fits all lines with one measured size; tajweed uses word-level indicators in QCF mode, preserving glyphs without claiming unverified character-to-glyph mappings.
 
-- Hifz feedback uses one cancellable Capacitor dispatcher with batched mistake priority and a 1500ms cooldown; CDN sound pointers map supplied effects to events, never replacing qari audio. No visual fallback is dispatched when native haptics are unavailable.
+- Hifz feedback batches mistake priority with a 1500ms cooldown. Gesture-unlocked Web Audio caches/queues supplied CDN effects independently of cancellable Capacitor patterns; exit/configuration cancels both. Qari audio is untouched; no visual fallback.
 - Quran v2 preserves legacy screens, casual mic isolation and hydrated gates. Opening pages use source lines/outlines; visibility ranks pages. Balanced header/dock tracks center title/mic. Supplied mushaf assets stay immutable.
 - Hifz program screens stay outside `src/lib/hifz/`, calling its engine. `/app/hifz` renders `<Outlet />` for `/app/hifz/recite`; `hifz_state_v1` and reminder IDs 910000/911000 avoid retired cleanup.
