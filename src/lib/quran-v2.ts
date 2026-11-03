@@ -14,15 +14,16 @@ export function toggleQuranV2(storage?: Pick<Storage, "getItem" | "setItem">) {
     return enabled;
   } catch { return false; }
 }
-/** A pause starts a fresh sequence; seven and ten remain part of the same sequence. */
-export function createVersionTapCounter(hifz: () => void, quran: () => void, now = () => Date.now()) {
+/** A pause starts a fresh sequence; seven and ten remain part of the same sequence.
+ *  The hifz callback returns true when beta was freshly unlocked, ending the sequence. */
+export function createVersionTapCounter(hifz: () => boolean | void, quran: () => void, now = () => Date.now()) {
   let count = 0, previous = 0;
   return () => {
     const time = now();
     if (time - previous > 1800) count = 0;
     previous = time;
     count++;
-    if (count === 7) hifz();
+    if (count === 7) { if (hifz()) count = 0; }
     if (count === 10) { quran(); count = 0; }
   };
 }
