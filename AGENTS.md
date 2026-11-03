@@ -63,5 +63,5 @@
 - Hifz mushaf rendering waits for its matching page font and fits all lines with one measured size; tajweed uses word-level indicators in QCF mode, preserving glyphs without claiming unverified character-to-glyph mappings.
 
 - Hifz feedback batches mistakes with a 1500ms cooldown. Gesture-unlocked Web Audio plays supplied CDN sounds on live updates, independently of haptic cancellation; never replace qari audio or add visual fallback.
-- Quran v2 preserves gates, mic isolation and assets. Marks drive glow; strips span layouts; header/dock clip text. RTL paging suppresses taps. Mic uses visible-page data; elsewhere jumps need confirmation; location requests reject stale results.
+- Quran v2 preserves gates/mic/assets. Tested helpers govern hidden reveals, empty-row headings and search. Selected/top-visible/live ayahs title the dominant page; header/dock clip. RTL paging suppresses taps; jumps require consent and reject stale locations.
 - Hifz program screens stay outside `src/lib/hifz/`, calling its engine. `/app/hifz` renders `<Outlet />` for `/app/hifz/recite`; `hifz_state_v1` and reminder IDs 910000/911000 avoid retired cleanup.
