@@ -1,4 +1,4 @@
-import {useCallback,useEffect,useRef,useState,type ReactNode} from "react";
+import {useCallback,useEffect,useLayoutEffect,useRef,useState,type ReactNode} from "react";
 import {useQuery,useQueryClient} from "@tanstack/react-query";
 import {Bookmark,ChevronLeft,Eye,EyeOff,MessageSquareCheck,LayoutGrid,Mic,MoreHorizontal,Pause,Play,Repeat,Search,Square,X} from "lucide-react";
 import {toast} from "sonner";
@@ -24,6 +24,7 @@ import {adjacentPage,nextLayout,pageRanges,swipeDestination,visiblePageNumber,pa
 import {useReaderVoice} from "./use-reader-voice";
 import {SilenceMonitor} from "./SilenceMonitor";
 import {debugEnabled} from "@/lib/hifz-debug";
+import {extendWindow,openingWindow,preservedScrollOffset,type PageWindow} from "./scroll-window";
 import "./reader.css";
 async function verseLocation(key:string):Promise<{page:number;hizb:number}>{
  const response=await fetch(`https://api.quran.com/api/v4/verses/by_key/${key}?fields=page_number,hizb_number`);
@@ -37,7 +38,9 @@ export type ReaderLesson={pill:ReactNode;marks:Marks;hidden:boolean;stream:Media
 export function UnifiedReader({chapterId=1,verse=1,initialPage,initialMode,back,lesson}:{chapterId?:number;verse?:number;initialPage?:number;initialMode?:"follow"|"search"|"smart";back:()=>void;lesson?:ReaderLesson}){
   const client=useQueryClient();const chapters=useQuery(reciteChaptersOptions).data??[];
   const [page,setPage]=useState(initialPage??1),[loaded,setLoaded]=useState(!!initialPage);
-  const [anchor,setAnchor]=useState(initialPage??1);
+  const [pageWindow,setPageWindow]=useState<PageWindow>(()=>openingWindow(initialPage??1));
+  const pendingScroll=useRef<{page:number;key?:string;top:number;landing:boolean}|null>(initialPage?{page:initialPage,top:0,landing:true}:null);
+  const loadingBefore=useRef(false);
   const [prefs,setPrefs]=useState<ReaderPreferences>({...DEFAULTS,layout:lesson?"Framed mushaf":"Mushaf text"});
   const [theme,setTheme]=useState("original"),[phase,setPhase]=useState<"morning"|"evening">("morning");
   const [chrome,setChrome]=useState(true),[tabbar,setTabbar]=useState(false),[hidden,setHidden]=useState(false),[revealed,setRevealed]=useState<Set<string>>(new Set());
@@ -96,15 +99,15 @@ export function UnifiedReader({chapterId=1,verse=1,initialPage,initialMode,back,
     const navigation=++navigationGeneration.current;locationGeneration.current++;
     if(jumpTimer.current)clearTimeout(jumpTimer.current);setElsewhere(null);setSheet(null);setError("");
     try{const destination=p??(v>1?(await verseLocation(`${s}:${v}`)).page:await reciteDestinationPage("surah",s));if(!destination)throw new Error("Missing page");
-      const data=await client.ensureQueryData(recitePageOptions(destination));if(navigation!==navigationGeneration.current)return;currentRef.current=data;setPage(destination);setAnchor(destination);setLoaded(true);if(lesson)lesson.onPage?.(destination);
+      const data=await client.ensureQueryData(recitePageOptions(destination));if(navigation!==navigationGeneration.current)return;currentRef.current=data;setPage(destination);setPageWindow(openingWindow(destination));setLoaded(true);if(lesson)lesson.onPage?.(destination);
       const selected=data.verses.find(ayah=>ayah.chapter===s&&ayah.number===v)??data.verses[0];
       selectedReading.current=selected?.key??null;if(selected)setReadingKey(selected.key);
-      requestAnimationFrame(()=>{const container=root.current?.querySelector(`[data-q2-page="${destination}"]`);const word=selected?.words.find(w=>!w.end);(word?container?.querySelector(`[data-q2-word="${word.key}"]`):container)?.scrollIntoView({behavior:retain?"smooth":"instant",block:"start"});});
+      pendingScroll.current={page:destination,key:selected?.words.find(w=>!w.end)?.key,top:0,landing:true};
       if(retain){sessionPassages.current.push(...pageRanges(data));await voiceRef.current.continueAt(pageRanges(data));}
     }catch{setError("Couldn’t open that passage. Please try again.");}
   }
   gotoRef.current=go;
-  useEffect(()=>{if(initialPage){setPage(initialPage);setAnchor(initialPage);setLoaded(true);}else void go(chapterId,verse);},[chapterId,verse,initialPage]);
+  useEffect(()=>{if(initialPage){setPage(initialPage);setPageWindow(openingWindow(initialPage));pendingScroll.current={page:initialPage,top:0,landing:true};setLoaded(true);}else void go(chapterId,verse);},[chapterId,verse,initialPage]);
   const started=useRef(false);
   useEffect(()=>{if(loaded&&current&&initialMode&&!started.current){started.current=true;void voice.request(initialMode,pageRanges(current));}},[loaded,current,initialMode]);
   useEffect(()=>()=>{if(jumpTimer.current)clearTimeout(jumpTimer.current);audio.current?.pause();cancelHifzFeedback();},[]);
@@ -127,6 +130,7 @@ export function UnifiedReader({chapterId=1,verse=1,initialPage,initialMode,back,
   },[voice.phase]);
   const visible=useCallback((candidate:RecitePage,ratio:number)=>{
     visiblePages.current.set(candidate.page,{data:candidate,ratio});
+    if(pendingScroll.current)return;
     const p=viewingPage();if(!p)return;
     if(!selectedReading.current){const container=scroll.current;if(container){const bounds=container.getBoundingClientRect();const key=topReadingWord([...container.querySelectorAll<HTMLElement>(`[data-q2-page="${p.page}"] [data-q2-word]`)].map(el=>{const r=el.getBoundingClientRect();return {key:el.dataset.q2Word??"",top:r.top,bottom:r.bottom};}),bounds.top,bounds.bottom);if(key)setReadingKey(key.split(":").slice(0,2).join(":"));}}
     if(currentRef.current?.page===p.page)return;
@@ -143,16 +147,52 @@ export function UnifiedReader({chapterId=1,verse=1,initialPage,initialMode,back,
   const readingChapter=Number(activeKey.split(":")[0]);
   useEffect(()=>{let alive=true;if(activeKey)void verseLocation(activeKey).then(v=>{if(alive)setHizb(v.hizb);}).catch(()=>undefined);return()=>{alive=false;};},[activeKey]);
   const name=readingChapter===1?"Al-Fātiḥah":chapters.find(c=>c.id===readingChapter)?.name_simple??"Quran";
-  const [tail,setTail]=useState(1);
-  useEffect(()=>{setTail(1);visiblePages.current.clear();},[anchor]);
+  const singlePage=prefs.paging==="swipe"||prefs.layout==="Framed mushaf";
+  // The browser's own anchoring is disabled: restore the same page/word's pixel
+  // position after prepends, including asynchronous font/content layout changes.
+  useLayoutEffect(()=>{
+    const container=scroll.current,body=pageTurn.current;if(!container||!body)return;
+    let frame=0;
+    const restore=()=>{
+      const pending=pendingScroll.current;if(!pending)return;
+      const article=body.querySelector<HTMLElement>(`[data-q2-page="${pending.page}"]`);
+      const target=pending.key?article?.querySelector<HTMLElement>(`[data-q2-word="${pending.key}"]`):article;
+      if(!target)return;
+      const top=target.getBoundingClientRect().top-container.getBoundingClientRect().top;
+      container.scrollTop=preservedScrollOffset(container.scrollTop,pending.top,top);
+      const ready=[...body.querySelectorAll<HTMLElement>("[data-q2-page]")].every(el=>el.querySelector(".q2-page-body"));
+      if(ready){cancelAnimationFrame(frame);frame=requestAnimationFrame(()=>{
+        if(pendingScroll.current!==pending)return;
+        container.scrollTop=preservedScrollOffset(container.scrollTop,pending.top,target.getBoundingClientRect().top-container.getBoundingClientRect().top);
+        pendingScroll.current=null;const viewed=viewingPage();if(viewed)visible(viewed,1);
+      });}
+    };
+    const resize=new ResizeObserver(restore),mutation=new MutationObserver(restore);
+    resize.observe(body);mutation.observe(body,{childList:true,subtree:true});restore();
+    return()=>{resize.disconnect();mutation.disconnect();cancelAnimationFrame(frame);};
+  },[pageWindow,singlePage,page,loaded,prefs.layout,visible]);
+  async function loadEarlier(){
+    const container=scroll.current;
+    if(!container||singlePage||pageWindow.first===1||pendingScroll.current||loadingBefore.current)return;
+    loadingBefore.current=true;const generation=navigationGeneration.current;
+    const next=extendWindow(pageWindow,"before");
+    try{
+      await Promise.all(Array.from({length:pageWindow.first-next.first},(_,i)=>next.first+i).map(async n=>{
+        await client.ensureQueryData(recitePageOptions(n));if(prefs.layout!=="Translation")await loadPageFont(n);
+      }));
+      if(generation!==navigationGeneration.current)return;
+      const viewed=viewingPage();const article=container.querySelector<HTMLElement>(`[data-q2-page="${viewed?.page}"]`);if(!article)return;
+      pendingScroll.current={page:Number(article.dataset.q2Page),top:article.getBoundingClientRect().top-container.getBoundingClientRect().top,landing:false};
+      setPageWindow(old=>({...old,first:next.first}));
+    }catch{setError("Couldn’t load earlier pages. Scroll up to retry.");}finally{loadingBefore.current=false;}
+  }
   useEffect(()=>{
     const node=root.current?.querySelector(".q2-load-next");if(!node||prefs.paging==="swipe"||prefs.layout==="Framed mushaf")return;
-    const observer=new IntersectionObserver(entries=>{if(entries.some(e=>e.isIntersecting))setTail(n=>Math.min(n+2,604-anchor));},{root:scroll.current,rootMargin:"250px"});observer.observe(node);return()=>observer.disconnect();
-  },[tail,anchor,prefs.layout,prefs.paging]);
-  const singlePage=prefs.paging==="swipe"||prefs.layout==="Framed mushaf";
+    const observer=new IntersectionObserver(entries=>{if(!pendingScroll.current&&entries.some(e=>e.isIntersecting))setPageWindow(old=>extendWindow(old,"after"));},{root:scroll.current,rootMargin:"250px"});observer.observe(node);return()=>observer.disconnect();
+  },[pageWindow,prefs.layout,prefs.paging]);
   useEffect(()=>{if(!singlePage)return;for(const n of [page-1,page+1])if(n>=1&&n<=604){void client.prefetchQuery(recitePageOptions(n));if(prefs.layout!=="Translation")void loadPageFont(n);}},[page,singlePage,client,prefs.layout]);
-  useEffect(()=>{scroll.current?.scrollTo({top:0});if(prefs.paging==="scroll")setAnchor(page);},[prefs.paging]);
-  const pages=singlePage?[page]:Array.from({length:Math.min(tail+1,605-anchor)},(_,i)=>anchor+i);
+  useEffect(()=>{pendingScroll.current={page,top:0,landing:true};setPageWindow(openingWindow(page));},[prefs.paging,prefs.layout]);
+  const pages=singlePage?[page]:Array.from({length:pageWindow.last-pageWindow.first+1},(_,i)=>pageWindow.first+i);
   async function turn(destination:number,dx:number){
     if(turning.current||destination===page)return;
     turning.current=true;
@@ -173,7 +213,7 @@ export function UnifiedReader({chapterId=1,verse=1,initialPage,initialMode,back,
     <header className="q2-topbar" inert={!chrome}><div className="q2-header-left"><Button variant="ghost" size="icon" aria-label="Back to Quran" onClick={()=>{voice.cancel();back();}}><ChevronLeft/></Button></div><Button variant="ghost" className="q2-location" onClick={()=>setSheet("navigation")}>{voice.phase==="active"&&voice.mode==="follow"?"Following the imam":<>{name}<small>Page {page} · Juz {first?.juz??1} · Hizb {hizb}</small></>}</Button><div className="q2-header-right"><Button variant="ghost" size="icon" aria-label="Search Quran" onClick={()=>setSheet("search")}><Search size={22}/></Button><Button variant="ghost" size="icon" aria-label="Reading appearance" onClick={()=>setSheet("settings")}>Aa</Button></div></header>
     {lesson&&<><div className="q2-lesson-pill">{lesson.pill}</div><div className="q2-lesson-tools">{lesson.tools}</div><SilenceMonitor stream={lesson.stream} onSilence={last=>lesson.onSilence?.(last)}/></>}
     <div className={`q2-scroll ${singlePage?"q2-paged":""}`} ref={scroll}
-      onScroll={()=>{const p=viewingPage();if(p)visible(p,1);}}
+      onScroll={()=>{const p=viewingPage();if(p)visible(p,1);if((scroll.current?.scrollTop??Infinity)<250)void loadEarlier();}}
       onWheel={()=>{selectedReading.current=null;}}
       onKeyDown={e=>{if(["ArrowDown","ArrowUp","PageDown","PageUp","Home","End"," "].includes(e.key))selectedReading.current=null;}}
       onPointerDownCapture={e=>{if(turning.current)return;swiped.current=false;pointer.current={x:e.clientX,y:e.clientY,t:e.timeStamp};}}
@@ -184,7 +224,7 @@ export function UnifiedReader({chapterId=1,verse=1,initialPage,initialMode,back,
       <div key={singlePage?page:"scroll"} ref={pageTurn} className={`q2-page-turn ${singlePage&&turnDirection?`q2-turn-${turnDirection}`:""}`} onAnimationEnd={()=>setTurnDirection(null)}>
       {loaded?pages.map(n=><ReaderPage key={n} number={n} chapters={chapters} {...prefs} reciting={lesson?!!lesson.stream:voice.phase==="active"||voice.phase==="finishing"} marks={lesson?.marks??marks} hidden={(lesson?.hidden??false)||hidden} revealed={revealed} highlight={lesson?.highlight??highlight} peek={lesson?.peeked} lessonKeys={lesson?.keys} translations={translationMap} onVisible={lesson||singlePage?undefined:visible} onWord={w=>{if(lesson)lesson.onWord(w);else if(hidden)reveal(false);else{setChrome(v=>!v);setTabbar(chrome);}}}/>):<div className="q2-loading">Opening Quran…</div>}
       </div>
-      {!singlePage&&anchor+tail<604&&<Button variant="ghost" className="q2-load-next" onClick={()=>setTail(n=>n+2)}>Next page <ChevronLeft size={15}/></Button>}
+      {!singlePage&&pageWindow.last<604&&<Button variant="ghost" className="q2-load-next" onClick={()=>setPageWindow(old=>extendWindow(old,"after"))}>Next page <ChevronLeft size={15}/></Button>}
     </div>
     <div className="q2-bottom" inert={!chrome}>
       {elsewhere&&<section className="q2-elsewhere"><div>You’re reciting {chapters.find(c=>c.id===elsewhere.sura)?.name_simple} · ayah {elsewhere.aya}</div><Button size="sm" onClick={()=>void go(elsewhere.sura,elsewhere.aya,elsewhere.page,true)}>Go there</Button><Button variant="ghost" size="icon" aria-label="Dismiss recitation location" onClick={()=>{locationGeneration.current++;if(jumpTimer.current)clearTimeout(jumpTimer.current);setElsewhere(null);}}><X size={16}/></Button></section>}
