@@ -52,7 +52,7 @@ export function ReaderSettings({prefs,change,page,chapters,close}:{prefs:ReaderP
 export function ReaderReciters({selected,select,close}:{selected:number;select:(id:number)=>void;close:()=>void}){
   const [q,setQ]=useState("");return <ReaderSheet title="Choose a reciter" close={close}><label className="q2-search"><Search size={16}/><input value={q} onChange={e=>setQ(e.target.value)} placeholder="Search reciters…"/></label>{RECITERS.filter(r=>reciterName(r).toLowerCase().includes(q.toLowerCase())).map(r=><Button variant="ghost" className="q2-nav-row" key={r.id} onClick={()=>select(r.id)}><span>{reciterName(r)}</span>{selected===r.id&&<Check size={16}/>}</Button>)}</ReaderSheet>;
 }
-export function ReaderMistakes({result,recording,tips,chapters,correct,highlight,close,passages,updates,reset}:{result:CheckResult|null;recording:Blob|null;tips:TajweedHint[];chapters:Chapter[];correct:(key:string)=>void;highlight:(key:string|null)=>void;close:()=>void;passages:Passage[];updates:{elapsed:number;result:CheckResult}[];reset:()=>void}){
+export function ReaderMistakes({result,recording,tips,chapters,correct,highlight,close,passages,updates,reset,listening=false,stopMic}:{result:CheckResult|null;recording:Blob|null;tips:TajweedHint[];chapters:Chapter[];correct:(key:string)=>void;highlight:(key:string|null)=>void;close:()=>void;passages:Passage[];updates:{elapsed:number;result:CheckResult}[];reset:()=>void;listening?:boolean;stopMic?:()=>void}){
   const empty:CheckResult={words:[],extras:[],reachedIndex:-1,startIndex:0,startKey:""};
   const replay=useRecitationReplay(recording,result??empty,highlight);
   const words=result?.words.filter(w=>w.status==="wrong"||w.status==="skipped")??[];
@@ -60,8 +60,10 @@ export function ReaderMistakes({result,recording,tips,chapters,correct,highlight
     <ReplayButton available={!!recording&&!!result} playing={replay.playing} play={()=>void replay.play()} stop={replay.stop}/>
     <Button variant="ghost" onClick={()=>{replay.stop();reset();}}><RotateCcw size={16}/>Reset mistakes</Button>
     {result&&<SampleReport result={result} recording={recording} passages={passages} updates={updates}/>}
+    {listening&&<p>Stop the mic to hear how you said each word.</p>}
+    {!listening&&!recording&&!!words.length&&<p>Your recording isn’t available for these mistakes. Recite again with the mic to hear yourself.</p>}
     {!words.length&&<p>No mistakes recorded in this session.</p>}
-    {words.map(w=><section key={w.key} className="q2-mistake-row"><div><strong dir="rtl">{w.text}</strong><small>{chapters.find(c=>c.id===Number(w.key.split(":")[0]))?.name_simple} · ayah {w.key.split(":")[1]} · {w.status}</small></div><div className="q2-segments"><Button variant="outline" onClick={()=>correct(w.key)}>Correct <Play size={14}/></Button><Button variant="outline" disabled={!recording} onClick={()=>void replay.play(w.key)}>You <Play size={14}/></Button></div></section>)}
+    {words.map(w=><section key={w.key} className="q2-mistake-row"><div><strong dir="rtl">{w.text}</strong><small>{chapters.find(c=>c.id===Number(w.key.split(":")[0]))?.name_simple} · ayah {w.key.split(":")[1]} · {w.status}</small></div><div className="q2-segments"><Button variant="outline" onClick={()=>correct(w.key)}>Correct <Play size={14}/></Button><Button variant="outline" disabled={!recording&&!listening} onClick={()=>{if(listening){stopMic?.();return;}void replay.play(w.key);}}>You <Play size={14}/></Button></div></section>)}
     {!!tips.length&&<><h3>Tajweed tips</h3>{tips.map(t=><section key={t.key} className="q2-mistake-row"><strong dir="rtl">{t.text}</strong><small>{t.kind}</small><p>{t.tip}</p><Button variant="ghost" onClick={()=>correct(t.key)}><Play size={15}/>Listen</Button></section>)}<small>Experimental tips, not a tajweed grade. Check with a qualified teacher.</small></>}
     {replay.error&&<p role="alert">{replay.error}</p>}
   </ReaderSheet>;
