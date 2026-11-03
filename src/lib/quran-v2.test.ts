@@ -4,15 +4,20 @@ test("only exact quran_v2=1 enables the new screens", () => {
   for (const value of [null,"0","true","01"]) expect(readQuranV2({getItem:()=>value})).toBe(false);
   expect(readQuranV2({getItem:()=>"1"})).toBe(true);
 });
-test("seven taps toggle Hifz and continuing to ten also toggles Quran", () => {
-  let h=0,q=0; const tap=createVersionTapCounter(()=>h++,()=>q++,()=>100);
+test("a fresh seven-tap unlock ends the sequence, so taps 8-10 never toggle Quran", () => {
+  let h=0,q=0; const tap=createVersionTapCounter(()=>{h++;return h===1;},()=>q++,()=>100);
   for(let i=0;i<6;i++)tap(); expect(h).toBe(0);expect(q).toBe(0);
   tap();expect(h).toBe(1);expect(q).toBe(0);
-  tap();tap();expect(q).toBe(0);tap();expect(q).toBe(1);
-  for(let i=0;i<10;i++)tap();expect(h).toBe(2);expect(q).toBe(2);
+  for(let i=0;i<3;i++)tap();expect(q).toBe(0);
+});
+test("with Hifz already on, a run of taps turns it off and toggles Quran at ten", () => {
+  let q=0,beta=true; const tap=createVersionTapCounter(()=>{beta=!beta;return beta;},()=>q++,()=>100);
+  for(let i=0;i<10;i++)tap();expect(beta).toBe(false);expect(q).toBe(1);
+  for(let i=0;i<7;i++)tap();expect(beta).toBe(true);expect(q).toBe(1);
+  for(let i=0;i<3;i++)tap();expect(q).toBe(1);
 });
 test("a separated seven-tap sequence continues to toggle Hifz",()=>{
-  let h=0,q=0,t=100;const tap=createVersionTapCounter(()=>h++,()=>q++,()=>t);
+  let h=0,q=0,t=100;const tap=createVersionTapCounter(()=>{h++;return h===1;},()=>q++,()=>t);
   for(let i=0;i<7;i++)tap();t+=2000;for(let i=0;i<7;i++)tap();expect(h).toBe(2);expect(q).toBe(0);
 });
 test("Quran toggle preserves existing progress",()=>{
