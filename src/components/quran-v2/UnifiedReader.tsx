@@ -10,7 +10,7 @@ import {mushafThemeId} from "@/components/recite/mushaf-theme";
 import {getPresetId,resolveVisualPhase} from "@/lib/theme-store";
 import {findReciter,reciterName,type Chapter} from "@/lib/quran";
 import {quranPlayer,useQuranPlayer} from "@/lib/quran-player";
-import {reciteChaptersOptions,reciteDestinationPage,recitePageOptions} from "@/lib/recite/data";
+import {loadPageFont,reciteChaptersOptions,reciteDestinationPage,recitePageOptions} from "@/lib/recite/data";
 import {pageWords,type Marks,type RecitePage,type ReciteWord} from "@/lib/recite/model";
 import type {CheckResult,Elsewhere,FollowPosition,TajweedHint} from "@/lib/hifz-ai";
 import {AI_DISCLAIMER} from "@/lib/hifz-ai/notices";
@@ -124,14 +124,14 @@ export function UnifiedReader({chapterId=1,verse=1,initialPage,initialMode,back,
     const observer=new IntersectionObserver(entries=>{if(entries.some(e=>e.isIntersecting))setTail(n=>Math.min(n+2,604-anchor));},{root:scroll.current,rootMargin:"250px"});observer.observe(node);return()=>observer.disconnect();
   },[tail,anchor,prefs.layout,prefs.paging]);
   const singlePage=prefs.paging==="swipe"||prefs.layout==="Framed mushaf";
-  useEffect(()=>{if(!singlePage)return;for(const n of [page-1,page+1])if(n>=1&&n<=604)void client.prefetchQuery(recitePageOptions(n));},[page,singlePage,client]);
+  useEffect(()=>{if(!singlePage)return;for(const n of [page-1,page+1])if(n>=1&&n<=604){void client.prefetchQuery(recitePageOptions(n));if(prefs.layout!=="Translation")void loadPageFont(n);}},[page,singlePage,client,prefs.layout]);
   useEffect(()=>{scroll.current?.scrollTo({top:0});if(prefs.paging==="scroll")setAnchor(page);},[prefs.paging]);
   const pages=singlePage?[page]:Array.from({length:Math.min(tail+1,605-anchor)},(_,i)=>anchor+i);
   async function turn(destination:number,dx:number){
     if(turning.current||destination===page)return;
     turning.current=true;
     try{
-      await client.ensureQueryData(recitePageOptions(destination));
+      await Promise.all([client.ensureQueryData(recitePageOptions(destination)),prefs.layout!=="Translation"?loadPageFont(destination):Promise.resolve()]);
       setTurnDirection(dx>0?"forward":"backward");
       await go(0,1,destination);
       scroll.current?.scrollTo({top:0});
