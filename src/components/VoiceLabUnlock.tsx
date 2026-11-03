@@ -1,6 +1,6 @@
 import { useRef } from "react";
 import { Button } from "@/components/ui/button";
-import { toggleHifzBeta, readHifzBeta } from "@/lib/hifz-beta";
+import { toggleHifzBeta } from "@/lib/hifz-beta";
 import { createVersionTapCounter, toggleQuranV2, readQuranV2 } from "@/lib/quran-v2";
 import { toast } from "sonner";
 import { DebugSettings } from "@/components/recite/DebugSettings";
