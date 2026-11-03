@@ -1,4 +1,5 @@
 # Roadmap
+- [ ] Strengthen live current/done word presentation without changing the AI engine; add saved page-by-page RTL swipes across all Quran v2 layouts and verify navigation/persistence.
 - [x] Fix active correct/unsure glow and inferred/current word, shared surah strips/Bismillah across layouts and scroll clipping below header. Page50/page604 and phone/desktop screenshots verified; controlled live fixture preserves wrong/skipped, 6 tests pass. AI engine and mic hook untouched.
 - [x] Guard the stopped result before merging; preview typecheck now reports build OK and 6 reader tests pass. AI engine unchanged.
 - [x] Match precision Quran reader reference: viewport-centered title/mic measured at 393/360/1280px, continuous frosted dock, balanced source-line opening pages and retained 15-line page3. Screenshots in /tmp/browser/precision-reader; search/settings/hide/mistakes/more/playback and mic consent checked, no browser errors; four reader tests pass. Actual-phone microphone and native safe-area behavior remain unverified.
