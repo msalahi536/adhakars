@@ -11,7 +11,7 @@ import {juzPages} from "@/lib/hifz";
 import type {CheckResult,TajweedHint} from "@/lib/hifz-ai";
 import {ReplayButton,useRecitationReplay} from "@/components/recite/RecitationReplay";
 import {ReaderPage} from "./ReaderPage";
-import {LAYOUTS,type ReaderLayout,type ReaderPaging} from "./reader-rules";
+import {LAYOUTS,matchesSurahSearch,type ReaderLayout,type ReaderPaging} from "./reader-rules";
 
 export type ReaderPreferences={layout:ReaderLayout;paging:ReaderPaging;size:number;tajweed:boolean;highlight:boolean;follow:boolean;arabic:boolean;translit:boolean;translation:boolean;translitSize:number;translationSize:number;translator:number;english:boolean};
 export type ReadingLocation={s:number;v:number;page:number;name:string};
@@ -28,7 +28,7 @@ export function ReaderNavigation({chapters,recent,bookmarks,go,close}:{chapters:
     <label className="q2-search"><Search size={17}/><input value={q} onChange={e=>setQ(e.target.value)} placeholder="Search surahs…"/></label>
     <div className="q2-nav-list">
       {tab==="Bookmarks"?bookmarks.length?bookmarks.map(r=><Button variant="ghost" className="q2-nav-row" key={`${r.s}:${r.v}`} onClick={()=>go(r.s,r.v,r.page)}><Bookmark size={16}/>{r.name} · {r.v}<small>Page {r.page}</small></Button>):<p>No bookmarks yet.</p>:Array.from({length:30},(_,i)=>i+1).map(j=>{
-        const [a,b]=juzPages(j);const list=chapters.filter(c=>start(c.id)>=a&&start(c.id)<=b&&`${c.name_simple} ${c.name_arabic} ${c.id}`.toLowerCase().includes(q.toLowerCase()));
+        const [a,b]=juzPages(j);const list=chapters.filter(c=>start(c.id)>=a&&start(c.id)<=b&&matchesSurahSearch(c,q));
         if(tab==="Surahs"&&!list.length)return null;
         return <section key={j} id={`q2-juz-${j}`}><Button variant="ghost" className="q2-juz-heading" onClick={()=>go(0,1,a)}>Juz {j}<small>Page {a}</small><ChevronRight size={15}/></Button>{tab==="Surahs"&&list.map(c=><Button variant="ghost" className="q2-nav-row" key={c.id} onClick={()=>go(c.id)}><span className="q2-number">{c.id}</span><span>{c.name_simple}<small>{c.verses_count} ayat · Page {start(c.id)}</small></span><span className="q2-surah-name" aria-label={c.name_arabic}>{String(c.id).padStart(3,"0")}</span></Button>)}</section>;
       })}
