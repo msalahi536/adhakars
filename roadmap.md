@@ -1,4 +1,5 @@
 # Roadmap
+- [ ] Enable two-way Quran v2 scrolling with stable prepends, exact passage landing, full-range reverse swipes and visible-page tracking; verify the three requested surah transitions.
 - [x] Restore adult-confirmed private reports in Quran v2 mistakes and existing Hifz results through shared restored modules; real Quran recording sent after 18+ confirmation, owner readback succeeded and UI deletion left zero files/rows. Private bucket and restoration migration applied. Hifz full lesson and physical-phone behavior remain unverified.
 - [x] Restore seven-tap-only Settings debug toggle and local recording/raw-output/timing ZIP exports in both result screens; real Quran ZIP contained recording, 68 raw-output timings and 24 callback updates. Hifz captures reuse its current mic without engine edits. 35 targeted regressions passed; preview build OK.
 - [x] Restore all six exact backup debug/hifz Al-Ikhlas recordings/diagnostics/README entries; byte-for-byte comparison passed. Protected engines and voice hook untouched.
