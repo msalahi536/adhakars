@@ -50,7 +50,7 @@ export function useReaderVoice({update,elsewhere,position,answer}:{update:(r:Che
     finally{if(id===generation.current)busy.current=false;}
   }
   async function continueAt(ranges:Range[],fresh=false){
-    const current=session.current;if(!current||mode!=="smart"||busy.current)return;
+    const current=session.current;if(!current||mode!=="smart"||busy.current)return false;
     busy.current=true;const id=generation.current,part=++segment.current;const held=current.stream;
     // Keep the same permission/track while settling the old page's audio context.
     held.getTracks().forEach(t=>t.enabled=false);
@@ -66,6 +66,7 @@ export function useReaderVoice({update,elsewhere,position,answer}:{update:(r:Che
       if(id!==generation.current){next.stream.getTracks().forEach(t=>t.stop());await next.stop();return;}
       // the new page's AI clock started as its mic opened, just now
       session.current=next;held.getTracks().forEach(t=>t.enabled=true);intent.current.ranges=ranges;
+      return true;
     }catch{cancel();setError("Listening stopped. Tap the mic to continue.");setPhase("error");}finally{busy.current=false;}
   }
   /** Reset mistakes: clear the session's results; if the mic is on, keep listening from scratch on the same page(s). */

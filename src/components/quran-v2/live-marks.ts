@@ -3,11 +3,13 @@ import { currentRecitationWord, hiddenWordVisible, recitedWord } from "./reader-
 
 /** Apply feedback before React renders the surrounding reader or asynchronous tips. */
 export function paintLiveWords(root: ParentNode, marks: Marks, active: boolean, highlight: string | null = null) {
+  const all = [...root.querySelectorAll<HTMLElement>("[data-q2-page]:not(.q2-preview) [data-q2-word]")];
+  const words = all.map(node => ({key:node.dataset.q2Word??"",end:false} as ReciteWord));
+  const explicit = Object.keys(marks).find(key => marks[key] === "in_progress");
+  const current = active ? explicit ?? currentRecitationWord(words,marks,true) : undefined;
   for (const page of root.querySelectorAll<HTMLElement>("[data-q2-page]")) {
     if (page.classList.contains("q2-preview")) continue;
     const nodes = [...page.querySelectorAll<HTMLElement>("[data-q2-word]")];
-    const words = nodes.map(node => ({ key: node.dataset.q2Word ?? "", end: false } as ReciteWord));
-    const current = currentRecitationWord(words, marks, active);
     for (const node of nodes) {
       const key = node.dataset.q2Word ?? "", status = marks[key];
       node.classList.toggle("q2-recited", recitedWord(status));

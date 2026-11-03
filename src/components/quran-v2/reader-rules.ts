@@ -46,8 +46,8 @@ export function visiblePageNumber(pages: {page:number;top:number;bottom:number}[
   return pages.map(p=>({...p,visible:Math.max(0,Math.min(p.bottom,bottom)-Math.max(p.top,top))}))
     .filter(p=>p.visible>0).sort((a,b)=>b.visible-a.visible||a.page-b.page)[0]?.page;
 }
-export function passageContains(page:RecitePage, location:{sura:number;aya:number}) {
-  return page.verses.some(v=>v.chapter===location.sura&&v.number===location.aya);
+export function passageContains(page:RecitePage, location:{sura:number;aya:number;word?:number}) {
+  return page.verses.some(v=>v.chapter===location.sura&&v.number===location.aya&&(location.word===undefined||v.words.some(w=>!w.end&&w.position===location.word)));
 }
 export function pageRanges(page: RecitePage) {
   return [...new Set(page.verses.map(v=>v.chapter))].map(sura=>{

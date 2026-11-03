@@ -1,4 +1,4 @@
-import { useLayoutEffect, useRef, useState, type ReactNode } from "react";
+import { memo, useLayoutEffect, useRef, useState, type ReactNode } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { loadPageFont, recitePageOptions } from "@/lib/recite/data";
 import { useEffect } from "react";
@@ -9,7 +9,7 @@ import type { Chapter } from "@/lib/quran";
 import type { Marks, RecitePage, ReciteWord } from "@/lib/recite/model";
 import { currentRecitationWord, hiddenWordVisible, mushafRows, recitedWord, type ReaderLayout } from "./reader-rules";
 
-export function ReaderPage({number,chapters,layout,marks,hidden,revealed,highlight,size,tajweed,arabic,translit,translation,translitSize,translationSize,onVisible,onWord,preview=false,translations,peek=false,lessonKeys,reciting=false}: {
+export const ReaderPage = memo(function ReaderPage({number,chapters,layout,marks,hidden,revealed,highlight,size,tajweed,arabic,translit,translation,translitSize,translationSize,onVisible,onWord,preview=false,translations,peek=false,lessonKeys,reciting=false}: {
   number:number;chapters:Chapter[];layout:ReaderLayout;marks:Marks;hidden:boolean;revealed:Set<string>;highlight:string|null;size:number;tajweed:boolean;arabic:boolean;translit:boolean;translation:boolean;translitSize:number;translationSize:number;
   onVisible?:(page:RecitePage,ratio:number)=>void;onWord?:(word:ReciteWord)=>void;preview?:boolean;translations?:Record<string,string>;peek?:boolean;lessonKeys?:Set<string>;reciting?:boolean;
 }) {
@@ -69,4 +69,4 @@ export function ReaderPage({number,chapters,layout,marks,hidden,revealed,highlig
     {query.isError?<div className="q2-loading"><p>Couldn’t load this page.</p><Button variant="outline" onClick={()=>void query.refetch()}>Retry page</Button></div>:!page||(!font&&layout!=="Translation")?<div className="q2-loading" role="status">{failed?<>The page font couldn’t load.<Button variant="outline" onClick={()=>setRetry(n=>n+1)}>Retry font</Button></>:"Loading mushaf…"}</div>:layout==="Framed mushaf"?<MushafFrame scale={.5} className="q2-frame">{content}</MushafFrame>:content}
     <footer className="q2-page-divider">{number}</footer>
   </article>;
-}
+});
