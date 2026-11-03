@@ -5,12 +5,22 @@ const API = "https://api.quran.com/api/v4";
 type RawVerse = { verse_key: string; verse_number: number; juz_number: number; translations?: { text: string }[]; words: { position: number; page_number: number; line_number: number; text_uthmani: string; text_uthmani_tajweed?: string; code_v2: string; char_type_name: string; audio_url?: string; translation?: { text: string }; transliteration?: { text: string } }[] };
 export async function fetchRecitePage(page: number): Promise<RecitePage> {
   const verses: ReciteVerse[] = [];
+  // by_page uses verse-level membership: a verse starting on the preceding
+  // page may still have words here. Fetch both memberships, then filter words.
+  const raw = new Map<string, RawVerse>();
+  for (const membership of page > 1 ? [page - 1, page] : [page]) {
   let cursor: number | null = 1;
   while (cursor) {
-    const res = await fetch(`${API}/verses/by_page/${page}?words=true&word_fields=text_uthmani,text_uthmani_tajweed,code_v2,line_number,page_number,audio_url&fields=page_number,juz_number&translations=20&language=en&per_page=50&page=${cursor}`);
+    const res = await fetch(`${API}/verses/by_page/${membership}?words=true&word_fields=text_uthmani,text_uthmani_tajweed,code_v2,line_number,page_number,audio_url&fields=page_number,juz_number&translations=20&language=en&per_page=50&page=${cursor}`);
     if (!res.ok) throw new Error("This page could not be loaded. Please check your connection.");
     const data = await res.json() as { verses: RawVerse[]; pagination: { next_page: number | null } };
-    for (const v of data.verses) verses.push({
+    for (const v of data.verses) raw.set(v.verse_key,v);
+    cursor = data.pagination.next_page;
+  }
+  }
+  for (const v of [...raw.values()].sort((a,b)=>Number(a.verse_key.split(":")[0])-Number(b.verse_key.split(":")[0])||a.verse_number-b.verse_number)) {
+    if(!v.words.some(w=>w.page_number===page))continue;
+    verses.push({
       key: v.verse_key, number: v.verse_number, chapter: Number(v.verse_key.split(":")[0]), juz: v.juz_number,
       translation: stripTags(v.translations?.[0]?.text ?? ""),
       words: v.words.filter((w) => w.page_number === page).map((w) => ({
@@ -20,7 +30,6 @@ export async function fetchRecitePage(page: number): Promise<RecitePage> {
         translation: stripTags(w.translation?.text ?? ""), transliteration: w.transliteration?.text ?? "",
       })),
     });
-    cursor = data.pagination.next_page;
   }
   return { page, verses };
 }
