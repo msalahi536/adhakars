@@ -2,6 +2,15 @@ import type { Marks, RecitePage, ReciteWord } from "@/lib/recite/model";
 export const LAYOUTS = ["Mushaf text", "Framed mushaf", "Translation"] as const;
 export type ReaderLayout = typeof LAYOUTS[number];
 export type ReaderPaging = "scroll" | "swipe";
+export function normalizeSurahSearch(value: string) {
+  return value.normalize("NFD").replace(/[\u0300-\u036f\u0610-\u061a\u064b-\u065f\u0670\u06d6-\u06edـ]/g,"").replace(/[أإآٱ]/g,"ا").replace(/ى/g,"ي").replace(/ة/g,"ه").toLowerCase().trim().replace(/^سوره\s*/,"").replace(/^ال/,"").replace(/^al[\s-]+/,"").replace(/[\s'’\-]/g,"");
+}
+export function matchesSurahSearch(chapter: {id:number;name_simple:string;name_arabic:string}, query:string) {
+  const q=normalizeSurahSearch(query);
+  if(!q)return true;
+  if(/^\d+$/.test(q))return chapter.id===Number(q);
+  return [chapter.name_simple,chapter.name_arabic].some(name=>normalizeSurahSearch(name).includes(q));
+}
 export function swipeDestination(page: number, dx: number, dy: number): number {
   if (Math.abs(dx) < 65 || Math.abs(dx) <= Math.abs(dy) * 1.3) return page;
   return Math.max(1, Math.min(604, page + (dx > 0 ? 1 : -1)));

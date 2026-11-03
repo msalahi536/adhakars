@@ -1,6 +1,15 @@
 import {test,expect} from "bun:test";
-import {adjacentPage,completedReading,currentRecitationWord,nextLayout,recitedWord,swipeDestination,visiblePageNumber,passageContains,hiddenWordVisible,mushafRows,topReadingWord,recitationReadingWord} from "./reader-rules";
+import {adjacentPage,completedReading,currentRecitationWord,nextLayout,recitedWord,swipeDestination,visiblePageNumber,passageContains,hiddenWordVisible,mushafRows,topReadingWord,recitationReadingWord,matchesSurahSearch,normalizeSurahSearch} from "./reader-rules";
 import type {ReciteWord,RecitePage} from "@/lib/recite/model";
+test("Arabic names, optional prefixes and number 67 find Al-Mulk",()=>{
+ const c={id:67,name_simple:"Al-Mulk",name_arabic:"الملك"};
+ for(const q of ["الملك","ملك","سورة الملك","سُورَةُ الْمُلْك","67","mulk"])expect(matchesSurahSearch(c,q)).toBe(true);
+ expect(matchesSurahSearch(c,"68")).toBe(false);expect(matchesSurahSearch(c,"البقرة")).toBe(false);
+ expect(matchesSurahSearch({id:2,name_simple:"Al-Baqarah",name_arabic:"البقرة"},"baqara")).toBe(true);
+});
+test("Arabic normalization removes elongation and standardizes letter variants",()=>{
+ expect(normalizeSurahSearch("سُورَةُ ٱلْأإآـىة")).toBe("ااايه");
+});
 test("recitation uses the scrolled page with the most visible pixels, not a shorter neighbor",()=>{
  expect(visiblePageNumber([{page:49,top:-200,bottom:150},{page:50,top:150,bottom:1450}],100,850)).toBe(50);
 });

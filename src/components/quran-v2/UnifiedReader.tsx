@@ -20,7 +20,7 @@ import {VoiceConsent} from "@/components/quran-voice/VoiceConsent";
 import {EchoMode} from "@/components/hifz/EchoMode";
 import {ReaderPage} from "./ReaderPage";
 import {ReaderMistakes,ReaderNavigation,ReaderReciters,ReaderSettings,ReaderSheet,type ReaderPreferences,type ReadingLocation} from "./ReaderSheets";
-import {adjacentPage,nextLayout,pageRanges,swipeDestination,visiblePageNumber,passageContains,topReadingWord,recitationReadingWord} from "./reader-rules";
+import {adjacentPage,nextLayout,pageRanges,swipeDestination,visiblePageNumber,passageContains,topReadingWord,recitationReadingWord,matchesSurahSearch} from "./reader-rules";
 import {useReaderVoice} from "./use-reader-voice";
 import {SilenceMonitor} from "./SilenceMonitor";
 import "./reader.css";
@@ -208,4 +208,4 @@ export function UnifiedReader({chapterId=1,verse=1,initialPage,initialMode,back,
     {lesson?.overlays}
   </div></MushafThemeProvider></Portal>;
 }
-function ReaderSearch({chapters,go}:{chapters:Chapter[];go:(s:number,v?:number,p?:number)=>Promise<void>}){const[q,setQ]=useState("");return <><label className="q2-search"><Search size={17}/><input value={q} onChange={e=>setQ(e.target.value)} placeholder="Surah name or ayah (67:3)"/></label>{/^\d+:\d+$/.test(q)&&<Button variant="outline" onClick={()=>{const[s,v]=q.split(":").map(Number);void go(s,v);}}>Open {q}</Button>}{chapters.filter(c=>`${c.name_simple} ${c.id}`.toLowerCase().includes(q.toLowerCase())).map(c=><Button variant="ghost" className="q2-nav-row" key={c.id} onClick={()=>void go(c.id)}>{c.name_simple}<span className="q2-surah-name">{String(c.id).padStart(3,"0")}</span></Button>)}</>;}
+function ReaderSearch({chapters,go}:{chapters:Chapter[];go:(s:number,v?:number,p?:number)=>Promise<void>}){const[q,setQ]=useState("");return <><label className="q2-search"><Search size={17}/><input value={q} onChange={e=>setQ(e.target.value)} placeholder="Surah name or ayah (67:3)"/></label>{/^\d+:\d+$/.test(q)&&<Button variant="outline" onClick={()=>{const[s,v]=q.split(":").map(Number);void go(s,v);}}>Open {q}</Button>}{chapters.filter(c=>matchesSurahSearch(c,q)).map(c=><Button variant="ghost" className="q2-nav-row" key={c.id} onClick={()=>void go(c.id)}>{c.name_simple}<span className="q2-surah-name">{String(c.id).padStart(3,"0")}</span></Button>)}</>;}
