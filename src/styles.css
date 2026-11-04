@@ -977,6 +977,27 @@ html[data-visual-phase="evening"] .daily-swipe-stack .adhkar-index-row > span {
 .daily-swipe-stack .adhkar-index-row:has(.adhkar-card-action) > span { position: absolute; left: 50%; transform: translateX(-50%); }
 .adhkar-card-action.is-icon-only { width: 30px; height: 30px; padding: 0; border: 1px solid var(--card-border, var(--border)); background: var(--pill-bg, var(--source-bg)) !important; color: var(--source-fg, var(--title)) !important; backdrop-filter: blur(12px); }
 .adhkar-card-action.is-delete { color: var(--destructive) !important; }
+.daily-swipe-stack .adhkar-index-row--paged { gap: 12px; }
+.daily-swipe-stack .adhkar-index-row--paged > span { margin: 0 !important; height: 36px; padding: 0 14px; font-size: 13px; }
+.daily-swipe-stack .adhkar-index-row .adhkar-index-arrow {
+  width: 36px;
+  height: 36px;
+  flex: 0 0 36px;
+  border: 1px solid rgba(255, 255, 255, 0.92);
+  background: rgba(250, 248, 241, 0.86);
+  color: var(--title);
+  box-shadow: 0 2px 8px color-mix(in oklab, var(--title) 5%, transparent);
+  backdrop-filter: blur(8px);
+}
+html[data-visual-phase="evening"] .adhkar-index-arrow {
+  border: none;
+  background: rgba(82, 81, 96, 0.5);
+  color: rgba(224, 224, 224, 1);
+  box-shadow: none;
+  backdrop-filter: blur(8px);
+}
+.adhkar-index-hint { position: absolute; top: calc(100% + 8px); left: 50%; z-index: 30; width: max-content; max-width: min(216px, calc(100vw - 56px)); padding: 7px 11px; border: 1px solid color-mix(in oklab, var(--accent) 24%, var(--border)); border-radius: 12px; background: color-mix(in oklab, var(--card) 92%, transparent); color: var(--foreground); font-size: 11px; line-height: 1.4; text-align: center; box-shadow: 0 6px 18px color-mix(in oklab, var(--foreground) 14%, transparent); backdrop-filter: blur(8px); transform: translateX(-50%); pointer-events: none; animation: pag-hint-in .3s ease both; }
+.adhkar-index-hint::after { position: absolute; bottom: 100%; left: 50%; width: 1.5px; height: 12px; border-radius: 1px; background: color-mix(in oklab, var(--accent) 55%, var(--border)); content: ""; transform: translateX(-50%); }
 
 .sleep-adhkar-header { position: relative; flex-shrink: 0; min-height: 196px; }
 .sleep-adhkar-header .adhkar-header { min-height: 160px; }

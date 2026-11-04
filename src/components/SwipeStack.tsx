@@ -6,7 +6,6 @@ import { ChevronLeft, ChevronRight, RotateCcw, ArrowRight, Pencil, Plus, Trash2 
 import type { SalahItem } from "@/data/salah";
 import { triggerHaptic } from "@/lib/theme";
 import { isItemComplete, itemId } from "@/data/salah";
-import { Pagination } from "./AdhkarPrimitives";
 import { RecitationPlaylistContext, playlistLabel } from "./RecitationPlaylist";
 
 type Props = {
@@ -27,6 +26,8 @@ type Phase = "idle" | "out-left" | "out-right" | "in-left" | "in-right";
 
 const OUT_MS = 280;
 const IN_MS = 320;
+
+const HINT_KEY = "adhkar:hint-pagination-v2";
 
 const readPersistedIdx = (key?: string): number => {
   if (!key || typeof window === "undefined") return 0;
@@ -122,6 +123,47 @@ export function SwipeStack({ items, counts, onIncrement, onReset, persistKey, fi
   scrubRef.current = (i) => scrubTo(i);
   const goToRef = useRef<(i: number) => void>(() => {});
   goToRef.current = (i) => goTo(i);
+  const idxRef = useRef(idx);
+  idxRef.current = idx;
+
+  // Hold an arrow to fly through the cards quickly (same acceleration as the old scrubber).
+  const holdTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const stopHold = () => {
+    if (holdTimerRef.current) {
+      clearTimeout(holdTimerRef.current);
+      holdTimerRef.current = null;
+    }
+  };
+  useEffect(() => stopHold, []);
+  const startHold = (dir: 1 | -1) => {
+    stopHold();
+    dismissIndexHint();
+    const step = (delay: number) => {
+      holdTimerRef.current = setTimeout(() => {
+        const next = idxRef.current + dir;
+        if (next < 0 || next > items.length - 1) {
+          stopHold();
+          return;
+        }
+        scrubRef.current(next);
+        void triggerHaptic("light");
+        // Accelerate: 340ms → 240ms → 150ms → 100ms floor
+        step(Math.max(100, Math.round(delay * 0.7)));
+      }, delay);
+    };
+    step(380);
+  };
+
+  // One-time hint above the arrows (same localStorage flag the old scrubber used).
+  const [showIndexHint, setShowIndexHint] = useState(false);
+  useEffect(() => {
+    try { if (localStorage.getItem(HINT_KEY) !== "1") setShowIndexHint(true); } catch { /* ignore */ }
+  }, []);
+  const dismissIndexHint = () => {
+    if (!showIndexHint) return;
+    setShowIndexHint(false);
+    try { localStorage.setItem(HINT_KEY, "1"); } catch { /* ignore */ }
+  };
   useEffect(() => {
     const onTrack = (e: Event) => {
       const id = (e as CustomEvent<string>).detail;
@@ -272,13 +314,52 @@ export function SwipeStack({ items, counts, onIncrement, onReset, persistKey, fi
   return (
     <RecitationPlaylistContext.Provider value={playlist}>
     <div className={`flex flex-1 flex-col overflow-hidden ${dailyLayout ? "daily-swipe-stack" : ""}`}>
-      <div className="adhkar-index-row mb-1 flex min-h-9 items-center justify-center gap-2 px-4">
+      <div className={`adhkar-index-row mb-1 flex min-h-9 items-center justify-center gap-2 px-4 ${dailyLayout ? "adhkar-index-row--paged" : ""}`}>
+        {dailyLayout && (
+          <button
+            type="button"
+            className="adhkar-pagination-arrow adhkar-index-arrow"
+            data-no-swipe
+            disabled={idx === 0}
+            onClick={() => { dismissIndexHint(); goPrev(); void triggerHaptic("light"); }}
+            onPointerDown={() => startHold(-1)}
+            onPointerUp={stopHold}
+            onPointerLeave={stopHold}
+            onPointerCancel={stopHold}
+            onContextMenu={(event) => event.preventDefault()}
+            aria-label="previous adhkar"
+          >
+            <ChevronLeft size={15} strokeWidth={1.8} />
+          </button>
+        )}
+        {dailyLayout && showIndexHint && (
+          <div className="adhkar-index-hint" role="status">
+            Hold an arrow to move quickly through the cards
+          </div>
+        )}
         <span
           className="rounded-full px-4 py-1.5 text-sm font-medium tabular-nums"
           style={{ background: "color-mix(in oklab, var(--surface-card) 82%, transparent)", border: "1px solid var(--border)", boxShadow: "0 5px 18px color-mix(in oklab, var(--foreground) 7%, transparent)" }}
         >
           {idx + 1} / {items.length}
         </span>
+        {dailyLayout && (
+          <button
+            type="button"
+            className="adhkar-pagination-arrow adhkar-index-arrow"
+            data-no-swipe
+            disabled={idx === items.length - 1}
+            onClick={() => { dismissIndexHint(); goNext(); void triggerHaptic("light"); }}
+            onPointerDown={() => startHold(1)}
+            onPointerUp={stopHold}
+            onPointerLeave={stopHold}
+            onPointerCancel={stopHold}
+            onContextMenu={(event) => event.preventDefault()}
+            aria-label="next adhkar"
+          >
+            <ChevronRight size={15} strokeWidth={1.8} />
+          </button>
+        )}
         {!dailyLayout && idx > 0 && (
           <button
             onClick={restart}
@@ -385,16 +466,7 @@ export function SwipeStack({ items, counts, onIncrement, onReset, persistKey, fi
 
 
 
-      {dailyLayout ? (
-        <Pagination
-          total={items.length}
-          active={idx}
-          onSelect={goTo}
-          onPrevious={goPrev}
-          onNext={goNext}
-          onScrub={scrubTo}
-        />
-      ) : <div className="mt-2 flex items-center justify-center px-6">
+      {dailyLayout ? null : <div className="mt-2 flex items-center justify-center px-6">
         <button
           onClick={goPrev}
           disabled={idx === 0}
