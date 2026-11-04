@@ -5398,3 +5398,73 @@ html[data-preset] .dhikr-card .adhkar-audio-strip .listen-button-wrap button {
   color: color-mix(in oklab, var(--card) 92%, white) !important; border-radius: 999px !important;
   box-shadow: 0 4px 10px -3px color-mix(in oklab, var(--primary) 55%, transparent) !important;
 }
+
+/* Premium adhkar refinement */
+.adhkar-reference-card.dhikr-card {
+  border-radius: 30px !important;
+  background: color-mix(in oklab, var(--card) 96%, var(--accent)) !important;
+  border: 1px solid color-mix(in oklab, var(--card-foreground) 7%, transparent) !important;
+  box-shadow: 0 1px 0 color-mix(in oklab, var(--card) 70%, transparent) inset, 0 18px 40px -18px color-mix(in oklab, var(--card-foreground) 28%, transparent), 0 4px 14px -6px color-mix(in oklab, var(--card-foreground) 12%, transparent) !important;
+}
+.dhikr-card .adhkar-audio-strip {
+  padding: 4px 18px 4px 4px; gap: 12px;
+  background: color-mix(in oklab, var(--card-foreground) 3.5%, var(--card));
+  box-shadow: none;
+}
+.dhikr-card .adhkar-audio-wave { justify-content: flex-start; gap: 3.5px; height: 18px; padding-left: 8px; }
+.dhikr-card .adhkar-audio-wave i { width: 1px; background: color-mix(in oklab, var(--primary) 55%, var(--card-foreground)); opacity: .75; }
+.dhikr-card .adhkar-audio-wave i.is-played { opacity: 1; background: var(--primary); }
+.dhikr-card .adhkar-audio-sep { height: 16px; background: color-mix(in oklab, var(--card-foreground) 12%, transparent); }
+.dhikr-card .adhkar-audio-time { font-size: 12px; color: color-mix(in oklab, var(--card-foreground) 60%, transparent); }
+html .dhikr-card .adhkar-audio-strip .listen-button-wrap button,
+html[data-preset] .dhikr-card .adhkar-audio-strip .listen-button-wrap button {
+  background: radial-gradient(circle at 35% 28%, color-mix(in oklab, var(--primary) 78%, var(--card)), var(--primary) 72%) !important;
+  box-shadow: 0 3px 8px -2px color-mix(in oklab, var(--primary) 45%, transparent), inset 0 1px 0 color-mix(in oklab, var(--card) 25%, transparent) !important;
+}
+.dhikr-card .adhkar-divider { width: auto; max-width: 240px; gap: 8px; margin: 6px auto 16px; color: color-mix(in oklab, var(--accent) 55%, var(--card-foreground) 15%); opacity: .8; }
+.dhikr-card .adhkar-divider span { flex: 1; width: auto; height: .75px; }
+.dhikr-card .adhkar-divider span:first-child { background: linear-gradient(to right, transparent, currentColor); }
+.dhikr-card .adhkar-divider span:last-child { background: linear-gradient(to left, transparent, currentColor); }
+.dhikr-card .adhkar-divider svg { flex: 0 0 20px; }
+.dhikr-card .adhkar-transliteration { font-family: var(--font-serif, Georgia, serif); font-size: 14px; line-height: 1.65; letter-spacing: .01em; color: color-mix(in oklab, var(--primary) 50%, var(--card-foreground)); }
+.dhikr-card .adhkar-source-badge {
+  height: 32px; min-height: 32px; padding: 0 16px 0 13px; gap: 9px;
+  background: color-mix(in oklab, var(--primary) 9%, var(--card));
+  color: color-mix(in oklab, var(--primary) 45%, var(--card-foreground));
+  font-weight: 500; letter-spacing: .005em;
+  box-shadow: none; border: 0;
+}
+.settings-button {
+  width: 40px !important; height: 40px !important; border-radius: 999px !important;
+  background: color-mix(in oklab, var(--card) 72%, transparent) !important;
+  border: 1px solid color-mix(in oklab, var(--card) 85%, var(--card-foreground) 6%) !important;
+  box-shadow: 0 6px 16px -6px color-mix(in oklab, var(--card-foreground) 25%, transparent) !important;
+  backdrop-filter: blur(10px);
+}
+.daily-swipe-stack .adhkar-index-row--paged { gap: 14px; }
+.daily-swipe-stack .adhkar-index-row .adhkar-index-arrow,
+.daily-swipe-stack .adhkar-index-row--paged > span {
+  background: color-mix(in oklab, var(--card) 72%, transparent) !important;
+  border: 1px solid color-mix(in oklab, var(--card) 85%, var(--card-foreground) 6%) !important;
+  box-shadow: 0 5px 14px -6px color-mix(in oklab, var(--card-foreground) 22%, transparent) !important;
+  backdrop-filter: blur(8px);
+  color: color-mix(in oklab, var(--primary) 40%, var(--card-foreground)) !important;
+}
+.daily-swipe-stack .adhkar-index-row .adhkar-index-arrow { width: 32px !important; height: 32px !important; border-radius: 999px !important; }
+.daily-swipe-stack .adhkar-index-row--paged > span { height: 32px; min-width: 76px; font-size: 13px; font-weight: 600; letter-spacing: .02em; }
+.adhkar-pagination-dots { gap: 7px; }
+.adhkar-pagination-dots span::after { width: 4.5px; height: 4.5px; background: color-mix(in oklab, var(--card-foreground) 22%, transparent); }
+.adhkar-pagination-dots span.is-active::after { width: 6px; height: 6px; background: color-mix(in oklab, var(--primary) 70%, var(--card-foreground)); }
+html .bottom-nav-row {
+  border-radius: 30px !important;
+  background: color-mix(in oklab, var(--card) 80%, transparent) !important;
+  border: 1px solid color-mix(in oklab, var(--card) 80%, var(--card-foreground) 6%) !important;
+  box-shadow: 0 14px 34px -14px color-mix(in oklab, var(--card-foreground) 30%, transparent), 0 2px 8px -4px color-mix(in oklab, var(--card-foreground) 12%, transparent) !important;
+  padding: 6px !important;
+}
+html .bottom-nav-row .nav-item { border-radius: 22px; margin: 0 1px; transition: background .25s ease, color .25s ease; }
+html .bottom-nav-row .nav-item:has(.nav-active-mark[data-active]) {
+  background: color-mix(in oklab, var(--primary) 12%, var(--card));
+  box-shadow: 0 3px 10px -5px color-mix(in oklab, var(--primary) 35%, transparent);
+}
+html .bottom-nav-row .nav-item:has(.nav-active-mark[data-active]) > span:not(.nav-active-mark) { font-weight: 600; }

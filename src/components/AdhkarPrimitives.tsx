@@ -23,7 +23,13 @@ export function Transliteration({ children }: { children: React.ReactNode }) {
 export function OrnamentalDivider() {
   return (
     <div className="adhkar-divider" aria-hidden>
-      <span /><i /><span />
+      <span />
+      <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="0.8" strokeLinejoin="round">
+        <path d="M12 3.5 14.4 7.6 19 7.6 16.8 12 19 16.4 14.4 16.4 12 20.5 9.6 16.4 5 16.4 7.2 12 5 7.6 9.6 7.6Z" />
+        <circle cx="12" cy="12" r="2.6" />
+        <path d="M12 9.4v-2M12 14.6v2M9.4 12h-2M14.6 12h2" />
+      </svg>
+      <span />
     </div>
   );
 }
@@ -41,7 +47,7 @@ export function SourceBadge({ source, onClick }: { source: string; onClick?: () 
       }}
       data-no-swipe
     >
-      <BookOpen size={13} strokeWidth={1.5} />
+      <BookOpen size={15} strokeWidth={1.3} />
       <span>{source}</span>
     </button>
   );
