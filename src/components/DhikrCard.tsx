@@ -225,7 +225,7 @@ function AudioStrip({ dhikrId }: { dhikrId: string }) {
       <div className="adhkar-audio-wave" aria-hidden>
         {WAVE.map((h, i) => {
           const live = isThis && player.playing;
-          const height = live ? Math.min(1, h * (0.35 + 0.65 * (player.levels[i % player.levels.length] ?? 0))) : 0.15;
+          const height = live ? Math.min(1, h * (0.35 + 0.65 * (player.levels[i % player.levels.length] ?? 0))) : h;
           return <i key={i} className={i / WAVE.length < progress ? "is-played" : ""} style={{ height: `${Math.round(height * 100)}%` }} />;
         })}
       </div>

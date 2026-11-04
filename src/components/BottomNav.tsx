@@ -97,6 +97,7 @@ export function BottomNav() {
                   <span
                     aria-hidden
                     className="nav-active-mark"
+                    data-active={active ? "true" : undefined}
                     style={{ background: active ? activeColor : "transparent" }}
                   />
                 </>
