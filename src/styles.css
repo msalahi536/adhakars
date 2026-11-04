@@ -5515,7 +5515,7 @@ html .bottom-nav-row .nav-item:has(.nav-active-mark[data-active]) {
 }
 html .bottom-nav-row .nav-item:has(.nav-active-mark[data-active]) > * { color: color-mix(in oklab, var(--primary) 70%, var(--card-foreground)) !important; opacity: 1 !important; }
 html .bottom-nav-row .nav-active-mark[data-active] { width: 16px !important; height: 1.5px !important; border-radius: 2px; background: color-mix(in oklab, var(--primary) 70%, var(--card-foreground)) !important; }
-html .dhikr-card .adhkar-source-badge { background: color-mix(in oklab, var(--primary) 10%, color-mix(in oklab, var(--accent) 14%, var(--card))) 100%, var(--card)); color: color-mix(in oklab, var(--primary) 60%, var(--card-foreground)); }
+html .dhikr-card .adhkar-source-badge { background: color-mix(in oklab, var(--primary) 10%, color-mix(in oklab, var(--accent) 14%, var(--card))); color: color-mix(in oklab, var(--primary) 60%, var(--card-foreground)); }
 html[data-visual-phase="evening"] .dhikr-card .adhkar-source-badge { background: color-mix(in oklab, var(--accent) 18%, var(--card)); }
 html .bottom-nav-row .nav-item:has(.nav-active-mark[data-active]) { }
 html[data-visual-phase="evening"] .bottom-nav-row .nav-item:has(.nav-active-mark[data-active]) { background: color-mix(in oklab, var(--primary) 16%, var(--card)); }
