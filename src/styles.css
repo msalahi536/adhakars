@@ -5379,3 +5379,22 @@ body.has-adhkar-mini.adhkar-tucked .quran-player:not(.rec-panel), body.has-adhka
 .rc-tj-necessary { background: var(--tj-necessary); }.rc-tj-obligatory { background: var(--tj-obligatory); }.rc-tj-permissible { background: var(--tj-permissible); }.rc-tj-normal { background: var(--tj-normal); }.rc-tj-ghunnah { background: var(--tj-ghunnah); }.rc-tj-qalqalah { background: var(--tj-qalqalah); }.rc-tj-silent { background: var(--tj-silent); }
 @media (max-height: 650px) { .rc-canvas { top: 14px; bottom: 110px; }.rc-margins { height: 30px; }.rc-bismillah { font-size: 16px; }.rc-surah-frame .rc-arabic { font-size: 16px; }.recite-page .rc-horizon { height: 78px; } }
 @media (prefers-reduced-motion: reduce) { .recite-page *, .recite-page *::before { animation: none !important; transition: none !important; } }
+
+/* Adhkar audio strip (replaces card titles) */
+.adhkar-audio-strip {
+  display: flex; align-items: center; gap: 14px;
+  margin: 18px 18px 0; padding: 6px 18px 6px 6px; border-radius: 999px;
+  background: color-mix(in oklab, var(--card-foreground) 5%, var(--card));
+  box-shadow: inset 0 1px 0 color-mix(in oklab, var(--card) 60%, transparent);
+}
+.adhkar-audio-wave { flex: 1; display: flex; align-items: center; gap: 3px; height: 18px; padding-left: 4px; }
+.adhkar-audio-wave i { display: block; width: 1.5px; border-radius: 2px; background: color-mix(in oklab, var(--card-foreground) 55%, transparent); transition: background .2s; }
+.adhkar-audio-wave i.is-played { background: var(--primary); }
+.adhkar-audio-sep { width: 1px; height: 22px; background: color-mix(in oklab, var(--card-foreground) 18%, transparent); }
+.adhkar-audio-time { font-family: var(--font-sans); font-size: 13px; font-variant-numeric: tabular-nums; color: color-mix(in oklab, var(--card-foreground) 75%, transparent); min-width: 32px; text-align: right; }
+html .dhikr-card .adhkar-audio-strip .listen-button-wrap button,
+html[data-preset] .dhikr-card .adhkar-audio-strip .listen-button-wrap button {
+  background: radial-gradient(circle at 35% 30%, color-mix(in oklab, var(--primary) 70%, white), var(--primary) 70%) !important;
+  color: color-mix(in oklab, var(--card) 92%, white) !important; border-radius: 999px !important;
+  box-shadow: 0 4px 10px -3px color-mix(in oklab, var(--primary) 55%, transparent) !important;
+}

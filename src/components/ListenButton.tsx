@@ -1,6 +1,6 @@
 // ============= Full file contents =============
 import { useLayoutEffect, useRef } from "react";
-import { Volume2 } from "lucide-react";
+import { Play, Volume2 } from "lucide-react";
 import { usePlaylist } from "./RecitationPlaylist";
 import { recitationPlayer, usePlayer, useRecitationMap, type Track } from "@/lib/recitation-player";
 import { setAnchor, setPopupOpen, usePopupOpen } from "@/lib/recitation-popup";
@@ -12,9 +12,10 @@ type Props = {
   title?: string;
   /** Section name for pages outside a swipe stack, e.g. "Duas". */
   section?: string;
+  icon?: "speaker" | "play";
 };
 
-export function ListenButton({ dhikrId, size = 32, title, section }: Props) {
+export function ListenButton({ dhikrId, size = 32, title, section, icon = "speaker" }: Props) {
   const btnRef = useRef<HTMLButtonElement | null>(null);
   const map = useRecitationMap();
   const player = usePlayer();
@@ -62,7 +63,7 @@ export function ListenButton({ dhikrId, size = 32, title, section }: Props) {
           <span className="rec-eq" aria-hidden>
             {player.levels.map((level, index) => <i key={index} style={{ height: `${Math.round(level * 100)}%` }} />)}
           </span>
-        ) : <Volume2 size={Math.round(size * 0.5)} strokeWidth={1.75} />}
+        ) : icon === "play" ? <Play size={Math.round(size * 0.42)} fill="currentColor" strokeWidth={0} style={{ marginLeft: Math.round(size * 0.06) }} /> : <Volume2 size={Math.round(size * 0.5)} strokeWidth={1.75} />}
       </Button>
     </div>
   );
