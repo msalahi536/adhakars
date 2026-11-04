@@ -1,6 +1,5 @@
 import { addGiveawayDhikr } from "@/lib/giveaway";
 import { useEffect, useRef, useState } from "react";
-import { AlertTriangle } from "lucide-react";
 import type { Dhikr } from "@/data/adhkar";
 import { ListenButton } from "./ListenButton";
 import { usePlayer } from "@/lib/recitation-player";
