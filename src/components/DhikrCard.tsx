@@ -78,7 +78,7 @@ export function DhikrCard({ dhikr, count, onIncrement, isSpecial, specialLabel, 
       style={{ background: "var(--card)", color: "var(--card-foreground)", border: "1px solid var(--border)", boxShadow: "var(--card-shadow, 0 4px 16px rgba(0,0,0,0.08))" }}
     >
       <div className="adhkar-card-heading items-center">
-        <ListenButton dhikrId={dhikr.id} size={42} />
+        <ListenButton dhikrId={dhikr.id} size={34} />
         <div className="adhkar-card-title-group min-w-0">
           <h3>{headingTitle}</h3>
           {headingSubtitle && <p className="adhkar-card-subtitle">{headingSubtitle}</p>}
