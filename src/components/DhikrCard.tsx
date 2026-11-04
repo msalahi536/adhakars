@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import { AlertTriangle } from "lucide-react";
 import type { Dhikr } from "@/data/adhkar";
 import { ListenButton } from "./ListenButton";
+import { usePlayer } from "@/lib/recitation-player";
 import { ArabicText, OrnamentalDivider, RepeatCounter, SourceBadge, Transliteration } from "./AdhkarPrimitives";
 import { getDisplay, triggerHaptic } from "@/lib/theme";
 import { HadithDetailsDrawer } from "./HadithDetailsDrawer";
@@ -68,22 +69,13 @@ export function DhikrCard({ dhikr, count, onIncrement, isSpecial, specialLabel, 
 
   const hasTranslation = !!(dhikr.translation || dhikr.arabicMulti);
   const hasCommentary = !!dhikr.commentary;
-  const titleParts = dhikr.title.match(/^(.*?)\s*\(([^)]+)\)$/);
-  const headingTitle = titleParts?.[1] ?? dhikr.title;
-  const headingSubtitle = titleParts?.[2];
 
   return (
     <div
       className={`dhikr-card relative flex w-full flex-col overflow-hidden ${referenceLayout ? "adhkar-reference-card" : "h-full"}`}
       style={{ background: "var(--card)", color: "var(--card-foreground)", border: "1px solid var(--border)", boxShadow: "var(--card-shadow, 0 4px 16px rgba(0,0,0,0.08))" }}
     >
-      <div className="adhkar-card-heading items-center">
-        <ListenButton dhikrId={dhikr.id} size={34} />
-        <div className="adhkar-card-title-group min-w-0">
-          <h3>{headingTitle}</h3>
-          {headingSubtitle && <p className="adhkar-card-subtitle">{headingSubtitle}</p>}
-        </div>
-      </div>
+      <AudioStrip dhikrId={dhikr.id} />
 
       {isSpecial && specialLabel && (
         <div
@@ -222,6 +214,32 @@ export function DhikrCard({ dhikr, count, onIncrement, isSpecial, specialLabel, 
           onOpenChange={setShowHadithDetails}
         />
       )}
+    </div>
+  );
+}
+
+const WAVE = [0.35, 0.6, 0.4, 0.75, 0.5, 0.95, 1, 0.45, 0.3, 0.55, 0.35, 0.4, 0.7, 0.45, 0.6, 0.3, 0.4];
+
+function fmt(t: number) {
+  const s = Math.max(0, Math.floor(t));
+  return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, "0")}`;
+}
+
+function AudioStrip({ dhikrId }: { dhikrId: string }) {
+  const player = usePlayer();
+  const isThis = player.track?.dhikrId === dhikrId;
+  const progress = isThis && player.duration ? player.current / player.duration : 0;
+  const time = isThis && player.duration ? fmt(player.playing ? player.current : player.duration) : "0:00";
+  return (
+    <div className="adhkar-audio-strip">
+      <ListenButton dhikrId={dhikrId} size={40} icon="play" />
+      <div className="adhkar-audio-wave" aria-hidden>
+        {WAVE.map((h, i) => (
+          <i key={i} className={i / WAVE.length < progress ? "is-played" : ""} style={{ height: `${Math.round(h * 100)}%` }} />
+        ))}
+      </div>
+      <span className="adhkar-audio-sep" aria-hidden />
+      <span className="adhkar-audio-time">{time}</span>
     </div>
   );
 }
