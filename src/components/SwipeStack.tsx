@@ -7,6 +7,8 @@ import type { SalahItem } from "@/data/salah";
 import { triggerHaptic } from "@/lib/theme";
 import { isItemComplete, itemId } from "@/data/salah";
 import { RecitationPlaylistContext, playlistLabel } from "./RecitationPlaylist";
+import { Pagination } from "./AdhkarPrimitives";
+import { Button } from "./ui/button";
 
 type Props = {
   items: SalahItem[];
@@ -316,7 +318,9 @@ export function SwipeStack({ items, counts, onIncrement, onReset, persistKey, fi
     <div className={`flex flex-1 flex-col overflow-hidden ${dailyLayout ? "daily-swipe-stack" : ""}`}>
       <div className={`adhkar-index-row mb-1 flex min-h-9 items-center justify-center gap-2 px-4 ${dailyLayout ? "adhkar-index-row--paged" : ""}`}>
         {dailyLayout && (
-          <button
+          <Button
+            variant="ghost"
+            size="icon"
             type="button"
             className="adhkar-pagination-arrow adhkar-index-arrow"
             data-no-swipe
@@ -330,7 +334,7 @@ export function SwipeStack({ items, counts, onIncrement, onReset, persistKey, fi
             aria-label="previous adhkar"
           >
             <ChevronLeft size={15} strokeWidth={1.8} />
-          </button>
+          </Button>
         )}
         {dailyLayout && showIndexHint && (
           <div className="adhkar-index-hint" role="status">
@@ -344,7 +348,9 @@ export function SwipeStack({ items, counts, onIncrement, onReset, persistKey, fi
           {idx + 1} / {items.length}
         </span>
         {dailyLayout && (
-          <button
+          <Button
+            variant="ghost"
+            size="icon"
             type="button"
             className="adhkar-pagination-arrow adhkar-index-arrow"
             data-no-swipe
@@ -358,7 +364,7 @@ export function SwipeStack({ items, counts, onIncrement, onReset, persistKey, fi
             aria-label="next adhkar"
           >
             <ChevronRight size={15} strokeWidth={1.8} />
-          </button>
+          </Button>
         )}
         {!dailyLayout && idx > 0 && (
           <button
@@ -466,7 +472,16 @@ export function SwipeStack({ items, counts, onIncrement, onReset, persistKey, fi
 
 
 
-      {dailyLayout ? null : <div className="mt-2 flex items-center justify-center px-6">
+      {dailyLayout ? (
+        <Pagination
+          total={items.length}
+          active={idx}
+          onSelect={goTo}
+          onPrevious={goPrev}
+          onNext={goNext}
+          onScrub={scrubTo}
+        />
+      ) : <div className="mt-2 flex items-center justify-center px-6">
         <button
           onClick={goPrev}
           disabled={idx === 0}

@@ -978,17 +978,20 @@ html[data-visual-phase="evening"] .daily-swipe-stack .adhkar-index-row > span {
 .adhkar-card-action.is-icon-only { width: 30px; height: 30px; padding: 0; border: 1px solid var(--card-border, var(--border)); background: var(--pill-bg, var(--source-bg)) !important; color: var(--source-fg, var(--title)) !important; backdrop-filter: blur(12px); }
 .adhkar-card-action.is-delete { color: var(--destructive) !important; }
 .daily-swipe-stack .adhkar-index-row--paged { gap: 12px; }
-.daily-swipe-stack .adhkar-index-row--paged > span { margin: 0 !important; height: 36px; padding: 0 14px; font-size: 13px; }
+.daily-swipe-stack .adhkar-index-row--paged > span { margin: 0 !important; height: 28px; min-width: 72px; justify-content: center; padding: 0 12px; font-size: 12px; }
 .daily-swipe-stack .adhkar-index-row .adhkar-index-arrow {
-  width: 36px;
-  height: 36px;
-  flex: 0 0 36px;
+  width: 28px;
+  height: 28px;
+  flex: 0 0 28px;
+  padding: 0;
   border: 1px solid rgba(255, 255, 255, 0.92);
   background: rgba(250, 248, 241, 0.86);
   color: var(--title);
   box-shadow: 0 2px 8px color-mix(in oklab, var(--title) 5%, transparent);
   backdrop-filter: blur(8px);
 }
+.daily-swipe-stack .adhkar-index-arrow svg { width: 13px; height: 13px; }
+.daily-swipe-stack > .adhkar-pagination-row { flex-shrink: 0; }
 html[data-visual-phase="evening"] .adhkar-index-arrow {
   border: none;
   background: rgba(82, 81, 96, 0.5);
