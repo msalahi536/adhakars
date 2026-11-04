@@ -94,6 +94,7 @@ export function Pagination({
   onNext,
   onScrub,
   hideSelector = false,
+  hideArrows = false,
 }: {
   total: number;
   active: number;
@@ -102,6 +103,7 @@ export function Pagination({
   onNext: () => void;
   onScrub: (index: number) => void;
   hideSelector?: boolean;
+  hideArrows?: boolean;
 }) {
   const [isScrubbing, setIsScrubbing] = useState(false);
   const [isAndroid, setIsAndroid] = useState(false);
@@ -166,7 +168,7 @@ export function Pagination({
           Hold me down to quickly move through cards or go back to the beginning
         </div>
       )}
-      <button
+      {!hideArrows && <button
         type="button"
         className="adhkar-pagination-arrow"
         data-no-swipe
@@ -182,7 +184,7 @@ export function Pagination({
         aria-label="previous"
       >
         <ChevronLeft size={14} strokeWidth={1.8} />
-      </button>
+      </button>}
       {!hideSelector && (
         <div
           className={`adhkar-pagination ${isAndroid ? "is-android" : ""} ${isScrubbing ? "is-scrubbing" : ""} ${showHint && !isScrubbing ? "is-hinting" : ""}`}
@@ -224,7 +226,7 @@ export function Pagination({
           />
         </div>
       )}
-      <button
+      {!hideArrows && <button
         type="button"
         className="adhkar-pagination-arrow"
         data-no-swipe
@@ -240,7 +242,7 @@ export function Pagination({
         aria-label="next"
       >
         <ChevronRight size={14} strokeWidth={1.8} />
-      </button>
+      </button>}
     </div>
   );
 }

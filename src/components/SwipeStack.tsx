@@ -474,6 +474,7 @@ export function SwipeStack({ items, counts, onIncrement, onReset, persistKey, fi
 
       {dailyLayout ? (
         <Pagination
+          hideArrows
           total={items.length}
           active={idx}
           onSelect={goTo}

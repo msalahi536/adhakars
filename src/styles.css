@@ -1011,7 +1011,7 @@ html[data-visual-phase="evening"] .adhkar-index-arrow {
 .sleep-adhkar-page .daily-swipe-stack .adhkar-card-stage { padding: 0 16px 14px; }
 .sleep-adhkar-page .daily-swipe-stack .adhkar-index-row { min-height: 42px; padding-top: 0; }
 
-.daily-swipe-stack .adhkar-card-stage { display: flex; min-height: 0; flex: 1 1 0%; overflow: hidden; padding: 0 24px 16px; }
+.daily-swipe-stack .adhkar-card-stage { display: flex; min-height: 0; flex: 1 1 0%; overflow: hidden; padding: 0 20px 16px; }
 .adhkar-card-motion { display: flex; width: 100%; min-height: 0; flex: 1 1 0%; align-self: stretch; }
 .adhkar-reference-card {
   display: flex;
@@ -1546,7 +1546,7 @@ html[data-preset][data-section="tasbih"] {
   .adhkar-progress-row,
   .adhkar-progress-track { width: 236px; }
   .adhkar-progress-track { flex-basis: 236px; height: 8px; }
-  .daily-swipe-stack .adhkar-card-stage { padding: 0 20px 10px; }
+  .daily-swipe-stack .adhkar-card-stage { padding: 0 18px 10px; }
   .adhkar-index-row { margin-bottom: 2px; }
   .adhkar-reference-card { padding: 20px 22px 18px; }
   .adhkar-card-heading h3 { font-size: 20px; }
