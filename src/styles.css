@@ -5387,7 +5387,7 @@ body.has-adhkar-mini.adhkar-tucked .quran-player:not(.rec-panel), body.has-adhka
   background: color-mix(in oklab, var(--card-foreground) 5%, var(--card));
   box-shadow: inset 0 1px 0 color-mix(in oklab, var(--card) 60%, transparent);
 }
-.adhkar-audio-wave { flex: 1; display: flex; align-items: center; gap: 3.5px; height: 16px; padding-left: 6px; }
+.adhkar-audio-wave { flex: 1; display: flex; align-items: center; gap: 4px; height: 20px; padding-left: 10px; }
 .adhkar-audio-wave i { display: block; width: 1.5px; border-radius: 2px; background: color-mix(in oklab, var(--card-foreground) 70%, transparent); transition: background .2s, height .12s linear; }
 .adhkar-audio-wave i.is-played { background: var(--primary); }
 .adhkar-audio-sep { width: 1px; height: 18px; background: color-mix(in oklab, var(--card-foreground) 18%, transparent); }
