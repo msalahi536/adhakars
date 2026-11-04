@@ -5519,3 +5519,30 @@ html .dhikr-card .adhkar-source-badge { background: color-mix(in oklab, oklch(0.
 html[data-visual-phase="evening"] .dhikr-card .adhkar-source-badge { background: color-mix(in oklab, var(--accent) 18%, var(--card)); }
 html .bottom-nav-row .nav-item:has(.nav-active-mark[data-active]) { background: radial-gradient(120% 90% at 40% 30%, color-mix(in oklab, oklch(0.78 0.07 130) 40%, var(--card)), color-mix(in oklab, oklch(0.78 0.07 130) 18%, var(--card)) 75%); }
 html[data-visual-phase="evening"] .bottom-nav-row .nav-item:has(.nav-active-mark[data-active]) { background: color-mix(in oklab, var(--primary) 16%, var(--card)); }
+
+/* Bottom nav — reference capsule */
+html .bottom-nav, html[data-section="salah"] .bottom-nav { width: calc(100% - 28px) !important; height: 76px !important; min-height: 76px !important; flex-basis: 76px !important; }
+html .bottom-nav-row, html[data-section="salah"] .bottom-nav-row {
+  max-width: 420px !important; height: 76px !important; padding: 7px 8px !important;
+  border-radius: 999px !important;
+  background: color-mix(in oklab, var(--card) 66%, transparent) !important;
+  border: 1px solid color-mix(in oklab, white 60%, transparent) !important;
+  box-shadow: inset 0 1px 0 color-mix(in oklab, white 70%, transparent), 0 1px 3px color-mix(in oklab, var(--card-foreground) 5%, transparent), 0 12px 40px -8px color-mix(in oklab, var(--card-foreground) 18%, transparent), 0 0 24px color-mix(in oklab, var(--card-foreground) 6%, transparent) !important;
+  backdrop-filter: blur(22px) saturate(150%);
+}
+html .bottom-nav-row .nav-item { gap: 6px; border-radius: 26px; transition: background .3s ease, box-shadow .3s ease; }
+html .bottom-nav-row .nav-item > svg { width: 24px; height: 24px; flex-basis: 24px; stroke-width: 1.3; }
+html .bottom-nav-row .nav-item > span:not(.nav-active-mark) { font-size: 13px !important; font-weight: 450; letter-spacing: .005em; color: color-mix(in oklab, var(--card-foreground) 62%, transparent); }
+html .bottom-nav-row .nav-item > svg { color: color-mix(in oklab, var(--card-foreground) 62%, transparent) !important; opacity: 1 !important; }
+html .bottom-nav-row .nav-item > span { opacity: 1 !important; }
+html .bottom-nav-row .nav-item:has(.nav-active-mark[data-active]) {
+  background: linear-gradient(160deg, color-mix(in oklab, oklch(0.8 0.07 130) 34%, var(--card)), color-mix(in oklab, oklch(0.8 0.07 130) 16%, var(--card))) !important;
+  box-shadow: inset 0 1px 0 color-mix(in oklab, white 55%, transparent), inset 0 -6px 12px -8px color-mix(in oklab, oklch(0.5 0.07 130) 25%, transparent), 0 6px 16px -8px color-mix(in oklab, oklch(0.45 0.07 130) 30%, transparent) !important;
+}
+html .bottom-nav-row .nav-item:has(.nav-active-mark[data-active]) > svg,
+html .bottom-nav-row .nav-item:has(.nav-active-mark[data-active]) > span:not(.nav-active-mark) { color: color-mix(in oklab, var(--primary) 65%, var(--card-foreground)) !important; font-weight: 500; }
+html .bottom-nav-row .nav-active-mark[data-active] { bottom: 6px; width: 20px !important; height: 1.5px !important; }
+html[data-visual-phase="evening"] .bottom-nav-row { border-color: color-mix(in oklab, white 12%, transparent) !important; box-shadow: inset 0 1px 0 color-mix(in oklab, white 10%, transparent), 0 12px 40px -8px rgb(0 0 0 / .35) !important; }
+html[data-visual-phase="evening"] .bottom-nav-row .nav-item:has(.nav-active-mark[data-active]) { background: color-mix(in oklab, var(--primary) 18%, var(--card)) !important; box-shadow: none !important; }
+html .bottom-nav-row .nav-item { padding-bottom: 6px; }
+html .bottom-nav-row .nav-active-mark[data-active] { bottom: 5px !important; }
