@@ -1020,7 +1020,7 @@ html[data-visual-phase="evening"] .daily-swipe-stack .adhkar-index-row > span {
   --adhkar-heading-divider: color-mix(in oklab, var(--card-foreground) 12%, transparent);
   --adhkar-audio-top: color-mix(in oklab, var(--accent) 65%, var(--card));
   --adhkar-audio-bottom: color-mix(in oklab, var(--accent) 86%, var(--card-foreground));
-  --adhkar-audio-ink: var(--accent-foreground);
+  --adhkar-audio-ink: var(--index-badge-fg, var(--accent-foreground));
   --adhkar-audio-shadow: 0 6px 12px color-mix(in oklab, var(--accent) 24%, transparent), inset 0 1px 1px color-mix(in oklab, var(--card) 28%, transparent);
 }
 html .dhikr-card .adhkar-card-heading h3,
