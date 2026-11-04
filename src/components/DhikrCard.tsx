@@ -68,20 +68,21 @@ export function DhikrCard({ dhikr, count, onIncrement, isSpecial, specialLabel, 
 
   const hasTranslation = !!(dhikr.translation || dhikr.arabicMulti);
   const hasCommentary = !!dhikr.commentary;
+  const titleParts = dhikr.title.match(/^(.*?)\s*\(([^)]+)\)$/);
+  const headingTitle = titleParts?.[1] ?? dhikr.title;
+  const headingSubtitle = titleParts?.[2];
 
   return (
     <div
       className={`dhikr-card relative flex w-full flex-col overflow-hidden ${referenceLayout ? "adhkar-reference-card" : "h-full"}`}
       style={{ background: "var(--card)", color: "var(--card-foreground)", border: "1px solid var(--border)", boxShadow: "var(--card-shadow, 0 4px 16px rgba(0,0,0,0.08))" }}
     >
-      <div className="adhkar-card-heading grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-4">
-        <ListenButton dhikrId={dhikr.id} size={34} />
-        <h3
-          className="min-w-0 uppercase"
-          style={{ letterSpacing: "0.16em", color: "var(--accent)", opacity: 1 }}
-        >
-          {dhikr.title}
-        </h3>
+      <div className="adhkar-card-heading items-center">
+        <ListenButton dhikrId={dhikr.id} size={42} />
+        <div className="adhkar-card-title-group min-w-0">
+          <h3>{headingTitle}</h3>
+          {headingSubtitle && <p className="adhkar-card-subtitle">{headingSubtitle}</p>}
+        </div>
       </div>
 
       {isSpecial && specialLabel && (
