@@ -6,7 +6,6 @@ import { ChevronLeft, ChevronRight, RotateCcw, ArrowRight, Pencil, Plus, Trash2 
 import type { SalahItem } from "@/data/salah";
 import { triggerHaptic } from "@/lib/theme";
 import { isItemComplete, itemId } from "@/data/salah";
-import { Pagination } from "./AdhkarPrimitives";
 import { RecitationPlaylistContext, playlistLabel } from "./RecitationPlaylist";
 
 type Props = {
