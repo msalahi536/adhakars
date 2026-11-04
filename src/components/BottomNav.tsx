@@ -54,6 +54,10 @@ export function BottomNav() {
   }, []);
 
 
+  const activeIndex = tabs.findIndex((t) => t.to === "/app/more"
+    ? pathname === "/app/more" || moreNestedActive
+    : pathname === t.to || pathname === t.to + "/");
+
   const iconColor = "var(--nav-inactive)";
   const activeColor = "var(--nav-active)";
   const borderColor = "var(--nav-border)";
@@ -64,6 +68,9 @@ export function BottomNav() {
         className="bottom-nav-row mx-auto max-w-md px-2"
         style={{ borderColor }}
       >
+        {activeIndex >= 0 && (
+          <span aria-hidden className="nav-glider" style={{ "--nav-i": activeIndex } as CSSProperties}><i /></span>
+        )}
         {tabs.map((t) => {
           const destination = t.to === "/app/more"
             ? (moreNestedActive && pathname !== "/app/more" ? "/app/more" : moreDestination)
