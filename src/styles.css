@@ -5521,9 +5521,8 @@ html .bottom-nav-row .nav-item:has(.nav-active-mark[data-active]) { background: 
 html[data-visual-phase="evening"] .bottom-nav-row .nav-item:has(.nav-active-mark[data-active]) { background: color-mix(in oklab, var(--primary) 16%, var(--card)); }
 
 /* Bottom nav — reference capsule */
-html .bottom-nav, html[data-section="salah"] .bottom-nav { width: calc(100% - 28px) !important; height: 76px !important; min-height: 76px !important; flex-basis: 76px !important; }
 html .bottom-nav-row, html[data-section="salah"] .bottom-nav-row {
-  max-width: 420px !important; height: 76px !important; padding: 7px 8px !important;
+  padding: 5px 7px !important;
   border-radius: 999px !important;
   background: color-mix(in oklab, var(--card) 66%, transparent) !important;
   border: 1px solid color-mix(in oklab, white 60%, transparent) !important;
