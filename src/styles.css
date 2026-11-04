@@ -1016,15 +1016,17 @@ html[data-visual-phase="evening"] .daily-swipe-stack .adhkar-index-row > span {
 .adhkar-card-heading h3 { font-family: var(--font-display); font-size: 24px; font-weight: 600; line-height: 1.12; letter-spacing: 0 !important; }
 .adhkar-card-title-group { border-left: 1px solid var(--adhkar-heading-divider); padding-left: 18px; min-height: 38px; display: flex; flex-direction: column; justify-content: center; gap: 3px; }
 .adhkar-card-subtitle { margin: 0; color: var(--text-muted, var(--muted-foreground)); font-size: 12px; line-height: 1.35; letter-spacing: 0; text-transform: capitalize; }
-:root {
+.dhikr-card, .home-appearance-preview {
   --adhkar-heading-divider: color-mix(in oklab, var(--card-foreground) 12%, transparent);
   --adhkar-audio-top: color-mix(in oklab, var(--accent) 65%, var(--card));
   --adhkar-audio-bottom: color-mix(in oklab, var(--accent) 86%, var(--card-foreground));
   --adhkar-audio-ink: var(--accent-foreground);
   --adhkar-audio-shadow: 0 6px 12px color-mix(in oklab, var(--accent) 24%, transparent), inset 0 1px 1px color-mix(in oklab, var(--card) 28%, transparent);
 }
-html .dhikr-card .adhkar-card-heading h3 { color: var(--card-foreground) !important; }
-html .dhikr-card .adhkar-card-heading button {
+html .dhikr-card .adhkar-card-heading h3,
+html[data-preset] .dhikr-card .adhkar-card-heading .adhkar-card-title-group h3 { color: var(--card-foreground) !important; }
+html .dhikr-card .adhkar-card-heading button,
+html[data-preset] .dhikr-card .adhkar-card-heading .listen-button-wrap button {
   border-radius: 42% 46% 40% 44%;
   background: linear-gradient(135deg, var(--adhkar-audio-top), var(--adhkar-audio-bottom)) !important;
   color: var(--adhkar-audio-ink) !important;
