@@ -1,6 +1,6 @@
 // ============= Full file contents =============
 import { useLayoutEffect, useRef } from "react";
-import { Play, Volume2 } from "lucide-react";
+import { Pause, Play, Volume2 } from "lucide-react";
 import { usePlaylist } from "./RecitationPlaylist";
 import { recitationPlayer, usePlayer, useRecitationMap, type Track } from "@/lib/recitation-player";
 import { setAnchor, setPopupOpen, usePopupOpen } from "@/lib/recitation-popup";
@@ -47,9 +47,14 @@ export function ListenButton({ dhikrId, size = 32, title, section, icon = "speak
         type="button"
         onClick={(e) => {
           e.stopPropagation();
+          if (icon === "play") {
+            if (isThis) recitationPlayer.toggle();
+            else if (rec) recitationPlayer.playOne({ dhikrId, title: name, url: rec.url }, playlist?.label ?? section ?? null);
+            return;
+          }
           setPopupOpen(isOpen ? null : { openerId: dhikrId, title: name, tracks: queueTracks, label: playlist?.label ?? section ?? null, track: rec ? { dhikrId, title: name, url: rec.url } : null });
         }}
-        aria-label="play recitation"
+        aria-label={playing ? "pause recitation" : "play recitation"}
         aria-expanded={isOpen}
         className="flex items-center justify-center rounded-full p-0 transition-transform active:scale-95"
         style={{
@@ -59,11 +64,11 @@ export function ListenButton({ dhikrId, size = 32, title, section, icon = "speak
           color: "var(--index-badge-fg, var(--accent-foreground))",
         }}
       >
-        {playing ? (
+        {icon === "play" ? (playing ? <Pause size={Math.round(size * 0.4)} fill="currentColor" strokeWidth={0} /> : <Play size={Math.round(size * 0.42)} fill="currentColor" strokeWidth={0} style={{ marginLeft: Math.round(size * 0.06) }} />) : playing ? (
           <span className="rec-eq" aria-hidden>
             {player.levels.map((level, index) => <i key={index} style={{ height: `${Math.round(level * 100)}%` }} />)}
           </span>
-        ) : icon === "play" ? <Play size={Math.round(size * 0.42)} fill="currentColor" strokeWidth={0} style={{ marginLeft: Math.round(size * 0.06) }} /> : <Volume2 size={Math.round(size * 0.5)} strokeWidth={1.75} />}
+        ) : <Volume2 size={Math.round(size * 0.5)} strokeWidth={1.75} />}
       </Button>
     </div>
   );

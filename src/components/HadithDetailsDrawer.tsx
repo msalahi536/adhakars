@@ -129,6 +129,7 @@ export function HadithDetailsDrawer({ dhikr, open, onOpenChange }: Props) {
           <TextCard title="Transliteration" text={dhikr.transliteration} copy />
           <TextCard title="Translation" text={dhikr.translation} copy />
           <TextCard title="Reward · In short" text={details?.reward} />
+          <TextCard title="Commentary" text={dhikr.commentary} />
 
           {details?.grading && (
             <section className="space-y-2 pt-2">
