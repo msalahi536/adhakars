@@ -5395,6 +5395,6 @@ body.has-adhkar-mini.adhkar-tucked .quran-player:not(.rec-panel), body.has-adhka
 html .dhikr-card .adhkar-audio-strip .listen-button-wrap button,
 html[data-preset] .dhikr-card .adhkar-audio-strip .listen-button-wrap button {
   background: radial-gradient(circle at 35% 30%, color-mix(in oklab, var(--primary) 70%, white), var(--primary) 70%) !important;
-  color: var(--primary-foreground) !important; border-radius: 999px !important;
+  color: color-mix(in oklab, var(--card) 92%, white) !important; border-radius: 999px !important;
   box-shadow: 0 4px 10px -3px color-mix(in oklab, var(--primary) 55%, transparent) !important;
 }
