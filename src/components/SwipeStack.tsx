@@ -28,6 +28,8 @@ type Phase = "idle" | "out-left" | "out-right" | "in-left" | "in-right";
 const OUT_MS = 280;
 const IN_MS = 320;
 
+const HINT_KEY = "adhkar:hint-pagination-v2";
+
 const readPersistedIdx = (key?: string): number => {
   if (!key || typeof window === "undefined") return 0;
   const raw = window.localStorage.getItem(`cardIdx_${key}`);
@@ -313,13 +315,52 @@ export function SwipeStack({ items, counts, onIncrement, onReset, persistKey, fi
   return (
     <RecitationPlaylistContext.Provider value={playlist}>
     <div className={`flex flex-1 flex-col overflow-hidden ${dailyLayout ? "daily-swipe-stack" : ""}`}>
-      <div className="adhkar-index-row mb-1 flex min-h-9 items-center justify-center gap-2 px-4">
+      <div className={`adhkar-index-row mb-1 flex min-h-9 items-center justify-center gap-2 px-4 ${dailyLayout ? "adhkar-index-row--paged" : ""}`}>
+        {dailyLayout && (
+          <button
+            type="button"
+            className="adhkar-pagination-arrow adhkar-index-arrow"
+            data-no-swipe
+            disabled={idx === 0}
+            onClick={() => { dismissIndexHint(); goPrev(); void triggerHaptic("light"); }}
+            onPointerDown={() => startHold(-1)}
+            onPointerUp={stopHold}
+            onPointerLeave={stopHold}
+            onPointerCancel={stopHold}
+            onContextMenu={(event) => event.preventDefault()}
+            aria-label="previous adhkar"
+          >
+            <ChevronLeft size={15} strokeWidth={1.8} />
+          </button>
+        )}
+        {dailyLayout && showIndexHint && (
+          <div className="adhkar-index-hint" role="status">
+            Hold an arrow to move quickly through the cards
+          </div>
+        )}
         <span
           className="rounded-full px-4 py-1.5 text-sm font-medium tabular-nums"
           style={{ background: "color-mix(in oklab, var(--surface-card) 82%, transparent)", border: "1px solid var(--border)", boxShadow: "0 5px 18px color-mix(in oklab, var(--foreground) 7%, transparent)" }}
         >
           {idx + 1} / {items.length}
         </span>
+        {dailyLayout && (
+          <button
+            type="button"
+            className="adhkar-pagination-arrow adhkar-index-arrow"
+            data-no-swipe
+            disabled={idx === items.length - 1}
+            onClick={() => { dismissIndexHint(); goNext(); void triggerHaptic("light"); }}
+            onPointerDown={() => startHold(1)}
+            onPointerUp={stopHold}
+            onPointerLeave={stopHold}
+            onPointerCancel={stopHold}
+            onContextMenu={(event) => event.preventDefault()}
+            aria-label="next adhkar"
+          >
+            <ChevronRight size={15} strokeWidth={1.8} />
+          </button>
+        )}
         {!dailyLayout && idx > 0 && (
           <button
             onClick={restart}

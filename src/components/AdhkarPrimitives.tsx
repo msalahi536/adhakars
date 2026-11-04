@@ -12,16 +12,6 @@ export function IslamicOrnament({ size = 24, className = "" }: { size?: number; 
   );
 }
 
-export function ProgressBar({ value, total }: { value: number; total: number }) {
-  return (
-    <div className="adhkar-progress-row">
-      <div className="adhkar-progress-track">
-        <div className="adhkar-progress-value" style={{ width: `${total ? (value / total) * 100 : 0}%` }} />
-      </div>
-    </div>
-  );
-}
-
 export function ArabicText({ children, size, large = false }: { children: React.ReactNode; size: number; large?: boolean }) {
   return <p className={`arabic adhkar-arabic ${large ? "is-large" : ""}`} lang="ar" dir="rtl" style={{ fontSize: size }}>{children}</p>;
 }
