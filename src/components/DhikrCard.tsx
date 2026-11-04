@@ -232,11 +232,12 @@ function AudioStrip({ dhikrId }: { dhikrId: string }) {
   const time = isThis && player.duration ? fmt(player.playing ? player.current : player.duration) : "0:00";
   return (
     <div className="adhkar-audio-strip">
-      <ListenButton dhikrId={dhikrId} size={40} icon="play" />
+      <ListenButton dhikrId={dhikrId} size={32} icon="play" />
       <div className="adhkar-audio-wave" aria-hidden>
-        {WAVE.map((h, i) => (
-          <i key={i} className={i / WAVE.length < progress ? "is-played" : ""} style={{ height: `${Math.round(h * 100)}%` }} />
-        ))}
+        {WAVE.map((h, i) => {
+          const live = isThis && player.playing ? 0.35 + 0.65 * (player.levels[i % player.levels.length] ?? 0) : 1;
+          return <i key={i} className={i / WAVE.length < progress ? "is-played" : ""} style={{ height: `${Math.round(Math.min(1, h * live) * 100)}%` }} />;
+        })}
       </div>
       <span className="adhkar-audio-sep" aria-hidden />
       <span className="adhkar-audio-time">{time}</span>
