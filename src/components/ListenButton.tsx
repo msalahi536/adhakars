@@ -4,6 +4,7 @@ import { Volume2 } from "lucide-react";
 import { usePlaylist } from "./RecitationPlaylist";
 import { recitationPlayer, usePlayer, useRecitationMap, type Track } from "@/lib/recitation-player";
 import { setAnchor, setPopupOpen, usePopupOpen } from "@/lib/recitation-popup";
+import { Button } from "@/components/ui/button";
 
 type Props = {
   dhikrId: string;
@@ -38,7 +39,9 @@ export function ListenButton({ dhikrId, size = 32, title, section }: Props) {
 
   return (
     <div className="listen-button-wrap relative shrink-0" data-no-swipe style={{ width: size, height: size }}>
-      <button
+      <Button
+        variant="ghost"
+        size="icon"
         ref={btnRef}
         type="button"
         onClick={(e) => {
@@ -47,7 +50,7 @@ export function ListenButton({ dhikrId, size = 32, title, section }: Props) {
         }}
         aria-label="play recitation"
         aria-expanded={isOpen}
-        className="flex items-center justify-center rounded-full transition-transform active:scale-95"
+        className="flex items-center justify-center rounded-full p-0 transition-transform active:scale-95"
         style={{
           width: size,
           height: size,
@@ -60,7 +63,7 @@ export function ListenButton({ dhikrId, size = 32, title, section }: Props) {
             {player.levels.map((level, index) => <i key={index} style={{ height: `${Math.round(level * 100)}%` }} />)}
           </span>
         ) : <Volume2 size={Math.round(size * 0.5)} strokeWidth={1.75} />}
-      </button>
+      </Button>
     </div>
   );
 }
