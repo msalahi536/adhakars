@@ -122,6 +122,47 @@ export function SwipeStack({ items, counts, onIncrement, onReset, persistKey, fi
   scrubRef.current = (i) => scrubTo(i);
   const goToRef = useRef<(i: number) => void>(() => {});
   goToRef.current = (i) => goTo(i);
+  const idxRef = useRef(idx);
+  idxRef.current = idx;
+
+  // Hold an arrow to fly through the cards quickly (same acceleration as the old scrubber).
+  const holdTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const stopHold = () => {
+    if (holdTimerRef.current) {
+      clearTimeout(holdTimerRef.current);
+      holdTimerRef.current = null;
+    }
+  };
+  useEffect(() => stopHold, []);
+  const startHold = (dir: 1 | -1) => {
+    stopHold();
+    dismissIndexHint();
+    const step = (delay: number) => {
+      holdTimerRef.current = setTimeout(() => {
+        const next = idxRef.current + dir;
+        if (next < 0 || next > items.length - 1) {
+          stopHold();
+          return;
+        }
+        scrubRef.current(next);
+        void triggerHaptic("light");
+        // Accelerate: 340ms → 240ms → 150ms → 100ms floor
+        step(Math.max(100, Math.round(delay * 0.7)));
+      }, delay);
+    };
+    step(380);
+  };
+
+  // One-time hint above the arrows (same localStorage flag the old scrubber used).
+  const [showIndexHint, setShowIndexHint] = useState(false);
+  useEffect(() => {
+    try { if (localStorage.getItem(HINT_KEY) !== "1") setShowIndexHint(true); } catch { /* ignore */ }
+  }, []);
+  const dismissIndexHint = () => {
+    if (!showIndexHint) return;
+    setShowIndexHint(false);
+    try { localStorage.setItem(HINT_KEY, "1"); } catch { /* ignore */ }
+  };
   useEffect(() => {
     const onTrack = (e: Event) => {
       const id = (e as CustomEvent<string>).detail;
