@@ -5468,3 +5468,50 @@ html .bottom-nav-row .nav-item:has(.nav-active-mark[data-active]) {
   box-shadow: 0 3px 10px -5px color-mix(in oklab, var(--primary) 35%, transparent);
 }
 html .bottom-nav-row .nav-item:has(.nav-active-mark[data-active]) > span:not(.nav-active-mark) { font-weight: 600; }
+
+/* Premium adhkar refinement — pass 2 (reference proportions) */
+.adhkar-reference-card.dhikr-card {
+  box-shadow: 0 0 0 1px color-mix(in oklab, var(--card) 60%, transparent) inset, 0 2px 6px color-mix(in oklab, var(--card-foreground) 4%, transparent), 0 10px 30px -6px color-mix(in oklab, var(--card-foreground) 10%, transparent), 0 24px 60px -20px color-mix(in oklab, var(--card-foreground) 14%, transparent) !important;
+}
+.dhikr-card .adhkar-audio-strip { background: color-mix(in oklab, var(--card-foreground) 6%, var(--card)); padding: 3px 16px 3px 3px; }
+.dhikr-card .adhkar-audio-wave i { width: 1px; opacity: .65; }
+.dhikr-card .adhkar-source-badge {
+  height: 26px; min-height: 26px; padding: 0 14px 0 11px; gap: 8px; font-size: 11.5px;
+  background: color-mix(in oklab, var(--accent) 16%, color-mix(in oklab, var(--card-foreground) 5%, var(--card)));
+  color: color-mix(in oklab, var(--primary) 55%, var(--card-foreground));
+}
+.dhikr-card .adhkar-source-badge svg { width: 14px; height: 14px; opacity: .8; }
+.settings-button {
+  width: 34px !important; height: 34px !important;
+  background: color-mix(in oklab, var(--card) 62%, transparent) !important;
+  border: 1px solid color-mix(in oklab, var(--card) 70%, transparent) !important;
+  box-shadow: 0 1px 2px color-mix(in oklab, var(--card-foreground) 6%, transparent), 0 6px 18px -6px color-mix(in oklab, var(--card-foreground) 20%, transparent) !important;
+  backdrop-filter: blur(14px) saturate(140%);
+}
+.settings-button svg { width: 16px; height: 16px; }
+.daily-swipe-stack .adhkar-index-row--paged { gap: 12px; }
+.daily-swipe-stack .adhkar-index-row .adhkar-index-arrow,
+.daily-swipe-stack .adhkar-index-row--paged > span {
+  background: color-mix(in oklab, var(--card) 58%, transparent) !important;
+  border: 1px solid color-mix(in oklab, var(--card) 65%, transparent) !important;
+  box-shadow: 0 4px 12px -6px color-mix(in oklab, var(--card-foreground) 18%, transparent) !important;
+  backdrop-filter: blur(12px) saturate(140%);
+}
+.daily-swipe-stack .adhkar-index-row .adhkar-index-arrow { width: 26px !important; height: 26px !important; min-width: 26px !important; }
+.daily-swipe-stack .adhkar-index-row .adhkar-index-arrow svg { width: 12px; height: 12px; }
+.daily-swipe-stack .adhkar-index-row--paged > span { height: 26px; min-width: 60px; padding: 0 12px; font-size: 12px; font-weight: 600; }
+html .bottom-nav-row {
+  border-radius: 999px !important;
+  background: color-mix(in oklab, var(--card) 70%, transparent) !important;
+  border: 1px solid color-mix(in oklab, var(--card) 75%, var(--card-foreground) 5%) !important;
+  box-shadow: 0 2px 6px color-mix(in oklab, var(--card-foreground) 5%, transparent), 0 14px 36px -12px color-mix(in oklab, var(--card-foreground) 22%, transparent) !important;
+  backdrop-filter: blur(20px) saturate(140%);
+  padding: 5px 7px !important;
+}
+html .bottom-nav-row .nav-item { border-radius: 999px; }
+html .bottom-nav-row .nav-item:has(.nav-active-mark[data-active]) {
+  background: radial-gradient(120% 90% at 40% 30%, color-mix(in oklab, var(--primary) 20%, var(--card)), color-mix(in oklab, var(--primary) 9%, var(--card)) 70%);
+  box-shadow: inset 0 1px 0 color-mix(in oklab, var(--card) 70%, transparent), 0 4px 12px -6px color-mix(in oklab, var(--primary) 30%, transparent);
+}
+html .bottom-nav-row .nav-item:has(.nav-active-mark[data-active]) > * { color: color-mix(in oklab, var(--primary) 70%, var(--card-foreground)) !important; opacity: 1 !important; }
+html .bottom-nav-row .nav-active-mark[data-active] { width: 16px !important; height: 1.5px !important; border-radius: 2px; background: color-mix(in oklab, var(--primary) 70%, var(--card-foreground)) !important; }
