@@ -5515,5 +5515,7 @@ html .bottom-nav-row .nav-item:has(.nav-active-mark[data-active]) {
 }
 html .bottom-nav-row .nav-item:has(.nav-active-mark[data-active]) > * { color: color-mix(in oklab, var(--primary) 70%, var(--card-foreground)) !important; opacity: 1 !important; }
 html .bottom-nav-row .nav-active-mark[data-active] { width: 16px !important; height: 1.5px !important; border-radius: 2px; background: color-mix(in oklab, var(--primary) 70%, var(--card-foreground)) !important; }
-html .dhikr-card .adhkar-source-badge { background: color-mix(in oklab, oklch(0.86 0.04 95) 70%, var(--card)); color: color-mix(in oklab, var(--primary) 60%, var(--card-foreground)); }
+html .dhikr-card .adhkar-source-badge { background: color-mix(in oklab, oklch(0.88 0.03 100) 55%, var(--card)); color: color-mix(in oklab, var(--primary) 60%, var(--card-foreground)); }
 html[data-visual-phase="evening"] .dhikr-card .adhkar-source-badge { background: color-mix(in oklab, var(--accent) 18%, var(--card)); }
+html .bottom-nav-row .nav-item:has(.nav-active-mark[data-active]) { background: radial-gradient(120% 90% at 40% 30%, color-mix(in oklab, oklch(0.78 0.07 130) 40%, var(--card)), color-mix(in oklab, oklch(0.78 0.07 130) 18%, var(--card)) 75%); }
+html[data-visual-phase="evening"] .bottom-nav-row .nav-item:has(.nav-active-mark[data-active]) { background: color-mix(in oklab, var(--primary) 16%, var(--card)); }
