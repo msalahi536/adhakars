@@ -467,16 +467,7 @@ export function SwipeStack({ items, counts, onIncrement, onReset, persistKey, fi
 
 
 
-      {dailyLayout ? (
-        <Pagination
-          total={items.length}
-          active={idx}
-          onSelect={goTo}
-          onPrevious={goPrev}
-          onNext={goNext}
-          onScrub={scrubTo}
-        />
-      ) : <div className="mt-2 flex items-center justify-center px-6">
+      {dailyLayout ? null : <div className="mt-2 flex items-center justify-center px-6">
         <button
           onClick={goPrev}
           disabled={idx === 0}
