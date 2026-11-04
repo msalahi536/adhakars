@@ -154,16 +154,6 @@ export function DhikrCard({ dhikr, count, onIncrement, isSpecial, specialLabel, 
               </p>
             </div>
           )}
-          {referenceLayout && hasCommentary && (
-            <details className="adhkar-commentary">
-              <summary>
-                <span>Commentary</span>
-                {dhikr.details?.weak && <AlertTriangle aria-label="Weak or disputed narration" size={13} strokeWidth={1.8} />}
-              </summary>
-              <p>{dhikr.commentary}</p>
-              <p className="adhkar-commentary-hint">Press the reference pill below to open the full hadith, grading, reward, and notes.</p>
-            </details>
-          )}
         </div>
 
         {/* Bottom fade hint */}
@@ -235,8 +225,9 @@ function AudioStrip({ dhikrId }: { dhikrId: string }) {
       <ListenButton dhikrId={dhikrId} size={30} icon="play" />
       <div className="adhkar-audio-wave" aria-hidden>
         {WAVE.map((h, i) => {
-          const live = isThis && player.playing ? 0.35 + 0.65 * (player.levels[i % player.levels.length] ?? 0) : 1;
-          return <i key={i} className={i / WAVE.length < progress ? "is-played" : ""} style={{ height: `${Math.round(Math.min(1, h * live) * 100)}%` }} />;
+          const live = isThis && player.playing;
+          const height = live ? Math.min(1, h * (0.35 + 0.65 * (player.levels[i % player.levels.length] ?? 0))) : 0.15;
+          return <i key={i} className={i / WAVE.length < progress ? "is-played" : ""} style={{ height: `${Math.round(height * 100)}%` }} />;
         })}
       </div>
       <span className="adhkar-audio-sep" aria-hidden />
