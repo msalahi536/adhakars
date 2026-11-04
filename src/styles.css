@@ -5383,14 +5383,14 @@ body.has-adhkar-mini.adhkar-tucked .quran-player:not(.rec-panel), body.has-adhka
 /* Adhkar audio strip (replaces card titles) */
 .adhkar-audio-strip {
   display: flex; align-items: center; gap: 14px;
-  margin: 18px 18px 0; padding: 6px 18px 6px 6px; border-radius: 999px;
+  margin: 12px 14px 0; padding: 4px 16px 4px 4px; border-radius: 999px;
   background: color-mix(in oklab, var(--card-foreground) 5%, var(--card));
   box-shadow: inset 0 1px 0 color-mix(in oklab, var(--card) 60%, transparent);
 }
-.adhkar-audio-wave { flex: 1; display: flex; align-items: center; gap: 3px; height: 18px; padding-left: 4px; }
-.adhkar-audio-wave i { display: block; width: 1.5px; border-radius: 2px; background: color-mix(in oklab, var(--card-foreground) 55%, transparent); transition: background .2s; }
+.adhkar-audio-wave { flex: 1; display: flex; align-items: center; gap: 3.5px; height: 16px; padding-left: 6px; }
+.adhkar-audio-wave i { display: block; width: 1.5px; border-radius: 2px; background: color-mix(in oklab, var(--card-foreground) 70%, transparent); transition: background .2s, height .12s linear; }
 .adhkar-audio-wave i.is-played { background: var(--primary); }
-.adhkar-audio-sep { width: 1px; height: 22px; background: color-mix(in oklab, var(--card-foreground) 18%, transparent); }
+.adhkar-audio-sep { width: 1px; height: 18px; background: color-mix(in oklab, var(--card-foreground) 18%, transparent); }
 .adhkar-audio-time { font-family: var(--font-sans); font-size: 13px; font-variant-numeric: tabular-nums; color: color-mix(in oklab, var(--card-foreground) 75%, transparent); min-width: 32px; text-align: right; }
 html .dhikr-card .adhkar-audio-strip .listen-button-wrap button,
 html[data-preset] .dhikr-card .adhkar-audio-strip .listen-button-wrap button {
