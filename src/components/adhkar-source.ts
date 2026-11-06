@@ -7,3 +7,9 @@ export function adhkarSourceLabel(source: string) {
     .filter(Boolean)
     .join(" · ");
 }
+
+export function adhkarSourceWithGrading(source: string) {
+  const reference = adhkarSourceLabel(source);
+  const grading = source.split(/\s*·\s*/).find((part) => /^(?:sahih|hasan|da['’]?if|weak|authentic|jayyid)\b/i.test(part.trim()));
+  return grading ? `${reference} · ${grading.trim()}` : reference;
+}

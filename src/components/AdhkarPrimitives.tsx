@@ -2,7 +2,7 @@ import { BookOpen, Check, ChevronLeft, ChevronRight } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { ProgressRing } from "./ProgressRing";
 import { triggerHaptic } from "@/lib/theme";
-import { adhkarSourceLabel } from "./adhkar-source";
+import { adhkarSourceLabel, adhkarSourceWithGrading } from "./adhkar-source";
 import { Button } from "./ui/button";
 
 export function IslamicOrnament({ size = 24, className = "" }: { size?: number; className?: string }) {
@@ -38,13 +38,29 @@ export function OrnamentalDivider() {
 
 export function SourceBadge({ source, onClick }: { source: string; onClick?: () => void }) {
   const label = adhkarSourceLabel(source);
+  const candidate = adhkarSourceWithGrading(source);
+  const textRef = useRef<HTMLSpanElement>(null);
+  const measureRef = useRef<HTMLSpanElement>(null);
+  const [fitsGrading, setFitsGrading] = useState(false);
+  useEffect(() => {
+    const text = textRef.current;
+    const measure = measureRef.current;
+    if (!text || !measure) return;
+    const check = () => setFitsGrading(measure.getBoundingClientRect().width <= text.clientWidth - 4);
+    const observer = new ResizeObserver(check);
+    observer.observe(text);
+    check();
+    void document.fonts.ready.then(check);
+    return () => observer.disconnect();
+  }, [source]);
+  const visibleLabel = fitsGrading ? candidate : label;
   return (
     <Button
       variant="ghost"
       type="button"
       className="adhkar-source-badge"
-      title={label}
-      aria-label={`${label}. Open full details`}
+      title={visibleLabel}
+      aria-label={`${visibleLabel}. Open full details`}
       onClick={() => {
         void triggerHaptic("light");
         onClick?.();
@@ -52,7 +68,8 @@ export function SourceBadge({ source, onClick }: { source: string; onClick?: () 
       data-no-swipe
     >
       <BookOpen size={15} strokeWidth={1.3} />
-      <span>{label}</span>
+      <span ref={textRef} className="adhkar-source-text">{visibleLabel}</span>
+      <span ref={measureRef} className="adhkar-source-measure" aria-hidden>{candidate}</span>
     </Button>
   );
 }
