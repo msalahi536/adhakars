@@ -178,3 +178,7 @@ body:has(.q2-sheet) .q2-topbar,body:has(.q2-sheet) .q2-bottom {visibility:hidden
 @media(min-width:700px){.q2-opening{padding:20px 38px 0;justify-content:center;}.q2-opening .q2-line{min-height:74px;}.q2-topbar{left:0;right:0;}.q2-bottom{left:0;right:0;}.q2-actionbar > button:not(.q2-mic){min-width:0;}}
 @media(max-width:370px){.q2-topbar{left:12px;right:12px;grid-template-columns:84px minmax(0,1fr) 84px;}.q2-header-left button,.q2-header-right button{width:40px;}.q2-location{font-size:24px!important;}.q2-location small{font-size:12px;}.q2-bottom{left:12px;right:12px;}.q2-actionbar{padding:6px;grid-template-columns:1.5fr 1.5fr 64px 1fr 1fr 1fr;}.q2-actionbar small{font-size:10px;}.q2-actionbar .q2-mic{width:60px;height:60px;}}
 @media(max-height:740px){.q2-opening .q2-line{min-height:52px;line-height:1.65;}.q2-opening .q2-basmala{min-height:52px;}.q2-opening .q2-page-divider{margin-top:20px;}.q2-opening{padding-top:4px;min-height:calc(100dvh - 235px);}.q2-opening-cartouche{margin-bottom:12px;}}
+/* added words: a small red marker just before the word they were said before */
+.q2-word.q2-added{position:relative;}
+.q2-word.q2-added::after{content:"";position:absolute;inset-inline-start:-.18em;top:50%;width:.32em;height:.32em;border-radius:999px;background:var(--q2-error);transform:translate(50%,-50%);pointer-events:none;box-shadow:0 0 0 2px color-mix(in oklab,var(--q2-error) 22%,transparent);}
+.q2-added-row strong span{font-family:inherit;margin-inline-start:.25em;}

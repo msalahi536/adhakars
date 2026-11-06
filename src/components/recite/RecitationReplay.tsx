@@ -61,9 +61,9 @@ export function useRecitationReplay(blob: Blob | null, result: CheckResult, high
     setError(""); setPlaying(true);
     return true;
   }
-  async function play(key?: string) {
+  async function play(key?: string, window?: { before?: number; after?: number }) {
     stop(); if (!url.current) return;
-    const clip = key ? clipFor(timeline, result, key) : null;
+    const clip = key ? clipFor(timeline, result, key, window) : null;
     if (key && !clip) { setError("This word has no recorded timing yet."); return; }
     if (clip && await playClip(clip)) return;
     const a = new Audio(url.current); audio.current = a;

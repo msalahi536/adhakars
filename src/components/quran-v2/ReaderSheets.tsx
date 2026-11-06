@@ -13,6 +13,7 @@ import {ReplayButton,useRecitationReplay} from "@/components/recite/RecitationRe
 import {ReaderPage} from "./ReaderPage";
 import {LAYOUTS,matchesSurahSearch,type ReaderLayout,type ReaderPaging} from "./reader-rules";
 import {SampleReport} from "@/components/hifz/SampleReport";
+import {addedWordKeys,ADDED_CLIP} from "@/components/recite/ai-feedback";
 import type {Passage} from "@/components/recite/ai-performance";
 
 export type ReaderPreferences={layout:ReaderLayout;paging:ReaderPaging;size:number;tajweed:boolean;highlight:boolean;follow:boolean;arabic:boolean;translit:boolean;translation:boolean;translitSize:number;translationSize:number;translator:number;english:boolean};
@@ -56,14 +57,18 @@ export function ReaderMistakes({result,recording,tips,chapters,correct,highlight
   const empty:CheckResult={words:[],extras:[],reachedIndex:-1,startIndex:0,startKey:""};
   const replay=useRecitationReplay(recording,result??empty,highlight);
   const words=result?.words.filter(w=>w.status==="wrong"||w.status==="skipped")??[];
+  const added=addedWordKeys(result).map(key=>({key,text:result?.words.find(w=>w.key===key)?.text??key}));
+  const name=(key:string)=>chapters.find(c=>c.id===Number(key.split(":")[0]))?.name_simple;
+  const you=(key:string,clip?:typeof ADDED_CLIP)=>{if(listening){stopMic?.();return;}void replay.play(key,clip);};
   return <ReaderSheet title="Session mistakes" close={()=>{replay.stop();close();}}>
     <ReplayButton available={!!recording&&!!result} playing={replay.playing} play={()=>void replay.play()} stop={replay.stop}/>
     <Button variant="ghost" onClick={()=>{replay.stop();reset();}}><RotateCcw size={16}/>Reset mistakes</Button>
     {result&&<SampleReport result={result} recording={recording} passages={passages} updates={updates}/>}
     {listening&&<p>Stop the mic to hear how you said each word.</p>}
-    {!listening&&!recording&&!!words.length&&<p>Your recording isn’t available for these mistakes. Recite again with the mic to hear yourself.</p>}
-    {!words.length&&<p>No mistakes recorded in this session.</p>}
-    {words.map(w=><section key={w.key} className="q2-mistake-row"><div><strong dir="rtl">{w.text}</strong><small>{chapters.find(c=>c.id===Number(w.key.split(":")[0]))?.name_simple} · ayah {w.key.split(":")[1]} · {w.status}</small></div><div className="q2-segments"><Button variant="outline" onClick={()=>correct(w.key)}>Correct <Play size={14}/></Button><Button variant="outline" disabled={!recording&&!listening} onClick={()=>{if(listening){stopMic?.();return;}void replay.play(w.key);}}>You <Play size={14}/></Button></div></section>)}
+    {!listening&&!recording&&!!(words.length||added.length)&&<p>Your recording isn’t available for these mistakes. Recite again with the mic to hear yourself.</p>}
+    {!words.length&&!added.length&&<p>No mistakes recorded in this session.</p>}
+    {words.map(w=><section key={w.key} className="q2-mistake-row"><div><strong dir="rtl">{w.text}</strong><small>{chapters.find(c=>c.id===Number(w.key.split(":")[0]))?.name_simple} · ayah {w.key.split(":")[1]} · {w.status}</small></div><div className="q2-segments"><Button variant="outline" onClick={()=>correct(w.key)}>Correct <Play size={14}/></Button><Button variant="outline" disabled={!recording&&!listening} onClick={()=>you(w.key)}>You <Play size={14}/></Button></div></section>)}
+    {added.map(a=><section key={`added-${a.key}`} className="q2-mistake-row q2-added-row"><div><strong>You added words before <span dir="rtl">{a.text}</span></strong><small>{name(a.key)} · ayah {a.key.split(":")[1]} · added words</small></div><div className="q2-segments"><Button variant="outline" disabled={!recording&&!listening} aria-label={`Hear the words you added before ${a.key}`} onClick={()=>you(a.key,ADDED_CLIP)}>Hear it <Play size={14}/></Button></div></section>)}
     {!!tips.length&&<><h3>Tajweed tips</h3>{tips.map(t=><section key={t.key} className="q2-mistake-row"><strong dir="rtl">{t.text}</strong><small>{t.kind}</small><p>{t.tip}</p><Button variant="ghost" onClick={()=>correct(t.key)}><Play size={15}/>Listen</Button></section>)}<small>Experimental tips, not a tajweed grade. Check with a qualified teacher.</small></>}
     {replay.error&&<p role="alert">{replay.error}</p>}
   </ReaderSheet>;

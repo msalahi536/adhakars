@@ -26,6 +26,7 @@ import {SilenceMonitor} from "./SilenceMonitor";
 import {debugEnabled} from "@/lib/hifz-debug";
 import {extendWindow,openingWindow,preservedScrollOffset,type PageWindow} from "./scroll-window";
 import {paintLiveWords} from "./live-marks";
+import {addedWordKeys,mistakeCount} from "@/components/recite/ai-feedback";
 import "./reader.css";
 async function verseLocation(key:string):Promise<{page:number;hizb:number}>{
  const response=await fetch(`https://api.quran.com/api/v4/verses/by_key/${key}?fields=page_number,hizb_number`);
@@ -49,7 +50,7 @@ export function UnifiedReader({chapterId=1,verse=1,initialPage,initialMode,back,
   const [sheet,setSheet]=useState<"navigation"|"settings"|"mistakes"|"more"|"reciter"|"echo"|"search"|null>(null);
   const [result,setResult]=useState<CheckResult|null>(null),[marks,setMarks]=useState<Marks>({}),[tips,setTips]=useState<TajweedHint[]>([]),[highlight,setHighlight]=useState<string|null>(null);
   const [confirmReset,setConfirmReset]=useState(false),[resetting,setResetting]=useState(false);
-  const liveMarks=useRef<Marks>({}),resetPending=useRef(false),sessionPage=useRef<number|null>(null);
+  const liveMarks=useRef<Marks>({}),liveAdded=useRef<Set<string>>(new Set()),seenAdded=useRef(new Set<string>()),resetPending=useRef(false),sessionPage=useRef<number|null>(null);
   const [elsewhere,setElsewhere]=useState<(Elsewhere & {page:number})|null>(null),[recent,setRecent]=useState<ReadingLocation[]>([]),[bookmarks,setBookmarks]=useState<ReadingLocation[]>([]);
   const [reciter,setReciter]=useState(7),[error,setError]=useState(""),[translationMap,setTranslationMap]=useState<Record<string,string>>({});
   const [hizb,setHizb]=useState(1);
@@ -73,7 +74,7 @@ export function UnifiedReader({chapterId=1,verse=1,initialPage,initialMode,back,
   const debugUpdates=useRef<{elapsed:number;result:CheckResult}[]>([]),debugStart=useRef(0);
   const sessionPassages=useRef<ReturnType<typeof pageRanges>>([]);
   const voice=useReaderVoice({
-    update:r=>{if(resetPending.current)return;const next:Marks={};for(const w of r.words)next[w.key]=w.status;liveMarks.current=next;if(root.current)paintLiveWords(root.current,next,true);setResult(r);setMarks(next);if(debugEnabled())debugUpdates.current.push({elapsed:(performance.now()-debugStart.current)/1000,result:structuredClone(r)});for(const w of r.words){if((w.status==="wrong"||w.status==="skipped")&&seenMarks.current.get(w.key)!==w.status)feedback(w.status==="wrong"?"wrong":"skip");seenMarks.current.set(w.key,w.status);}},
+    update:r=>{if(resetPending.current)return;const next:Marks={};for(const w of r.words)next[w.key]=w.status;liveMarks.current=next;const added=addedWordKeys(r);liveAdded.current=new Set(added);if(root.current)paintLiveWords(root.current,next,true,null,liveAdded.current);for(const k of added){if(!seenAdded.current.has(k)){seenAdded.current.add(k);feedback("small");}}setResult(r);setMarks(next);if(debugEnabled())debugUpdates.current.push({elapsed:(performance.now()-debugStart.current)/1000,result:structuredClone(r)});for(const w of r.words){if((w.status==="wrong"||w.status==="skipped")&&seenMarks.current.get(w.key)!==w.status)feedback(w.status==="wrong"?"wrong":"skip");seenMarks.current.set(w.key,w.status);}},
     elsewhere:p=>{
       const token=++locationGeneration.current;
       if(jumpTimer.current)clearTimeout(jumpTimer.current);
@@ -95,7 +96,7 @@ export function UnifiedReader({chapterId=1,verse=1,initialPage,initialMode,back,
   paintState.current={active:voice.phase==="active"||voice.phase==="finishing",highlight};
   useLayoutEffect(()=>{
     const node=root.current;if(!node||lesson)return;
-    const paint=()=>paintLiveWords(node,liveMarks.current,paintState.current.active,paintState.current.highlight);
+    const paint=()=>paintLiveWords(node,liveMarks.current,paintState.current.active,paintState.current.highlight,liveAdded.current);
     paint();const observer=new MutationObserver(paint);observer.observe(node,{childList:true,subtree:true});
     return()=>observer.disconnect();
   },[lesson,marks,highlight,voice.phase,hidden,revealed,prefs.layout,prefs.paging]);
@@ -111,7 +112,7 @@ export function UnifiedReader({chapterId=1,verse=1,initialPage,initialMode,back,
       const accepted=await voiceRef.current.resetMistakes();
       if(accepted===false)return;
       audio.current?.pause();cancelHifzFeedback();
-      liveMarks.current={};seenMarks.current.clear();setResult(null);setMarks({});setTips([]);setHighlight(null);setElsewhere(null);locationGeneration.current++;
+      liveMarks.current={};liveAdded.current=new Set();seenAdded.current.clear();seenMarks.current.clear();setResult(null);setMarks({});setTips([]);setHighlight(null);setElsewhere(null);locationGeneration.current++;
       debugUpdates.current=[];debugStart.current=performance.now();if(root.current)paintLiveWords(root.current,{},voiceRef.current.phase==="active");
       setConfirmReset(false);
     }finally{resetPending.current=false;setResetting(false);}
@@ -265,7 +266,7 @@ export function UnifiedReader({chapterId=1,verse=1,initialPage,initialMode,back,
       {(player.playing||player.loading)&&<div className="q2-player"><Button variant="ghost" size="icon" aria-label={player.playing?"Pause recitation":"Play recitation"} onClick={()=>quranPlayer.toggle()}>{player.playing?<Pause size={17}/>:<Play size={17}/>}</Button><Button variant="ghost" onClick={()=>setSheet("reciter")}>{reciterName(findReciter(player.reciterId))}</Button><Button variant="ghost" onClick={()=>quranPlayer.setRate(player.rate===1?1.25:player.rate===1.25?.75:1)}>{player.rate}×</Button><Button variant="ghost" size="icon" aria-label="Close player" onClick={()=>quranPlayer.stop()}><X size={16}/></Button></div>}
       {voice.phase==="active"&&<><small className="q2-disclaimer">{voice.mode==="follow"?"Following only · no grading":AI_DISCLAIMER}</small>{voice.mode==="follow"&&<Button variant="outline" onClick={()=>void voice.stop()}><Square size={13}/>Stop following</Button>}</>}
       {(hidden||lesson?.hidden)&&<div className="q2-reveal"><Button variant="outline" size="sm" onClick={()=>lesson?lesson.peek():reveal(false)}>Reveal word</Button><Button variant="outline" size="sm" onClick={()=>lesson?lesson.peek():reveal(true)}>Reveal ayah</Button></div>}
-      <nav className="q2-actionbar" aria-label="Reader actions"><Button variant="ghost" onClick={play}><Play size={22}/><small>Play</small></Button><Button variant="ghost" onClick={()=>{const layout=nextLayout(prefs.layout);change({layout});toast(layout);}}><LayoutGrid size={22}/><small>Layout</small></Button><Button className="q2-mic" aria-label={voice.phase==="active"?"Stop microphone":"Start smart microphone"} disabled={lesson?.busy||voice.phase==="loading"||voice.phase==="finishing"} onClick={mic}>{voice.phase==="active"?<VoiceBars stream={voice.stream}/>:lesson?.stream?<VoiceBars stream={lesson.stream}/>:<Mic size={32}/>}</Button><Button variant="ghost" onClick={()=>setHidden(v=>!v)}>{hidden?<Eye size={22}/>:<EyeOff size={22}/>}<small>{hidden?"Show":"Hide"}<br/>verses</small></Button><Button variant="ghost" aria-label="Mistakes" onClick={()=>setSheet("mistakes")}><span className="q2-badge-icon"><MessageSquareCheck size={22}/>{!!result?.words.filter(w=>w.status==="wrong"||w.status==="skipped").length&&<b>{result.words.filter(w=>w.status==="wrong"||w.status==="skipped").length}</b>}</span><small>Mistakes</small></Button><Button variant="ghost" size="icon" aria-label="More reader actions" onClick={()=>setSheet("more")}><MoreHorizontal size={20}/></Button></nav>
+      <nav className="q2-actionbar" aria-label="Reader actions"><Button variant="ghost" onClick={play}><Play size={22}/><small>Play</small></Button><Button variant="ghost" onClick={()=>{const layout=nextLayout(prefs.layout);change({layout});toast(layout);}}><LayoutGrid size={22}/><small>Layout</small></Button><Button className="q2-mic" aria-label={voice.phase==="active"?"Stop microphone":"Start smart microphone"} disabled={lesson?.busy||voice.phase==="loading"||voice.phase==="finishing"} onClick={mic}>{voice.phase==="active"?<VoiceBars stream={voice.stream}/>:lesson?.stream?<VoiceBars stream={lesson.stream}/>:<Mic size={32}/>}</Button><Button variant="ghost" onClick={()=>setHidden(v=>!v)}>{hidden?<Eye size={22}/>:<EyeOff size={22}/>}<small>{hidden?"Show":"Hide"}<br/>verses</small></Button><Button variant="ghost" aria-label="Mistakes" onClick={()=>setSheet("mistakes")}><span className="q2-badge-icon"><MessageSquareCheck size={22}/>{!!mistakeCount(result)&&<b>{mistakeCount(result)}</b>}</span><small>Mistakes</small></Button><Button variant="ghost" size="icon" aria-label="More reader actions" onClick={()=>setSheet("more")}><MoreHorizontal size={20}/></Button></nav>
     </div>
     {tabbar&&chrome&&<div className="q2-tabs"><BottomNav/></div>}
     <VoiceConsent phase={voice.phase} progress={voice.progress} error={voice.error} begin={()=>{unlockHifzFeedbackAudio();seenMarks.current.clear();void voice.begin();}} cancel={voice.cancel}/>
