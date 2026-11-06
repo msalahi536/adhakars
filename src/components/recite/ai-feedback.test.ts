@@ -21,5 +21,8 @@ describe("added words", () => {
     extras: [{ atKey: "1:1:3", kind: "extra" as const, heard: "x" }, { atKey: "1:1:3", kind: "extra" as const, heard: "y" }, { atKey: "1:1:4", kind: "repeat" as const, heard: "z" }], reachedIndex: 1 };
   it("extras of kind extra are mistakes before their atKey, repeats are not", () => expect(addedWordKeys(r)).toEqual(["1:1:3"]));
   it("counts wrong + added, never unsure", () => expect(mistakeCount(r)).toBe(2));
+  it("marks an added word's atKey wrong without changing repeats", () => {
+    expect(mapAiWords(r, ["1:1:3", "1:1:4"]).statuses).toEqual({ "1:1:3": "wrong" });
+  });
   it("added clip covers 1s before and 0.1s after", () => expect(ADDED_CLIP).toEqual({ before: 1.0, after: 0.1 }));
 });

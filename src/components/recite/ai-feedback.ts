@@ -11,6 +11,7 @@ export function mapAiWords(result: CheckResult, visibleKeys: string[]) {
       if (visible.has(nextKey)) statuses[nextKey] = word.status;
     }
   }
+  for (const key of addedWordKeys(result)) if (visible.has(key)) statuses[key] = "wrong";
   return { statuses, repeated };
 }
 export function newMistakes(previous: Record<string, WordStatus>, current: Record<string, WordStatus>) {
