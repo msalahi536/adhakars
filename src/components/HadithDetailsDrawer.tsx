@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { Award, BookOpen, Check, ChevronRight, Copy, X } from "lucide-react";
+import { Award, BookOpen, Check, ChevronRight, Copy, Gift, MessageSquare, X } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import type { Dhikr } from "@/data/adhkar";
 import {
   Dialog,
@@ -16,51 +17,51 @@ type Props = {
   onOpenChange: (open: boolean) => void;
 };
 
-const cardStyle: React.CSSProperties = {
-  background: "color-mix(in oklab, var(--foreground) 4%, transparent)",
-  border: "1px solid color-mix(in oklab, var(--foreground) 9%, transparent)",
-};
-
 function CopyBtn({ text, label }: { text: string; label: string }) {
   const [done, setDone] = useState(false);
   return (
-    <button
+    <Button
+      variant="ghost"
+      size="icon"
       type="button"
       aria-label={`Copy ${label}`}
+      title={`Copy ${label}`}
       onClick={() => {
         navigator.clipboard?.writeText(text).then(() => {
           setDone(true);
           setTimeout(() => setDone(false), 1400);
         }).catch(() => {});
       }}
-      className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-muted-foreground transition-colors hover:text-foreground"
-      style={{ background: "color-mix(in oklab, var(--foreground) 7%, transparent)" }}
+      className="hadith-icon-button h-8 w-8 shrink-0 rounded-full"
     >
       {done ? <Check size={14} /> : <Copy size={14} />}
-    </button>
+    </Button>
   );
 }
 
 function Label({ children }: { children: string }) {
   return (
-    <h3 className="text-[11px] font-semibold uppercase tracking-[0.18em]" style={{ color: "color-mix(in oklab, var(--accent) 80%, var(--muted-foreground))" }}>
+    <h3 className="hadith-section-label text-[11px] font-semibold uppercase tracking-normal">
       {children}
     </h3>
   );
 }
 
-function TextCard({ title, text, arabic, copy }: { title: string; text?: string; arabic?: boolean; copy?: boolean }) {
+function TextCard({ title, text, arabic, copy, icon }: { title: string; text?: string; arabic?: boolean; copy?: boolean; icon?: React.ReactNode }) {
   if (!text) return null;
   return (
-    <section className="rounded-[20px] px-4 pb-4 pt-3.5" style={cardStyle}>
+    <section className="hadith-detail-section rounded-[24px] px-5 pb-4 pt-3.5">
       <div className="mb-2 flex items-center justify-between gap-2">
-        <Label>{title}</Label>
+        <div className="flex items-center gap-3">
+          {icon && <span className="hadith-icon-button flex h-8 w-8 shrink-0 items-center justify-center rounded-full">{icon}</span>}
+          <Label>{title}</Label>
+        </div>
         {copy && <CopyBtn text={text} label={title.toLowerCase()} />}
       </div>
       {arabic ? (
-        <p className="arabic whitespace-pre-line text-center text-[25px] leading-[2.05]" lang="ar" dir="rtl">{text}</p>
+        <p className="hadith-detail-text arabic whitespace-pre-line py-1 text-center text-[27px] leading-[1.95]" lang="ar" dir="rtl">{text}</p>
       ) : (
-        <p className="whitespace-pre-line text-[14.5px] leading-7 text-foreground/90">{text}</p>
+        <p className="hadith-detail-text whitespace-pre-line text-[15px] leading-[1.65]">{text}</p>
       )}
     </section>
   );
@@ -68,18 +69,19 @@ function TextCard({ title, text, arabic, copy }: { title: string; text?: string;
 
 function RowPill({ icon, text, open, onClick }: { icon: React.ReactNode; text: string; open?: boolean; onClick?: () => void }) {
   return (
-    <button
+    <Button
+      variant="ghost"
       type="button"
       onClick={onClick}
-      className="flex w-full items-center gap-3 rounded-full py-2 pl-2 pr-4 text-left"
-      style={cardStyle}
+      aria-expanded={open}
+      className="hadith-row-pill h-auto w-full justify-start gap-3 whitespace-normal rounded-full py-2 pl-2 pr-3 text-left font-normal"
     >
-      <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-foreground/80" style={{ background: "color-mix(in oklab, var(--foreground) 7%, transparent)" }}>
+      <span className="hadith-icon-button flex h-9 w-9 shrink-0 items-center justify-center rounded-full">
         {icon}
       </span>
-      <span className="min-w-0 flex-1 text-[14.5px] text-foreground/90">{text}</span>
-      <ChevronRight size={16} className={`shrink-0 text-muted-foreground transition-transform ${open ? "rotate-90" : ""}`} />
-    </button>
+      <span className="hadith-detail-text min-w-0 flex-1 text-[14px] leading-5">{text}</span>
+      <ChevronRight size={16} className={`hadith-section-label shrink-0 transition-transform ${open ? "rotate-90" : ""}`} />
+    </Button>
   );
 }
 
@@ -93,46 +95,46 @@ export function HadithDetailsDrawer({ dhikr, open, onOpenChange }: Props) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent
-        className="hadith-details-drawer grid max-h-[82dvh] w-[calc(100%_-_28px)] max-w-[420px] grid-rows-[auto_minmax(0,1fr)] gap-0 overflow-hidden rounded-[30px] border-border bg-card p-0 text-card-foreground shadow-2xl [&>button:last-child]:hidden"
+        className="hadith-details-drawer grid h-[min(92dvh,860px)] w-[calc(100%_-_24px)] max-w-[460px] grid-rows-[auto_minmax(0,1fr)] gap-0 overflow-hidden rounded-[32px] p-0 [&>button:last-child]:hidden"
       >
-        <DialogHeader className="relative px-5 pb-3 pt-3 text-left">
-          <div className="mx-auto mb-3 h-1 w-10 rounded-full bg-muted-foreground/30" />
-          <div className="flex items-center gap-3.5 pr-11">
+        <DialogHeader className="relative px-6 pb-4 pt-4 text-left">
+          <div className="hadith-sheet-handle mx-auto mb-8 h-[5px] w-12 rounded-full" />
+          <div className="flex items-center gap-4">
             <span
-              className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full"
-              style={{ background: "color-mix(in oklab, var(--accent) 55%, var(--card))", color: "var(--card)" }}
+              className="hadith-source-icon flex h-16 w-16 shrink-0 items-center justify-center rounded-full"
             >
-              <BookOpen size={19} strokeWidth={1.7} />
+              <BookOpen size={29} strokeWidth={1.5} />
             </span>
             <div className="min-w-0">
-              <DialogTitle className="font-serif text-[21px] leading-[1.2]">{dhikr.title}</DialogTitle>
-              <DialogDescription className="mt-1 text-xs leading-5 text-muted-foreground">
+              <DialogTitle className="sr-only">Hadith details</DialogTitle>
+              <DialogDescription className="hadith-section-label text-[13px] leading-[1.65]">
                 {dhikr.source}
               </DialogDescription>
             </div>
           </div>
-          <DialogClose
+          <DialogClose asChild>
+          <Button variant="ghost" size="icon"
             aria-label="Close hadith details"
-            className="absolute right-4 top-5 flex h-9 w-9 items-center justify-center rounded-full text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-            style={{ background: "color-mix(in oklab, var(--foreground) 7%, transparent)" }}
+            className="hadith-icon-button absolute right-4 top-4 h-9 w-9 rounded-full"
           >
             <X size={16} />
+          </Button>
           </DialogClose>
         </DialogHeader>
 
         <div
-          className="hide-scrollbar min-h-0 space-y-3 overflow-y-auto overscroll-contain px-4 pb-6 pt-2"
+          className="hadith-detail-scroll hide-scrollbar min-h-0 space-y-4 overflow-y-auto overscroll-contain px-4 pb-6 pt-1"
           style={{ WebkitOverflowScrolling: "touch" }}
           data-no-swipe
         >
           <TextCard title="Arabic" text={dhikr.arabic} arabic copy />
           <TextCard title="Transliteration" text={dhikr.transliteration} copy />
           <TextCard title="Translation" text={dhikr.translation} copy />
-          <TextCard title="Reward · In short" text={details?.reward} />
-          <TextCard title="Commentary" text={dhikr.commentary} />
+          <TextCard title="Reward · In short" text={details?.reward} icon={<Gift size={16} strokeWidth={1.6} />} />
+          <TextCard title="Commentary" text={dhikr.commentary} icon={<MessageSquare size={16} strokeWidth={1.6} />} />
 
           {details?.grading && (
-            <section className="space-y-2 pt-2">
+            <section className="hadith-detail-section space-y-2 rounded-[24px] p-3.5">
               <div className="px-1"><Label>Grading</Label></div>
               <RowPill icon={<Award size={16} strokeWidth={1.6} />} text={gradeShort || details.grading} open={showGrading} onClick={() => setShowGrading((v) => !v)} />
               {showGrading && <p className="whitespace-pre-line px-2 text-[13.5px] leading-6 text-muted-foreground">{details.grading}</p>}
@@ -140,7 +142,7 @@ export function HadithDetailsDrawer({ dhikr, open, onOpenChange }: Props) {
           )}
 
           {hasNarration && (
-            <section className="space-y-2 pt-2">
+            <section className="hadith-detail-section space-y-2 rounded-[24px] p-3.5">
               <div className="px-1"><Label>Full narration</Label></div>
               <RowPill icon={<BookOpen size={16} strokeWidth={1.6} />} text={showNarration ? "Hide full hadith and narration" : "View full hadith and narration"} open={showNarration} onClick={() => setShowNarration((v) => !v)} />
               {showNarration && (
