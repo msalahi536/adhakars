@@ -2,6 +2,42 @@
 @source "../src";
 @import "tw-animate-css";
 
+/* Hadith reference sheet: theme-derived porcelain and softly shaded insets. */
+.hadith-details-drawer {
+  --hadith-paper: color-mix(in oklab, var(--card) 65%, var(--background));
+  --hadith-ink: var(--card-foreground);
+  --hadith-tint: color-mix(in oklab, var(--accent) 75%, var(--hadith-ink));
+  --hadith-rim: color-mix(in oklab, var(--hadith-ink) 8%, var(--hadith-paper));
+  --hadith-sheet-gradient: linear-gradient(145deg, var(--card), var(--hadith-paper) 55%, color-mix(in oklab, var(--hadith-paper) 96%, var(--accent)));
+  --hadith-panel-gradient: linear-gradient(140deg, var(--card), color-mix(in oklab, var(--hadith-paper) 97%, var(--hadith-ink)));
+  --hadith-control-gradient: linear-gradient(135deg, color-mix(in oklab, var(--hadith-paper) 88%, var(--accent)), color-mix(in oklab, var(--hadith-paper) 94%, var(--accent)));
+  --hadith-source-gradient: linear-gradient(140deg, color-mix(in oklab, var(--accent) 65%, var(--card)), color-mix(in oklab, var(--accent) 85%, var(--card)));
+  --hadith-shadow: 0 22px 64px color-mix(in oklab, var(--foreground) 22%, transparent), inset 0 1px 0 color-mix(in oklab, var(--card) 85%, transparent);
+  background: var(--hadith-sheet-gradient);
+  border-color: var(--hadith-rim);
+  color: var(--hadith-ink);
+  box-shadow: var(--hadith-shadow);
+}
+.hadith-detail-section {
+  background: var(--hadith-panel-gradient);
+  border: 1px solid var(--hadith-rim);
+  box-shadow: inset 0 1px 0 color-mix(in oklab, var(--card) 65%, transparent), 0 1px 2px color-mix(in oklab, var(--hadith-ink) 2%, transparent);
+}
+.hadith-section-label { color: var(--hadith-tint); }
+.hadith-detail-text { color: var(--hadith-ink); }
+.hadith-sheet-handle { background: color-mix(in oklab, var(--accent) 35%, var(--hadith-paper)); }
+.hadith-icon-button, .hadith-row-pill {
+  background: var(--hadith-control-gradient);
+  color: var(--hadith-tint);
+}
+.hadith-icon-button:hover, .hadith-row-pill:hover { background: var(--hadith-control-gradient); filter: brightness(0.98); }
+.hadith-row-pill { border: 1px solid var(--hadith-rim); }
+.hadith-source-icon {
+  background: var(--hadith-source-gradient);
+  color: var(--accent-foreground);
+  box-shadow: inset 0 -2px 0 color-mix(in oklab, var(--accent) 65%, transparent), inset 0 1px 0 color-mix(in oklab, var(--card) 25%, transparent);
+}
+
 
 
 @theme inline {
