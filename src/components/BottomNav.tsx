@@ -1,5 +1,5 @@
 import { Link, useRouterState } from "@tanstack/react-router";
-import { Sun, Moon, MoreHorizontal } from "lucide-react";
+import "./BottomNav.css";
 import { useEffect, useState, type CSSProperties } from "react";
 import {
   getLastMoreDestination, MORE_DESTINATION_EVENT, MORE_DESTINATIONS, type MoreDestination,
@@ -8,9 +8,9 @@ import {
 
 type NavIconProps = { size?: number; strokeWidth?: number; style?: CSSProperties };
 
-function SalahIcon({ size = 22, strokeWidth = 1.5, style }: NavIconProps) {
+function SalahIcon() {
   return (
-    <svg aria-hidden viewBox="0 0 24 24" width={size} height={size} fill="none" stroke="currentColor" strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round" style={style}>
+    <svg aria-hidden viewBox="0 0 24 24">
       <path d="M12 2.5v1.5" />
       <path d="M12 4c-3 1.6-4.8 3.8-4.8 6.2h9.6C16.8 7.8 15 5.6 12 4z" />
       <path d="M5.5 21V12.5h13V21" />
@@ -32,20 +32,25 @@ export function TasbihIcon({ size = 22, strokeWidth = 1.5, style }: NavIconProps
   );
 }
 
-function QuranIcon({ size = 22, strokeWidth = 1.5, style }: NavIconProps) {
-  return (
-    <svg aria-hidden viewBox="0 0 24 24" width={size} height={size} fill="none" stroke="currentColor" strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round" style={style}>
-      <path d="M12 6.5C10 5 7 4.5 3.5 5v13c3.5-.5 6.5 0 8.5 1.5 2-1.5 5-2 8.5-1.5V5C17 4.5 14 5 12 6.5Z" /><path d="M12 6.5v13" /><path d="M5 20.5 12 22l7-1.5" />
-    </svg>
-  );
+function MorningIcon() {
+  return <svg aria-hidden viewBox="0 0 24 24"><circle cx="12" cy="12" r="4.5"/><path d="M12 2.5v2M12 19.5v2M2.5 12h2M19.5 12h2M5.3 5.3l1.4 1.4M17.3 17.3l1.4 1.4M5.3 18.7l1.4-1.4M17.3 6.7l1.4-1.4"/></svg>;
+}
+function EveningIcon() {
+  return <svg aria-hidden viewBox="0 0 24 24"><path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z"/></svg>;
+}
+function QuranIcon() {
+  return <svg aria-hidden viewBox="0 0 24 24"><path d="M12 6.5C9.5 4.8 6 4.5 3 5.3v13c3-.8 6.5-.5 9 1.2 2.5-1.7 6-2 9-1.2v-13c-3-.8-6.5-.5-9 1.2z"/><path d="M12 6.5v13"/><path d="M1.5 7v12.8c3.5-.7 7-.3 10.5 1.4 3.5-1.7 7-2.1 10.5-1.4V7"/></svg>;
+}
+function MoreIcon() {
+  return <svg aria-hidden viewBox="0 0 24 24"><circle cx="5.5" cy="12" r="1.1"/><circle cx="12" cy="12" r="1.1"/><circle cx="18.5" cy="12" r="1.1"/></svg>;
 }
 
 const tabs = [
-  { to: "/app" as const, label: "Morning", Icon: Sun },
-  { to: "/app/evening" as const, label: "Evening", Icon: Moon },
+  { to: "/app" as const, label: "Morning", Icon: MorningIcon },
+  { to: "/app/evening" as const, label: "Evening", Icon: EveningIcon },
   { to: "/app/salah" as const, label: "Salah", Icon: SalahIcon },
   { to: "/app/quran" as const, label: "Quran", Icon: QuranIcon },
-  { to: "/app/more" as const, label: "More", Icon: MoreHorizontal },
+  { to: "/app/more" as const, label: "More", Icon: MoreIcon },
 ];
 
 export function BottomNav() {
@@ -61,69 +66,36 @@ export function BottomNav() {
   }, []);
 
 
-  const activeIndex = tabs.findIndex((t) => t.to === "/app/more"
-    ? pathname === "/app/more" || moreNestedActive
-    : pathname === t.to || pathname === t.to + "/");
-
-  const iconColor = "var(--nav-inactive)";
-  const activeColor = "var(--nav-active)";
-  const borderColor = "var(--nav-border)";
-
   return (
-    <nav className="bottom-nav reference-bottom-nav" aria-label="Main navigation">
-      <div
-        className="bottom-nav-row mx-auto max-w-md px-2"
-        style={{ borderColor }}
-      >
-        {activeIndex >= 0 && (
-          <span aria-hidden className="nav-glider" style={{ "--nav-i": activeIndex, top: 9, bottom: 7 } as CSSProperties}>
-            <span className="nav-selected-capsule" style={{ background: "var(--nav-ref-pill-gradient)", boxShadow: "var(--nav-ref-pill-shadow)", borderRadius: 22 }} />
-          </span>
-        )}
+    <div className="bn-wrap">
+      <nav className="bn" aria-label="Main navigation">
         {tabs.map((t) => {
           const destination = t.to === "/app/more"
             ? (moreNestedActive && pathname !== "/app/more" ? "/app/more" : moreDestination)
             : t.to;
           return (
-          <Link
-            key={t.to}
-            to={destination}
-            activeOptions={{ exact: true, includeSearch: false }}
-            className="nav-item relative flex flex-1 flex-col items-center justify-center px-0 font-medium"
-            style={{ transition: "color 0.25s ease", minWidth: 0 }}
-          >
-            {({ isActive }) => {
-              const active = isActive || (t.to === "/app/more" && moreNestedActive);
-              const color = active ? activeColor : iconColor;
-              const opacity = active ? 1 : 0.6;
-              return (
-                <>
-                   <t.Icon size={22} strokeWidth={1.5} style={{ color, opacity }} />
-                  <span
-                    style={{
-                      color,
-                      opacity,
-                       fontSize: 12,
-                      whiteSpace: "nowrap",
-                      lineHeight: 1,
-                    }}
-                  >
-                    {t.label}
-                  </span>
-                  <span
-                    aria-hidden
-                    className="nav-active-mark"
-                    data-active={active ? "true" : undefined}
-                    style={{ background: active ? activeColor : "transparent" }}
-                  />
-                </>
-              );
-            }}
-          </Link>
+            <Link
+              key={t.to}
+              to={destination}
+              activeOptions={{ exact: true, includeSearch: false }}
+              className={({ isActive }) => `bn-tab ${isActive || (t.to === "/app/more" && moreNestedActive) ? "is-active" : ""}`}
+            >
+              {({ isActive }) => {
+                const active = isActive || (t.to === "/app/more" && moreNestedActive);
+                return (
+                  <>
+                    {active && <span aria-hidden className="bn-pill" />}
+                    <t.Icon />
+                    <span className="bn-label">{t.label}</span>
+                    {active && <span aria-hidden className="bn-underline" />}
+                  </>
+                );
+              }}
+            </Link>
           );
         })}
-      </div>
-    </nav>
+      </nav>
+    </div>
   );
 }
 
