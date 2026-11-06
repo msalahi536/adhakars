@@ -111,7 +111,8 @@ export function SwipeStack({ items, counts, onIncrement, onReset, persistKey, fi
       setTimeout(() => {
         if (generation !== animationGeneration.current) return;
         if (queuedBack.current) {
-          setIdx((i) => Math.max(0, i - queuedBack.current));
+          const steps = queuedBack.current;
+          setIdx((i) => Math.max(0, i - steps));
           queuedBack.current = 0;
         }
         destinationRef.current = null;
