@@ -1148,6 +1148,10 @@ html[data-visual-phase="evening"] .adhkar-card-heading button { background: rgba
 .adhkar-translation { display: block; width: 100%; max-width: 100%; margin: 0; color: var(--text-muted); font-family: var(--font-sans); font-size: 13px; font-weight: 400; line-height: 1.5; text-align: center; white-space: normal; overflow-wrap: anywhere; word-break: normal; }
 
 .adhkar-card-footer { position: relative; z-index: 1; display: flex; flex: 0 0 auto; align-items: flex-end; gap: 12px; margin-top: 14px; padding: 0; background: transparent; border: 0; }
+.dhikr-card .adhkar-card-footer { align-items: center; }
+.dhikr-card .adhkar-repeat-counter { width: 76px !important; height: 76px !important; }
+.dhikr-card .adhkar-repeat-counter > svg { width: 100%; height: 100%; }
+.dhikr-card .adhkar-counter-value { font-size: 30px !important; }
 .adhkar-source-column { flex: 1; min-width: 0; gap: 0; max-width: none; }
 .adhkar-source-badge { display: inline-flex; width: auto; height: 28px; min-height: 28px; min-width: 0; align-items: center; gap: 8px; align-self: flex-start; max-width: 100%; padding: 0 14px; border-radius: 999px; background: var(--source-bg); color: var(--source-fg); font-size: 12px; font-weight: 500; line-height: 1.25; white-space: nowrap; }
 .adhkar-source-badge svg { flex: 0 0 auto; }
