@@ -1149,6 +1149,8 @@ html[data-visual-phase="evening"] .adhkar-card-heading button { background: rgba
 
 .adhkar-card-footer { position: relative; z-index: 1; display: flex; flex: 0 0 auto; align-items: flex-end; gap: 12px; margin-top: 14px; padding: 0; background: transparent; border: 0; }
 .dhikr-card .adhkar-card-footer { align-items: center; }
+.dhikr-card .adhkar-source-column { padding-right: 14px; margin-right: 2px; position: relative; }
+.dhikr-card .adhkar-source-column:has(.adhkar-source-badge)::after { content: ""; position: absolute; right: 0; top: 50%; transform: translateY(-50%); height: 26px; width: 1px; background: color-mix(in oklab, var(--primary) 24%, transparent); }
 .dhikr-card .adhkar-repeat-counter { width: 76px !important; height: 76px !important; }
 .dhikr-card .adhkar-repeat-counter > svg { width: 100%; height: 100%; }
 .dhikr-card .adhkar-counter-value { font-size: 30px !important; }
@@ -5517,7 +5519,7 @@ html .bottom-nav-row .nav-item:has(.nav-active-mark[data-active]) > span:not(.na
 .dhikr-card .adhkar-audio-wave[data-playing="false"] i { transition: height .6s cubic-bezier(.22, 1, .36, 1); }
 @media (prefers-reduced-motion: reduce) { .dhikr-card .adhkar-audio-wave i { transition: none; } }
 .dhikr-card .adhkar-source-badge {
-  height: 26px; min-height: 26px; padding: 0 14px 0 11px; gap: 8px; font-size: 11.5px;
+  height: 24px; min-height: 24px; padding: 0 12px 0 10px; gap: 7px; font-size: 11px; font-weight: 500;
   background: color-mix(in oklab, var(--accent) 16%, color-mix(in oklab, var(--card-foreground) 5%, var(--card)));
   color: color-mix(in oklab, var(--primary) 55%, var(--card-foreground));
 }
