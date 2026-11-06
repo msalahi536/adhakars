@@ -50,7 +50,7 @@ export function UnifiedReader({chapterId=1,verse=1,initialPage,initialMode,back,
   const [sheet,setSheet]=useState<"navigation"|"settings"|"mistakes"|"more"|"reciter"|"echo"|"search"|null>(null);
   const [result,setResult]=useState<CheckResult|null>(null),[marks,setMarks]=useState<Marks>({}),[tips,setTips]=useState<TajweedHint[]>([]),[highlight,setHighlight]=useState<string|null>(null);
   const [confirmReset,setConfirmReset]=useState(false),[resetting,setResetting]=useState(false);
-  const liveMarks=useRef<Marks>({}),resetPending=useRef(false),sessionPage=useRef<number|null>(null);
+  const liveMarks=useRef<Marks>({}),liveAdded=useRef<Set<string>>(new Set()),seenAdded=useRef(new Set<string>()),resetPending=useRef(false),sessionPage=useRef<number|null>(null);
   const [elsewhere,setElsewhere]=useState<(Elsewhere & {page:number})|null>(null),[recent,setRecent]=useState<ReadingLocation[]>([]),[bookmarks,setBookmarks]=useState<ReadingLocation[]>([]);
   const [reciter,setReciter]=useState(7),[error,setError]=useState(""),[translationMap,setTranslationMap]=useState<Record<string,string>>({});
   const [hizb,setHizb]=useState(1);

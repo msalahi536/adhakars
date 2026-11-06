@@ -6,6 +6,7 @@ import { diffAyat } from "@/lib/hifz-ai/mutashabih";
 import type { Attempt } from "./ai-performance";
 import { ReplayButton, useRecitationReplay } from "./RecitationReplay";
 import { ReportProblem } from "./SampleReports";
+import { addedWordKeys, ADDED_CLIP } from "./ai-feedback";
 
 export function AiResultSheet({ attempt, passes, lesson, chapters, again, next, wordAudio, ayahAudio, close, recording = null, highlight = () => undefined, showTips = true }: {
   attempt: Attempt; passes: number; lesson: boolean; chapters: Chapter[];
@@ -30,6 +31,7 @@ export function AiResultSheet({ attempt, passes, lesson, chapters, again, next, 
   }, [compare, source, destination, retry]);
   const diff = ayat?.[0] && ayat[1] ? diffAyat(ayat[0].text.trim().split(/\s+/), ayat[1].text.trim().split(/\s+/)) : null;
   const mistakes = attempt.result.words.filter((w) => w.status === "wrong" || w.status === "skipped");
+  const added = addedWordKeys(attempt.result);
   if (compare) return <section className="rc-sheet rc-result-sheet" role="dialog" aria-modal="true" aria-label="Spot the difference">
     <header><Button variant="ghost" size="icon" aria-label="Back to result" onClick={() => setCompare(false)}><ArrowLeft /></Button><h2>Spot the difference</h2></header>
     {error ? <><p>These ayat couldn’t load.</p><Button variant="outline" onClick={() => setRetry((v) => v + 1)}>Retry</Button></> : !diff || !ayat ? <p role="status">Loading ayat…</p> : ayat.map((ayah, i) => <section className="rc-compare-ayah" key={ayah.key}>
@@ -48,6 +50,7 @@ export function AiResultSheet({ attempt, passes, lesson, chapters, again, next, 
     <ReportProblem attempt={attempt} recording={recording} passages={attempt.passages ?? []} />
     <div className="rc-result-evidence">
       {mistakes.map((w) => <div className="rc-result-word" key={w.key}><span><small>{name(w.key)} · {w.status === "skipped" ? "Skipped" : "Mistake"}</small><span className="rc-arabic" dir="rtl">{w.text}</span></span><div className="hx-word-actions"><Button variant="ghost" size="sm" aria-label={`Hear correct word ${w.key}`} onClick={() => { replay.stop(); wordAudio(w.key); }}><Play size={13} />Correct</Button><Button variant="ghost" size="sm" disabled={!recording} onClick={() => void replay.play(w.key)}><Play size={13} />You</Button></div></div>)}
+      {added.map((key) => <div className="rc-result-word rc-result-added" key={`added-${key}`}><span><small>{name(key)} · Added words</small><span>You added words before <span className="rc-arabic" dir="rtl">{attempt.result.words.find((w) => w.key === key)?.text ?? ""}</span></span></span><div className="hx-word-actions"><Button variant="ghost" size="sm" disabled={!recording} aria-label={`Hear the words you added before ${key}`} onClick={() => void replay.play(key, ADDED_CLIP)}><Play size={13} />Hear it</Button></div></div>)}
       {attempt.hes.map((h) => <p className="rc-hesitation-note" key={h.key}>{h.kind === "transition" ? `Slow start of ayah ${h.key.split(":")[1]}` : h.kind === "restart" ? `Restarted before ﴿${attempt.result.words.find((w) => w.key === h.key)?.text ?? ""}﴾` : `Paused ${h.seconds}s before ﴿${attempt.result.words.find((w) => w.key === h.key)?.text ?? ""}﴾`}</p>)}
       {attempt.driftError && <p role="status">{attempt.driftError}</p>}
     </div>
