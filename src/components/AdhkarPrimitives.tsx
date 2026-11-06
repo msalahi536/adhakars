@@ -39,21 +39,24 @@ export function OrnamentalDivider() {
 export function SourceBadge({ source, onClick }: { source: string; onClick?: () => void }) {
   const label = adhkarSourceLabel(source);
   const candidate = adhkarSourceWithGrading(source);
+  const compactCandidate = candidate.replace(/\s*\([^)]*\)/g, "");
   const textRef = useRef<HTMLSpanElement>(null);
   const measureRef = useRef<HTMLSpanElement>(null);
-  const [fitsGrading, setFitsGrading] = useState(false);
+  const compactRef = useRef<HTMLSpanElement>(null);
+  const [gradingFit, setGradingFit] = useState<"full" | "compact" | "none">("none");
   useEffect(() => {
     const text = textRef.current;
     const measure = measureRef.current;
-    if (!text || !measure) return;
-    const check = () => setFitsGrading(measure.getBoundingClientRect().width <= text.clientWidth - 4);
+    const compact = compactRef.current;
+    if (!text || !measure || !compact) return;
+    const check = () => setGradingFit(measure.getBoundingClientRect().width <= text.clientWidth - 4 ? "full" : compact.getBoundingClientRect().width <= text.clientWidth - 4 ? "compact" : "none");
     const observer = new ResizeObserver(check);
     observer.observe(text);
     check();
     void document.fonts.ready.then(check);
     return () => observer.disconnect();
   }, [source]);
-  const visibleLabel = fitsGrading ? candidate : label;
+  const visibleLabel = gradingFit === "full" ? candidate : gradingFit === "compact" ? compactCandidate : label;
   return (
     <Button
       variant="ghost"
@@ -70,6 +73,7 @@ export function SourceBadge({ source, onClick }: { source: string; onClick?: () 
       <BookOpen size={15} strokeWidth={1.3} />
       <span ref={textRef} className="adhkar-source-text">{visibleLabel}</span>
       <span ref={measureRef} className="adhkar-source-measure" aria-hidden>{candidate}</span>
+      <span ref={compactRef} className="adhkar-source-measure" aria-hidden>{compactCandidate}</span>
     </Button>
   );
 }
