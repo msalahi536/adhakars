@@ -22,8 +22,13 @@ const emit = () => subs.forEach((f) => f());
 let lastSection: PopupOpen | null = null;
 export function getLastSection() { return lastSection; }
 
+/** Keep the full section when card playback starts without opening the popup. */
+export function rememberSection(section: PopupOpen) {
+  if (section.label && section.tracks.length > 1) lastSection = section;
+}
+
 export function setPopupOpen(next: PopupOpen | null) {
-  if (next && next.label && next.tracks.length > 1) lastSection = next;
+  if (next) rememberSection(next);
   open = next;
   emit();
 }

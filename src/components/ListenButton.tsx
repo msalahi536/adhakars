@@ -3,7 +3,7 @@ import { useLayoutEffect, useRef } from "react";
 import { Pause, Play, Volume2 } from "lucide-react";
 import { usePlaylist } from "./RecitationPlaylist";
 import { recitationPlayer, usePlayer, useRecitationMap, type Track } from "@/lib/recitation-player";
-import { setAnchor, setPopupOpen, usePopupOpen } from "@/lib/recitation-popup";
+import { rememberSection, setAnchor, setPopupOpen, usePopupOpen } from "@/lib/recitation-popup";
 import { Button } from "@/components/ui/button";
 
 type Props = {
@@ -48,6 +48,7 @@ export function ListenButton({ dhikrId, size = 32, title, section, icon = "speak
         onClick={(e) => {
           e.stopPropagation();
           if (icon === "play") {
+            rememberSection({ openerId: dhikrId, title: name, tracks: queueTracks, label: playlist?.label ?? section ?? null, track: rec ? { dhikrId, title: name, url: rec.url } : null });
             if (isThis) recitationPlayer.toggle();
             else if (rec) recitationPlayer.playOne({ dhikrId, title: name, url: rec.url }, playlist?.label ?? section ?? null);
             return;
