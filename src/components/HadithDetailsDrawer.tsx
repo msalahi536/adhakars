@@ -127,11 +127,7 @@ export function HadithDetailsDrawer({ dhikr, open, onOpenChange }: Props) {
         >
           <TextCard title="Reward · In short" text={details?.reward} icon={<Gift size={16} strokeWidth={1.6} />} />
           <TextCard title="Commentary" text={dhikr.commentary} icon={<MessageSquare size={16} strokeWidth={1.6} />} />
-          <TextCard title="Arabic" text={dhikr.arabic} arabic copy />
-          <TextCard title="Transliteration" text={dhikr.transliteration} copy />
-          <TextCard title="Translation" text={dhikr.translation} copy />
-
-          <TextCard title="Grading" text={details?.grading} icon={<Award size={16} strokeWidth={1.6} />} />
+          <TextCard title="Grading" text={details?.grading?.split(/\s*·\s*/).join("\n")} icon={<Award size={16} strokeWidth={1.6} />} />
 
           {hasNarration && (
             <section className="hadith-detail-section space-y-2 rounded-[24px] p-3.5">
@@ -145,6 +141,10 @@ export function HadithDetailsDrawer({ dhikr, open, onOpenChange }: Props) {
               )}
             </section>
           )}
+
+          <TextCard title="Arabic" text={dhikr.arabic} arabic copy />
+          <TextCard title="Transliteration" text={dhikr.transliteration} copy />
+          <TextCard title="Translation" text={dhikr.translation} copy />
 
           {details?.notes?.map((note, index) => (
             <TextCard key={`${dhikr.id}-note-${index}`} title={index === 0 ? "Notes" : `Note ${index + 1}`} text={note} />
