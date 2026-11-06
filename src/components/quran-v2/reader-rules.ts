@@ -59,13 +59,8 @@ export function nextLayout(layout: ReaderLayout): ReaderLayout { return LAYOUTS[
 export function completedReading(verse: number, total: number) { return total>0 && verse>=total; }
 export function adjacentPage(current: number, destination: number) {return destination===current+1 && destination<=604;}
 export function currentRecitationWord(words: ReciteWord[], marks: Marks, active: boolean): string | undefined {
+  // only the word actually being said: during a breath (between words, or after an ayah) nothing is
+  // current, so the cursor never runs ahead of the reciter
   if (!active) return;
-  const text = words.filter(w => !w.end);
-  const explicit = text.find(w => marks[w.key] === "in_progress");
-  if (explicit) return explicit.key;
-  let last = -1;
-  text.forEach((w, i) => { if (["correct", "unsure", "wrong", "skipped"].includes(marks[w.key])) last = i; });
-  if (last < 0) return;
-  const next = text[last + 1];
-  return next && (!marks[next.key] || marks[next.key] === "pending") ? next.key : undefined;
+  return words.filter(w => !w.end).find(w => marks[w.key] === "in_progress")?.key;
 }

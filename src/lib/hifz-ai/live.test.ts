@@ -1,7 +1,7 @@
 import { describe, expect, test } from "bun:test";
 import { readFileSync } from "fs";
 import { join } from "path";
-import { buildReference, check, checkReached, type CheckResult, type WordResult } from "./checker";
+import { buildReference, check, checkReached, type CheckResult, type Reference, type WordResult } from "./checker";
 import { QuranIndex } from "./quran-index";
 import { detectElsewhere, withoutOpeners } from "./smart";
 
@@ -123,5 +123,56 @@ describe("the tracker only judges what was really recited", () => {
   test("breath, then re-reading the last words: no mistakes, no running ahead", () => {
     const heard = from("67:1:1", 6) + from("67:1:4", 3) + from("67:1:7", 12);
     expect(bad(live(heard, "reached").fin)).toEqual([]);
+  });
+});
+
+describe("reported cases (Al-Fatiha, Al-A'la, going back)", () => {
+  const surah = (s: number, first: number, last: number) => {
+    const k = key(s); const ref = buildReference(k, s, first, last);
+    const words: [string, string][] = [];
+    for (let a = first; a <= last; a++) for (const [w, , ph] of k[String(a)]) words.push([`${s}:${a}:${w}`, ph]);
+    const w = (start: string, n = 1) => { const i = words.findIndex((x) => x[0] === start); return words.slice(i, i + n).map((x) => x[1]).join(""); };
+    return { ref, w };
+  };
+  const live = (ref: Reference, heard: string, mode: "all" | "reached" = "reached") => {
+    const t = new RecitationTracker(ref, mode); const ch = Array.from(heard); const conf = ch.map(() => 1);
+    const ups: CheckResult[] = [];
+    for (let i = 4; i <= ch.length + 3; i += 4) ups.push(t.update(ch.slice(0, i).join(""), conf.slice(0, i)));
+    return { ups, fin: t.finish(heard, conf) };
+  };
+  const flags = (r: CheckResult) => r.words.filter((x) => x.status === "wrong" || x.status === "skipped").map((x) => x.key);
+  const AUDHU = "ءَعُۥۥذُبِللَااهِمِنَششَيطَاانِررَجِۦۦۦۦم";
+  const BASMALA = "بِسمِللَااهِررَحمَاانِررَحِۦۦۦۦم";
+  test("Al-Fatiha: a wrong word for غَيْرِ ٱلْمَغْضُوبِ عَلَيْهِمْ is caught, the rest still followed, آمين ignored", () => {
+    const { ref, w } = surah(1, 1, 7);
+    const { fin } = live(ref, w("1:6:1", 3) + w("1:7:1", 4) + "صَدَقَ" + w("1:7:8", 2) + "ءَاامِۦۦن");
+    expect(flags(fin)).toEqual(["1:7:5", "1:7:6", "1:7:7"]);
+    expect(fin.words.find((x) => x.key === "1:7:9")!.status).toBe("correct");
+  });
+  test("Al-Fatiha then آمين: no mistakes", () => {
+    const { ref, w } = surah(1, 1, 7);
+    expect(flags(live(ref, w("1:5:1", 4) + w("1:6:1", 3) + w("1:7:1", 9) + "ءَاامِۦۦن").fin)).toEqual([]);
+  });
+  test("Al-A'la after a'udhu billah and the basmala: starts at ayah 1, never jumps to ayah 7", () => {
+    const { ref, w } = surah(87, 1, 15);
+    const { ups, fin } = live(ref, AUDHU + BASMALA + w("87:1:1", 4) + w("87:2:1", 3) + w("87:3:1", 3));
+    for (const u of ups) for (const x of u.words) if (x.status !== "pending") expect(Number(x.key.split(":")[1])).toBeLessThanOrEqual(3);
+    expect(flags(fin)).toEqual([]);
+    expect(fin.words.slice(0, 10).every((x) => x.status === "correct")).toBe(true);
+  });
+  test("Al-Fatiha's own basmala is recited, not cut", () => {
+    const { ref, w } = surah(1, 1, 7);
+    const { fin } = live(ref, w("1:1:1", 4) + w("1:2:1", 4));
+    expect(fin.words.slice(0, 8).every((x) => x.status === "correct")).toBe(true);
+  });
+  test("going back rewinds the highlight to where the reciter is", () => {
+    const { ref, w } = surah(67, 1, 12);
+    const { ups, fin } = live(ref, w("67:1:1", 9) + w("67:1:5", 5) + w("67:2:1", 3));
+    const shownTo = (r: CheckResult) => r.words.reduce((m, x, i) => (x.status !== "pending" ? i : m), -1);
+    // reached the end of ayah 1 (word 9), then on re-reading from 1:5 the highlight went back there
+    const done = ups.findIndex((u) => shownTo(u) === 8);
+    expect(done).toBeGreaterThan(0);
+    expect(ups.slice(done).some((u) => shownTo(u) <= 5)).toBe(true);
+    expect(flags(fin)).toEqual([]);
   });
 });

@@ -13,9 +13,9 @@ test("layout cycles Mushaf text, Framed mushaf, Translation",()=>{expect(nextLay
 test("100 percent read is complete rather than Continue",()=>{expect(completedReading(6,7)).toBe(false);expect(completedReading(7,7)).toBe(true);});
 test("only immediate next page is a silent continuation",()=>{expect(adjacentPage(603,604)).toBe(true);expect(adjacentPage(604,605)).toBe(false);expect(adjacentPage(10,12)).toBe(false);});
 const words = ["3:1:1", "3:1:2", "3:1:3", "3:1:4"].map(key => ({key, end:false} as ReciteWord));
-test("hidden pending word stays hidden even when inferred current during a breath",()=>{
+test("during a breath nothing is current and the next hidden word stays hidden",()=>{
  const marks={"3:1:1":"correct","3:1:2":"pending"} as const;
- expect(currentRecitationWord(words,marks,true)).toBe("3:1:2");expect(hiddenWordVisible(marks["3:1:2"])).toBe(false);
+ expect(currentRecitationWord(words,marks,true)).toBeUndefined();expect(hiddenWordVisible(marks["3:1:2"])).toBe(false);
  for(const state of ["in_progress","correct","unsure","wrong","skipped"])expect(hiddenWordVisible(state)).toBe(true);
  expect(hiddenWordVisible("pending",true)).toBe(true);
 });
@@ -39,8 +39,9 @@ test("Arabic variants, exact numbers and prefix-free English find surahs",()=>{
 test("correct and unsure are done, errors and pending are not",()=>{expect(recitedWord("correct")).toBe(true);expect(recitedWord("unsure")).toBe(true);for(const s of ["wrong","skipped","pending","in_progress"])expect(recitedWord(s)).toBe(false);});
 test("RTL swipes turn exactly one page and stop at Quran boundaries",()=>{expect(swipeDestination(50,220,10)).toBe(51);expect(swipeDestination(50,-220,10)).toBe(49);expect(swipeDestination(604,220,0)).toBe(604);expect(swipeDestination(1,-220,0)).toBe(1);});
 test("vertical movement and short taps never turn a page",()=>{expect(swipeDestination(50,20,0)).toBe(50);expect(swipeDestination(50,80,100)).toBe(50);});
-test("current word follows correct and unsure words, not an earlier pending word", () => {
-  expect(currentRecitationWord(words, {"3:1:1":"pending", "3:1:2":"correct", "3:1:3":"unsure", "3:1:4":"pending"}, true)).toBe("3:1:4");
+test("the cursor never runs ahead: after the last said word, nothing is current until the next is begun", () => {
+  expect(currentRecitationWord(words, {"3:1:1":"pending", "3:1:2":"correct", "3:1:3":"unsure", "3:1:4":"pending"}, true)).toBeUndefined();
+  expect(currentRecitationWord(words, {"3:1:2":"correct", "3:1:3":"in_progress"}, true)).toBe("3:1:3");
 });
 test("explicit in-progress takes priority and inactive mic has no current word", () => {
   expect(currentRecitationWord(words, {"3:1:2":"in_progress"}, true)).toBe("3:1:2");

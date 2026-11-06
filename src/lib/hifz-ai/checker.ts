@@ -185,14 +185,20 @@ export interface WordJudgement {
  * Judge one word from the sounds aligned to it. MEMORY mistakes (wrong / skipped) need clear
  * evidence; pronunciation-level differences are only ever "unsure".
  */
-/** Edit distance for judging: a breathy ه / ء / ع slipped in by the model counts half. */
+/**
+ * Edit distance for judging: a breathy ه / ء / ع slipped in by the model counts half, and so does a
+ * glottal onset ء heard as something else (the model often hears the ء of إِلَّا / أَو / أَم as ن
+ * after a ن or a nasal: "نِلَّا" is a mishearing, not a memory mistake).
+ */
 function judgeLev(a: string[], b: string[]): number {
   const light = (c: string) => c === "ه" || c === "ء" || c === "ع";
+  // one letter heard as two similar ones next to each other (د -> "ظد"): the same letter, not an added one
+  const ins = b.map((c, j) => (light(c) ? 0.5 : (j > 0 && same(c, b[j - 1])) || (j + 1 < b.length && same(c, b[j + 1])) ? 0.25 : 1));
   let prev = [0];
-  for (let j = 1; j <= b.length; j++) prev[j] = prev[j - 1] + (light(b[j - 1]) ? 0.5 : 1);
+  for (let j = 1; j <= b.length; j++) prev[j] = prev[j - 1] + ins[j - 1];
   for (let i = 1; i <= a.length; i++) {
     const cur = [i];
-    for (let j = 1; j <= b.length; j++) cur[j] = Math.min(prev[j] + 1, cur[j - 1] + (light(b[j - 1]) ? 0.5 : 1), prev[j - 1] + (same(a[i - 1], b[j - 1]) ? 0 : 1));
+    for (let j = 1; j <= b.length; j++) cur[j] = Math.min(prev[j] + 1, cur[j - 1] + ins[j - 1], prev[j - 1] + (same(a[i - 1], b[j - 1]) ? 0 : a[i - 1] === "ء" || b[j - 1] === "ء" ? 0.5 : 1));
     prev = cur;
   }
   return prev[b.length];
@@ -218,7 +224,7 @@ function judgeSkeleton(expected: string, expSk: string[], heardTxt: string, hear
   const L = Math.max(1, expSk.length);
   // one stray letter before the word is usually the tail of the previous word (طِبَاقًا مَا -> "طباقت ما")
   const stray = [...(a >= 2 ? heardSk.slice(0, a) : []), ...heardSk.slice(b)];
-  const extraCons = stray.filter((c) => !"ءعيو".includes(c)).length; // hamza onsets / glides aren't new letters
+  const extraCons = stray.filter((c) => !"ءعيوه".includes(c)).length; // hamza onsets / glides / breath aren't new letters
   const added = hard === 0 && extraCons > 0 && extraCons <= 2;
   if (added) {
     hard = lev(expSk, heardSk); // a letter or two stuck onto the word: the word itself changed
@@ -231,7 +237,11 @@ function judgeSkeleton(expected: string, expSk: string[], heardTxt: string, hear
   const real = judgeLev(expSk, added ? heardSk : heardSk.slice(a, b));
   if (hard === 0) status = soft <= 2 ? "correct" : "unsure";
   else if (hard >= L * 0.75 && L >= 2 && a === b) status = "skipped";
+  // a word of 3+ letters of which at most one stray breathy letter was heard: it was not said
+  else if (expSk.filter((c) => !"ءهع".includes(c)).length >= 2 && heardSk.filter((c) => !"ءهع".includes(c)).length === 0) status = "skipped";
   else if (L >= 4 && real < 2) status = "unsure";
+  // a short word needs one full real letter change (similar-sounding letters / a misheard ء don't count)
+  else if (L < 4 && real < 1) status = "unsure";
   else if (hard / L >= 0.5) {
     const onlyMissing = hard === L - (b - a);
     const need = L <= 2 && !added ? 0.85 : 0.6; // a swapped sound in a 1-2 letter word needs a surer model
