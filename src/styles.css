@@ -5649,5 +5649,5 @@ html .bottom-nav-row .nav-active-mark[data-active] { bottom: 5px !important; wid
 }
 .nav-glider { top: 6px; bottom: 6px; padding: 0 4px; }
 html .bottom-nav-row .nav-item:has(.nav-active-mark[data-active]) > span:not(.nav-active-mark) { color: color-mix(in oklab, var(--primary) 45%, oklch(0.3 0.05 125)) !important; }
-html:not([data-preset]):not([data-visual-phase="evening"]) .dhikr-card .adhkar-source-badge { background: var(--adhkar-pill-reference); }
-html:not([data-preset]):not([data-visual-phase="evening"]) .nav-glider i { background: linear-gradient(150deg, color-mix(in oklab, var(--nav-selection-reference) 92%, var(--card)), var(--nav-selection-reference)); }
+html:is(:not([data-preset]), [data-preset="original"]):not([data-visual-phase="evening"]) .dhikr-card .adhkar-source-badge { background: var(--adhkar-pill-reference); }
+html:is(:not([data-preset]), [data-preset="original"]):not([data-visual-phase="evening"]) .nav-glider i { background: linear-gradient(150deg, color-mix(in oklab, var(--nav-selection-reference) 92%, var(--card)), var(--nav-selection-reference)); }
