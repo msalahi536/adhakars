@@ -44,6 +44,9 @@ export class QuranRecognizer {
   private states = new Map<string, ort.Tensor>();
   private fb = new StreamingFbank();
   private feats: number[] = []; // feature rows (flattened) waiting to be fed
+  private rowTimes: number[] = []; // when each waiting feature row was spoken (s since restart)
+  private rowsMade = 0; // feature rows produced from real audio since restart
+  private lastRealTime = 0;
   private framesFed = 0; // output frames so far
   private samplesIn = 0; // real audio received (seconds = samplesIn / SR)
   private prev = -1;
@@ -97,6 +100,7 @@ export class QuranRecognizer {
     }
     this.prev = -1;
     this.feats = [];
+    this.rowTimes = [];
     this.heardSinceReset = false;
   }
 
@@ -104,6 +108,8 @@ export class QuranRecognizer {
   restart() {
     this.reset();
     this.fb = new StreamingFbank();
+    this.rowsMade = 0;
+    this.lastRealTime = 0;
     this.framesFed = 0;
     this.samplesIn = 0;
     this.silentSamples = 0;
@@ -128,7 +134,7 @@ export class QuranRecognizer {
     }
 
     const rows = this.fb.push(samples);
-    for (let i = 0; i < rows.length; i++) this.feats.push(rows[i]);
+    this.addRows(rows, true);
 
     const out = await this.run();
     if (this.heardSinceReset && this.silentSamples > this.resetAfterPause * SR) {
@@ -142,17 +148,34 @@ export class QuranRecognizer {
 
   private async drain(): Promise<Emission[]> {
     const rows = this.fb.push(new Float32Array(Math.round(1.05 * SR)));
-    for (let i = 0; i < rows.length; i++) this.feats.push(rows[i]);
+    this.addRows(rows, false);
     return this.run();
+  }
+
+  /**
+   * Queue feature rows with the moment each one was spoken: frame i is centred at i*10 ms + 5 ms.
+   * Pushed silence (drain / flush) is not real audio: it carries the time of the last real frame.
+   */
+  private addRows(rows: Float32Array, real: boolean) {
+    for (let i = 0; i < rows.length; i++) this.feats.push(rows[i]);
+    const n = rows.length / NMEL;
+    for (let r = 0; r < n; r++) {
+      const t = real ? (this.rowsMade + r) * 0.01 + 0.005 : this.lastRealTime;
+      this.rowTimes.push(t);
+    }
+    this.rowsMade += n;
+    if (real && n) this.lastRealTime = (this.rowsMade - 1) * 0.01 + 0.005;
   }
 
   /** Push ~1 s of silence through so the final sounds are emitted. */
   async flush(): Promise<Emission[]> {
-    // the pushed silence isn't real audio: the last sounds happened when the user stopped
+    // the pushed silence isn't real audio: its rows carry the time of the last real frame
     const now = this.samplesIn;
-    const out = await this.accept(new Float32Array(Math.round(1.05 * SR)));
+    const rows = this.fb.push(new Float32Array(Math.round(1.05 * SR)));
+    this.addRows(rows, false);
+    const out = await this.run();
     this.samplesIn = now;
-    for (const e of out) e.time = now / SR;
+    for (const e of out) e.time = Math.min(e.time, now / SR);
     return out;
   }
 
@@ -168,17 +191,21 @@ export class QuranRecognizer {
       const lp = res["log_probs"];
       const [, frames, vocab] = lp.dims as number[];
       const d = lp.data as Float32Array;
+      const step = chunk / frames; // feature rows per output frame
       for (let t = 0; t < frames; t++) {
         let best = 0;
         for (let v = 1; v < vocab; v++) if (d[t * vocab + v] > d[t * vocab + best]) best = v;
         if (best !== blank && best !== this.prev) {
-          out.push({ token: this.tokens.get(best) ?? "", time: this.samplesIn / SR, prob: Math.exp(d[t * vocab + best]) });
+          // when it was said: the time of the feature row this output frame stands for
+          const row = Math.min(Math.floor(t * step), this.rowTimes.length - 1);
+          out.push({ token: this.tokens.get(best) ?? "", time: row >= 0 ? this.rowTimes[row] : this.samplesIn / SR, prob: Math.exp(d[t * vocab + best]) });
           this.heardSinceReset = true;
         }
         this.prev = best;
       }
       this.framesFed += frames;
       this.feats.splice(0, chunk * NMEL);
+      this.rowTimes.splice(0, chunk);
     }
     return out;
   }

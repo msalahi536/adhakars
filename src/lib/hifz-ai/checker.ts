@@ -117,7 +117,9 @@ for (const cls of SOFT_CLASSES) for (const c of cls) {
   if (!SOFT.has(c)) SOFT.set(c, new Set());
   for (const d of cls) SOFT.get(c)!.add(d);
 }
-const same = (a: string, b: string) => a === b || (SOFT.get(a)?.has(b) ?? false);
+export const same = (a: string, b: string) => a === b || (SOFT.get(a)?.has(b) ?? false);
+/** A vowel / length mark (the nasal ں counts as a consonant). */
+export const isVowel = (c: string) => VOWELS.has(c) && c !== "ں";
 
 /** Consonant skeleton: vowels dropped (except the nasal ں), repeats collapsed. */
 export function skeleton(ph: string): string[] {
@@ -129,7 +131,7 @@ export function skeleton(ph: string): string[] {
   return out;
 }
 
-function lev(a: string[], b: string[], soft = true): number {
+export function lev(a: string[], b: string[], soft = true): number {
   let prev = Array.from({ length: b.length + 1 }, (_, j) => j);
   for (let i = 1; i <= a.length; i++) {
     const cur = [i];
@@ -168,6 +170,76 @@ function bestSubstring(pat: string[], text: string[]): [number, number, number] 
   let best = 0;
   for (let j = 0; j <= m; j++) if (prev[j] < prev[best] || (prev[j] === prev[best] && j > best)) best = j;
   return [prev[best], sprev[best], best];
+}
+
+
+export interface WordJudgement {
+  status: WordStatus;
+  /** Nothing was heard for the word at all. */
+  skippedOutright: boolean;
+  /** Leftover sound pieces (3+ consonants) said around the word: repeats or added speech. */
+  strays: string[][];
+}
+
+/**
+ * Judge one word from the sounds aligned to it. MEMORY mistakes (wrong / skipped) need clear
+ * evidence; pronunciation-level differences are only ever "unsure".
+ */
+/** Edit distance for judging: a breathy ه / ء / ع slipped in by the model counts half. */
+function judgeLev(a: string[], b: string[]): number {
+  const light = (c: string) => c === "ه" || c === "ء" || c === "ع";
+  let prev = [0];
+  for (let j = 1; j <= b.length; j++) prev[j] = prev[j - 1] + (light(b[j - 1]) ? 0.5 : 1);
+  for (let i = 1; i <= a.length; i++) {
+    const cur = [i];
+    for (let j = 1; j <= b.length; j++) cur[j] = Math.min(prev[j] + 1, cur[j - 1] + (light(b[j - 1]) ? 0.5 : 1), prev[j - 1] + (same(a[i - 1], b[j - 1]) ? 0 : 1));
+    prev = cur;
+  }
+  return prev[b.length];
+}
+
+export function judgeWord(expected: string, heardTxt: string, wconf: number): WordJudgement {
+  // the tanween / ikhfa nasal (ں) is tajweed, not memory: said or not, judge whichever fits better
+  const nasal = (c: string) => (c === "ں" ? "ن" : c);
+  const heardSk = skeleton(heardTxt).map(nasal);
+  const full = skeleton(expected).map(nasal);
+  const bare = skeleton(expected).filter((c) => c !== "ں");
+  const a = judgeSkeleton(expected, full, heardTxt, heardSk, wconf);
+  if (bare.length === full.length) return a;
+  const b = judgeSkeleton(expected, bare, heardTxt, heardSk, wconf);
+  const rank = (x: WordJudgement) => ["correct", "unsure", "wrong", "skipped"].indexOf(x.status) * 10 + x.strays.length;
+  return rank(b) < rank(a) ? b : a;
+}
+
+function judgeSkeleton(expected: string, expSk: string[], heardTxt: string, heardSk: string[], wconf: number): WordJudgement {
+  if (heardSk.length === 0) return { status: expSk.length ? "skipped" : "correct", skippedOutright: true, strays: [] };
+  let [hard, a, b] = bestSubstring(expSk, heardSk);
+  const soft = lev(Array.from(expected), Array.from(heardTxt));
+  const L = Math.max(1, expSk.length);
+  // one stray letter before the word is usually the tail of the previous word (طِبَاقًا مَا -> "طباقت ما")
+  const stray = [...(a >= 2 ? heardSk.slice(0, a) : []), ...heardSk.slice(b)];
+  const extraCons = stray.filter((c) => !"ءعيو".includes(c)).length; // hamza onsets / glides aren't new letters
+  const added = hard === 0 && extraCons > 0 && extraCons <= 2;
+  if (added) {
+    hard = lev(expSk, heardSk); // a letter or two stuck onto the word: the word itself changed
+    a = 0;
+    b = heardSk.length;
+  }
+  let status: WordStatus;
+  // one swapped letter in a long word (plus model breath noise) is pronunciation or a mishearing,
+  // never a memory mistake: a long word needs 2+ real letter changes to be "wrong"
+  const real = judgeLev(expSk, added ? heardSk : heardSk.slice(a, b));
+  if (hard === 0) status = soft <= 2 ? "correct" : "unsure";
+  else if (hard >= L * 0.75 && L >= 2 && a === b) status = "skipped";
+  else if (L >= 4 && real < 2) status = "unsure";
+  else if (hard / L >= 0.5) {
+    const onlyMissing = hard === L - (b - a);
+    const need = L <= 2 && !added ? 0.85 : 0.6; // a swapped sound in a 1-2 letter word needs a surer model
+    status = wconf >= need && !onlyMissing ? "wrong" : "unsure";
+  } else status = "unsure";
+  const strays: string[][] = [];
+  if (hard < L) for (const piece of [heardSk.slice(0, a), heardSk.slice(b)]) if (piece.length >= 3) strays.push(piece);
+  return { status, skippedOutright: false, strays };
 }
 
 // ---------- alignment ----------
@@ -328,40 +400,17 @@ export function check(reference: Reference, heard: string, final: boolean, conf?
       words.push({ key: w.key, text: w.text, status: started ? "in_progress" : "pending", expected, heard: started ? heardTxt : "", ...(started ? { at: idx[js[0]], end: idx[js[js.length - 1]] } : {}) });
       return;
     }
-    const expSk = skeleton(expected);
-    const heardSk = skeleton(heardTxt);
-    if (heardSk.length === 0) {
-      words.push({ key: w.key, text: w.text, status: expSk.length ? "skipped" : "correct", expected, heard: heardTxt });
+    const wconf = js.length ? js.reduce((t, j) => t + rconf[j], 0) / js.length : 1;
+    const jw = judgeWord(expected, heardTxt, wconf);
+    if (jw.skippedOutright) {
+      words.push({ key: w.key, text: w.text, status: jw.status, expected, heard: heardTxt });
       return;
     }
-    let [hard, a, b] = bestSubstring(expSk, heardSk);
-    const soft = lev(Array.from(expected), Array.from(heardTxt));
-    const wconf = js.reduce((t, j) => t + rconf[j], 0) / js.length;
-    const L = Math.max(1, expSk.length);
-    // one stray letter before the word is usually the tail of the previous word (طِبَاقًا مَا -> "طباقت ما")
-    const stray = [...(a >= 2 ? heardSk.slice(0, a) : []), ...heardSk.slice(b)];
-    const extraCons = stray.filter((c) => !"ءعيو".includes(c)).length; // hamza onsets / glides aren't new letters
-    const added = hard === 0 && extraCons > 0 && extraCons <= 2;
-    if (added) {
-      hard = lev(expSk, heardSk); // a letter or two stuck onto the word: the word itself changed
-      a = 0;
-      b = heardSk.length;
-    }
-    let status: WordStatus;
-    if (hard === 0) status = soft <= 2 ? "correct" : "unsure";
-    else if (hard >= L * 0.75 && L >= 2 && a === b) status = "skipped";
-    else if (hard / L >= 0.5) {
-      const onlyMissing = hard === L - (b - a);
-      const need = L <= 2 && !added ? 0.85 : 0.6; // a swapped sound in a 1-2 letter word needs a surer model
-      status = wconf >= need && !onlyMissing ? "wrong" : "unsure";
-    } else status = "unsure";
-    if (hard < L) {
-      for (const piece of [heardSk.slice(0, a), heardSk.slice(b)]) {
-        if (piece.length < 3) continue;
-        const kind = coveredByNearby(piece, ref, reference.words, k) >= 0.6 ? "repeat" : "extra";
-        extras.push({ atKey: w.key, heard: piece.join(""), kind });
-        if (kind === "extra" && status === "correct") status = "unsure";
-      }
+    let status = jw.status;
+    for (const piece of jw.strays) {
+      const kind = coveredByNearby(piece, ref, reference.words, k) >= 0.6 ? "repeat" : "extra";
+      extras.push({ atKey: w.key, heard: piece.join(""), kind });
+      if (kind === "extra" && status === "correct") status = "unsure";
     }
     words.push({ key: w.key, text: w.text, status, expected, heard: heardTxt, ...(js.length ? { at: idx[js[0]], end: idx[js[js.length - 1]] } : {}) });
   });

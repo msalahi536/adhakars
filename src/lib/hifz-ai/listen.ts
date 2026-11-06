@@ -9,8 +9,7 @@ import { SR } from "./fbank";
 import { buildReference, check, loadSurah, type CheckResult } from "./checker";
 import { DEFAULT_MODEL_URL, QuranRecognizer } from "./recognizer";
 import { cachedAsset } from "./assets";
-import { MistakeStabilizer } from "./stabilize";
-import { Attempts } from "./attempts";
+import { RecitationTracker } from "./tracker";
 
 let shared: Promise<QuranRecognizer> | null = null;
 
@@ -86,8 +85,9 @@ export async function startListening(opts: {
   let failure: unknown;
   let stopped: Promise<CheckResult> | undefined;
   let last: CheckResult = check(reference, "", false);
-  const steady = new MistakeStabilizer();
-  const attempts = new Attempts(reference, opts.finish ?? "all"); // going back to repeat starts a new attempt
+  // follows the reciter word by word: re-reading, redoing and starting anywhere move it back, words
+  // are only judged once the reciter has clearly moved past them, nothing said means no mistakes
+  const tracker = new RecitationTracker(reference, opts.finish ?? "all");
 
   const toMono16k = (input: Float32Array): Float32Array => {
     if (ratio === 1) return input.slice();
@@ -115,8 +115,8 @@ export async function startListening(opts: {
         heard += e.token;
         for (let k = 0; k < e.token.length; k++) { conf.push(e.prob); times.push(e.time); }
       }
-      last = { ...attempts.update(heard, conf), heard, conf: [...conf], times: [...times] };
-      opts.onUpdate(steady.apply(last)); // live: a mistake shows (and buzzes) only once it is sure
+      last = { ...tracker.update(heard, conf), heard, conf: [...conf], times: [...times] };
+      opts.onUpdate(last);
     }).catch((error) => {
       failure = error;
       node.disconnect(); src.disconnect(); stream.getTracks().forEach((t) => t.stop());
@@ -141,7 +141,7 @@ export async function startListening(opts: {
         for (let k = 0; k < e.token.length; k++) { conf.push(e.prob); times.push(e.time); }
       }
       await ctx.close();
-      last = { ...attempts.finish(heard, conf), heard, conf: [...conf], times: [...times] };
+      last = { ...tracker.finish(heard, conf), heard, conf: [...conf], times: [...times] };
       opts.onUpdate(last);
       return last;
       })().finally(() => { if (ctx.state !== "closed") void ctx.close().catch(() => undefined); });
