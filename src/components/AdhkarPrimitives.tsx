@@ -2,7 +2,7 @@ import { BookOpen, Check, ChevronLeft, ChevronRight } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { ProgressRing } from "./ProgressRing";
 import { triggerHaptic } from "@/lib/theme";
-import { adhkarSourceLabel } from "./adhkar-source";
+import { adhkarSourceLabel, adhkarSourceWithGrading } from "./adhkar-source";
 import { Button } from "./ui/button";
 
 export function IslamicOrnament({ size = 24, className = "" }: { size?: number; className?: string }) {
@@ -38,13 +38,32 @@ export function OrnamentalDivider() {
 
 export function SourceBadge({ source, onClick }: { source: string; onClick?: () => void }) {
   const label = adhkarSourceLabel(source);
+  const candidate = adhkarSourceWithGrading(source);
+  const compactCandidate = candidate.replace(/\s*\([^)]*\)/g, "");
+  const textRef = useRef<HTMLSpanElement>(null);
+  const measureRef = useRef<HTMLSpanElement>(null);
+  const compactRef = useRef<HTMLSpanElement>(null);
+  const [gradingFit, setGradingFit] = useState<"full" | "compact" | "none">("none");
+  useEffect(() => {
+    const text = textRef.current;
+    const measure = measureRef.current;
+    const compact = compactRef.current;
+    if (!text || !measure || !compact) return;
+    const check = () => setGradingFit(measure.getBoundingClientRect().width <= text.clientWidth - 4 ? "full" : compact.getBoundingClientRect().width <= text.clientWidth - 4 ? "compact" : "none");
+    const observer = new ResizeObserver(check);
+    observer.observe(text);
+    check();
+    void document.fonts.ready.then(check);
+    return () => observer.disconnect();
+  }, [source]);
+  const visibleLabel = gradingFit === "full" ? candidate : gradingFit === "compact" ? compactCandidate : label;
   return (
     <Button
       variant="ghost"
       type="button"
       className="adhkar-source-badge"
-      title={label}
-      aria-label={`${label}. Open full details`}
+      title={visibleLabel}
+      aria-label={`${visibleLabel}. Open full details`}
       onClick={() => {
         void triggerHaptic("light");
         onClick?.();
@@ -52,7 +71,9 @@ export function SourceBadge({ source, onClick }: { source: string; onClick?: () 
       data-no-swipe
     >
       <BookOpen size={15} strokeWidth={1.3} />
-      <span>{label}</span>
+      <span ref={textRef} className="adhkar-source-text">{visibleLabel}</span>
+      <span ref={measureRef} className="adhkar-source-measure" aria-hidden>{candidate}</span>
+      <span ref={compactRef} className="adhkar-source-measure" aria-hidden>{compactCandidate}</span>
     </Button>
   );
 }
