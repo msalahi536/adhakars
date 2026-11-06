@@ -70,6 +70,7 @@ export function BottomNav() {
     <div className="bn-wrap">
       <nav className="bn" aria-label="Main navigation">
         {tabs.map((t) => {
+          const active = pathname === t.to || pathname === t.to + "/" || (t.to === "/app/more" && moreNestedActive);
           const destination = t.to === "/app/more"
             ? (moreNestedActive && pathname !== "/app/more" ? "/app/more" : moreDestination)
             : t.to;
@@ -78,7 +79,8 @@ export function BottomNav() {
               key={t.to}
               to={destination}
               activeOptions={{ exact: true, includeSearch: false }}
-              className={({ isActive }) => `bn-tab ${isActive || (t.to === "/app/more" && moreNestedActive) ? "is-active" : ""}`}
+              className={`bn-tab ${active ? "is-active" : ""}`}
+              aria-current={active ? "page" : undefined}
             >
               {({ isActive }) => {
                 const active = isActive || (t.to === "/app/more" && moreNestedActive);
