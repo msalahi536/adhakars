@@ -11,8 +11,15 @@ type NavIconProps = { size?: number; strokeWidth?: number; style?: CSSProperties
 function SalahIcon({ size = 22, strokeWidth = 1.5, style }: NavIconProps) {
   return (
     <svg aria-hidden viewBox="0 0 24 24" width={size} height={size} fill="none" stroke="currentColor" strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round" style={style}>
-      <path d="M2 21h20M3 21V11h4v10M17 21V11h4v10M3 11l2-4 2 4M17 11l2-4 2 4M7 21v-9h10v9" />
-      <path d="M7 12c0-3 3-3.8 5-6 2 2.2 5 3 5 6M12 6V3M10 21v-4a2 2 0 0 1 4 0v4" />
+      <path d="M12 2.5v1.5" />
+      <path d="M12 4c-3 1.6-4.8 3.8-4.8 6.2h9.6C16.8 7.8 15 5.6 12 4z" />
+      <path d="M5.5 21V12.5h13V21" />
+      <path d="M3 21h18" />
+      <path d="M10.2 21v-3.2a1.8 1.8 0 0 1 3.6 0V21" />
+      <path d="M3.5 21v-7.5" />
+      <path d="M3.5 13.5l.75-1.5.75 1.5" />
+      <path d="M20.5 21v-7.5" />
+      <path d="M19.75 13.5l.75-1.5.75 1.5" />
     </svg>
   );
 }
@@ -69,7 +76,9 @@ export function BottomNav() {
         style={{ borderColor }}
       >
         {activeIndex >= 0 && (
-          <span aria-hidden className="nav-glider" style={{ "--nav-i": activeIndex } as CSSProperties}><i /></span>
+          <span aria-hidden className="nav-glider" style={{ "--nav-i": activeIndex, top: 9, bottom: 7 } as CSSProperties}>
+            <span className="nav-selected-capsule" style={{ background: "var(--nav-ref-pill-gradient)", boxShadow: "var(--nav-ref-pill-shadow)", borderRadius: 22 }} />
+          </span>
         )}
         {tabs.map((t) => {
           const destination = t.to === "/app/more"

@@ -5650,10 +5650,13 @@ html .bottom-nav-row .nav-active-mark[data-active] { bottom: 5px !important; wid
 .nav-glider { top: 6px; bottom: 6px; padding: 0 4px; }
 html .bottom-nav-row .nav-item:has(.nav-active-mark[data-active]) > span:not(.nav-active-mark) { color: color-mix(in oklab, var(--primary) 45%, oklch(0.3 0.05 125)) !important; }
 html:is(:not([data-preset]), [data-preset="original"]):not([data-visual-phase="evening"]) .dhikr-card .adhkar-source-badge { background: var(--adhkar-pill-reference); }
-html:is(:not([data-preset]), [data-preset="original"]):not([data-visual-phase="evening"]) .nav-glider i { background: linear-gradient(150deg, color-mix(in oklab, var(--nav-selection-reference) 92%, var(--card)), var(--nav-selection-reference)); }
 
 /* Navbar-only reference styling; the outer nav retains layout clearance. */
 .reference-bottom-nav {
+  --nav-ref-pill-gradient: linear-gradient(180deg, #F2F0E3 0%, #E3E5D0 45%, #D5D7BE 100%);
+  --nav-ref-pill-shadow: 0 4px 12px rgba(120,135,90,0.18), inset 0 1px 0 rgba(255,255,255,0.65), inset 0 -2px 6px rgba(150,160,120,0.15);
+  --nav-ref-selected-ink: #1F2A12;
+  --nav-ref-underline: #2B3A12;
   --nav-ref-top: color-mix(in oklab, var(--card) 94%, var(--accent));
   --nav-ref-bottom: color-mix(in oklab, var(--card) 86%, var(--accent));
   --nav-ref-muted: var(--nav-inactive);
@@ -5688,12 +5691,12 @@ html .reference-bottom-nav .nav-item { gap: 6px; padding-bottom: 6px; border-rad
 html .reference-bottom-nav .nav-item > svg { width: 24px !important; height: 24px !important; flex-basis: 24px !important; stroke-width: 1.5 !important; opacity: 1 !important; color: var(--nav-ref-muted) !important; }
 html .reference-bottom-nav .nav-item > span:not(.nav-active-mark) { font-size: 13px !important; font-weight: 400 !important; color: var(--nav-ref-muted) !important; opacity: 1 !important; }
 html .reference-bottom-nav .nav-item:has(.nav-active-mark[data-active]) > svg { color: var(--nav-ref-icon) !important; }
-html .reference-bottom-nav .nav-item:has(.nav-active-mark[data-active]) > span:not(.nav-active-mark) { color: var(--nav-ref-ink) !important; font-weight: 600 !important; }
+html .reference-bottom-nav .nav-item:has(.nav-active-mark[data-active]) > span:not(.nav-active-mark) { color: var(--nav-ref-selected-ink) !important; font-weight: 500 !important; }
 html .reference-bottom-nav .nav-item:active { transform: scale(.96); }
 html .reference-bottom-nav .nav-item:focus-visible { outline: 2px solid color-mix(in oklab, var(--nav-ref-icon) 40%, transparent); outline-offset: -3px; }
 html .reference-bottom-nav .nav-item:hover:not(:has(.nav-active-mark[data-active])) > :not(.nav-active-mark) { color: color-mix(in oklab, var(--nav-ref-muted) 65%, var(--nav-ref-ink)) !important; }
 html .reference-bottom-nav .nav-glider { top: 9px; bottom: 7px; padding: 0 3px; transition: left .3s ease-out; }
-html .reference-bottom-nav .nav-glider i { border-radius: 22px; animation: none; background: linear-gradient(180deg, var(--nav-ref-pill-top), var(--nav-ref-pill-mid) 45%, var(--nav-ref-pill-bottom)); box-shadow: 0 4px 12px color-mix(in oklab, var(--primary) 18%, transparent), inset 0 1px 0 color-mix(in oklab, var(--nav-ref-rim) 65%, transparent), inset 0 -2px 6px color-mix(in oklab, var(--primary) 15%, transparent); }
-html .reference-bottom-nav .nav-active-mark[data-active] { width: 22px !important; height: 2.5px !important; bottom: 12px !important; background: var(--nav-ref-icon) !important; border-radius: 999px; }
+html .reference-bottom-nav .nav-selected-capsule { display: block; height: 100%; }
+html .reference-bottom-nav .nav-active-mark[data-active] { width: 20px !important; height: 2px !important; bottom: 12px !important; background: var(--nav-ref-underline) !important; border-radius: 999px; }
 html[dir="rtl"] .reference-bottom-nav .nav-glider { left: calc(8px + (4 - var(--nav-i)) * (100% - 16px) / 5); }
 @media (prefers-reduced-motion: reduce) { html .reference-bottom-nav .nav-glider, html .reference-bottom-nav .nav-item { transition: none !important; } html .reference-bottom-nav .nav-item:active { transform: none; } }
