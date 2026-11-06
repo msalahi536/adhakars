@@ -2,6 +2,8 @@ import { BookOpen, Check, ChevronLeft, ChevronRight } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { ProgressRing } from "./ProgressRing";
 import { triggerHaptic } from "@/lib/theme";
+import { adhkarSourceLabel } from "./adhkar-source";
+import { Button } from "./ui/button";
 
 export function IslamicOrnament({ size = 24, className = "" }: { size?: number; className?: string }) {
   return (
@@ -35,12 +37,14 @@ export function OrnamentalDivider() {
 }
 
 export function SourceBadge({ source, onClick }: { source: string; onClick?: () => void }) {
+  const label = adhkarSourceLabel(source);
   return (
-    <button
+    <Button
+      variant="ghost"
       type="button"
       className="adhkar-source-badge"
-      title={source}
-      aria-label={`${source}. Open full details`}
+      title={label}
+      aria-label={`${label}. Open full details`}
       onClick={() => {
         void triggerHaptic("light");
         onClick?.();
@@ -48,8 +52,8 @@ export function SourceBadge({ source, onClick }: { source: string; onClick?: () 
       data-no-swipe
     >
       <BookOpen size={15} strokeWidth={1.3} />
-      <span>{source}</span>
-    </button>
+      <span>{label}</span>
+    </Button>
   );
 }
 
