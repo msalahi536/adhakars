@@ -1,4 +1,6 @@
 # Roadmap
+- [x] Extend rapid-tap skipping to forward adhkar navigation; browser verified three taps reach 4/23 immediately without delayed jumps, back returns 1/23; six focused tests pass.
+- [x] Soften audio peaks, taper side bars and ease down on pause; actual playback checked at phone size, all 17 bars settle flat with a 600ms transition, preview build OK.
 - [x] Make divider lines consistent on all adhkar cards, remove adhkar mini-player artwork, and center adhkar play icons; 26 divider pairs across morning cards checked, three player icon centers verified, phone screenshots checked.
 - [x] Refine card audio bars with uniform shade and varied sound-driven peaks; actual playback moves all 17 bars, reaches 84% height, and pause flattens all bars. Two tests pass.
 - [x] Remove waveform bars only from the minimized adhkar audio popup shown in the reference; screenshot checked and pause verified, Quran player bars and controls preserved.
