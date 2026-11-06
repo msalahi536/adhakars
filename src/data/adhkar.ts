@@ -154,12 +154,12 @@ export const morningAdhkar: Dhikr[] = [
     transliteration: "Allāhumma ʿālima ʾl-ghaybi wa ʾsh-shahādah, fāṭira ʾs-samāwāti wa ʾl-arḍ, rabba kulli shayʾin wa malīkah, ash-hadu an lā ilāha illā ant, aʿūdhu bika min sharri nafsī wa min sharri ʾsh-shayṭāni wa shirkih — [addition:] wa an aqtarifa ʿalā nafsī sūʾan, aw ajurrahu ilā muslim.",
     translation: "O Allah, Knower of the unseen and the seen, Originator of the heavens and the earth, Lord and Sovereign of all things, I bear witness that there is no god but You. I seek refuge in You from the evil of my own soul and from the evil of Satan and his incitement to associate others with You — [addition:] and from bringing evil upon myself, or dragging it onto a Muslim.",
     source: "Tirmidhi 3392  ·  Abu Dawud 5067  ·  Tirmidhi 3529  ·  Hasan sahih (at-Tirmidhi) · Sahih (al-Albani) · addition hasan",
-    commentary: "Note F — the added clause — The final clause, shown in the second line of the Arabic, is an addition found in Tirmidhi 3529 (hasan), not in the Abu Dawud wording. Shaykh at-Tarefe includes it; it is optional.",
+    commentary: "Note F — the added clause — The final clause, shown in the second line of the Arabic, is an addition found in Tirmidhi 3529 (hasan), not in the Abu Dawud wording. It is optional.",
     target: 1,
     details: {
       grading: "Hasan sahih (at-Tirmidhi) · Sahih (al-Albani) · addition hasan",
       narration: "Abu Hurairah said: Abu Bakr said, “O Messenger of Allah, command me with something that I may say when I reach morning and evening.” He said: “Say: [the words above].” He said: “Say it when you reach morning, and evening, and when you go to bed.”",
-      notes: ["Note F — the added clause — The final clause, shown in the second line of the Arabic, is an addition found in Tirmidhi 3529 (hasan), not in the Abu Dawud wording. Shaykh at-Tarefe includes it; it is optional."],
+      notes: ["Note F — the added clause — The final clause, shown in the second line of the Arabic, is an addition found in Tirmidhi 3529 (hasan), not in the Abu Dawud wording. It is optional."],
     },
   },
   {
@@ -271,13 +271,13 @@ export const morningAdhkar: Dhikr[] = [
     transliteration: "Lā ilāha illā ʾllāhu waḥdahu lā sharīka lah, lahu ʾl-mulku wa lahu ʾl-ḥamd, wa huwa ʿalā kulli shayʾin qadīr.",
     translation: "There is no god but Allah alone, who has no partner. His is the dominion and His is the praise, and He is over all things competent.",
     source: "Abu Dawud 5077  ·  Bukhari 3293  ·  Sahih (al-Albani) · Sahih (al-Bukhari, Muslim)",
-    commentary: "Note On Wording: Abu Dawud 5077 gives it for the morning and the evening. A ten-times morning-and-evening wording is in Musnad Ahmad 8719, and the hundred-times-a-day version with its own reward is in Bukhari 3293 and Muslim 2691. Shaykh at-Tarefe lists both counts.",
+    commentary: "Note On Wording: Abu Dawud 5077 gives it for the morning and the evening. A ten-times morning-and-evening wording is in Musnad Ahmad 8719, and the hundred-times-a-day version with its own reward is in Bukhari 3293 and Muslim 2691.",
     target: 10,
     details: {
       grading: "Sahih (al-Albani) · Sahih (al-Bukhari, Muslim)",
       reward: "Saying it brings the reward of freeing a slave from the descendants of Isma‘il, ten good deeds recorded, ten sins erased, ten ranks raised, and protection from Satan until evening (or until morning, if said in the evening).",
       narration: "Narrated Abu ‘Ayyash: The Messenger of Allah (ﷺ) said: “If anyone says in the morning: ‘There is no god but Allah alone Who has no partner; to Him belongs the dominion, to Him praise is due, and He is Omnipotent’ — he will have a reward equivalent to that for setting free a slave from among the descendants of Isma‘il. He will have ten good deeds recorded for him, ten evil deeds deducted from him, he will be advanced ten degrees, and will be guarded from the Devil till the evening. If he says them in the evening, he will have a similar recompense till the morning.” The version of Hammad says: A man saw the Messenger of Allah (ﷺ) in a dream and said: Messenger of Allah! Abu ‘Ayyash is relating such and such on your authority. He said: “Abu ‘Ayyash has spoken the truth.”",
-      notes: ["Note On Wording: Abu Dawud 5077 gives it for the morning and the evening. A ten-times morning-and-evening wording is in Musnad Ahmad 8719, and the hundred-times-a-day version with its own reward is in Bukhari 3293 and Muslim 2691. Shaykh at-Tarefe lists both counts."],
+      notes: ["Note On Wording: Abu Dawud 5077 gives it for the morning and the evening. A ten-times morning-and-evening wording is in Musnad Ahmad 8719, and the hundred-times-a-day version with its own reward is in Bukhari 3293 and Muslim 2691."],
     },
   },
   {
@@ -483,12 +483,12 @@ export const eveningAdhkar: Dhikr[] = [
     transliteration: "Allāhumma ʿālima ʾl-ghaybi wa ʾsh-shahādah, fāṭira ʾs-samāwāti wa ʾl-arḍ, rabba kulli shayʾin wa malīkah, ash-hadu an lā ilāha illā ant, aʿūdhu bika min sharri nafsī wa min sharri ʾsh-shayṭāni wa shirkih — [addition:] wa an aqtarifa ʿalā nafsī sūʾan, aw ajurrahu ilā muslim.",
     translation: "O Allah, Knower of the unseen and the seen, Originator of the heavens and the earth, Lord and Sovereign of all things, I bear witness that there is no god but You. I seek refuge in You from the evil of my own soul and from the evil of Satan and his incitement to associate others with You — [addition:] and from bringing evil upon myself, or dragging it onto a Muslim.",
     source: "Tirmidhi 3392  ·  Abu Dawud 5067  ·  Tirmidhi 3529  ·  Hasan sahih (at-Tirmidhi) · Sahih (al-Albani) · addition hasan",
-    commentary: "Note F — the added clause — The final clause, shown in the second line of the Arabic, is an addition found in Tirmidhi 3529 (hasan), not in the Abu Dawud wording. Shaykh at-Tarefe includes it; it is optional.",
+    commentary: "Note F — the added clause — The final clause, shown in the second line of the Arabic, is an addition found in Tirmidhi 3529 (hasan), not in the Abu Dawud wording. It is optional.",
     target: 1,
     details: {
       grading: "Hasan sahih (at-Tirmidhi) · Sahih (al-Albani) · addition hasan",
       narration: "Abu Hurairah said: Abu Bakr said, “O Messenger of Allah, command me with something that I may say when I reach morning and evening.” He said: “Say: [the words above].” He said: “Say it when you reach morning, and evening, and when you go to bed.”",
-      notes: ["Note F — the added clause — The final clause, shown in the second line of the Arabic, is an addition found in Tirmidhi 3529 (hasan), not in the Abu Dawud wording. Shaykh at-Tarefe includes it; it is optional."],
+      notes: ["Note F — the added clause — The final clause, shown in the second line of the Arabic, is an addition found in Tirmidhi 3529 (hasan), not in the Abu Dawud wording. It is optional."],
     },
   },
   {
@@ -600,13 +600,13 @@ export const eveningAdhkar: Dhikr[] = [
     transliteration: "Lā ilāha illā ʾllāhu waḥdahu lā sharīka lah, lahu ʾl-mulku wa lahu ʾl-ḥamd, wa huwa ʿalā kulli shayʾin qadīr.",
     translation: "There is no god but Allah alone, who has no partner. His is the dominion and His is the praise, and He is over all things competent.",
     source: "Abu Dawud 5077  ·  Bukhari 3293  ·  Sahih (al-Albani) · Sahih (al-Bukhari, Muslim)",
-    commentary: "Note On Wording: Abu Dawud 5077 gives it for the morning and the evening. A ten-times morning-and-evening wording is in Musnad Ahmad 8719, and the hundred-times-a-day version with its own reward is in Bukhari 3293 and Muslim 2691. Shaykh at-Tarefe lists both counts.",
+    commentary: "Note On Wording: Abu Dawud 5077 gives it for the morning and the evening. A ten-times morning-and-evening wording is in Musnad Ahmad 8719, and the hundred-times-a-day version with its own reward is in Bukhari 3293 and Muslim 2691.",
     target: 10,
     details: {
       grading: "Sahih (al-Albani) · Sahih (al-Bukhari, Muslim)",
       reward: "Saying it brings the reward of freeing a slave from the descendants of Isma‘il, ten good deeds recorded, ten sins erased, ten ranks raised, and protection from Satan until evening (or until morning, if said in the evening).",
       narration: "Narrated Abu ‘Ayyash: The Messenger of Allah (ﷺ) said: “If anyone says in the morning: ‘There is no god but Allah alone Who has no partner; to Him belongs the dominion, to Him praise is due, and He is Omnipotent’ — he will have a reward equivalent to that for setting free a slave from among the descendants of Isma‘il. He will have ten good deeds recorded for him, ten evil deeds deducted from him, he will be advanced ten degrees, and will be guarded from the Devil till the evening. If he says them in the evening, he will have a similar recompense till the morning.” The version of Hammad says: A man saw the Messenger of Allah (ﷺ) in a dream and said: Messenger of Allah! Abu ‘Ayyash is relating such and such on your authority. He said: “Abu ‘Ayyash has spoken the truth.”",
-      notes: ["Note On Wording: Abu Dawud 5077 gives it for the morning and the evening. A ten-times morning-and-evening wording is in Musnad Ahmad 8719, and the hundred-times-a-day version with its own reward is in Bukhari 3293 and Muslim 2691. Shaykh at-Tarefe lists both counts."],
+      notes: ["Note On Wording: Abu Dawud 5077 gives it for the morning and the evening. A ten-times morning-and-evening wording is in Musnad Ahmad 8719, and the hundred-times-a-day version with its own reward is in Bukhari 3293 and Muslim 2691."],
     },
   },
   {
