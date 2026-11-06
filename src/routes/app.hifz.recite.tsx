@@ -586,7 +586,6 @@ function Recite() {
     trackerRef.current.recordMark(word.key, state === "wrong" ? "wrong" : state === "skipped" ? "skipped" : state === "unsure" ? "unsure" : "correct");
     if (state === "wrong") playFeedback("wrong");
     else if (state === "skipped") playFeedback("skip");
-    else if (state === "unsure") playFeedback("unsure");
     else if (state === "correct") playFeedback("reveal");
   }
   function grade(value: "Easy" | "Okay" | "Hard") {
