@@ -87,10 +87,8 @@ function RowPill({ icon, text, open, onClick }: { icon: React.ReactNode; text: s
 
 export function HadithDetailsDrawer({ dhikr, open, onOpenChange }: Props) {
   const details = dhikr.details;
-  const [showGrading, setShowGrading] = useState(false);
   const [showNarration, setShowNarration] = useState(false);
   const hasNarration = !!(details?.narration || details?.narrationArabic);
-  const gradeShort = details?.grading?.split(/[.\n]/)[0]?.trim();
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -98,16 +96,16 @@ export function HadithDetailsDrawer({ dhikr, open, onOpenChange }: Props) {
         className="hadith-details-drawer grid h-[min(92dvh,860px)] w-[calc(100%_-_24px)] max-w-[460px] grid-rows-[auto_minmax(0,1fr)] gap-0 overflow-hidden rounded-[32px] p-0 [&>button:last-child]:hidden"
       >
         <DialogHeader className="relative px-6 pb-4 pt-4 text-left">
-          <div className="hadith-sheet-handle mx-auto mb-8 h-[5px] w-12 rounded-full" />
-          <div className="flex items-center gap-4">
+          <div className="hadith-sheet-handle mx-auto mb-6 h-[5px] w-12 rounded-full" />
+          <div className="flex items-center gap-3">
             <span
-              className="hadith-source-icon flex h-16 w-16 shrink-0 items-center justify-center rounded-full"
+              className="hadith-source-icon flex h-11 w-11 shrink-0 items-center justify-center rounded-full"
             >
-              <BookOpen size={29} strokeWidth={1.5} />
+              <BookOpen size={21} strokeWidth={1.5} />
             </span>
             <div className="min-w-0">
               <DialogTitle className="sr-only">Hadith details</DialogTitle>
-              <DialogDescription className="hadith-section-label text-[13px] leading-[1.65]">
+              <DialogDescription className="hadith-section-label text-[11px] leading-[1.65]">
                 {dhikr.source}
               </DialogDescription>
             </div>
@@ -127,19 +125,13 @@ export function HadithDetailsDrawer({ dhikr, open, onOpenChange }: Props) {
           style={{ WebkitOverflowScrolling: "touch" }}
           data-no-swipe
         >
+          <TextCard title="Reward · In short" text={details?.reward} icon={<Gift size={16} strokeWidth={1.6} />} />
+          <TextCard title="Commentary" text={dhikr.commentary} icon={<MessageSquare size={16} strokeWidth={1.6} />} />
           <TextCard title="Arabic" text={dhikr.arabic} arabic copy />
           <TextCard title="Transliteration" text={dhikr.transliteration} copy />
           <TextCard title="Translation" text={dhikr.translation} copy />
-          <TextCard title="Reward · In short" text={details?.reward} icon={<Gift size={16} strokeWidth={1.6} />} />
-          <TextCard title="Commentary" text={dhikr.commentary} icon={<MessageSquare size={16} strokeWidth={1.6} />} />
 
-          {details?.grading && (
-            <section className="hadith-detail-section space-y-2 rounded-[24px] p-3.5">
-              <div className="px-1"><Label>Grading</Label></div>
-              <RowPill icon={<Award size={16} strokeWidth={1.6} />} text={gradeShort || details.grading} open={showGrading} onClick={() => setShowGrading((v) => !v)} />
-              {showGrading && <p className="whitespace-pre-line px-2 text-[13.5px] leading-6 text-muted-foreground">{details.grading}</p>}
-            </section>
-          )}
+          <TextCard title="Grading" text={details?.grading} icon={<Award size={16} strokeWidth={1.6} />} />
 
           {hasNarration && (
             <section className="hadith-detail-section space-y-2 rounded-[24px] p-3.5">
