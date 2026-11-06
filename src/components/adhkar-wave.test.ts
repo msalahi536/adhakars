@@ -10,3 +10,11 @@ test("every bar responds to playback levels, not only a subset", () => {
   expect(loud).toHaveLength(17);
   for (let i = 0; i < 17; i++) expect(loud[i]).toBeGreaterThan(quiet[i]);
 });
+test("outer bars stay low and the middle carries bounded peaks", () => {
+  const bars = adhkarWave(true, true, [1, 1, 1, 1, 1, 1], 17);
+  expect(bars[0]).toBeLessThanOrEqual(0.26);
+  expect(bars[16]).toBeLessThanOrEqual(0.26);
+  expect(bars[8]).toBeGreaterThan(bars[0] ?? 0);
+  expect(bars[8]).toBeGreaterThan(bars[16] ?? 0);
+  for (const bar of bars) expect(bar).toBeLessThanOrEqual(0.72);
+});
