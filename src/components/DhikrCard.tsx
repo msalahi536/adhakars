@@ -100,6 +100,7 @@ export function DhikrCard({ dhikr, count, onIncrement, isSpecial, specialLabel, 
                 <div key={part.label}>
                   <div className="label-caps mb-1.5 text-center">{part.label}</div>
                     {display.showArabic && <ArabicText size={arabicSize} large={display.arabicLarge}>{part.arabic}</ArabicText>}
+                  {display.showArabic && ((display.showTransliteration && part.transliteration) || (display.showTranslation && part.translation)) && <OrnamentalDivider />}
                    {display.showTransliteration && part.transliteration && (
                      <p className="adhkar-transliteration">
                       {part.transliteration}
@@ -216,7 +217,6 @@ function fmt(t: number) {
 function AudioStrip({ dhikrId }: { dhikrId: string }) {
   const player = usePlayer();
   const isThis = player.track?.dhikrId === dhikrId;
-  const progress = isThis && player.duration ? player.current / player.duration : 0;
   const live = isThis && player.playing;
   const bars = adhkarWave(player.playing, isThis, player.levels, 17);
   const time = isThis && player.duration ? fmt(player.playing ? player.current : player.duration) : "0:00";
@@ -224,7 +224,7 @@ function AudioStrip({ dhikrId }: { dhikrId: string }) {
     <div className="adhkar-audio-strip">
       <ListenButton dhikrId={dhikrId} size={30} icon="play" />
       <div className="adhkar-audio-wave" aria-hidden data-playing={live}>
-        {bars.map((height, i) => <i key={i} className={live && i / bars.length < progress ? "is-played" : ""} style={{ height: `${Math.round(height * 100)}%` }} />)}
+        {bars.map((height, i) => <i key={i} style={{ height: `${Math.round(height * 100)}%` }} />)}
       </div>
       <span className="adhkar-audio-sep" aria-hidden />
       <span className="adhkar-audio-time">{time}</span>

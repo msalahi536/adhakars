@@ -177,7 +177,7 @@ export function RecitationPopup() {
         <div className="quran-controls rec-panel-controls">
           <button type="button" onClick={() => step(-1)} disabled={!canPrev} aria-label="Previous recitation"><SkipBack size={22} fill="currentColor" /></button>
           <button type="button" className="quran-play" onClick={onPlay} disabled={!hasAudio} aria-label={playing && !showOpener ? "Pause" : "Play"}>
-            {playing && !showOpener ? <Pause size={24} fill="currentColor" /> : <Play size={24} fill="currentColor" style={{ marginLeft: 3 }} />}
+            {playing && !showOpener ? <Pause size={24} fill="currentColor" /> : <Play size={24} fill="currentColor" />}
           </button>
           <button type="button" onClick={() => step(1)} disabled={!canNext} aria-label="Next recitation"><SkipForward size={22} fill="currentColor" /></button>
         </div>
