@@ -62,9 +62,9 @@ export function MiniPlayerPill(p: Props) {
           <span className="mini-pill-title">{p.title}</span>
           <span className="mini-pill-sub">{p.subtitle}</span>
         </span>
-        <span className="mini-pill-eq" aria-hidden>
+        {!adhkar && <span className="mini-pill-eq" aria-hidden>
           {bars.map((h, i) => <i key={i} style={{ height: `${Math.round(h * 100)}%` }} />)}
-        </span>
+        </span>}
       </button>
       <button className="mini-pill-play" aria-label={p.playing ? "Pause" : "Play"} onClick={p.onToggle}>
         {p.loading && !p.playing ? <Loader2 size={18} className="animate-spin" /> : p.playing ? <Pause size={18} fill="currentColor" /> : <Play size={18} fill="currentColor" style={{ marginLeft: 2 }} />}

@@ -1,4 +1,6 @@
 # Roadmap
+- [ ] Refine card audio bars with uniform shade and varied sound-driven peaks; verify actual playback and pause.
+- [ ] Remove waveform bars only from the minimized adhkar audio popup shown in the reference; preserve Quran player bars and controls.
 - [x] Restore uniform mistake styling for wrong/skipped/added atKey, keep added rows, and remove personal replay controls while retaining the replay module. Controlled browser marks and populated Mistakes sheet verified; pending hides without glow; AI engine/current-word rule unchanged. 38 focused tests pass. Physical-phone recitation remains unverified.
 - [x] Fix all 17 adhkar waveform bars with playback-gated shared-band interpolation; actual audio in phone-sized browser moves every bar, pause returns all to a static inactive state. Playing/paused screenshots checked.
 - [x] Shrink adhkar heading arrows to 28px and number pill to 72×28px; restore the shared bottom dot swiper. Phone screenshots compared with reference; arrow and keyboard selector navigation verified, morning/evening dots visible, build OK.
