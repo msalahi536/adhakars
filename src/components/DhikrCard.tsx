@@ -100,6 +100,7 @@ export function DhikrCard({ dhikr, count, onIncrement, isSpecial, specialLabel, 
                 <div key={part.label}>
                   <div className="label-caps mb-1.5 text-center">{part.label}</div>
                     {display.showArabic && <ArabicText size={arabicSize} large={display.arabicLarge}>{part.arabic}</ArabicText>}
+                  {display.showArabic && ((display.showTransliteration && part.transliteration) || (display.showTranslation && part.translation)) && <OrnamentalDivider />}
                    {display.showTransliteration && part.transliteration && (
                      <p className="adhkar-transliteration">
                       {part.transliteration}

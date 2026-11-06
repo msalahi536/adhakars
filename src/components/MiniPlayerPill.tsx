@@ -55,7 +55,7 @@ export function MiniPlayerPill(p: Props) {
   }
   return (
     <div className={`mini-pill ${p.className ?? ""}`} role="group" aria-label={p.label} style={p.style}>
-      <span className="mini-pill-art" aria-hidden />
+      {!adhkar && <span className="mini-pill-art" aria-hidden />}
       <button className="mini-pill-main" onClick={p.onOpen} aria-label={`Open player, ${p.title}`}>
         <span className="mini-pill-photo">{p.photo ? <img src={p.photo} alt="" /> : p.initial}</span>
         <span className="min-w-0 text-left">
@@ -67,7 +67,7 @@ export function MiniPlayerPill(p: Props) {
         </span>}
       </button>
       <button className="mini-pill-play" aria-label={p.playing ? "Pause" : "Play"} onClick={p.onToggle}>
-        {p.loading && !p.playing ? <Loader2 size={18} className="animate-spin" /> : p.playing ? <Pause size={18} fill="currentColor" /> : <Play size={18} fill="currentColor" style={{ marginLeft: 2 }} />}
+        {p.loading && !p.playing ? <Loader2 size={18} className="animate-spin" /> : p.playing ? <Pause size={18} fill="currentColor" /> : <Play size={18} fill="currentColor" />}
       </button>
       <span className="mini-pill-div" aria-hidden />
       <span className="mini-pill-side">

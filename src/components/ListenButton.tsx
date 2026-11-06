@@ -64,7 +64,7 @@ export function ListenButton({ dhikrId, size = 32, title, section, icon = "speak
           color: "var(--index-badge-fg, var(--accent-foreground))",
         }}
       >
-        {icon === "play" ? (playing ? <Pause size={Math.round(size * 0.4)} fill="currentColor" strokeWidth={0} /> : <Play size={Math.round(size * 0.42)} fill="currentColor" strokeWidth={0} style={{ marginLeft: Math.round(size * 0.06) }} />) : playing ? (
+        {icon === "play" ? (playing ? <Pause size={Math.round(size * 0.4)} fill="currentColor" strokeWidth={0} /> : <Play size={Math.round(size * 0.42)} fill="currentColor" strokeWidth={0} />) : playing ? (
           <span className="rec-eq" aria-hidden>
             {player.levels.map((level, index) => <i key={index} style={{ height: `${Math.round(level * 100)}%` }} />)}
           </span>

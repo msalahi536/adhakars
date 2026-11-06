@@ -5456,8 +5456,8 @@ html[data-preset] .dhikr-card .adhkar-audio-strip .listen-button-wrap button {
   background: radial-gradient(circle at 35% 28%, color-mix(in oklab, var(--primary) 78%, var(--card)), var(--primary) 72%) !important;
   box-shadow: 0 3px 8px -2px color-mix(in oklab, var(--primary) 45%, transparent), inset 0 1px 0 color-mix(in oklab, var(--card) 25%, transparent) !important;
 }
-.dhikr-card .adhkar-divider { width: auto; max-width: 240px; gap: 8px; margin: 6px auto 16px; color: color-mix(in oklab, var(--accent) 55%, var(--card-foreground) 15%); opacity: .8; }
-.dhikr-card .adhkar-divider span { flex: 1; width: auto; height: .75px; }
+.dhikr-card .adhkar-divider { width: min(100%, 240px); flex: none; max-width: 240px; gap: 8px; margin: 6px auto 16px; color: color-mix(in oklab, var(--accent) 55%, var(--card-foreground) 15%); opacity: .8; }
+.dhikr-card .adhkar-divider span { flex: 1 1 0; min-width: 0; width: auto; height: 1px; }
 .dhikr-card .adhkar-divider span:first-child { background: linear-gradient(to right, transparent, currentColor); }
 .dhikr-card .adhkar-divider span:last-child { background: linear-gradient(to left, transparent, currentColor); }
 .dhikr-card .adhkar-divider svg { flex: 0 0 20px; }
