@@ -5651,3 +5651,49 @@ html .bottom-nav-row .nav-active-mark[data-active] { bottom: 5px !important; wid
 html .bottom-nav-row .nav-item:has(.nav-active-mark[data-active]) > span:not(.nav-active-mark) { color: color-mix(in oklab, var(--primary) 45%, oklch(0.3 0.05 125)) !important; }
 html:is(:not([data-preset]), [data-preset="original"]):not([data-visual-phase="evening"]) .dhikr-card .adhkar-source-badge { background: var(--adhkar-pill-reference); }
 html:is(:not([data-preset]), [data-preset="original"]):not([data-visual-phase="evening"]) .nav-glider i { background: linear-gradient(150deg, color-mix(in oklab, var(--nav-selection-reference) 92%, var(--card)), var(--nav-selection-reference)); }
+
+/* Navbar-only reference styling; the outer nav retains layout clearance. */
+.reference-bottom-nav {
+  --nav-ref-top: color-mix(in oklab, var(--card) 94%, var(--accent));
+  --nav-ref-bottom: color-mix(in oklab, var(--card) 86%, var(--accent));
+  --nav-ref-muted: var(--nav-inactive);
+  --nav-ref-ink: var(--nav-active);
+  --nav-ref-icon: var(--nav-active);
+  --nav-ref-pill-top: color-mix(in oklab, var(--card) 90%, var(--primary));
+  --nav-ref-pill-mid: color-mix(in oklab, var(--card) 78%, var(--primary));
+  --nav-ref-pill-bottom: color-mix(in oklab, var(--card) 65%, var(--primary));
+  --nav-ref-warm: oklch(0.5 0.05 70);
+  --nav-ref-rim: oklch(1 0 0);
+}
+html:is(:not([data-preset]), [data-preset="original"]):not([data-visual-phase="evening"]) .reference-bottom-nav {
+  --nav-ref-top: #F9F2EB; --nav-ref-bottom: #F4EBE1;
+  --nav-ref-muted: #6C6B6A; --nav-ref-ink: #1F2A12; --nav-ref-icon: #2B3A12;
+  --nav-ref-pill-top: #F2F0E3; --nav-ref-pill-mid: #E3E5D0; --nav-ref-pill-bottom: #D5D7BE;
+}
+html[data-visual-phase="evening"] .reference-bottom-nav {
+  --nav-ref-top: color-mix(in oklab, var(--nav-bg) 90%, var(--card));
+  --nav-ref-bottom: var(--nav-bg); --nav-ref-ink: var(--nav-active); --nav-ref-icon: var(--nav-active);
+  --nav-ref-rim: var(--nav-active);
+}
+html .reference-bottom-nav { width: calc(100% - 32px); height: calc(88px + env(safe-area-inset-bottom)); min-height: calc(88px + env(safe-area-inset-bottom)); flex-basis: calc(88px + env(safe-area-inset-bottom)); margin-bottom: 0; }
+html .reference-bottom-nav .bottom-nav-row {
+  position: fixed; bottom: calc(12px + env(safe-area-inset-bottom)); left: 50%; transform: translateX(-50%);
+  width: calc(100% - 32px); max-width: 440px; height: 76px; padding: 0 8px !important;
+  border: 0 !important; border-radius: 38px !important; overflow: visible;
+  background: linear-gradient(180deg, color-mix(in oklab, var(--nav-ref-top) 92%, transparent), color-mix(in oklab, var(--nav-ref-bottom) 92%, transparent)) !important;
+  backdrop-filter: blur(16px);
+  box-shadow: 0 2px 4px color-mix(in oklab, var(--nav-ref-warm) 6%, transparent), 0 10px 24px color-mix(in oklab, var(--nav-ref-warm) 10%, transparent), 0 24px 48px color-mix(in oklab, var(--nav-ref-warm) 12%, transparent), inset 0 1px 0 color-mix(in oklab, var(--nav-ref-rim) 70%, transparent), inset 0 -1px 0 color-mix(in oklab, var(--nav-ref-rim) 50%, transparent) !important;
+}
+html .reference-bottom-nav .nav-item { gap: 6px; padding-bottom: 6px; border-radius: 22px; transition: color .2s ease, transform .12s ease !important; }
+html .reference-bottom-nav .nav-item > svg { width: 24px !important; height: 24px !important; flex-basis: 24px !important; stroke-width: 1.5 !important; opacity: 1 !important; color: var(--nav-ref-muted) !important; }
+html .reference-bottom-nav .nav-item > span:not(.nav-active-mark) { font-size: 13px !important; font-weight: 400 !important; color: var(--nav-ref-muted) !important; opacity: 1 !important; }
+html .reference-bottom-nav .nav-item:has(.nav-active-mark[data-active]) > svg { color: var(--nav-ref-icon) !important; }
+html .reference-bottom-nav .nav-item:has(.nav-active-mark[data-active]) > span:not(.nav-active-mark) { color: var(--nav-ref-ink) !important; font-weight: 600 !important; }
+html .reference-bottom-nav .nav-item:active { transform: scale(.96); }
+html .reference-bottom-nav .nav-item:focus-visible { outline: 2px solid color-mix(in oklab, var(--nav-ref-icon) 40%, transparent); outline-offset: -3px; }
+html .reference-bottom-nav .nav-item:hover:not(:has(.nav-active-mark[data-active])) > :not(.nav-active-mark) { color: color-mix(in oklab, var(--nav-ref-muted) 65%, var(--nav-ref-ink)) !important; }
+html .reference-bottom-nav .nav-glider { top: 9px; bottom: 7px; padding: 0 3px; transition: left .3s ease-out; }
+html .reference-bottom-nav .nav-glider i { border-radius: 22px; animation: none; background: linear-gradient(180deg, var(--nav-ref-pill-top), var(--nav-ref-pill-mid) 45%, var(--nav-ref-pill-bottom)); box-shadow: 0 4px 12px color-mix(in oklab, var(--primary) 18%, transparent), inset 0 1px 0 color-mix(in oklab, var(--nav-ref-rim) 65%, transparent), inset 0 -2px 6px color-mix(in oklab, var(--primary) 15%, transparent); }
+html .reference-bottom-nav .nav-active-mark[data-active] { width: 22px !important; height: 2.5px !important; bottom: 12px !important; background: var(--nav-ref-icon) !important; border-radius: 999px; }
+html[dir="rtl"] .reference-bottom-nav .nav-glider { left: calc(8px + (4 - var(--nav-i)) * (100% - 16px) / 5); }
+@media (prefers-reduced-motion: reduce) { html .reference-bottom-nav .nav-glider, html .reference-bottom-nav .nav-item { transition: none !important; } html .reference-bottom-nav .nav-item:active { transform: none; } }

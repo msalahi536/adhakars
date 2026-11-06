@@ -11,8 +11,8 @@ type NavIconProps = { size?: number; strokeWidth?: number; style?: CSSProperties
 function SalahIcon({ size = 22, strokeWidth = 1.5, style }: NavIconProps) {
   return (
     <svg aria-hidden viewBox="0 0 24 24" width={size} height={size} fill="none" stroke="currentColor" strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round" style={style}>
-      <path d="M3 21h18M5 21V10h3v11M16 21V10h3v11M4 10h5M15 10h5M6.5 10V7M17.5 10V7" />
-      <path d="M8 21v-7.5A4.7 4.7 0 0 1 12 8a4.7 4.7 0 0 1 4 5.5V21M10.5 21v-4a1.5 1.5 0 0 1 3 0v4M12 8V3M12 3c1.2.2 2 .8 2.5 1.7-1.1.3-2 .1-2.5-.6" />
+      <path d="M2 21h20M3 21V11h4v10M17 21V11h4v10M3 11l2-4 2 4M17 11l2-4 2 4M7 21v-9h10v9" />
+      <path d="M7 12c0-3 3-3.8 5-6 2 2.2 5 3 5 6M12 6V3M10 21v-4a2 2 0 0 1 4 0v4" />
     </svg>
   );
 }
@@ -63,7 +63,7 @@ export function BottomNav() {
   const borderColor = "var(--nav-border)";
 
   return (
-    <nav className="bottom-nav" aria-label="Main navigation">
+    <nav className="bottom-nav reference-bottom-nav" aria-label="Main navigation">
       <div
         className="bottom-nav-row mx-auto max-w-md px-2"
         style={{ borderColor }}
