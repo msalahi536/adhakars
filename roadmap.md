@@ -1,4 +1,6 @@
 # Roadmap
+- [ ] Extend rapid-tap animation skipping to forward adhkar navigation without dropped taps or delayed jumps.
+- [ ] Soften audio bar peaks, taper the sides and ease bars down when paused.
 - [x] Make divider lines consistent on all adhkar cards, remove adhkar mini-player artwork, and center adhkar play icons; 26 divider pairs across morning cards checked, three player icon centers verified, phone screenshots checked.
 - [x] Refine card audio bars with uniform shade and varied sound-driven peaks; actual playback moves all 17 bars, reaches 84% height, and pause flattens all bars. Two tests pass.
 - [x] Remove waveform bars only from the minimized adhkar audio popup shown in the reference; screenshot checked and pause verified, Quran player bars and controls preserved.

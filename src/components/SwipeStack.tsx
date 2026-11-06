@@ -9,7 +9,7 @@ import { isItemComplete, itemId } from "@/data/salah";
 import { RecitationPlaylistContext, playlistLabel } from "./RecitationPlaylist";
 import { Pagination } from "./AdhkarPrimitives";
 import { Button } from "./ui/button";
-import { nextBackBurst } from "./rapid-back";
+import { nextArrowBurst, type ArrowBurst } from "./rapid-back";
 
 type Props = {
   items: SalahItem[];
@@ -57,9 +57,9 @@ export function SwipeStack({ items, counts, onIncrement, onReset, persistKey, fi
   const animating = useRef(false);
   const animationGeneration = useRef(0);
   const destinationRef = useRef<number | null>(null);
-  const backBurst = useRef({ last: -Infinity, count: 0 });
-  const queuedBack = useRef(0);
-  const [instantBack, setInstantBack] = useState(false);
+  const arrowBurst = useRef<ArrowBurst>({ last: -Infinity, count: 0, direction: -1 });
+  const queuedSteps = useRef(0);
+  const [instantArrow, setInstantArrow] = useState(false);
   const isDragging = useRef(false);
   const startX = useRef(0);
   const startY = useRef(0);
@@ -74,9 +74,9 @@ export function SwipeStack({ items, counts, onIncrement, onReset, persistKey, fi
     animationGeneration.current++;
     animating.current = false;
     destinationRef.current = null;
-    queuedBack.current = 0;
-    backBurst.current = { last: -Infinity, count: 0 };
-    setInstantBack(false);
+    queuedSteps.current = 0;
+    arrowBurst.current = { last: -Infinity, count: 0, direction: -1 };
+    setInstantArrow(false);
     setPhase("idle");
     prevCompleteRef.current = false;
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -95,7 +95,7 @@ export function SwipeStack({ items, counts, onIncrement, onReset, persistKey, fi
     animating.current = true;
     const generation = ++animationGeneration.current;
     destinationRef.current = destination ?? idx + (dir === "next" ? 1 : -1);
-    setInstantBack(false);
+    setInstantArrow(false);
     triggerHaptic("light");
     setPhase(dir === "next" ? "out-left" : "out-right");
     setDragOffset(0);
@@ -110,10 +110,10 @@ export function SwipeStack({ items, counts, onIncrement, onReset, persistKey, fi
       });
       setTimeout(() => {
         if (generation !== animationGeneration.current) return;
-        if (queuedBack.current) {
-          const steps = queuedBack.current;
-          setIdx((i) => Math.max(0, i - steps));
-          queuedBack.current = 0;
+        if (queuedSteps.current) {
+          const steps = queuedSteps.current;
+          setIdx((i) => Math.max(0, Math.min(items.length - 1, i + steps)));
+          queuedSteps.current = 0;
         }
         destinationRef.current = null;
         setPhase("idle");
@@ -126,16 +126,16 @@ export function SwipeStack({ items, counts, onIncrement, onReset, persistKey, fi
 
   const goNext = () => animateTo("next");
   const goPrev = () => animateTo("prev");
-  const tapBack = () => {
-    backBurst.current = nextBackBurst(backBurst.current, performance.now());
-    if (backBurst.current.count > 2) {
+  const tapArrow = (direction: 1 | -1) => {
+    arrowBurst.current = nextArrowBurst(arrowBurst.current, performance.now(), direction);
+    if (arrowBurst.current.count > 2) {
       const base = destinationRef.current ?? idxRef.current;
-      const target = Math.max(0, base - queuedBack.current - 1);
+      const target = Math.max(0, Math.min(items.length - 1, base + queuedSteps.current + direction));
       animationGeneration.current++;
       animating.current = false;
       destinationRef.current = null;
-      queuedBack.current = 0;
-      setInstantBack(true);
+      queuedSteps.current = 0;
+      setInstantArrow(true);
       setDragOffset(0);
       setEnter(false);
       setPhase("idle");
@@ -143,9 +143,9 @@ export function SwipeStack({ items, counts, onIncrement, onReset, persistKey, fi
       idxRef.current = target;
       prevCompleteRef.current = false;
     } else if (animating.current) {
-      queuedBack.current++;
+      queuedSteps.current += direction;
     } else {
-      goPrev();
+      animateTo(direction === 1 ? "next" : "prev");
     }
   };
   const goTo = (i: number) => {
@@ -342,7 +342,7 @@ export function SwipeStack({ items, counts, onIncrement, onReset, persistKey, fi
       transition = `transform ${IN_MS}ms cubic-bezier(0.4,0,0.2,1), opacity ${IN_MS}ms ease`;
     }
   } else {
-    transition = isDragging.current || instantBack ? "none" : `transform 0.25s ease`;
+    transition = isDragging.current || instantArrow ? "none" : `transform 0.25s ease`;
   }
 
   const isLast = idx === items.length - 1;
@@ -370,7 +370,7 @@ export function SwipeStack({ items, counts, onIncrement, onReset, persistKey, fi
             className="adhkar-pagination-arrow adhkar-index-arrow"
             data-no-swipe
             disabled={idx === 0}
-            onClick={() => { dismissIndexHint(); tapBack(); void triggerHaptic("light"); }}
+            onClick={() => { dismissIndexHint(); tapArrow(-1); void triggerHaptic("light"); }}
             onPointerDown={() => startHold(-1)}
             onPointerUp={stopHold}
             onPointerLeave={stopHold}
@@ -400,7 +400,7 @@ export function SwipeStack({ items, counts, onIncrement, onReset, persistKey, fi
             className="adhkar-pagination-arrow adhkar-index-arrow"
             data-no-swipe
             disabled={idx === items.length - 1}
-            onClick={() => { dismissIndexHint(); goNext(); void triggerHaptic("light"); }}
+            onClick={() => { dismissIndexHint(); tapArrow(1); void triggerHaptic("light"); }}
             onPointerDown={() => startHold(1)}
             onPointerUp={stopHold}
             onPointerLeave={stopHold}
