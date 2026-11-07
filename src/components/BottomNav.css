@@ -23,7 +23,7 @@
 /* Let content extend to the screen bottom behind the floating bar; give
    scrollers end padding so the last content can still scroll clear of it. */
 .app-shell:has(> .bn-wrap) .scroll-area{padding-bottom:calc(96px + env(safe-area-inset-bottom))}
-/* Fixed-height adhkar pages don't scroll; clear exactly the bar so the dots sit just above it. */
-.app-shell:has(> .bn-wrap) .daily-adhkar-page.scroll-area{padding-bottom:84px}
+/* Keep the full 30px dot slider and its edge clear of the floating bar. */
+.app-shell:has(> .bn-wrap) .daily-adhkar-page.scroll-area{padding-bottom:92px}
 .app-shell:has(> .bn-wrap) .daily-swipe-stack .adhkar-card-stage{padding-bottom:6px}
-.app-shell:has(> .bn-wrap) .daily-swipe-stack > .adhkar-pagination-row{height:28px;min-height:28px;padding-bottom:0}
+.app-shell:has(> .bn-wrap) .daily-swipe-stack > .adhkar-pagination-row{height:30px;min-height:30px;padding-bottom:0}
