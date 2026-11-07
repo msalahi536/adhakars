@@ -23,5 +23,5 @@
 /* Let content extend to the screen bottom behind the floating bar; give
    scrollers end padding so the last content can still scroll clear of it. */
 .app-shell:has(> .bn-wrap) .scroll-area{padding-bottom:calc(96px + env(safe-area-inset-bottom))}
-/* Fixed-height adhkar pages don't scroll; the clearance padding would shrink the card stage. */
-.app-shell:has(> .bn-wrap) .daily-adhkar-page.scroll-area{padding-bottom:0}
+/* Fixed-height adhkar pages don't scroll; clear exactly the bar so the dots sit just above it. */
+.app-shell:has(> .bn-wrap) .daily-adhkar-page.scroll-area{padding-bottom:calc(88px + env(safe-area-inset-bottom))}
