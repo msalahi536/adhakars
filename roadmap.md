@@ -1,4 +1,5 @@
 # Roadmap
+- [ ] Remove the navbar veil seam and tighten daily-card/dot spacing; verify morning, evening and scrolled Quran at phone sizes.
 - [x] Extend rapid-tap skipping to forward adhkar navigation; browser verified three taps reach 4/23 immediately without delayed jumps, back returns 1/23; six focused tests pass.
 - [x] Soften audio peaks, taper side bars and ease down on pause; actual playback checked at phone size, all 17 bars settle flat with a 600ms transition, preview build OK.
 - [x] Make divider lines consistent on all adhkar cards, remove adhkar mini-player artwork, and center adhkar play icons; 26 divider pairs across morning cards checked, three player icon centers verified, phone screenshots checked.

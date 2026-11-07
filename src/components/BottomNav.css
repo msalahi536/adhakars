@@ -1,7 +1,7 @@
 .bn-wrap{position:fixed;left:0;right:0;bottom:calc(12px + env(safe-area-inset-bottom));display:flex;justify-content:center;z-index:50;pointer-events:none}
-/* Fade scrolling content out so nothing is visible past the top of the bar. */
-.bn-veil{position:absolute;left:0;right:0;top:-26px;bottom:calc(-12px - env(safe-area-inset-bottom));pointer-events:none;
-  background:linear-gradient(to bottom, transparent 0%, var(--background) 30%)}
+/* Clip only page content at the bar's top, leaving the existing artwork seamless.
+   The shell already reserves the device's bottom safe area. */
+.app-shell:has(> .bn-wrap) > .app-content-frame{clip-path:inset(0 0 84px 0)}
 .bn{pointer-events:auto;position:relative;width:calc(100% - 24px);max-width:420px;height:72px;box-sizing:border-box;padding:0 10px;border-radius:30px;display:flex;align-items:stretch;
   background:var(--bn-background);
   box-shadow:var(--bn-shadow);backdrop-filter:blur(20px) saturate(115%);-webkit-backdrop-filter:blur(20px) saturate(115%);
@@ -24,4 +24,6 @@
    scrollers end padding so the last content can still scroll clear of it. */
 .app-shell:has(> .bn-wrap) .scroll-area{padding-bottom:calc(96px + env(safe-area-inset-bottom))}
 /* Fixed-height adhkar pages don't scroll; clear exactly the bar so the dots sit just above it. */
-.app-shell:has(> .bn-wrap) .daily-adhkar-page.scroll-area{padding-bottom:calc(88px + env(safe-area-inset-bottom))}
+.app-shell:has(> .bn-wrap) .daily-adhkar-page.scroll-area{padding-bottom:84px}
+.app-shell:has(> .bn-wrap) .daily-swipe-stack .adhkar-card-stage{padding-bottom:6px}
+.app-shell:has(> .bn-wrap) .daily-swipe-stack > .adhkar-pagination-row{height:28px;min-height:28px;padding-bottom:0}
