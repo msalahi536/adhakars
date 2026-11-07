@@ -5723,6 +5723,12 @@ html[data-preset]:not([data-preset="original"]):not([data-visual-phase="evening"
   --bn-pill-background: linear-gradient(180deg,color-mix(in oklab,var(--nav-bg) 86%,var(--nav-active)) 0%,color-mix(in oklab,var(--nav-bg) 75%,var(--nav-active)) 45%,color-mix(in oklab,var(--nav-bg) 65%,var(--nav-active)) 100%);
   --bn-pill-shadow: 0 2px 8px color-mix(in oklab,var(--nav-active) 14%,transparent),inset 0 1px 0 color-mix(in oklab,var(--bn-light) 55%,transparent),inset 0 -1px 2px color-mix(in oklab,var(--nav-active) 10%,transparent);
 }
+html[data-preset="dark-red"]:not([data-visual-phase="evening"]) {
+  --bn-active: var(--card-foreground);
+  --bn-muted: color-mix(in oklab,var(--card-foreground) 70%,var(--nav-bg));
+  --bn-pill-background: linear-gradient(180deg,color-mix(in oklab,var(--nav-bg) 74%,var(--card-foreground)),color-mix(in oklab,var(--nav-bg) 86%,var(--card-foreground)));
+  --bn-shadow: 0 8px 28px color-mix(in oklab,var(--bn-shade) 35%,transparent),inset 0 1px 0 color-mix(in oklab,var(--card-foreground) 28%,transparent),inset 0 -1px 0 color-mix(in oklab,var(--card-foreground) 12%,transparent);
+}
 html[data-visual-phase="evening"] {
   --bn-background: linear-gradient(180deg,color-mix(in oklab,var(--nav-bg) 94%,var(--nav-active)) 0%,color-mix(in oklab,var(--nav-bg) 97%,var(--bn-shade)) 100%);
   --bn-muted: color-mix(in oklab,var(--nav-inactive) 88%,var(--nav-bg));
