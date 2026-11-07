@@ -17,5 +17,6 @@
 .bn-underline{position:absolute;left:50%;transform:translateX(-50%);bottom:12px;width:20px;height:2px;border-radius:2px;background:var(--bn-underline);z-index:1}
 @keyframes bnIn{from{opacity:0;transform:translateX(-50%) scale(.92)}to{opacity:1;transform:translateX(-50%) scale(1)}}
 @media (prefers-reduced-motion:reduce){.bn-pill{animation:none}.bn-tab{transition:none}}
-/* Reserve space outside the scrolling content; no page styling is changed. */
-.app-shell:has(> .bn-wrap)::before{content:"";order:1;flex:0 0 calc(100px + env(safe-area-inset-bottom));pointer-events:none}
+/* Let content extend to the screen bottom behind the floating bar; give
+   scrollers end padding so the last content can still scroll clear of it. */
+.app-shell:has(> .bn-wrap) .scroll-area{padding-bottom:calc(96px + env(safe-area-inset-bottom))}
