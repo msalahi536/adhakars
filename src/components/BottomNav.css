@@ -1,4 +1,7 @@
 .bn-wrap{position:fixed;left:0;right:0;bottom:calc(12px + env(safe-area-inset-bottom));display:flex;justify-content:center;z-index:50;pointer-events:none}
+/* Fade scrolling content out so nothing is visible past the top of the bar. */
+.bn-veil{position:absolute;left:0;right:0;top:-26px;bottom:calc(-12px - env(safe-area-inset-bottom));pointer-events:none;
+  background:linear-gradient(to bottom, transparent 0%, var(--background) 30%)}
 .bn{pointer-events:auto;position:relative;width:calc(100% - 24px);max-width:420px;height:72px;box-sizing:border-box;padding:0 10px;border-radius:30px;display:flex;align-items:stretch;
   background:var(--bn-background);
   box-shadow:var(--bn-shadow);backdrop-filter:blur(20px) saturate(115%);-webkit-backdrop-filter:blur(20px) saturate(115%);

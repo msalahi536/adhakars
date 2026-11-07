@@ -68,6 +68,7 @@ export function BottomNav() {
 
   return (
     <div className="bn-wrap">
+      <div aria-hidden className="bn-veil" />
       <nav className="bn" aria-label="Main navigation">
         {tabs.map((t) => {
           const active = pathname === t.to || pathname === t.to + "/" || (t.to === "/app/more" && moreNestedActive);
