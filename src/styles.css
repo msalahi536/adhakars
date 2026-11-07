@@ -5700,3 +5700,42 @@ html .reference-bottom-nav .nav-selected-capsule { display: block; height: 100%;
 html .reference-bottom-nav .nav-active-mark[data-active] { width: 20px !important; height: 2px !important; bottom: 12px !important; background: var(--nav-ref-underline) !important; border-radius: 999px; }
 html[dir="rtl"] .reference-bottom-nav .nav-glider { left: calc(8px + (4 - var(--nav-i)) * (100% - 16px) / 5); }
 @media (prefers-reduced-motion: reduce) { html .reference-bottom-nav .nav-glider, html .reference-bottom-nav .nav-item { transition: none !important; } html .reference-bottom-nav .nav-item:active { transform: none; } }
+
+/* Current bottom navigation: shared geometry, phase/personal-aware glass tokens. */
+:root {
+  --bn-background: linear-gradient(180deg,#FAF4EE 0%,#F5EDE4 100%);
+  --bn-shadow: 0 1px 2px rgba(110,85,60,.06),0 6px 14px rgba(110,85,60,.08),0 18px 40px rgba(110,85,60,.14),0 30px 60px rgba(110,85,60,.06),inset 0 1px 0 rgba(255,255,255,.9),inset 0 -1.5px 0 rgba(255,255,255,.95),inset 1px 0 0 rgba(255,255,255,.6),inset -1px 0 0 rgba(255,255,255,.6);
+  --bn-muted: #7A7875;
+  --bn-active: #2E3A1E;
+  --bn-label: #1F2A12;
+  --bn-pill-background: linear-gradient(180deg,#F1F1E3 0%,#E3E4CF 45%,#D5D8BF 100%);
+  --bn-pill-shadow: 0 2px 8px rgba(125,135,95,.14),inset 0 1px 0 rgba(255,255,255,.55),inset 0 -1px 2px rgba(140,150,110,.10);
+  --bn-underline: #2B3A12;
+  --bn-light: oklch(1 0 0);
+  --bn-shade: oklch(0.12 0.025 280);
+}
+html[data-preset]:not([data-preset="original"]):not([data-visual-phase="evening"]) {
+  --bn-background: linear-gradient(180deg,color-mix(in oklab,var(--nav-bg) 94%,var(--bn-light)),color-mix(in oklab,var(--nav-bg) 94%,var(--nav-active)));
+  --bn-muted: var(--nav-inactive);
+  --bn-active: color-mix(in oklab,var(--nav-active) 75%,var(--card-foreground));
+  --bn-label: var(--bn-active);
+  --bn-underline: var(--bn-active);
+  --bn-pill-background: linear-gradient(180deg,color-mix(in oklab,var(--nav-bg) 86%,var(--nav-active)) 0%,color-mix(in oklab,var(--nav-bg) 75%,var(--nav-active)) 45%,color-mix(in oklab,var(--nav-bg) 65%,var(--nav-active)) 100%);
+  --bn-pill-shadow: 0 2px 8px color-mix(in oklab,var(--nav-active) 14%,transparent),inset 0 1px 0 color-mix(in oklab,var(--bn-light) 55%,transparent),inset 0 -1px 2px color-mix(in oklab,var(--nav-active) 10%,transparent);
+}
+html[data-preset="dark-red"]:not([data-preset="original"]):not([data-visual-phase="evening"]) {
+  --bn-active: var(--card-foreground);
+  --bn-muted: color-mix(in oklab,var(--card-foreground) 70%,var(--nav-bg));
+  --bn-pill-background: linear-gradient(180deg,color-mix(in oklab,var(--nav-bg) 74%,var(--card-foreground)),color-mix(in oklab,var(--nav-bg) 86%,var(--card-foreground)));
+  --bn-shadow: 0 8px 28px color-mix(in oklab,var(--bn-shade) 35%,transparent),inset 0 1px 0 color-mix(in oklab,var(--card-foreground) 28%,transparent),inset 0 -1px 0 color-mix(in oklab,var(--card-foreground) 12%,transparent);
+}
+html[data-visual-phase="evening"] {
+  --bn-background: linear-gradient(180deg,color-mix(in oklab,var(--nav-bg) 94%,var(--nav-active)) 0%,color-mix(in oklab,var(--nav-bg) 97%,var(--bn-shade)) 100%);
+  --bn-muted: color-mix(in oklab,var(--nav-inactive) 88%,var(--nav-bg));
+  --bn-active: var(--nav-active);
+  --bn-label: var(--nav-active);
+  --bn-underline: var(--nav-active);
+  --bn-pill-background: linear-gradient(180deg,color-mix(in oklab,var(--nav-bg) 72%,var(--nav-active)) 0%,color-mix(in oklab,var(--nav-bg) 79%,var(--nav-active)) 45%,color-mix(in oklab,var(--nav-bg) 83%,var(--nav-active)) 100%);
+  --bn-shadow: 0 8px 28px color-mix(in oklab,var(--bn-shade) 38%,transparent),inset 0 1px 0 color-mix(in oklab,var(--nav-active) 38%,transparent),inset 0 -1px 0 color-mix(in oklab,var(--nav-active) 18%,transparent),inset 1px 0 0 color-mix(in oklab,var(--nav-active) 16%,transparent),inset -1px 0 0 color-mix(in oklab,var(--nav-active) 16%,transparent);
+  --bn-pill-shadow: 0 2px 12px color-mix(in oklab,var(--nav-active) 7%,transparent),inset 0 1px 0 color-mix(in oklab,var(--nav-active) 26%,transparent),inset 0 -1px 2px color-mix(in oklab,var(--bn-shade) 12%,transparent);
+}
