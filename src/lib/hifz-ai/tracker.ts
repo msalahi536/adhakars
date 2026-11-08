@@ -17,7 +17,7 @@
  *   4. reports leftover sounds between words that fit no nearby text as added words ("extra").
  * The newest attempt at a word wins: a mistake corrected by going back is cleared.
  */
-import { isVowel, judgeWord, normalize, same, skeleton, type CheckResult, type ExtraSpeech, type Reference, type WordResult, type WordStatus } from "./checker";
+import { harakahIssue, isVowel, judgeWord, lev, normalize, same, skeleton, type CheckResult, type ExtraSpeech, type Reference, type WordResult, type WordStatus } from "./checker";
 
 /** Tunables (measured on real spliced recitations, see live.test.ts). */
 export const TRACKER = {
@@ -30,9 +30,11 @@ export const TRACKER = {
   minExtra: 3, // consonants of unexplained speech that count as added words
   farWords: 8, // a jump back further than this needs twice the evidence before words are judged
   aheadWords: 40, // how far ahead the reciter can be found again
-  skipToSurah: 3, // finishing (or cutting short) a surah and starting the next one
+  skipToSurah: 3,
+  skipToAyah: 5, // leaving out the rest of an ayah / a whole ayah // finishing (or cutting short) a surah and starting the next one
   farBack: 3, // extra cost for going back many words (0.06 per word)
-  sureStart: 7, // consonants needed before showing a start anywhere but the passage start
+  sureStart: 7,
+  ambiguous: 3, // another start place this close in cost: not sure where the reciter began yet // consonants needed before showing a start anywhere but the passage start
   verify: 4, // a jump back is believed once this many consonants after it match (at most 1 off)
 };
 /**
@@ -154,7 +156,8 @@ export class RecitationTracker {
   private openers: string[][];
   private amin: boolean;
 
-  constructor(private reference: Reference, private finishMode: "all" | "reached" = "all") {
+  private raw: { c: string; p: number }[] = []; // everything heard, as heard (harakat + length kept)
+  constructor(private reference: Reference, private finishMode: "all" | "reached" = "all", private opts: { strictHarakat?: boolean } = {}) {
     this.ref = Array.from(reference.norm);
     this.wordStart = reference.words.map((w) => w.s);
     this.wordOf = new Int32Array(this.ref.length + 1).fill(reference.words.length - 1);
@@ -202,9 +205,63 @@ export class RecitationTracker {
     return false;
   }
   private waiting = false;
+  private lastCost = 0;
+  /**
+   * Before anything is judged: could the reciter just as well have started in another ayah? Several
+   * ayat open the same way (Al-Baqarah 2:68 / 2:69 / 2:70 قَالُوا ادْعُ لَنَا رَبَّكَ يُبَيِّن لَّنَا مَا…):
+   * keep following without judging until the words tell them apart.
+   */
+  private ambiguousStart(tail: string[], occ: Occurrence[]): boolean {
+    const best = this.lastCost;
+    const ayah = (k: number) => this.reference.words[k].key.split(":").slice(0, 2).join(":");
+    const a0 = ayah(occ[0].word);
+    const banned = new Set<number>();
+    this.reference.words.forEach((w, k) => { if (ayah(k) === a0) banned.add(-1 - k); });
+    this.alignOnce(tail, banned);
+    const alt = this.lastCost;
+    this.lastCost = best;
+    return alt - best < TRACKER.ambiguous;
+  }
+  private superseded: WordResult[] = []; // earlier tries of words that were then re-recited
+  /**
+   * Went wrong, then went back and recited it right (e.g. continued into a similar ayah from
+   * elsewhere, realised, and restarted the ayah): the correct re-read wins, but the wrong try is
+   * still a mistake. Report it as added words where it happened, when it really differed from the
+   * text (3+ real letter changes in a run of words). A word merely cut short before a breath and
+   * re-read (its sounds are the word's opening) is not a wrong try.
+   */
+  private wrongTries(tries: WordResult[]) {
+    if (!tries.length) return;
+    const order = new Map(this.reference.words.map((w, i) => [w.key, i]));
+    const sorted = tries.filter((t) => t.heard && t.status !== "correct").sort((a, b) => order.get(a.key)! - order.get(b.key)!);
+    let run: WordResult[] = [];
+    const flush = () => {
+      let changes = 0;
+      const heard: string[] = [];
+      for (const t of run) {
+        const exp = skeleton(t.expected), got = skeleton(t.heard ?? "");
+        const cut = got.length < exp.length && lev(exp.slice(0, got.length), got) === 0;
+        if (cut) continue;
+        changes += lev(exp, got);
+        heard.push(...got);
+      }
+      if (changes >= 3 && wordsWorth(heard) && !this.extras.some((x) => x.atKey === run[0].key && x.kind === "extra")) {
+        this.extras.push({ atKey: run[0].key, heard: heard.join(""), kind: "extra" });
+      }
+      run = [];
+    };
+    for (const t of sorted) {
+      if (run.length && order.get(t.key)! !== order.get(run[run.length - 1].key)! + 1) flush();
+      run.push(t);
+    }
+    flush();
+  }
+
   /** Going back: a few words (a breath) is cheap, far back (another surah's opening) less so. */
   private backCost(i: number) {
     const back = Math.max(0, this.wordOf[Math.min(this.pos, this.ref.length - 1)] - this.wordOf[i]);
+    // redoing from the start of an ayah is the most natural way back, even a long way back
+    if (this.ayahFirst[this.wordOf[i]]) return TRACKER.jump + Math.min(1, back * 0.02);
     return TRACKER.jump + Math.min(TRACKER.farBack, back * 0.06);
   }
   private surahFirst(k: number) { return this.reference.words[k].key.endsWith(":1:1"); }
@@ -221,6 +278,7 @@ export class RecitationTracker {
   }
 
   private step(heard: string, conf: number[] | undefined, final: boolean): CheckResult {
+    if (this.opts.strictHarakat) this.raw = Array.from(heard).map((c, i) => ({ c, p: conf?.[i] ?? 1 }));
     const n0 = normalize(heard);
     let rec: string[] = [], idx: number[] = [], rconf: number[] = [];
     const load = () => {
@@ -248,6 +306,7 @@ export class RecitationTracker {
     // commit everything the reciter has clearly moved past
     let upto = -1;
     if (final) upto = occ.length - 1;
+    else if (!this.started && this.ambiguousStart(tail, occ)) upto = -1;
     else {
       // going far back (another ayah with the same opening, e.g. 88:8 / 88:2 وُجُوهٌ يَوْمَئِذٍ):
       // be surer before judging anything there
@@ -266,18 +325,24 @@ export class RecitationTracker {
       if (!this.started) { this.started = true; this.startWord = occ[0].word; }
       const judged = this.judge(occ.slice(0, upto + 1), path, tail, rec, idx, rconf, final, occ[upto + 1]);
       const rank = (st: WordStatus) => (st === "correct" ? 0 : st === "unsure" ? 1 : 2);
+      const replaced: WordResult[] = [...this.superseded];
+      this.superseded = [];
       for (const [k, j] of judged) {
         const before = this.committed.get(k);
+        if (before && before.status !== "correct" && rank(j.result.status) < rank(before.status)) replaced.push(before);
         // the newest attempt wins only if it is not worse: going back to fix a mistake clears it,
         // but a "worse re-read" of a word already said right is really added speech
         if (before && rank(j.result.status) > rank(before.status) && !j.inside) {
           // a clearly wrong re-read is added speech; a merely unsure one is just a re-read
           if (rank(j.result.status) === 2 && j.result.heard && skeleton(j.result.heard).length >= TRACKER.minExtra) this.extras.push({ atKey: j.result.key, heard: skeleton(j.result.heard).join(""), kind: "extra" });
+          // the word keeps its earlier judgement, but speech found next to it this time still counts
+          this.extras.push(...j.extras);
           continue;
         }
         this.committed.set(k, j.result);
         this.extras.push(...j.extras);
       }
+      this.wrongTries(replaced);
       const last = occ[upto];
       const w = this.reference.words[last.word];
       this.pos = last.complete ? w.e : this.pos;
@@ -337,7 +402,14 @@ export class RecitationTracker {
   private alignOnce(tail: string[], banned: Set<number>): Step[] {
     const ref = this.ref;
     const m = tail.length;
-    const lowWord = this.started ? Math.max(0, this.wordOf[Math.min(this.pos, ref.length - 1)] - TRACKER.backWords) : 0;
+    // look back far enough for a redo: 40 words, and always the start of the previous ayah (Al-Baqarah
+    // 2:25 + 2:26 are 110 words: redoing both must reach back to 2:25)
+    let lowWord = this.started ? Math.max(0, this.wordOf[Math.min(this.pos, ref.length - 1)] - TRACKER.backWords) : 0;
+    if (this.started) {
+      let k = this.wordOf[Math.min(this.pos, ref.length - 1)], starts = 0;
+      while (k > 0 && starts < 3) { if (this.ayahFirst[k]) starts++; if (starts < 3) k--; }
+      lowWord = Math.min(lowWord, k);
+    }
     const lo = this.started ? this.wordStart[lowWord] : 0;
     // the next surah's opening may be further ahead (the rest of this surah cut short, or a wrong
     // turn into the same opening earlier, e.g. Al-Falaq / An-Nas قُلْ أَعُوذُ بِرَبِّ): keep it in view
@@ -345,6 +417,12 @@ export class RecitationTracker {
     const wNow = this.wordOf[Math.min(this.pos, ref.length - 1)];
     for (let k = wNow + 1; k < Math.min(this.reference.words.length, wNow + TRACKER.aheadWords); k++) {
       if (this.surahFirst(k)) { aheadTo = this.wordStart[Math.min(this.reference.words.length - 1, k + 10)] ?? ref.length; break; }
+    }
+    // and a whole long ayah may be left out: keep the two ayat after the current one in view
+    let ayahs = 0;
+    for (let k = wNow + 1; k < this.reference.words.length && k < wNow + 80; k++) {
+      if (this.ayahFirst[k] && ++ayahs === 2) { aheadTo = Math.max(aheadTo, this.wordStart[Math.min(this.reference.words.length - 1, k + 4)] ?? ref.length); break; }
+      if (k === this.reference.words.length - 1) aheadTo = ref.length;
     }
     const hi = Math.min(ref.length, this.started ? Math.max(this.pos + Math.ceil(m * 1.6) + 30, aheadTo) : ref.length);
     const n = hi - lo;
@@ -359,6 +437,7 @@ export class RecitationTracker {
       for (let i = lo; i < this.pos; i++) if (this.isWordStart[i] && !banned.has(i)) { D[0][at(i)] = this.backCost(i); B[0][at(i)] = 5; }
     } else {
       for (let k = 0; k < this.reference.words.length; k++) {
+        if (banned.has(-1 - k)) continue; // (start word ruled out, see ambiguousStart)
         const s = this.wordStart[k];
         const c = k === 0 || this.surahFirst(k) ? 0 : this.ayahFirst[k] ? TRACKER.startAyah : TRACKER.startWord;
         const ck = c + k * 1e-4; // equally good: the earlier place
@@ -374,23 +453,31 @@ export class RecitationTracker {
       }
     };
     const jumpRow = (j: number) => {
-      if (j === 0) return; // nothing said yet: the starting points already cover where to begin
+      // before the first sound: where to begin is covered by the starting points, but once the
+      // recitation is under way a skip can come first (82:3 left out: the وَ of 82:4's وَإِذَا must
+      // not be spent on 82:3 just to be able to jump)
+      if (j === 0 && !this.started) return;
       const row = D[j], br = B[j], jr = J[j];
       const snap = Float64Array.from(row);
       // going back (re-read / redo): reach any word start from a position ahead of it
       let best = INF, bestAt = -1;
-      for (let x = n; x >= 0; x--) {
+      for (let x = n; x >= 0 && j > 0; x--) {
         if (this.isWordStart[lo + x] && best + this.backCost(lo + x) < row[x] && !banned.has(j * BAN + lo + x)) { row[x] = best + this.backCost(lo + x); br[x] = 4; jr[x] = bestAt; }
         if (snap[x] < best) { best = snap[x]; bestAt = x; }
       }
       // going ahead (skipped words): reach a later word start from a position before it
       best = INF; bestAt = -1;
       for (let x = 0; x <= n; x++) {
-        const sk = this.surahFirst(this.wordOf[lo + x]) ? TRACKER.skipToSurah : TRACKER.skip;
+        // skipping lands on a new ayah more naturally than mid-ayah (a whole ayah left out:
+        // 82:1-4 all open with وَإِذَا, so its وَإِذَا belongs to the next ayah, not the skipped one)
+        const wx = this.wordOf[lo + x];
+        const sk = this.surahFirst(wx) ? TRACKER.skipToSurah : this.ayahFirst[wx] ? TRACKER.skipToAyah : TRACKER.skip;
         if (this.isWordStart[lo + x] && best + sk < row[x]) { row[x] = best + sk; br[x] = 4; jr[x] = bestAt; }
         if (snap[x] < best) { best = snap[x]; bestAt = x; }
       }
     };
+    relaxRow(0);
+    jumpRow(0);
     relaxRow(0);
     for (let j = 1; j <= m; j++) {
       const prev = D[j - 1], row = D[j], br = B[j];
@@ -413,6 +500,7 @@ export class RecitationTracker {
     // free end
     let end = 0;
     for (let x = 1; x <= n; x++) if (D[m][x] < D[m][end] || (D[m][x] === D[m][end] && x > end)) end = x;
+    this.lastCost = D[m][end];
     const steps: Step[] = [];
     let x = end, j = m;
     let guard = (m + 1) * (n + 1) * 2;
@@ -506,12 +594,21 @@ export class RecitationTracker {
         if (kind === "extra" && status === "correct") status = "unsure";
       }
       const res: WordResult = { key: w.key, text: w.text, status, expected, heard: heardTxt, ...(js.length ? { at: idx[base + js[0]], end: idx[base + js[js.length - 1]] } : {}) };
+      // strict harakat: right letters, wrong harakah / vowel length (e.g. مَلِكِ for Hafs's مَالِكِ)
+      if (this.opts.strictHarakat && status === "correct" && res.at !== undefined && res.end !== undefined) {
+        let to = res.end + 1;
+        while (to < this.raw.length && isVowel(this.raw[to].c)) to++;
+        const issue = harakahIssue(w.ph, this.raw.slice(res.at, to));
+        if (issue) { res.status = "wrong"; res.issue = issue; }
+      }
       wordsJudged.push({ k: o.word, o, res });
       // a real skip inside a redo: a short run of skipped words, right after words said in this go
       let run = 1;
       for (let r = q - 1; r >= 0 && !said(occ[r]); r--) run++;
       for (let r = q + 1; r < occ.length && !said(occ[r]); r++) run++;
       const inside = res.status === "skipped" && run <= 3 && occ.slice(Math.max(0, q - 3), q).some(said) && (occ.slice(q + 1).some(said) || said(next));
+      const earlier = out.get(o.word);
+      if (earlier) this.superseded.push(earlier.result); // visited again in this go (went back): keep the first try
       out.set(o.word, { result: res, extras, inside });
     }
     // a short word dropped right after a pause (ayah start), with its neighbours said: "unsure", never a skip

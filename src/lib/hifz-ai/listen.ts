@@ -53,6 +53,9 @@ export async function startListening(opts: {
   /** "all" (lessons): the whole range must be recited, unreached words count as skipped.
    *  "reached" (free reading): judge only as far as the reciter got; the rest stays pending. */
   finish?: "all" | "reached";
+  /** Strict harakat (opt-in, beta): also flag a wrong harakah or vowel length when every letter of
+   *  the word was right (checked against Hafs 'an 'Asim). Result words carry `issue`. */
+  strictHarakat?: boolean;
 }): Promise<ListenSession> {
   const passages = opts.passages ?? [opts];
   const [rec, references] = await Promise.all([getRecognizer(opts.modelUrl, opts.onProgress), Promise.all(passages.map(async (r) => buildReference(await loadSurah(r.sura), r.sura, r.first, r.last)))]);
@@ -87,7 +90,7 @@ export async function startListening(opts: {
   let last: CheckResult = check(reference, "", false);
   // follows the reciter word by word: re-reading, redoing and starting anywhere move it back, words
   // are only judged once the reciter has clearly moved past them, nothing said means no mistakes
-  const tracker = new RecitationTracker(reference, opts.finish ?? "all");
+  const tracker = new RecitationTracker(reference, opts.finish ?? "all", { strictHarakat: opts.strictHarakat });
 
   const toMono16k = (input: Float32Array): Float32Array => {
     if (ratio === 1) return input.slice();

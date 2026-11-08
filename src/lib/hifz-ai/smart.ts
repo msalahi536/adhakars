@@ -101,6 +101,8 @@ export async function startSmartRecite(opts: {
   onError?: (e: unknown) => void;
   stream?: MediaStream;
   keepStream?: boolean;
+  /** Strict harakat (opt-in, beta): see startListening. */
+  strictHarakat?: boolean;
 }): Promise<ListenSession> {
   const ix = await loadQuranIndex();
   let reported = "";
@@ -114,6 +116,7 @@ export async function startSmartRecite(opts: {
     stream: opts.stream,
     keepStream: opts.keepStream,
     finish: "reached", // free reading: stopping mid-page is not skipping the rest
+    strictHarakat: opts.strictHarakat,
     onProgress: opts.onProgress,
     onError: opts.onError,
     onUpdate: (r) => {

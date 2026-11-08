@@ -176,3 +176,71 @@ describe("reported cases (Al-Fatiha, Al-A'la, going back)", () => {
     expect(flags(fin)).toEqual([]);
   });
 });
+
+describe("whole-Quran sweep findings", () => {
+  const ayahs = (s: number, first: number, last: number) => {
+    const k = key(s); const ref = buildReference(k, s, first, last);
+    const ph = (a: number) => k[String(a)].map((w: [number, string, string]) => w[2]);
+    return { ref, ph };
+  };
+  const run = (ref: Reference, heard: string, opts: { strictHarakat?: boolean } = {}) => {
+    const t = new RecitationTracker(ref, "reached", opts); const ch = Array.from(heard); const conf = ch.map(() => 0.95);
+    for (let i = 4; i <= ch.length + 3; i += 4) t.update(ch.slice(0, i).join(""), conf.slice(0, i));
+    return t.finish(heard, conf);
+  };
+  const flags = (r: CheckResult) => r.words.filter((x) => x.status === "wrong" || x.status === "skipped").map((x) => x.key + (x.issue ? `(${x.issue})` : ""));
+  test("strict harakat: Hamzah's مَلِكِ and عَلَيهُم in Al-Fatiha are flagged against Hafs; off by default", () => {
+    const { ref, ph } = ayahs(1, 1, 7);
+    const fat = [1, 2, 3, 4, 5, 6, 7].map(ph);
+    fat[3][0] = "مَلِكِ"; fat[6][3] = "عَلَيهُم"; fat[6][6] = "عَلَيهُم";
+    const heard = fat.map((a) => a.join("")).join(" ");
+    expect(flags(run(ref, heard))).toEqual([]);
+    expect(flags(run(ref, heard, { strictHarakat: true }))).toEqual(["1:4:1(length)", "1:7:4(harakah)", "1:7:7(harakah)"]);
+  });
+  test("strict harakat: a correct recitation stays clean", () => {
+    const { ref, ph } = ayahs(1, 1, 7);
+    expect(flags(run(ref, [1, 2, 3, 4, 5, 6, 7].map((a) => ph(a).join("")).join(" "), { strictHarakat: true }))).toEqual([]);
+  });
+  test("a whole ayah left out, next ayah with the same opening (82:3 skipped, 82:4 also starts وَإِذَا)", () => {
+    const { ref, ph } = ayahs(82, 1, 8);
+    const heard = [1, 2, 4, 5].map((a) => ph(a).join("")).join(" ");
+    expect(flags(run(ref, heard))).toEqual(["82:3:1", "82:3:2", "82:3:3"]);
+  });
+  test("a wrong word sharing one letter with the right one is wrong, not unsure (رَبَّهُم said as مِنَ)", () => {
+    const { ref, ph } = ayahs(67, 12, 13);
+    const a = ph(12); const heard = [...a.slice(0, 3), "مِنَ", ...a.slice(4)].join("") + " " + ph(13).join("");
+    expect(flags(run(ref, heard))).toContain("67:12:4");
+  });
+  test("went into a similar ayah from elsewhere, then restarted correctly: still reported", () => {
+    const { ref, ph } = ayahs(79, 39, 46);
+    const other = key(84)["10"].map((w: [number, string, string]) => w[2]).slice(2).join(""); // مَنْ أُوتِيَ كِتَابَهُ وَرَاءَ ظَهْرِهِ
+    const heard = ph(39).join("") + " " + ph(40).slice(0, 2).join("") + other + " " + ph(40).join("") + " " + ph(41).join("");
+    const r = run(ref, heard);
+    expect(flags(r)).toEqual([]);
+    expect(r.extras.some((x) => x.kind === "extra")).toBe(true);
+  });
+});
+
+describe("long surahs (whole-Quran sweep)", () => {
+  const page = (s: number, first: number, last: number) => {
+    const k = key(s); const ref = buildReference(k, s, first, last);
+    const ayah = (a: number) => k[String(a)].map((w: [number, string, string]) => w[2]).join("");
+    return { ref, ayah };
+  };
+  const run = (ref: Reference, heard: string) => {
+    const t = new RecitationTracker(ref, "reached"); const ch = Array.from(heard); const conf = ch.map(() => 0.95);
+    for (let i = 4; i <= ch.length + 3; i += 4) t.update(ch.slice(0, i).join(""), conf.slice(0, i));
+    return t.finish(heard, conf);
+  };
+  const flags = (r: CheckResult) => r.words.filter((x) => x.status === "wrong" || x.status === "skipped").map((x) => x.key);
+  test("starting at 2:69, whose opening is shared with 2:68 and 2:70: placed right, no mistakes", () => {
+    const { ref, ayah } = page(2, 65, 72);
+    const r = run(ref, [69, 70, 71].map(ayah).join(" "));
+    expect(flags(r)).toEqual([]);
+    expect(r.words.filter((x) => x.status !== "pending").every((x) => ["2:69", "2:70", "2:71"].some((p) => x.key.startsWith(p + ":")))).toBe(true);
+  });
+  test("redoing two very long ayat (Al-Baqarah 2:25 + 2:26, ~110 words): no mistakes", () => {
+    const { ref, ayah } = page(2, 24, 29);
+    expect(flags(run(ref, [24, 25, 26, 25, 26, 27].map(ayah).join(" ")))).toEqual([]);
+  });
+});

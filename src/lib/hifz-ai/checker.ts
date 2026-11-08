@@ -17,6 +17,8 @@ export interface WordResult {
   heard: string;
   at?: number; // index in the heard string of this word's first sound (for timing / hesitation)
   end?: number; // index of its last sound
+  /** Strict harakat mode only: the letters were right but a harakah / vowel length was not. */
+  issue?: "harakah" | "length";
 }
 
 export interface ExtraSpeech {
@@ -87,6 +89,42 @@ export function normalize(ph: string): { s: string; idx: number[] } {
     prev = c;
   });
   return { s: out.join(""), idx };
+}
+
+// ---------- harakat (strict mode) ----------
+
+const HARAKAH = new Set(["َ", "ُ", "ِ"]);
+const LONG_OF: Record<string, string> = { "ا": "َ", "ۦ": "ِ", "ۥ": "ُ", "ى": "َ" };
+const isVowelCh = (c: string) => HARAKAH.has(c) || c in LONG_OF || (VOWELS.has(c) && c !== "ں");
+/** Each letter with the vowel after it: which harakah, and how long (1 = short, 2+ = long). */
+function nuclei(chars: { c: string; p: number }[]): { c: string; v: string; len: number; p: number }[] {
+  const out: { c: string; v: string; len: number; p: number }[] = [];
+  for (let i = 0; i < chars.length; i++) {
+    const c = chars[i].c;
+    if (isVowelCh(c) || c === "ں") continue;
+    let j = i + 1, v = "", len = 0, p = chars[i].p;
+    while (j < chars.length && isVowelCh(chars[j].c)) { const x = chars[j].c; v ||= HARAKAH.has(x) ? x : LONG_OF[x] ?? ""; len++; p = Math.min(p, chars[j].p); j++; }
+    const last = out[out.length - 1];
+    if (last && last.c === c && last.len === 0) { out[out.length - 1] = { c, v, len, p: Math.min(p, last.p) }; continue; } // shadda
+    out.push({ c, v, len, p });
+  }
+  return out;
+}
+/**
+ * Strict harakat: with every letter of the word heard exactly, is a harakah or a vowel's length
+ * different from the text (Hafs)? Only when the model is sure (>= minConf); never on the word's last
+ * letter (a stop changes it). Measured on clean recitation: harakat 99.4% / length 100% right when the
+ * letters are right, and the one miss had low confidence.
+ */
+export function harakahIssue(expectedPh: string, heard: { c: string; p: number }[], minConf = 0.8): "harakah" | "length" | undefined {
+  const e = nuclei(Array.from(expectedPh).map((c) => ({ c, p: 1 }))), h = nuclei(heard);
+  if (e.length !== h.length || e.some((x, i) => x.c !== h[i].c)) return;
+  for (let i = 0; i < e.length - 1; i++) {
+    const x = e[i], y = h[i];
+    if (!x.len || !y.len || y.p < minConf) continue;
+    if (x.v && y.v && x.v !== y.v) return "harakah";
+    if ((x.len >= 2) !== (y.len >= 2)) return "length";
+  }
 }
 
 /** Reference for ayat first..last of a surah, recited back to back. */
@@ -218,7 +256,12 @@ export function judgeWord(expected: string, heardTxt: string, wconf: number): Wo
 }
 
 function judgeSkeleton(expected: string, expSk: string[], heardTxt: string, heardSk: string[], wconf: number): WordJudgement {
-  if (heardSk.length === 0) return { status: expSk.length ? "skipped" : "correct", skippedOutright: true, strays: [] };
+  if (heardSk.length === 0) {
+    // a short word's long vowel heard in its place (وَلَا / وَمَا said quickly: the model caught only
+    // the "aa"): something was said there, so not a skip. A skipped word leaves no sound at all.
+    if (expSk.length <= 2 && Array.from(heardTxt).some((c) => c === "ا" || c === "ۦ" || c === "ۥ")) return { status: "unsure", skippedOutright: false, strays: [] };
+    return { status: expSk.length ? "skipped" : "correct", skippedOutright: true, strays: [] };
+  }
   let [hard, a, b] = bestSubstring(expSk, heardSk);
   const soft = lev(Array.from(expected), Array.from(heardTxt));
   const L = Math.max(1, expSk.length);
@@ -239,11 +282,17 @@ function judgeSkeleton(expected: string, expSk: string[], heardTxt: string, hear
   else if (hard >= L * 0.75 && L >= 2 && a === b) status = "skipped";
   // a word of 3+ letters of which at most one stray breathy letter was heard: it was not said
   else if (expSk.filter((c) => !"ءهع".includes(c)).length >= 2 && heardSk.filter((c) => !"ءهع".includes(c)).length === 0) status = "skipped";
+  // a different word: part of it, plus 2+ solid letters that are not in it (وَأَنَّى heard as "لءنسان")
+  else if (hard >= 1 && heardSk.filter((c, i) => (i < a || i >= b) && !"ءعيوهں".includes(c)).length >= 2 && real >= 1) status = "wrong";
+  // most of a long word never said (كَيْدَهُمْ heard as "هُم"): clean recitation never loses 3+ letters
+  else if (L >= 4 && hard >= 3 && hard === L - (b - a)) status = "skipped";
   else if (L >= 4 && real < 2) status = "unsure";
   // a short word needs one full real letter change (similar-sounding letters / a misheard ء don't count)
   else if (L < 4 && real < 1) status = "unsure";
   else if (hard / L >= 0.5) {
-    const onlyMissing = hard === L - (b - a);
+    // only letters missing (a word heard in part): unsure. But other solid letters heard instead
+    // (رَبَّهُم said as "مِن") make it a different word.
+    const onlyMissing = hard === L - (b - a) && extraCons === 0;
     const need = L <= 2 && !added ? 0.85 : 0.6; // a swapped sound in a 1-2 letter word needs a surer model
     status = wconf >= need && !onlyMissing ? "wrong" : "unsure";
   } else status = "unsure";
