@@ -92,6 +92,8 @@
 .q2-live-preview .q2-basmala {font-size:15px;}
 .q2-live-preview .q2-cartouche {height:27px;}
 .q2-setting-row {display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px 0;border-bottom:1px solid var(--border);font-size:13px;}
+.q2-setting-hint {display:block;color:var(--muted-foreground);font-size:11px;line-height:1.4;margin-top:2px;}
+.q2-disclaimer-hafs {display:block;}
 .q2-slider-label {display:flex;flex-wrap:wrap;justify-content:space-between;font-size:13px;gap:15px;padding:15px 0;}
 .q2-slider-label > :last-child {width:100%;}
 .q2-mistake-row {padding:14px 0;border-bottom:1px solid var(--border);font-size:13px;}

@@ -7,6 +7,8 @@ import {play as feedback} from "@/lib/hifzHaptics";
 import {mergeResults} from "@/lib/hifz-ai/replay";
 
 type Range={sura:number;first:number;last:number};
+/** Device-saved reader setting; read at call time so page restarts pick up changes. */
+function strictHarakat(){try{return JSON.parse(localStorage.getItem("quran-v2:preferences")??"null")?.strictHarakat===true;}catch{return false;}}
 export function useReaderVoice({update,elsewhere,position,answer}:{update:(r:CheckResult)=>void;elsewhere:(p:Elsewhere)=>void;position:(p:FollowPosition)=>void;answer:(a:SearchAnswer)=>void}) {
   const [phase,setPhase]=useState("idle"),[mode,setMode]=useState<"smart"|"follow"|"search">("smart");
   const [progress,setProgress]=useState(0),[error,setError]=useState("");
@@ -29,7 +31,7 @@ export function useReaderVoice({update,elsewhere,position,answer}:{update:(r:Che
       const engine=await import("@/lib/hifz-ai");await engine.prepareChecker(p=>{if(id===generation.current)setProgress(p);});
       if(id!==generation.current)return;
       const failure=(e:unknown)=>{if(id!==generation.current)return;release();setStream(null);setPhase("error");setError(e instanceof Error&&e.name==="NotAllowedError"?"Allow microphone access in your browser or phone settings, then retry.":"Couldn’t start listening. Please try again.");};
-      const current=intent.current.mode==="smart"?await engine.startSmartRecite({passages:intent.current.ranges,keepStream:true,onUpdate:r=>{if(id===generation.current&&part===segment.current)callbacks.current.update(merged(r));},onElsewhere:p=>{if(id===generation.current&&part===segment.current)callbacks.current.elsewhere(p);},onError:failure}):intent.current.mode==="follow"?await engine.startFollowing({onPosition:p=>{if(id===generation.current)callbacks.current.position(p);},onError:failure}):await engine.startVoiceSearch({maxSeconds:15,onError:failure,onAnswer:a=>{if(id===generation.current){session.current=null;setStream(null);setPhase("idle");callbacks.current.answer(a);}}});
+      const current=intent.current.mode==="smart"?await engine.startSmartRecite({passages:intent.current.ranges,strictHarakat:strictHarakat(),keepStream:true,onUpdate:r=>{if(id===generation.current&&part===segment.current)callbacks.current.update(merged(r));},onElsewhere:p=>{if(id===generation.current&&part===segment.current)callbacks.current.elsewhere(p);},onError:failure}):intent.current.mode==="follow"?await engine.startFollowing({onPosition:p=>{if(id===generation.current)callbacks.current.position(p);},onError:failure}):await engine.startVoiceSearch({maxSeconds:15,onError:failure,onAnswer:a=>{if(id===generation.current){session.current=null;setStream(null);setPhase("idle");callbacks.current.answer(a);}}});
       if(id!==generation.current){current.stream.getTracks().forEach(t=>t.stop());await current.stop();return;}
       session.current=current;setStream(current.stream);setPhase("active");feedback("micStart");
       if(intent.current.mode==="smart"){capture.current=captureRecording(current.stream);clock.current={start:performance.now(),offset:0,prev:null};}
@@ -62,7 +64,7 @@ export function useReaderVoice({update,elsewhere,position,answer}:{update:(r:Che
       clock.current.prev=fresh?null:last?merged(last):clock.current.prev;
       const engine=await import("@/lib/hifz-ai");
       clock.current.offset=(performance.now()-clock.current.start)/1000;
-      const next=await engine.startSmartRecite({passages:ranges,stream:held,keepStream:true,onUpdate:r=>{if(id===generation.current&&part===segment.current)callbacks.current.update(merged(r));},onElsewhere:p=>{if(id===generation.current&&part===segment.current)callbacks.current.elsewhere(p);}});
+      const next=await engine.startSmartRecite({passages:ranges,strictHarakat:strictHarakat(),stream:held,keepStream:true,onUpdate:r=>{if(id===generation.current&&part===segment.current)callbacks.current.update(merged(r));},onElsewhere:p=>{if(id===generation.current&&part===segment.current)callbacks.current.elsewhere(p);}});
       if(id!==generation.current){next.stream.getTracks().forEach(t=>t.stop());await next.stop();return;}
       // the new page's AI clock started as its mic opened, just now
       session.current=next;held.getTracks().forEach(t=>t.enabled=true);intent.current.ranges=ranges;
