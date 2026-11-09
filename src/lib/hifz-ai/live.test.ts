@@ -244,3 +244,29 @@ describe("long surahs (whole-Quran sweep)", () => {
     expect(flags(run(ref, [24, 25, 26, 25, 26, 27].map(ayah).join(" ")))).toEqual([]);
   });
 });
+
+describe("single clear letter swap", () => {
+  test("صِرَاطَ said with ز in Al-Fatiha is a mistake when the model is sure", () => {
+    const k = key(1); const ref = buildReference(k, 1, 1, 7);
+    const fat = [1, 2, 3, 4, 5, 6, 7].map((a) => k[String(a)].map((w: [number, string, string]) => w[2]));
+    fat[6][0] = fat[6][0].replace("صِ", "زِ");
+    const heard = fat.map((a) => a.join("")).join(" ");
+    const sure = new RecitationTracker(ref, "reached").finish(heard, Array.from(heard).map(() => 0.97));
+    expect(sure.words.find((w) => w.key === "1:7:1")!.status).toBe("wrong");
+    const unsure = new RecitationTracker(ref, "reached").finish(heard, Array.from(heard).map(() => 0.7));
+    expect(unsure.words.find((w) => w.key === "1:7:1")!.status).toBe("unsure");
+  });
+});
+
+describe("strict mode: other riwayat read against Hafs", () => {
+  const one = (s: number, a: number, wi: number, change: (p: string) => string, strict = true) => {
+    const k = key(s); const ref = buildReference(k, s, a, a); const ph = k[String(a)].map((w: [number, string, string]) => w[2]);
+    ph[wi - 1] = change(ph[wi - 1]); const heard = ph.join("");
+    const w = new RecitationTracker(ref, "all", { strictHarakat: strict }).finish(heard, Array.from(heard).map(() => 0.96)).words[wi - 1];
+    return `${w.status}${w.issue ? ":" + w.issue : ""}`;
+  };
+  test("Qunbul's ٱلسِّرَاطَ (light س for heavy ص)", () => expect(one(1, 6, 2, (p) => p.replace(/ص/g, "س"))).toBe("wrong:letter"));
+  test("a light letter made heavy: ذَٰلِكَ with ظ", () => expect(one(2, 2, 1, (p) => p.replace("ذ", "ظ"))).toBe("wrong:letter"));
+  test("Warsh's tas-hil in ءَأَنذَرْتَهُمْ", () => expect(one(2, 6, 6, (p) => p.replace("ءَءَ", "ءَٲ"))).toBe("wrong:tashil"));
+  test("heavy/light swaps are forgiven when strict mode is off", () => expect(one(2, 2, 1, (p) => p.replace("ذ", "ظ"), false)).toBe("correct"));
+});

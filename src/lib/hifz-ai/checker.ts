@@ -18,7 +18,7 @@ export interface WordResult {
   at?: number; // index in the heard string of this word's first sound (for timing / hesitation)
   end?: number; // index of its last sound
   /** Strict harakat mode only: the letters were right but a harakah / vowel length was not. */
-  issue?: "harakah" | "length";
+  issue?: "harakah" | "length" | "letter" | "imalah" | "tashil";
 }
 
 export interface ExtraSpeech {
@@ -124,6 +124,31 @@ export function harakahIssue(expectedPh: string, heard: { c: string; p: number }
     if (!x.len || !y.len || y.p < minConf) continue;
     if (x.v && y.v && x.v !== y.v) return "harakah";
     if ((x.len >= 2) !== (y.len >= 2)) return "length";
+  }
+}
+
+/**
+ * Strict mode, letters: a light letter made heavy or the reverse (س/ص, ت/ط, د/ض, ذ/ظ, ك/ق, ه/ح),
+ * or ز for one of its neighbours, which the normal check forgives as similar sounds. On clean
+ * recitation the model mixes these up very rarely when sure (4 in 255,000 letters at 95%).
+ * Also imalah (۪) and tas-hil (ٲ) heard where Hafs has none (the model hears them only where the
+ * text has them).
+ */
+const HEAVY_LIGHT = [["س", "ص"], ["ت", "ط"], ["د", "ض"], ["ذ", "ظ"], ["ك", "ق"], ["ه", "ح"], ["ز", "ذ"], ["ز", "ظ"], ["ز", "س"], ["ز", "ص"], ["ز", "ط"]];
+export function strictLetterIssue(expectedPh: string, heard: { c: string; p: number }[], minConf = 0.9): "letter" | "imalah" | "tashil" | undefined {
+  const raw = heard.map((h) => h.c).join("");
+  if (raw.includes("۪") && !expectedPh.includes("۪")) return "imalah";
+  if (raw.includes("ٲ") && !expectedPh.includes("ٲ")) return "tashil";
+  const nasal = (c: string) => (c === "ں" ? "ن" : c);
+  const exp = skeleton(expectedPh).map(nasal);
+  const got: { c: string; p: number }[] = [];
+  for (const h of heard) { const k = skeleton(h.c)[0]; if (!k) continue; const c = nasal(k); if (got.length && got[got.length - 1].c === c) { got[got.length - 1].p = Math.max(got[got.length - 1].p, h.p); continue; } got.push({ c, p: h.p }); }
+  if (got.length !== exp.length) return;
+  for (let i = 0; i < exp.length; i++) {
+    if (exp[i] === got[i].c) continue;
+    const pair = HEAVY_LIGHT.some(([x, y]) => (x === exp[i] && y === got[i].c) || (y === exp[i] && x === got[i].c));
+    if (!pair) return; // some other difference: the normal check judges it
+    if (got[i].p >= minConf) return "letter";
   }
 }
 

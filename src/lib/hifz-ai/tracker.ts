@@ -17,7 +17,7 @@
  *   4. reports leftover sounds between words that fit no nearby text as added words ("extra").
  * The newest attempt at a word wins: a mistake corrected by going back is cleared.
  */
-import { harakahIssue, isVowel, judgeWord, lev, normalize, same, skeleton, type CheckResult, type ExtraSpeech, type Reference, type WordResult, type WordStatus } from "./checker";
+import { harakahIssue, strictLetterIssue, isVowel, judgeWord, lev, normalize, same, skeleton, type CheckResult, type ExtraSpeech, type Reference, type WordResult, type WordStatus } from "./checker";
 
 /** Tunables (measured on real spliced recitations, see live.test.ts). */
 export const TRACKER = {
@@ -35,6 +35,7 @@ export const TRACKER = {
   farBack: 3, // extra cost for going back many words (0.06 per word)
   sureStart: 7,
   ambiguous: 3, // another start place this close in cost: not sure where the reciter began yet // consonants needed before showing a start anywhere but the passage start
+  swapConf: 0.95, // a single swapped letter is a mistake when the model is at least this sure of it
   verify: 4, // a jump back is believed once this many consonants after it match (at most 1 off)
 };
 /**
@@ -45,6 +46,25 @@ const SOFT = new Set(["ء", "ه", "ع", "ح", "ں"]);
 export function wordsWorth(sk: string[]): boolean {
   const solid = sk.filter((c) => !SOFT.has(c)).length;
   return solid >= 2 || (sk.length >= TRACKER.minExtra && solid >= 1);
+}
+/** Exactly one letter differs, the letters are not alike or soft, and the model was sure of it. */
+export function letterSwap(expected: string, heard: { c: string; p: number }[], minConf = TRACKER.swapConf): boolean {
+  const nasal = (c: string) => (c === "ں" ? "ن" : c);
+  const exp = skeleton(expected).map(nasal);
+  const got: { c: string; p: number }[] = [];
+  for (const h of heard) {
+    const k = skeleton(h.c)[0];
+    if (!k) continue;
+    const c = nasal(k);
+    if (got.length && got[got.length - 1].c === c) { got[got.length - 1].p = Math.max(got[got.length - 1].p, h.p); continue; }
+    got.push({ c, p: h.p });
+  }
+  if (got.length !== exp.length || exp.length < 2) return false;
+  const diff = exp.map((c, i) => i).filter((i) => exp[i] !== got[i].c);
+  if (diff.length !== 1) return false;
+  const i = diff[0], e = exp[i], h = got[i].c;
+  if (same(e, h) || SOFT.has(e) || SOFT.has(h) || e === "ي" || e === "و" || h === "ي" || h === "و") return false;
+  return got[i].p >= minConf;
 }
 const BAN = 1 << 20; // key = tail index * BAN + ref index
 
@@ -587,6 +607,10 @@ export class RecitationTracker {
       const wconf = js.length ? js.reduce((t, j) => t + rconf[base + j], 0) / js.length : 1;
       const jw = judgeWord(expected, heardTxt, wconf);
       let status: WordStatus = jw.status;
+      // one clear letter swapped (ٱلصِّرَاطَ said with ز): the word judge leaves a single change in a
+      // longer word as "unsure" (the model mishears now and then), but when the model is sure of the
+      // swapped-in letter and the two letters don't sound alike, it is a mistake
+      if (status === "unsure" && letterSwap(expected, js.map((j) => ({ c: tail[j], p: rconf[base + j] })))) status = "wrong";
       const extras: ExtraSpeech[] = [];
       for (const piece of jw.strays) {
         const kind = this.nearby(piece, o.word) ? "repeat" : "extra";
@@ -595,10 +619,12 @@ export class RecitationTracker {
       }
       const res: WordResult = { key: w.key, text: w.text, status, expected, heard: heardTxt, ...(js.length ? { at: idx[base + js[0]], end: idx[base + js[js.length - 1]] } : {}) };
       // strict harakat: right letters, wrong harakah / vowel length (e.g. مَلِكِ for Hafs's مَالِكِ)
-      if (this.opts.strictHarakat && status === "correct" && res.at !== undefined && res.end !== undefined) {
+      if (this.opts.strictHarakat && (status === "correct" || status === "unsure") && res.at !== undefined && res.end !== undefined) {
         let to = res.end + 1;
-        while (to < this.raw.length && isVowel(this.raw[to].c)) to++;
-        const issue = harakahIssue(w.ph, this.raw.slice(res.at, to));
+        // the word's sounds run on through vowels and the imalah / ishmam marks after its last letter
+        while (to < this.raw.length && (isVowel(this.raw[to].c) || "۪ىؙ".includes(this.raw[to].c))) to++;
+        const span = this.raw.slice(res.at, to);
+        const issue = strictLetterIssue(w.ph, span) ?? (status === "correct" ? harakahIssue(w.ph, span) : undefined);
         if (issue) { res.status = "wrong"; res.issue = issue; }
       }
       wordsJudged.push({ k: o.word, o, res });
