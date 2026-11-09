@@ -238,7 +238,7 @@ function Home({v2=false}:{v2?:boolean}) {
             </label>
           </div>
 
-          {v2 && !t ? <section><Button variant="ghost" className="q2-home-card" onClick={()=>void navigate({to:"/app/quran",search:{voice:"search"}})}><Mic/><span><strong>Recite anything</strong><small>We’ll find it and check you</small></span></Button><Button variant="link" className="q2-home-follow" onClick={()=>void navigate({to:"/app/quran",search:{voice:"follow"}})}>Follow the imam →</Button></section> : beta.enabled && !t && <div className="qv-entry-actions"><Button variant="outline" onClick={()=>void navigate({to:"/app/quran",search:{voice:"follow"}})}><Play size={16}/>Follow the imam</Button><Button variant="outline" onClick={()=>void navigate({to:"/app/quran",search:{voice:"search"}})}><Search size={16}/>Find an ayah</Button></div>}
+          {!v2 && beta.enabled && !t && <div className="qv-entry-actions"><Button variant="outline" onClick={()=>void navigate({to:"/app/quran",search:{voice:"follow"}})}><Play size={16}/>Follow the imam</Button><Button variant="outline" onClick={()=>void navigate({to:"/app/quran",search:{voice:"search"}})}><Search size={16}/>Find an ayah</Button></div>}
 
           {reciterHits.length > 0 && (
             <div className="quran-card divide-y">
