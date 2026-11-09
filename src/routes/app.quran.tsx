@@ -6,7 +6,7 @@ import { preferredTafsirBook } from "@/lib/tafsir";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { QuranFaceBubble, QuranMiniPlayer } from "@/components/QuranMiniPlayer";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { Check, ChevronDown, ChevronLeft, ChevronRight, Clock, Heart, Infinity as InfinityIcon, Info, MoreHorizontal, RotateCcw, RotateCw, SlidersHorizontal, Loader2, Maximize2, Pause, Play, Repeat, Search, Shuffle, SkipBack, SkipForward, X, Mic } from "lucide-react";
+import { Check, ChevronDown, ChevronLeft, ChevronRight, Clock, Heart, Infinity as InfinityIcon, Info, MoreHorizontal, RotateCcw, RotateCw, SlidersHorizontal, Loader2, Maximize2, Pause, Play, Repeat, Search, Shuffle, SkipBack, SkipForward, X } from "lucide-react";
 import {
   featuredRank, findReciter, getChapterAudio, getChapters, getVerses, homeReciterRow, POPULAR_RECITERS, RECITERS, reciterHasPhoto,
   reciterHasSurah, reciterName, reciterScore, reciterPhoto, reciterSubtitle, searchChapters, searchReciters, parseVerseRef, type Chapter, type Reciter, type Verse, getVerseByKey, searchVerses, type VerseHit,
