@@ -1,4 +1,5 @@
 # Roadmap
+- [x] Master all 31 active adhkar recordings with gentle bass/harshness reduction, de-essing and compression; all 48 assignments use enhanced files, originals preserved. All files delivered and Ayatul Kursi playback verified; eight tests pass, loudness -18 LUFS, no clipping. Subjective listening and physical-phone background playback not verified.
 - [x] Remove the navbar veil seam and tighten daily-card/dot spacing; morning/evening cards are 20px taller at 402px width, dots end exactly above the navbar, and scrolled Quran is clipped at the navbar top. Verified at 402×874, 402×645 and 393×813; preview build OK.
 - [x] Extend rapid-tap skipping to forward adhkar navigation; browser verified three taps reach 4/23 immediately without delayed jumps, back returns 1/23; six focused tests pass.
 - [x] Soften audio peaks, taper side bars and ease down on pause; actual playback checked at phone size, all 17 bars settle flat with a 600ms transition, preview build OK.

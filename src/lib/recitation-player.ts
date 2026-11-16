@@ -2,6 +2,7 @@
 // keeps playing when the page changes or the app goes to the background.
 import { useSyncExternalStore } from "react";
 import { getRecitations } from "./recitations.functions";
+import { enhancedRecitationUrl } from "./adhkar-audio";
 import { createBandSampler, METER_FFT_SIZE, spectrumBands, restingLevels, shapeMeter, type MeterLevels } from "./recitation-meter";
 
 export type Track = { dhikrId: string; title: string; url: string };
@@ -291,7 +292,11 @@ export function loadRecitations() {
   if (!mapPromise) {
     mapPromise = getRecitations()
       .catch(() => ({}) as Map_)
-      .then((m) => { mapCache = m; mapSubs.forEach((f) => f()); return m; });
+      .then((m) => {
+        mapCache = Object.fromEntries(Object.entries(m).map(([id, file]) => [id, { ...file, url: enhancedRecitationUrl(file.url) }]));
+        mapSubs.forEach((f) => f());
+        return mapCache;
+      });
   }
   return mapPromise;
 }
