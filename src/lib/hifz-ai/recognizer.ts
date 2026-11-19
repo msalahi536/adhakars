@@ -1,12 +1,11 @@
 /**
  * Streaming Quran phoneme recognizer in the browser / Capacitor WebView.
- * Model: Quran-Lab zipformer_p-arabic-v3.2 (int8 ONNX), run with onnxruntime-web (WASM).
+ * Model: Sahih Al-Adhkar's own streaming conformer (int8 ONNX, ~30 MB), run with onnxruntime-web (WASM).
+ * Its sounds are written in the app's Arabic-letter notation by tokens.txt, so the checker and tracker
+ * read it exactly as before; the answer files in /hifz-ai/ayat are built from the same labels.
  *
- * Feed 16 kHz mono samples as they arrive; tokens come out every chunk (0.32 s with chunk16).
+ * Feed 16 kHz mono samples as they arrive; tokens come out every chunk (0.32 s).
  * The model's memory is reset after a long pause, which keeps repeats and restarts detectable.
- *
- * Model license: Quran-Lab NPL-1.2. Free apps only, no paid features built on it, and the app must say
- * that automatic feedback can be wrong and does not replace a qualified teacher.
  */
 import * as ort from "onnxruntime-web";
 import { NMEL, SR, StreamingFbank } from "./fbank";
@@ -61,11 +60,11 @@ export class QuranRecognizer {
     modelUrl: string; // the .onnx file (host it yourself; see README)
     configUrl?: string; // model-config.json
     tokensUrl?: string; // tokens.txt
-    variant?: "chunk16" | "chunk24";
+    variant?: string; // key in model-config.json ("own")
     onProgress?: (p: number) => void;
   }): Promise<QuranRecognizer> {
     const r = new QuranRecognizer();
-    const variant = opts.variant ?? "chunk16";
+    const variant = opts.variant ?? "own";
     const [cfgAll, tokTxt, model] = await Promise.all([
       cachedAsset(opts.configUrl ?? "/hifz-ai/model/model-config.json").then((x) => x.json()),
       cachedAsset(opts.tokensUrl ?? "/hifz-ai/model/tokens.txt").then((x) => x.text()),

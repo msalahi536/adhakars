@@ -13,9 +13,9 @@ import { RecitationTracker } from "./tracker";
 
 let shared: Promise<QuranRecognizer> | null = null;
 
-/** Load the model once per app session (first time downloads ~73 MB, then cached). */
+/** Load the model once per app session (first time downloads ~30 MB, then cached). */
 export function getRecognizer(modelUrl = DEFAULT_MODEL_URL, onProgress?: (p: number) => void) {
-  shared ??= QuranRecognizer.create({ modelUrl, variant: "chunk16", onProgress }).catch((e) => {
+  shared ??= QuranRecognizer.create({ modelUrl, variant: "own", onProgress }).catch((e) => {
     shared = null; // let the user retry (e.g. after reconnecting)
     throw e;
   });
