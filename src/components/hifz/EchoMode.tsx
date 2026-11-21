@@ -78,7 +78,7 @@ export function EchoMode({ keys, reciter, close, highlight, modern = false }: { 
     <p className="hx-status" role="status">{caption}{stage === "repeat" ? " · Your turn" : stage === "listen" ? " · Listening" : ""}{correct && <Check size={14} className="inline text-accent" aria-label="Correct repeat" />}</p>
     <div className={`hx-echo-text ${stage === "repeat" && settings.hide ? "hx-echo-hidden" : ""}`} dir="rtl">{(current.length ? current : keys).map((key) => <span className={current.includes(key) ? "hx-echo-current" : ""} key={key}>{texts[key]} </span>)}</div>
     {error && <p role="alert">{error}</p>}
-    {ai.phase === "download" && <><p>Download the checker once (73 MB). Wi-Fi recommended.</p><Button onClick={() => { void ai.confirm().then(() => ai.stop()); }}>Download checker</Button></>}
+    {ai.phase === "download" && <><p>Download the checker once (30 MB). Wi-Fi recommended.</p><Button onClick={() => { void ai.confirm().then(() => ai.stop()); }}>Download checker</Button></>}
     {ai.phase === "error" && <p role="alert">{ai.error}</p>}
     <Button onClick={running ? stop : () => void run()} disabled={!keys.length}>{running ? <Square /> : <Play />}{running ? "Stop echo" : "Start echo"}</Button>
   </DialogContent></Dialog>;
