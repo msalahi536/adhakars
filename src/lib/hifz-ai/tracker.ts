@@ -175,6 +175,7 @@ export class RecitationTracker {
   private dropped: [number, number][] = []; // raw heard index ranges cut out (isti'adha, basmala, amin)
   private openers: string[][];
   private amin: boolean;
+  private aminZone: [number, number]; // ref chars of Al-Fatiha's last ayah
 
   private raw: { c: string; p: number }[] = []; // everything heard, as heard (harakat + length kept)
   constructor(private reference: Reference, private finishMode: "all" | "reached" = "all", private opts: { strictHarakat?: boolean } = {}) {
@@ -192,6 +193,10 @@ export class RecitationTracker {
     // a passage that itself contains the basmala (Al-Fatiha 1:1, An-Naml 27:30) keeps it as text
     this.openers = OPENERS.filter((o) => fitIn(o, refSk)[0] > 1);
     this.amin = reference.words.some((w) => w.key === "1:7:9");
+    // "amin" is only said right after Al-Fatiha: elsewhere ءَامَنُوا (2:9, 2:13…) sounds the same
+    const f7 = reference.words.findIndex((w) => w.key.startsWith("1:7:"));
+    const f9 = reference.words.findIndex((w) => w.key === "1:7:9");
+    this.aminZone = f7 >= 0 && f9 >= 0 ? [reference.words[f7].s, reference.words[f9].e] : [-1, -1];
   }
 
   /** Cut isti'adha / basmala / amin out of the not-yet-committed sounds. True = still saying one. */
@@ -209,7 +214,7 @@ export class RecitationTracker {
       // cut once it is over (its last letter arrives a moment late: wait for the next sound)
       if (e > b && cost <= Math.floor(o.length * 0.25) && (e < sk.length || final)) { this.dropped.push([raw(at[b]), endRaw(e)]); return true; }
     }
-    if (this.amin && sk.length >= FATIHA_END.length + 2) {
+    if (this.amin && this.pos >= this.aminZone[0] && this.pos <= this.aminZone[1] && sk.length >= FATIHA_END.length + 2) {
       const pat = [...FATIHA_END, ...AMIN];
       const [cost, b, e] = fitIn(pat, sk);
       if (cost <= 1 && e - b >= pat.length - 1 && e >= sk.length - 1) {

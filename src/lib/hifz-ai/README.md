@@ -1,14 +1,14 @@
 # hifz-ai — on-device recitation checking
 
-Runs fully on the phone (no server, no per-use cost). Free feature only (model license NPL-1.2).
+Runs fully on the phone (no server, no per-use cost). Uses Sahih Al-Adhkar's own recitation model.
 
 ## Files
 - `listen.ts` — `startListening({ sura, first, last, onUpdate })` → mic → model → word statuses; `session.stop()` gives the final result.
 - `recognizer.ts` — streaming model runner (onnxruntime-web, WASM). Resets its memory after a 1 s pause so repeats/restarts are caught.
 - `checker.ts` — compares what was heard with the answer key, per word.
 - `fbank.ts` — audio features (bit-identical to the reference Python).
-- `public/hifz-ai/ayat/NNN.json` — answer key per surah (loaded on demand, ~10–60 KB gzipped).
-- `public/hifz-ai/model/` — `model-config.json` and `tokens.txt`; the 73 MB model is hosted through `model.onnx.asset.json` and cached on device. Matching ORT 1.20.1 WASM uses `runtime.wasm.asset.json`; its companion module is in `public/hifz-ai/runtime/`.
+- `public/hifz-ai/ayat/NNN.json` — answer key per surah (loaded on demand, ~10–60 KB gzipped). Built from our own labels (Quran.com Uthmani text + our phonemizer), written in the same Arabic-letter notation the model's tokens.txt uses.
+- `public/hifz-ai/model/` — `model-config.json` and `tokens.txt`; the ~30 MB model (`model.int8.onnx`, our own conformer) is hosted through `model.onnx.asset.json` and cached on device. Matching ORT 1.20.1 WASM uses `runtime.wasm.asset.json`; its companion module is in `public/hifz-ai/runtime/`.
 
 Dependency: `"onnxruntime-web": "1.20.1"` (keep `ORT_VERSION` in recognizer.ts the same).
 

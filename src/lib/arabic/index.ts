@@ -2,7 +2,7 @@
  * Arabic Companion (v2): from not knowing a single letter to reading the Quran (Track 1, 30 lessons),
  * then recognising its most frequent words (Track 2, 60 days). Pure logic here; screens call it.
  *
- * Free forever: the "say it" checking uses the hifz recitation model (NPL-1.2, free use only).
+ * Free forever: the "say it" checking uses the app's own hifz recitation model.
  * Show AI_DISCLAIMER and AI_CREDIT from @/lib/hifz-ai wherever the mic checks speech.
  */
 export { toPhonemes, lengthClass } from "./phonetic";
