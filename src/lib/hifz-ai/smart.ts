@@ -49,6 +49,19 @@ export function withoutOpeners(heard: string): string {
   return text;
 }
 
+/** Do these sounds fit (nearly) anywhere on the page? */
+function onPage(ix: QuranIndex, text: string, passages: Passage[]): boolean {
+  const q = Array.from(skel(text));
+  return passages.some((p) => {
+    const lo = ix.ayaStart(p.sura, p.first);
+    const nx = ix.ayaStart(p.sura, p.last + 1);
+    const hi = nx >= 0 ? nx : ix.ayaStart(p.sura + 1, 1) >= 0 ? ix.ayaStart(p.sura + 1, 1) : ix.S.length;
+    if (lo < 0) return false;
+    const [cost] = fit(q, ix.S.slice(lo, hi));
+    return cost / q.length <= 0.34;
+  });
+}
+
 const inside = (sura: number, aya: number, passages: Passage[]) =>
   passages.some((p) => p.sura === sura && aya >= p.first && aya <= p.last);
 
@@ -68,6 +81,9 @@ export function detectElsewhere(ix: QuranIndex, result: CheckResult & { heard?: 
   const candidates: string[] = [];
   // 1) the opening: several words heard and almost none matched the page
   if (recited.length >= 4 && goodAll <= 1) candidates.push(heard);
+  // 0) the very start, before the page has judged anything: a short opening that exists in only one
+  //    place (وَالْعَصْرِ) can be placed right away (judged below with the "exact" rule)
+  else if (goodAll <= 1) candidates.push(heard);
   // 2) later: the last 6 words stopped matching -> look at the tail of what was heard
   if (recent.length >= 6 && goodRecent <= 1) candidates.push(heard.slice(-90));
   // 3) reached the last word of the page and kept going (next page, or another surah):
@@ -78,10 +94,12 @@ export function detectElsewhere(ix: QuranIndex, result: CheckResult & { heard?: 
   }
   for (const raw of candidates) {
     const text = withoutOpeners(raw);
-    if (Array.from(skel(text)).length < 10) continue; // only the isti'adha / basmala: nothing to place yet
+    const n = Array.from(skel(text)).length;
+    if (n < 6) continue; // only the isti'adha / basmala: nothing to place yet
     const a = judgeSearch(ix, text);
     const top = a.matches[0];
-    if (!a.confident || !top) continue;
+    if (!top || !(a.confident && n >= 10) && !a.exact) continue;
+    if (n < 10 && onPage(ix, text, passages)) return null; // a short opening that also fits the page: stay
     const all = [top, ...a.samePhrase];
     if (all.some((m) => inside(m.sura, m.aya, passages))) return null; // it IS on this page (a repeated phrase)
     // the page itself is nearly as good a match: the reciter is just making mistakes, stay here

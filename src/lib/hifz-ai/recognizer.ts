@@ -128,7 +128,9 @@ export class QuranRecognizer {
       for (let i = a; i < a + hop; i++) e += samples[i] * samples[i];
       const db = 10 * Math.log10(e / hop + 1e-12);
       this.level = db > this.level ? db : this.level - 0.01; // slow decay of the speech level
-      if (db < Math.max(-55, this.level - 30)) this.silentSamples += hop;
+      // relative to this speaker: a soft voice sits near -55 dBFS, and calling it silence wiped the
+      // model's memory mid-ayah (3-4 times per ayah at a quiet voice)
+      if (db < Math.max(-70, this.level - 30)) this.silentSamples += hop;
       else this.silentSamples = 0;
     }
 
