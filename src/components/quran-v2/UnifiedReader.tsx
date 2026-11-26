@@ -50,7 +50,7 @@ export function UnifiedReader({chapterId=1,verse=1,initialPage,initialMode,back,
   const [sheet,setSheet]=useState<"navigation"|"settings"|"mistakes"|"more"|"reciter"|"echo"|"search"|null>(null);
   const [result,setResult]=useState<CheckResult|null>(null),[marks,setMarks]=useState<Marks>({}),[tips,setTips]=useState<TajweedHint[]>([]),[highlight,setHighlight]=useState<string|null>(null);
   const [confirmReset,setConfirmReset]=useState(false),[resetting,setResetting]=useState(false);
-  const liveMarks=useRef<Marks>({}),liveAdded=useRef<Set<string>>(new Set()),seenAdded=useRef(new Set<string>()),resetPending=useRef(false),sessionPage=useRef<number|null>(null);
+  const liveMarks=useRef<Marks>({}),liveAdded=useRef<Set<string>>(new Set()),liveOpener=useRef<{sura:number;state?:"saying"|"said"}|null>(null),seenAdded=useRef(new Set<string>()),resetPending=useRef(false),sessionPage=useRef<number|null>(null);
   const [elsewhere,setElsewhere]=useState<(Elsewhere & {page:number})|null>(null),[recent,setRecent]=useState<ReadingLocation[]>([]),[bookmarks,setBookmarks]=useState<ReadingLocation[]>([]);
   const [reciter,setReciter]=useState(7),[error,setError]=useState(""),[translationMap,setTranslationMap]=useState<Record<string,string>>({});
   const [hizb,setHizb]=useState(1);
@@ -74,7 +74,7 @@ export function UnifiedReader({chapterId=1,verse=1,initialPage,initialMode,back,
   const debugUpdates=useRef<{elapsed:number;result:CheckResult}[]>([]),debugStart=useRef(0);
   const sessionPassages=useRef<ReturnType<typeof pageRanges>>([]);
   const voice=useReaderVoice({
-    update:r=>{if(resetPending.current)return;const next:Marks={};for(const w of r.words)next[w.key]=w.status;const rewound=r.words.filter(w=>w.status==="pending"&&liveMarks.current[w.key]&&liveMarks.current[w.key]!=="pending").map(w=>w.key);if(rewound.length){setRevealed(old=>{const fresh=new Set(old);for(const key of rewound)fresh.delete(key);return fresh;});setHighlight(old=>old&&rewound.includes(old)?null:old);}liveMarks.current=next;const added=addedWordKeys(r);liveAdded.current=new Set(added);if(root.current)paintLiveWords(root.current,next,true,null,liveAdded.current);for(const k of added){if(!seenAdded.current.has(k)){seenAdded.current.add(k);feedback("small");}}setResult(r);setMarks(next);if(debugEnabled())debugUpdates.current.push({elapsed:(performance.now()-debugStart.current)/1000,result:structuredClone(r)});for(const w of r.words){if((w.status==="wrong"||w.status==="skipped")&&seenMarks.current.get(w.key)!==w.status)feedback(w.status==="wrong"?"wrong":"skip");seenMarks.current.set(w.key,w.status);}},
+    update:r=>{if(resetPending.current)return;const next:Marks={};for(const w of r.words)next[w.key]=w.status;const rewound=r.words.filter(w=>w.status==="pending"&&liveMarks.current[w.key]&&liveMarks.current[w.key]!=="pending").map(w=>w.key);if(rewound.length){setRevealed(old=>{const fresh=new Set(old);for(const key of rewound)fresh.delete(key);return fresh;});setHighlight(old=>old&&rewound.includes(old)?null:old);}liveMarks.current=next;const added=addedWordKeys(r);liveAdded.current=new Set(added);liveOpener.current={sura:Number((r.startKey||r.words[0]?.key||"").split(":")[0]),state:r.openers?.basmala};if(root.current)paintLiveWords(root.current,next,true,null,liveAdded.current,liveOpener.current);for(const k of added){if(!seenAdded.current.has(k)){seenAdded.current.add(k);feedback("small");}}setResult(r);setMarks(next);if(debugEnabled())debugUpdates.current.push({elapsed:(performance.now()-debugStart.current)/1000,result:structuredClone(r)});for(const w of r.words){if((w.status==="wrong"||w.status==="skipped")&&seenMarks.current.get(w.key)!==w.status)feedback(w.status==="wrong"?"wrong":"skip");seenMarks.current.set(w.key,w.status);}},
     elsewhere:p=>{
       const token=++locationGeneration.current;
       if(jumpTimer.current)clearTimeout(jumpTimer.current);
@@ -96,7 +96,7 @@ export function UnifiedReader({chapterId=1,verse=1,initialPage,initialMode,back,
   paintState.current={active:voice.phase==="active"||voice.phase==="finishing",highlight};
   useLayoutEffect(()=>{
     const node=root.current;if(!node||lesson)return;
-    const paint=()=>paintLiveWords(node,liveMarks.current,paintState.current.active,paintState.current.highlight,liveAdded.current);
+    const paint=()=>paintLiveWords(node,liveMarks.current,paintState.current.active,paintState.current.highlight,liveAdded.current,liveOpener.current);
     paint();const observer=new MutationObserver(paint);observer.observe(node,{childList:true,subtree:true});
     return()=>observer.disconnect();
   },[lesson,marks,highlight,voice.phase,hidden,revealed,prefs.layout,prefs.paging]);
@@ -112,7 +112,7 @@ export function UnifiedReader({chapterId=1,verse=1,initialPage,initialMode,back,
       const accepted=await voiceRef.current.resetMistakes();
       if(accepted===false)return;
       audio.current?.pause();cancelHifzFeedback();
-      liveMarks.current={};liveAdded.current=new Set();seenAdded.current.clear();seenMarks.current.clear();setResult(null);setMarks({});setTips([]);setHighlight(null);setElsewhere(null);locationGeneration.current++;
+      liveMarks.current={};liveAdded.current=new Set();liveOpener.current=null;seenAdded.current.clear();seenMarks.current.clear();setResult(null);setMarks({});setTips([]);setHighlight(null);setElsewhere(null);locationGeneration.current++;
       debugUpdates.current=[];debugStart.current=performance.now();if(root.current)paintLiveWords(root.current,{},voiceRef.current.phase==="active");
       setConfirmReset(false);
     }finally{resetPending.current=false;setResetting(false);}

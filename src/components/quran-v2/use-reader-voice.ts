@@ -17,7 +17,7 @@ export function useReaderVoice({update,elsewhere,position,answer}:{update:(r:Che
   const capture=useRef<ReturnType<typeof captureRecording>>(null);
   // One recording spans every page of a mic session, but each page restarts the AI clock at 0.
   const clock=useRef<{start:number;offset:number;prev:CheckResult|null}>({start:0,offset:0,prev:null});
-  const merged=(r:CheckResult)=>mergeResults(clock.current.prev,r,clock.current.offset);
+  const merged=(r:CheckResult):CheckResult=>({...mergeResults(clock.current.prev,r,clock.current.offset),openers:r.openers??clock.current.prev?.openers});
   const intent=useRef<{mode:"smart"|"follow"|"search";ranges:Range[]}>({mode:"smart",ranges:[]});
   const callbacks=useRef({update,elsewhere,position,answer});callbacks.current={update,elsewhere,position,answer};
   const release=()=>{const s=session.current;session.current=null;if(s){s.stream.getTracks().forEach(t=>t.stop());void s.stop().catch(()=>undefined);}capture.current?.discard();capture.current=null;};

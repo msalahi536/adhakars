@@ -51,18 +51,18 @@ export const ReaderPage = memo(function ReaderPage({number,chapters,layout,marks
   };
   const content=page&&<div ref={body} className={`q2-page-body ${layout==="Translation"?"q2-translation-page":""}`} style={{fontFamily:layout!=="Translation"?font??undefined:undefined}}>
     {layout==="Translation"?page.verses.map(v=><section key={v.key} className="q2-verse" data-q2-verse={v.key}>
-      {v.number===1&&<>{surahStrip(v.chapter)}{v.chapter!==1&&v.chapter!==9&&<div className="q2-basmala" dir="rtl">بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ</div>}</>}
+      {v.number===1&&<>{surahStrip(v.chapter)}{v.chapter!==1&&v.chapter!==9&&<div className="q2-basmala" data-q2-basmala={v.chapter} dir="rtl">بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ</div>}</>}
       <small>{chapters.find(c=>c.id===v.chapter)?.name_simple} · ayah {v.number}</small>
       {arabic&&<div dir="rtl" className="q2-arabic-row">{v.words.filter(w => !w.end).map(word)}</div>}
       {translit&&<p className="q2-translit" style={{fontSize:translitSize}}>{v.words.filter(w=>!w.end).map(w=>w.transliteration).join(" ")}</p>}
       {translation&&<p style={{fontSize:translationSize}}>{translations?.[v.key]??v.translation}</p>}
     </section>):number<=2?<>
       {surahStrip(page.verses[0]?.chapter??1)}
-      {number===2&&<div className="q2-basmala" dir="rtl">بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ</div>}
+      {number===2&&<div className="q2-basmala" data-q2-basmala={2} dir="rtl">بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ</div>}
       {[...new Set(page.verses.flatMap(v=>v.words).map(w=>w.line))].sort((a,b)=>a-b).map(line=><div className={`q2-line q2-short-line ${number===1&&line===2?"q2-opening-basmala":""}`} key={line} dir="rtl">{page.verses.flatMap(v=>v.words).filter(w=>w.line===line).map(word)}</div>)}
-    </>:mushafRows(page).map(row=>{
+    </>:mushafRows(page).map((row,i,rows)=>{
       if(row.chapter)return <div key={row.line} className="q2-cartouche">{surahStrip(row.chapter)}</div>;
-      if(row.basmala)return <div key={row.line} className="q2-basmala" dir="rtl">بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ</div>;
+      if(row.basmala)return <div key={row.line} className="q2-basmala" data-q2-basmala={rows[i-1]?.chapter||rows[i+1]?.words[0]?.key.split(":")[0]} dir="rtl">بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ</div>;
       return <div className="q2-line" key={row.line} dir="rtl">{row.words.map(word)}</div>;
     })}
   </div>;
