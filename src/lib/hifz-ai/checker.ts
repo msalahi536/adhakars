@@ -106,10 +106,11 @@ function nuclei(chars: { c: string; p: number }[]): { c: string; v: string; len:
   for (let i = 0; i < chars.length; i++) {
     const c = chars[i].c;
     if (isVowelCh(c) || c === "ں") continue;
-    let j = i + 1, v = "", len = 0, p = chars[i].p;
-    while (j < chars.length && isVowelCh(chars[j].c)) { const x = chars[j].c; v ||= HARAKAH.has(x) ? x : LONG_OF[x] ?? ""; len++; p = Math.min(p, chars[j].p); j++; }
+    let j = i + 1, v = "", len = 0, p = chars[i].p, pv = 1;
+    while (j < chars.length && isVowelCh(chars[j].c)) { const x = chars[j].c; v ||= HARAKAH.has(x) ? x : LONG_OF[x] ?? ""; len++; p = Math.min(p, chars[j].p); pv = Math.min(pv, chars[j].p); j++; }
     const last = out[out.length - 1];
-    if (last && last.c === c && last.len === 0) { out[out.length - 1] = { c, v, len, p: Math.min(p, last.p) }; continue; } // shadda
+    // shadda, or one letter heard twice: either hearing of the letter confirms it; the vowel counts as heard
+    if (last && last.c === c && last.len === 0) { out[out.length - 1] = { c, v, len, p: Math.min(Math.max(chars[i].p, last.p), pv) }; continue; }
     out.push({ c, v, len, p });
   }
   return out;
@@ -123,7 +124,7 @@ function nuclei(chars: { c: string; p: number }[]): { c: string; v: string; len:
  * may lengthen it). Measured on clean recitation: harakat 99.4% / length 100% right when the letters
  * are right, and the one miss had low confidence.
  */
-export function harakahIssue(expectedPh: string, heard: { c: string; p: number }[], minConf = 0.8, judgeLast = false, strays = "عءيوه"): "harakah" | "length" | undefined {
+export function harakahIssue(expectedPh: string, heard: { c: string; p: number }[], minConf = 0.8, judgeLast = false, strays = "عءيوه", lastConf = minConf): "harakah" | "length" | undefined {
   const e = nuclei(Array.from(expectedPh).map((c) => ({ c, p: 1 }))), h0 = nuclei(heard);
   // Line the heard letters up with the word's. Every letter of the word must be there, in order; a
   // letter heard twice (a held ع comes out "عَعَ") or a stray glide / hamza / breath in between is
@@ -145,7 +146,7 @@ export function harakahIssue(expectedPh: string, heard: { c: string; p: number }
   for (let i = 0; i < e.length; i++) {
     const x = e[i], y = h[i], last = i === e.length - 1;
     if (last && !judgeLast) break;
-    if (!x.len || !y.len || y.p < minConf) continue;
+    if (!x.len || !y.len || y.p < (last ? lastConf : minConf)) continue;
     if (x.v && y.v && x.v !== y.v) return "harakah";
     if (!last && (x.len >= 2) !== (y.len >= 2)) return "length";
   }
