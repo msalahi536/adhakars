@@ -44,10 +44,10 @@ export function useReaderVoice({update,elsewhere,position,answer}:{update:(r:Che
     if(await checkerDownloaded())await begin();else setPhase("consent");
   }
   async function stop(){
-    if(busy.current)return;busy.current=true;setPhase("finishing");const id=generation.current;
+    if(busy.current)return;busy.current=true;setPhase("finishing");const id=generation.current;feedback("micStop");
     const current=session.current;session.current=null;
     const blob=capture.current?.finish();capture.current=null;
-    try{const result=await current?.stop();if(id===generation.current){if(result)callbacks.current.update(mode==="smart"?merged(result):result);setRecording(await blob??null);current?.stream.getTracks().forEach(t=>t.stop());setStream(null);setPhase("idle");feedback("micStop");}}
+    try{const result=await current?.stop();if(id===generation.current){if(result)callbacks.current.update(mode==="smart"?merged(result):result);setRecording(await blob??null);current?.stream.getTracks().forEach(t=>t.stop());setStream(null);setPhase("idle");}}
     catch {if(id===generation.current){current?.stream.getTracks().forEach(t=>t.stop());setStream(null);setError("Couldn’t finish this recording. Tap the mic to retry.");setPhase("error");}}
     finally{if(id===generation.current)busy.current=false;}
   }
