@@ -55,6 +55,7 @@ export class QuranRecognizer {
   private speechLevel: number | null = null; // this speaker's average speech loudness (dBFS)
   private gainDb = 0; // applied before the model (autoGain)
   private gainFloor = -70; // autoGain's own view of the room
+  private speechSteps = 0;
   private heardSinceReset = false;
 
   /** Pause length (s) after which the model's memory is reset. */
@@ -121,6 +122,7 @@ export class QuranRecognizer {
     this.speechLevel = null;
     this.gainDb = 0;
     this.gainFloor = -70;
+    this.speechSteps = 0;
   }
 
   /**
@@ -128,7 +130,7 @@ export class QuranRecognizer {
    * often ignore the browser's autoGainControl: a normal voice arrived at about -47 dBFS and a
    * whisper at -52, 25-30 dB below the training audio, and the model then misheard harakat and
    * lost whispers. Causal (each 20 ms step uses only what came before), never turns audio down,
-   * at most +30 dB, and moves at most 0.5 dB per step once set so it never pumps.
+   * at most +30 dB, rising at most 1.5 dB and falling 0.5 dB per 20 ms step so it never pumps.
    */
   private autoGain(samples: Float32Array): Float32Array {
     const hop = 320, out = new Float32Array(samples.length);
@@ -140,13 +142,14 @@ export class QuranRecognizer {
       const g = Math.pow(10, this.gainDb / 20);
       for (let i = a; i < end; i++) out[i] = Math.max(-1, Math.min(1, samples[i] * g));
       this.gainFloor = db < this.gainFloor ? db : this.gainFloor + 0.01;
-      let first = false;
       if (db > this.gainFloor + 10) {
-        first = this.speechLevel === null;
-        this.speechLevel = this.speechLevel === null ? db : this.speechLevel + 0.05 * (db - this.speechLevel);
+        this.speechSteps++;
+        // the first 0.3 s of speech sets the level from its LOUDEST moment: a word's quiet onset must
+        // not set a huge gain (that misheard the first word of an ayah); after that, the average
+        this.speechLevel = this.speechLevel === null ? db : this.speechSteps <= 15 ? Math.max(this.speechLevel, db) : this.speechLevel + 0.05 * (db - this.speechLevel);
       }
       const want = this.speechLevel === null ? 0 : Math.min(30, Math.max(0, -22 - this.speechLevel));
-      this.gainDb = first ? want : this.gainDb + Math.max(-0.5, Math.min(0.5, want - this.gainDb));
+      this.gainDb += Math.max(-0.5, Math.min(1.5, want - this.gainDb)); // up 1.5 / down 0.5 dB per step: no pumping
     }
     return out;
   }
