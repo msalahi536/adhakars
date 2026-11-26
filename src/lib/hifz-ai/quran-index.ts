@@ -164,6 +164,7 @@ export function loadQuranIndex(url = "/hifz-ai/quran-index.json"): Promise<Quran
 
 export interface SearchAnswer {
   confident: boolean; // true = clear answer; false = keep listening (or "recite a little more")
+  exact: boolean; // short but unmistakable: heard exactly, and nowhere else in the Quran is even close (وَالْعَصْرِ)
   matches: { sura: number; aya: number; word: number; score: number; now: WordRef }[]; // best first; now = where the recitation has reached
   samePhrase: { sura: number; aya: number; word: number }[]; // other places with exactly the same words
 }
@@ -193,7 +194,9 @@ export function judgeSearch(ix: QuranIndex, phonemes: string, top = 3): SearchAn
   // the same words exist in several places: keep listening, the next words usually tell them apart
   const unique = twins.length === 0 || q.length >= 30;
   const confident = !!a && q.length >= 8 && a.score >= 0.7 && unique && (!b || a.score - b.score >= 0.12);
-  return { confident, matches, samePhrase: twins.map((h) => ix.where(begin(h))) };
+  // a short opening said exactly that exists in only one place (no other place within one letter)
+  const exact = !!a && q.length >= 6 && a.score >= 0.99 && twins.length === 0 && (!b || a.score - b.score > 1.5 / q.length);
+  return { confident, exact, matches, samePhrase: twins.map((h) => ix.where(begin(h))) };
 }
 
 export async function findInQuran(phonemes: string, top = 3): Promise<SearchAnswer> {

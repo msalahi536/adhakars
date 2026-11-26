@@ -36,6 +36,9 @@ export interface CheckResult {
   reachedIndex: number; // how far into the reference the recitation has got
   startIndex: number; // where the recitation began (an ayah start); words before it stay "pending"
   startKey: string; // key of the first word the reciter started from
+  /** Said before the passage (not part of it): "saying" while it is being said, "said" once over.
+   *  For highlighting the isti'adha / basmala shown above a surah. */
+  openers?: { istiadha?: "saying" | "said"; basmala?: "saying" | "said" };
 }
 
 interface RefWord {
@@ -308,7 +311,8 @@ function judgeSkeleton(expected: string, expSk: string[], heardTxt: string, hear
   // a word of 3+ letters of which at most one stray breathy letter was heard: it was not said
   else if (expSk.filter((c) => !"ءهع".includes(c)).length >= 2 && heardSk.filter((c) => !"ءهع".includes(c)).length === 0) status = "skipped";
   // a different word: part of it, plus 2+ solid letters that are not in it (وَأَنَّى heard as "لءنسان")
-  else if (hard >= 1 && heardSk.filter((c, i) => (i < a || i >= b) && !"ءعيوهں".includes(c)).length >= 2 && real >= 1) status = "wrong";
+  // (a short word needs just one: ٱلصَّمَدُ said as صَدَقَ keeps ص-د but loses م and gains ق)
+  else if (hard >= 1 && heardSk.filter((c, i) => (i < a || i >= b) && !"ءعيوهں".includes(c)).length >= (L <= 4 ? 1 : 2) && real >= 1) status = "wrong";
   // most of a long word never said (كَيْدَهُمْ heard as "هُم"): clean recitation never loses 3+ letters
   else if (L >= 4 && hard >= 3 && hard === L - (b - a)) status = "skipped";
   else if (L >= 4 && real < 2) status = "unsure";
