@@ -38,7 +38,8 @@ export interface CheckResult {
   startKey: string; // key of the first word the reciter started from
   /** Said before the passage (not part of it): "saying" while it is being said, "said" once over.
    *  For highlighting the isti'adha / basmala shown above a surah. */
-  openers?: { istiadha?: "saying" | "said"; basmala?: "saying" | "said" };
+  openers?: { istiadha?: "saying" | "said"; basmala?: "saying" | "said"; basmalaWords?: number };
+  // basmalaWords: how many of the basmala's 4 words are done (بِسْمِ ٱللَّهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ), for word-by-word highlighting
 }
 
 interface RefWord {
@@ -115,18 +116,22 @@ function nuclei(chars: { c: string; p: number }[]): { c: string; v: string; len:
 }
 /**
  * Strict harakat: with every letter of the word heard exactly, is a harakah or a vowel's length
- * different from the text (Hafs)? Only when the model is sure (>= minConf); never on the word's last
- * letter (a stop changes it). Measured on clean recitation: harakat 99.4% / length 100% right when the
- * letters are right, and the one miss had low confidence.
+ * different from the text (Hafs)? Only when the model is sure (>= minConf). The word's last letter:
+ * at the end of an ayah a stop changes it, so it is left alone there; inside an ayah (judgeLast) a
+ * different harakah on it IS a mistake (أَنْعَمْتَ said أَنْعَمْتُ). A stop inside an ayah drops the vowel
+ * (nothing heard on the last letter), which is never flagged. Its length is still not judged (a stop
+ * may lengthen it). Measured on clean recitation: harakat 99.4% / length 100% right when the letters
+ * are right, and the one miss had low confidence.
  */
-export function harakahIssue(expectedPh: string, heard: { c: string; p: number }[], minConf = 0.8): "harakah" | "length" | undefined {
+export function harakahIssue(expectedPh: string, heard: { c: string; p: number }[], minConf = 0.8, judgeLast = false): "harakah" | "length" | undefined {
   const e = nuclei(Array.from(expectedPh).map((c) => ({ c, p: 1 }))), h = nuclei(heard);
   if (e.length !== h.length || e.some((x, i) => x.c !== h[i].c)) return;
-  for (let i = 0; i < e.length - 1; i++) {
-    const x = e[i], y = h[i];
+  for (let i = 0; i < e.length; i++) {
+    const x = e[i], y = h[i], last = i === e.length - 1;
+    if (last && !judgeLast) break;
     if (!x.len || !y.len || y.p < minConf) continue;
     if (x.v && y.v && x.v !== y.v) return "harakah";
-    if ((x.len >= 2) !== (y.len >= 2)) return "length";
+    if (!last && (x.len >= 2) !== (y.len >= 2)) return "length";
   }
 }
 
@@ -315,6 +320,10 @@ function judgeSkeleton(expected: string, expSk: string[], heardTxt: string, hear
   else if (hard >= 1 && heardSk.filter((c, i) => (i < a || i >= b) && !"ءعيوهں".includes(c)).length >= (L <= 4 ? 1 : 2) && real >= 1) status = "wrong";
   // most of a long word never said (كَيْدَهُمْ heard as "هُم"): clean recitation never loses 3+ letters
   else if (L >= 4 && hard >= 3 && hard === L - (b - a)) status = "skipped";
+  // a whole other word said in its place (وَجَعَلْنَا said as يَوْمَئِذٍ): the model sure, 2+ solid letters
+  // heard that the word does not have at all, and most of the word gone. A mishearing of the right
+  // word keeps most of its letters.
+  else if (L >= 4 && wconf >= 0.8 && heardSk.filter((c) => !"ءعيوهں".includes(c) && !expSk.includes(c)).length >= 2 && lev(expSk, heardSk, false) >= Math.max(3, Math.ceil(0.6 * L))) status = "wrong";
   else if (L >= 4 && real < 2) status = "unsure";
   // a short word needs one full real letter change (similar-sounding letters / a misheard ء don't count)
   else if (L < 4 && real < 1) status = "unsure";

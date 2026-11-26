@@ -51,6 +51,7 @@ export class QuranRecognizer {
   private prev = -1;
   private silentSamples = 0;
   private level = -60;
+  private floor = -70; // the room's own noise level (slowly rising minimum)
   private heardSinceReset = false;
 
   /** Pause length (s) after which the model's memory is reset. */
@@ -113,6 +114,7 @@ export class QuranRecognizer {
     this.samplesIn = 0;
     this.silentSamples = 0;
     this.level = -60;
+    this.floor = -70;
   }
 
   /**
@@ -128,9 +130,12 @@ export class QuranRecognizer {
       for (let i = a; i < a + hop; i++) e += samples[i] * samples[i];
       const db = 10 * Math.log10(e / hop + 1e-12);
       this.level = db > this.level ? db : this.level - 0.01; // slow decay of the speech level
-      // relative to this speaker: a soft voice sits near -55 dBFS, and calling it silence wiped the
-      // model's memory mid-ayah (3-4 times per ayah at a quiet voice)
-      if (db < Math.max(-70, this.level - 30)) this.silentSamples += hop;
+      this.floor = db < this.floor ? db : this.floor + 0.01; // the room: follows the quietest moments
+      // Silence = near the room's own noise, or far below this speaker's loudest. Judged against the
+      // loudest alone, one tap on the phone (or a loud first word) made a whisper count as silence for
+      // ~20 s, and every 0.35 s of "silence" wiped the model's memory: whispers were never heard.
+      // Measured (whispered recitation after a tap): 14-27 of 20-36 sounds lost -> 0-2.
+      if (db < Math.max(-70, Math.min(this.level - 30, this.floor + 8))) this.silentSamples += hop;
       else this.silentSamples = 0;
     }
 
