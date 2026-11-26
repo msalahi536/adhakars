@@ -34,6 +34,7 @@ export const TRACKER = {
   skipToAyah: 5, // leaving out the rest of an ayah / a whole ayah // finishing (or cutting short) a surah and starting the next one
   farBack: 3, // extra cost for going back many words (0.06 per word)
   sureStart: 7,
+  decideStart: 16, // consonants after which the start is decided even if another place is close in cost
   ambiguous: 3, // another start place this close in cost: not sure where the reciter began yet // consonants needed before showing a start anywhere but the passage start
   swapConf: 0.95, // a single swapped letter is a mistake when the model is at least this sure of it
   verify: 4, // a jump back is believed once this many consonants after it match (at most 1 off)
@@ -358,7 +359,10 @@ export class RecitationTracker {
     // commit everything the reciter has clearly moved past
     let upto = -1;
     if (final) upto = occ.length - 1;
-    else if (!this.started && this.ambiguousStart(tail, occ)) upto = -1;
+    // not sure yet where the reciter began (another place opens the same way): wait - but only so
+    // long. A skipped word right after the start makes the true place cost more and kept the start
+    // "ambiguous" for the whole recitation, so no mistake showed until the mic stopped.
+    else if (!this.started && skeleton(tail.join("")).length < TRACKER.decideStart && this.ambiguousStart(tail, occ)) upto = -1;
     else {
       // going far back (another ayah with the same opening, e.g. 88:8 / 88:2 وُجُوهٌ يَوْمَئِذٍ):
       // be surer before judging anything there
