@@ -113,6 +113,12 @@ const OPENERS = [
   "بِسمِللَااهِررَحمَاانِررَحِۦۦم", // bismillahi r-rahmani r-rahim
 ].map((o) => skeleton(o));
 const OPENER_NAME: ("istiadha" | "basmala")[] = ["istiadha", "istiadha", "basmala"];
+/** where each basmala word ends, in skeleton letters: بسم | الله | الرحمن | الرحيم */
+const BASMALA_ENDS = (() => {
+  const ends: number[] = []; let prev = "", n = 0;
+  for (const w of ["بِسمِ", "للَااهِ", "ررَحمَاانِ", "ررَحِۦۦم"]) { for (const c of skeleton(w)) { if (c !== prev) n++; prev = c; } ends.push(n); }
+  return ends;
+})();
 const FATIHA_END = skeleton("ضضَاالِۦۦن"); // ...wa la d-dallin
 const AMIN = skeleton("ءَاامِۦۦن");
 
@@ -176,7 +182,7 @@ export class RecitationTracker {
   private dropped: [number, number][] = []; // raw heard index ranges cut out (isti'adha, basmala, amin)
   private openers: string[][];
   private openerNames: ("istiadha" | "basmala")[];
-  private opened: { istiadha?: "saying" | "said"; basmala?: "saying" | "said" } = {};
+  private opened: { istiadha?: "saying" | "said"; basmala?: "saying" | "said"; basmalaWords?: number } = {};
   private amin: boolean;
   private aminZone: [number, number]; // ref chars of Al-Fatiha's last ayah
 
@@ -220,6 +226,7 @@ export class RecitationTracker {
       if (e > b && cost <= Math.floor(o.length * 0.25) && (e < sk.length || final)) {
         this.dropped.push([raw(at[b]), endRaw(e)]);
         this.opened[this.openerNames[k]] = "said";
+        if (this.openerNames[k] === "basmala") this.opened.basmalaWords = 4;
         return true;
       }
     }
@@ -236,7 +243,11 @@ export class RecitationTracker {
       for (const [k, o] of this.openers.entries()) {
         if (sk.length <= o.length + 1 && prefixDist(sk, o) <= Math.max(1, Math.floor(Math.min(sk.length, o.length) * 0.25))) {
           const name = this.openerNames[k];
-          if (this.opened[name] !== "said") this.opened[name] = "saying";
+          if (this.opened[name] !== "said") {
+            this.opened[name] = "saying";
+            // words done: a word counts once the first letter of the next one is heard (its end is then sure)
+            if (name === "basmala") this.opened.basmalaWords = BASMALA_ENDS.filter((e) => e < sk.length).length;
+          }
           this.waiting = true;
           return false;
         }
@@ -645,7 +656,10 @@ export class RecitationTracker {
         // the word's sounds run on through vowels and the imalah / ishmam marks after its last letter
         while (to < this.raw.length && (isVowel(this.raw[to].c) || "۪ىؙ".includes(this.raw[to].c))) to++;
         const span = this.raw.slice(res.at, to);
-        const issue = strictLetterIssue(w.ph, span) ?? (status === "correct" ? harakahIssue(w.ph, span) : undefined);
+        // the last letter's harakah is judged inside an ayah (no stop expected there)
+        const nextW = this.reference.words[o.word + 1];
+        const midAyah = !!nextW && nextW.key.split(":").slice(0, 2).join(":") === w.key.split(":").slice(0, 2).join(":");
+        const issue = strictLetterIssue(w.ph, span) ?? (status === "correct" ? harakahIssue(w.ph, span, 0.8, midAyah) : undefined);
         if (issue) { res.status = "wrong"; res.issue = issue; }
       }
       wordsJudged.push({ k: o.word, o, res });
@@ -834,7 +848,10 @@ export class RecitationTracker {
     });
     // an opener that was being said but never finished (the reciter went straight on) is not "saying" any more
     const openers = { ...this.opened };
-    if (!this.waiting) for (const k of Object.keys(openers) as (keyof typeof openers)[]) if (openers[k] === "saying") delete openers[k];
+    if (!this.waiting) {
+      if (openers.istiadha === "saying") delete openers.istiadha;
+      if (openers.basmala === "saying") { delete openers.basmala; delete openers.basmalaWords; }
+    }
     return { words: result, extras: [...this.extras], reachedIndex: this.reached, startIndex, startKey: words[Math.max(0, this.startWord)]?.key ?? "", openers };
   }
 }

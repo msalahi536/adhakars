@@ -166,7 +166,12 @@ describe("reported cases (Al-Fatiha, Al-A'la, going back)", () => {
     expect(ups.some((u) => u.openers?.basmala === "saying")).toBe(true);
     expect(ups.some((u) => u.openers?.istiadha === "said")).toBe(true);
     expect(fin.openers?.basmala).toBe("said");
+    expect(fin.openers?.basmalaWords).toBe(4);
     expect(flags(fin)).toEqual([]);
+    // word by word while it is said: never goes back, passes through 1, 2 and 3
+    const seen = ups.map((u) => u.openers?.basmalaWords).filter((n): n is number => n !== undefined);
+    for (let i = 1; i < seen.length; i++) expect(seen[i]).toBeGreaterThanOrEqual(seen[i - 1]);
+    expect(new Set(seen).has(1) && new Set(seen).has(2) && new Set(seen).has(3)).toBe(true);
   });
   test("no basmala said: nothing reported", () => {
     const { ref, w } = surah(112, 1, 4);
@@ -208,6 +213,18 @@ describe("whole-Quran sweep findings", () => {
     const heard = fat.map((a) => a.join("")).join(" ");
     expect(flags(run(ref, heard))).toEqual([]);
     expect(flags(run(ref, heard, { strictHarakat: true }))).toEqual(["1:4:1(length)", "1:7:4(harakah)", "1:7:7(harakah)"]);
+  });
+  test("strict harakat: a wrong harakah on a word's LAST letter inside an ayah is caught (أَنْعَمْتَ -> أَنْعَمْتُ)", () => {
+    const { ref, ph } = ayahs(1, 1, 7);
+    const fat = [1, 2, 3, 4, 5, 6, 7].map(ph);
+    fat[6][2] = fat[6][2].replace(/َ$/, "ُ");
+    expect(flags(run(ref, fat.map((a) => a.join("")).join(" "), { strictHarakat: true }))).toEqual(["1:7:3(harakah)"]);
+  });
+  test("strict harakat: stopping on a word inside an ayah (no vowel on its last letter) is not a mistake", () => {
+    const { ref, ph } = ayahs(1, 1, 7);
+    const fat = [1, 2, 3, 4, 5, 6, 7].map(ph);
+    fat[6][2] = fat[6][2].replace(/َ$/, "");
+    expect(flags(run(ref, fat.map((a) => a.join("")).join(" "), { strictHarakat: true }))).toEqual([]);
   });
   test("strict harakat: a correct recitation stays clean", () => {
     const { ref, ph } = ayahs(1, 1, 7);
