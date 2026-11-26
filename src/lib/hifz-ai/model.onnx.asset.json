@@ -1,11 +1,11 @@
 {
   "version": 1,
-  "asset_id": "bf72ea97-136c-45fa-97d1-d77f0246b0d5",
+  "asset_id": "2d84a21b-0bfc-4ef1-9ad0-6ced9c4eed7c",
   "project_id": "52d629f3-34a0-4e01-bea4-f2b3af1922d0",
-  "url": "/__l5e/assets-v1/bf72ea97-136c-45fa-97d1-d77f0246b0d5/model.int8.onnx",
-  "r2_key": "a/v1/52d629f3-34a0-4e01-bea4-f2b3af1922d0/bf72ea97-136c-45fa-97d1-d77f0246b0d5/model.int8.onnx",
+  "url": "/__l5e/assets-v1/2d84a21b-0bfc-4ef1-9ad0-6ced9c4eed7c/model.int8.onnx",
+  "r2_key": "a/v1/52d629f3-34a0-4e01-bea4-f2b3af1922d0/2d84a21b-0bfc-4ef1-9ad0-6ced9c4eed7c/model.int8.onnx",
   "original_filename": "model.int8.onnx",
   "size": 29750711,
   "content_type": "application/octet-stream",
-  "created_at": "2026-11-21T02:59:13Z"
+  "created_at": "2026-11-26T14:28:30Z"
 }
