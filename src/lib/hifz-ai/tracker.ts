@@ -653,13 +653,17 @@ export class RecitationTracker {
       // strict harakat: right letters, wrong harakah / vowel length (e.g. مَلِكِ for Hafs's مَالِكِ)
       if (this.opts.strictHarakat && (status === "correct" || status === "unsure") && res.at !== undefined && res.end !== undefined) {
         let to = res.end + 1;
+        // its last letter heard twice (a held ت: "ءَنعَمتتُ") still belongs to it, vowel and all
+        while (to < this.raw.length && this.raw[to].c === this.raw[res.end].c) to++;
         // the word's sounds run on through vowels and the imalah / ishmam marks after its last letter
         while (to < this.raw.length && (isVowel(this.raw[to].c) || "۪ىؙ".includes(this.raw[to].c))) to++;
         const span = this.raw.slice(res.at, to);
         // the last letter's harakah is judged inside an ayah (no stop expected there)
         const nextW = this.reference.words[o.word + 1];
         const midAyah = !!nextW && nextW.key.split(":").slice(0, 2).join(":") === w.key.split(":").slice(0, 2).join(":");
-        const issue = strictLetterIssue(w.ph, span) ?? harakahIssue(w.ph, span, 0.8, midAyah, status === "correct" ? "عءيوه" : "يو");
+        const issue = strictLetterIssue(w.ph, span) ?? harakahIssue(w.ph, span, 0.8, midAyah, status === "correct" ? "عءيوه" : "يو", to >= this.raw.length ? 0.55 : 0.8);
+        // (the reciter stopped right after this word, mid-ayah: a stop should carry no vowel at all, so
+        //  a different one heard there counts even when the model is less sure of the fading sound)
         // ("unsure" words: the model already heard the letters a little off, so only a held letter
         //  or a ي/و glide may be set aside, never an added hamza: فَٱرْجِعِ heard "فَءَرجَعُ" is not judged)
         if (issue) { res.status = "wrong"; res.issue = issue; }
