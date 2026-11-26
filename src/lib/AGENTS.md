@@ -2,3 +2,4 @@
 - Sample consent is verified by Cloud, never device storage; owner policies protect private deletable ZIPs, and debug helpers retain recording/output in memory without modifying checker engines.
 - Extra reciter portraits are asset pointers matched by normalized name before the Quran.com photo fallback.
 - Adhkar voice mastering uses separate CDN audio mapped by original storage path; never process the live playback graph, preserving mobile background audio and original uploads.
+- Recitation feedback uses peak-normalized, overlap-safe Web Audio and serialized recording-only audio-session leases; the local Capacitor plugin restores native routing/volume without changing qari audio.

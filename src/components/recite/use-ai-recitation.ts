@@ -5,6 +5,7 @@ import { play as feedback, unlockHifzFeedbackAudio } from "@/lib/hifzHaptics";
 import { mapAiWords, newMistakes } from "./ai-feedback";
 import { captureRecording } from "./recording";
 import { debugEnabled, rememberDebugUpdates } from "@/lib/hifz-debug";
+import { useRecitationAudioSession, withRecitationAudioSession } from "@/lib/recitation-audio-session";
 
 export type AiRange = { sura: number; first: number; last: number };
 function friendlyError(error: unknown) {
@@ -17,6 +18,7 @@ export function useAiRecitation(page: number, enabled: boolean, keys: string[], 
   const [phase, setPhase] = useState<"idle" | "download" | "loading" | "listening" | "stopping" | "finished" | "error">("idle");
   const [progress, setProgress] = useState(0);
   const [stream, setStream] = useState<MediaStream | null>(null);
+  useRecitationAudioSession(phase === "loading" || phase === "stopping" || !!stream, stream);
   const [result, setResult] = useState<CheckResult | null>(null);
   const [error, setError] = useState("");
   const [recording, setRecording] = useState<Blob | null>(null);
@@ -67,7 +69,7 @@ export function useAiRecitation(page: number, enabled: boolean, keys: string[], 
     debugUpdates.current = [];
     try {
       // Ask from the user's start/consent gesture, before model preparation.
-      const mic = capture.current?.getAudioTracks().some((t) => t.readyState === "live") ? capture.current : await navigator.mediaDevices.getUserMedia({ audio: { channelCount: 1, echoCancellation: false, noiseSuppression: true, autoGainControl: true } });
+      const mic = capture.current?.getAudioTracks().some((t) => t.readyState === "live") ? capture.current : await withRecitationAudioSession(() => navigator.mediaDevices.getUserMedia({ audio: { channelCount: 1, echoCancellation: false, noiseSuppression: true, autoGainControl: true } }));
       if (id !== generation.current) { mic.getTracks().forEach((t) => t.stop()); return; }
       capture.current = mic;
       mic.getAudioTracks().forEach((t) => { t.enabled = true; });
