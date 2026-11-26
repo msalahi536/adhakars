@@ -123,9 +123,25 @@ function nuclei(chars: { c: string; p: number }[]): { c: string; v: string; len:
  * may lengthen it). Measured on clean recitation: harakat 99.4% / length 100% right when the letters
  * are right, and the one miss had low confidence.
  */
-export function harakahIssue(expectedPh: string, heard: { c: string; p: number }[], minConf = 0.8, judgeLast = false): "harakah" | "length" | undefined {
-  const e = nuclei(Array.from(expectedPh).map((c) => ({ c, p: 1 }))), h = nuclei(heard);
-  if (e.length !== h.length || e.some((x, i) => x.c !== h[i].c)) return;
+export function harakahIssue(expectedPh: string, heard: { c: string; p: number }[], minConf = 0.8, judgeLast = false, strays = "عءيوه"): "harakah" | "length" | undefined {
+  const e = nuclei(Array.from(expectedPh).map((c) => ({ c, p: 1 }))), h0 = nuclei(heard);
+  // Line the heard letters up with the word's. Every letter of the word must be there, in order; a
+  // letter heard twice (a held ع comes out "عَعَ") or a stray glide / hamza / breath in between is
+  // allowed (at most 2) and set aside. Any other difference is a letter mistake: not judged here.
+  const h: typeof h0 = [];
+  let j = 0, extra = 0;
+  for (let i = 0; i < e.length; i++) {
+    while (j < h0.length && h0[j].c !== e[i].c) {
+      const dup = h0[j].c === e[i - 1]?.c, glide = strays.includes(h0[j].c);
+      if (!(dup || glide) || ++extra > 2) return;
+      j++;
+    }
+    if (j >= h0.length) return;
+    // the same letter heard again right after (a held letter): keep the later one, it carries the vowel
+    while (j + 1 < h0.length && h0[j + 1].c === e[i].c && e[i + 1]?.c !== e[i].c && !h0[j].len) j++;
+    h.push(h0[j++]);
+  }
+  if (h0.length - j > 0) return; // more letters heard after the word: not this word
   for (let i = 0; i < e.length; i++) {
     const x = e[i], y = h[i], last = i === e.length - 1;
     if (last && !judgeLast) break;
@@ -302,6 +318,9 @@ function judgeSkeleton(expected: string, expSk: string[], heardTxt: string, hear
   const stray = [...(a >= 2 ? heardSk.slice(0, a) : []), ...heardSk.slice(b)];
   const extraCons = stray.filter((c) => !"ءعيوه".includes(c)).length; // hamza onsets / glides / breath aren't new letters
   const added = hard === 0 && extraCons > 0 && extraCons <= 2;
+  // a short word with a solid letter it doesn't have heard AFTER it (ٱلصَّمَدُ heard "صَمَتَق" when
+  // صَدَقَ was said: the model half-heard the text, but the ق is not in the word)
+  const tailAdded = added && expSk.length <= 4 && heardSk.slice(b).some((c) => !"ءعيوهں".includes(c) && !expSk.includes(c));
   if (added) {
     hard = lev(expSk, heardSk); // a letter or two stuck onto the word: the word itself changed
     a = 0;
@@ -311,7 +330,8 @@ function judgeSkeleton(expected: string, expSk: string[], heardTxt: string, hear
   // one swapped letter in a long word (plus model breath noise) is pronunciation or a mishearing,
   // never a memory mistake: a long word needs 2+ real letter changes to be "wrong"
   const real = judgeLev(expSk, added ? heardSk : heardSk.slice(a, b));
-  if (hard === 0) status = soft <= 2 ? "correct" : "unsure";
+  if (tailAdded && wconf >= 0.8) status = "wrong";
+  else if (hard === 0) status = soft <= 2 ? "correct" : "unsure";
   else if (hard >= L * 0.75 && L >= 2 && a === b) status = "skipped";
   // a word of 3+ letters of which at most one stray breathy letter was heard: it was not said
   else if (expSk.filter((c) => !"ءهع".includes(c)).length >= 2 && heardSk.filter((c) => !"ءهع".includes(c)).length === 0) status = "skipped";

@@ -659,7 +659,9 @@ export class RecitationTracker {
         // the last letter's harakah is judged inside an ayah (no stop expected there)
         const nextW = this.reference.words[o.word + 1];
         const midAyah = !!nextW && nextW.key.split(":").slice(0, 2).join(":") === w.key.split(":").slice(0, 2).join(":");
-        const issue = strictLetterIssue(w.ph, span) ?? (status === "correct" ? harakahIssue(w.ph, span, 0.8, midAyah) : undefined);
+        const issue = strictLetterIssue(w.ph, span) ?? harakahIssue(w.ph, span, 0.8, midAyah, status === "correct" ? "عءيوه" : "يو");
+        // ("unsure" words: the model already heard the letters a little off, so only a held letter
+        //  or a ي/و glide may be set aside, never an added hamza: فَٱرْجِعِ heard "فَءَرجَعُ" is not judged)
         if (issue) { res.status = "wrong"; res.issue = issue; }
       }
       wordsJudged.push({ k: o.word, o, res });
