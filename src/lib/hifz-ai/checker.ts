@@ -36,6 +36,9 @@ export interface CheckResult {
   reachedIndex: number; // how far into the reference the recitation has got
   startIndex: number; // where the recitation began (an ayah start); words before it stay "pending"
   startKey: string; // key of the first word the reciter started from
+  /** Said before the passage (not part of it): "saying" while it is being said, "said" once over.
+   *  For highlighting the isti'adha / basmala shown above a surah. */
+  openers?: { istiadha?: "saying" | "said"; basmala?: "saying" | "said" };
 }
 
 interface RefWord {

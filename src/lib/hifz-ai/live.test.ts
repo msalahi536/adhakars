@@ -160,6 +160,18 @@ describe("reported cases (Al-Fatiha, Al-A'la, going back)", () => {
     expect(flags(fin)).toEqual([]);
     expect(fin.words.slice(0, 10).every((x) => x.status === "correct")).toBe(true);
   });
+  test("the basmala before a surah is reported (saying -> said) for highlighting", () => {
+    const { ref, w } = surah(112, 1, 4);
+    const { ups, fin } = live(ref, AUDHU + BASMALA + w("112:1:1", 4) + w("112:2:1", 2));
+    expect(ups.some((u) => u.openers?.basmala === "saying")).toBe(true);
+    expect(ups.some((u) => u.openers?.istiadha === "said")).toBe(true);
+    expect(fin.openers?.basmala).toBe("said");
+    expect(flags(fin)).toEqual([]);
+  });
+  test("no basmala said: nothing reported", () => {
+    const { ref, w } = surah(112, 1, 4);
+    expect(live(ref, w("112:1:1", 4)).fin.openers?.basmala).toBeUndefined();
+  });
   test("Al-Fatiha's own basmala is recited, not cut", () => {
     const { ref, w } = surah(1, 1, 7);
     const { fin } = live(ref, w("1:1:1", 4) + w("1:2:1", 4));

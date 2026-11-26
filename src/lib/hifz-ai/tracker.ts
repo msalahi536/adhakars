@@ -112,6 +112,7 @@ const OPENERS = [
   "ءَعُۥۥذُبِللَااهِمِنَششَيطَاانِررَجِۦۦم", // a'udhu billahi mina sh-shaytani r-rajim
   "بِسمِللَااهِررَحمَاانِررَحِۦۦم", // bismillahi r-rahmani r-rahim
 ].map((o) => skeleton(o));
+const OPENER_NAME: ("istiadha" | "basmala")[] = ["istiadha", "istiadha", "basmala"];
 const FATIHA_END = skeleton("ضضَاالِۦۦن"); // ...wa la d-dallin
 const AMIN = skeleton("ءَاامِۦۦن");
 
@@ -174,6 +175,8 @@ export class RecitationTracker {
   private startWord = -1; // where the recitation began
   private dropped: [number, number][] = []; // raw heard index ranges cut out (isti'adha, basmala, amin)
   private openers: string[][];
+  private openerNames: ("istiadha" | "basmala")[];
+  private opened: { istiadha?: "saying" | "said"; basmala?: "saying" | "said" } = {};
   private amin: boolean;
   private aminZone: [number, number]; // ref chars of Al-Fatiha's last ayah
 
@@ -191,7 +194,9 @@ export class RecitationTracker {
     });
     const refSk = skeleton(reference.norm);
     // a passage that itself contains the basmala (Al-Fatiha 1:1, An-Naml 27:30) keeps it as text
-    this.openers = OPENERS.filter((o) => fitIn(o, refSk)[0] > 1);
+    const keep = OPENERS.map((o) => fitIn(o, refSk)[0] > 1);
+    this.openers = OPENERS.filter((_, k) => keep[k]);
+    this.openerNames = OPENER_NAME.filter((_, k) => keep[k]);
     this.amin = reference.words.some((w) => w.key === "1:7:9");
     // "amin" is only said right after Al-Fatiha: elsewhere ءَامَنُوا (2:9, 2:13…) sounds the same
     const f7 = reference.words.findIndex((w) => w.key.startsWith("1:7:"));
@@ -208,11 +213,15 @@ export class RecitationTracker {
     }
     const raw = (k: number) => (k < idx.length ? idx[k] : (idx[idx.length - 1] ?? 0) + 1);
     const endRaw = (e: number) => (e < at.length ? raw(at[e]) : raw(rec.length));
-    for (const o of this.openers) {
+    for (const [k, o] of this.openers.entries()) {
       if (sk.length < o.length * 0.7) continue;
       const [cost, b, e] = fitIn(o, sk);
       // cut once it is over (its last letter arrives a moment late: wait for the next sound)
-      if (e > b && cost <= Math.floor(o.length * 0.25) && (e < sk.length || final)) { this.dropped.push([raw(at[b]), endRaw(e)]); return true; }
+      if (e > b && cost <= Math.floor(o.length * 0.25) && (e < sk.length || final)) {
+        this.dropped.push([raw(at[b]), endRaw(e)]);
+        this.opened[this.openerNames[k]] = "said";
+        return true;
+      }
     }
     if (this.amin && this.pos >= this.aminZone[0] && this.pos <= this.aminZone[1] && sk.length >= FATIHA_END.length + 2) {
       const pat = [...FATIHA_END, ...AMIN];
@@ -224,7 +233,14 @@ export class RecitationTracker {
     }
     // nothing placed yet and the sounds so far are the start of an opener: wait for it to finish
     if (!this.started && sk.length >= 2) {
-      for (const o of this.openers) if (sk.length <= o.length + 1 && prefixDist(sk, o) <= Math.max(1, Math.floor(Math.min(sk.length, o.length) * 0.25))) { this.waiting = true; return false; }
+      for (const [k, o] of this.openers.entries()) {
+        if (sk.length <= o.length + 1 && prefixDist(sk, o) <= Math.max(1, Math.floor(Math.min(sk.length, o.length) * 0.25))) {
+          const name = this.openerNames[k];
+          if (this.opened[name] !== "said") this.opened[name] = "saying";
+          this.waiting = true;
+          return false;
+        }
+      }
     }
     this.waiting = false;
     return false;
@@ -816,6 +832,9 @@ export class RecitationTracker {
       if (final && this.finishMode === "all" && anything && w.s >= startIndex) return { key: w.key, text: w.text, status: "skipped", expected, heard: "" };
       return { key: w.key, text: w.text, status: "pending", expected, heard: "" };
     });
-    return { words: result, extras: [...this.extras], reachedIndex: this.reached, startIndex, startKey: words[Math.max(0, this.startWord)]?.key ?? "" };
+    // an opener that was being said but never finished (the reciter went straight on) is not "saying" any more
+    const openers = { ...this.opened };
+    if (!this.waiting) for (const k of Object.keys(openers) as (keyof typeof openers)[]) if (openers[k] === "saying") delete openers[k];
+    return { words: result, extras: [...this.extras], reachedIndex: this.reached, startIndex, startKey: words[Math.max(0, this.startWord)]?.key ?? "", openers };
   }
 }
