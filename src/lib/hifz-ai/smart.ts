@@ -110,6 +110,25 @@ export function detectElsewhere(ix: QuranIndex, result: CheckResult & { heard?: 
   return null;
 }
 
+/** Correct words on this page before its mistakes are shown. */
+export const PLACED_AFTER = 3;
+
+/**
+ * Until the recitation has matched the page (PLACED_AFTER correct words), its mistakes are held
+ * back: a reciter who is somewhere else (a qari on the masjid speaker reciting 18:79 while the
+ * page shows 18:9) produced 8 "wrong" words in 7 seconds before the jump to the right place, and
+ * they stayed on the page. Real mistakes in the first words still show, a moment later, once the
+ * page is confirmed; a page that never matches shows none (those words stay pending).
+ */
+export function withheldUntilPlaced(r: CheckResult): CheckResult {
+  const held = (s: string) => s === "wrong" || s === "skipped";
+  return {
+    ...r,
+    words: r.words.map((w) => (held(w.status) ? { ...w, status: "pending" as const, issue: undefined } : w)),
+    extras: [],
+  };
+}
+
 /** startListening + elsewhere detection. onElsewhere fires once per new place. */
 export async function startSmartRecite(opts: {
   passages: Passage[];
@@ -125,6 +144,7 @@ export async function startSmartRecite(opts: {
   const ix = await loadQuranIndex();
   let reported = "";
   let seen: Elsewhere | null = null; // must be found on two updates in a row (same surah, within an ayah)
+  let placed = false; // the recitation has matched this page (see withheldUntilPlaced)
   const [first] = opts.passages;
   return startListening({
     sura: first.sura,
@@ -138,7 +158,8 @@ export async function startSmartRecite(opts: {
     onProgress: opts.onProgress,
     onError: opts.onError,
     onUpdate: (r) => {
-      opts.onUpdate(r);
+      placed ||= r.words.filter((w) => w.status === "correct").length >= PLACED_AFTER;
+      opts.onUpdate(placed ? r : withheldUntilPlaced(r));
       const found = detectElsewhere(ix, r as CheckResult & { heard?: string }, opts.passages);
       const agrees = !!found && !!seen && found.sura === seen.sura && Math.abs(found.aya - seen.aya) <= 1;
       seen = found;
