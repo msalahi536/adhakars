@@ -1,7 +1,7 @@
 import modelAsset from "./model.onnx.asset.json";
 // A new name whenever the model or its answer files change: phones then fetch the new set once,
 // instead of mixing a new model with old cached files.
-export const MODEL_CACHE = "hifz-ai-model-own-2";
+export const MODEL_CACHE = "hifz-ai-model-own-3";
 let cleaned = false;
 /** Delete caches left by earlier models (the old one was ~73 MB). Runs once per app start. */
 async function dropOldCaches() {
