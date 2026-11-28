@@ -44,3 +44,22 @@ describe("snap to where the reciter is", () => {
     }
   });
 });
+
+import { withheldUntilPlaced } from "./smart";
+test("mistakes are held back until the page is confirmed (a reciter somewhere else)", () => {
+  const r = {
+    words: [
+      { key: "18:9:1", text: "", status: "wrong", expected: "", heard: "" },
+      { key: "18:9:2", text: "", status: "correct", expected: "", heard: "" },
+      { key: "18:9:3", text: "", status: "skipped", expected: "", heard: "" },
+      { key: "18:9:4", text: "", status: "wrong", expected: "", heard: "", issue: "harakah" },
+    ],
+    extras: [{ kind: "extra" }],
+    reachedIndex: 3, startIndex: 0, startKey: "18:9:1",
+  } as any;
+  const w = withheldUntilPlaced(r);
+  expect(w.words.map((x: any) => x.status)).toEqual(["pending", "correct", "pending", "pending"]);
+  expect(w.words[3].issue).toBeUndefined();
+  expect(w.extras).toEqual([]);
+  expect(r.words[0].status).toBe("wrong"); // the original is untouched (elsewhere detection reads it)
+});
