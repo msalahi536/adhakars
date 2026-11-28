@@ -226,6 +226,15 @@ describe("whole-Quran sweep findings", () => {
     fat[6][2] = fat[6][2].replace(/َ$/, "");
     expect(flags(run(ref, fat.map((a) => a.join("")).join(" "), { strictHarakat: true }))).toEqual([]);
   });
+  test("strict harakat: a word ending in a qalqalah letter is judged too (لَمْ يَلِدْ said يَلَد, bounce heard or not)", () => {
+    const { ref, ph } = ayahs(112, 1, 4);
+    for (const said of ["يَلَد", "يَلَدڇ"]) {
+      const ik = [1, 2, 3, 4].map(ph);
+      ik[2][1] = said;
+      expect(flags(run(ref, ik.map((a) => a.join("")).join(" "), { strictHarakat: true }))).toEqual(["112:3:2(harakah)"]);
+    }
+    expect(flags(run(ref, [1, 2, 3, 4].map((a) => ph(a).join("")).join(" "), { strictHarakat: true }))).toEqual([]);
+  });
   test("strict harakat: a correct recitation stays clean", () => {
     const { ref, ph } = ayahs(1, 1, 7);
     expect(flags(run(ref, [1, 2, 3, 4, 5, 6, 7].map((a) => ph(a).join("")).join(" "), { strictHarakat: true }))).toEqual([]);

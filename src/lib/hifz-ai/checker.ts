@@ -105,7 +105,9 @@ function nuclei(chars: { c: string; p: number }[]): { c: string; v: string; len:
   const out: { c: string; v: string; len: number; p: number }[] = [];
   for (let i = 0; i < chars.length; i++) {
     const c = chars[i].c;
-    if (isVowelCh(c) || c === "ں") continue;
+    // ں (nasal) and ڇ (the qalqalah bounce) are no letters of their own: a word ending in a bounced
+    // letter (يَلِدْ = "يَلِدڇ") is judged on its letters and vowels, heard with or without the bounce
+    if (isVowelCh(c) || c === "ں" || c === "ڇ") continue;
     let j = i + 1, v = "", len = 0, p = chars[i].p, pv = 1;
     while (j < chars.length && isVowelCh(chars[j].c)) { const x = chars[j].c; v ||= HARAKAH.has(x) ? x : LONG_OF[x] ?? ""; len++; p = Math.min(p, chars[j].p); pv = Math.min(pv, chars[j].p); j++; }
     const last = out[out.length - 1];
